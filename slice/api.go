@@ -7,7 +7,7 @@ import (
 //Of slice constructor
 func Of[T any](values ...T) []T { return values }
 
-//Map Checks items by Predicate filters, applies Converter and accumulate to result slice
+//Map applies Converter to items and accumulate to result slice
 func Map[From, To any](items []From, by Converter[From, To], filters ...Predicate[From]) []To {
 	result := make([]To, 0)
 	for _, v := range items {
@@ -18,23 +18,29 @@ func Map[From, To any](items []From, by Converter[From, To], filters ...Predicat
 	return result
 }
 
-//Flatt extracts embedded slices of items by Flatter, checks extracted slice values by Predicate filters
-//and accumulate to result slice
-func Flatt[From, To any](items []From, by Flatter[From, To], filters ...Predicate[To]) []To {
+//Flatt extracts embedded slices of items by Flatter and accumulate to result slice
+func Flatt[From, To any](items []From, by Flatter[From, To], filters ...Predicate[From]) []To {
 	out := make([]To, 0)
 	for _, v := range items {
-		flatted := by(v)
-		if len(filters) == 0 {
-			out = append(out, flatted...)
-		} else {
-			for _, f := range flatted {
-				if IsFit(f, filters...) {
-					out = append(out, f)
-				}
-			}
+		if IsFit(v, filters...) {
+			out = append(out, by(v)...)
 		}
 	}
 	return out
+}
+
+//Filter tests items and adds that fit to result
+func Filter[T any](items []T, filters ...Predicate[T]) []T {
+	if len(filters) == 0 {
+		return items
+	}
+	result := make([]T, 0)
+	for _, v := range items {
+		if IsFit[T](v, filters...) {
+			result = append(result, v)
+		}
+	}
+	return result
 }
 
 //AsIs helper for Map, Flatt
@@ -84,7 +90,7 @@ func NotNil[T any](t T) bool {
 type Converter[From, To any] func(From) To
 
 //Flatter extracts slice of To
-type Flatter[From, To any] func(From) []To
+type Flatter[From, To any] Converter[From, []To]
 
 //Predicate tests value (converts to true or false)
 type Predicate[T any] Converter[T, bool]
