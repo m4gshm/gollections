@@ -9,6 +9,14 @@ func Of[T any](values ...T) []T { return values }
 
 //Map applies Converter to items and accumulate to result slice
 func Map[From, To any](items []From, by Converter[From, To], filters ...Predicate[From]) []To {
+	if len(filters) == 0 {
+		result := make([]To, 0)
+		for _, v := range items {
+			result = append(result, by(v))
+		}
+		return result
+	}
+
 	result := make([]To, 0)
 	for _, v := range items {
 		if IsFit[From](v, filters...) {
@@ -20,13 +28,20 @@ func Map[From, To any](items []From, by Converter[From, To], filters ...Predicat
 
 //Flatt extracts embedded slices of items by Flatter and accumulate to result slice
 func Flatt[From, To any](items []From, by Flatter[From, To], filters ...Predicate[From]) []To {
-	out := make([]To, 0)
+	if len(filters) == 0 {
+		result := make([]To, 0)
+		for _, v := range items {
+			result = append(result, by(v)...)
+		}
+		return result
+	}
+	result := make([]To, 0)
 	for _, v := range items {
 		if IsFit(v, filters...) {
-			out = append(out, by(v)...)
+			result = append(result, by(v)...)
 		}
 	}
-	return out
+	return result
 }
 
 //Filter tests items and adds that fit to result
