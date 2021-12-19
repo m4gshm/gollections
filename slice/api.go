@@ -18,7 +18,7 @@ func Map[From, To any](items []From, by Converter[From, To], filters ...Predicat
 	return result
 }
 
-//Flatt Extracts embedded slices of items by Flatter, checks extracted slice values by Predicate filters
+//Flatt extracts embedded slices of items by Flatter, checks extracted slice values by Predicate filters
 //and accumulate to result slice
 func Flatt[From, To any](items []From, by Flatter[From, To], filters ...Predicate[To]) []To {
 	out := make([]To, 0)
