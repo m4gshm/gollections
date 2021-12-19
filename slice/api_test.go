@@ -33,7 +33,7 @@ func Test_FlattSlices(t *testing.T) {
 	var (
 		odds           = func(v int) bool { return v%2 != 0 }
 		multiDimension = [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
-		oneDimension   = Filter(Flatt(Flatt(multiDimension, AsIs[[][]int]), AsIs[[]int], NotNil[[]int]), odds)
+		oneDimension   = Filter(Flatt(Flatt(multiDimension, To[[][]int]), To[[]int], NotNil[[]int]), odds)
 	)
 
 	assert.Equal(t, Of(1, 3, 5, 7), oneDimension)

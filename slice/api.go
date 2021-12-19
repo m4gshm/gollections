@@ -43,6 +43,9 @@ func Filter[T any](items []T, filters ...Predicate[T]) []T {
 	return result
 }
 
+//To helper for Map, Flatt
+func To[T any](value T) T { return value }
+
 //AsIs helper for Map, Flatt
 func AsIs[T any](value T) T { return value }
 
