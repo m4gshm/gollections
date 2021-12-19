@@ -4,14 +4,48 @@ import (
 	"reflect"
 )
 
+//Of slice constructor
 func Of[T any](values ...T) []T { return values }
 
+//Map Checks items by Predicate filters, applies Converter and accumulate to result slice
+func Map[From, To any](items []From, by Converter[From, To], filters ...Predicate[From]) []To {
+	result := make([]To, 0)
+	for _, v := range items {
+		if IsFit[From](v, filters...) {
+			result = append(result, by(v))
+		}
+	}
+	return result
+}
+
+//Flatt Extracts embedded slices of items by Flatter, checks extracted slice values by Predicate filters
+//and accumulate to result slice
+func Flatt[From, To any](items []From, by Flatter[From, To], filters ...Predicate[To]) []To {
+	out := make([]To, 0)
+	for _, v := range items {
+		flatted := by(v)
+		if len(filters) == 0 {
+			out = append(out, flatted...)
+		} else {
+			for _, f := range flatted {
+				if IsFit(f, filters...) {
+					out = append(out, f)
+				}
+			}
+		}
+	}
+	return out
+}
+
+//AsIs helper for Map, Flatt
 func AsIs[T any](value T) T { return value }
 
+//And apply two converters in order
 func And[I, O, N any](first Converter[I, O], second Converter[O, N]) Converter[I, N] {
 	return func(i I) N { return second(first(i)) }
 }
 
+//Or applies first Converter, applies second Converter if the first returns zero
 func Or[I, O any](first Converter[I, O], second Converter[I, O]) Converter[I, O] {
 	return func(i I) O {
 		c := first(i)
@@ -20,34 +54,6 @@ func Or[I, O any](first Converter[I, O], second Converter[I, O]) Converter[I, O]
 		}
 		return c
 	}
-}
-
-func Map[From, To any](values []From, by Converter[From, To], filters ...Predicate[From]) []To {
-	out := make([]To, 0)
-	for _, v := range values {
-		if IsFit(v, filters...) {
-			c := by(v)
-			out = append(out, c)
-		}
-	}
-	return out
-}
-
-func Flatt[From, To any](values []From, by Flatter[From, To], filters ...Predicate[To]) []To {
-	out := make([]To, 0)
-	for _, v := range values {
-		flatted := by(v)
-		if len(filters) == 0 {
-			out = append(out, flatted...)
-		} else {
-			for _, ss := range flatted {
-				if IsFit(ss, filters...) {
-					out = append(out, ss)
-				}
-			}
-		}
-	}
-	return out
 }
 
 //IsFit apply predicates
@@ -74,6 +80,11 @@ func NotNil[T any](t T) bool {
 	return !Nil(t)
 }
 
-type Converter[From, To any] func(v From) To
-type Flatter[From, To any] func(v From) []To
-type Predicate[T any] func(v T) bool
+//Converter convert From -> To
+type Converter[From, To any] func(From) To
+
+//Flatter extracts slice of To
+type Flatter[From, To any] func(From) []To
+
+//Predicate tests value (converts to true or false)
+type Predicate[T any] Converter[T, bool]

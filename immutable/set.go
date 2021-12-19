@@ -32,7 +32,7 @@ func (s Set[T]) String() string {
 	return "[" + str + "]"
 }
 
-func (s Set) Len() int {
+func (s Set[T]) Len() int {
 	return len(s)
 }
 
