@@ -1,40 +1,45 @@
 package slice
 
-func Of[T any](values ...T) []T {
-	return values
-}
+import (
+	"reflect"
+)
 
-func Convert[From, To any](values []From, by Converter[From, To]) ([]To, error) {
-	out := make([]To, len(values))
-	for i, v := range values {
-		o, err := by(v)
-		if err != nil {
-			return nil, err
-		}
-		out[i] = o
-	}
-	return out, nil
-}
+func Of[T any](values ...T) []T { return values }
 
-type Converter[From, To any] func(v From) (To, error)
+func AsIs[T any](value T) T { return value }
 
 func And[I, O, N any](f Converter[I, O], s Converter[O, N]) Converter[I, N] {
-	return func(i I) (N, error) {
-		c, err := f(i)
-		if err != nil {
-			var n N
-			return n, err
-		}
-		return s(c)
+	return func(i I) N {
+		return s(f(i))
 	}
 }
 
 func Or[I, O any](f Converter[I, O], s Converter[I, O]) Converter[I, O] {
-	return func(i I) (O, error) {
-		if c, err := f(i); err != nil {
+	return func(i I) O {
+		c := f(i)
+		if reflect.ValueOf(c).IsZero() {
 			return s(i)
-		} else {
-			return c, nil
 		}
+		return c
 	}
 }
+
+func Convert[From, To any](values []From, by Converter[From, To]) []To {
+	out := make([]To, len(values))
+	for i, v := range values {
+		o := by(v)
+		out[i] = o
+	}
+	return out
+}
+
+func Spread[I, O any](values []I, by Spreader[I, O]) []O {
+	result := make([]O, 0)
+	for _, c := range values {
+		result = append(result, by(c)...)
+	}
+	return result
+}
+
+type Converter[From, To any] func(v From) To
+type Spreader[From, To any] func(v From) []To
