@@ -1,9 +1,5 @@
 package iterator
 
-type Iterable[T any] interface {
-	It() Iterable[T]
-}
-
 type Iterator[T any] interface {
 	Next() bool
 	Get() T

@@ -2,6 +2,8 @@ package slice
 
 import (
 	"reflect"
+
+	"github.com/m4gshm/container/check"
 )
 
 //Of slice constructor
@@ -52,6 +54,17 @@ func Filter[T any](items []T, filters ...Predicate[T]) []T {
 	result := make([]T, 0)
 	for _, v := range items {
 		if IsFit(v, filters...) {
+			result = append(result, v)
+		}
+	}
+	return result
+}
+
+//NotNil filter nullable values
+func NotNil[T any](values []T) []T {
+	result := make([]T, 0)
+	for _, v := range values {
+		if check.NotNil(v) {
 			result = append(result, v)
 		}
 	}
