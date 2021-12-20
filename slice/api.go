@@ -89,21 +89,6 @@ func IsFit[T any](v T, predicates ...Predicate[T]) bool {
 	return fit
 }
 
-//Nil Predicate
-func Nil[T any](t T) bool {
-	v := reflect.ValueOf(t)
-	switch v.Kind() {
-	case reflect.Chan, reflect.Func, reflect.Interface, reflect.Map, reflect.Pointer, reflect.Slice, reflect.UnsafePointer:
-		return v.IsNil()
-	}
-	return false
-}
-
-//NotNil Predicate
-func NotNil[T any](t T) bool {
-	return !Nil(t)
-}
-
 //Converter convert From -> To
 type Converter[From, To any] func(From) To
 

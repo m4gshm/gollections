@@ -5,6 +5,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/m4gshm/container/check"
 )
 
 func Test_MapAndFilter(t *testing.T) {
@@ -33,7 +35,7 @@ func Test_FlattSlices(t *testing.T) {
 	var (
 		odds           = func(v int) bool { return v%2 != 0 }
 		multiDimension = [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
-		oneDimension   = Filter(Flatt(Flatt(multiDimension, To[[][]int]), To[[]int], NotNil[[]int]), odds)
+		oneDimension   = Filter(Flatt(Flatt(multiDimension, To[[][]int]), To[[]int], check.NotNil[[]int]), odds)
 	)
 
 	assert.Equal(t, Of(1, 3, 5, 7), oneDimension)
@@ -69,8 +71,8 @@ func Test_FlattDeepStructure(t *testing.T) {
 	var (
 		getName       = func(a *Attributes) string { return a.name }
 		getAttributes = func(item *Item) []*Attributes { return item.attributes }
-		noNilItem     = NotNil[*Item]
-		noNilAttr     = NotNil[*Attributes]
+		noNilItem     = check.NotNil[*Item]
+		noNilAttr     = check.NotNil[*Attributes]
 
 		items = []*Item{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil}
 		names = Map(Flatt(items, getAttributes, noNilItem), getName, noNilAttr)
