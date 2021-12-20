@@ -1,13 +1,10 @@
 package iterator
 
 import (
-	"runtime"
 	"testing"
 )
 
 func Benchmark_MapIterator(b *testing.B) {
-	runtime.GOMAXPROCS(1)
-
 	values := map[int]int{}
 	for i := 0; i < 100000; i++ {
 		values[i] = i
@@ -25,8 +22,6 @@ func Benchmark_MapIterator(b *testing.B) {
 }
 
 func Benchmark_EmbeddedMapFor(b *testing.B) {
-	runtime.GOMAXPROCS(1)
-
 	values := map[int]int{}
 	for i := 0; i < 100000; i++ {
 		values[i] = i

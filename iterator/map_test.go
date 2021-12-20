@@ -2,15 +2,12 @@ package iterator
 
 import (
 	"fmt"
-	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func Test_MapIterator(t *testing.T) {
-	runtime.GOMAXPROCS(1)
-
 	type s struct {
 		name string
 	}

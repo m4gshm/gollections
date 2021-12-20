@@ -19,7 +19,7 @@ func Map[From, To any](items []From, by Converter[From, To], filters ...Predicat
 
 	result := make([]To, 0)
 	for _, v := range items {
-		if IsFit[From](v, filters...) {
+		if IsFit(v, filters...) {
 			result = append(result, by(v))
 		}
 	}
@@ -51,7 +51,7 @@ func Filter[T any](items []T, filters ...Predicate[T]) []T {
 	}
 	result := make([]T, 0)
 	for _, v := range items {
-		if IsFit[T](v, filters...) {
+		if IsFit(v, filters...) {
 			result = append(result, v)
 		}
 	}
