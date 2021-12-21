@@ -4,16 +4,17 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/m4gshm/container/conv"
 	"github.com/stretchr/testify/assert"
 )
 
 func Test_MapAndFilter(t *testing.T) {
 	var (
-		toString Converter[int, string]    = func(i int) string { return fmt.Sprintf("%d", i) }
-		addTail  Converter[string, string] = func(s string) string { return s + "_tail" }
+		toString conv.Converter[int, string]    = func(i int) string { return fmt.Sprintf("%d", i) }
+		addTail  conv.Converter[string, string] = func(s string) string { return s + "_tail" }
 
 		items     = Of(1, 2, 3, 4, 5)
-		converted = Map(items, And(toString, addTail), func(v int) bool { return v%2 == 0 })
+		converted = Map(items, conv.And(toString, addTail), func(v int) bool { return v%2 == 0 })
 	)
 	assert.Equal(t, Of("2_tail", "4_tail"), converted)
 
@@ -21,7 +22,7 @@ func Test_MapAndFilter(t *testing.T) {
 	converted = make([]string, 0)
 	for _, i := range items {
 		if i%2 == 0 {
-			converted = append(converted, And(toString, addTail)(i))
+			converted = append(converted, conv.And(toString, addTail)(i))
 		}
 	}
 
@@ -33,7 +34,7 @@ func Test_FlattSlices(t *testing.T) {
 	var (
 		odds           = func(v int) bool { return v%2 != 0 }
 		multiDimension = [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
-		oneDimension   = Filter(Flatt(Flatt(NotNil(multiDimension), To[[][]int]), To[[]int]), odds)
+		oneDimension   = Filter(Flatt(Flatt(NotNil(multiDimension), conv.To[[][]int]), conv.To[[]int]), odds)
 	)
 
 	assert.Equal(t, Of(1, 3, 5, 7), oneDimension)

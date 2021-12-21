@@ -1,14 +1,14 @@
 package iterator
 
-type Slice[T any] struct {
+type SliceIter[T any] struct {
 	values  []T
 	current T
 	i       int
 }
 
-var _ Iterator[interface{}] = (*Slice[interface{}])(nil)
+var _ Iterator[interface{}] = (*SliceIter[interface{}])(nil)
 
-func (s *Slice[T]) Next() bool {
+func (s *SliceIter[T]) Next() bool {
 	if s.i < len(s.values) {
 		s.current = s.values[s.i]
 		s.i++
@@ -17,6 +17,6 @@ func (s *Slice[T]) Next() bool {
 	return false
 }
 
-func (s *Slice[T]) Get() T {
+func (s *SliceIter[T]) Get() T {
 	return s.current
 }

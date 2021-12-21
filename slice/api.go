@@ -1,112 +1,51 @@
 package slice
 
 import (
-	"reflect"
-
 	"github.com/m4gshm/container/check"
+	"github.com/m4gshm/container/conv"
 )
 
 //Of slice constructor
 func Of[T any](values ...T) []T { return values }
 
-//Map applies Converter to items and accumulate to result slice
-func Map[From, To any](items []From, by Converter[From, To], filters ...Predicate[From]) []To {
+func ForEach[T any](items []T, apply func(T), filters ...check.Predicate[T]) {
 	if len(filters) == 0 {
-		result := make([]To, 0)
 		for _, v := range items {
-			result = append(result, by(v))
+			apply(v)
 		}
-		return result
+		return
 	}
-
-	result := make([]To, 0)
 	for _, v := range items {
-		if IsFit(v, filters...) {
-			result = append(result, by(v))
+		if check.IsFit(v, filters...) {
+			apply(v)
 		}
 	}
+}
+
+//Map applies Converter to items and accumulate to result slice
+func Map[From, To any](items []From, by conv.Converter[From, To], filters ...check.Predicate[From]) []To {
+	result := make([]To, 0)
+	ForEach(items, func(v From) { result = append(result, by(v)) }, filters...)
 	return result
 }
 
 //Flatt extracts embedded slices of items by Flatter and accumulate to result slice
-func Flatt[From, To any](items []From, by Flatter[From, To], filters ...Predicate[From]) []To {
-	if len(filters) == 0 {
-		result := make([]To, 0)
-		for _, v := range items {
-			result = append(result, by(v)...)
-		}
-		return result
-	}
+func Flatt[From, To any](items []From, by conv.Flatter[From, To], filters ...check.Predicate[From]) []To {
 	result := make([]To, 0)
-	for _, v := range items {
-		if IsFit(v, filters...) {
-			result = append(result, by(v)...)
-		}
-	}
+	ForEach(items, func(v From) { result = append(result, by(v)...) }, filters...)
 	return result
 }
 
 //Filter tests items and adds that fit to result
-func Filter[T any](items []T, filters ...Predicate[T]) []T {
-	if len(filters) == 0 {
-		return items
-	}
+func Filter[T any](items []T, filters ...check.Predicate[T]) []T {
 	result := make([]T, 0)
-	for _, v := range items {
-		if IsFit(v, filters...) {
-			result = append(result, v)
-		}
-	}
+	ForEach(items, func(v T) { result = append(result, v) }, filters...)
 	return result
 }
 
 //NotNil filter nullable values
-func NotNil[T any](values []T) []T {
+func NotNil[T any](items []T) []T {
 	result := make([]T, 0)
-	for _, v := range values {
-		if check.NotNil(v) {
-			result = append(result, v)
-		}
-	}
+	ForEach(items, func(v T) { result = append(result, v) }, check.NotNil[T])
 	return result
 }
-
-//To helper for Map, Flatt
-func To[T any](value T) T { return value }
-
-//AsIs helper for Map, Flatt
-func AsIs[T any](value T) T { return value }
-
-//And apply two converters in order
-func And[I, O, N any](first Converter[I, O], second Converter[O, N]) Converter[I, N] {
-	return func(i I) N { return second(first(i)) }
-}
-
-//Or applies first Converter, applies second Converter if the first returns zero
-func Or[I, O any](first Converter[I, O], second Converter[I, O]) Converter[I, O] {
-	return func(i I) O {
-		c := first(i)
-		if reflect.ValueOf(c).IsZero() {
-			return second(i)
-		}
-		return c
-	}
-}
-
-//IsFit apply predicates
-func IsFit[T any](v T, predicates ...Predicate[T]) bool {
-	fit := true
-	for i := 0; fit && i < len(predicates); i++ {
-		fit = predicates[i](v)
-	}
-	return fit
-}
-
-//Converter convert From -> To
-type Converter[From, To any] func(From) To
-
-//Flatter extracts slice of To
-type Flatter[From, To any] Converter[From, []To]
-
-//Predicate tests value (converts to true or false)
-type Predicate[T any] Converter[T, bool]
