@@ -10,8 +10,8 @@ import (
 
 func Test_MapAndFilter(t *testing.T) {
 	var (
-		toString conv.Converter[int, string]    = func(i int) string { return fmt.Sprintf("%d", i) }
-		addTail  conv.Converter[string, string] = func(s string) string { return s + "_tail" }
+		toString = func(i int) string { return fmt.Sprintf("%d", i) }
+		addTail  = func(s string) string { return s + "_tail" }
 
 		items     = Of(1, 2, 3, 4, 5)
 		converted = Map(items, conv.And(toString, addTail), func(v int) bool { return v%2 == 0 })
