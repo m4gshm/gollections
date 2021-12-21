@@ -4,12 +4,13 @@ import (
 	"reflect"
 )
 
-func newMap[K comparable, V any](values map[K]V) *Map[K, V] {
-	return &Map[K, V]{iter: reflect.ValueOf(values).MapRange()}
+func newMap[K comparable, V any](items map[K]V) *Map[K, V] {
+	return &Map[K, V]{items: items, iter: reflect.ValueOf(items).MapRange()}
 }
 
 type Map[K comparable, V any] struct {
-	iter *reflect.MapIter
+	items map[K]V
+	iter  *reflect.MapIter
 }
 
 type KV[K comparable, V any] struct {
@@ -32,8 +33,6 @@ func (s *Map[K, V]) Next() bool {
 }
 
 func (s *Map[K, V]) Get() *KV[K, V] {
-	return &KV[K, V]{
-		key:   s.iter.Key().Interface().(K),
-		value: s.iter.Value().Interface().(V),
-	}
+	key := s.iter.Key().Interface().(K)
+	return &KV[K, V]{key: key, value: s.items[key]}
 }
