@@ -40,7 +40,7 @@ func Map[From, To any](items []From, by conv.Converter[From, To], filters ...che
 }
 
 //Flatt extracts embedded slices of items by Flatter and accumulate to result slice
-func Flatt[From, To any](items []From, by conv.Flatter[From, To], filters ...check.Predicate[From]) []To {
+func Flatt[From, To any](items []From, by Flatter[From, To], filters ...check.Predicate[From]) []To {
 	result := make([]To, 0)
 	if len(filters) == 0 {
 		for _, v := range items {
@@ -83,3 +83,7 @@ func NotNil[T any](items []T) []T {
 	}
 	return result
 }
+
+
+//Flatter extracts slice of To
+type Flatter[From, To any] conv.Converter[From, []To]

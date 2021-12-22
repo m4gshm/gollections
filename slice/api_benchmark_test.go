@@ -10,7 +10,7 @@ import (
 
 var amount = 100_000
 
-func Benchmark_SliceForEach(b *testing.B) {
+func Benchmark_Slice_ForEach(b *testing.B) {
 	values := make([]int, amount)
 	for i := 0; i < amount; i++ {
 		values[i] = i
@@ -24,7 +24,7 @@ func Benchmark_SliceForEach(b *testing.B) {
 	b.StopTimer()
 }
 
-func Benchmark_EmbeddedSliceForAppendByFunc(b *testing.B) {
+func Benchmark_Slice_EmbeddedForAppendByFunc(b *testing.B) {
 	values := make([]int, amount)
 	for i := 0; i < amount; i++ {
 		values[i] = i
@@ -40,7 +40,7 @@ func Benchmark_EmbeddedSliceForAppendByFunc(b *testing.B) {
 	b.StopTimer()
 }
 
-func Benchmark_EmbeddedSliceForByIndexAppendByFunc(b *testing.B) {
+func Benchmark_Slice_EmbeddedForByIndexAppendByFunc(b *testing.B) {
 	values := make([]int, amount)
 	for i := 0; i < amount; i++ {
 		values[i] = i
@@ -57,7 +57,7 @@ func Benchmark_EmbeddedSliceForByIndexAppendByFunc(b *testing.B) {
 	b.StopTimer()
 }
 
-func Benchmark_EmbeddedSliceFor(b *testing.B) {
+func Benchmark_Slice_EmbeddedFor(b *testing.B) {
 	values := make([]int, amount)
 	for i := 0; i < amount; i++ {
 		values[i] = i
@@ -72,7 +72,7 @@ func Benchmark_EmbeddedSliceFor(b *testing.B) {
 	b.StopTimer()
 }
 
-func Benchmark_EmbeddedSliceForByIndex(b *testing.B) {
+func Benchmark_EmbeddedSlice_ForByIndex(b *testing.B) {
 	values := make([]int, amount)
 	for i := 0; i < amount; i++ {
 		values[i] = i
@@ -88,7 +88,7 @@ func Benchmark_EmbeddedSliceForByIndex(b *testing.B) {
 	b.StopTimer()
 }
 
-func Benchmark_MapAndFilter(b *testing.B) {
+func Benchmark_Slice_MapAndFilter(b *testing.B) {
 	var (
 		toString = func(i int) string { return fmt.Sprintf("%d", i) }
 		addTail  = func(s string) string { return s + "_tail" }
@@ -103,7 +103,7 @@ func Benchmark_MapAndFilter(b *testing.B) {
 	b.StopTimer()
 }
 
-func Benchmark_MapAndFilterPlainOld(b *testing.B) {
+func Benchmark_Slice_PlainOld_MapAndFilter(b *testing.B) {
 	var (
 		toString = func(i int) string { return fmt.Sprintf("%d", i) }
 		addTail  = func(s string) string { return s + "_tail" }
@@ -124,7 +124,7 @@ func Benchmark_MapAndFilterPlainOld(b *testing.B) {
 	b.StopTimer()
 }
 
-func Benchmark_FlattSlices(b *testing.B) {
+func Benchmark_Slice_Flatt(b *testing.B) {
 	var (
 		odds           = func(v int) bool { return v%2 != 0 }
 		multiDimension = [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
@@ -137,7 +137,7 @@ func Benchmark_FlattSlices(b *testing.B) {
 	b.StopTimer()
 }
 
-func Benchmark_FlattSlices2(b *testing.B) {
+func Benchmark_Slice_Flatt_2(b *testing.B) {
 	var (
 		odds           = func(v int) bool { return v%2 != 0 }
 		multiDimension = [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
@@ -150,7 +150,7 @@ func Benchmark_FlattSlices2(b *testing.B) {
 	b.StopTimer()
 }
 
-func Benchmark_FlattSlicesPlainOld(b *testing.B) {
+func Benchmark_Slice_PlainOld_Flatt(b *testing.B) {
 	var (
 		odds           = func(v int) bool { return v%2 != 0 }
 		multiDimension = [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
@@ -172,7 +172,7 @@ func Benchmark_FlattSlicesPlainOld(b *testing.B) {
 	b.StopTimer()
 }
 
-func Benchmark_MapFlattDeepStructure(b *testing.B) {
+func Benchmark_Slice_MapFlattDeepStructure(b *testing.B) {
 	type (
 		Attributes struct{ name string }
 		Item       struct{ attributes []*Attributes }
@@ -192,7 +192,7 @@ func Benchmark_MapFlattDeepStructure(b *testing.B) {
 	b.StopTimer()
 }
 
-func Benchmark_MapFlattDeepStructure2(b *testing.B) {
+func Benchmark_Slice_MapFlattDeep2(b *testing.B) {
 	type (
 		Attributes struct{ name string }
 		Item       struct{ attributes []*Attributes }
@@ -212,7 +212,7 @@ func Benchmark_MapFlattDeepStructure2(b *testing.B) {
 	b.StopTimer()
 }
 
-func Benchmark_MapFlattDeepStructurePlainOld(b *testing.B) {
+func Benchmark_Slice_PlainOld_MapFlattDeepStructure(b *testing.B) {
 	type (
 		Attributes struct{ name string }
 		Item       struct{ attributes []*Attributes }

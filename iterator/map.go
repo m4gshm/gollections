@@ -9,7 +9,6 @@ func NewMap[K comparable, V any](items map[K]V) *MapIter[K, V] {
 }
 
 type MapIter[K comparable, V any] struct {
-	Iterator[*KV[K, V]]
 	items map[K]V
 	iter  *reflect.MapIter
 }

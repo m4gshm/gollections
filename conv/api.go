@@ -5,9 +5,6 @@ import "reflect"
 //Converter convert From -> To
 type Converter[From, To any] func(From) To
 
-//Flatter extracts slice of To
-type Flatter[From, To any] Converter[From, []To]
-
 //To helper for Map, Flatt
 func To[T any](value T) T { return value }
 

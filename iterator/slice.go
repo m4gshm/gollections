@@ -6,7 +6,6 @@ func New[T any](elements ...T) *Slice[T] {
 
 type Slice[T any] struct {
 	Iterator[T]
-
 	elements []T
 	current  T
 	i        int
