@@ -3,18 +3,18 @@
 all: build test bench
 
 .PHONY: test
-test: gofmt
+test:
 	$(info #Running tests...)
 	go test ./...
 
 
 .PHONY: build
-build: gofmt
+build:
 	$(info #Building...)
 	go build -gcflags -m ./...
 
 .PHONY: bench
-bench: gofmt
+bench:
 	$(info #Running benchmarks...)
 	go test -gcflags -m -bench . ./...
 

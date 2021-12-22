@@ -49,7 +49,6 @@ func WrapMap[K comparable, V any](values map[K]V) Iterator[*KV[K, V]] {
 //Map applies 'by' Converter of 'elements' Iterator and accumulate to result Iterator
 func Map[From, To any](elements Iterator[From], by conv.Converter[From, To], filters ...check.Predicate[From]) Iterator[To] {
 	return &ConvertIter[From, To]{iter: elements, by: by, filters: filters}
-
 }
 
 //Flatt extracts embedded slices of elements by Flatter and accumulate to result Iterator

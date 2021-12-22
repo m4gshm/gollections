@@ -18,7 +18,7 @@ func (s *Slice[T]) Next() (T, bool) {
 	e := s.elements
 	i := s.i
 	if i < len(e) {
-		v = s.elements[i]
+		v = e[i]
 		s.current = v
 		s.i = i + 1
 		return v, true
