@@ -93,9 +93,8 @@ func Benchmark_Slice_MapAndFilter(b *testing.B) {
 		toString = func(i int) string { return fmt.Sprintf("%d", i) }
 		addTail  = func(s string) string { return s + "_tail" }
 		even     = func(v int) bool { return v%2 == 0 }
-		items    = Of(1, 2, 3, 4, 5)
 	)
-
+	items := Of(1, 2, 3, 4, 5)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_ = Map(items, conv.And(toString, addTail), even)
@@ -108,9 +107,9 @@ func Benchmark_Slice_PlainOld_MapAndFilter(b *testing.B) {
 		toString = func(i int) string { return fmt.Sprintf("%d", i) }
 		addTail  = func(s string) string { return s + "_tail" }
 		even     = func(v int) bool { return v%2 == 0 }
-		items    = Of(1, 2, 3, 4, 5)
 	)
 
+	items := Of(1, 2, 3, 4, 5)
 	b.ResetTimer()
 	for j := 0; j < b.N; j++ {
 		converted := make([]string, 0)
@@ -126,10 +125,9 @@ func Benchmark_Slice_PlainOld_MapAndFilter(b *testing.B) {
 
 func Benchmark_Slice_Flatt(b *testing.B) {
 	var (
-		odds           = func(v int) bool { return v%2 != 0 }
-		multiDimension = [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
+		odds = func(v int) bool { return v%2 != 0 }
 	)
-
+	multiDimension := [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_ = Filter(Flatt(Flatt(multiDimension, conv.To[[][]int]), conv.To[[]int]), odds)
@@ -139,10 +137,9 @@ func Benchmark_Slice_Flatt(b *testing.B) {
 
 func Benchmark_Slice_Flatt_2(b *testing.B) {
 	var (
-		odds           = func(v int) bool { return v%2 != 0 }
-		multiDimension = [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
+		odds = func(v int) bool { return v%2 != 0 }
 	)
-
+	multiDimension := [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_ = Flatt(multiDimension, func(i2 [][]int) []int { return Flatt(i2, func(i1 []int) []int { return Filter(i1, odds) }) })
@@ -152,10 +149,10 @@ func Benchmark_Slice_Flatt_2(b *testing.B) {
 
 func Benchmark_Slice_PlainOld_Flatt(b *testing.B) {
 	var (
-		odds           = func(v int) bool { return v%2 != 0 }
-		multiDimension = [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
+		odds = func(v int) bool { return v%2 != 0 }
 	)
 
+	multiDimension := [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
 	b.ResetTimer()
 	for j := 0; j < b.N; j++ {
 		oneDimension := make([]int, 0)
@@ -179,35 +176,13 @@ func Benchmark_Slice_MapFlattDeepStructure(b *testing.B) {
 	)
 
 	var (
-		items = []*Item{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil}
-
 		getName       = func(a *Attributes) string { return a.name }
 		getAttributes = func(item *Item) []*Attributes { return item.attributes }
 	)
-
+	items := []*Item{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_ = Map(Flatt(items, getAttributes, check.NotNil[*Item]), getName, check.NotNil[*Attributes])
-	}
-	b.StopTimer()
-}
-
-func Benchmark_Slice_MapFlattDeep2(b *testing.B) {
-	type (
-		Attributes struct{ name string }
-		Item       struct{ attributes []*Attributes }
-	)
-
-	var (
-		items = []*Item{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil}
-
-		getName = func(a *Attributes) string { return a.name }
-	)
-
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		_ = Flatt(items, func(item *Item) []string { return Map(item.attributes, getName, check.NotNil[*Attributes]) }, check.NotNil[*Item])
-
 	}
 	b.StopTimer()
 }
@@ -219,13 +194,14 @@ func Benchmark_Slice_PlainOld_MapFlattDeepStructure(b *testing.B) {
 	)
 
 	var (
-		items = []*Item{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil}
-
 		getName       = func(a *Attributes) string { return a.name }
 		getAttributes = func(item *Item) []*Attributes { return item.attributes }
 	)
+	items := []*Item{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil}
+
 	b.ResetTimer()
 	for j := 0; j < b.N; j++ {
+		
 		names := make([]string, 0)
 		for _, i := range items {
 			if check.NotNil(i) {

@@ -5,7 +5,7 @@ all: build test
 .PHONY: test
 test:
 	$(info #Running tests...)
-	go test -gcflags -m ./...
+	go test ./...
 
 
 .PHONY: build

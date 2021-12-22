@@ -3,22 +3,22 @@ package iterator
 import (
 	"github.com/m4gshm/container/check"
 	"github.com/m4gshm/container/conv"
+	"github.com/m4gshm/container/slice"
 )
 
 type Iterator[T any] interface {
 	HasNext() bool
 	Get() T
-	Next() (T, bool)
 }
 
 //Of wararg Iterator constructor
-func Of[T any](elements ...T) Iterator[T] { return Wrap(elements) }
+func Of[T any](elements ...T) Iterator[T] { return NewSlice(elements) }
 
-func SliceOf[T any](elements Iterator[T]) []T {
+func ToSlice[T any](elements Iterator[T]) []T {
 	s := make([]T, 0)
 
-	for v, ok := elements.Next(); ok; v, ok = elements.Next() {
-		s = append(s, v)
+	for elements.HasNext() {
+		s = append(s, elements.Get())
 	}
 
 	return s
@@ -26,13 +26,17 @@ func SliceOf[T any](elements Iterator[T]) []T {
 
 //Wrap Iterator constructor
 func Wrap[T any](elements []T) Iterator[T] {
-	return It(elements)
+	return NewSlice(elements)
 }
 
+//Iter Iterator constructor
 func Iter[T any](elements []T) Iterator[T] {
-	s:= &Slice[T]{elements: elements}
-	s.Iterator = s
-	return s
+	return NewSlice(elements)
+}
+
+//NewSlice default constructor
+func NewSlice[T any](elements []T) *Slice[T] {
+	return &Slice[T]{elements: elements}
 }
 
 func WrapMap[K comparable, V any](values map[K]V) Iterator[*KV[K, V]] {
@@ -46,7 +50,7 @@ func Map[From, To any](items Iterator[From], by conv.Converter[From, To], filter
 }
 
 //Flatt extracts embedded slices of items by Flatter and accumulate to result slice
-func Flatt[From, To any](items Iterator[From], by Flatter[From, To, Iterator[To]], filters ...check.Predicate[From]) Iterator[To] {
+func Flatt[From, To any](items Iterator[From], by slice.Flatter[From, To], filters ...check.Predicate[From]) Iterator[To] {
 	return &FlattIter[From, To]{iter: items, by: by, filters: filters}
 }
 
@@ -57,31 +61,21 @@ func Filter[T any](items Iterator[T], filters ...check.Predicate[T]) Iterator[T]
 
 //NotNil filter nullable values
 func NotNil[T any](items Iterator[T]) Iterator[T] {
-	var (
-		result = make([]T, 0)
-		add    = func(v T) { result = append(result, v) }
-	)
-	for v, ok := items.Next(); ok; v, ok = items.Next() {
-		if check.NotNil(v) {
-			add(v)
-		}
-	}
-	return Wrap(result)
+	return Filter(items, check.NotNil[T])
 }
 
 func ForEach[T any, It Iterator[T]](elements It, apply func(T), filters ...check.Predicate[T]) {
 	if len(filters) == 0 {
-		for v, ok := elements.Next(); ok; v, ok = elements.Next() {
-			apply(v)
+		for elements.HasNext() {
+			apply(elements.Get())
 		}
 		return
 	}
-	for v, ok := elements.Next(); ok; v, ok = elements.Next() {
+	for elements.HasNext() {
+		v:=elements.Get()
 		if check.IsFit(v, filters...) {
-			apply(v)
+		apply(v)
 		}
 	}
 }
 
-//Flatter extracts Iterator of To
-type Flatter[From, To any, ToIt Iterator[To]] conv.Converter[From, ToIt]

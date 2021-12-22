@@ -14,19 +14,12 @@ type ConvertIter[From, To any] struct {
 
 var _ Iterator[interface{}] = (*ConvertIter[interface{}, interface{}])(nil)
 
-func (s *ConvertIter[From, To]) Next() (To, bool) {
-	v, ok := filter(s.iter, s.filters)
-	var r To
-	if !ok {
-		return r, false
-	}
-	return s.by(v), true
-}
-
 func (s *ConvertIter[From, To]) HasNext() bool {
-	v, ok := s.Next()
-	s.current = v
-	return ok
+	if v, ok := filterNext(s.iter, s.filters); ok {
+		s.current = s.by(v)
+		return true
+	}
+	return false
 }
 
 func (s *ConvertIter[From, To]) Get() To {

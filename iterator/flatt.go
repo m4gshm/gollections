@@ -2,58 +2,49 @@ package iterator
 
 import (
 	"github.com/m4gshm/container/check"
+	"github.com/m4gshm/container/slice"
 )
 
 type FlattIter[From, To any] struct {
 	iter    Iterator[From]
-	by      Flatter[From, To, Iterator[To]]
+	by      slice.Flatter[From, To]
 	filters []check.Predicate[From]
-	current Iterator[To]
+	iterTo  []To
+	indTo   int
 	c       To
 }
 
 var _ Iterator[interface{}] = (*FlattIter[interface{}, interface{}])(nil)
 
-func (s *FlattIter[From, To]) Next() (To, bool) {
-	next := func() (To, bool) {
-		n, ok := s.current.Next()
-
-		if !ok {
-			s.current = nil
-		}
-		return n, ok
-	}
-
-	if s.current != nil {
-		if c, ok := next(); ok {
-			return c, true
-		}
-	}
-
-	var c To
-	v, ok := s.iter.Next()
-	if !ok {
-		return c, false
-	}
-
-	ok = check.IsFit(v, s.filters...)
-	if !ok {
-		return c, false
-	}
-
-	current := s.by(v)
-	if current != nil {
-		s.current = current
-		return next()
-	} else {
-		return c, false
-	}
-}
-
 func (s *FlattIter[From, To]) HasNext() bool {
-	v, ok := s.Next()
-	s.c = v
-	return ok
+	if iterTo := s.iterTo; iterTo != nil {
+		indTo := s.indTo
+		if indTo < len(iterTo) {
+			c := iterTo[indTo]
+			s.c = c
+			s.indTo = indTo + 1
+			return true
+		} else {
+			s.indTo = 0
+			s.iterTo = nil
+		}
+	}
+
+	iter := s.iter
+	for {
+		if ok := iter.HasNext(); !ok {
+			return false
+		}
+		v := iter.Get()
+		if ok := check.IsFit(v, s.filters...); ok {
+			if iterTo := s.by(v); len(iterTo) > 0 {
+				s.c = iterTo[0]
+				s.iterTo = iterTo
+				s.indTo = 1
+				return true
+			}
+		}
+	}
 }
 
 func (s *FlattIter[From, To]) Get() To {

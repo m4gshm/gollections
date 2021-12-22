@@ -22,13 +22,6 @@ func (s *MapIter[K, V]) Get() *KV[K, V] {
 	return &KV[K, V]{key: key, value: s.items[key]}
 }
 
-func (s *MapIter[K, V]) Next() (*KV[K, V], bool) {
-	if ok:= s.iter.Next(); ok {
-		return s.Get(), true
-	} 
-	return nil, false
-}
-
 type KV[K comparable, V any] struct {
 	key   K
 	value V
