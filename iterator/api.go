@@ -6,14 +6,16 @@ import (
 	"github.com/m4gshm/container/slice"
 )
 
+//Iterator base interface for containers, collections
 type Iterator[T any] interface {
 	HasNext() bool
 	Get() T
 }
 
-//Of wararg Iterator constructor
+//Of wararg Iterator constructor based on slice
 func Of[T any](elements ...T) Iterator[T] { return NewSlice(elements) }
 
+//ToSlice Iterator to slice converter
 func ToSlice[T any](elements Iterator[T]) []T {
 	s := make([]T, 0)
 
@@ -39,29 +41,30 @@ func NewSlice[T any](elements []T) *Slice[T] {
 	return &Slice[T]{elements: elements}
 }
 
+//WrapMap Key, value Iterator constructor.
 func WrapMap[K comparable, V any](values map[K]V) Iterator[*KV[K, V]] {
 	return NewMap(values)
 }
 
-//Map applies Converter to items and accumulate to result slice
-func Map[From, To any](items Iterator[From], by conv.Converter[From, To], filters ...check.Predicate[From]) Iterator[To] {
-	return &ConvertIter[From, To]{iter: items, by: by, filters: filters}
+//Map applies 'by' Converter of 'elements' Iterator and accumulate to result Iterator
+func Map[From, To any](elements Iterator[From], by conv.Converter[From, To], filters ...check.Predicate[From]) Iterator[To] {
+	return &ConvertIter[From, To]{iter: elements, by: by, filters: filters}
 
 }
 
-//Flatt extracts embedded slices of items by Flatter and accumulate to result slice
-func Flatt[From, To any](items Iterator[From], by slice.Flatter[From, To], filters ...check.Predicate[From]) Iterator[To] {
-	return &FlattIter[From, To]{iter: items, by: by, filters: filters}
+//Flatt extracts embedded slices of elements by Flatter and accumulate to result Iterator
+func Flatt[From, To any](elements Iterator[From], by slice.Flatter[From, To], filters ...check.Predicate[From]) Iterator[To] {
+	return &FlattIter[From, To]{iter: elements, by: by, filters: filters}
 }
 
-//Filter tests items and adds that fit to result
-func Filter[T any](items Iterator[T], filters ...check.Predicate[T]) Iterator[T] {
-	return &FilterIter[T]{iter: items, filters: filters}
+//Filter tests elements and adds that fit to result
+func Filter[T any](elements Iterator[T], filters ...check.Predicate[T]) Iterator[T] {
+	return &FilterIter[T]{iter: elements, filters: filters}
 }
 
-//NotNil filter nullable values
-func NotNil[T any](items Iterator[T]) Iterator[T] {
-	return Filter(items, check.NotNil[T])
+//NotNil filter nullable elements
+func NotNil[T any](elements Iterator[T]) Iterator[T] {
+	return Filter(elements, check.NotNil[T])
 }
 
 func ForEach[T any, It Iterator[T]](elements It, apply func(T), filters ...check.Predicate[T]) {
@@ -72,10 +75,9 @@ func ForEach[T any, It Iterator[T]](elements It, apply func(T), filters ...check
 		return
 	}
 	for elements.HasNext() {
-		v:=elements.Get()
+		v := elements.Get()
 		if check.IsFit(v, filters...) {
-		apply(v)
+			apply(v)
 		}
 	}
 }
-

@@ -201,7 +201,7 @@ func Benchmark_Slice_PlainOld_MapFlattDeepStructure(b *testing.B) {
 
 	b.ResetTimer()
 	for j := 0; j < b.N; j++ {
-		
+
 		names := make([]string, 0)
 		for _, i := range items {
 			if check.NotNil(i) {

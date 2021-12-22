@@ -9,7 +9,6 @@ import (
 //Predicate tests value (converts to true or false)
 type Predicate[T any] conv.Converter[T, bool]
 
-
 //Nil checker. Safe for non-nullable types
 func Nil[T any](val T) bool {
 	v := reflect.ValueOf(val)
@@ -35,4 +34,3 @@ func IsFit[T any](v T, predicates ...Predicate[T]) bool {
 	}
 	return fit
 }
-

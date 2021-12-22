@@ -29,6 +29,6 @@ func filterNext[T any](iter Iterator[T], filters []check.Predicate[T]) (T, bool)
 			return v, true
 		}
 	}
-	var v  T
+	var v T
 	return v, false
 }

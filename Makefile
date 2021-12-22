@@ -1,20 +1,23 @@
 
 .PHONY: all
-all: build test
+all: build test bench
 
 .PHONY: test
-test:
+test: gofmt
 	$(info #Running tests...)
 	go test ./...
 
 
 .PHONY: build
-build:
+build: gofmt
 	$(info #Building...)
 	go build -gcflags -m ./...
 
 .PHONY: bench
-bench:
+bench: gofmt
 	$(info #Running benchmarks...)
 	go test -gcflags -m -bench . ./...
 
+.PHONY: gofmt
+gofmt:
+	go fmt ./...

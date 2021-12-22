@@ -36,7 +36,6 @@ func Test_FlattSlices(t *testing.T) {
 		odds              = func(v int) bool { return v%2 != 0 }
 		multiDimensionOld = [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
 		multiDimension    = [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
-
 		oneDimension      = Filter(Flatt(Flatt(Wrap(multiDimension), conv.To[[][]int]), conv.To[[]int]), odds)
 	)
 

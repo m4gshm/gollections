@@ -84,6 +84,5 @@ func NotNil[T any](items []T) []T {
 	return result
 }
 
-
 //Flatter extracts slice of To
 type Flatter[From, To any] conv.Converter[From, []To]
