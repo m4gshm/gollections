@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/m4gshm/container/check"
 	"github.com/m4gshm/container/conv"
 	"github.com/stretchr/testify/assert"
 )
@@ -34,9 +35,12 @@ func Test_FlattSlices(t *testing.T) {
 	var (
 		odds           = func(v int) bool { return v%2 != 0 }
 		multiDimension = [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
-		oneDimension   = Filter(Flatt(Flatt(NotNil(multiDimension), conv.To[[][]int]), conv.To[[]int]), odds)
+		oneDimension   = Filter(Flatt(Flatt(multiDimension, conv.To[[][]int]), conv.To[[]int]), odds)
 	)
 
+	assert.Equal(t, Of(1, 3, 5, 7), oneDimension)
+
+	oneDimension = Flatt(multiDimension, func(i2 [][]int) []int { return Flatt(i2, func(i1 []int) []int { return Filter(i1, odds) }) })
 	assert.Equal(t, Of(1, 3, 5, 7), oneDimension)
 
 	//plain old style
@@ -72,9 +76,15 @@ func Test_FlattDeepStructure(t *testing.T) {
 
 		getName       = func(a *Attributes) string { return a.name }
 		getAttributes = func(item *Item) []*Attributes { return item.attributes }
-		names         = Map(NotNil(Flatt(NotNil(items), getAttributes)), getName)
 	)
 
+	names := Map(NotNil(Flatt(NotNil(items), getAttributes)), getName)
+	assert.Equal(t, Of("first", "second"), names)
+
+	names = Map(Flatt(items, getAttributes, check.NotNil[*Item]), getName, check.NotNil[*Attributes])
+	assert.Equal(t, Of("first", "second"), names)
+
+	names = Flatt(items, func(item *Item) []string { return Map(item.attributes, getName, check.NotNil[*Attributes]) }, check.NotNil[*Item])
 	assert.Equal(t, Of("first", "second"), names)
 
 	//plain old style

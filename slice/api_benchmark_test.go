@@ -126,20 +126,33 @@ func Benchmark_MapAndFilterPlainOld(b *testing.B) {
 
 func Benchmark_FlattSlices(b *testing.B) {
 	var (
-		odd            = func(v int) bool { return v%2 != 0 }
+		odds           = func(v int) bool { return v%2 != 0 }
 		multiDimension = [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
 	)
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_ = Filter(Flatt(Flatt(multiDimension, conv.To[[][]int], check.NotNil[[][]int]), conv.To[[]int], check.NotNil[[]int]), odd)
+		_ = Filter(Flatt(Flatt(multiDimension, conv.To[[][]int]), conv.To[[]int]), odds)
+	}
+	b.StopTimer()
+}
+
+func Benchmark_FlattSlices2(b *testing.B) {
+	var (
+		odds           = func(v int) bool { return v%2 != 0 }
+		multiDimension = [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
+	)
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_ = Flatt(multiDimension, func(i2 [][]int) []int { return Flatt(i2, func(i1 []int) []int { return Filter(i1, odds) }) })
 	}
 	b.StopTimer()
 }
 
 func Benchmark_FlattSlicesPlainOld(b *testing.B) {
 	var (
-		odd            = func(v int) bool { return v%2 != 0 }
+		odds           = func(v int) bool { return v%2 != 0 }
 		multiDimension = [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
 	)
 
@@ -147,14 +160,10 @@ func Benchmark_FlattSlicesPlainOld(b *testing.B) {
 	for j := 0; j < b.N; j++ {
 		oneDimension := make([]int, 0)
 		for _, i := range multiDimension {
-			if check.NotNil(i) {
-				for _, ii := range i {
-					if check.NotNil(ii) {
-						for _, iii := range ii {
-							if odd(iii) {
-								oneDimension = append(oneDimension, iii)
-							}
-						}
+			for _, ii := range i {
+				for _, iii := range ii {
+					if odds(iii) {
+						oneDimension = append(oneDimension, iii)
 					}
 				}
 			}
@@ -183,6 +192,26 @@ func Benchmark_MapFlattDeepStructure(b *testing.B) {
 	b.StopTimer()
 }
 
+func Benchmark_MapFlattDeepStructure2(b *testing.B) {
+	type (
+		Attributes struct{ name string }
+		Item       struct{ attributes []*Attributes }
+	)
+
+	var (
+		items = []*Item{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil}
+
+		getName = func(a *Attributes) string { return a.name }
+	)
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_ = Flatt(items, func(item *Item) []string { return Map(item.attributes, getName, check.NotNil[*Attributes]) }, check.NotNil[*Item])
+
+	}
+	b.StopTimer()
+}
+
 func Benchmark_MapFlattDeepStructurePlainOld(b *testing.B) {
 	type (
 		Attributes struct{ name string }
@@ -199,7 +228,7 @@ func Benchmark_MapFlattDeepStructurePlainOld(b *testing.B) {
 	for j := 0; j < b.N; j++ {
 		names := make([]string, 0)
 		for _, i := range items {
-			if check.NotNil(i){
+			if check.NotNil(i) {
 				for _, a := range getAttributes(i) {
 					if check.NotNil(a) {
 						names = append(names, getName(a))
