@@ -5,6 +5,7 @@ all: build test bench
 .PHONY: test
 test:
 	$(info #Running tests...)
+	go clean -testcache
 	go test ./...
 
 

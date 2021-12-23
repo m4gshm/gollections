@@ -26,3 +26,5 @@ func Or[I, O any](first Converter[I, O], second Converter[I, O]) Converter[I, O]
 		return c
 	}
 }
+
+type BinaryOp[T any] func(T, T) T
