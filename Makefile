@@ -16,7 +16,7 @@ build:
 .PHONY: bench
 bench:
 	$(info #Running benchmarks...)
-	go test -gcflags -m -bench . ./...
+	go test -gcflags -m -bench . -benchmem ./...
 
 .PHONY: gofmt
 gofmt:
