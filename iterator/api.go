@@ -86,7 +86,7 @@ func Filter[T any](elements Iterator[T], filters ...check.Predicate[T]) Iterator
 	return &FilterIter[T]{iter: elements, filters: filters}
 }
 
-//NotNil reates a lazy Iterator that filters nullable elements
+//NotNil creates a lazy Iterator that filters nullable elements
 func NotNil[T any](elements Iterator[T]) Iterator[T] {
 	return Filter(elements, check.NotNil[T])
 }
