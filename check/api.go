@@ -26,11 +26,24 @@ func NotNil[T any](val T) bool {
 	return !Nil(val)
 }
 
-//IsFit apply predicates
-func IsFit[T any](v T, predicates ...Predicate[T]) bool {
-	fit := true
-	for i := 0; fit && i < len(predicates); i++ {
-		fit = predicates[i](v)
+//Union reduce predicates to an one
+func Union[T any](predicates []Predicate[T]) Predicate[T] {
+	l := len(predicates)
+	if l == 0 {
+		return func(_ T) bool { return false }
+	} else if l == 1 {
+		return predicates[0]
 	}
-	return fit
+	return func(v T) bool {
+		for i := 0; i < len(predicates); i++ {
+			if !predicates[i](v) {
+				return false
+			}
+		}
+		return true
+	}
+}
+
+func Always[T any](v bool) func(T) bool {
+	return func(_ T) bool { return true }
 }

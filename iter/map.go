@@ -1,7 +1,9 @@
-package iterator
+package iter
 
 import (
 	"reflect"
+
+	"github.com/m4gshm/container/typ"
 )
 
 func NewMap[K comparable, V any](elements map[K]V) *MapIter[K, V] {
@@ -35,4 +37,4 @@ func (k *KV[K, V]) Value() V {
 	return k.value
 }
 
-var _ Iterator[*KV[interface{}, interface{}]] = (*MapIter[interface{}, interface{}])(nil)
+var _ typ.Iterator[*KV[interface{}, interface{}]] = (*MapIter[interface{}, interface{}])(nil)

@@ -1,8 +1,9 @@
-package iterator
+package iter
 
 import (
 	"testing"
 
+	"github.com/m4gshm/container/iter"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -13,7 +14,7 @@ func Test_MapIterator(t *testing.T) {
 
 	values := map[string]*s{"first": {"first_name"}, "second": {"first_second"}}
 	result := map[string]*s{}
-	it := WrapMap(values)
+	it := iter.WrapMap(values)
 	for it.HasNext() {
 		kv := it.Get()
 		result[kv.Key()] = kv.Value()

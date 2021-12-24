@@ -3,86 +3,39 @@ package slice
 import (
 	"github.com/m4gshm/container/check"
 	"github.com/m4gshm/container/conv"
+	"github.com/m4gshm/container/typ"
 )
 
-//Of slice constructor
-func Of[T any](values ...T) []T { return values }
-
-func ForEach[T any](items []T, apply func(T), filters ...check.Predicate[T]) {
-	if len(filters) == 0 {
-		for _, v := range items {
-			apply(v)
-		}
-		return
-	}
-	for _, v := range items {
-		if check.IsFit(v, filters...) {
-			apply(v)
-		}
-	}
+func Of[T any](elements ...T) []T {
+	return elements
 }
 
-//Map applies Converter to items and accumulate to result slice
-func Map[From, To any](items []From, by conv.Converter[From, To], filters ...check.Predicate[From]) []To {
-	result := make([]To, 0)
-	if len(filters) == 0 {
-		for _, v := range items {
-			result = append(result, by(v))
-		}
-	} else {
-		for _, v := range items {
-			if check.IsFit(v, filters...) {
-				result = append(result, by(v))
-			}
-		}
-	}
-	return result
+//Map creates a lazy Iterator that converts elements with a converter and returns them
+func Map[From, To any](elements []From, by conv.Converter[From, To]) typ.Iterator[To] {
+	return &Convert[From, To]{Elements: elements, By: by}
 }
 
-//Flatt extracts embedded slices of items by Flatter and accumulate to result slice
-func Flatt[From, To any](items []From, by Flatter[From, To], filters ...check.Predicate[From]) []To {
-	result := make([]To, 0)
-	if len(filters) == 0 {
-		for _, v := range items {
-			result = append(result, by(v)...)
-		}
-	} else {
-		for _, v := range items {
-			if check.IsFit(v, filters...) {
-				result = append(result, by(v)...)
-			}
-		}
-	}
-	return result
+// additionally filters 'From' elements by filters
+func MapFit[From, To any](elements []From, fit check.Predicate[From], by conv.Converter[From, To]) typ.Iterator[To] {
+	return &ConvertFit[From, To]{Elements: elements, By: by, Fit: fit}
 }
 
-//Filter tests items and adds that fit to result
-func Filter[T any](items []T, filters ...check.Predicate[T]) []T {
-	result := make([]T, 0)
-	if len(filters) == 0 {
-		for _, v := range items {
-			result = append(result, v)
-		}
-	} else {
-		for _, v := range items {
-			if check.IsFit(v, filters...) {
-				result = append(result, v)
-			}
-		}
-	}
-	return result
+//Flatt creates a lazy Iterator that extracts slices of 'To' by a Flatter from elements of 'From' and flattens as one iterable collection of 'To' elements
+func Flatt[From, To any](elements []From, by conv.Flatter[From, To]) typ.Iterator[To] {
+	return &Flatten[From, To]{Elements: elements, Flatt: by}
 }
 
-//NotNil filter nullable values
-func NotNil[T any](items []T) []T {
-	var result = make([]T, 0)
-	for _, v := range items {
-		if check.NotNil(v) {
-			result = append(result, v)
-		}
-	}
-	return result
+// additionally checks 'From' elements by fit
+func FlattFit[From, To any](elements []From, fit check.Predicate[From], flatt conv.Flatter[From, To]) typ.Iterator[To] {
+	return &FlattenFit[From, To]{Elements: elements, Flatt: flatt, Fit: fit}
 }
 
-//Flatter extracts slice of To
-type Flatter[From, To any] conv.Converter[From, []To]
+//Filter creates a lazy Iterator that checks elements by filters and returns successful ones
+func Filter[T any](elements []T, filter check.Predicate[T]) typ.Iterator[T] {
+	return &Fit[T]{Elements: elements, By: filter}
+}
+
+//NotNil creates a lazy Iterator that filters nullable elements
+func NotNil[T any](elements []T) typ.Iterator[T] {
+	return Filter(elements, check.NotNil[T])
+}

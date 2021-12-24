@@ -5,6 +5,9 @@ import "reflect"
 //Converter convert From -> To
 type Converter[From, To any] func(From) To
 
+//Flatter extracts slice of To
+type Flatter[From, To any] Converter[From, []To]
+
 //To helper for Map, Flatt
 func To[T any](value T) T { return value }
 
@@ -26,5 +29,3 @@ func Or[I, O any](first Converter[I, O], second Converter[I, O]) Converter[I, O]
 		return c
 	}
 }
-
-type BinaryOp[T any] func(T, T) T
