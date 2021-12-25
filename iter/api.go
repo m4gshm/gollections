@@ -3,29 +3,20 @@ package iter
 import (
 	"github.com/m4gshm/container/check"
 	"github.com/m4gshm/container/conv"
+	in "github.com/m4gshm/container/iter/impl/iter"
+	impl "github.com/m4gshm/container/iter/impl/iter"
 	"github.com/m4gshm/container/op"
 	"github.com/m4gshm/container/typ"
 )
 
 //Of Iterator constructor
 func Of[T any](elements ...T) typ.Iterator[T] {
-	return &Slice[T]{Elements: elements}
+	return impl.NewReseteable(elements)
 }
 
 //Wrap slice to Iterator
 func Wrap[T any](elements []T) typ.Iterator[T] {
-	return &Slice[T]{Elements: elements}
-}
-
-//ToSlice converts Iterator to slice
-func ToSlice[T any](elements typ.Iterator[T]) []T {
-	s := make([]T, 0)
-
-	for elements.HasNext() {
-		s = append(s, elements.Get())
-	}
-
-	return s
+	return impl.NewReseteable(elements)
 }
 
 // WrapMap Key, value Iterator constructor.
@@ -35,40 +26,27 @@ func WrapMap[K comparable, V any](values map[K]V) typ.Iterator[*KV[K, V]] {
 
 //Map creates a lazy Iterator that converts elements with a converter and returns them
 func Map[From, To any](elements typ.Iterator[From], by conv.Converter[From, To]) typ.Iterator[To] {
-	return &Convert[From, To]{Iter: elements, By: by}
+	return in.Map(elements, by)
 }
 
 // additionally filters 'From' elements by filters
 func MapFit[From, To any](elements typ.Iterator[From], fit check.Predicate[From], by conv.Converter[From, To]) typ.Iterator[To] {
-	return &ConvertFit[From, To]{Iter: elements, By: by, Fit: fit}
-}
-
-//Reduce reduces elements to an one
-func Reduce[T any](elements typ.Iterator[T], by op.Binary[T]) T {
-	if !elements.HasNext() {
-		var nothing T
-		return nothing
-	}
-	result := elements.Get()
-	for elements.HasNext() {
-		result = by(result, elements.Get())
-	}
-	return result
+	return in.MapFit(elements, fit, by)
 }
 
 //Flatt creates a lazy Iterator that extracts slices of 'To' by a Flatter from elements of 'From' and flattens as one iterable collection of 'To' elements
 func Flatt[From, To any](elements typ.Iterator[From], by conv.Flatter[From, To]) typ.Iterator[To] {
-	return &Flatten[From, To]{Iter: elements, Flatt: by}
+	return in.Flatt(elements, by)
 }
 
 // additionally checks 'From' elements by fit
 func FlattFit[From, To any](elements typ.Iterator[From], fit check.Predicate[From], flatt conv.Flatter[From, To]) typ.Iterator[To] {
-	return &FlattenFit[From, To]{Iter: elements, Flatt: flatt, Fit: fit}
+	return in.FlattFit(elements, fit, flatt)
 }
 
 //Filter creates a lazy Iterator that checks elements by filters and returns successful ones
 func Filter[T any](elements typ.Iterator[T], filter check.Predicate[T]) typ.Iterator[T] {
-	return &Fit[T]{Iter: elements, By: filter}
+	return in.Filter(elements, filter)
 }
 
 //NotNil creates a lazy Iterator that filters nullable elements
@@ -77,16 +55,20 @@ func NotNil[T any](elements typ.Iterator[*T]) typ.Iterator[*T] {
 }
 
 //ForEach applies func on elements
-func ForEach[T any, It typ.Iterator[T]](elements It, apply func(T)) {
-	for elements.HasNext() {
-		apply(elements.Get())
-	}
+func ForEach[T any](elements typ.Iterator[T], apply func(T)) {
+	in.ForEach(elements, apply)
 }
 
-func ForEachFit[T any, It typ.Iterator[T]](elements It, apply func(T), fit check.Predicate[T]) {
-	for elements.HasNext() {
-		if v := elements.Get(); fit(v) {
-			apply(v)
-		}
-	}
+func ForEachFit[T any](elements typ.Iterator[T], apply func(T), fit check.Predicate[T]) {
+	in.ForEachFit(elements, apply, fit)
+}
+
+//Reduce reduces elements to an one
+func Reduce[T any](elements typ.Iterator[T], by op.Binary[T]) T {
+	return in.Reduce(elements, by)
+}
+
+//ToSlice converts Iterator to slice
+func ToSlice[T any](elements typ.Iterator[T]) []T {
+	return in.ToSlice[T](elements)
 }

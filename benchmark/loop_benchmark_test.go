@@ -29,7 +29,7 @@ func Benchmark_ForEach_Iterator_Impl(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		result := make([]int, 0, 100000)
-		iter.ForEach(iter.SliceWrapper(values), func(v int) { result = append(result, v) })
+		iter.ForEach(iter.Wrap(values), func(v int) { result = append(result, v) })
 	}
 	b.StopTimer()
 }
@@ -58,14 +58,13 @@ func Benchmark_IterateHasNextGet_Iterator_Impl(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		result := make([]int, 0, 100000)
-		it := iter.SliceWrapper(values)
+		it := iter.Wrap(values)
 		for it.HasNext() {
 			result = append(result, it.Get())
 		}
 	}
 	b.StopTimer()
 }
-
 
 func Benchmark_WrapMapHasNextGet(b *testing.B) {
 	values := map[int]int{}
