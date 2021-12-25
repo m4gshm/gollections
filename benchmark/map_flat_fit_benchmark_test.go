@@ -195,109 +195,94 @@ func Benchmark_ReduceSum_Slice_PlainOld(b *testing.B) {
 	b.StopTimer()
 }
 
-func Benchmark_MapFlattStructure_Iterable(b *testing.B) {
-	type (
-		Attributes struct{ name string }
-		Item       struct{ attributes []*Attributes }
-	)
+type (
+	Attributes  struct{ name string }
+	Participant struct{ attributes []*Attributes }
+)
 
-	var (
-		getName       = func(a *Attributes) string { return a.name }
-		getAttributes = func(item *Item) []*Attributes { return item.attributes }
-	)
-	items := []*Item{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil}
+func (a *Attributes) GetName() string { 
+	if a == nil {
+		return ""
+	}
+	return a.name 
+}
+
+func (p *Participant) GetAttributes() []*Attributes {
+	if p == nil {
+		return nil
+	}
+	return p.attributes
+}
+
+func Benchmark_MapFlattStructure_IterableNotNil(b *testing.B) {
+
+	items := []*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_ = iter.ToSlice(iter.Map(iter.NotNil(iter.Flatt(iter.NotNil(iter.Wrap(items)), getAttributes)), getName))
+		_ = iter.ToSlice(iter.Map(iter.NotNil(iter.Flatt(iter.NotNil(iter.Wrap(items)), (*Participant).GetAttributes)), (*Attributes).GetName))
+	}
+	b.StopTimer()
+}
+
+func Benchmark_MapFlattStructure_IterableWithoutNotNilFiltering(b *testing.B) {
+	items := []*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_ = iter.ToSlice(iter.Map((iter.Flatt((iter.Wrap(items)), (*Participant).GetAttributes)), (*Attributes).GetName))
 	}
 	b.StopTimer()
 }
 
 func Benchmark_MapFlattStructure_Iterable_2(b *testing.B) {
-	type (
-		Attributes struct{ name string }
-		Item       struct{ attributes []*Attributes }
-	)
-
-	var (
-		getName       = func(a *Attributes) string { return a.name }
-		getAttributes = func(item *Item) []*Attributes { return item.attributes }
-	)
-	items := iter.Wrap([]*Item{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil})
+	items := iter.Wrap([]*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil})
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_ = iter.ToSlice(iter.Map(iter.NotNil(iter.Flatt(iter.NotNil(items), getAttributes)), getName))
-		items.(*iter.Slice[*Item]).Reset()
+		_ = iter.ToSlice(iter.Map(iter.NotNil(iter.Flatt(iter.NotNil(items), (*Participant).GetAttributes)), (*Attributes).GetName))
+		items.(*iter.Slice[*Participant]).Reset()
 	}
 	b.StopTimer()
 }
 
 func Benchmark_MapFlattStructure_IterableFit(b *testing.B) {
-	type (
-		Attributes struct{ name string }
-		Item       struct{ attributes []*Attributes }
-	)
-
-	var (
-		getName       = func(a *Attributes) string { return a.name }
-		getAttributes = func(item *Item) []*Attributes { return item.attributes }
-	)
-	items := []*Item{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil}
+	items := []*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_ = iter.ToSlice(iter.MapFit(iter.FlattFit(iter.Wrap(items), check.NotNil[*Item], getAttributes), check.NotNil[*Attributes], getName))
+		_ = iter.ToSlice(iter.MapFit(iter.FlattFit(iter.Wrap(items), check.NotNil[Participant], (*Participant).GetAttributes), check.NotNil[Attributes], (*Attributes).GetName))
 	}
 	b.StopTimer()
 }
 
 func Benchmark_MapFlattStructure_IterableFit2(b *testing.B) {
-	type (
-		Attributes struct{ name string }
-		Item       struct{ attributes []*Attributes }
-	)
-
-	var (
-		getName       = func(a *Attributes) string { return a.name }
-		getAttributes = func(item *Item) []*Attributes { return item.attributes }
-	)
-	items := iter.Wrap([]*Item{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil})
+	items := iter.Wrap([]*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil})
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_ = iter.ToSlice(iter.MapFit(iter.FlattFit(items, check.NotNil[*Item], getAttributes), check.NotNil[*Attributes], getName))
-		items.(*iter.Slice[*Item]).Reset()
+		_ = iter.ToSlice(iter.MapFit(iter.FlattFit(items, check.NotNil[Participant], (*Participant).GetAttributes), check.NotNil[Attributes], (*Attributes).GetName))
+		items.(*iter.Slice[*Participant]).Reset()
 	}
 	b.StopTimer()
 }
 
 func Benchmark_MapFlattStructure_SliceFit(b *testing.B) {
-	type (
-		Attributes struct{ name string }
-		Item       struct{ attributes []*Attributes }
-	)
-
-	var (
-		getName       = func(a *Attributes) string { return a.name }
-		getAttributes = func(item *Item) []*Attributes { return item.attributes }
-	)
-	items := []*Item{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil}
+	items := []*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_ = iter.ToSlice(iter.MapFit(slice.FlattFit(items, check.NotNil[*Item], getAttributes), check.NotNil[*Attributes], getName))
+		_ = iter.ToSlice(iter.MapFit(slice.FlattFit(items, check.NotNil[Participant], (*Participant).GetAttributes), check.NotNil[Attributes], (*Attributes).GetName))
+	}
+	b.StopTimer()
+}
+
+func Benchmark_MapFlattStructure_SliceWithoutNilCheck(b *testing.B) {
+	items := []*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_ = iter.ToSlice(iter.Map(slice.Flatt(items, (*Participant).GetAttributes), (*Attributes).GetName))
 	}
 	b.StopTimer()
 }
 
 func Benchmark_MapFlattStructure_Slice_PlainOld(b *testing.B) {
-	type (
-		Attributes struct{ name string }
-		Item       struct{ attributes []*Attributes }
-	)
 
-	var (
-		getName       = func(a *Attributes) string { return a.name }
-		getAttributes = func(item *Item) []*Attributes { return item.attributes }
-	)
-	items := []*Item{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil}
+	items := []*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil}
 
 	b.ResetTimer()
 	for j := 0; j < b.N; j++ {
@@ -305,9 +290,9 @@ func Benchmark_MapFlattStructure_Slice_PlainOld(b *testing.B) {
 		names := make([]string, 0)
 		for _, i := range items {
 			if check.NotNil(i) {
-				for _, a := range getAttributes(i) {
+				for _, a := range i.GetAttributes() {
 					if check.NotNil(a) {
-						names = append(names, getName(a))
+						names = append(names, a.GetName())
 					}
 				}
 			}

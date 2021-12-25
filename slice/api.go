@@ -36,6 +36,6 @@ func Filter[T any](elements []T, filter check.Predicate[T]) typ.Iterator[T] {
 }
 
 //NotNil creates a lazy Iterator that filters nullable elements
-func NotNil[T any](elements []T) typ.Iterator[T] {
+func NotNil[T any](elements []*T) typ.Iterator[*T] {
 	return Filter(elements, check.NotNil[T])
 }

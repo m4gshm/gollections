@@ -35,12 +35,12 @@ func WrapMap[K comparable, V any](values map[K]V) typ.Iterator[*KV[K, V]] {
 
 //Map creates a lazy Iterator that converts elements with a converter and returns them
 func Map[From, To any](elements typ.Iterator[From], by conv.Converter[From, To]) typ.Iterator[To] {
-	return &Convert[From, To]{iter: elements, by: by}
+	return &Convert[From, To]{Iter: elements, By: by}
 }
 
 // additionally filters 'From' elements by filters
 func MapFit[From, To any](elements typ.Iterator[From], fit check.Predicate[From], by conv.Converter[From, To]) typ.Iterator[To] {
-	return &ConvertFit[From, To]{iter: elements, by: by, fit: fit}
+	return &ConvertFit[From, To]{Iter: elements, By: by, Fit: fit}
 }
 
 //Reduce reduces elements to an one
@@ -72,7 +72,7 @@ func Filter[T any](elements typ.Iterator[T], filter check.Predicate[T]) typ.Iter
 }
 
 //NotNil creates a lazy Iterator that filters nullable elements
-func NotNil[T any](elements typ.Iterator[T]) typ.Iterator[T] {
+func NotNil[T any](elements typ.Iterator[*T]) typ.Iterator[*T] {
 	return Filter(elements, check.NotNil[T])
 }
 

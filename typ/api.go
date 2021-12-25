@@ -1,6 +1,5 @@
 package typ
 
-
 //Iterator base interface for containers, collections
 type Iterator[T any] interface {
 	//checks ability on next element
@@ -12,5 +11,3 @@ type Iterator[T any] interface {
 type Resetable interface {
 	Reset()
 }
-
-

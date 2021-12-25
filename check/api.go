@@ -1,29 +1,36 @@
 package check
 
 import (
-	"reflect"
-
 	"github.com/m4gshm/container/conv"
 )
 
 //Predicate tests value (converts to true or false)
 type Predicate[T any] conv.Converter[T, bool]
 
-//Nil checker. Safe for non-nullable types
-func Nil[T any](val T) bool {
-	v := reflect.ValueOf(val)
-	switch v.Kind() {
-	case reflect.Chan, reflect.Func, reflect.Interface, reflect.Map, reflect.Pointer, reflect.Slice, reflect.UnsafePointer:
-		return v.IsNil()
-	case reflect.Invalid:
-		return reflect.TypeOf(val) == nil
-	}
-	return false
+//Nil checker.
+func Nil[T any](val *T) bool {
+	return val == nil
 }
 
-//NotNil checker. Safe for non-nullable types
-func NotNil[T any](val T) bool {
+//NotNil checker.
+func NotNil[T any](val *T) bool {
 	return !Nil(val)
+}
+
+type array interface {
+	[]any | []int | []int8 | []int16 | []int32 | []int64 | []uint | []uint8 | []uint16 | []uint32 | []uint64 | []float32 | []float64 | []uintptr | []complex64 | []complex128 | []string | string
+}
+
+func Empty[T array](val T) bool {
+	return len(val) == 0
+}
+
+func EmptyMap[K comparable, V any](val map[K]V) bool {
+	return len(val) == 0
+}
+
+func Not[T any](p Predicate[T]) Predicate[T] {
+	return func(v T) bool { return !p(v) }
 }
 
 //Union reduce predicates to an one
@@ -45,5 +52,9 @@ func Union[T any](predicates []Predicate[T]) Predicate[T] {
 }
 
 func Always[T any](v bool) func(T) bool {
+	return func(_ T) bool { return true }
+}
+
+func Never[T any](v bool) func(T) bool {
 	return func(_ T) bool { return true }
 }

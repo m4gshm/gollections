@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/m4gshm/container/check"
 	"github.com/m4gshm/container/conv"
 	"github.com/m4gshm/container/iter"
 	"github.com/m4gshm/container/op"
@@ -81,10 +80,10 @@ func Test_ReduceSlices(t *testing.T) {
 
 	e := 1 + 3 + 5 + 7
 
-	oddSum := iter.Reduce(iter.Filter(iter.Flatt(iter.FlattFit(iter.Wrap(multiDimension), check.NotNil[[][]int], conv.To[[][]int]), conv.To[[]int]), odds), op.Sum[int])
+	oddSum := iter.Reduce(iter.Filter(iter.Flatt(iter.Flatt(iter.Wrap(multiDimension), conv.To[[][]int]), conv.To[[]int]), odds), op.Sum[int])
 	assert.Equal(t, e, oddSum)
 
-	oddSum = iter.Reduce(iter.Filter(iter.Flatt(slice.FlattFit(multiDimension, check.NotNil[[][]int], conv.To[[][]int]), conv.To[[]int]), odds), op.Sum[int])
+	oddSum = iter.Reduce(iter.Filter(iter.Flatt(slice.Flatt(multiDimension, conv.To[[][]int]), conv.To[[]int]), odds), op.Sum[int])
 	assert.Equal(t, e, oddSum)
 
 	//plain old style
@@ -101,4 +100,35 @@ func Test_ReduceSlices(t *testing.T) {
 
 	assert.Equal(t, e, oddSum)
 
+}
+
+type (
+	Attributes  struct{ name string }
+	Participant struct{ attributes []*Attributes }
+)
+
+func (a *Attributes) GetName() string { 
+	if a == nil {
+		return ""
+	}
+	return a.name 
+}
+
+func (p *Participant) GetAttributes() []*Attributes {
+	if p == nil {
+		return nil
+	}
+	return p.attributes
+}
+
+func Test_MapFlattStructure_Iterable(t *testing.T) {
+	expected := slice.Of("first", "second", "")
+
+	items := []*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil}
+
+	names := iter.ToSlice(iter.Map(iter.Flatt(iter.Wrap(items), (*Participant).GetAttributes), (*Attributes).GetName))
+	assert.Equal(t, expected, names)
+
+	names = iter.ToSlice(iter.Map(slice.Flatt(items, (*Participant).GetAttributes), (*Attributes).GetName))
+	assert.Equal(t, expected, names)
 }
