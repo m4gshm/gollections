@@ -3,7 +3,7 @@ package iter
 import (
 	"testing"
 
-	"github.com/m4gshm/container/iter"
+	"github.com/m4gshm/container/iter/impl/iter"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -15,7 +15,7 @@ func Test_MapIterator(t *testing.T) {
 	values := map[string]*s{"first": {"first_name"}, "second": {"first_second"}}
 	result := map[string]*s{}
 
-	for it := iter.NewMap(values); it.HasNext(); {
+	for it := iter.NewKV(values); it.HasNext(); {
 		k, v := it.Get().Get()
 		result[k] = v
 	}
@@ -34,7 +34,7 @@ func Test_MapIterateResetIterat(t *testing.T) {
 	values := map[string]*s{"first": {"first_name"}, "second": {"first_second"}}
 	result1 := map[string]*s{}
 
-	it := iter.NewMap(values)
+	it := iter.NewKV(values)
 	for it.HasNext() {
 		k, v := it.Get().Get()
 		result1[k] = v

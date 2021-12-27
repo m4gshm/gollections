@@ -19,7 +19,7 @@ func NewOrderKV[k comparable, v any](order []*k, uniques map[k]v) *OrderedKVIter
 type KVIter[k comparable, v any] struct {
 	elements map[k]v
 	iter     *reflect.MapIter
-	refVal        reflect.Value
+	refVal   reflect.Value
 }
 
 var _ typ.Iterator[*typ.KV[interface{}, interface{}]] = (*KVIter[interface{}, interface{}])(nil)

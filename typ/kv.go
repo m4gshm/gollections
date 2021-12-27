@@ -17,3 +17,7 @@ func (k *KV[K, V]) Key() K {
 func (k *KV[K, V]) Value() V {
 	return k.value
 }
+
+func (k *KV[K, V]) Get() (K,V) {
+	return k.key, k.value
+}

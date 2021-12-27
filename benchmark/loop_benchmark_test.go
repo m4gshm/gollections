@@ -163,7 +163,7 @@ func Benchmark_NewMap_HasNextGet_Reset(b *testing.B) {
 	for i := 0; i < 100000; i++ {
 		values[i] = i
 	}
-	iter := iter.NewMap(values)
+	iter := impliter.NewKV(values)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		for iter.HasNext() {
