@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/m4gshm/container/iter"
-	implIter "github.com/m4gshm/container/iter/impl/iter"
+	impliter "github.com/m4gshm/container/iter/impl/iter"
 )
 
 var amount = 100_000
@@ -31,7 +31,7 @@ func Benchmark_ForEach_Iterator_Impl(b *testing.B) {
 	result := 0
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		implIter.ForEach(implIter.New(values), func(v int) { result = v })
+		impliter.ForEach(impliter.New(values), func(v int) { result = v })
 	}
 	b.StopTimer()
 	_ = result
@@ -62,7 +62,7 @@ func Benchmark_HasNextGet_Iterator_Impl(b *testing.B) {
 	result := 0
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		it := implIter.New(values); 
+		it := impliter.New(values); 
 		for it.HasNext() {
 			result = it.Get()
 		}
@@ -76,7 +76,7 @@ func Benchmark_HasNextGetReset_Iterator_Impl(b *testing.B) {
 	for i := 0; i < amount; i++ {
 		values[i] = i
 	}
-	it := implIter.NewReseteable(values)
+	it := impliter.NewReseteable(values)
 	result := 0
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -141,14 +141,14 @@ func Benchmark_WrapMap_HasNextGet(b *testing.B) {
 	b.StopTimer()
 }
 
-func Benchmark_NewMap_HasNextGet(b *testing.B) {
+func Benchmark_NewKVHasNextGet(b *testing.B) {
 	values := map[int]int{}
 	for i := 0; i < 100000; i++ {
 		values[i] = i
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		iter := iter.NewMap(values)
+		iter := impliter.NewKV(values)
 		for iter.HasNext() {
 			kv := iter.Get()
 			_ = kv.Key()

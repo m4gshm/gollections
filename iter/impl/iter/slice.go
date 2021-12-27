@@ -7,32 +7,33 @@ func New[T any](elements []T) *Iter[T] {
 }
 
 func NewReseteable[T any](elements []T) *ResIter[T] {
-	return &ResIter[T]{&Iter[T]{elements: elements}}
+	return &ResIter[T]{New(elements)}
 }
 
 type Iter[T any] struct {
 	elements []T
-	current  T
-	i        int
+	next     int
 }
 
 var _ typ.Iterator[interface{}] = (*Iter[interface{}])(nil)
 
 func (s *Iter[T]) HasNext() bool {
-	var v T
 	e := s.elements
-	i := s.i
-	if i < len(e) {
-		v = e[i]
-		s.current = v
-		s.i = i + 1
+	l := len(e)
+	if l == 0 {
+		return false
+	}
+	next := s.next
+	if next < l {
 		return true
 	}
 	return false
 }
 
 func (s *Iter[T]) Get() T {
-	return s.current
+	current := s.next
+	s.next++
+	return s.elements[current]
 }
 
 type ResIter[T any] struct {
@@ -42,7 +43,5 @@ type ResIter[T any] struct {
 var _ typ.Resetable = (*ResIter[interface{}])(nil)
 
 func (s *ResIter[T]) Reset() {
-	var v T
-	s.current = v
-	s.i = 0
+	s.next = 0
 }

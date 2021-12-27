@@ -4,7 +4,6 @@ import (
 	"reflect"
 
 	"github.com/m4gshm/container/conv"
-	"github.com/m4gshm/container/typ"
 )
 
 //Predicate tests value (converts to true or false)
@@ -29,7 +28,7 @@ func Zero[T any](val T) bool {
 	return reflect.ValueOf(val).IsZero()
 }
 
-func Empty[T typ.Array](val T) bool {
+func Empty[T Array](val T) bool {
 	return len(val) == 0
 }
 
@@ -67,4 +66,13 @@ func Always[T any](v bool) func(T) bool {
 
 func Never[T any](v bool) func(T) bool {
 	return func(_ T) bool { return !v }
+}
+
+type Array interface {
+	~[]any | ~[]uintptr |
+		~[]int | ~[]int8 | []int16 | []int32 | []int64 |
+		~[]uint | ~[]uint8 | ~[]uint16 | ~[]uint32 | ~[]uint64 |
+		~[]float32 | ~[]float64 |
+		~[]complex64 | ~[]complex128 |
+		~[]string | ~string
 }
