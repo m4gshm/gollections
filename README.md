@@ -3,14 +3,35 @@
 Golang experiments with container data structures, slices, maps, and so on using generics.
 Need use version 1.18 beta 1 or newer.
 
-## Packages
+## Containers
 
-### [Types](./typ/)
+### Immutable 
+
+
+[OrderedMap](./immutable/map.go)
+
+[OrderedSet](./immutable/set.go)
+
+
+## Packages
+### [Interfaces](./typ/api.go)
 ```go
-//Iterator objects container access intefrace 
+//Common interfaces
+
 type Iterator[T any] interface {
+	//checks ability on next element
 	HasNext() bool
+	//retrieves next element
 	Get() T
+}
+
+type Walk[T any] interface {
+	Begin() Iterator[T]
+}
+
+type Container[T any, S constraints.Integer] interface {
+	Values() []T
+	Len() S
 }
 ```
 
