@@ -5,9 +5,10 @@ import (
 
 	"github.com/m4gshm/container/iter/impl/iter"
 	"github.com/m4gshm/container/slice"
+	"github.com/m4gshm/container/typ"
 )
 
-func newSet[T comparable](values []T) *OrderSet[T] {
+func NewSet[T comparable](values []T) *OrderedSet[T] {
 	var (
 		uniques = make(map[T]int, 0)
 		order   = make([]*T, 0, 0)
@@ -21,23 +22,23 @@ func newSet[T comparable](values []T) *OrderSet[T] {
 			pos++
 		}
 	}
-	return &OrderSet[T]{elements: order, uniques: uniques}
+	return &OrderedSet[T]{elements: order, uniques: uniques}
 }
 
-type OrderSet[T comparable] struct {
+type OrderedSet[T comparable] struct {
 	elements   []*T
 	uniques    map[T]int
 	changeMark int32
 }
 
-var _ Set[any] = (*OrderSet[any])(nil)
-var _ fmt.Stringer = (*OrderSet[any])(nil)
+var _ Set[any, *OrderIter[any]] = (*OrderedSet[any])(nil)
+var _ fmt.Stringer = (*OrderedSet[any])(nil)
 
-func (s *OrderSet[T]) Begin() Iterator[T] {
-	return &OrderIter[T]{iter.NewDeleteable(&s.elements, &s.changeMark, func(ref *T) bool {return s.Delete(*ref)})}
+func (s *OrderedSet[T]) Begin() *OrderIter[T] {
+	return &OrderIter[T]{iter.NewDeleteable(&s.elements, &s.changeMark, func(ref *T) bool { return s.Delete(*ref) })}
 }
 
-func (s *OrderSet[T]) Values() []T {
+func (s *OrderedSet[T]) Values() []T {
 	e := s.elements
 	out := make([]T, len(e))
 	for i, v := range e {
@@ -46,16 +47,22 @@ func (s *OrderSet[T]) Values() []T {
 	return out
 }
 
-func (s *OrderSet[T]) Len() int {
+func (s *OrderedSet[T]) ForEach(w typ.Walker[int, T]) {
+	for i, e := range s.elements {
+		w(i, *e)
+	}
+}
+
+func (s *OrderedSet[T]) Len() int {
 	return len(s.elements)
 }
 
-func (s *OrderSet[T]) Contains(v T) bool {
+func (s *OrderedSet[T]) Contains(v T) bool {
 	_, ok := s.uniques[v]
 	return ok
 }
 
-func (s *OrderSet[T]) Add(v T) bool {
+func (s *OrderedSet[T]) Add(v T) bool {
 	markOnStart := s.changeMark
 	u := s.uniques
 	if _, ok := u[v]; !ok {
@@ -72,7 +79,7 @@ func (s *OrderSet[T]) Add(v T) bool {
 	return false
 }
 
-func (s *OrderSet[T]) Delete(v T) bool {
+func (s *OrderedSet[T]) Delete(v T) bool {
 	markOnStart := s.changeMark
 	u := s.uniques
 	changeMark := s.changeMark
@@ -94,6 +101,6 @@ func (s *OrderSet[T]) Delete(v T) bool {
 	return false
 }
 
-func (s *OrderSet[T]) String() string {
+func (s *OrderedSet[T]) String() string {
 	return slice.ToString(s.elements)
 }

@@ -5,7 +5,7 @@ Need use version 1.18 beta 1 or newer.
 
 ## Containers
 
-### Immutable 
+### [Immutable](./immutable/api.go)
 
 
 [OrderedMap](./immutable/map.go)
@@ -13,10 +13,18 @@ Need use version 1.18 beta 1 or newer.
 [OrderedSet](./immutable/set.go)
 
 
+### [Mutable](./mutable/api.go)
+
+[OrderedMap](./mutable/map.go)
+
+[OrderedSet](./mutable/set.go)
+
+
 ## Packages
-### [Interfaces](./typ/api.go)
+### [Interfaces](./typ/iface.go)
 ```go
 //Common interfaces
+
 
 type Iterator[T any] interface {
 	//checks ability on next element
@@ -25,13 +33,37 @@ type Iterator[T any] interface {
 	Get() T
 }
 
-type Walk[T any] interface {
-	Begin() Iterator[T]
+type Iterable[T any, It Iterator[T]] interface {
+	Begin() It
 }
 
-type Container[T any, S constraints.Integer] interface {
-	Values() []T
-	Len() S
+type Walker[P any, T any] func(position P, value T)
+type Walk[T any, P any] interface {
+	ForEach(Walker[P, T])
+}
+
+type Container[T any] interface {
+	Values() T
+}
+
+type Measureable[L constraints.Integer] interface {
+	Len() L
+}
+
+type Checkable[T any] interface {
+	Contains(T) bool
+}
+
+type Resetable interface {
+	Reset()
+}
+
+type Appendable[T any] interface {
+	Add(T) bool
+}
+
+type Deletable[T any] interface {
+	Delete(T) bool
 }
 ```
 

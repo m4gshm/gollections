@@ -26,6 +26,9 @@ func Test_Set_Iterate(t *testing.T) {
 		out = append(out, it.Get())
 	}
 	assert.Equal(t, expected, out)
+	
+	out = make([]int, 0)
+	set.ForEach(func(i int, v int) {out = append(out, v)})
 }
 
 func Test_Set_Add(t *testing.T) {

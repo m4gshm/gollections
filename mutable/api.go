@@ -8,8 +8,9 @@ type Iterator[T any] interface {
 	Delete() bool
 }
 
-type Set[T any] interface {
-	typ.Walk[T, Iterator[T]]
+type Set[T any, It typ.Iterator[T]] interface {
+	typ.Walk[T, int]
+	typ.Iterable[T, It]
 	typ.Container[[]T]
 	typ.Measureable[int]
 	typ.Checkable[T]
@@ -18,6 +19,6 @@ type Set[T any] interface {
 }
 
 
-func NewOrderedSet[T comparable](values ...T) Set[T] {
-	return newSet(values)
+func NewOrderedSet[T comparable](values ...T) Set[T, *OrderIter[T]] {
+	return NewSet(values)
 }

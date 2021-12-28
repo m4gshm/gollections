@@ -8,7 +8,7 @@ import (
 	"github.com/m4gshm/container/typ"
 )
 
-func newSet[T comparable](values []T) *OrderedSet[T] {
+func NewSet[T comparable](values []T) *OrderedSet[T] {
 	var (
 		uniques = make(map[T]struct{}, 0)
 		order   = make([]*T, 0, 0)
@@ -28,10 +28,10 @@ type OrderedSet[T comparable] struct {
 	uniques  map[T]struct{}
 }
 
-var _ Set[any] = (*OrderedSet[any])(nil)
+var _ Set[any, *OrderIter[any]] = (*OrderedSet[any])(nil)
 var _ fmt.Stringer = (*OrderedSet[any])(nil)
 
-func (s *OrderedSet[T]) Begin() typ.Iterator[T] {
+func (s *OrderedSet[T]) Begin() *OrderIter[T] {
 	return &OrderIter[T]{Iter: iter.New(&s.elements)}
 }
 
@@ -42,6 +42,12 @@ func (s *OrderedSet[T]) Values() []T {
 		out[i] = *v
 	}
 	return out
+}
+
+func (s *OrderedSet[T]) ForEach(w typ.Walker[int, T]) {
+	for i, e := range s.elements {
+		w(i, *e)
+	}
 }
 
 func (s *OrderedSet[T]) Len() int {

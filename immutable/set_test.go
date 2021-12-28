@@ -18,12 +18,17 @@ func Test_Set_Iterate(t *testing.T) {
 	expected := slice.Of(1, 2, 4, 3)
 	assert.Equal(t, expected, values)
 
-	iterSlice := iter.ToSlice(set.Begin())
+	iterSlice := iter.ToSlice[int](set.Begin())
 	assert.Equal(t, expected, iterSlice)
 
 	out := make([]int, 0)
 	for it := set.Begin(); it.HasNext(); {
 		out = append(out, it.Get())
 	}
+	assert.Equal(t, expected, out)
+
+	out = make([]int, 0)
+	set.ForEach(func(i int, v int) {out = append(out, v)})
+
 	assert.Equal(t, expected, out)
 }

@@ -1,6 +1,8 @@
 package typ
 
-import "constraints"
+import (
+	"constraints"
+)
 
 //Iterator base interface for containers, collections
 type Iterator[T any] interface {
@@ -10,8 +12,13 @@ type Iterator[T any] interface {
 	Get() T
 }
 
-type Walk[T any, It Iterator[T]] interface {
+type Iterable[T any, It Iterator[T]] interface {
 	Begin() It
+}
+
+type Walker[P any, T any] func(position P, value T)
+type Walk[T any, P any] interface {
+	ForEach(Walker[P, T])
 }
 
 type Container[T any] interface {

@@ -6,10 +6,10 @@ import (
 )
 
 type OrderIter[T any] struct {
-	*iter.Iter[*T]
+	 *iter.Iter[*T]
 }
 
-var _ typ.Iterator[interface{}] = (*OrderIter[interface{}])(nil)
+var _ typ.Iterator[any] = (*OrderIter[any])(nil)
 
 func (i *OrderIter[T]) HasNext() bool {
 	return i.Iter.HasNext()

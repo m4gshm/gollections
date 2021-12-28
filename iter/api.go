@@ -55,7 +55,9 @@ func NotNil[T any](elements typ.Iterator[*T]) typ.Iterator[*T] {
 
 //ForEach applies func on elements
 func ForEach[T any](elements typ.Iterator[T], apply func(T)) {
-	impl.ForEach(elements, apply)
+	for elements.HasNext() {
+		apply(elements.Get())
+	}
 }
 
 func ForEachFit[T any](elements typ.Iterator[T], apply func(T), fit check.Predicate[T]) {

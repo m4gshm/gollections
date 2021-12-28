@@ -3,8 +3,10 @@ package benchmark
 import (
 	"testing"
 
+	"github.com/m4gshm/container/immutable"
 	"github.com/m4gshm/container/iter"
 	impliter "github.com/m4gshm/container/iter/impl/iter"
+	"github.com/m4gshm/container/mutable"
 )
 
 var amount = 100_000
@@ -37,6 +39,36 @@ func Benchmark_ForEach_Iterator_Impl(b *testing.B) {
 	_ = result
 }
 
+func Benchmark_ForEach_Immutable_OrdererSet_Iterator(b *testing.B) {
+	values := make([]int, amount)
+	for i := 0; i < amount; i++ {
+		values[i] = i
+	}
+	set := immutable.NewOrderedSet(values...)
+	result := 0
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		impliter.ForEach(set.Begin(), func(v int) { result = v })
+	}
+	b.StopTimer()
+	_ = result
+}
+
+func Benchmark_ForEach_Mutable_OrdererSet_Iterator(b *testing.B) {
+	values := make([]int, amount)
+	for i := 0; i < amount; i++ {
+		values[i] = i
+	}
+	set := mutable.NewOrderedSet(values...)
+	result := 0
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		impliter.ForEach(set.Begin(), func(v int) { result = v })
+	}
+	b.StopTimer()
+	_ = result
+}
+
 func Benchmark_HasNextGet_Iterator_Interface(b *testing.B) {
 	values := make([]int, amount)
 	for i := 0; i < amount; i++ {
@@ -62,7 +94,7 @@ func Benchmark_HasNextGet_Iterator_Impl(b *testing.B) {
 	result := 0
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		it := impliter.New(&values); 
+		it := impliter.New(&values)
 		for it.HasNext() {
 			result = it.Get()
 		}
@@ -84,6 +116,71 @@ func Benchmark_HasNextGetReset_Iterator_Impl(b *testing.B) {
 			result = it.Get()
 		}
 		it.Reset()
+	}
+	b.StopTimer()
+	_ = result
+}
+
+func Benchmark_ForEach_Immutable_OrdererSet_Walker(b *testing.B) {
+	values := make([]int, amount)
+	for i := 0; i < amount; i++ {
+		values[i] = i
+	}
+	set := immutable.NewOrderedSet(values...)
+	result := 0
+	f := func(_ int, v int) { result = v }
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		set.ForEach(f)
+	}
+	b.StopTimer()
+	_ = result
+}
+
+
+
+func Benchmark_ForEach_Immutable_OrdererSet_Walker_Impl(b *testing.B) {
+	values := make([]int, amount)
+	for i := 0; i < amount; i++ {
+		values[i] = i
+	}
+	set := immutable.NewSet(values)
+	result := 0
+	f := func(_ int, v int) { result = v }
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		set.ForEach(f)
+	}
+	b.StopTimer()
+	_ = result
+}
+func Benchmark_ForEach_Mutable_OrdererSet_Walker(b *testing.B) {
+	values := make([]int, amount)
+	for i := 0; i < amount; i++ {
+		values[i] = i
+	}
+	set := mutable.NewOrderedSet(values...)
+	var result int
+	f := func(i int, v int) { result = v }
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		set.ForEach(f)
+	}
+	b.StopTimer()
+	_ = result
+}
+
+func Benchmark_ForEach_Mutable_OrdererSet_Walker_Impl(b *testing.B) {
+	values := make([]int, amount)
+	for i := 0; i < amount; i++ {
+		values[i] = i
+	}
+	set := mutable.NewSet(values)
+	var result int
+	f := func(i int, v int) { result = v }
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		set.ForEach(f)
 	}
 	b.StopTimer()
 	_ = result

@@ -42,6 +42,15 @@ func (s *OrderedMap[k, v]) Values() map[k]v {
 	return out
 }
 
+func (s *OrderedMap[k, v]) ForEach(w typ.Walker[k, v]) {
+	e := s.uniques
+	for _, ref := range s.order {
+		key := *ref
+		w(key, e[key])
+	}
+}
+
+
 func (s *OrderedMap[k, v]) Len() int {
 	return len(s.order)
 }
