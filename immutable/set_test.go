@@ -8,8 +8,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_Set(t *testing.T) {
-	set := NewSet(1, 1, 2, 4, 3, 1)
+func Test_Set_Iterate(t *testing.T) {
+	set := NewOrderedSet(1, 1, 2, 4, 3, 1)
 	values := set.Values()
 
 	assert.Equal(t, 4, set.Len())

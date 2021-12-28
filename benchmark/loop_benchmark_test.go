@@ -31,7 +31,7 @@ func Benchmark_ForEach_Iterator_Impl(b *testing.B) {
 	result := 0
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		impliter.ForEach(impliter.New(values), func(v int) { result = v })
+		impliter.ForEach(impliter.New(&values), func(v int) { result = v })
 	}
 	b.StopTimer()
 	_ = result
@@ -62,7 +62,7 @@ func Benchmark_HasNextGet_Iterator_Impl(b *testing.B) {
 	result := 0
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		it := impliter.New(values); 
+		it := impliter.New(&values); 
 		for it.HasNext() {
 			result = it.Get()
 		}
@@ -76,7 +76,7 @@ func Benchmark_HasNextGetReset_Iterator_Impl(b *testing.B) {
 	for i := 0; i < amount; i++ {
 		values[i] = i
 	}
-	it := impliter.NewReseteable(values)
+	it := impliter.NewReseteable(&values)
 	result := 0
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {

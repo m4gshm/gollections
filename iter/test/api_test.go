@@ -44,10 +44,10 @@ func Test_FlattSlices(t *testing.T) {
 
 	e := slice.Of(1, 3, 5, 7)
 
-	a := iter.ToSlice[int](iter.Filter(iter.Flatt(iter.Flatt(iter.Wrap(multiDimension), conv.To[[][]int]), conv.To[[]int]), odds))
+	a := iter.ToSlice(iter.Filter(iter.Flatt(iter.Flatt(iter.Wrap(multiDimension), conv.To[[][]int]), conv.To[[]int]), odds))
 	assert.Equal(t, e, a)
 
-	a = iter.ToSlice[int](iter.Filter(iter.Flatt(slice.Flatt(multiDimension, conv.To[[][]int]), conv.To[[]int]), odds))
+	a = iter.ToSlice(iter.Filter(iter.Flatt(slice.Flatt(multiDimension, conv.To[[][]int]), conv.To[[]int]), odds))
 	assert.Equal(t, e, a)
 
 	//plain old style
@@ -107,11 +107,11 @@ type (
 	Participant struct{ attributes []*Attributes }
 )
 
-func (a *Attributes) GetName() string { 
+func (a *Attributes) GetName() string {
 	if a == nil {
 		return ""
 	}
-	return a.name 
+	return a.name
 }
 
 func (p *Participant) GetAttributes() []*Attributes {

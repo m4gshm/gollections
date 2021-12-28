@@ -1,6 +1,8 @@
 package slice
 
 import (
+	"fmt"
+
 	"github.com/m4gshm/container/check"
 	"github.com/m4gshm/container/conv"
 	impl "github.com/m4gshm/container/slice/impl/slice"
@@ -39,4 +41,15 @@ func Filter[T any](elements []T, filter check.Predicate[T]) typ.Iterator[T] {
 //NotNil creates a lazy Iterator that filters nullable elements
 func NotNil[T any](elements []*T) typ.Iterator[*T] {
 	return Filter(elements, check.NotNil[T])
+}
+
+func ToString[T any](elements []T) string {
+	str := ""
+	for _, v := range elements {
+		if len(str) > 0 {
+			str += ", "
+		}
+		str += fmt.Sprintf("%+v", v)
+	}
+	return "[" + str + "]"
 }

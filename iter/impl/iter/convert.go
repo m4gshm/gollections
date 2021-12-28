@@ -11,6 +11,7 @@ type ConvertFit[From, To any] struct {
 	By      conv.Converter[From, To]
 	Fit     check.Predicate[From]
 	current To
+	err     error
 }
 
 var _ typ.Iterator[interface{}] = (*ConvertFit[interface{}, interface{}])(nil)

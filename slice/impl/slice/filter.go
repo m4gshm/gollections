@@ -7,10 +7,10 @@ import (
 
 type Fit[T any] struct {
 	Elements []T
-	By   check.Predicate[T]
+	By       check.Predicate[T]
 
-	current  T
-	i        int
+	current T
+	i       int
 }
 
 var _ typ.Iterator[interface{}] = (*Fit[interface{}])(nil)

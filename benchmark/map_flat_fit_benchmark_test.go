@@ -43,7 +43,7 @@ func Benchmark_MapAndFilter_Iterable_Impl(b *testing.B) {
 	var s []string
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		s = iterImpl.ToSlice[string](iterImpl.Map(iterImpl.Filter(iterImpl.New(items), even), conv.And(toString, addTail)))
+		s = iterImpl.ToSlice[string](iterImpl.Map(iterImpl.Filter(iterImpl.New(&items), even), conv.And(toString, addTail)))
 	}
 	_ = s
 
@@ -213,7 +213,7 @@ func Benchmark_ReduceSum_Iterable_Impl(b *testing.B) {
 	multiDimension := [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_ = iterImpl.Reduce(iterImpl.Filter(iterImpl.Flatt(iterImpl.Flatt(iterImpl.New(multiDimension), conv.To[[][]int]), conv.To[[]int]), odds), op.Sum[int])
+		_ = iterImpl.Reduce(iterImpl.Filter(iterImpl.Flatt(iterImpl.Flatt(iterImpl.New(&multiDimension), conv.To[[][]int]), conv.To[[]int]), odds), op.Sum[int])
 	}
 	b.StopTimer()
 }
@@ -320,7 +320,7 @@ func Benchmark_MapFlattStructure_IterableFit(b *testing.B) {
 }
 
 func Benchmark_MapFlattStructure_IterableFitReset_Impl(b *testing.B) {
-	items := iterImpl.NewReseteable([]*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil})
+	items := iterImpl.NewReseteable(&[]*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil})
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_ = iterImpl.ToSlice[string](iterImpl.MapFit(iterImpl.FlattFit(items, check.NotNil[Participant], (*Participant).GetAttributes), check.NotNil[Attributes], (*Attributes).GetName))

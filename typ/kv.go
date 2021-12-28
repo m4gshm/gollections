@@ -1,23 +1,22 @@
 package typ
 
-
 func NewKV[K any, V any](key K, value V) *KV[K, V] {
-	return &KV[K, V]{key: key, value: value}
+	return &KV[K, V]{K: key, V: value}
 }
 
-type KV[K any, V any] struct {
-	key   K
-	value V
+type KV[k any, v any] struct {
+	K k
+	V v
 }
 
 func (k *KV[K, V]) Key() K {
-	return k.key
+	return k.K
 }
 
 func (k *KV[K, V]) Value() V {
-	return k.value
+	return k.V
 }
 
-func (k *KV[K, V]) Get() (K,V) {
-	return k.key, k.value
+func (k *KV[K, V]) Get() (K, V) {
+	return k.K, k.V
 }
