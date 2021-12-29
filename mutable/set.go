@@ -31,7 +31,7 @@ type OrderedSet[T comparable] struct {
 	changeMark int32
 }
 
-var _ Set[any, *OrderIter[any]] = (*OrderedSet[any])(nil)
+// var _ Set[any, *OrderIter[any]] = (*OrderedSet[any])(nil)
 var _ fmt.Stringer = (*OrderedSet[any])(nil)
 
 func (s *OrderedSet[T]) Begin() *OrderIter[T] {
@@ -47,9 +47,9 @@ func (s *OrderedSet[T]) Values() []T {
 	return out
 }
 
-func (s *OrderedSet[T]) ForEach(w typ.Walker[int, T]) {
-	for i, e := range s.elements {
-		w(i, *e)
+func (s *OrderedSet[T]) ForEach(w typ.Walker[T]) {
+	for _, e := range s.elements {
+		w(*e)
 	}
 }
 

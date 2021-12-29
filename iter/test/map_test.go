@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_MapIterator(t *testing.T) {
+func Test_KVIter_Iterate(t *testing.T) {
 	type s struct {
 		name string
 	}
@@ -26,7 +26,7 @@ func Test_MapIterator(t *testing.T) {
 	}
 }
 
-func Test_MapIterateResetIterat(t *testing.T) {
+func Test_KVIterReset(t *testing.T) {
 	type s struct {
 		name string
 	}

@@ -18,7 +18,7 @@ func Test_Set_Iterate(t *testing.T) {
 	expected := slice.Of(1, 2, 4, 3)
 	assert.Equal(t, expected, values)
 
-	iterSlice := iter.ToSlice[int](set.Begin())
+	iterSlice := iter.Slice[int](set.Begin())
 	assert.Equal(t, expected, iterSlice)
 
 	out := make([]int, 0)
@@ -26,9 +26,9 @@ func Test_Set_Iterate(t *testing.T) {
 		out = append(out, it.Get())
 	}
 	assert.Equal(t, expected, out)
-	
+
 	out = make([]int, 0)
-	set.ForEach(func(i int, v int) {out = append(out, v)})
+	set.ForEach(func(v int) { out = append(out, v) })
 }
 
 func Test_Set_Add(t *testing.T) {
@@ -41,7 +41,7 @@ func Test_Set_Add(t *testing.T) {
 
 	values := set.Values()
 
-	assert.Equal(t, slice.Of(1,2,4,3), values)
+	assert.Equal(t, slice.Of(1, 2, 4, 3), values)
 }
 
 func Test_Set_Delete(t *testing.T) {
@@ -59,7 +59,7 @@ func Test_Set_DeleteByIterator(t *testing.T) {
 	set := NewOrderedSet(1, 1, 2, 4, 3, 1)
 	iter := set.Begin()
 
-	i:=0
+	i := 0
 	for iter.HasNext() {
 		i++
 		iter.Delete()

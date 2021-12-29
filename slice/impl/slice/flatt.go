@@ -1,21 +1,20 @@
 package slice
 
 import (
-	"github.com/m4gshm/container/check"
-	"github.com/m4gshm/container/conv"
+	"github.com/m4gshm/container/iter/impl/iter"
 	"github.com/m4gshm/container/typ"
 )
 
-
 type FlattenFit[From, To any] struct {
-	Elements   []From
-	Flatt      conv.Flatter[From, To]
-	Fit        check.Predicate[From]
+	Elements []From
+	Flatt    typ.Flatter[From, To]
+	Fit      typ.Predicate[From]
 
 	indFrom    int
 	elementsTo []To
 	indTo      int
 	c          To
+	err        error
 }
 
 var _ typ.Iterator[interface{}] = (*FlattenFit[interface{}, interface{}])(nil)
@@ -46,21 +45,30 @@ func (s *FlattenFit[From, To]) HasNext() bool {
 			}
 		}
 	}
+	s.err = iter.Exhausted
 	return false
 }
 
 func (s *FlattenFit[From, To]) Get() To {
+	if err := s.err; err != nil {
+		panic(err)
+	}
 	return s.c
 }
 
+func (s *FlattenFit[From, To]) Err() error {
+	return s.err
+}
+
 type Flatten[From, To any] struct {
-	Elements   []From
-	Flatt      conv.Flatter[From, To]
+	Elements []From
+	Flatt    typ.Flatter[From, To]
 
 	indFrom    int
 	elementsTo []To
 	indTo      int
 	c          To
+	err        error
 }
 
 var _ typ.Iterator[interface{}] = (*Flatten[interface{}, interface{}])(nil)
@@ -90,9 +98,17 @@ func (s *Flatten[From, To]) HasNext() bool {
 			return true
 		}
 	}
+	s.err = iter.Exhausted
 	return false
 }
 
 func (s *Flatten[From, To]) Get() To {
+	if err := s.err; err != nil {
+		panic(err)
+	}
 	return s.c
+}
+
+func (s *Flatten[From, To]) Err() error {
+	return s.err
 }

@@ -3,14 +3,11 @@ package check
 import (
 	"reflect"
 
-	"github.com/m4gshm/container/conv"
+	"github.com/m4gshm/container/typ"
 )
 
-//Predicate tests value (converts to true or false)
-type Predicate[T any] conv.Converter[T, bool]
-
 //Not invert predicate
-func Not[T any](p Predicate[T]) Predicate[T] {
+func Not[T any](p typ.Predicate[T]) typ.Predicate[T] {
 	return func(v T) bool { return !p(v) }
 }
 
@@ -36,12 +33,12 @@ func EmptyMap[K comparable, V any](val map[K]V) bool {
 	return len(val) == 0
 }
 
-func And[T any](p1, p2 Predicate[T]) Predicate[T] {
+func And[T any](p1, p2 typ.Predicate[T]) typ.Predicate[T] {
 	return func(v T) bool { return p1(v) && p2(v) }
 }
 
 //Union reduce predicates to an one
-func Union[T any](predicates []Predicate[T]) Predicate[T] {
+func Union[T any](predicates []typ.Predicate[T]) typ.Predicate[T] {
 	l := len(predicates)
 	if l == 0 {
 		return func(_ T) bool { return false }

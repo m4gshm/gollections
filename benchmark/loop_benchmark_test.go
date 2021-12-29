@@ -11,6 +11,23 @@ import (
 
 var amount = 100_000
 
+func Benchmark_ForEach_Stream(b *testing.B) {
+	amount = 2
+	values := make([]int, amount)
+	for i := 0; i < amount; i++ {
+		values[i] = i
+	}
+
+	var result int
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		iter.Stream(iter.Wrap(values)).ForEach(func(v int) { result = v })
+	}
+
+	b.StopTimer()
+	_ = result
+}
+
 func Benchmark_ForEach_Iterator_Interface(b *testing.B) {
 	values := make([]int, amount)
 	for i := 0; i < amount; i++ {
@@ -19,7 +36,7 @@ func Benchmark_ForEach_Iterator_Interface(b *testing.B) {
 	result := 0
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		iter.ForEach(iter.Wrap(values), func(v int) { result = v })
+		iter.ForEach(iter.Wrap(values), func(v int) { result++ })
 	}
 	b.StopTimer()
 	_ = result
@@ -77,8 +94,7 @@ func Benchmark_HasNextGet_Iterator_Interface(b *testing.B) {
 	result := 0
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		it := iter.Wrap(values)
-		for it.HasNext() {
+		for it := iter.Wrap(values); it.HasNext(); {
 			result = it.Get()
 		}
 	}
@@ -94,8 +110,7 @@ func Benchmark_HasNextGet_Iterator_Impl(b *testing.B) {
 	result := 0
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		it := impliter.New(&values)
-		for it.HasNext() {
+		for it := impliter.New(&values); it.HasNext(); {
 			result = it.Get()
 		}
 	}
@@ -128,16 +143,13 @@ func Benchmark_ForEach_Immutable_OrdererSet_Walker(b *testing.B) {
 	}
 	set := immutable.NewOrderedSet(values...)
 	result := 0
-	f := func(_ int, v int) { result = v }
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		set.ForEach(f)
+		set.ForEach(func(v int) { result = v })
 	}
 	b.StopTimer()
 	_ = result
 }
-
-
 
 func Benchmark_ForEach_Immutable_OrdererSet_Walker_Impl(b *testing.B) {
 	values := make([]int, amount)
@@ -146,10 +158,9 @@ func Benchmark_ForEach_Immutable_OrdererSet_Walker_Impl(b *testing.B) {
 	}
 	set := immutable.NewSet(values)
 	result := 0
-	f := func(_ int, v int) { result = v }
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		set.ForEach(f)
+		set.ForEach(func(v int) { result = v })
 	}
 	b.StopTimer()
 	_ = result
@@ -161,10 +172,9 @@ func Benchmark_ForEach_Mutable_OrdererSet_Walker(b *testing.B) {
 	}
 	set := mutable.NewOrderedSet(values...)
 	var result int
-	f := func(i int, v int) { result = v }
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		set.ForEach(f)
+		set.ForEach(func(v int) { result = v })
 	}
 	b.StopTimer()
 	_ = result
@@ -177,10 +187,9 @@ func Benchmark_ForEach_Mutable_OrdererSet_Walker_Impl(b *testing.B) {
 	}
 	set := mutable.NewSet(values)
 	var result int
-	f := func(i int, v int) { result = v }
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		set.ForEach(f)
+		set.ForEach(func(v int) { result = v })
 	}
 	b.StopTimer()
 	_ = result
@@ -210,12 +219,10 @@ func Benchmark_ForByIndex_EmbeddedSlice(b *testing.B) {
 	result := 0
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-
 		for j := 0; j < len(values); j++ {
 			v := values[j]
 			result += v
 		}
-
 	}
 	b.StopTimer()
 	_ = result
@@ -245,8 +252,7 @@ func Benchmark_NewKVHasNextGet(b *testing.B) {
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		iter := impliter.NewKV(values)
-		for iter.HasNext() {
+		for iter := impliter.NewKV(values); iter.HasNext(); {
 			kv := iter.Get()
 			_ = kv.Key()
 			_ = kv.Value()

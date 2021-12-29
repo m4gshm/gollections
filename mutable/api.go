@@ -9,7 +9,7 @@ type Iterator[T any] interface {
 }
 
 type Set[T any, It typ.Iterator[T]] interface {
-	typ.Walk[T, int]
+	typ.Walk[T]
 	typ.Iterable[T, It]
 	typ.Container[[]T]
 	typ.Measureable[int]

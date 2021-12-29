@@ -6,22 +6,22 @@ import (
 )
 
 type Set[T any, It typ.Iterator[T]] interface {
-	typ.Walk[T, int]
-	typ.Iterable[T, It]
+	typ.Walk[T]
 	typ.Container[[]T]
 	typ.Measureable[int]
 	typ.Checkable[T]
+	typ.Stream[T]
 }
 
 type Map[k comparable, v any, It typ.Iterator[*typ.KV[k, v]]] interface {
-	typ.Walk[v, k]
+	typ.Track[v, k]
 	typ.Iterable[*typ.KV[k, v], It]
 	typ.Container[map[k]v]
 	typ.Measureable[int]
 	typ.Checkable[k]
 }
 
-func NewOrderedSet[T comparable](values ...T) Set[T, *OrderIter[T]] {
+func NewOrderedSet[T comparable](values ...T) Set[T, typ.Iterator[T]] {
 	return NewSet(values)
 }
 

@@ -1,18 +1,18 @@
 package slice
 
 import (
-	"github.com/m4gshm/container/check"
-	"github.com/m4gshm/container/conv"
+	"github.com/m4gshm/container/iter/impl/iter"
 	"github.com/m4gshm/container/typ"
 )
 
 type ConvertFit[From, To any] struct {
 	Elements []From
-	By       conv.Converter[From, To]
-	Fit      check.Predicate[From]
+	By       typ.Converter[From, To]
+	Fit      typ.Predicate[From]
 
-	i        int
-	current  To
+	i       int
+	current To
+	err     error
 }
 
 var _ typ.Iterator[interface{}] = (*ConvertFit[interface{}, interface{}])(nil)
@@ -22,20 +22,28 @@ func (s *ConvertFit[From, To]) HasNext() bool {
 		s.current = s.By(v)
 		return true
 	}
+	s.err = iter.Exhausted
 	return false
 }
 
 func (s *ConvertFit[From, To]) Get() To {
+	if err := s.err; err != nil {
+		panic(err)
+	}
 	return s.current
+}
+
+func (s *ConvertFit[From, To]) Err() error {
+	return s.err
 }
 
 type Convert[From, To any] struct {
 	Elements []From
-	By       conv.Converter[From, To]
+	By       typ.Converter[From, To]
 
-	i        int
-	current  To
-
+	i       int
+	current To
+	err     error
 }
 
 var _ typ.Iterator[interface{}] = (*Convert[interface{}, interface{}])(nil)
@@ -50,15 +58,22 @@ func (s *Convert[From, To]) HasNext() bool {
 		s.current = s.By(v)
 		return true
 	}
+	s.err = iter.Exhausted
 	return false
 }
 
 func (s *Convert[From, To]) Get() To {
+	if err := s.err; err != nil {
+		panic(err)
+	}
 	return s.current
 }
 
+func (s *Convert[From, To]) Err() error {
+	return s.err
+}
 
-func nextArrayElem[T any](elements []T, filter check.Predicate[T], indexHolder *int) (T, bool) {
+func nextArrayElem[T any](elements []T, filter typ.Predicate[T], indexHolder *int) (T, bool) {
 	l := len(elements)
 	for i := *indexHolder; i < l; i++ {
 		if v := elements[i]; filter(v) {

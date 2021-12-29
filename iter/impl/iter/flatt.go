@@ -1,20 +1,18 @@
 package iter
 
 import (
-	"github.com/m4gshm/container/check"
-	"github.com/m4gshm/container/conv"
 	"github.com/m4gshm/container/typ"
 )
 
 type FlattenFit[From, To any] struct {
 	Iter  typ.Iterator[From]
-	Flatt conv.Flatter[From, To]
-	Fit   check.Predicate[From]
+	Flatt typ.Flatter[From, To]
+	Fit   typ.Predicate[From]
 
 	iterTo []To
 	indTo  int
 	c      To
-	toErr  error
+	err    error
 }
 
 var _ typ.Iterator[interface{}] = (*FlattenFit[interface{}, interface{}])(nil)
@@ -35,9 +33,12 @@ func (s *FlattenFit[From, To]) HasNext() bool {
 	iter := s.Iter
 	for {
 		if !iter.HasNext() {
+			s.err = Exhausted
 			return false
-		}
-		if v := iter.Get(); s.Fit(v) {
+		} else if err := iter.Err(); err != nil {
+			s.err = err
+			return true
+		} else if v := iter.Get(); s.Fit(v) {
 			if iterTo := s.Flatt(v); len(iterTo) > 0 {
 				s.c = iterTo[0]
 				s.iterTo = iterTo
@@ -52,13 +53,17 @@ func (s *FlattenFit[From, To]) Get() To {
 	return s.c
 }
 
+func (s *FlattenFit[From, To]) Err() error {
+	return s.err
+}
+
 type Flatten[From, To any] struct {
 	Iter   typ.Iterator[From]
-	Flatt  conv.Flatter[From, To]
+	Flatt  typ.Flatter[From, To]
 	iterTo []To
 	indTo  int
 	c      To
-	toErr  error
+	err    error
 }
 
 var _ typ.Iterator[interface{}] = (*Flatten[interface{}, interface{}])(nil)
@@ -79,7 +84,11 @@ func (s *Flatten[From, To]) HasNext() bool {
 	iter := s.Iter
 	for {
 		if ok := iter.HasNext(); !ok {
+			s.err = Exhausted
 			return false
+		} else if err := iter.Err(); err != nil {
+			s.err = iter.Err()
+			return true
 		}
 		v := iter.Get()
 		if iterTo := s.Flatt(v); len(iterTo) > 0 {
@@ -95,15 +104,20 @@ func (s *Flatten[From, To]) Get() To {
 	return s.c
 }
 
+func (s *Flatten[From, To]) Err() error {
+	return s.err
+}
+
 type FlattFitSlice[From, To any] struct {
 	Elements []From
-	Flatt    conv.Flatter[From, To]
-	Fit      check.Predicate[From]
+	Flatt    typ.Flatter[From, To]
+	Fit      typ.Predicate[From]
 
 	indFrom    int
 	elementsTo []To
 	indTo      int
 	c          To
+	err        error
 }
 
 var _ typ.Iterator[interface{}] = (*FlattFitSlice[interface{}, interface{}])(nil)
@@ -134,21 +148,30 @@ func (s *FlattFitSlice[From, To]) HasNext() bool {
 			}
 		}
 	}
+	s.err = Exhausted
 	return false
 }
 
 func (s *FlattFitSlice[From, To]) Get() To {
+	if err := s.err; err != nil {
+		panic(err)
+	}
 	return s.c
+}
+
+func (s *FlattFitSlice[From, To]) Err() error {
+	return s.err
 }
 
 type FlattSlice[From, To any] struct {
 	Elements []From
-	Flatt    conv.Flatter[From, To]
+	Flatt    typ.Flatter[From, To]
 
 	indFrom    int
 	elementsTo []To
 	indTo      int
 	c          To
+	err        error
 }
 
 var _ typ.Iterator[interface{}] = (*FlattSlice[interface{}, interface{}])(nil)
@@ -178,9 +201,17 @@ func (s *FlattSlice[From, To]) HasNext() bool {
 			return true
 		}
 	}
+	s.err = Exhausted
 	return false
 }
 
 func (s *FlattSlice[From, To]) Get() To {
+	if err := s.err; err != nil {
+		panic(err)
+	}
 	return s.c
+}
+
+func (s *FlattSlice[From, To]) Err() error {
+	return s.err
 }

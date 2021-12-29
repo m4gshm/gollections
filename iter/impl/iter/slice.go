@@ -1,8 +1,14 @@
 package iter
 
-import "github.com/m4gshm/container/typ"
+import (
+	"errors"
+
+	"github.com/m4gshm/container/typ"
+)
 
 const noStarted = -1
+
+var Exhausted = errors.New("interator exhausted")
 
 func New[T any](elements *[]T) *Iter[T] {
 	return &Iter[T]{elements: elements, current: noStarted}
@@ -14,6 +20,7 @@ func NewReseteable[T any](elements *[]T) *Reseteable[T] {
 
 type Iter[T any] struct {
 	elements *[]T
+	err      error
 	current  int
 }
 
@@ -23,11 +30,19 @@ func (s *Iter[T]) HasNext() bool {
 	if hasNext(s.elements, &s.current) {
 		return true
 	}
+	s.err = Exhausted
 	return false
 }
 
 func (s *Iter[T]) Get() T {
+	if err := s.err; err != nil {
+		panic(err)
+	}
 	return (*s.elements)[s.current]
+}
+
+func (s *Iter[T]) Err() error {
+	return s.err
 }
 
 func (s *Iter[T]) Position() int {
@@ -46,8 +61,8 @@ var _ typ.Resetable = (*Reseteable[interface{}])(nil)
 
 func (s *Reseteable[T]) Reset() {
 	s.SetPosition(noStarted)
+	s.err = nil
 }
-
 
 func NewDeleteable[T any](elements *[]T, changeMark *int32, del func(v T) bool) *Deleteable[T] {
 	return &Deleteable[T]{New(elements), changeMark, del}
