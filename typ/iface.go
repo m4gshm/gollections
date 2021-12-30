@@ -6,6 +6,9 @@ import (
 	"github.com/m4gshm/container/op"
 )
 
+/*
+ *  Common interfaces
+ */
 
 type Container[T any, L constraints.Integer] interface {
 	Walk[T]

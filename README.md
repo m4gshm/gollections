@@ -25,6 +25,128 @@ Need use version 1.18 beta 1 or newer.
 
 ## Packages
 ### [Interfaces](./typ/iface.go)
+
+```go
+/*
+ *  Common interfaces
+ */
+
+type Container[T any, L constraints.Integer] interface {
+	Walk[T]
+	Finite[[]T, L]
+}
+
+type Vector[T any] interface {
+	Container[T, int]
+	RandomAccess[int, T]
+}
+
+type Set[T any] interface {
+	Container[T, int]
+	Checkable[T]
+}
+
+type Map[k comparable, v any, IT Iterator[*KV[k, v]]] interface {
+	Track[v, k]
+	Iterable[*KV[k, v], IT]
+	Finite[map[k]v, int]
+	Checkable[k]
+	KeyAccess[k, v]
+}
+
+//Iterator base interface for containers, collections
+type Iterator[T any] interface {
+	//checks ability on next element or error
+	HasNext() bool
+	//retrieves next element
+	Get() T
+	//retrieves error
+	Err() error
+}
+
+//Resetable an object with resettable state (e.g. slice based iterator)
+type Resetable interface {
+	Reset()
+}
+
+//Iterable iterator supplier
+type Iterable[T any, It Iterator[T]] interface {
+	Begin() It
+}
+
+//Walk touches all elements of the collection
+type Walk[T any] interface {
+	ForEach(func(element T))
+}
+
+//Track traverses container elements with position tracking (index, key, coordinates, etc.)
+type Track[T any, P any] interface {
+	ForEach(func(position P, element T))
+}
+
+//Checkable container with ability to check if an element is present
+type Checkable[T any] interface {
+	Contains(T) bool
+}
+
+//Finite not endless container that can be transformed to array or map of elements
+type Finite[T any, L constraints.Integer] interface {
+	Values() T
+	Len() L
+}
+
+type Transformable[T any] interface {
+	Filter(Predicate[T]) Pipe[T]
+	Map(Converter[T, T]) Pipe[T]
+	Reduce(op.Binary[T]) T
+}
+
+type Pipe[T any] interface {
+	Transformable[T]
+	Iterable[T, Iterator[T]]
+	Walk[T]
+}
+
+type Pipeable[T any] interface {
+	Pipe() Pipe[T]
+}
+
+type Appendable[T any] interface {
+	Add(T) bool
+}
+
+type Deletable[T any] interface {
+	Delete(T) bool
+}
+
+type Access[K any, V any] interface {
+	Get(K) (V, bool)
+}
+
+type RandomAccess[K constraints.Integer, V any] interface {
+	Access[K, V]
+}
+
+type KeyAccess[K comparable, V any] interface {
+	Access[K, V]
+}
+
+```
+
+### [Iterator](./iter/)
+API over 'Iterator' to make map, filter, flat, reduce operations in declarative style. 
+
+Consists of two groups of operations:
+ * Intermediate - only defines computation (Wrap,Map, Flatt, Filter).
+ * Final - applies intermediate links (ToSlice, Reudce)
+  
+
+### [Slice](./slice/)
+Same as [iter](./iter/) but specifically for slices. Generally more performant than [iter](./iter/) but only as the first in a chain of intermediate operations.
+
+
+
+## Examples
 ```go
 package examples
 
