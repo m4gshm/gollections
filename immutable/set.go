@@ -29,7 +29,7 @@ type OrderedSet[T comparable] struct {
 	uniques  map[T]struct{}
 }
 
-var _ Set[any, typ.Iterator[any]] = (*OrderedSet[any])(nil)
+var _ Set[any] = (*OrderedSet[any])(nil)
 var _ fmt.Stringer = (*OrderedSet[any])(nil)
 
 func (s *OrderedSet[T]) Begin() typ.Iterator[T] {

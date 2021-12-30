@@ -10,7 +10,8 @@ type FlattenFit[From, To any] struct {
 	Flatt    typ.Flatter[From, To]
 	Fit      typ.Predicate[From]
 
-	indFrom    int
+	indFrom int
+
 	elementsTo []To
 	indTo      int
 	c          To

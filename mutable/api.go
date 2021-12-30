@@ -8,7 +8,7 @@ type Iterator[T any] interface {
 	Delete() bool
 }
 
-type Set[T any, It typ.Iterator[T]] interface {
+type Set[T any, It Iterator[T]] interface {
 	typ.Walk[T]
 	typ.Iterable[T, It]
 	typ.Container[[]T]

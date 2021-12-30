@@ -1,6 +1,8 @@
 package op
 
-import "constraints"
+import (
+	"constraints"
+)
 
 type Binary[T any] func(T, T) T
 

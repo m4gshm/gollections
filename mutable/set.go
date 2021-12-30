@@ -31,7 +31,7 @@ type OrderedSet[T comparable] struct {
 	changeMark int32
 }
 
-// var _ Set[any, *OrderIter[any]] = (*OrderedSet[any])(nil)
+var _ Set[any, *OrderIter[any]] = (*OrderedSet[any])(nil)
 var _ fmt.Stringer = (*OrderedSet[any])(nil)
 
 func (s *OrderedSet[T]) Begin() *OrderIter[T] {

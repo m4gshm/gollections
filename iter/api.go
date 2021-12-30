@@ -17,11 +17,10 @@ func Wrap[T any](elements []T) typ.Iterator[T] {
 	return impl.NewReseteable(&elements)
 }
 
-//Stream new stream 
+//Stream new stream
 func Stream[T any](elements typ.Iterator[T]) typ.Stream[T] {
 	return impl.NewStream(elements)
 }
-
 
 // WrapMap Key, value Iterator constructor.
 func WrapMap[k comparable, v any](values map[k]v) typ.Iterator[*typ.KV[k, v]] {
@@ -77,4 +76,19 @@ func Reduce[T any](elements typ.Iterator[T], by op.Binary[T]) T {
 //Slice converts Iterator to slice
 func Slice[T any](elements typ.Iterator[T]) []T {
 	return impl.Slice[T](elements)
+}
+
+func Group[T any, K comparable](elements typ.Iterator[T], by typ.Converter[T, K]) map[K][]T {
+	groups := map[K][]T{}
+	for elements.HasNext() {
+		e := elements.Get()
+		key := by(e)
+		group := groups[key]
+		if group == nil {
+			group = make([]T, 0)
+		}
+		groups[key] = append(group, e)
+
+	}
+	return groups
 }

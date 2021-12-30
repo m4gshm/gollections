@@ -5,7 +5,7 @@ import (
 	"github.com/m4gshm/container/typ"
 )
 
-type Set[T any, It typ.Iterator[T]] interface {
+type Set[T any] interface {
 	typ.Walk[T]
 	typ.Container[[]T]
 	typ.Measureable[int]
@@ -21,7 +21,7 @@ type Map[k comparable, v any, It typ.Iterator[*typ.KV[k, v]]] interface {
 	typ.Checkable[k]
 }
 
-func NewOrderedSet[T comparable](values ...T) Set[T, typ.Iterator[T]] {
+func NewOrderedSet[T comparable](values ...T) Set[T] {
 	return NewSet(values)
 }
 

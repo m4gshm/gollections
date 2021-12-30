@@ -144,11 +144,19 @@ func Test_Iterate(t *testing.T) {
 
 	result := make([]int, 0)
 
-	stream.ForEach(func(i int) {result = append(result, i)})
+	stream.ForEach(func(i int) { result = append(result, i) })
 
 	result = make([]int, 0)
-	iter.ForEach(iter.Wrap(values), func(i int) {result = append(result, i)})
+	iter.ForEach(iter.Wrap(values), func(i int) { result = append(result, i) })
 
 	assert.Equal(t, values, result)
 
+}
+
+func Test_Group(t *testing.T) {
+	groups := iter.Group(iter.Of(0, 1, 1, 2, 4, 3, 1, 6, 7), func(e int) bool { return e%2 == 0 })
+
+	assert.Equal(t, len(groups), 2)
+	assert.Equal(t, []int{1, 1, 3, 1, 7}, groups[false])
+	assert.Equal(t, []int{0, 2, 4, 6}, groups[true])
 }
