@@ -53,6 +53,21 @@ func ToString[T any](elements []T) string {
 	return "[" + str + "]"
 }
 
+func ToStringRefs[T any](elements []*T) string {
+	str := ""
+	for _, ref := range elements {
+		if len(str) > 0 {
+			str += ", "
+		}
+		if ref == nil {
+			str += "nil"
+		} else {
+			str += fmt.Sprintf("%+v", *ref)
+		}
+	}
+	return "[" + str + "]"
+}
+
 func Group[T any, K comparable](elements []T, by typ.Converter[T, K]) map[K][]T {
 	groups := map[K][]T{}
 	for _, e := range elements {

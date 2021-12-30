@@ -17,9 +17,9 @@ func Wrap[T any](elements []T) typ.Iterator[T] {
 	return impl.NewReseteable(&elements)
 }
 
-//Stream new stream
-func Stream[T any](elements typ.Iterator[T]) typ.Stream[T] {
-	return impl.NewStream(elements)
+//Pipe new stream
+func Pipe[T any](elements typ.Iterator[T]) typ.Pipe[T] {
+	return impl.NewPipe(elements)
 }
 
 // WrapMap Key, value Iterator constructor.

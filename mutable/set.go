@@ -3,7 +3,9 @@ package mutable
 import (
 	"fmt"
 
+	"github.com/m4gshm/container/immutable"
 	"github.com/m4gshm/container/iter/impl/iter"
+	"github.com/m4gshm/container/op"
 	"github.com/m4gshm/container/slice"
 	"github.com/m4gshm/container/typ"
 )
@@ -31,11 +33,19 @@ type OrderedSet[T comparable] struct {
 	changeMark int32
 }
 
-var _ Set[any, *OrderIter[any]] = (*OrderedSet[any])(nil)
+var _ Set[any] = (*OrderedSet[any])(nil)
 var _ fmt.Stringer = (*OrderedSet[any])(nil)
 
-func (s *OrderedSet[T]) Begin() *OrderIter[T] {
-	return &OrderIter[T]{iter.NewDeleteable(&s.elements, &s.changeMark, func(ref *T) bool { return s.Delete(*ref) })}
+func (s *OrderedSet[T]) Begin() DelIter[T] {
+	return s.begin()
+}
+
+func (s *OrderedSet[T]) begin() *OrderIter[T] {
+	return &OrderIter[T]{s.newIter()}
+}
+
+func (s *OrderedSet[T]) newIter() *iter.Deleteable[*T] {
+	return iter.NewDeleteable(&s.elements, &s.changeMark, func(ref *T) bool { return s.Delete(*ref) })
 }
 
 func (s *OrderedSet[T]) Values() []T {
@@ -47,9 +57,9 @@ func (s *OrderedSet[T]) Values() []T {
 	return out
 }
 
-func (s *OrderedSet[T]) ForEach(w typ.Walker[T]) {
+func (s *OrderedSet[T]) ForEach(walker func(T)) {
 	for _, e := range s.elements {
-		w(*e)
+		walker(*e)
 	}
 }
 
@@ -99,6 +109,21 @@ func (s *OrderedSet[T]) Delete(v T) bool {
 		return true
 	}
 	return false
+}
+
+func (s *OrderedSet[T]) Filter(filter typ.Predicate[T]) typ.Pipe[T] {
+	return iter.NewPipe[T](&immutable.OrderIter[T]{Iterator: iter.Filter(s.newIter(), func(ref *T) bool { return filter(*ref) })})
+}
+
+func (s *OrderedSet[T]) Map(by typ.Converter[T, T]) typ.Pipe[T] {
+	return iter.NewPipe[T](&immutable.OrderIter[T]{Iterator: iter.Map(s.newIter(), func(ref *T) *T {
+		conv := by(*ref)
+		return &conv
+	})})
+}
+
+func (s *OrderedSet[T]) Reduce(by op.Binary[T]) T {
+	return iter.Reduce(&OrderIter[T]{s.newIter()}, by)
 }
 
 func (s *OrderedSet[T]) String() string {

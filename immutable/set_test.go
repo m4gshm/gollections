@@ -50,7 +50,7 @@ func Test_Set_FilterMapReduce(t *testing.T) {
 	//no sum, already computer stream
 	assert.Equal(t, 12, sum)
 
-	sum = iter.Stream(NewOrderedSet(1, 1, 2, 4, 3, 1).Begin()).Filter(func(i int) bool { return i%2 == 0 }).Map(func(i int) int { return i * 2 }).Reduce(op.Sum[int])
+	sum = iter.Pipe(NewOrderedSet(1, 1, 2, 4, 3, 1).Begin()).Filter(func(i int) bool { return i%2 == 0 }).Map(func(i int) int { return i * 2 }).Reduce(op.Sum[int])
 	//no sum, already computer stream
 	assert.Equal(t, 12, sum)
 }

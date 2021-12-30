@@ -140,7 +140,7 @@ func Test_Iterate(t *testing.T) {
 		values[i] = i
 	}
 
-	stream := iter.Stream(iter.Wrap(values))
+	stream := iter.Pipe(iter.Wrap(values))
 
 	result := make([]int, 0)
 

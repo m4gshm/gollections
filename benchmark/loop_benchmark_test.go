@@ -11,7 +11,7 @@ import (
 
 var amount = 100_000
 
-func Benchmark_ForEach_Stream(b *testing.B) {
+func Benchmark_ForEach_Pipe(b *testing.B) {
 	amount = 2
 	values := make([]int, amount)
 	for i := 0; i < amount; i++ {
@@ -21,7 +21,7 @@ func Benchmark_ForEach_Stream(b *testing.B) {
 	var result int
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		iter.Stream(iter.Wrap(values)).ForEach(func(v int) { result = v })
+		iter.Pipe(iter.Wrap(values)).ForEach(func(v int) { result = v })
 	}
 
 	b.StopTimer()
@@ -76,7 +76,7 @@ func Benchmark_ForEach_Mutable_OrdererSet_Iterator(b *testing.B) {
 	for i := 0; i < amount; i++ {
 		values[i] = i
 	}
-	set := mutable.NewOrderedSet(values...)
+	var set mutable.Set[int] = mutable.NewOrderedSet(values...)
 	result := 0
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {

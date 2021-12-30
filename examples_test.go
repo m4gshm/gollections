@@ -1,31 +1,3 @@
-# Gollections
-
-Golang experiments with container data structures, slices, maps, and so on using generics.
-Need use version 1.18 beta 1 or newer.
-
-## Containers
-
-### [Immutable](./immutable/api.go)
-
-[Vector](./immutable/vector.go)
-
-[OrderedMap](./immutable/map.go)
-
-[OrderedSet](./immutable/set.go)
-
-
-### [Mutable](./mutable/api.go)
-
-[Vector](./mutable/vector.go)
-
-[OrderedMap](./mutable/map.go)
-
-[OrderedSet](./mutable/set.go)
-
-
-## Packages
-### [Interfaces](./typ/iface.go)
-```go
 package examples
 
 import (
@@ -83,4 +55,3 @@ func Test_compute_odds_sum(t *testing.T) {
 
 	assert.Equal(t, expected, oddSum)
 }
-```

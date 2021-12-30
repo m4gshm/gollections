@@ -5,34 +5,34 @@ import (
 	"github.com/m4gshm/container/typ"
 )
 
-func NewStream[T any](it typ.Iterator[T]) *IterStream[T] {
-	return &IterStream[T]{it: it}
+func NewPipe[T any](it typ.Iterator[T]) *IterPipe[T] {
+	return &IterPipe[T]{it: it}
 }
 
-type IterStream[T any] struct {
+type IterPipe[T any] struct {
 	it typ.Iterator[T]
 }
 
-var _ typ.Stream[any] = (*IterStream[any])(nil)
+var _ typ.Pipe[any] = (*IterPipe[any])(nil)
 
-func (s *IterStream[T]) Filter(fit typ.Predicate[T]) typ.Stream[T] {
-	return NewStream[T](Filter(s.it, fit))
+func (s *IterPipe[T]) Filter(fit typ.Predicate[T]) typ.Pipe[T] {
+	return NewPipe[T](Filter(s.it, fit))
 }
 
-func (s *IterStream[T]) Map(by typ.Converter[T, T]) typ.Stream[T] {
-	return NewStream[T](Map(s.it, by))
+func (s *IterPipe[T]) Map(by typ.Converter[T, T]) typ.Pipe[T] {
+	return NewPipe[T](Map(s.it, by))
 }
 
-func (s *IterStream[T]) ForEach(w typ.Walker[T]) {
+func (s *IterPipe[T]) ForEach(walker func(T)) {
 	for s.it.HasNext() {
-		w(s.it.Get())
+		walker(s.it.Get())
 	}
 }
 
-func (s *IterStream[T]) Reduce(by op.Binary[T]) T {
+func (s *IterPipe[T]) Reduce(by op.Binary[T]) T {
 	return Reduce(s.it, by)
 }
 
-func (s *IterStream[T]) Begin() typ.Iterator[T] {
+func (s *IterPipe[T]) Begin() typ.Iterator[T] {
 	return s.it
 }

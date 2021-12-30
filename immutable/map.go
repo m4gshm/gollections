@@ -26,7 +26,7 @@ type OrderedMap[k comparable, v any] struct {
 	uniques map[k]v
 }
 
-var _ Map[any, any, *iter.OrderedKVIter[any, any]] = (*OrderedMap[interface{}, interface{}])(nil)
+var _ typ.Map[any, any, *iter.OrderedKVIter[any, any]] = (*OrderedMap[interface{}, interface{}])(nil)
 // var _ fmt.Stringer = (*OrderedMap[interface{}, interface{}])(nil)
 
 func (s *OrderedMap[k, v]) Begin() *iter.OrderedKVIter[k, v] {
@@ -42,11 +42,11 @@ func (s *OrderedMap[k, v]) Values() map[k]v {
 	return out
 }
 
-func (s *OrderedMap[k, v]) ForEach(w typ.Tracker[k, v]) {
+func (s *OrderedMap[k, v]) ForEach(tracker func(k,v)) {
 	e := s.uniques
 	for _, ref := range s.order {
 		key := *ref
-		w(key, e[key])
+		tracker(key, e[key])
 	}
 }
 
@@ -60,4 +60,8 @@ func (s *OrderedMap[k, v]) Contains(key k) bool {
 	return ok
 }
 
+func (s *OrderedMap[k, v]) Get(key k) (v, bool) {
+	val, ok:= s.uniques[key]
+	return val, ok
+}
 

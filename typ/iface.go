@@ -6,6 +6,30 @@ import (
 	"github.com/m4gshm/container/op"
 )
 
+
+type Container[T any, L constraints.Integer] interface {
+	Walk[T]
+	Finite[[]T, L]
+}
+
+type Vector[T any] interface {
+	Container[T, int]
+	RandomAccess[int, T]
+}
+
+type Set[T any] interface {
+	Container[T, int]
+	Checkable[T]
+}
+
+type Map[k comparable, v any, IT Iterator[*KV[k, v]]] interface {
+	Track[v, k]
+	Iterable[*KV[k, v], IT]
+	Finite[map[k]v, int]
+	Checkable[k]
+	KeyAccess[k, v]
+}
+
 //Iterator base interface for containers, collections
 type Iterator[T any] interface {
 	//checks ability on next element or error
@@ -16,47 +40,51 @@ type Iterator[T any] interface {
 	Err() error
 }
 
+//Resetable an object with resettable state (e.g. slice based iterator)
+type Resetable interface {
+	Reset()
+}
+
 //Iterable iterator supplier
 type Iterable[T any, It Iterator[T]] interface {
 	Begin() It
 }
 
-type Stream[T any] interface {
-	Filter(Predicate[T]) Stream[T]
-	Map(Converter[T, T]) Stream[T]
-	Reduce(op.Binary[T]) T
-	Iterable[T, Iterator[T]]
-	Walk[T]
-}
-
-//Walk walks the elements of container
-type Track[T any, P any] interface {
-	ForEach(Tracker[P, T])
-}
-
-//Tracker callback function for Track interface
-type Tracker[P any, T any] func(position P, value T)
-
+//Walk touches all elements of the collection
 type Walk[T any] interface {
-	ForEach(Walker[T])
-}
-//Walker callback function for Walk interface
-type Walker[T any] func(value T)
-
-type Container[T any] interface {
-	Values() T
+	ForEach(func(element T))
 }
 
-type Measureable[L constraints.Integer] interface {
-	Len() L
+//Track traverses container elements with position tracking (index, key, coordinates, etc.)
+type Track[T any, P any] interface {
+	ForEach(func(position P, element T))
 }
 
+//Checkable container with ability to check if an element is present
 type Checkable[T any] interface {
 	Contains(T) bool
 }
 
-type Resetable interface {
-	Reset()
+//Finite not endless container that can be transformed to array or map of elements
+type Finite[T any, L constraints.Integer] interface {
+	Values() T
+	Len() L
+}
+
+type Transformable[T any] interface {
+	Filter(Predicate[T]) Pipe[T]
+	Map(Converter[T, T]) Pipe[T]
+	Reduce(op.Binary[T]) T
+}
+
+type Pipe[T any] interface {
+	Transformable[T]
+	Iterable[T, Iterator[T]]
+	Walk[T]
+}
+
+type Pipeable[T any] interface {
+	Pipe() Pipe[T]
 }
 
 type Appendable[T any] interface {
@@ -68,7 +96,7 @@ type Deletable[T any] interface {
 }
 
 type Access[K any, V any] interface {
-	Get(K) V
+	Get(K) (V, bool)
 }
 
 type RandomAccess[K constraints.Integer, V any] interface {
