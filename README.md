@@ -64,11 +64,6 @@ type Iterator[T any] interface {
 	Err() error
 }
 
-//Resetable an object with resettable state (e.g. slice based iterator)
-type Resetable interface {
-	Reset()
-}
-
 //Iterable iterator supplier
 type Iterable[T any, It Iterator[T]] interface {
 	Begin() It
@@ -93,30 +88,6 @@ type Checkable[T any] interface {
 type Finite[T any, L constraints.Integer] interface {
 	Values() T
 	Len() L
-}
-
-type Transformable[T any] interface {
-	Filter(Predicate[T]) Pipe[T]
-	Map(Converter[T, T]) Pipe[T]
-	Reduce(op.Binary[T]) T
-}
-
-type Pipe[T any] interface {
-	Transformable[T]
-	Iterable[T, Iterator[T]]
-	Walk[T]
-}
-
-type Pipeable[T any] interface {
-	Pipe() Pipe[T]
-}
-
-type Appendable[T any] interface {
-	Add(T) bool
-}
-
-type Deletable[T any] interface {
-	Delete(T) bool
 }
 
 type Access[K any, V any] interface {
