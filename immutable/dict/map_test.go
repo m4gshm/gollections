@@ -1,4 +1,4 @@
-package immutable
+package omap
 
 import (
 	"testing"
@@ -9,7 +9,7 @@ import (
 )
 
 func Test_Map_Iterate(t *testing.T) {
-	opdered := NewOrderedMap(K.V(1, "1"), K.V(1, "1"), K.V(2, "2"), K.V(4, "4"), K.V(3, "3"), K.V(1, "1"))
+	opdered := Of(K.V(1, "1"), K.V(1, "1"), K.V(2, "2"), K.V(4, "4"), K.V(3, "3"), K.V(1, "1"))
 	assert.Equal(t, 4, opdered.Len())
 	assert.Equal(t, 4, len(opdered.Values()))
 

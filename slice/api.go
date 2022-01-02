@@ -1,6 +1,7 @@
 package slice
 
 import (
+	"constraints"
 	"fmt"
 
 	"github.com/m4gshm/container/check"
@@ -9,6 +10,26 @@ import (
 )
 
 func Of[T any](elements ...T) []T {
+	return elements
+}
+
+func Range[T constraints.Integer](from T, to T) []T {
+	if to == from {
+		return []T{to}
+	}
+	amount := to - from
+	delta := 1
+	if amount < 0 {
+		amount = -amount
+		delta = -1
+	} 
+	amount = amount + 1
+	elements := make([]T, amount)
+	e := from
+	for i := 0; i < int(amount); i++ {
+		elements[i] = e
+		e = e + T(delta)
+	}
 	return elements
 }
 

@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/m4gshm/container/conv"
-	"github.com/m4gshm/container/immutable"
+	"github.com/m4gshm/container/immutable/set"
 	it "github.com/m4gshm/container/iter"
 	"github.com/m4gshm/container/op"
 	slc "github.com/m4gshm/container/slice"
@@ -14,9 +14,9 @@ import (
 )
 
 func Test_OrderedSet(t *testing.T) {
-	set := immutable.NewOrderedSet(1, 1, 2, 4, 3, 1)
-	values := set.Values()
-	fmt.Println(set) //[1, 2, 4, 3]
+	s := set.Of(1, 1, 2, 4, 3, 1)
+	values := s.Values()
+	fmt.Println(s) //[1, 2, 4, 3]
 
 	assert.Equal(t, slc.Of(1, 2, 4, 3), values)
 }
@@ -24,7 +24,7 @@ func Test_OrderedSet(t *testing.T) {
 func Test_group_odd_even(t *testing.T) {
 	var (
 		even   = func(v int) bool { return v%2 == 0 }
-		groups = walk.Group(immutable.NewOrderedSet(1, 1, 2, 4, 3, 1), even)
+		groups = walk.Group(set.Of(1, 1, 2, 4, 3, 1), even)
 	)
 	fmt.Println(groups) //map[false:[1 3] true:[2 4]]
 	assert.Equal(t, map[bool][]int{false: {1, 3}, true: {2, 4}}, groups)

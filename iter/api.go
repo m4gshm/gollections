@@ -9,12 +9,12 @@ import (
 
 //Of Iterator constructor
 func Of[T any](elements ...T) typ.Iterator[T] {
-	return impl.NewReseteable(&elements)
+	return impl.NewReseteable(elements)
 }
 
 //Wrap slice to Iterator
 func Wrap[T any](elements []T) typ.Iterator[T] {
-	return impl.NewReseteable(&elements)
+	return impl.NewReseteable(elements)
 }
 
 //Pipe new stream

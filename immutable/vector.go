@@ -9,50 +9,49 @@ import (
 	"github.com/m4gshm/container/typ"
 )
 
-
-func New[T any](values []T) *Slice[T] {
+func NewVector[T any](values []T) *Vector[T] {
 	elements := make([]T, len(values))
 	copy(elements, values)
-	return Wrap(elements)
+	return WrapVector(elements)
 }
 
-func Wrap[T any](elements []T) *Slice[T] {
-	return &Slice[T]{elements: elements}
+func WrapVector[T any](elements []T) *Vector[T] {
+	return &Vector[T]{elements: elements}
 }
 
-type Slice[T any] struct {
+type Vector[T any] struct {
 	elements   []T
 	changeMark int32
 }
 
-var _ Vector[any] = (*Slice[any])(nil)
-var _ fmt.Stringer = (*Slice[any])(nil)
+var _ Vec[any] = (*Vector[any])(nil)
+var _ fmt.Stringer = (*Vector[any])(nil)
 
-func (s *Slice[T]) Begin() typ.Iterator[T] {
-	return s.newIter()
+func (s *Vector[T]) Begin() typ.Iterator[T] {
+	return s.Iter()
 }
 
-func (s *Slice[T]) newIter() *iter.Iter[T] {
-	return iter.New(&s.elements)
+func (s *Vector[T]) Iter() *iter.Iter[T] {
+	return iter.New(s.elements)
 }
 
-func (s *Slice[T]) Values() []T {
+func (s *Vector[T]) Values() []T {
 	elements := make([]T, len(s.elements))
 	copy(elements, elements)
 	return elements
 }
 
-func (s *Slice[T]) ForEach(walker func(T)) {
+func (s *Vector[T]) ForEach(walker func(T)) {
 	for _, e := range s.elements {
 		walker(e)
 	}
 }
 
-func (s *Slice[T]) Len() int {
+func (s *Vector[T]) Len() int {
 	return len(s.elements)
 }
 
-func (s *Slice[T]) Get(index int) (T, bool) {
+func (s *Vector[T]) Get(index int) (T, bool) {
 	elements := s.elements
 	l := len(elements)
 	if l > 0 && (index >= 0 || index < l) {
@@ -62,18 +61,18 @@ func (s *Slice[T]) Get(index int) (T, bool) {
 	return no, false
 }
 
-func (s *Slice[T]) Filter(filter typ.Predicate[T]) typ.Pipe[T] {
-	return iter.NewPipe[T](iter.Filter(s.newIter(), filter))
+func (s *Vector[T]) Filter(filter typ.Predicate[T]) typ.Pipe[T] {
+	return iter.NewPipe[T](iter.Filter(s.Iter(), filter))
 }
 
-func (s *Slice[T]) Map(by typ.Converter[T, T]) typ.Pipe[T] {
-	return iter.NewPipe[T](iter.Map(s.newIter(), by))
+func (s *Vector[T]) Map(by typ.Converter[T, T]) typ.Pipe[T] {
+	return iter.NewPipe[T](iter.Map(s.Iter(), by))
 }
 
-func (s *Slice[T]) Reduce(by op.Binary[T]) T {
-	return iter.Reduce(s.newIter(), by)
+func (s *Vector[T]) Reduce(by op.Binary[T]) T {
+	return iter.Reduce(s.Iter(), by)
 }
 
-func (s *Slice[T]) String() string {
+func (s *Vector[T]) String() string {
 	return slice.ToString(s.elements)
 }

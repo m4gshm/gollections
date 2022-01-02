@@ -25,9 +25,9 @@ type Set[T any] interface {
 	Checkable[T]
 }
 
-type Map[k comparable, v any, IT Iterator[*KV[k, v]]] interface {
+type Map[k comparable, v any] interface {
 	Track[v, k]
-	Iterable[*KV[k, v], IT]
+	Iterable[*KV[k, v]]
 	Finite[map[k]v, int]
 	Checkable[k]
 	KeyAccess[k, v]
@@ -49,8 +49,8 @@ type Resetable interface {
 }
 
 //Iterable iterator supplier
-type Iterable[T any, It Iterator[T]] interface {
-	Begin() It
+type Iterable[T any] interface {
+	Begin() Iterator[T]
 }
 
 //Walk touches all elements of the collection
@@ -82,7 +82,7 @@ type Transformable[T any] interface {
 
 type Pipe[T any] interface {
 	Transformable[T]
-	Iterable[T, Iterator[T]]
+	Iterable[T]
 	Walk[T]
 }
 

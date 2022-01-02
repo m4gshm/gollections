@@ -6,27 +6,26 @@ import (
 	"github.com/m4gshm/container/immutable"
 )
 
-func New[T any](values []T) *Slice[T] {
+func NewVector[T any](values []T) *Vector[T] {
 	elements := make([]T, len(values))
 	copy(elements, values)
-	return Wrap(elements)
+	return WrapVector(elements)
 }
 
-func Wrap[T any](elements []T) *Slice[T] {
-	return &Slice[T]{Slice: immutable.Wrap(elements), elements:  &elements}
+func WrapVector[T any](elements []T) *Vector[T] {
+	return &Vector[T]{Vector: immutable.WrapVector(elements), elements:  &elements}
 }
 
-type Slice[T any] struct {
-	*immutable.Slice[T]
+type Vector[T any] struct {
+	*immutable.Vector[T]
 	elements   *[]T
 	changeMark int32
 }
 
-var _ Vector[any] = (*Slice[any])(nil)
-var _ fmt.Stringer = (*Slice[any])(nil)
+var _ Vec[any] = (*Vector[any])(nil)
+var _ fmt.Stringer = (*Vector[any])(nil)
 
-
-func (s *Slice[T]) Add(v T) bool {
+func (s *Vector[T]) Add(v T) bool {
 	markOnStart := s.changeMark
 	*s.elements = append(*s.elements, v)
 	markOnFinish := s.changeMark

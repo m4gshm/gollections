@@ -1,15 +1,17 @@
-package mutable
+package set
 
 import (
 	"testing"
 
 	"github.com/m4gshm/container/iter"
+	"github.com/m4gshm/container/op"
 	"github.com/m4gshm/container/slice"
+	"github.com/m4gshm/container/walk"
 	"github.com/stretchr/testify/assert"
 )
 
 func Test_Set_Iterate(t *testing.T) {
-	set := NewOrderedSet(1, 1, 2, 4, 3, 1)
+	set := Of(1, 1, 2, 4, 3, 1)
 	values := set.Values()
 
 	assert.Equal(t, 4, set.Len())
@@ -32,7 +34,7 @@ func Test_Set_Iterate(t *testing.T) {
 }
 
 func Test_Set_Add(t *testing.T) {
-	set := NewOrderedSet[int]()
+	set := New[int]()
 	assert.Equal(t, set.Add(1), true)
 	assert.Equal(t, set.Add(2), true)
 	assert.Equal(t, set.Add(4), true)
@@ -45,7 +47,7 @@ func Test_Set_Add(t *testing.T) {
 }
 
 func Test_Set_Delete(t *testing.T) {
-	set := NewOrderedSet(1, 1, 2, 4, 3, 1)
+	set := Of(1, 1, 2, 4, 3, 1)
 	values := set.Values()
 
 	for _, v := range values {
@@ -56,7 +58,7 @@ func Test_Set_Delete(t *testing.T) {
 }
 
 func Test_Set_DeleteByIterator(t *testing.T) {
-	set := NewOrderedSet(1, 1, 2, 4, 3, 1)
+	set := Of(1, 1, 2, 4, 3, 1)
 	iter := set.Begin()
 
 	i := 0
@@ -67,4 +69,22 @@ func Test_Set_DeleteByIterator(t *testing.T) {
 
 	assert.Equal(t, 4, i)
 	assert.Equal(t, 0, set.Len())
+}
+
+func Test_Set_FilterMapReduce(t *testing.T) {
+	sum := Of(1, 1, 2, 4, 3, 1).Filter(func(i int) bool { return i%2 == 0 }).Map(func(i int) int { return i * 2 }).Reduce(op.Sum[int])
+	//no sum, already computer stream
+	assert.Equal(t, 12, sum)
+
+	sum = iter.Pipe[int](Of(1, 1, 2, 4, 3, 1).Begin()).Filter(func(i int) bool { return i%2 == 0 }).Map(func(i int) int { return i * 2 }).Reduce(op.Sum[int])
+	//no sum, already computer stream
+	assert.Equal(t, 12, sum)
+}
+
+func Test_Set_Group(t *testing.T) {
+	groups := walk.Group(Of(0, 1, 1, 2, 4, 3, 1, 6, 7), func(e int) bool { return e%2 == 0 })
+
+	assert.Equal(t, len(groups), 2)
+	assert.Equal(t, []int{1, 3, 7}, groups[false])
+	assert.Equal(t, []int{0, 2, 4, 6}, groups[true])
 }

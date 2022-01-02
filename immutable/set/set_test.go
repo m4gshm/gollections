@@ -1,4 +1,4 @@
-package immutable
+package set
 
 import (
 	"testing"
@@ -11,7 +11,7 @@ import (
 )
 
 func Test_Set_Iterate(t *testing.T) {
-	set := NewOrderedSet(1, 1, 2, 4, 3, 1)
+	set := Of(1, 1, 2, 4, 3, 1)
 	values := set.Values()
 
 	assert.Equal(t, 4, set.Len())
@@ -36,7 +36,7 @@ func Test_Set_Iterate(t *testing.T) {
 }
 
 func Test_Set_Contains(t *testing.T) {
-	set := NewOrderedSet(1, 1, 2, 4, 3, 1)
+	set := Of(1, 1, 2, 4, 3, 1)
 	assert.True(t, set.Contains(1))
 	assert.True(t, set.Contains(2))
 	assert.True(t, set.Contains(4))
@@ -46,17 +46,17 @@ func Test_Set_Contains(t *testing.T) {
 }
 
 func Test_Set_FilterMapReduce(t *testing.T) {
-	sum := NewOrderedSet(1, 1, 2, 4, 3, 1).Filter(func(i int) bool { return i%2 == 0 }).Map(func(i int) int { return i * 2 }).Reduce(op.Sum[int])
+	sum := Of(1, 1, 2, 4, 3, 1).Filter(func(i int) bool { return i%2 == 0 }).Map(func(i int) int { return i * 2 }).Reduce(op.Sum[int])
 	//no sum, already computer stream
 	assert.Equal(t, 12, sum)
 
-	sum = iter.Pipe(NewOrderedSet(1, 1, 2, 4, 3, 1).Begin()).Filter(func(i int) bool { return i%2 == 0 }).Map(func(i int) int { return i * 2 }).Reduce(op.Sum[int])
+	sum = iter.Pipe[int](Of(1, 1, 2, 4, 3, 1).Begin()).Filter(func(i int) bool { return i%2 == 0 }).Map(func(i int) int { return i * 2 }).Reduce(op.Sum[int])
 	//no sum, already computer stream
 	assert.Equal(t, 12, sum)
 }
 
 func Test_Set_Group(t *testing.T) {
-	groups := walk.Group(NewOrderedSet(0, 1, 1, 2, 4, 3, 1, 6, 7), func(e int) bool { return e%2 == 0 })
+	groups := walk.Group(Of(0, 1, 1, 2, 4, 3, 1, 6, 7), func(e int) bool { return e%2 == 0 })
 
 	assert.Equal(t, len(groups), 2)
 	assert.Equal(t, []int{1, 3, 7}, groups[false])

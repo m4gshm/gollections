@@ -5,7 +5,7 @@ import (
 	"github.com/m4gshm/container/typ"
 )
 
-func newMap[k comparable, v any](values []*typ.KV[k, v]) *OrderedMap[k, v] {
+func NewOrderedMap[k comparable, v any](values []*typ.KV[k, v]) *OrderedMap[k, v] {
 	var (
 		uniques = make(map[k]v, 0)
 		order   = make([]*k, 0, 0)
@@ -26,11 +26,11 @@ type OrderedMap[k comparable, v any] struct {
 	uniques map[k]v
 }
 
-var _ typ.Map[any, any, *iter.OrderedKVIter[any, any]] = (*OrderedMap[interface{}, interface{}])(nil)
+var _ typ.Map[any, any] = (*OrderedMap[interface{}, interface{}])(nil)
 // var _ fmt.Stringer = (*OrderedMap[interface{}, interface{}])(nil)
 
-func (s *OrderedMap[k, v]) Begin() *iter.OrderedKVIter[k, v] {
-	return iter.NewOrderKV(&s.order, s.uniques)
+func (s *OrderedMap[k, v]) Begin() typ.Iterator[*typ.KV[k, v]] {
+	return iter.NewOrderKV[k, v](s.order, s.uniques)
 }
 
 func (s *OrderedMap[k, v]) Values() map[k]v {

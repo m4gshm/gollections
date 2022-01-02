@@ -12,7 +12,7 @@ func NewKV[k comparable, v any](elements map[k]v) *KVIter[k, v] {
 	return &KVIter[k, v]{elements: elements, refVal: refVal, iter: refVal.MapRange()}
 }
 
-func NewOrderKV[k comparable, v any](order *[]*k, uniques map[k]v) *OrderedKVIter[k, v] {
+func NewOrderKV[k comparable, v any](order []*k, uniques map[k]v) *OrderedKVIter[k, v] {
 	return &OrderedKVIter[k, v]{order: New(order), uniques: uniques}
 }
 
