@@ -23,8 +23,8 @@ func Pipe[T any](elements typ.Iterator[T]) typ.Pipe[T] {
 }
 
 // WrapMap Key, value Iterator constructor.
-func WrapMap[k comparable, v any](values map[k]v) typ.Iterator[*typ.KV[k, v]] {
-	return impl.NewKV(values)
+func WrapMap[k comparable, v any](elements map[k]v) typ.Iterator[*typ.KV[k, v]] {
+	return impl.NewKV(elements)
 }
 
 //Map creates a lazy Iterator that converts elements with a converter and returns them

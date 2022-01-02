@@ -4,7 +4,7 @@ import (
 	"github.com/m4gshm/container/typ"
 )
 
-type Vec[T any] interface {
+type Vector[T any] interface {
 	typ.Vector[T]
 	typ.Iterable[T]
 	typ.Transformable[T]

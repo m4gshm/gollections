@@ -1,21 +1,20 @@
-package immutable
+package vector
 
 import (
 	"fmt"
 
+	"github.com/m4gshm/container/immutable"
 	"github.com/m4gshm/container/iter/impl/iter"
 	"github.com/m4gshm/container/op"
 	"github.com/m4gshm/container/slice"
 	"github.com/m4gshm/container/typ"
 )
 
-func NewVector[T any](values []T) *Vector[T] {
-	elements := make([]T, len(values))
-	copy(elements, values)
-	return WrapVector(elements)
+func Convert[T any](elements []T) *Vector[T] {
+	return Wrap(slice.Copy(elements))
 }
 
-func WrapVector[T any](elements []T) *Vector[T] {
+func Wrap[T any](elements []T) *Vector[T] {
 	return &Vector[T]{elements: elements}
 }
 
@@ -24,7 +23,7 @@ type Vector[T any] struct {
 	changeMark int32
 }
 
-var _ Vec[any] = (*Vector[any])(nil)
+var _ immutable.Vector[any] = (*Vector[any])(nil)
 var _ fmt.Stringer = (*Vector[any])(nil)
 
 func (s *Vector[T]) Begin() typ.Iterator[T] {

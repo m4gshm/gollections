@@ -104,7 +104,7 @@ type KeyAccess[K comparable, V any] interface {
 
 ```
 
-### [Iterator](./iter/)
+### [Iterator](./iter/api.go)
 API over 'Iterator' to make map, filter, flat, reduce operations in declarative style. 
 
 Consists of two groups of operations:
@@ -112,8 +112,8 @@ Consists of two groups of operations:
  * Final - applies intermediate links (ToSlice, Reudce)
   
 
-### [Slice](./slice/)
-Same as [iter](./iter/) but specifically for slices. Generally more performant than [iter](./iter/) but only as the first in a chain of intermediate operations.
+### [Slice](./slice/api.go)
+Same as [iter](./iter/api.go) but specifically for slices. Generally more performant than [iter](./iter/api.go) but only as the first in a chain of intermediate operations.
 
 
 

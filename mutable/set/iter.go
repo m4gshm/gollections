@@ -1,7 +1,8 @@
-package mutable
+package set
 
 import (
 	"github.com/m4gshm/container/iter/impl/iter"
+	"github.com/m4gshm/container/mutable"
 	"github.com/m4gshm/container/typ"
 )
 
@@ -10,7 +11,7 @@ type OrderIter[T any] struct {
 }
 
 var _ typ.Iterator[any] = (*OrderIter[any])(nil)
-var _ DelIter[any] = (*OrderIter[any])(nil)
+var _ mutable.DelIter[any] = (*OrderIter[any])(nil)
 
 func (i *OrderIter[T]) HasNext() bool {
 	return i.Deleteable.HasNext()

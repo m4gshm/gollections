@@ -4,10 +4,10 @@ import (
 	"github.com/m4gshm/container/immutable"
 )
 
-func Of[T comparable](values ...T) immutable.Set[T] {
-	return immutable.NewOrderedSet(values)
+func Of[T comparable](elements ...T) immutable.Set[T] {
+	return NewOrderedSet(elements)
 }
 
-func New[T comparable](values []T) immutable.Set[T] {
-	return immutable.NewOrderedSet(values)
+func New[T comparable](elements []T) immutable.Set[T] {
+	return NewOrderedSet(elements)
 }

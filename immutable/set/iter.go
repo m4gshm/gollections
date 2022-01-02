@@ -1,4 +1,4 @@
-package immutable
+package set
 
 import (
 	"github.com/m4gshm/container/typ"

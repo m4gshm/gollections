@@ -13,6 +13,12 @@ func Of[T any](elements ...T) []T {
 	return elements
 }
 
+func Copy[T any](elements []T) []T {
+	copied := make([]T, len(elements))
+	copy(copied, elements)
+	return copied
+}
+
 func Range[T constraints.Integer](from T, to T) []T {
 	if to == from {
 		return []T{to}

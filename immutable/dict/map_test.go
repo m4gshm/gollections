@@ -1,4 +1,4 @@
-package omap
+package dict
 
 import (
 	"testing"

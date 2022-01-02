@@ -1,22 +1,23 @@
-package mutable
+package set
 
 import (
 	"fmt"
 
-	"github.com/m4gshm/container/immutable"
+	"github.com/m4gshm/container/immutable/set"
 	"github.com/m4gshm/container/iter/impl/iter"
+	"github.com/m4gshm/container/mutable"
 	"github.com/m4gshm/container/op"
 	"github.com/m4gshm/container/slice"
 	"github.com/m4gshm/container/typ"
 )
 
-func ToOrderedSet[T comparable](values []T) *OrderedSet[T] {
+func ToOrderedSet[T comparable](elements []T) *OrderedSet[T] {
 	var (
 		uniques = make(map[T]int, 0)
 		order   = make([]*T, 0, 0)
 	)
 	pos := 0
-	for _, v := range values {
+	for _, v := range elements {
 		if _, ok := uniques[v]; !ok {
 			vv := v
 			order = append(order, &vv)
@@ -37,10 +38,10 @@ type OrderedSet[T comparable] struct {
 	changeMark int32
 }
 
-var _ Set[any] = (*OrderedSet[any])(nil)
+var _ mutable.Set[any] = (*OrderedSet[any])(nil)
 var _ fmt.Stringer = (*OrderedSet[any])(nil)
 
-func (s *OrderedSet[T]) Begin() DelIter[T] {
+func (s *OrderedSet[T]) Begin() mutable.DelIter[T] {
 	return s.Iter()
 }
 
@@ -116,11 +117,11 @@ func (s *OrderedSet[T]) Delete(v T) bool {
 }
 
 func (s *OrderedSet[T]) Filter(filter typ.Predicate[T]) typ.Pipe[T] {
-	return iter.NewPipe[T](&immutable.OrderIter[T]{Iterator: iter.Filter(s.delIter(), func(ref *T) bool { return filter(*ref) })})
+	return iter.NewPipe[T](&set.OrderIter[T]{Iterator: iter.Filter(s.delIter(), func(ref *T) bool { return filter(*ref) })})
 }
 
 func (s *OrderedSet[T]) Map(by typ.Converter[T, T]) typ.Pipe[T] {
-	return iter.NewPipe[T](&immutable.OrderIter[T]{Iterator: iter.Map(s.delIter(), func(ref *T) *T {
+	return iter.NewPipe[T](&set.OrderIter[T]{Iterator: iter.Map(s.delIter(), func(ref *T) *T {
 		conv := by(*ref)
 		return &conv
 	})})

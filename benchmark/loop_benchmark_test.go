@@ -3,17 +3,16 @@ package benchmark
 import (
 	"testing"
 
-	"github.com/m4gshm/container/immutable"
 	"github.com/m4gshm/container/immutable/set"
 	"github.com/m4gshm/container/immutable/vector"
 	"github.com/m4gshm/container/iter"
 	impliter "github.com/m4gshm/container/iter/impl/iter"
-	"github.com/m4gshm/container/mutable"
+	mset "github.com/m4gshm/container/mutable/set"
 	"github.com/m4gshm/container/slice"
 )
 
 var (
-	max = 100000
+	max    = 100000
 	values = slice.Range(1, max)
 	result = 0
 )
@@ -50,7 +49,6 @@ func Benchmark_ForRange_Immutable_Vector_Values(b *testing.B) {
 	_ = result
 }
 
-
 func Benchmark_ForRange_Immutable_Vector_Impl_Values(b *testing.B) {
 	c := vector.New(values)
 	b.ResetTimer()
@@ -63,7 +61,6 @@ func Benchmark_ForRange_Immutable_Vector_Impl_Values(b *testing.B) {
 	_ = result
 }
 
-
 func Benchmark_ForEach_Immutable_OrdererSet(b *testing.B) {
 	c := set.Of(values...)
 	b.ResetTimer()
@@ -75,7 +72,7 @@ func Benchmark_ForEach_Immutable_OrdererSet(b *testing.B) {
 }
 
 func Benchmark_ForEach_Immutable_OrdererSet_Impl(b *testing.B) {
-	c := immutable.NewOrderedSet(values)
+	c := set.NewOrderedSet(values)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		c.ForEach(func(v int) { result = v })
@@ -109,7 +106,7 @@ func Benchmark_ForEach_Immutable_OrdererSet_Impl_Values(b *testing.B) {
 }
 
 func Benchmark_ForEach_Mutable_OrdererSet(b *testing.B) {
-	set := mutable.ToOrderedSet(values)
+	set := mset.ToOrderedSet(values)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		set.ForEach(func(v int) { result = v })
@@ -119,7 +116,7 @@ func Benchmark_ForEach_Mutable_OrdererSet(b *testing.B) {
 }
 
 func Benchmark_ForEach_Mutable_OrdererSet_Impl(b *testing.B) {
-	set := mutable.ToOrderedSet(values)
+	set := mset.ToOrderedSet(values)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		set.ForEach(func(v int) { result = v })
@@ -141,7 +138,7 @@ func Benchmark_HasNextGet_Iterator_Immutable_Vector(b *testing.B) {
 }
 
 func Benchmark_HasNextGet_Iterator_Immutable_Vector_Impl(b *testing.B) {
-	c := vector.New(values)
+	c := vector.Convert(values)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		for it := c.Iter(); it.HasNext(); {
