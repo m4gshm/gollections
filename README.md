@@ -9,7 +9,7 @@ Need use version 1.18 beta 1 or newer.
 
 [Vector](./immutable/vector/api.go)
 
-[OrderedMap](./immutable/map/api.go)
+[OrderedMap](./immutable/dict/api.go)
 
 [OrderedSet](./immutable/set/api.go)
 
@@ -18,7 +18,7 @@ Need use version 1.18 beta 1 or newer.
 
 [Vector](./mutable/vector/api.go)
 
-[OrderedMap](./mutable/map/api.go)
+[OrderedMap](./mutable/dict/api.go)
 
 [OrderedSet](./mutable/set/api.go)
 
