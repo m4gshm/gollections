@@ -6,6 +6,7 @@ import (
 	"github.com/m4gshm/container/immutable/vector"
 	"github.com/m4gshm/container/mutable"
 	"github.com/m4gshm/container/slice"
+	"github.com/m4gshm/container/typ"
 )
 
 func Create[T any](capacity int) *Vector[T] {
@@ -26,7 +27,7 @@ type Vector[T any] struct {
 	changeMark int32
 }
 
-var _ mutable.Vector[any] = (*Vector[any])(nil)
+var _ mutable.Vector[any, typ.Iterator[any]] = (*Vector[any])(nil)
 var _ fmt.Stringer = (*Vector[any])(nil)
 
 func (s *Vector[T]) Add(v T) bool {

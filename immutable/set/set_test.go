@@ -12,7 +12,7 @@ import (
 
 func Test_Set_Iterate(t *testing.T) {
 	set := Of(1, 1, 2, 4, 3, 1)
-	values := set.Values()
+	values := set.Elements()
 
 	assert.Equal(t, 4, set.Len())
 	assert.Equal(t, 4, len(values))

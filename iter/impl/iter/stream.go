@@ -13,13 +13,13 @@ type IterPipe[T any] struct {
 	it typ.Iterator[T]
 }
 
-var _ typ.Pipe[any] = (*IterPipe[any])(nil)
+var _ typ.Pipe[any, typ.Iterator[any]] = (*IterPipe[any])(nil)
 
-func (s *IterPipe[T]) Filter(fit typ.Predicate[T]) typ.Pipe[T] {
+func (s *IterPipe[T]) Filter(fit typ.Predicate[T]) typ.Pipe[T, typ.Iterator[T]] {
 	return NewPipe[T](Filter(s.it, fit))
 }
 
-func (s *IterPipe[T]) Map(by typ.Converter[T, T]) typ.Pipe[T] {
+func (s *IterPipe[T]) Map(by typ.Converter[T, T]) typ.Pipe[T, typ.Iterator[T]] {
 	return NewPipe[T](Map(s.it, by))
 }
 

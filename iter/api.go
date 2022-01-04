@@ -18,7 +18,7 @@ func Wrap[T any](elements []T) typ.Iterator[T] {
 }
 
 //Pipe new stream
-func Pipe[T any](elements typ.Iterator[T]) typ.Pipe[T] {
+func Pipe[T any](elements typ.Iterator[T]) typ.Pipe[T, typ.Iterator[T]] {
 	return impl.NewPipe(elements)
 }
 

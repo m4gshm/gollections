@@ -10,27 +10,29 @@ import (
  *  Common interfaces
  */
 
-type Container[T any, L constraints.Integer] interface {
+type Container[T any, L constraints.Integer, IT Iterator[T]] interface {
 	Walk[T]
 	Finite[[]T, L]
+	Iterable[T, IT]
 }
 
-type Vector[T any] interface {
-	Container[T, int]
+type Vector[T any, IT Iterator[T]] interface {
+	Container[T, int, IT]
 	RandomAccess[int, T]
 }
 
-type Set[T any] interface {
-	Container[T, int]
+type Set[T any, IT Iterator[T]] interface {
+	Container[T, int, IT]
 	Checkable[T]
 }
 
 type Map[k comparable, v any] interface {
 	Track[v, k]
-	Iterable[*KV[k, v]]
 	Finite[map[k]v, int]
 	Checkable[k]
 	KeyAccess[k, v]
+	Keys() Container[k, int, Iterator[k]]
+	Values() Container[v, int, Iterator[v]]
 }
 
 //Iterator base interface for containers, collections
@@ -49,8 +51,8 @@ type Resetable interface {
 }
 
 //Iterable iterator supplier
-type Iterable[T any] interface {
-	Begin() Iterator[T]
+type Iterable[T any, IT Iterator[T]] interface {
+	Begin() IT
 }
 
 //Walk touches all elements of the collection
@@ -70,32 +72,24 @@ type Checkable[T any] interface {
 
 //Finite not endless container that can be transformed to array or map of elements
 type Finite[T any, L constraints.Integer] interface {
-	Values() T
+	Elements() T
 	Len() L
 }
 
-type Transformable[T any] interface {
-	Filter(Predicate[T]) Pipe[T]
-	Map(Converter[T, T]) Pipe[T]
+type Transformable[T any, IT Iterator [T]] interface {
+	Filter(Predicate[T]) Pipe[T, IT]
+	Map(Converter[T, T]) Pipe[T, IT]
 	Reduce(op.Binary[T]) T
 }
 
-type Pipe[T any] interface {
-	Transformable[T]
-	Iterable[T]
+type Pipe[T any, IT Iterator [T]] interface {
+	Transformable[T, IT]
+	Iterable[T, IT]
 	Walk[T]
 }
 
-type Pipeable[T any] interface {
-	Pipe() Pipe[T]
-}
-
-type Appendable[T any] interface {
-	Add(T) bool
-}
-
-type Deletable[T any] interface {
-	Delete(T) bool
+type Pipeable[T any, IT Iterator [T]] interface {
+	Pipe() Pipe[T, IT]
 }
 
 type Access[K any, V any] interface {

@@ -12,7 +12,7 @@ import (
 
 func Test_Set_Iterate(t *testing.T) {
 	set := Of(1, 1, 2, 4, 3, 1)
-	values := set.Values()
+	values := set.Elements()
 
 	assert.Equal(t, 4, set.Len())
 	assert.Equal(t, 4, len(values))
@@ -34,21 +34,21 @@ func Test_Set_Iterate(t *testing.T) {
 }
 
 func Test_Set_Add(t *testing.T) {
-	set := New[int]()
+	set := New[int](0)
 	assert.Equal(t, set.Add(1), true)
 	assert.Equal(t, set.Add(2), true)
 	assert.Equal(t, set.Add(4), true)
 	assert.Equal(t, set.Add(3), true)
 	assert.Equal(t, set.Add(1), false)
 
-	values := set.Values()
+	values := set.Elements()
 
 	assert.Equal(t, slice.Of(1, 2, 4, 3), values)
 }
 
 func Test_Set_Delete(t *testing.T) {
 	set := Of(1, 1, 2, 4, 3, 1)
-	values := set.Values()
+	values := set.Elements()
 
 	for _, v := range values {
 		set.Delete(v)

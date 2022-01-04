@@ -7,25 +7,25 @@ import (
 	"github.com/m4gshm/container/typ"
 )
 
-func NewKV[k comparable, v any](elements map[k]v) *KVIter[k, v] {
+func NewKV[k comparable, v any](elements map[k]v) *KV[k, v] {
 	refVal := reflect.ValueOf(elements)
-	return &KVIter[k, v]{elements: elements, refVal: refVal, iter: refVal.MapRange()}
+	return &KV[k, v]{elements: elements, refVal: refVal, iter: refVal.MapRange()}
 }
 
-func NewOrderKV[k comparable, v any](order []*k, uniques map[k]v) *OrderedKVIter[k, v] {
-	return &OrderedKVIter[k, v]{order: New(order), uniques: uniques}
+func NewOrderedKV[k comparable, v any](order []*k, uniques map[k]v) *OrderedKV[k, v] {
+	return &OrderedKV[k, v]{elements: New(order), uniques: uniques}
 }
 
-type KVIter[k comparable, v any] struct {
+type KV[k comparable, v any] struct {
 	elements map[k]v
 	iter     *reflect.MapIter
 	refVal   reflect.Value
 	err      error
 }
 
-var _ typ.Iterator[*typ.KV[interface{}, interface{}]] = (*KVIter[interface{}, interface{}])(nil)
+var _ typ.Iterator[*typ.KV[interface{}, interface{}]] = (*KV[interface{}, interface{}])(nil)
 
-func (s *KVIter[k, v]) HasNext() bool {
+func (s *KV[k, v]) HasNext() bool {
 	next := s.iter.Next()
 	if !next {
 		s.err = Exhausted
@@ -33,7 +33,7 @@ func (s *KVIter[k, v]) HasNext() bool {
 	return next
 }
 
-func (s *KVIter[k, v]) Get() *typ.KV[k, v] {
+func (s *KV[k, v]) Get() *typ.KV[k, v] {
 	if err := s.err; err != nil {
 		panic(err)
 	}
@@ -41,31 +41,31 @@ func (s *KVIter[k, v]) Get() *typ.KV[k, v] {
 	return K.V(key, s.elements[key])
 }
 
-func (s *KVIter[k, v]) Err() error {
+func (s *KV[k, v]) Err() error {
 	return s.err
 }
 
-func (s *KVIter[k, v]) Reset() {
+func (s *KV[k, v]) Reset() {
 	s.iter.Reset(s.refVal)
 	s.err = nil
 }
 
-type OrderedKVIter[k comparable, v any] struct {
-	order   *Iter[*k]
-	uniques map[k]v
+type OrderedKV[k comparable, v any] struct {
+	elements *Iter[*k]
+	uniques  map[k]v
 }
 
-var _ typ.Iterator[*typ.KV[any, any]] = (*OrderedKVIter[any, any])(nil)
+var _ typ.Iterator[*typ.KV[any, any]] = (*OrderedKV[any, any])(nil)
 
-func (s *OrderedKVIter[k, v]) HasNext() bool {
-	return s.order.HasNext()
+func (s *OrderedKV[k, v]) HasNext() bool {
+	return s.elements.HasNext()
 }
 
-func (s *OrderedKVIter[k, v]) Get() *typ.KV[k, v] {
-	key := *s.order.Get()
+func (s *OrderedKV[k, v]) Get() *typ.KV[k, v] {
+	key := *s.elements.Get()
 	return K.V(key, s.uniques[key])
 }
 
-func (s *OrderedKVIter[k, v]) Err() error {
-	return s.order.Err()
+func (s *OrderedKV[k, v]) Err() error {
+	return s.elements.Err()
 }

@@ -3,9 +3,9 @@ package set
 import (
 	"fmt"
 
-	"github.com/m4gshm/container/immutable/set"
 	"github.com/m4gshm/container/iter/impl/iter"
 	"github.com/m4gshm/container/mutable"
+	miter "github.com/m4gshm/container/mutable/iter"
 	"github.com/m4gshm/container/op"
 	"github.com/m4gshm/container/slice"
 	"github.com/m4gshm/container/typ"
@@ -25,11 +25,15 @@ func ToOrderedSet[T comparable](elements []T) *OrderedSet[T] {
 			pos++
 		}
 	}
-	return &OrderedSet[T]{elements: order, uniques: uniques}
+	return WrapOrderedSet(order, uniques)
 }
 
-func NewOrderedSet[T comparable]() *OrderedSet[T] {
-	return &OrderedSet[T]{elements: make([]*T, 0), uniques: map[T]int{}}
+func NewOrderedSet[T comparable](capacity int) *OrderedSet[T] {
+	return WrapOrderedSet(make([]*T, 0, capacity), make(map[T]int, capacity))
+}
+
+func WrapOrderedSet[T comparable](elements []*T, uniques map[T]int) *OrderedSet[T] {
+	return &OrderedSet[T]{elements: elements, uniques: uniques}
 }
 
 type OrderedSet[T comparable] struct {
@@ -38,22 +42,22 @@ type OrderedSet[T comparable] struct {
 	changeMark int32
 }
 
-var _ mutable.Set[any] = (*OrderedSet[any])(nil)
+var _ mutable.Set[any, mutable.Iterator[any]] = (*OrderedSet[any])(nil)
 var _ fmt.Stringer = (*OrderedSet[any])(nil)
 
-func (s *OrderedSet[T]) Begin() mutable.DelIter[T] {
+func (s *OrderedSet[T]) Begin() mutable.Iterator[T] {
 	return s.Iter()
 }
 
-func (s *OrderedSet[T]) Iter() *OrderIter[T] {
-	return &OrderIter[T]{s.delIter()}
+func (s *OrderedSet[T]) Iter() *RefIter[T] {
+	return &RefIter[T]{s.delIter()}
 }
 
-func (s *OrderedSet[T]) delIter() *iter.Deleteable[*T] {
-	return iter.NewDeleteable(&s.elements, &s.changeMark, func(ref *T) bool { return s.Delete(*ref) })
+func (s *OrderedSet[T]) delIter() *miter.Deleteable[*T] {
+	return miter.NewDeleteable(&s.elements, &s.changeMark, func(ref *T) bool { return s.Delete(*ref) })
 }
 
-func (s *OrderedSet[T]) Values() []T {
+func (s *OrderedSet[T]) Elements() []T {
 	e := s.elements
 	out := make([]T, len(e))
 	for i, v := range e {
@@ -116,19 +120,19 @@ func (s *OrderedSet[T]) Delete(v T) bool {
 	return false
 }
 
-func (s *OrderedSet[T]) Filter(filter typ.Predicate[T]) typ.Pipe[T] {
-	return iter.NewPipe[T](&set.OrderIter[T]{Iterator: iter.Filter(s.delIter(), func(ref *T) bool { return filter(*ref) })})
+func (s *OrderedSet[T]) Filter(filter typ.Predicate[T]) typ.Pipe[T, typ.Iterator[T]] {
+	return iter.NewPipe[T](&iter.RefIter[T]{Iterator: iter.Filter(s.delIter(), func(ref *T) bool { return filter(*ref) })})
 }
 
-func (s *OrderedSet[T]) Map(by typ.Converter[T, T]) typ.Pipe[T] {
-	return iter.NewPipe[T](&set.OrderIter[T]{Iterator: iter.Map(s.delIter(), func(ref *T) *T {
+func (s *OrderedSet[T]) Map(by typ.Converter[T, T]) typ.Pipe[T, typ.Iterator[T]] {
+	return iter.NewPipe[T](&iter.RefIter[T]{Iterator: iter.Map(s.delIter(), func(ref *T) *T {
 		conv := by(*ref)
 		return &conv
 	})})
 }
 
 func (s *OrderedSet[T]) Reduce(by op.Binary[T]) T {
-	return iter.Reduce(&OrderIter[T]{s.delIter()}, by)
+	return iter.Reduce(&RefIter[T]{s.delIter()}, by)
 }
 
 func (s *OrderedSet[T]) String() string {

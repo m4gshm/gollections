@@ -1,25 +1,26 @@
-package vector
+package ref
 
 import (
 	"fmt"
 
 	"github.com/m4gshm/container/immutable"
+	"github.com/m4gshm/container/immutable/vector"
 	"github.com/m4gshm/container/iter/impl/iter"
 	"github.com/m4gshm/container/op"
 	"github.com/m4gshm/container/slice"
 	"github.com/m4gshm/container/typ"
 )
 
-func Convert[T any](elements []T) *Vector[T] {
+func Convert[T any](elements []*T) *Vector[T] {
 	return Wrap(slice.Copy(elements))
 }
 
-func Wrap[T any](elements []T) *Vector[T] {
-	return &Vector[T]{elements: elements}
+func Wrap[T any](elements []*T) *Vector[T] {
+	return &Vector[T]{vector.Wrap(elements)}
 }
 
 type Vector[T any] struct {
-	elements   []T
+	*vector.Vector[*T]
 }
 
 var _ immutable.Vector[any, typ.Iterator[any]] = (*Vector[any])(nil)
@@ -29,29 +30,26 @@ func (s *Vector[T]) Begin() typ.Iterator[T] {
 	return s.Iter()
 }
 
-func (s *Vector[T]) Iter() *iter.Iter[T] {
-	return iter.New(s.elements)
+func (s *Vector[T]) Iter() *iter.RefIter[T] {
+	return &iter.RefIter[T]{Iterator: s.Vector.Iter()}
 }
 
 func (s *Vector[T]) Elements() []T {
-	return slice.Copy(s.elements)
+	refs := s.Vector.Elements()
+	elements := make([]T, len(refs))
+	for i, r := range refs {
+		elements[i] = *r
+	}
+	return elements
 }
 
 func (s *Vector[T]) ForEach(walker func(T)) {
-	for _, e := range s.elements {
-		walker(e)
-	}
-}
-
-func (s *Vector[T]) Len() int {
-	return len(s.elements)
+	s.Vector.ForEach(func(ref *T) { walker(*ref) })
 }
 
 func (s *Vector[T]) Get(index int) (T, bool) {
-	elements := s.elements
-	l := len(elements)
-	if l > 0 && (index >= 0 || index < l) {
-		return s.elements[index], true
+	if r, ok := s.Vector.Get(index); ok {
+		return *r, true
 	}
 	var no T
 	return no, false
@@ -70,5 +68,5 @@ func (s *Vector[T]) Reduce(by op.Binary[T]) T {
 }
 
 func (s *Vector[T]) String() string {
-	return slice.ToString(s.elements)
+	return slice.ToString(s.Elements())
 }
