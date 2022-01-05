@@ -43,7 +43,7 @@ Functions grouped into packages by applicable type ([iterable container](./c/api
 
 Iterator, Iterable, Container, Vector, Map, Set and so on.
 
-### [Iterable container API](./it/api.go)
+### [Iterable container API](./c/api.go)
 Declarative style API over 'Iterable' interface. Based on 'Iterator API' (see below).
 
 ### [Iterator API](./it/api.go)
