@@ -1,26 +1,26 @@
 # Gollections
 
-Golang experiments with container data structures, slices, maps, and so on using generics.
-Need use version 1.18 beta 1 or newer.
+Golang generic container data structures and functions.
+
+Need use Go version 1.18 beta 1 or newer.
 
 ## Containers
 
-### [Immutable](./immutable/api.go)
+* ### [Immutable](./immutable/api.go)
 
-[Vector](./immutable/vector/api.go)
+  * [Vector](./immutable/vector/api.go)
 
-[OrderedMap](./immutable/dict/api.go)
+  * [OrderedMap](./immutable/dict/api.go)
 
-[OrderedSet](./immutable/set/api.go)
+  * [OrderedSet](./immutable/set/api.go)
 
+* ### [Mutable](./mutable/api.go)
 
-### [Mutable](./mutable/api.go)
+  * [Vector](./mutable/vector/api.go)
 
-[Vector](./mutable/vector/api.go)
+  * [OrderedMap](./mutable/dict/api.go)
 
-[OrderedMap](./mutable/dict/api.go)
-
-[OrderedSet](./mutable/set/api.go)
+  * [OrderedSet](./mutable/set/api.go)
 
 
 ## Packages
