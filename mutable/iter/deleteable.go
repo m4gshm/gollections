@@ -1,7 +1,7 @@
-package iter
+package it
 
 import (
-	"github.com/m4gshm/container/iter/impl/iter"
+	"github.com/m4gshm/container/it/impl/it"
 	"github.com/m4gshm/container/mutable"
 	"github.com/m4gshm/container/typ"
 )
@@ -24,10 +24,10 @@ var _ typ.Iterator[any] = (*Deleteable[any])(nil)
 var _ mutable.Iterator[any] = (*Deleteable[any])(nil)
 
 func (i *Deleteable[T]) HasNext() bool {
-	return iter.HasNext(*i.elements, &i.current, &i.err)
+	return it.HasNext(*i.elements, &i.current, &i.err)
 }
 func (i *Deleteable[T]) Get() T {
-	return iter.Get(i.current, *i.elements, i.err)
+	return it.Get(i.current, *i.elements, i.err)
 }
 
 func (i *Deleteable[T]) Delete() bool {
@@ -42,4 +42,3 @@ func (i *Deleteable[T]) Delete() bool {
 func (s *Deleteable[T]) Err() error {
 	return s.err
 }
-

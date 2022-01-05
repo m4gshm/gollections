@@ -1,8 +1,8 @@
-package iter
+package it
 
 import (
 	"github.com/m4gshm/container/check"
-	impl "github.com/m4gshm/container/iter/impl/iter"
+	impl "github.com/m4gshm/container/it/impl/it"
 	"github.com/m4gshm/container/op"
 	"github.com/m4gshm/container/typ"
 )
@@ -78,6 +78,7 @@ func Slice[T any](elements typ.Iterator[T]) []T {
 	return impl.Slice[T](elements)
 }
 
+//Group groups elements to slices by a converter and returns map
 func Group[T any, K comparable](elements typ.Iterator[T], by typ.Converter[T, K]) map[K][]T {
 	groups := map[K][]T{}
 	for elements.HasNext() {

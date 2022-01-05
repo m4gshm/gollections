@@ -4,40 +4,53 @@ Golang generic container data structures and functions.
 
 Need use Go version 1.18 beta 1 or newer.
 
-## Containers
+## [Mutable containers](./mutable/api.go)
 
-* ### [Immutable](./immutable/api.go)
+Supports write operations (append, delete, replace).
 
-  * [Vector](./immutable/vector/api.go)
+  * [Vector](./mutable/vector/api.go) - the simplest based on slices collection.
+  * [OrderedSet](./mutable/set/api.go) - collection of unique items, prevents duplicates, provides iteration in order of addition.
+  * [OrderedMap](./mutable/dict/api.go) - same as embedded map, but supports iteration in the order in which elements are added.
 
-  * [OrderedMap](./immutable/dict/api.go)
+## [Immutable containers](./immutable/api.go) 
 
-  * [OrderedSet](./immutable/set/api.go)
-
-* ### [Mutable](./mutable/api.go)
-
-  * [Vector](./mutable/vector/api.go)
-
-  * [OrderedMap](./mutable/dict/api.go)
-
-  * [OrderedSet](./mutable/set/api.go)
+The same interfaces as in the mutable package but for read-only purposes.
 
 
-## Packages
-### [Interfaces](./typ/iface.go)
-
-Common interfaces: Iterator, Container, Vector, Map, Set and so on.
-
-### [Iterator](./iter/api.go)
-API over 'Iterator' to make map, filter, flat, reduce operations in declarative style. 
+## Functions
 
 Consists of two groups of operations:
- * Intermediate - only defines computation (Wrap,Map, Flatt, Filter).
- * Final - applies intermediate links (ToSlice, Reudce)
-  
+ * Intermediate - only defines a computation (Wrap, Map, Flatt, Filter).
+ * Final - applies intermediates and retrieves the result (ForEach, Slice, Reudce)
 
-### [Slice](./slice/api.go)
-Same as [iter](./iter/api.go) but specifically for slices. Generally more performant than [iter](./iter/api.go) but only as the first in a chain of intermediate operations.
+Intermediates should wrap one by one to make a lazy computation chain that can be applied to the latest final operation.
+
+```go
+//Example 'filter', 'map', 'reduce' for an iterative container of 'items'
+
+
+var items immutable.Vector[Item]
+
+func condition(item Item) = ...
+func max(attribute1 Attribute, attribute2 Attribute) = ... 
+
+maxItemAttribute := it.Reduce(it.Map(c.Filer(items, condition), Item.GetAttribute), max)
+```
+Functions grouped into packages by applicable type ([iterable container](./c/api.go), [iterator](./it/api.go), [walker](walk/api.go), [slice](slice/api.go))
+
+## Packages
+### [Common interfaces](./typ/iface.go)
+
+Iterator, Iterable, Container, Vector, Map, Set and so on.
+
+### [Iterable container API](./it/api.go)
+Declarative style API over 'Iterable' interface. Based on 'Iterator API' (see below).
+
+### [Iterator API](./it/api.go)
+Declarative style API over 'Iterator' interface. 
+
+### [Slice API](./slice/api.go)
+Same as 'Iterator API' but specifically for slices. Generally more performant than 'Iterator' but only as the first in a chain of intermediate operations.
 
 
 
@@ -51,7 +64,7 @@ import (
 
 	"github.com/m4gshm/container/conv"
 	"github.com/m4gshm/container/immutable/set"
-	it "github.com/m4gshm/container/iter"
+	"github.com/m4gshm/container/it"
 	"github.com/m4gshm/container/op"
 	slc "github.com/m4gshm/container/slice"
 	"github.com/m4gshm/container/walk"
@@ -60,7 +73,7 @@ import (
 
 func Test_OrderedSet(t *testing.T) {
 	s := set.Of(1, 1, 2, 4, 3, 1)
-	values := s.Values()
+	values := s.Elements()
 	fmt.Println(s) //[1, 2, 4, 3]
 
 	assert.Equal(t, slc.Of(1, 2, 4, 3), values)

@@ -3,7 +3,7 @@ package set
 import (
 	"fmt"
 
-	"github.com/m4gshm/container/iter/impl/iter"
+	"github.com/m4gshm/container/it/impl/it"
 	"github.com/m4gshm/container/mutable"
 	miter "github.com/m4gshm/container/mutable/iter"
 	"github.com/m4gshm/container/op"
@@ -121,18 +121,18 @@ func (s *OrderedSet[T]) Delete(v T) bool {
 }
 
 func (s *OrderedSet[T]) Filter(filter typ.Predicate[T]) typ.Pipe[T, typ.Iterator[T]] {
-	return iter.NewPipe[T](&iter.RefIter[T]{Iterator: iter.Filter(s.delIter(), func(ref *T) bool { return filter(*ref) })})
+	return it.NewPipe[T](&it.RefIter[T]{Iterator: it.Filter(s.delIter(), func(ref *T) bool { return filter(*ref) })})
 }
 
 func (s *OrderedSet[T]) Map(by typ.Converter[T, T]) typ.Pipe[T, typ.Iterator[T]] {
-	return iter.NewPipe[T](&iter.RefIter[T]{Iterator: iter.Map(s.delIter(), func(ref *T) *T {
+	return it.NewPipe[T](&it.RefIter[T]{Iterator: it.Map(s.delIter(), func(ref *T) *T {
 		conv := by(*ref)
 		return &conv
 	})})
 }
 
 func (s *OrderedSet[T]) Reduce(by op.Binary[T]) T {
-	return iter.Reduce(&RefIter[T]{s.delIter()}, by)
+	return it.Reduce(&RefIter[T]{s.delIter()}, by)
 }
 
 func (s *OrderedSet[T]) String() string {

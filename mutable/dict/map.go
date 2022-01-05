@@ -3,7 +3,7 @@ package dict
 import (
 	"github.com/m4gshm/container/immutable/vector/dict"
 	"github.com/m4gshm/container/immutable/vector/ref"
-	"github.com/m4gshm/container/iter/impl/iter"
+	"github.com/m4gshm/container/it/impl/it"
 	"github.com/m4gshm/container/mutable"
 	"github.com/m4gshm/container/typ"
 )
@@ -41,8 +41,8 @@ func (s *OrderedMap[k, v]) Begin() typ.Iterator[*typ.KV[k, v]] {
 	return s.Iter()
 }
 
-func (s *OrderedMap[k, v]) Iter() *iter.OrderedKV[k, v] {
-	return iter.NewOrderedKV(s.elements, s.uniques)
+func (s *OrderedMap[k, v]) Iter() *it.OrderedKV[k, v] {
+	return it.NewOrderedKV(s.elements, s.uniques)
 }
 
 func (s *OrderedMap[k, v]) Elements() map[k]v {

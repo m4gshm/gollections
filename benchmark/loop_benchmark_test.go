@@ -5,8 +5,8 @@ import (
 
 	"github.com/m4gshm/container/immutable/set"
 	"github.com/m4gshm/container/immutable/vector"
-	"github.com/m4gshm/container/iter"
-	impliter "github.com/m4gshm/container/iter/impl/iter"
+	"github.com/m4gshm/container/it"
+	impliter "github.com/m4gshm/container/it/impl/it"
 	mset "github.com/m4gshm/container/mutable/set"
 	"github.com/m4gshm/container/slice"
 )
@@ -152,7 +152,7 @@ func Benchmark_HasNextGet_Iterator_Immutable_Vector_Impl(b *testing.B) {
 func Benchmark_HasNextGet_Iterator_WrapSlice(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		for it := iter.Wrap(values); it.HasNext(); {
+		for it := it.Wrap(values); it.HasNext(); {
 			result = it.Get()
 		}
 	}
@@ -214,7 +214,7 @@ func Benchmark_WrapMap_HasNextGet(b *testing.B) {
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		iter := iter.WrapMap(values)
+		iter := it.WrapMap(values)
 		for iter.HasNext() {
 			kv := iter.Get()
 			_ = kv.Key()

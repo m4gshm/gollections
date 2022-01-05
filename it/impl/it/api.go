@@ -1,4 +1,4 @@
-package iter
+package it
 
 import (
 	"github.com/m4gshm/container/check"
@@ -64,7 +64,7 @@ func Reduce[T any, IT typ.Iterator[T]](elements IT, by op.Binary[T]) T {
 	return result
 }
 
-//ToSlice converts Iterator to slice
+//Slice converts Iterator to slice
 func Slice[T any, IT typ.Iterator[T]](elements IT) []T {
 	s := make([]T, 0)
 

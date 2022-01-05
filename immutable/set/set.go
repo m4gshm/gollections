@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/m4gshm/container/immutable"
-	"github.com/m4gshm/container/iter/impl/iter"
+	"github.com/m4gshm/container/it/impl/it"
 	"github.com/m4gshm/container/op"
 	"github.com/m4gshm/container/slice"
 	"github.com/m4gshm/container/typ"
@@ -43,11 +43,11 @@ var _ fmt.Stringer = (*OrderedSet[any])(nil)
 var _ fmt.GoStringer = (*OrderedSet[any])(nil)
 
 func (s *OrderedSet[T]) Begin() typ.Iterator[T] {
-	return &iter.RefIter[T]{Iterator: s.newIter()}
+	return &it.RefIter[T]{Iterator: s.newIter()}
 }
 
-func (s *OrderedSet[T]) newIter() *iter.Iter[*T] {
-	return iter.New(s.elements)
+func (s *OrderedSet[T]) newIter() *it.Iter[*T] {
+	return it.New(s.elements)
 }
 
 func (s *OrderedSet[T]) Elements() []T {
@@ -66,18 +66,18 @@ func (s *OrderedSet[T]) ForEach(walker func(T)) {
 }
 
 func (s *OrderedSet[T]) Filter(filter typ.Predicate[T]) typ.Pipe[T, typ.Iterator[T]] {
-	return iter.NewPipe[T](&iter.RefIter[T]{iter.Filter(s.newIter(), func(ref *T) bool { return filter(*ref) })})
+	return it.NewPipe[T](&it.RefIter[T]{it.Filter(s.newIter(), func(ref *T) bool { return filter(*ref) })})
 }
 
 func (s *OrderedSet[T]) Map(by typ.Converter[T, T]) typ.Pipe[T, typ.Iterator[T]] {
-	return iter.NewPipe[T](&iter.RefIter[T]{iter.Map(s.newIter(), func(ref *T) *T {
+	return it.NewPipe[T](&it.RefIter[T]{it.Map(s.newIter(), func(ref *T) *T {
 		conv := by(*ref)
 		return &conv
 	})})
 }
 
 func (s *OrderedSet[T]) Reduce(by op.Binary[T]) T {
-	return iter.Reduce(&iter.RefIter[T]{s.newIter()}, by)
+	return it.Reduce(&it.RefIter[T]{s.newIter()}, by)
 }
 
 func (s *OrderedSet[T]) Len() int {

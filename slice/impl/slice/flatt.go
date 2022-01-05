@@ -1,7 +1,7 @@
 package slice
 
 import (
-	"github.com/m4gshm/container/iter/impl/iter"
+	"github.com/m4gshm/container/it/impl/it"
 	"github.com/m4gshm/container/typ"
 )
 
@@ -46,7 +46,7 @@ func (s *FlattenFit[From, To]) HasNext() bool {
 			}
 		}
 	}
-	s.err = iter.Exhausted
+	s.err = it.Exhausted
 	return false
 }
 
@@ -99,7 +99,7 @@ func (s *Flatten[From, To]) HasNext() bool {
 			return true
 		}
 	}
-	s.err = iter.Exhausted
+	s.err = it.Exhausted
 	return false
 }
 

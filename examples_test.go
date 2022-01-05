@@ -6,7 +6,7 @@ import (
 
 	"github.com/m4gshm/container/conv"
 	"github.com/m4gshm/container/immutable/set"
-	it "github.com/m4gshm/container/iter"
+	"github.com/m4gshm/container/it"
 	"github.com/m4gshm/container/op"
 	slc "github.com/m4gshm/container/slice"
 	"github.com/m4gshm/container/walk"

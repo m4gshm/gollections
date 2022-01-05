@@ -1,9 +1,9 @@
-package iter
+package it
 
 import (
 	"testing"
 
-	"github.com/m4gshm/container/iter/impl/iter"
+	"github.com/m4gshm/container/it/impl/it"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -15,7 +15,7 @@ func Test_KVIter_Iterate(t *testing.T) {
 	values := map[string]*s{"first": {"first_name"}, "second": {"first_second"}}
 	result := map[string]*s{}
 
-	for it := iter.NewKV(values); it.HasNext(); {
+	for it := it.NewKV(values); it.HasNext(); {
 		k, v := it.Get().Get()
 		result[k] = v
 	}
@@ -34,7 +34,7 @@ func Test_KVIterReset(t *testing.T) {
 	values := map[string]*s{"first": {"first_name"}, "second": {"first_second"}}
 	result1 := map[string]*s{}
 
-	it := iter.NewKV(values)
+	it := it.NewKV(values)
 	for it.HasNext() {
 		k, v := it.Get().Get()
 		result1[k] = v

@@ -1,4 +1,4 @@
-package iter
+package it
 
 import (
 	"github.com/m4gshm/container/op"

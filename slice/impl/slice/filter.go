@@ -1,7 +1,7 @@
 package slice
 
 import (
-	"github.com/m4gshm/container/iter/impl/iter"
+	"github.com/m4gshm/container/it/impl/it"
 	"github.com/m4gshm/container/typ"
 )
 
@@ -21,7 +21,7 @@ func (s *Fit[T]) HasNext() bool {
 	if ok {
 		s.current = v
 	} else {
-		s.err = iter.Exhausted
+		s.err = it.Exhausted
 	}
 	return ok
 }

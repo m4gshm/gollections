@@ -1,9 +1,8 @@
-package iter
+package it
 
 import (
 	"github.com/m4gshm/container/typ"
 )
-
 
 func NewRef[T any](elements []*T) *RefIter[T] {
 	return &RefIter[T]{New(elements)}

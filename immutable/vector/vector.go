@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/m4gshm/container/immutable"
-	"github.com/m4gshm/container/iter/impl/iter"
+	"github.com/m4gshm/container/it/impl/it"
 	"github.com/m4gshm/container/op"
 	"github.com/m4gshm/container/slice"
 	"github.com/m4gshm/container/typ"
@@ -29,8 +29,8 @@ func (s *Vector[T]) Begin() typ.Iterator[T] {
 	return s.Iter()
 }
 
-func (s *Vector[T]) Iter() *iter.Iter[T] {
-	return iter.New(s.elements)
+func (s *Vector[T]) Iter() *it.Iter[T] {
+	return it.New(s.elements)
 }
 
 func (s *Vector[T]) Elements() []T {
@@ -58,15 +58,15 @@ func (s *Vector[T]) Get(index int) (T, bool) {
 }
 
 func (s *Vector[T]) Filter(filter typ.Predicate[T]) typ.Pipe[T, typ.Iterator[T]] {
-	return iter.NewPipe[T](iter.Filter(s.Iter(), filter))
+	return it.NewPipe[T](it.Filter(s.Iter(), filter))
 }
 
 func (s *Vector[T]) Map(by typ.Converter[T, T]) typ.Pipe[T, typ.Iterator[T]] {
-	return iter.NewPipe[T](iter.Map(s.Iter(), by))
+	return it.NewPipe[T](it.Map(s.Iter(), by))
 }
 
 func (s *Vector[T]) Reduce(by op.Binary[T]) T {
-	return iter.Reduce(s.Iter(), by)
+	return it.Reduce(s.Iter(), by)
 }
 
 func (s *Vector[T]) String() string {

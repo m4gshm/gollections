@@ -1,7 +1,7 @@
 package dict
 
 import (
-	"github.com/m4gshm/container/iter/impl/iter"
+	"github.com/m4gshm/container/it/impl/it"
 	"github.com/m4gshm/container/typ"
 )
 
@@ -20,11 +20,11 @@ type Iterator[k comparable, v any] struct {
 var _ typ.Iterator[any] = (*Iterator[any, any])(nil)
 
 func (s *Iterator[k, v]) HasNext() bool {
-	return iter.HasNext(s.elements, &s.current, &s.err)
+	return it.HasNext(s.elements, &s.current, &s.err)
 }
 
 func (s *Iterator[k, v]) Get() v {
-	kref := iter.Get(s.current, s.elements, s.err)
+	kref := it.Get(s.current, s.elements, s.err)
 	return s.uniques[*kref]
 }
 

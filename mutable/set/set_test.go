@@ -3,7 +3,7 @@ package set
 import (
 	"testing"
 
-	"github.com/m4gshm/container/iter"
+	"github.com/m4gshm/container/it"
 	"github.com/m4gshm/container/op"
 	"github.com/m4gshm/container/slice"
 	"github.com/m4gshm/container/walk"
@@ -20,7 +20,7 @@ func Test_Set_Iterate(t *testing.T) {
 	expected := slice.Of(1, 2, 4, 3)
 	assert.Equal(t, expected, values)
 
-	iterSlice := iter.Slice[int](set.Begin())
+	iterSlice := it.Slice[int](set.Begin())
 	assert.Equal(t, expected, iterSlice)
 
 	out := make([]int, 0)
@@ -76,7 +76,7 @@ func Test_Set_FilterMapReduce(t *testing.T) {
 	//no sum, already computer stream
 	assert.Equal(t, 12, sum)
 
-	sum = iter.Pipe[int](Of(1, 1, 2, 4, 3, 1).Begin()).Filter(func(i int) bool { return i%2 == 0 }).Map(func(i int) int { return i * 2 }).Reduce(op.Sum[int])
+	sum = it.Pipe[int](Of(1, 1, 2, 4, 3, 1).Begin()).Filter(func(i int) bool { return i%2 == 0 }).Map(func(i int) int { return i * 2 }).Reduce(op.Sum[int])
 	//no sum, already computer stream
 	assert.Equal(t, 12, sum)
 }

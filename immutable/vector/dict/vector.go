@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/m4gshm/container/immutable"
-	"github.com/m4gshm/container/iter/impl/iter"
+	"github.com/m4gshm/container/it/impl/it"
 	"github.com/m4gshm/container/op"
 	"github.com/m4gshm/container/slice"
 	"github.com/m4gshm/container/typ"
@@ -66,15 +66,15 @@ func (s *Vector[k, v]) Get(index int) (v, bool) {
 }
 
 func (s *Vector[k, v]) Filter(filter typ.Predicate[v]) typ.Pipe[v, typ.Iterator[v]] {
-	return iter.NewPipe[v](iter.Filter(s.Iter(), filter))
+	return it.NewPipe[v](it.Filter(s.Iter(), filter))
 }
 
 func (s *Vector[k, v]) Map(by typ.Converter[v, v]) typ.Pipe[v, typ.Iterator[v]] {
-	return iter.NewPipe[v](iter.Map(s.Iter(), by))
+	return it.NewPipe[v](it.Map(s.Iter(), by))
 }
 
 func (s *Vector[k, v]) Reduce(by op.Binary[v]) v {
-	return iter.Reduce(s.Iter(), by)
+	return it.Reduce(s.Iter(), by)
 }
 
 func (s *Vector[k, v]) String() string {

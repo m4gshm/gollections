@@ -2,12 +2,12 @@ package set
 
 import (
 	"github.com/m4gshm/container/mutable"
-	"github.com/m4gshm/container/mutable/iter"
+	it "github.com/m4gshm/container/mutable/iter"
 	"github.com/m4gshm/container/typ"
 )
 
 type RefIter[T any] struct {
-	*iter.Deleteable[*T]
+	*it.Deleteable[*T]
 }
 
 var _ typ.Iterator[any] = (*RefIter[any])(nil)
