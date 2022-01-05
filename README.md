@@ -21,13 +21,12 @@ The same interfaces as in the mutable package but for read-only purposes.
 
 Consists of two groups of operations:
  * Intermediate - only defines a computation (Wrap, Map, Flatt, Filter).
- * Final - applies intermediates and retrieves the result (ForEach, Slice, Reudce)
+ * Final - applies intermediates and retrieves the result (ForEach, Slice, Reduce)
 
 Intermediates should wrap one by one to make a lazy computation chain that can be applied to the latest final operation.
 
 ```go
 //Example 'filter', 'map', 'reduce' for an iterative container of 'items'
-
 
 var items immutable.Vector[Item]
 
