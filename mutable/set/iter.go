@@ -21,6 +21,6 @@ func (i *RefIter[T]) Get() T {
 	return *i.Deleteable.Get()
 }
 
-func (i *RefIter[T]) Delete() bool {
+func (i *RefIter[T]) Delete() (bool, error) {
 	return i.Deleteable.Delete()
 }

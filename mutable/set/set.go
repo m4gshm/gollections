@@ -54,7 +54,7 @@ func (s *OrderedSet[T]) Iter() *RefIter[T] {
 }
 
 func (s *OrderedSet[T]) delIter() *miter.Deleteable[*T] {
-	return miter.NewDeleteable(&s.elements, &s.changeMark, func(ref *T) bool { return s.Delete(*ref) })
+	return miter.NewDeleteable(&s.elements, &s.changeMark, func(ref *T) (bool, error) { return s.Delete(*ref) })
 }
 
 func (s *OrderedSet[T]) Elements() []T {
@@ -81,43 +81,81 @@ func (s *OrderedSet[T]) Contains(v T) bool {
 	return ok
 }
 
-func (s *OrderedSet[T]) Add(v T) bool {
+func (s *OrderedSet[T]) Add(elements ...T) (bool, error) {
+	u := s.uniques
+	result := false
+	for i := range elements {
+		markOnStart := s.changeMark
+		v := elements[i]
+		if _, ok := u[v]; !ok {
+			e := s.elements
+			u[v] = len(e)
+			s.elements = append(e, &v)
+			cmt, err := mutable.Commit(markOnStart, &s.changeMark)
+			if err != nil {
+				return false, err
+			}
+			result = result || cmt
+		}
+	}
+	return result, nil
+}
+
+func (s *OrderedSet[T]) AddAll(elements []T) (bool, error) {
+	u := s.uniques
+	result := false
+	for i := range elements {
+		markOnStart := s.changeMark
+		v := elements[i]
+		if _, ok := u[v]; !ok {
+			e := s.elements
+			u[v] = len(e)
+			s.elements = append(e, &v)
+			cmt, err := mutable.Commit(markOnStart, &s.changeMark)
+			if err != nil {
+				return false, err
+			}
+			result = result || cmt
+		}
+	}
+	return result, nil
+}
+
+func (s *OrderedSet[T]) AddOne(v T) (bool, error) {
 	markOnStart := s.changeMark
 	u := s.uniques
 	if _, ok := u[v]; !ok {
 		e := s.elements
 		u[v] = len(e)
 		s.elements = append(e, &v)
-		markOnFinish := s.changeMark
-		if markOnFinish != markOnStart {
-			panic("concurrent ordered map read and write")
-		}
-		s.changeMark++
-		return true
+		return mutable.Commit(markOnStart, &s.changeMark)
 	}
-	return false
+	return false, nil
 }
 
-func (s *OrderedSet[T]) Delete(v T) bool {
-	markOnStart := s.changeMark
+func (s *OrderedSet[T]) Delete(elements ...T) (bool, error) {
 	u := s.uniques
-	changeMark := s.changeMark
-	if pos, ok := u[v]; ok {
-		delete(u, v)
-		e := s.elements
-		ne := append(e[0:pos], e[pos+1:]...)
-		for i := pos; i < len(ne); i++ {
-			u[*ne[i]]--
+	result := false
+	for i := range elements {
+		v := elements[i]
+		if pos, ok := u[v]; ok {
+			markOnStart := s.changeMark
+			delete(u, v)
+			//todo: need optimize
+			e := s.elements
+			ne := append(e[0:pos], e[pos+1:]...)
+			for i := pos; i < len(ne); i++ {
+				u[*ne[i]]--
+			}
+			s.elements = ne
+			ok, err := mutable.Commit(markOnStart, &s.changeMark)
+			if err != nil {
+				return false, err
+			}
+			result = result || ok
 		}
-		s.elements = ne
-		markOnFinish := s.changeMark
-		if markOnFinish != markOnStart {
-			panic("concurrent ordered map read and write")
-		}
-		changeMark++
-		return true
 	}
-	return false
+	return result, nil
 }
 
 func (s *OrderedSet[T]) Filter(filter typ.Predicate[T]) typ.Pipe[T, typ.Iterator[T]] {

@@ -35,11 +35,10 @@ func Test_Set_Iterate(t *testing.T) {
 
 func Test_Set_Add(t *testing.T) {
 	set := New[int](0)
-	assert.Equal(t, set.Add(1), true)
-	assert.Equal(t, set.Add(2), true)
-	assert.Equal(t, set.Add(4), true)
-	assert.Equal(t, set.Add(3), true)
-	assert.Equal(t, set.Add(1), false)
+	added, _ := set.Add(1, 2, 4, 3)
+	assert.Equal(t, added, true)
+	added, _ = set.Add(1)
+	assert.Equal(t, added, false)
 
 	values := set.Elements()
 
