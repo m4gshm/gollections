@@ -7,7 +7,7 @@ import (
 )
 
 func Test_ValueTypeAlwaysNotNil(t *testing.T) {
-	emptyString:=""
+	emptyString := ""
 	ref := &emptyString
 	assert.Equal(t, false, Nil(ref))
 	ref = nil
@@ -45,13 +45,11 @@ func Test_NilStruct(t *testing.T) {
 	assert.Equal(t, false, Nil(&i))
 }
 
-
 func Test_Empty(t *testing.T) {
-	s:=""
+	s := ""
 	assert.Equal(t, true, Empty(s))
 
-	i:=[]int{}
+	i := []int{}
 	assert.Equal(t, true, Empty(i))
-
 
 }

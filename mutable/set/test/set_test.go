@@ -51,7 +51,7 @@ func Test_Set_Delete(t *testing.T) {
 	values := set.Elements()
 
 	for _, v := range values {
-		set.Delete(v)
+		_, _ = set.Delete(v)
 	}
 
 	assert.Equal(t, 0, set.Len())
@@ -64,7 +64,7 @@ func Test_Set_DeleteByIterator(t *testing.T) {
 	i := 0
 	for iter.HasNext() {
 		i++
-		iter.Delete()
+		_, _ = iter.Delete()
 	}
 
 	assert.Equal(t, 4, i)

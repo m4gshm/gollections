@@ -85,7 +85,6 @@ func Benchmark_Map_Vector_Iterator_No_Cache_Operation(b *testing.B) {
 	b.StopTimer()
 }
 
-
 func Benchmark_Map_Vector_Iterator_Impl(b *testing.B) {
 	op := conv.And(toString, addTail)
 	items := vector.Convert(values)
@@ -106,7 +105,7 @@ func Benchmark_Map_Vector_ForEach_(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		s = mvector.Create[string](c)
-		items.ForEach(func(element int) { s.Add(op(element)) })
+		items.ForEach(func(element int) { _, _ = s.Add(op(element)) })
 	}
 	_ = s
 	b.StopTimer()

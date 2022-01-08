@@ -11,7 +11,7 @@ func NewIter[T any](elements **[]T, changeMark *int32, del func(int) (bool, erro
 }
 
 type Iter[T any] struct {
-	elements    **[]T
+	elements   **[]T
 	err        error
 	current    int
 	changeMark *int32

@@ -67,7 +67,7 @@ func Test_Vector_DeleteByIterator(t *testing.T) {
 	i := 0
 	for iter.HasNext() {
 		i++
-		iter.Delete()
+		_, _ = iter.Delete()
 	}
 
 	assert.Equal(t, 6, i)

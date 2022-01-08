@@ -66,18 +66,18 @@ func (s *OrderedSet[T]) ForEach(walker func(T)) {
 }
 
 func (s *OrderedSet[T]) Filter(filter typ.Predicate[T]) typ.Pipe[T, typ.Iterator[T]] {
-	return it.NewPipe[T](&it.RefIter[T]{it.Filter(s.newIter(), func(ref *T) bool { return filter(*ref) })})
+	return it.NewPipe[T](&it.RefIter[T]{Iterator: it.Filter(s.newIter(), func(ref *T) bool { return filter(*ref) })})
 }
 
 func (s *OrderedSet[T]) Map(by typ.Converter[T, T]) typ.Pipe[T, typ.Iterator[T]] {
-	return it.NewPipe[T](&it.RefIter[T]{it.Map(s.newIter(), func(ref *T) *T {
+	return it.NewPipe[T](&it.RefIter[T]{Iterator: it.Map(s.newIter(), func(ref *T) *T {
 		conv := by(*ref)
 		return &conv
 	})})
 }
 
 func (s *OrderedSet[T]) Reduce(by op.Binary[T]) T {
-	return it.Reduce(&it.RefIter[T]{s.newIter()}, by)
+	return it.Reduce(&it.RefIter[T]{Iterator: s.newIter()}, by)
 }
 
 func (s *OrderedSet[T]) Len() int {

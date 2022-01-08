@@ -10,7 +10,7 @@ test:
 
 
 .PHONY: build
-build:
+build: gofmt govet errcheck
 	$(info #Building...)
 	# go build -gcflags -m ./...
 	go build ./...
@@ -23,3 +23,13 @@ bench:
 .PHONY: gofmt
 gofmt:
 	go fmt ./...
+
+.PHONY: govet
+govet:
+	go vet ./...
+
+
+.PHONY: errcheck
+errcheck:
+	go install github.com/kisielk/errcheck@latest
+	errcheck ./...

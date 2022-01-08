@@ -67,7 +67,6 @@ func (s *OrderedMap[k, v]) Get(key k) (v, bool) {
 	return val, ok
 }
 
-
 func (s *OrderedMap[k, v]) Keys() typ.Container[k, int, typ.Iterator[k]] {
 	return ref.Wrap(s.elements)
 }

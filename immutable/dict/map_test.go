@@ -26,6 +26,6 @@ func Test_Map_Iterate(t *testing.T) {
 	assert.Equal(t, expectedK, keys)
 	assert.Equal(t, expectedV, values)
 
-	assert.Equal(t, slice.Of(1, 2, 4, 3),  opdered.Keys().Elements())
-	assert.Equal(t, slice.Of("1", "2", "4", "3"),  opdered.Values().Elements())
+	assert.Equal(t, slice.Of(1, 2, 4, 3), opdered.Keys().Elements())
+	assert.Equal(t, slice.Of("1", "2", "4", "3"), opdered.Values().Elements())
 }

@@ -76,19 +76,19 @@ type Finite[T any, L constraints.Integer] interface {
 	Len() L
 }
 
-type Transformable[T any, IT Iterator [T]] interface {
+type Transformable[T any, IT Iterator[T]] interface {
 	Filter(Predicate[T]) Pipe[T, IT]
 	Map(Converter[T, T]) Pipe[T, IT]
 	Reduce(op.Binary[T]) T
 }
 
-type Pipe[T any, IT Iterator [T]] interface {
+type Pipe[T any, IT Iterator[T]] interface {
 	Transformable[T, IT]
 	Iterable[T, IT]
 	Walk[T]
 }
 
-type Pipeable[T any, IT Iterator [T]] interface {
+type Pipeable[T any, IT Iterator[T]] interface {
 	Pipe() Pipe[T, IT]
 }
 
