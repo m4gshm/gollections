@@ -16,7 +16,7 @@ func Convert[T any](elements []*T) *Vector[T] {
 }
 
 func Wrap[T any](elements []*T) *Vector[T] {
-	return &Vector[T]{vector.Wrap(elements)}
+	return &Vector[T]{vector.Wrap(&elements)}
 }
 
 type Vector[T any] struct {

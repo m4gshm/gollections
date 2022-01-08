@@ -29,8 +29,9 @@ func NewOrderedMap[k comparable, v any](capacity int) *OrderedMap[k, v] {
 }
 
 type OrderedMap[k comparable, v any] struct {
-	elements []*k
-	uniques  map[k]v
+	changeMark int32
+	elements   []*k
+	uniques    map[k]v
 }
 
 var _ mutable.Map[any, any, typ.Iterator[*typ.KV[any, any]]] = (*OrderedMap[any, any])(nil)
@@ -76,15 +77,15 @@ func (s *OrderedMap[k, v]) Get(key k) (v, bool) {
 	return val, ok
 }
 
-func (s *OrderedMap[k, v]) Put(key k, value v) bool {
+func (s *OrderedMap[k, v]) Set(key k, value v) (bool, error) {
 	u := s.uniques
 	if _, ok := u[key]; !ok {
 		e := s.elements
 		u[key] = value
 		s.elements = append(e, &key)
-		return true
+		return true, nil
 	}
-	return false
+	return false, nil
 }
 
 func (s *OrderedMap[k, v]) Keys() typ.Container[k, int, typ.Iterator[k]] {

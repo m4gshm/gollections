@@ -11,15 +11,16 @@ import (
 )
 
 func Convert[T any](elements []T) *Vector[T] {
-	return Wrap(slice.Copy(elements))
+	c := slice.Copy(elements)
+	return Wrap(&c)
 }
 
-func Wrap[T any](elements []T) *Vector[T] {
+func Wrap[T any](elements *[]T) *Vector[T] {
 	return &Vector[T]{elements: elements}
 }
 
 type Vector[T any] struct {
-	elements   []T
+	elements *[]T
 }
 
 var _ immutable.Vector[any, typ.Iterator[any]] = (*Vector[any])(nil)
@@ -30,28 +31,28 @@ func (s *Vector[T]) Begin() typ.Iterator[T] {
 }
 
 func (s *Vector[T]) Iter() *it.Iter[T] {
-	return it.New(s.elements)
+	return it.New(*s.elements)
 }
 
 func (s *Vector[T]) Elements() []T {
-	return slice.Copy(s.elements)
+	return slice.Copy(*s.elements)
 }
 
 func (s *Vector[T]) ForEach(walker func(T)) {
-	for _, e := range s.elements {
+	for _, e := range *s.elements {
 		walker(e)
 	}
 }
 
 func (s *Vector[T]) Len() int {
-	return len(s.elements)
+	return len(*s.elements)
 }
 
 func (s *Vector[T]) Get(index int) (T, bool) {
-	elements := s.elements
+	elements := *s.elements
 	l := len(elements)
 	if l > 0 && (index >= 0 || index < l) {
-		return s.elements[index], true
+		return elements[index], true
 	}
 	var no T
 	return no, false
@@ -70,5 +71,5 @@ func (s *Vector[T]) Reduce(by op.Binary[T]) T {
 }
 
 func (s *Vector[T]) String() string {
-	return slice.ToString(s.elements)
+	return slice.ToString(*s.elements)
 }

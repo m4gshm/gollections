@@ -1,4 +1,4 @@
-package test
+package vector
 
 import (
 	"testing"

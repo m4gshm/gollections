@@ -8,31 +8,33 @@ import (
 
 var BadRW = errors.New("concurrent read and write")
 
-type Vector[T any, IT typ.Iterator[T]] interface {
+type Vector[T any, IT Iterator[T]] interface {
 	typ.Vector[T, IT]
 	typ.Transformable[T, typ.Iterator[T]]
-	Appendable[T]
+	Addable[T]
+	Settable[int, T]
+	Delete(index int) (bool, error)
 }
 
-type Set[T any, IT Iterator[T]] interface {
+type Set[T comparable, IT Iterator[T]] interface {
 	typ.Set[T, IT]
 	typ.Transformable[T, typ.Iterator[T]]
-	Appendable[T]
-	Deletable[T]
+	Addable[T]
+	Delete(...T) (bool, error)
 }
 
 type Map[k comparable, v any, IT typ.Iterator[*typ.KV[k, v]]] interface {
 	typ.Map[k, v]
 	typ.Iterable[*typ.KV[k, v], IT]
-	Put(key k, value v) bool
+	Settable[k, v]
 }
 
-type Appendable[T any] interface {
+type Addable[T any] interface {
 	Add(...T) (bool, error)
 }
 
-type Deletable[T any] interface {
-	Delete(...T) (bool, error)
+type Settable[k any, v any] interface {
+	Set(key k, value v) (bool, error)
 }
 
 type Iterable[T any, IT typ.Iterator[T]] interface {

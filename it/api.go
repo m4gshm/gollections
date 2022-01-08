@@ -2,10 +2,15 @@ package it
 
 import (
 	"github.com/m4gshm/container/check"
+	"github.com/m4gshm/container/it/impl/it"
 	impl "github.com/m4gshm/container/it/impl/it"
 	"github.com/m4gshm/container/op"
 	"github.com/m4gshm/container/typ"
 )
+
+const NoStarted = it.NoStarted
+
+var Exhausted = it.Exhausted
 
 //Of Iterator constructor
 func Of[T any](elements ...T) typ.Iterator[T] {

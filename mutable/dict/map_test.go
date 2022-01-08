@@ -32,11 +32,16 @@ func Test_Map_Iterate(t *testing.T) {
 
 func Test_Map_Add(t *testing.T) {
 	d := New[int, string](4)
-	assert.Equal(t, d.Put(1, "1"), true)
-	assert.Equal(t, d.Put(2, "2"), true)
-	assert.Equal(t, d.Put(4, "4"), true)
-	assert.Equal(t, d.Put(3, "3"), true)
-	assert.Equal(t, d.Put(1, "11"), false)
+	s, _:=  d.Set(1, "1")
+	assert.Equal(t, s, true)
+	s, _=  d.Set(2, "2")
+	assert.Equal(t, s, true)
+	s, _=  d.Set(4, "4")
+	assert.Equal(t, s, true)
+	s, _=  d.Set(3, "3")
+	assert.Equal(t, s, true)
+	s, _=  d.Set(1, "11")
+	assert.Equal(t, s, false)
 
 	assert.Equal(t, slice.Of(1, 2, 4, 3),  d.Keys().Elements())
 	assert.Equal(t, slice.Of("1", "2", "4", "3"),  d.Values().Elements())

@@ -19,6 +19,10 @@ func Copy[T any](elements []T) []T {
 	return copied
 }
 
+func Delete[T any](index int, elements []T) []T {
+	return append(elements[0:index], elements[index+1:]...)
+}
+
 func Range[T constraints.Integer](from T, to T) []T {
 	if to == from {
 		return []T{to}
@@ -28,7 +32,7 @@ func Range[T constraints.Integer](from T, to T) []T {
 	if amount < 0 {
 		amount = -amount
 		delta = -1
-	} 
+	}
 	amount = amount + 1
 	elements := make([]T, amount)
 	e := from

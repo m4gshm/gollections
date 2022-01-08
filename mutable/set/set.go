@@ -5,7 +5,6 @@ import (
 
 	"github.com/m4gshm/container/it/impl/it"
 	"github.com/m4gshm/container/mutable"
-	miter "github.com/m4gshm/container/mutable/iter"
 	"github.com/m4gshm/container/op"
 	"github.com/m4gshm/container/slice"
 	"github.com/m4gshm/container/typ"
@@ -49,12 +48,8 @@ func (s *OrderedSet[T]) Begin() mutable.Iterator[T] {
 	return s.Iter()
 }
 
-func (s *OrderedSet[T]) Iter() *RefIter[T] {
-	return &RefIter[T]{s.delIter()}
-}
-
-func (s *OrderedSet[T]) delIter() *miter.Deleteable[*T] {
-	return miter.NewDeleteable(&s.elements, &s.changeMark, func(ref *T) (bool, error) { return s.Delete(*ref) })
+func (s *OrderedSet[T]) Iter() *Iter[T] {
+	return NewIter(&s.elements, &s.changeMark, s.DeleteOne)
 }
 
 func (s *OrderedSet[T]) Elements() []T {
@@ -134,6 +129,10 @@ func (s *OrderedSet[T]) AddOne(v T) (bool, error) {
 }
 
 func (s *OrderedSet[T]) Delete(elements ...T) (bool, error) {
+	return s.DeleteAll(elements)
+}
+
+func (s *OrderedSet[T]) DeleteAll(elements []T) (bool, error) {
 	u := s.uniques
 	result := false
 	for i := range elements {
@@ -143,7 +142,7 @@ func (s *OrderedSet[T]) Delete(elements ...T) (bool, error) {
 			delete(u, v)
 			//todo: need optimize
 			e := s.elements
-			ne := append(e[0:pos], e[pos+1:]...)
+			ne := slice.Delete(pos, e)
 			for i := pos; i < len(ne); i++ {
 				u[*ne[i]]--
 			}
@@ -158,19 +157,33 @@ func (s *OrderedSet[T]) Delete(elements ...T) (bool, error) {
 	return result, nil
 }
 
+func (s *OrderedSet[T]) DeleteOne(v T) (bool, error) {
+	u := s.uniques
+	if pos, ok := u[v]; ok {
+		markOnStart := s.changeMark
+		delete(u, v)
+		//todo: need optimize
+		e := s.elements
+		ne := slice.Delete(pos, e)
+		for i := pos; i < len(ne); i++ {
+			u[*ne[i]]--
+		}
+		s.elements = ne
+		return mutable.Commit(markOnStart, &s.changeMark)
+	}
+	return false, nil
+}
+
 func (s *OrderedSet[T]) Filter(filter typ.Predicate[T]) typ.Pipe[T, typ.Iterator[T]] {
-	return it.NewPipe[T](&it.RefIter[T]{Iterator: it.Filter(s.delIter(), func(ref *T) bool { return filter(*ref) })})
+	return it.NewPipe[T](it.Filter(s.Iter(), filter))
 }
 
 func (s *OrderedSet[T]) Map(by typ.Converter[T, T]) typ.Pipe[T, typ.Iterator[T]] {
-	return it.NewPipe[T](&it.RefIter[T]{Iterator: it.Map(s.delIter(), func(ref *T) *T {
-		conv := by(*ref)
-		return &conv
-	})})
+	return it.NewPipe[T](it.Map(s.Iter(), by))
 }
 
 func (s *OrderedSet[T]) Reduce(by op.Binary[T]) T {
-	return it.Reduce(&RefIter[T]{s.delIter()}, by)
+	return it.Reduce(s.Iter(), by)
 }
 
 func (s *OrderedSet[T]) String() string {
