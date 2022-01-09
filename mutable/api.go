@@ -8,6 +8,7 @@ import (
 
 var BadRW = errors.New("concurrent read and write")
 
+//Vector - the container stores ordered elements, provides index access
 type Vector[T any, IT Iterator[T]] interface {
 	typ.Vector[T, IT]
 	typ.Transformable[T, typ.Iterator[T]]
@@ -16,6 +17,7 @@ type Vector[T any, IT Iterator[T]] interface {
 	Delete(index int) (bool, error)
 }
 
+//Set - the container provides uniqueness (does't insert duplicated values)
 type Set[T comparable, IT Iterator[T]] interface {
 	typ.Set[T, IT]
 	typ.Transformable[T, typ.Iterator[T]]
@@ -23,6 +25,7 @@ type Set[T comparable, IT Iterator[T]] interface {
 	Delete(...T) (bool, error)
 }
 
+//Map - the container provides access to elements by key
 type Map[k comparable, v any, IT typ.Iterator[*typ.KV[k, v]]] interface {
 	typ.Map[k, v]
 	typ.Iterable[*typ.KV[k, v], IT]

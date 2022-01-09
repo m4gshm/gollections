@@ -6,26 +6,26 @@ import (
 	"github.com/m4gshm/container/op"
 )
 
-/*
- *  Common interfaces
- */
-
+//Container - base interface for container interfaces
 type Container[T any, L constraints.Integer, IT Iterator[T]] interface {
 	Walk[T]
 	Finite[[]T, L]
 	Iterable[T, IT]
 }
 
+//Vector - the container stores ordered elements, provides index access
 type Vector[T any, IT Iterator[T]] interface {
 	Container[T, int, IT]
 	RandomAccess[int, T]
 }
 
+//Set - the container provides uniqueness (does't insert duplicated values)
 type Set[T any, IT Iterator[T]] interface {
 	Container[T, int, IT]
 	Checkable[T]
 }
 
+//Map - the container provides access to elements by key
 type Map[k comparable, v any] interface {
 	Track[v, k]
 	Finite[map[k]v, int]
