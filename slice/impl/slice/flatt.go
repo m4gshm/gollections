@@ -14,7 +14,7 @@ type FlattenFit[From, To any] struct {
 
 	elementsTo []To
 	indTo      int
-	c          To
+	current    To
 	err        error
 }
 
@@ -24,7 +24,7 @@ func (s *FlattenFit[From, To]) HasNext() bool {
 	if elementsTo := s.elementsTo; len(elementsTo) > 0 {
 		if indTo := s.indTo; indTo < len(elementsTo) {
 			c := elementsTo[indTo]
-			s.c = c
+			s.current = c
 			s.indTo = indTo + 1
 			return true
 		} else {
@@ -39,7 +39,7 @@ func (s *FlattenFit[From, To]) HasNext() bool {
 		s.indFrom = indFrom + 1
 		if v := elements[indFrom]; s.Fit(v) {
 			if elementsTo := s.Flatt(v); len(elementsTo) > 0 {
-				s.c = elementsTo[0]
+				s.current = elementsTo[0]
 				s.elementsTo = elementsTo
 				s.indTo = 1
 				return true
@@ -51,10 +51,15 @@ func (s *FlattenFit[From, To]) HasNext() bool {
 }
 
 func (s *FlattenFit[From, To]) Get() To {
-	if err := s.err; err != nil {
+	v, err := s.Next()
+	if err != nil {
 		panic(err)
 	}
-	return s.c
+	return v
+}
+
+func (s *FlattenFit[From, To]) Next() (To, error) {
+	return s.current, s.err
 }
 
 func (s *FlattenFit[From, To]) Err() error {
@@ -68,7 +73,7 @@ type Flatten[From, To any] struct {
 	indFrom    int
 	elementsTo []To
 	indTo      int
-	c          To
+	current    To
 	err        error
 }
 
@@ -78,7 +83,7 @@ func (s *Flatten[From, To]) HasNext() bool {
 	if elementsTo := s.elementsTo; len(elementsTo) > 0 {
 		if indTo := s.indTo; indTo < len(elementsTo) {
 			c := elementsTo[indTo]
-			s.c = c
+			s.current = c
 			s.indTo = indTo + 1
 			return true
 		} else {
@@ -93,7 +98,7 @@ func (s *Flatten[From, To]) HasNext() bool {
 		s.indFrom = indFrom + 1
 		v := elements[indFrom]
 		if elementsTo := s.Flatt(v); len(elementsTo) > 0 {
-			s.c = elementsTo[0]
+			s.current = elementsTo[0]
 			s.elementsTo = elementsTo
 			s.indTo = 1
 			return true
@@ -104,10 +109,15 @@ func (s *Flatten[From, To]) HasNext() bool {
 }
 
 func (s *Flatten[From, To]) Get() To {
-	if err := s.err; err != nil {
+	v, err := s.Next()
+	if err != nil {
 		panic(err)
 	}
-	return s.c
+	return v
+}
+
+func (s *Flatten[From, To]) Next() (To, error) {
+	return s.current, s.err
 }
 
 func (s *Flatten[From, To]) Err() error {

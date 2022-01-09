@@ -27,10 +27,15 @@ func (s *Fit[T]) HasNext() bool {
 }
 
 func (s *Fit[T]) Get() T {
-	if err := s.err; err != nil {
+	v, err := s.Next()
+	if err != nil {
 		panic(err)
 	}
-	return s.current
+	return v
+}
+
+func (s *Fit[T]) Next() (T, error) {
+	return s.current, s.err
 }
 
 func (s *Fit[T]) Err() error {

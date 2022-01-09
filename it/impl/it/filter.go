@@ -25,10 +25,15 @@ func (s *Fit[T]) HasNext() bool {
 }
 
 func (s *Fit[T]) Get() T {
-	if err := s.err; err != nil {
+	n, err := s.Next()
+	if err != nil {
 		panic(err)
 	}
-	return s.current
+	return n
+}
+
+func (s *Fit[T]) Next() (T, error) {
+	return s.current, s.err
 }
 
 func (s *Fit[T]) Err() error {
@@ -37,11 +42,10 @@ func (s *Fit[T]) Err() error {
 
 func nextFiltered[T any](iter typ.Iterator[T], filter typ.Predicate[T]) (T, bool, error) {
 	for iter.HasNext() {
-		if err := iter.Err(); err != nil {
+		if v, err := iter.Next(); err != nil {
 			var no T
 			return no, true, err
-		}
-		if v := iter.Get(); filter(v) {
+		} else if filter(v) {
 			return v, true, nil
 		}
 	}

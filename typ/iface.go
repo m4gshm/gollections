@@ -43,6 +43,8 @@ type Iterator[T any] interface {
 	Get() T
 	//retrieves error
 	Err() error
+
+	Next() (T, error)
 }
 
 //Resetable an object with resettable state (e.g. slice based iterator)

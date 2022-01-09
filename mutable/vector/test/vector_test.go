@@ -1,9 +1,12 @@
 package vector
 
 import (
+	"errors"
+	"sync"
 	"testing"
 
 	"github.com/m4gshm/container/it"
+	"github.com/m4gshm/container/mutable"
 	"github.com/m4gshm/container/mutable/vector"
 	"github.com/m4gshm/container/op"
 	"github.com/m4gshm/container/slice"
@@ -88,4 +91,48 @@ func Test_Vector_Group(t *testing.T) {
 	assert.Equal(t, len(groups), 2)
 	assert.Equal(t, []int{1, 1, 3, 1, 7}, groups[false])
 	assert.Equal(t, []int{0, 2, 4, 6}, groups[true])
+}
+
+func Test_Vector_Concurrent_Update(t *testing.T) {
+	vec := vector.Empty[int64]()
+
+	wg := sync.WaitGroup{}
+
+	wg.Add(1)
+	var add error
+	go func() {
+		defer wg.Done()
+		i := int64(0)
+		for {
+			if _, err := vec.Add(i); err != nil {
+				if errors.Is(err, mutable.BadRW) {
+					add = err
+					return
+				}
+			}
+			i++
+		}
+	}()
+
+	wg.Add(1)
+	var delete error
+	go func() {
+		defer wg.Done()
+		for {
+			for iter := vec.Begin(); iter.HasNext(); {
+				if _, err := iter.Delete(); err != nil {
+					if errors.Is(err, mutable.BadRW) {
+						delete = err
+						return
+					}
+
+				}
+			}
+		}
+	}()
+
+	wg.Wait()
+	if add == nil || delete == nil {
+		t.Fatal("no errors")
+	}
 }

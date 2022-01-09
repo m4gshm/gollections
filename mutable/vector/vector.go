@@ -28,6 +28,7 @@ type Vector[t any /*if replaces generic type by 'T' it raises compile-time error
 	*vector.Vector[t]
 	elements   **[]t
 	changeMark int32
+	err        error
 }
 
 var _ mutable.Vector[any, mutable.Iterator[any]] = (*Vector[any])(nil)
@@ -46,28 +47,40 @@ func (s *Vector[t]) Add(v ...t) (bool, error) {
 }
 
 func (s *Vector[t]) AddAll(v []t) (bool, error) {
+	if err := s.err; err != nil {
+		return false, err
+	}
 	markOnStart := s.changeMark
 	**s.elements = append(**s.elements, v...)
-	return mutable.Commit(markOnStart, &s.changeMark)
+	return mutable.Commit(markOnStart, &s.changeMark, &s.err)
 }
 
 func (s *Vector[t]) AddOne(v t) (bool, error) {
+	if err := s.err; err != nil {
+		return false, err
+	}
 	markOnStart := s.changeMark
 	**s.elements = append(**s.elements, v)
-	return mutable.Commit(markOnStart, &s.changeMark)
+	return mutable.Commit(markOnStart, &s.changeMark, &s.err)
 }
 
 func (s *Vector[t]) Delete(index int) (bool, error) {
+	if err := s.err; err != nil {
+		return false, err
+	}
 	e := **s.elements
 	if index >= 0 && index < len(e) {
 		markOnStart := s.changeMark
 		**s.elements = slice.Delete(index, e)
-		return mutable.Commit(markOnStart, &s.changeMark)
+		return mutable.Commit(markOnStart, &s.changeMark, &s.err)
 	}
 	return false, nil
 }
 
 func (s *Vector[t]) Set(index int, value t) (bool, error) {
+	if err := s.err; err != nil {
+		return false, err
+	}
 	e := **s.elements
 	if index < 0 {
 		return false, fmt.Errorf("%w: %d", BadIndex, index)

@@ -32,6 +32,7 @@ type OrderedMap[k comparable, v any] struct {
 	changeMark int32
 	elements   []*k
 	uniques    map[k]v
+	err        error
 }
 
 var _ mutable.Map[any, any, typ.Iterator[*typ.KV[any, any]]] = (*OrderedMap[any, any])(nil)
@@ -78,12 +79,16 @@ func (s *OrderedMap[k, v]) Get(key k) (v, bool) {
 }
 
 func (s *OrderedMap[k, v]) Set(key k, value v) (bool, error) {
+	if err := s.err; err != nil {
+		return false, err
+	}
 	u := s.uniques
 	if _, ok := u[key]; !ok {
+		markOnStart := s.changeMark
 		e := s.elements
 		u[key] = value
 		s.elements = append(e, &key)
-		return true, nil
+		return mutable.Commit(markOnStart, &s.changeMark, &s.err)
 	}
 	return false, nil
 }

@@ -27,10 +27,15 @@ func (s *ConvertFit[From, To]) HasNext() bool {
 }
 
 func (s *ConvertFit[From, To]) Get() To {
-	if err := s.err; err != nil {
+	v, err := s.Next()
+	if err != nil {
 		panic(err)
 	}
-	return s.current
+	return v
+}
+
+func (s *ConvertFit[From, To]) Next() (To, error) {
+	return s.current, s.err
 }
 
 func (s *ConvertFit[From, To]) Err() error {
@@ -63,10 +68,15 @@ func (s *Convert[From, To]) HasNext() bool {
 }
 
 func (s *Convert[From, To]) Get() To {
-	if err := s.err; err != nil {
+	v, err := s.Next()
+	if err != nil {
 		panic(err)
 	}
-	return s.current
+	return v
+}
+
+func (s *Convert[From, To]) Next() (To, error) {
+	return s.current, s.err
 }
 
 func (s *Convert[From, To]) Err() error {

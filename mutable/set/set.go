@@ -39,6 +39,7 @@ type OrderedSet[T comparable] struct {
 	elements   []*T
 	uniques    map[T]int
 	changeMark int32
+	err        error
 }
 
 var _ mutable.Set[any, mutable.Iterator[any]] = (*OrderedSet[any])(nil)
@@ -77,26 +78,13 @@ func (s *OrderedSet[T]) Contains(v T) bool {
 }
 
 func (s *OrderedSet[T]) Add(elements ...T) (bool, error) {
-	u := s.uniques
-	result := false
-	for i := range elements {
-		markOnStart := s.changeMark
-		v := elements[i]
-		if _, ok := u[v]; !ok {
-			e := s.elements
-			u[v] = len(e)
-			s.elements = append(e, &v)
-			cmt, err := mutable.Commit(markOnStart, &s.changeMark)
-			if err != nil {
-				return false, err
-			}
-			result = result || cmt
-		}
-	}
-	return result, nil
+	return s.AddAll(elements)
 }
 
 func (s *OrderedSet[T]) AddAll(elements []T) (bool, error) {
+	if err := s.err; err != nil {
+		return false, err
+	}
 	u := s.uniques
 	result := false
 	for i := range elements {
@@ -106,7 +94,7 @@ func (s *OrderedSet[T]) AddAll(elements []T) (bool, error) {
 			e := s.elements
 			u[v] = len(e)
 			s.elements = append(e, &v)
-			cmt, err := mutable.Commit(markOnStart, &s.changeMark)
+			cmt, err := mutable.Commit(markOnStart, &s.changeMark, &s.err)
 			if err != nil {
 				return false, err
 			}
@@ -117,13 +105,16 @@ func (s *OrderedSet[T]) AddAll(elements []T) (bool, error) {
 }
 
 func (s *OrderedSet[T]) AddOne(v T) (bool, error) {
+	if err := s.err; err != nil {
+		return false, err
+	}
 	markOnStart := s.changeMark
 	u := s.uniques
 	if _, ok := u[v]; !ok {
 		e := s.elements
 		u[v] = len(e)
 		s.elements = append(e, &v)
-		return mutable.Commit(markOnStart, &s.changeMark)
+		return mutable.Commit(markOnStart, &s.changeMark, &s.err)
 	}
 	return false, nil
 }
@@ -133,6 +124,9 @@ func (s *OrderedSet[T]) Delete(elements ...T) (bool, error) {
 }
 
 func (s *OrderedSet[T]) DeleteAll(elements []T) (bool, error) {
+	if err := s.err; err != nil {
+		return false, err
+	}
 	u := s.uniques
 	result := false
 	for i := range elements {
@@ -147,7 +141,7 @@ func (s *OrderedSet[T]) DeleteAll(elements []T) (bool, error) {
 				u[*ne[i]]--
 			}
 			s.elements = ne
-			ok, err := mutable.Commit(markOnStart, &s.changeMark)
+			ok, err := mutable.Commit(markOnStart, &s.changeMark, &s.err)
 			if err != nil {
 				return false, err
 			}
@@ -158,6 +152,9 @@ func (s *OrderedSet[T]) DeleteAll(elements []T) (bool, error) {
 }
 
 func (s *OrderedSet[T]) DeleteOne(v T) (bool, error) {
+	if err := s.err; err != nil {
+		return false, err
+	}
 	u := s.uniques
 	if pos, ok := u[v]; ok {
 		markOnStart := s.changeMark
@@ -169,7 +166,7 @@ func (s *OrderedSet[T]) DeleteOne(v T) (bool, error) {
 			u[*ne[i]]--
 		}
 		s.elements = ne
-		return mutable.Commit(markOnStart, &s.changeMark)
+		return mutable.Commit(markOnStart, &s.changeMark, &s.err)
 	}
 	return false, nil
 }

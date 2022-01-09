@@ -27,10 +27,15 @@ func (s *ConvertFit[From, To]) HasNext() bool {
 }
 
 func (s *ConvertFit[From, To]) Get() To {
-	if err := s.err; err != nil {
+	v, err := s.Next()
+	if err != nil {
 		panic(err)
 	}
-	return s.current
+	return v
+}
+
+func (s *ConvertFit[From, To]) Next() (To, error) {
+	return s.current, s.err
 }
 
 func (s *ConvertFit[From, To]) Err() error {
@@ -46,6 +51,15 @@ var _ typ.Iterator[interface{}] = (*Convert[interface{}, interface{}])(nil)
 
 func (s *Convert[From, To]) HasNext() bool {
 	return s.Iter.HasNext()
+}
+
+func (s *Convert[From, To]) Next() (To, error) {
+	v, err := s.Iter.Next()
+	if err != nil {
+		var no To
+		return no, err
+	}
+	return s.By(v), nil
 }
 
 func (s *Convert[From, To]) Get() To {

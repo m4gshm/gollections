@@ -50,7 +50,15 @@ func (s *FlattenFit[From, To]) HasNext() bool {
 }
 
 func (s *FlattenFit[From, To]) Get() To {
-	return s.c
+	v, err := s.Next()
+	if err != nil {
+		panic(err)
+	}
+	return v
+}
+
+func (s *FlattenFit[From, To]) Next() (To, error) {
+	return s.c, s.err
 }
 
 func (s *FlattenFit[From, To]) Err() error {
@@ -102,7 +110,15 @@ func (s *Flatten[From, To]) HasNext() bool {
 }
 
 func (s *Flatten[From, To]) Get() To {
-	return s.c
+	v, err := s.Next()
+	if err != nil {
+		panic(err)
+	}
+	return v
+}
+
+func (s *Flatten[From, To]) Next() (To, error) {
+	return s.c, s.err
 }
 
 func (s *Flatten[From, To]) Err() error {

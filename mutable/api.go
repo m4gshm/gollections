@@ -49,10 +49,12 @@ type Iterator[T any] interface {
 	Delete() (bool, error)
 }
 
-func Commit(markOnStart int32, mark *int32) (bool, error) {
+func Commit(markOnStart int32, mark *int32, err *error) (bool, error) {
 	markOnFinish := *mark
 	if markOnFinish != markOnStart {
-		return false, BadRW
+		e := BadRW
+		*err = e
+		return false, e
 	}
 	(*mark)++
 	return true, nil

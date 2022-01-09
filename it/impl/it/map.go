@@ -34,11 +34,19 @@ func (s *KV[k, v]) HasNext() bool {
 }
 
 func (s *KV[k, v]) Get() *typ.KV[k, v] {
-	if err := s.err; err != nil {
+	kv, err := s.Next()
+	if err != nil {
 		panic(err)
 	}
+	return kv
+}
+
+func (s *KV[k, v]) Next() (*typ.KV[k, v], error) {
+	if err := s.err; err != nil {
+		return nil, err
+	}
 	key := s.iter.Key().Interface().(k)
-	return K.V(key, s.elements[key])
+	return K.V(key, s.elements[key]), nil
 }
 
 func (s *KV[k, v]) Err() error {
@@ -64,6 +72,15 @@ func (s *OrderedKV[k, v]) HasNext() bool {
 func (s *OrderedKV[k, v]) Get() *typ.KV[k, v] {
 	key := *s.elements.Get()
 	return K.V(key, s.uniques[key])
+}
+
+func (s *OrderedKV[k, v]) Next() (*typ.KV[k, v], error) {
+	ref, err := s.elements.Next()
+	if err != nil {
+		return nil, err
+	}
+	key := *ref
+	return K.V(key, s.uniques[key]), nil
 }
 
 func (s *OrderedKV[k, v]) Err() error {

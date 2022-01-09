@@ -24,8 +24,13 @@ var _ mutable.Iterator[any] = (*Iter[any])(nil)
 func (i *Iter[T]) HasNext() bool {
 	return it.HasNext(**i.elements, &i.current, &i.err)
 }
+
 func (i *Iter[T]) Get() T {
 	return it.Get(i.current, **i.elements, i.err)
+}
+
+func (i *Iter[T]) Next() (T, error) {
+	return it.Next(i.current, **i.elements, i.err)
 }
 
 func (i *Iter[T]) Delete() (bool, error) {
@@ -56,6 +61,15 @@ func (i *RefIter[T]) HasNext() bool {
 
 func (i *RefIter[T]) Get() T {
 	return *i.Iter.Get()
+}
+
+func (i *RefIter[T]) Next() (T, error) {
+	v, err := i.Iter.Next()
+	if err != nil {
+		var no T
+		return no, err
+	}
+	return *v, nil
 }
 
 func (i *RefIter[T]) Delete() (bool, error) {

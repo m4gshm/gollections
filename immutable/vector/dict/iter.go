@@ -23,6 +23,15 @@ func (s *Iterator[k, v]) HasNext() bool {
 	return it.HasNext(s.elements, &s.current, &s.err)
 }
 
+func (s *Iterator[k, v]) Next() (v, error) {
+	kref, err := it.Next(s.current, s.elements, s.err)
+	if err != nil {
+		var no v
+		return no, err
+	}
+	return s.uniques[*kref], nil
+}
+
 func (s *Iterator[k, v]) Get() v {
 	kref := it.Get(s.current, s.elements, s.err)
 	return s.uniques[*kref]
