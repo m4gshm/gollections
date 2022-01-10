@@ -8,12 +8,12 @@ import (
 	"github.com/m4gshm/gollections/it"
 	impliter "github.com/m4gshm/gollections/it/impl/it"
 	mset "github.com/m4gshm/gollections/mutable/set"
-	"github.com/m4gshm/gollections/slice"
+	"github.com/m4gshm/gollections/slice/range_"
 )
 
 var (
 	max    = 100000
-	values = slice.Range(1, max)
+	values = range_.Of(1, max)
 	result = 0
 )
 

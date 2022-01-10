@@ -10,7 +10,7 @@ import (
 	"github.com/m4gshm/gollections/mutable/vector"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
-	"github.com/m4gshm/gollections/walk"
+	"github.com/m4gshm/gollections/walk/group"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -86,7 +86,7 @@ func Test_Vector_FilterMapReduce(t *testing.T) {
 }
 
 func Test_Vector_Group(t *testing.T) {
-	groups := walk.Group(vector.Of(0, 1, 1, 2, 4, 3, 1, 6, 7), func(e int) bool { return e%2 == 0 })
+	groups := group.Of(vector.Of(0, 1, 1, 2, 4, 3, 1, 6, 7), func(e int) bool { return e%2 == 0 })
 
 	assert.Equal(t, len(groups), 2)
 	assert.Equal(t, []int{1, 1, 3, 1, 7}, groups[false])

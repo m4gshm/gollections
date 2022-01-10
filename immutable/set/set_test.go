@@ -6,7 +6,7 @@ import (
 	"github.com/m4gshm/gollections/it"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
-	"github.com/m4gshm/gollections/walk"
+	"github.com/m4gshm/gollections/walk/group"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -54,7 +54,7 @@ func Test_Set_FilterMapReduce(t *testing.T) {
 }
 
 func Test_Set_Group(t *testing.T) {
-	groups := walk.Group(Of(0, 1, 1, 2, 4, 3, 1, 6, 7), func(e int) bool { return e%2 == 0 })
+	groups := group.Of(Of(0, 1, 1, 2, 4, 3, 1, 6, 7), func(e int) bool { return e%2 == 0 })
 
 	assert.Equal(t, len(groups), 2)
 	assert.Equal(t, []int{1, 3, 7}, groups[false])

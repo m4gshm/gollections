@@ -4,12 +4,12 @@ import (
 	"testing"
 
 	"github.com/m4gshm/gollections/mutable/vector"
-	"github.com/m4gshm/gollections/slice"
+	"github.com/m4gshm/gollections/slice/range_"
 )
 
 var (
 	max    = 100000
-	values = slice.Range(1, max)
+	values = range_.Of(1, max)
 )
 
 func Benchmark_Vector_Add(b *testing.B) {
