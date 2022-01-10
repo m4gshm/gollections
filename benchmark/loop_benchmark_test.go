@@ -3,12 +3,12 @@ package benchmark
 import (
 	"testing"
 
-	"github.com/m4gshm/container/immutable/set"
-	"github.com/m4gshm/container/immutable/vector"
-	"github.com/m4gshm/container/it"
-	impliter "github.com/m4gshm/container/it/impl/it"
-	mset "github.com/m4gshm/container/mutable/set"
-	"github.com/m4gshm/container/slice"
+	"github.com/m4gshm/gollections/immutable/set"
+	"github.com/m4gshm/gollections/immutable/vector"
+	"github.com/m4gshm/gollections/it"
+	impliter "github.com/m4gshm/gollections/it/impl/it"
+	mset "github.com/m4gshm/gollections/mutable/set"
+	"github.com/m4gshm/gollections/slice"
 )
 
 var (

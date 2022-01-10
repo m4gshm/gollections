@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/m4gshm/container/conv"
-	"github.com/m4gshm/container/it"
-	"github.com/m4gshm/container/op"
-	"github.com/m4gshm/container/slice"
+	"github.com/m4gshm/gollections/conv"
+	"github.com/m4gshm/gollections/it"
+	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/slice"
 	"github.com/stretchr/testify/assert"
 )
 

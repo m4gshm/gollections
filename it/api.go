@@ -1,11 +1,11 @@
 package it
 
 import (
-	"github.com/m4gshm/container/check"
-	"github.com/m4gshm/container/it/impl/it"
-	impl "github.com/m4gshm/container/it/impl/it"
-	"github.com/m4gshm/container/op"
-	"github.com/m4gshm/container/typ"
+	"github.com/m4gshm/gollections/check"
+	"github.com/m4gshm/gollections/it/impl/it"
+	impl "github.com/m4gshm/gollections/it/impl/it"
+	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/typ"
 )
 
 const NoStarted = it.NoStarted

@@ -1,7 +1,7 @@
 package vector
 
 import (
-	"github.com/m4gshm/container/mutable"
+	"github.com/m4gshm/gollections/mutable"
 )
 
 func Of[T any](elements ...T) mutable.Vector[T, mutable.Iterator[T]] {

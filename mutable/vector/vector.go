@@ -4,9 +4,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/m4gshm/container/immutable/vector"
-	"github.com/m4gshm/container/mutable"
-	"github.com/m4gshm/container/slice"
+	"github.com/m4gshm/gollections/immutable/vector"
+	"github.com/m4gshm/gollections/mutable"
+	"github.com/m4gshm/gollections/slice"
 )
 
 var BadIndex = errors.New("bad index")

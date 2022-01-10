@@ -1,8 +1,8 @@
 package dict
 
 import (
-	"github.com/m4gshm/container/it/impl/it"
-	"github.com/m4gshm/container/typ"
+	"github.com/m4gshm/gollections/it/impl/it"
+	"github.com/m4gshm/gollections/typ"
 )
 
 func NewIterator[k comparable, v any](elements []*k, uniques map[k]v) *Iterator[k, v] {

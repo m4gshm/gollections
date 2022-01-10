@@ -1,8 +1,8 @@
 package vector
 
 import (
-	"github.com/m4gshm/container/immutable"
-	"github.com/m4gshm/container/typ"
+	"github.com/m4gshm/gollections/immutable"
+	"github.com/m4gshm/gollections/typ"
 )
 
 func Of[T any](elements ...T) immutable.Vector[T, typ.Iterator[T]] {

@@ -4,17 +4,17 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/m4gshm/container/c"
-	"github.com/m4gshm/container/check"
-	"github.com/m4gshm/container/conv"
-	"github.com/m4gshm/container/immutable/vector"
-	"github.com/m4gshm/container/it"
-	iterimpl "github.com/m4gshm/container/it/impl/it"
-	mvector "github.com/m4gshm/container/mutable/vector"
-	"github.com/m4gshm/container/op"
-	"github.com/m4gshm/container/slice"
-	sliceimpl "github.com/m4gshm/container/slice/impl/slice"
-	"github.com/m4gshm/container/typ"
+	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/check"
+	"github.com/m4gshm/gollections/conv"
+	"github.com/m4gshm/gollections/immutable/vector"
+	"github.com/m4gshm/gollections/it"
+	iterimpl "github.com/m4gshm/gollections/it/impl/it"
+	mvector "github.com/m4gshm/gollections/mutable/vector"
+	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/slice"
+	sliceimpl "github.com/m4gshm/gollections/slice/impl/slice"
+	"github.com/m4gshm/gollections/typ"
 )
 
 var (

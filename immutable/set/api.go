@@ -1,8 +1,8 @@
 package set
 
 import (
-	"github.com/m4gshm/container/immutable"
-	"github.com/m4gshm/container/typ"
+	"github.com/m4gshm/gollections/immutable"
+	"github.com/m4gshm/gollections/typ"
 )
 
 func Of[T comparable](elements ...T) immutable.Set[T, typ.Iterator[T]] {

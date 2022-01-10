@@ -3,7 +3,7 @@ package it
 import (
 	"testing"
 
-	"github.com/m4gshm/container/it/impl/it"
+	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/stretchr/testify/assert"
 )
 

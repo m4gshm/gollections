@@ -5,12 +5,12 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/m4gshm/container/it"
-	"github.com/m4gshm/container/mutable"
-	"github.com/m4gshm/container/mutable/vector"
-	"github.com/m4gshm/container/op"
-	"github.com/m4gshm/container/slice"
-	"github.com/m4gshm/container/walk"
+	"github.com/m4gshm/gollections/it"
+	"github.com/m4gshm/gollections/mutable"
+	"github.com/m4gshm/gollections/mutable/vector"
+	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/slice"
+	"github.com/m4gshm/gollections/walk"
 
 	"github.com/stretchr/testify/assert"
 )

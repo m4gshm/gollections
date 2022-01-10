@@ -3,7 +3,7 @@ package it
 import (
 	"errors"
 
-	"github.com/m4gshm/container/typ"
+	"github.com/m4gshm/gollections/typ"
 )
 
 const NoStarted = -1

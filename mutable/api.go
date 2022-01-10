@@ -3,7 +3,7 @@ package mutable
 import (
 	"errors"
 
-	"github.com/m4gshm/container/typ"
+	"github.com/m4gshm/gollections/typ"
 )
 
 var BadRW = errors.New("concurrent read and write")

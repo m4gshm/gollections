@@ -1,8 +1,8 @@
 package slice
 
 import (
-	"github.com/m4gshm/container/it/impl/it"
-	"github.com/m4gshm/container/typ"
+	"github.com/m4gshm/gollections/it/impl/it"
+	"github.com/m4gshm/gollections/typ"
 )
 
 type FlattenFit[From, To any] struct {

@@ -4,9 +4,9 @@ import (
 	"constraints"
 	"fmt"
 
-	"github.com/m4gshm/container/check"
-	impl "github.com/m4gshm/container/slice/impl/slice"
-	"github.com/m4gshm/container/typ"
+	"github.com/m4gshm/gollections/check"
+	impl "github.com/m4gshm/gollections/slice/impl/slice"
+	"github.com/m4gshm/gollections/typ"
 )
 
 func Of[T any](elements ...T) []T {

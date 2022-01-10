@@ -1,10 +1,10 @@
 package dict
 
 import (
-	"github.com/m4gshm/container/immutable/vector/dict"
-	"github.com/m4gshm/container/immutable/vector/ref"
-	"github.com/m4gshm/container/it/impl/it"
-	"github.com/m4gshm/container/typ"
+	"github.com/m4gshm/gollections/immutable/vector/dict"
+	"github.com/m4gshm/gollections/immutable/vector/ref"
+	"github.com/m4gshm/gollections/it/impl/it"
+	"github.com/m4gshm/gollections/typ"
 )
 
 func NewOrderedMap[k comparable, v any](elements []*typ.KV[k, v]) *OrderedMap[k, v] {

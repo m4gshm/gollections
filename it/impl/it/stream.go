@@ -1,8 +1,8 @@
 package it
 
 import (
-	"github.com/m4gshm/container/op"
-	"github.com/m4gshm/container/typ"
+	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/typ"
 )
 
 func NewPipe[T any](it typ.Iterator[T]) *IterPipe[T] {

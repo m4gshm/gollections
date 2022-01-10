@@ -3,7 +3,7 @@ package conv
 import (
 	"reflect"
 
-	"github.com/m4gshm/container/typ"
+	"github.com/m4gshm/gollections/typ"
 )
 
 //To helper for Map, Flatt

@@ -1,9 +1,9 @@
 package vector
 
 import (
-	"github.com/m4gshm/container/it/impl/it"
-	"github.com/m4gshm/container/mutable"
-	"github.com/m4gshm/container/typ"
+	"github.com/m4gshm/gollections/it/impl/it"
+	"github.com/m4gshm/gollections/mutable"
+	"github.com/m4gshm/gollections/typ"
 )
 
 func NewIter[T any](elements **[]T, changeMark *int32, del func(int) (bool, error)) *Iter[T] {

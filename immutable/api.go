@@ -1,7 +1,7 @@
 package immutable
 
 import (
-	"github.com/m4gshm/container/typ"
+	"github.com/m4gshm/gollections/typ"
 )
 
 //Vector - the container stores ordered elements, provides index access

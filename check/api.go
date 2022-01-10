@@ -3,7 +3,7 @@ package check
 import (
 	"reflect"
 
-	"github.com/m4gshm/container/typ"
+	"github.com/m4gshm/gollections/typ"
 )
 
 //Not invert predicate

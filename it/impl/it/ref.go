@@ -1,7 +1,7 @@
 package it
 
 import (
-	"github.com/m4gshm/container/typ"
+	"github.com/m4gshm/gollections/typ"
 )
 
 func NewRef[T any](elements []*T) *RefIter[T] {

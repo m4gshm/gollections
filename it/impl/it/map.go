@@ -3,8 +3,8 @@ package it
 import (
 	"reflect"
 
-	"github.com/m4gshm/container/K"
-	"github.com/m4gshm/container/typ"
+	"github.com/m4gshm/gollections/K"
+	"github.com/m4gshm/gollections/typ"
 )
 
 func NewKV[k comparable, v any](elements map[k]v) *KV[k, v] {

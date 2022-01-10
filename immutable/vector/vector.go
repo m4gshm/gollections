@@ -3,11 +3,11 @@ package vector
 import (
 	"fmt"
 
-	"github.com/m4gshm/container/immutable"
-	"github.com/m4gshm/container/it/impl/it"
-	"github.com/m4gshm/container/op"
-	"github.com/m4gshm/container/slice"
-	"github.com/m4gshm/container/typ"
+	"github.com/m4gshm/gollections/immutable"
+	"github.com/m4gshm/gollections/it/impl/it"
+	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/slice"
+	"github.com/m4gshm/gollections/typ"
 )
 
 func Convert[T any](elements []T) *Vector[T] {

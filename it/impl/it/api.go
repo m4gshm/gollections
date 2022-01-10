@@ -1,9 +1,9 @@
 package it
 
 import (
-	"github.com/m4gshm/container/check"
-	"github.com/m4gshm/container/op"
-	"github.com/m4gshm/container/typ"
+	"github.com/m4gshm/gollections/check"
+	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/typ"
 )
 
 //Map creates a lazy Iterator that converts elements with a converter and returns them

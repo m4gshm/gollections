@@ -1,4 +1,4 @@
-module github.com/m4gshm/container
+module github.com/m4gshm/gollections
 
 go 1.18
 

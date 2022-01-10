@@ -3,7 +3,7 @@ package typ
 import (
 	"constraints"
 
-	"github.com/m4gshm/container/op"
+	"github.com/m4gshm/gollections/op"
 )
 
 //Container - base interface for container interfaces

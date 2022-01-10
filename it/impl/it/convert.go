@@ -1,7 +1,7 @@
 package it
 
 import (
-	"github.com/m4gshm/container/typ"
+	"github.com/m4gshm/gollections/typ"
 )
 
 type ConvertFit[From, To any] struct {

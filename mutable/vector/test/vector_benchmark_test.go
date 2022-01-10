@@ -3,8 +3,8 @@ package vector
 import (
 	"testing"
 
-	"github.com/m4gshm/container/mutable/vector"
-	"github.com/m4gshm/container/slice"
+	"github.com/m4gshm/gollections/mutable/vector"
+	"github.com/m4gshm/gollections/slice"
 )
 
 var (

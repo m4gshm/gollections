@@ -1,7 +1,7 @@
 package set
 
 import (
-	"github.com/m4gshm/container/mutable"
+	"github.com/m4gshm/gollections/mutable"
 )
 
 func Of[T comparable](elements ...T) mutable.Set[T, mutable.Iterator[T]] {

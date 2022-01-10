@@ -3,8 +3,8 @@ package dict
 import (
 	"testing"
 
-	"github.com/m4gshm/container/K"
-	"github.com/m4gshm/container/slice"
+	"github.com/m4gshm/gollections/K"
+	"github.com/m4gshm/gollections/slice"
 	"github.com/stretchr/testify/assert"
 )
 
