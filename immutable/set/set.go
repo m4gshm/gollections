@@ -3,7 +3,6 @@ package set
 import (
 	"fmt"
 
-	"github.com/m4gshm/gollections/immutable"
 	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
@@ -38,7 +37,7 @@ type OrderedSet[T comparable] struct {
 	uniques  map[T]struct{}
 }
 
-var _ immutable.Set[any, typ.Iterator[any]] = (*OrderedSet[any])(nil)
+var _ typ.Set[any, typ.Iterator[any]] = (*OrderedSet[any])(nil)
 var _ fmt.Stringer = (*OrderedSet[any])(nil)
 var _ fmt.GoStringer = (*OrderedSet[any])(nil)
 
@@ -50,7 +49,7 @@ func (s *OrderedSet[T]) newIter() *it.Iter[*T] {
 	return it.New(s.elements)
 }
 
-func (s *OrderedSet[T]) Elements() []T {
+func (s *OrderedSet[T]) Collect() []T {
 	e := s.elements
 	out := make([]T, len(e))
 	for i, v := range e {
@@ -59,17 +58,18 @@ func (s *OrderedSet[T]) Elements() []T {
 	return out
 }
 
-func (s *OrderedSet[T]) ForEach(walker func(T)) {
+func (s *OrderedSet[T]) ForEach(walker func(T)) error {
 	for _, e := range s.elements {
 		walker(*e)
 	}
+	return nil
 }
 
-func (s *OrderedSet[T]) Filter(filter typ.Predicate[T]) typ.Pipe[T, typ.Iterator[T]] {
+func (s *OrderedSet[T]) Filter(filter typ.Predicate[T]) typ.Pipe[T, []T, typ.Iterator[T]] {
 	return it.NewPipe[T](&it.RefIter[T]{Iterator: it.Filter(s.newIter(), func(ref *T) bool { return filter(*ref) })})
 }
 
-func (s *OrderedSet[T]) Map(by typ.Converter[T, T]) typ.Pipe[T, typ.Iterator[T]] {
+func (s *OrderedSet[T]) Map(by typ.Converter[T, T]) typ.Pipe[T, []T, typ.Iterator[T]] {
 	return it.NewPipe[T](&it.RefIter[T]{Iterator: it.Map(s.newIter(), func(ref *T) *T {
 		conv := by(*ref)
 		return &conv

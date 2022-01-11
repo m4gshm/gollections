@@ -13,9 +13,8 @@ import (
 
 func Test_Set_Iterate(t *testing.T) {
 	set := set.Of(1, 1, 2, 4, 3, 1)
-	values := set.Elements()
+	values := set.Collect()
 
-	assert.Equal(t, 4, set.Len())
 	assert.Equal(t, 4, len(values))
 
 	expected := slice.Of(1, 2, 4, 3)
@@ -26,12 +25,13 @@ func Test_Set_Iterate(t *testing.T) {
 
 	out := make([]int, 0)
 	for it := set.Begin(); it.HasNext(); {
-		out = append(out, it.Get())
+		n, _ := it.Next()
+		out = append(out, n)
 	}
 	assert.Equal(t, expected, out)
 
 	out = make([]int, 0)
-	set.ForEach(func(v int) { out = append(out, v) })
+	_ = set.ForEach(func(v int) { out = append(out, v) })
 }
 
 func Test_Set_Add(t *testing.T) {
@@ -41,20 +41,20 @@ func Test_Set_Add(t *testing.T) {
 	added, _ = set.Add(1)
 	assert.Equal(t, added, false)
 
-	values := set.Elements()
+	values := set.Collect()
 
 	assert.Equal(t, slice.Of(1, 2, 4, 3), values)
 }
 
 func Test_Set_Delete(t *testing.T) {
 	set := set.Of(1, 1, 2, 4, 3, 1)
-	values := set.Elements()
+	values := set.Collect()
 
 	for _, v := range values {
 		_, _ = set.Delete(v)
 	}
 
-	assert.Equal(t, 0, set.Len())
+	assert.Equal(t, 0, len(set.Collect()))
 }
 
 func Test_Set_DeleteByIterator(t *testing.T) {
@@ -68,7 +68,7 @@ func Test_Set_DeleteByIterator(t *testing.T) {
 	}
 
 	assert.Equal(t, 4, i)
-	assert.Equal(t, 0, set.Len())
+	assert.Equal(t, 0, len(set.Collect()))
 }
 
 func Test_Set_FilterMapReduce(t *testing.T) {

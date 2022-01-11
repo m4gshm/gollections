@@ -5,8 +5,11 @@ import (
 	"fmt"
 
 	"github.com/m4gshm/gollections/immutable/vector"
+	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/mutable"
+	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
+	"github.com/m4gshm/gollections/typ"
 )
 
 var BadIndex = errors.New("bad index")
@@ -32,6 +35,7 @@ type Vector[t any /*if replaces generic type by 'T' it raises compile-time error
 }
 
 var _ mutable.Vector[any, mutable.Iterator[any]] = (*Vector[any])(nil)
+var _ typ.Vector[any, mutable.Iterator[any]] = (*Vector[any])(nil)
 var _ fmt.Stringer = (*Vector[any])(nil)
 
 func (s *Vector[t]) Begin() mutable.Iterator[t] {
@@ -99,4 +103,16 @@ func (s *Vector[t]) Set(index int, value t) (bool, error) {
 	}
 	e[index] = value
 	return true, nil
+}
+
+func (s *Vector[t]) Filter(filter typ.Predicate[t]) typ.Pipe[t, []t, typ.Iterator[t]] {
+	return it.NewPipe[t](it.Filter(s.Iter(), filter))
+}
+
+func (s *Vector[t]) Map(by typ.Converter[t, t]) typ.Pipe[t, []t, typ.Iterator[t]] {
+	return it.NewPipe[t](it.Map(s.Iter(), by))
+}
+
+func (s *Vector[t]) Reduce(by op.Binary[t]) t {
+	return it.Reduce(s.Iter(), by)
 }

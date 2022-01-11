@@ -140,21 +140,21 @@ func Test_Iterate(t *testing.T) {
 		values[i] = i
 	}
 
-	stream := it.Pipe[int](it.Wrap(values))
+	stream := it.Pipe(it.Wrap(values))
 
 	result := make([]int, 0)
 
-	stream.ForEach(func(i int) { result = append(result, i) })
+	_ = stream.ForEach(func(i int) { result = append(result, i) })
 
 	result = make([]int, 0)
-	it.ForEach(it.Wrap(values), func(i int) { result = append(result, i) })
+	_ = it.ForEach(it.Wrap(values), func(i int) { result = append(result, i) })
 
 	assert.Equal(t, values, result)
 
 }
 
 func Test_Group(t *testing.T) {
-	groups := it.Group(it.Of(0, 1, 1, 2, 4, 3, 1, 6, 7), func(e int) bool { return e%2 == 0 })
+	groups := it.Group(it.Of(0, 1, 1, 2, 4, 3, 1, 6, 7), func(e int) bool { return e%2 == 0 }).Collect()
 
 	assert.Equal(t, len(groups), 2)
 	assert.Equal(t, []int{1, 1, 3, 1, 7}, groups[false])

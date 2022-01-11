@@ -2,6 +2,7 @@ package it
 
 import (
 	"github.com/m4gshm/gollections/check"
+	"github.com/m4gshm/gollections/collect"
 	"github.com/m4gshm/gollections/it/impl/it"
 	impl "github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/op"
@@ -23,7 +24,7 @@ func Wrap[T any](elements []T) typ.Iterator[T] {
 }
 
 //Pipe new stream
-func Pipe[T any](elements typ.Iterator[T]) typ.Pipe[T, typ.Iterator[T]] {
+func Pipe[T any](elements typ.Iterator[T]) typ.Pipe[T, []T, typ.Iterator[T]] {
 	return impl.NewPipe(elements)
 }
 
@@ -63,10 +64,15 @@ func NotNil[T any](elements typ.Iterator[*T]) typ.Iterator[*T] {
 }
 
 //ForEach applies func on elements
-func ForEach[T any](elements typ.Iterator[T], apply func(T)) {
+func ForEach[T any](elements typ.Iterator[T], apply func(T)) error {
 	for elements.HasNext() {
-		apply(elements.Get())
+		n, err := elements.Next()
+		if err != nil {
+			return err
+		}
+		apply(n)
 	}
+	return nil
 }
 
 func ForEachFit[T any](elements typ.Iterator[T], apply func(T), fit typ.Predicate[T]) {
@@ -84,17 +90,6 @@ func Slice[T any](elements typ.Iterator[T]) []T {
 }
 
 //Group groups elements to slices by a converter and returns map
-func Group[T any, K comparable, IT typ.Iterator[T]](elements IT, by typ.Converter[T, K]) map[K][]T {
-	groups := map[K][]T{}
-	for elements.HasNext() {
-		e := elements.Get()
-		key := by(e)
-		group := groups[key]
-		if group == nil {
-			group = make([]T, 0)
-		}
-		groups[key] = append(group, e)
-
-	}
-	return groups
+func Group[T any, K comparable, IT typ.Iterator[T]](elements IT, by typ.Converter[T, K]) typ.MapPipe[K, T, []T] {
+	return impl.NewOrderedKVPipe(impl.NewGrouper(elements, by), collect.Groups[K, T])
 }

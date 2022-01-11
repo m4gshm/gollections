@@ -12,7 +12,7 @@ type Fit[T any] struct {
 	err     error
 }
 
-var _ typ.Iterator[interface{}] = (*Fit[interface{}])(nil)
+var _ typ.Iterator[any] = (*Fit[any])(nil)
 
 func (s *Fit[T]) HasNext() bool {
 	v, ok, err := nextFiltered(s.Iter, s.By)
@@ -24,20 +24,8 @@ func (s *Fit[T]) HasNext() bool {
 	return ok
 }
 
-func (s *Fit[T]) Get() T {
-	n, err := s.Next()
-	if err != nil {
-		panic(err)
-	}
-	return n
-}
-
 func (s *Fit[T]) Next() (T, error) {
 	return s.current, s.err
-}
-
-func (s *Fit[T]) Err() error {
-	return s.err
 }
 
 func nextFiltered[T any](iter typ.Iterator[T], filter typ.Predicate[T]) (T, bool, error) {

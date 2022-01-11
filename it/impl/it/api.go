@@ -39,13 +39,13 @@ func NotNil[T any, IT typ.Iterator[*T]](elements IT) *Fit[*T] {
 //ForEach applies func on elements
 func ForEach[T any, IT typ.Iterator[T]](elements IT, apply func(T)) {
 	for elements.HasNext() {
-		apply(elements.Get())
+		apply(get[T](elements))
 	}
 }
 
 func ForEachFit[T any, IT typ.Iterator[T]](elements IT, apply func(T), fit typ.Predicate[T]) {
 	for elements.HasNext() {
-		if v := elements.Get(); fit(v) {
+		if v := get[T](elements); fit(v) {
 			apply(v)
 		}
 	}
@@ -57,9 +57,9 @@ func Reduce[T any, IT typ.Iterator[T]](elements IT, by op.Binary[T]) T {
 		var nothing T
 		return nothing
 	}
-	result := elements.Get()
+	result := get[T](elements)
 	for elements.HasNext() {
-		result = by(result, elements.Get())
+		result = by(result, get[T](elements))
 	}
 	return result
 }
@@ -69,8 +69,16 @@ func Slice[T any, IT typ.Iterator[T]](elements IT) []T {
 	s := make([]T, 0)
 
 	for elements.HasNext() {
-		s = append(s, elements.Get())
+		s = append(s, get[T](elements))
 	}
 
 	return s
+}
+
+func get[T any, IT typ.Iterator[T]](elements IT) T {
+	n, err := elements.Next()
+	if err != nil {
+		panic(err)
+	}
+	return n
 }

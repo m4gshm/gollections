@@ -3,7 +3,6 @@ package ref
 import (
 	"fmt"
 
-	"github.com/m4gshm/gollections/immutable"
 	"github.com/m4gshm/gollections/immutable/vector"
 	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/op"
@@ -23,7 +22,7 @@ type Vector[T any] struct {
 	*vector.Vector[*T]
 }
 
-var _ immutable.Vector[any, typ.Iterator[any]] = (*Vector[any])(nil)
+var _ typ.Vector[any, typ.Iterator[any]] = (*Vector[any])(nil)
 var _ fmt.Stringer = (*Vector[any])(nil)
 
 func (s *Vector[T]) Begin() typ.Iterator[T] {
@@ -34,8 +33,8 @@ func (s *Vector[T]) Iter() *it.RefIter[T] {
 	return &it.RefIter[T]{Iterator: s.Vector.Iter()}
 }
 
-func (s *Vector[T]) Elements() []T {
-	refs := s.Vector.Elements()
+func (s *Vector[T]) Collect() []T {
+	refs := s.Vector.Collect()
 	elements := make([]T, len(refs))
 	for i, r := range refs {
 		elements[i] = *r
@@ -43,8 +42,12 @@ func (s *Vector[T]) Elements() []T {
 	return elements
 }
 
-func (s *Vector[T]) ForEach(walker func(T)) {
-	s.Vector.ForEach(func(ref *T) { walker(*ref) })
+func (s *Vector[T]) TrackEach(tracker func(int, T)) error {
+	return s.Vector.TrackEach(func(index int, ref *T) { tracker(index, *ref) })
+}
+
+func (s *Vector[T]) ForEach(walker func(T)) error {
+	return s.Vector.ForEach(func(ref *T) { walker(*ref) })
 }
 
 func (s *Vector[T]) Get(index int) (T, bool) {
@@ -55,11 +58,11 @@ func (s *Vector[T]) Get(index int) (T, bool) {
 	return no, false
 }
 
-func (s *Vector[T]) Filter(filter typ.Predicate[T]) typ.Pipe[T, typ.Iterator[T]] {
+func (s *Vector[T]) Filter(filter typ.Predicate[T]) typ.Pipe[T, []T, typ.Iterator[T]] {
 	return it.NewPipe[T](it.Filter(s.Iter(), filter))
 }
 
-func (s *Vector[T]) Map(by typ.Converter[T, T]) typ.Pipe[T, typ.Iterator[T]] {
+func (s *Vector[T]) Map(by typ.Converter[T, T]) typ.Pipe[T, []T, typ.Iterator[T]] {
 	return it.NewPipe[T](it.Map(s.Iter(), by))
 }
 
@@ -68,5 +71,5 @@ func (s *Vector[T]) Reduce(by op.Binary[T]) T {
 }
 
 func (s *Vector[T]) String() string {
-	return slice.ToString(s.Elements())
+	return slice.ToString(s.Collect())
 }

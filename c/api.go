@@ -49,7 +49,7 @@ func Slice[T any, IT typ.Iterable[T, typ.Iterator[T]]](elements IT) []T {
 }
 
 //Group groups elements to slices by a converter and returns map
-func Group[T any, K comparable, IT typ.Iterable[T, typ.Iterator[T]]](elements IT, by typ.Converter[T, K]) map[K][]T {
+func Group[T any, K comparable, IT typ.Iterable[T, typ.Iterator[T]]](elements IT, by typ.Converter[T, K]) typ.MapPipe[K, T, []T] {
 	return it.Group(elements.Begin(), by)
 
 }

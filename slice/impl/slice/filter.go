@@ -26,28 +26,16 @@ func (s *Fit[T]) HasNext() bool {
 	return ok
 }
 
-func (s *Fit[T]) Get() T {
-	v, err := s.Next()
-	if err != nil {
-		panic(err)
-	}
-	return v
-}
-
 func (s *Fit[T]) Next() (T, error) {
 	return s.current, s.err
 }
 
-func (s *Fit[T]) Err() error {
-	return s.err
-}
-
-func nextFiltered[T any](iter typ.Iterator[T], fit typ.Predicate[T]) (T, bool) {
-	for iter.HasNext() {
-		if v := iter.Get(); fit(v) {
-			return v, true
-		}
-	}
-	var v T
-	return v, false
-}
+// func nextFiltered[T any](iter typ.Iterator[T], fit typ.Predicate[T]) (T, bool) {
+// 	for iter.HasNext() {
+// 		if v := iter.Get(); fit(v) {
+// 			return v, true
+// 		}
+// 	}
+// 	var v T
+// 	return v, false
+// }

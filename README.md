@@ -74,7 +74,7 @@ import (
 
 func Test_OrderedSet(t *testing.T) {
 	s := set.Of(1, 1, 2, 4, 3, 1)
-	values := s.Elements()
+	values := s.Collect()
 	fmt.Println(s) //[1, 2, 4, 3]
 
 	assert.Equal(t, slc.Of(1, 2, 4, 3), values)

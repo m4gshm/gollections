@@ -3,7 +3,6 @@ package vector
 import (
 	"fmt"
 
-	"github.com/m4gshm/gollections/immutable"
 	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
@@ -23,7 +22,7 @@ type Vector[T any] struct {
 	elements *[]T
 }
 
-var _ immutable.Vector[any, typ.Iterator[any]] = (*Vector[any])(nil)
+var _ typ.Vector[any, typ.Iterator[any]] = (*Vector[any])(nil)
 var _ fmt.Stringer = (*Vector[any])(nil)
 
 func (s *Vector[T]) Begin() typ.Iterator[T] {
@@ -34,14 +33,22 @@ func (s *Vector[T]) Iter() *it.Iter[T] {
 	return it.New(*s.elements)
 }
 
-func (s *Vector[T]) Elements() []T {
+func (s *Vector[T]) Collect() []T {
 	return slice.Copy(*s.elements)
 }
 
-func (s *Vector[T]) ForEach(walker func(T)) {
+func (s *Vector[T]) TrackEach(tracker func(int, T)) error {
+	for i, e := range *s.elements {
+		tracker(i, e)
+	}
+	return nil
+}
+
+func (s *Vector[T]) ForEach(walker func(T)) error {
 	for _, e := range *s.elements {
 		walker(e)
 	}
+	return nil
 }
 
 func (s *Vector[T]) Len() int {
@@ -58,11 +65,11 @@ func (s *Vector[T]) Get(index int) (T, bool) {
 	return no, false
 }
 
-func (s *Vector[T]) Filter(filter typ.Predicate[T]) typ.Pipe[T, typ.Iterator[T]] {
+func (s *Vector[T]) Filter(filter typ.Predicate[T]) typ.Pipe[T, []T, typ.Iterator[T]] {
 	return it.NewPipe[T](it.Filter(s.Iter(), filter))
 }
 
-func (s *Vector[T]) Map(by typ.Converter[T, T]) typ.Pipe[T, typ.Iterator[T]] {
+func (s *Vector[T]) Map(by typ.Converter[T, T]) typ.Pipe[T, []T, typ.Iterator[T]] {
 	return it.NewPipe[T](it.Map(s.Iter(), by))
 }
 

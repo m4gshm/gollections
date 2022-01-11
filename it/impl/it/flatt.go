@@ -35,10 +35,10 @@ func (s *FlattenFit[From, To]) HasNext() bool {
 		if !iter.HasNext() {
 			s.err = Exhausted
 			return false
-		} else if err := iter.Err(); err != nil {
+		} else if v, err := iter.Next(); err != nil {
 			s.err = err
 			return true
-		} else if v := iter.Get(); s.Fit(v) {
+		} else if s.Fit(v) {
 			if elementsTo := s.Flatt(v); len(elementsTo) > 0 {
 				s.c = elementsTo[0]
 				s.elementsTo = elementsTo
@@ -95,12 +95,10 @@ func (s *Flatten[From, To]) HasNext() bool {
 		if ok := iter.HasNext(); !ok {
 			s.err = Exhausted
 			return false
-		} else if err := iter.Err(); err != nil {
-			s.err = iter.Err()
+		} else if v, err := iter.Next(); err != nil {
+			s.err = err
 			return true
-		}
-		v := iter.Get()
-		if elementsTo := s.Flatt(v); len(elementsTo) > 0 {
+		} else if elementsTo := s.Flatt(v); len(elementsTo) > 0 {
 			s.c = elementsTo[0]
 			s.elementsTo = elementsTo
 			s.indTo = 1

@@ -8,11 +8,11 @@ test:
 	go clean -testcache
 	go test ./...
 
-
 .PHONY: build
 build: gofmt govet errcheck
 	$(info #Building...)
 	# go build -gcflags -m ./...
+	go clean -cache
 	go build ./...
 
 .PHONY: bench
@@ -28,8 +28,7 @@ gofmt:
 govet:
 	go vet ./...
 
-
 .PHONY: errcheck
 errcheck:
-	go install github.com/kisielk/errcheck@latest
+	# go install github.com/kisielk/errcheck@latest
 	errcheck ./...

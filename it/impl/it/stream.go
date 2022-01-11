@@ -10,23 +10,29 @@ func NewPipe[T any](it typ.Iterator[T]) *IterPipe[T] {
 }
 
 type IterPipe[T any] struct {
-	it typ.Iterator[T]
+	it       typ.Iterator[T]
+	elements []T
 }
 
-var _ typ.Pipe[any, typ.Iterator[any]] = (*IterPipe[any])(nil)
+var _ typ.Pipe[any, []any, typ.Iterator[any]] = (*IterPipe[any])(nil)
 
-func (s *IterPipe[T]) Filter(fit typ.Predicate[T]) typ.Pipe[T, typ.Iterator[T]] {
+func (s *IterPipe[T]) Filter(fit typ.Predicate[T]) typ.Pipe[T, []T, typ.Iterator[T]] {
 	return NewPipe[T](Filter(s.it, fit))
 }
 
-func (s *IterPipe[T]) Map(by typ.Converter[T, T]) typ.Pipe[T, typ.Iterator[T]] {
+func (s *IterPipe[T]) Map(by typ.Converter[T, T]) typ.Pipe[T, []T, typ.Iterator[T]] {
 	return NewPipe[T](Map(s.it, by))
 }
 
-func (s *IterPipe[T]) ForEach(walker func(T)) {
+func (s *IterPipe[T]) ForEach(walker func(T)) error {
 	for s.it.HasNext() {
-		walker(s.it.Get())
+		n, err := s.it.Next()
+		if err != nil {
+			return err
+		}
+		walker(n)
 	}
+	return nil
 }
 
 func (s *IterPipe[T]) Reduce(by op.Binary[T]) T {
@@ -35,4 +41,21 @@ func (s *IterPipe[T]) Reduce(by op.Binary[T]) T {
 
 func (s *IterPipe[T]) Begin() typ.Iterator[T] {
 	return s.it
+}
+
+func (s *IterPipe[T]) Collect() []T {
+	e := s.elements
+	if e == nil {
+		e = make([]T, 0)
+		it := s.it
+		for it.HasNext() {
+			n, err := it.Next()
+			if err != nil {
+				panic(err)
+			}
+			e = append(e, n)
+		}
+		s.elements = e
+	}
+	return e
 }

@@ -1,4 +1,4 @@
-package dict
+package map_
 
 import (
 	"github.com/m4gshm/gollections/mutable"

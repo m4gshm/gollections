@@ -53,7 +53,7 @@ func (s *OrderedSet[T]) Iter() *Iter[T] {
 	return NewIter(&s.elements, &s.changeMark, s.DeleteOne)
 }
 
-func (s *OrderedSet[T]) Elements() []T {
+func (s *OrderedSet[T]) Collect() []T {
 	e := s.elements
 	out := make([]T, len(e))
 	for i, v := range e {
@@ -62,10 +62,11 @@ func (s *OrderedSet[T]) Elements() []T {
 	return out
 }
 
-func (s *OrderedSet[T]) ForEach(walker func(T)) {
+func (s *OrderedSet[T]) ForEach(walker func(T)) error {
 	for _, e := range s.elements {
 		walker(*e)
 	}
+	return nil
 }
 
 func (s *OrderedSet[T]) Len() int {
@@ -171,11 +172,11 @@ func (s *OrderedSet[T]) DeleteOne(v T) (bool, error) {
 	return false, nil
 }
 
-func (s *OrderedSet[T]) Filter(filter typ.Predicate[T]) typ.Pipe[T, typ.Iterator[T]] {
+func (s *OrderedSet[T]) Filter(filter typ.Predicate[T]) typ.Pipe[T, []T, typ.Iterator[T]] {
 	return it.NewPipe[T](it.Filter(s.Iter(), filter))
 }
 
-func (s *OrderedSet[T]) Map(by typ.Converter[T, T]) typ.Pipe[T, typ.Iterator[T]] {
+func (s *OrderedSet[T]) Map(by typ.Converter[T, T]) typ.Pipe[T, []T, typ.Iterator[T]] {
 	return it.NewPipe[T](it.Map(s.Iter(), by))
 }
 

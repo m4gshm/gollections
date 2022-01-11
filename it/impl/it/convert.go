@@ -61,11 +61,3 @@ func (s *Convert[From, To]) Next() (To, error) {
 	}
 	return s.By(v), nil
 }
-
-func (s *Convert[From, To]) Get() To {
-	return s.By(s.Iter.Get())
-}
-
-func (s *Convert[From, To]) Err() error {
-	return s.Iter.Err()
-}

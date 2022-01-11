@@ -21,7 +21,7 @@ func Benchmark_ForEach_Immutable_Vector(b *testing.B) {
 	c := vector.Of(values...)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		c.ForEach(func(v int) { result = v })
+		_ = c.ForEach(func(v int) { result = v })
 	}
 	b.StopTimer()
 	_ = result
@@ -31,7 +31,7 @@ func Benchmark_ForEach_Immutable_Vector_Impl(b *testing.B) {
 	c := vector.New(values)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		c.ForEach(func(v int) { result = v })
+		_ = c.ForEach(func(v int) { result = v })
 	}
 	b.StopTimer()
 	_ = result
@@ -41,7 +41,7 @@ func Benchmark_ForRange_Immutable_Vector_Values(b *testing.B) {
 	c := vector.Of(values...)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		for _, v := range c.Elements() {
+		for _, v := range c.Collect() {
 			result = v
 		}
 	}
@@ -53,7 +53,7 @@ func Benchmark_ForRange_Immutable_Vector_Impl_Values(b *testing.B) {
 	c := vector.New(values)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		for _, v := range c.Elements() {
+		for _, v := range c.Collect() {
 			result = v
 		}
 	}
@@ -65,7 +65,7 @@ func Benchmark_ForEach_Immutable_OrdererSet(b *testing.B) {
 	c := set.Of(values...)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		c.ForEach(func(v int) { result = v })
+		_ = c.ForEach(func(v int) { result = v })
 	}
 	b.StopTimer()
 	_ = result
@@ -75,7 +75,7 @@ func Benchmark_ForEach_Immutable_OrdererSet_Impl(b *testing.B) {
 	c := set.ToOrderedSet(values)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		c.ForEach(func(v int) { result = v })
+		_ = c.ForEach(func(v int) { result = v })
 	}
 	b.StopTimer()
 	_ = result
@@ -85,7 +85,7 @@ func Benchmark_ForRange_Immutable_OrdererSet_Values(b *testing.B) {
 	c := set.Of(values...)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		for _, v := range c.Elements() {
+		for _, v := range c.Collect() {
 			result = v
 		}
 	}
@@ -97,7 +97,7 @@ func Benchmark_ForEach_Immutable_OrdererSet_Impl_Values(b *testing.B) {
 	c := set.Of(values...)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		for _, v := range c.Elements() {
+		for _, v := range c.Collect() {
 			result = v
 		}
 	}
@@ -109,7 +109,7 @@ func Benchmark_ForEach_Mutable_OrdererSet(b *testing.B) {
 	set := mset.ToOrderedSet(values)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		set.ForEach(func(v int) { result = v })
+		_ = set.ForEach(func(v int) { result = v })
 	}
 	b.StopTimer()
 	_ = result
@@ -119,7 +119,7 @@ func Benchmark_ForEach_Mutable_OrdererSet_Impl(b *testing.B) {
 	set := mset.ToOrderedSet(values)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		set.ForEach(func(v int) { result = v })
+		_ = set.ForEach(func(v int) { result = v })
 	}
 	b.StopTimer()
 	_ = result
@@ -130,7 +130,7 @@ func Benchmark_HasNextGet_Iterator_Immutable_Vector(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		for it := c.Begin(); it.HasNext(); {
-			result = it.Get()
+			result, _ = it.Next()
 		}
 	}
 	b.StopTimer()
@@ -153,7 +153,7 @@ func Benchmark_HasNextGet_Iterator_WrapSlice(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		for it := it.Wrap(values); it.HasNext(); {
-			result = it.Get()
+			result, _ = it.Next()
 		}
 	}
 	b.StopTimer()
@@ -216,7 +216,7 @@ func Benchmark_WrapMap_HasNextGet(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		iter := it.WrapMap(values)
 		for iter.HasNext() {
-			kv := iter.Get()
+			kv, _ := iter.Next()
 			_ = kv.Key()
 			_ = kv.Value()
 		}

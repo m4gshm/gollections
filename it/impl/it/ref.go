@@ -14,10 +14,6 @@ type RefIter[T any] struct {
 
 var _ typ.Iterator[any] = (*RefIter[any])(nil)
 
-func (i *RefIter[T]) Get() T {
-	return *i.Iterator.Get()
-}
-
 func (i *RefIter[T]) Next() (T, error) {
 	v, err := i.Iterator.Next()
 	if err != nil {

@@ -7,43 +7,43 @@ import (
 )
 
 //Container - base interface for container interfaces
-type Container[T any, L constraints.Integer, IT Iterator[T]] interface {
+type Container[T any, C any, L constraints.Integer, IT Iterator[T]] interface {
 	Walk[T]
-	Finite[[]T, L]
+	Collectable[C, L]
 	Iterable[T, IT]
 }
 
 //Vector - the container stores ordered elements, provides index access
 type Vector[T any, IT Iterator[T]] interface {
-	Container[T, int, IT]
+	Container[T, []T, int, IT]
+	Track[T, int]
 	RandomAccess[int, T]
+	Transformable[T, []T, Iterator[T]]
 }
 
 //Set - the container provides uniqueness (does't insert duplicated values)
 type Set[T any, IT Iterator[T]] interface {
-	Container[T, int, IT]
+	Container[T, []T, int, IT]
+	Transformable[T, []T, Iterator[T]]
 	Checkable[T]
 }
 
 //Map - the container provides access to elements by key
-type Map[k comparable, v any] interface {
+type Map[k comparable, v any, IT Iterator[*KV[k, v]]] interface {
+	Container[*KV[k, v], map[k]v, int, Iterator[*KV[k, v]]]
 	Track[v, k]
-	Finite[map[k]v, int]
 	Checkable[k]
 	KeyAccess[k, v]
-	Keys() Container[k, int, Iterator[k]]
-	Values() Container[v, int, Iterator[v]]
+	Transformable[*KV[k, v], map[k]v, Iterator[*KV[k, v]]]
+	Keys() Container[k, []k, int, Iterator[k]]
+	Values() Container[v, []v, int, Iterator[v]]
 }
 
 //Iterator base interface for containers, collections
 type Iterator[T any] interface {
 	//checks ability on next element or error
 	HasNext() bool
-	//retrieves next element
-	Get() T
-	//retrieves error
-	Err() error
-
+	//retrieves next element or error
 	Next() (T, error)
 }
 
@@ -59,12 +59,12 @@ type Iterable[T any, IT Iterator[T]] interface {
 
 //Walk touches all elements of the collection
 type Walk[T any] interface {
-	ForEach(func(element T))
+	ForEach(func(element T)) error
 }
 
 //Track traverses container elements with position tracking (index, key, coordinates, etc.)
 type Track[T any, P any] interface {
-	ForEach(func(position P, element T))
+	TrackEach(func(position P, element T)) error
 }
 
 //Checkable container with ability to check if an element is present
@@ -72,26 +72,30 @@ type Checkable[T any] interface {
 	Contains(T) bool
 }
 
-//Finite not endless container that can be transformed to array or map of elements
-type Finite[T any, L constraints.Integer] interface {
-	Elements() T
-	Len() L
+//Collectable not endless container that can be transformed to array or map of elements
+type Collectable[T any, L constraints.Integer] interface {
+	Collect() T
 }
 
-type Transformable[T any, IT Iterator[T]] interface {
-	Filter(Predicate[T]) Pipe[T, IT]
-	Map(Converter[T, T]) Pipe[T, IT]
+type Transformable[T any, C any, IT Iterator[T]] interface {
+	Filter(Predicate[T]) Pipe[T, C, IT]
+	Map(Converter[T, T]) Pipe[T, C, IT]
 	Reduce(op.Binary[T]) T
 }
 
-type Pipe[T any, IT Iterator[T]] interface {
-	Transformable[T, IT]
-	Iterable[T, IT]
-	Walk[T]
+type Pipe[T any, C any, IT Iterator[T]] interface {
+	Transformable[T, C, IT]
+	Container[T, C, int, IT]
 }
 
-type Pipeable[T any, IT Iterator[T]] interface {
-	Pipe() Pipe[T, IT]
+type SlicePipe[T any, IT Iterator[T]] interface {
+	Pipe[T, []T, IT]
+}
+
+type MapPipe[k comparable, v any, c any] Pipe[*KV[k, v], map[k]c, Iterator[*KV[k, v]]]
+
+type Pipeable[T any, C any, IT Iterator[T]] interface {
+	Pipe() Pipe[T, C, IT]
 }
 
 type Access[K any, V any] interface {

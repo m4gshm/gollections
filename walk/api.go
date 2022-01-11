@@ -1,10 +1,12 @@
 package walk
 
-import "github.com/m4gshm/gollections/typ"
+import (
+	"github.com/m4gshm/gollections/typ"
+)
 
 func Group[T any, K comparable, W typ.Walk[T]](elements W, by typ.Converter[T, K]) map[K][]T {
 	groups := map[K][]T{}
-	elements.ForEach(func(e T) {
+	_ = elements.ForEach(func(e T) {
 		key := by(e)
 		group := groups[key]
 		if group == nil {

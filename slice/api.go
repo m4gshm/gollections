@@ -9,10 +9,12 @@ import (
 	"github.com/m4gshm/gollections/typ"
 )
 
+//Of - constructor
 func Of[T any](elements ...T) []T {
 	return elements
 }
 
+//Copy - makes a new slice with copied elements
 func Copy[T any](elements []T) []T {
 	copied := make([]T, len(elements))
 	copy(copied, elements)
@@ -21,6 +23,20 @@ func Copy[T any](elements []T) []T {
 
 func Delete[T any](index int, elements []T) []T {
 	return append(elements[0:index], elements[index+1:]...)
+}
+
+func Group[T any, K comparable](elements []T, by typ.Converter[T, K]) map[K][]T {
+	groups := map[K][]T{}
+	for _, e := range elements {
+		key := by(e)
+		group := groups[key]
+		if group == nil {
+			group = make([]T, 0)
+		}
+		groups[key] = append(group, e)
+
+	}
+	return groups
 }
 
 func Range[T constraints.Integer](from T, to T) []T {
@@ -97,18 +113,4 @@ func ToStringRefs[T any](elements []*T) string {
 		}
 	}
 	return "[" + str + "]"
-}
-
-func Group[T any, K comparable](elements []T, by typ.Converter[T, K]) map[K][]T {
-	groups := map[K][]T{}
-	for _, e := range elements {
-		key := by(e)
-		group := groups[key]
-		if group == nil {
-			group = make([]T, 0)
-		}
-		groups[key] = append(group, e)
-
-	}
-	return groups
 }

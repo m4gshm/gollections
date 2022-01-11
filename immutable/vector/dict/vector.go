@@ -3,7 +3,6 @@ package dict
 import (
 	"fmt"
 
-	"github.com/m4gshm/gollections/immutable"
 	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
@@ -19,7 +18,7 @@ type Vector[k comparable, v any] struct {
 	uniques  map[k]v
 }
 
-var _ immutable.Vector[any, typ.Iterator[any]] = (*Vector[any, any])(nil)
+var _ typ.Vector[any, typ.Iterator[any]] = (*Vector[any, any])(nil)
 var _ fmt.Stringer = (*Vector[any, any])(nil)
 
 func (s *Vector[k, v]) Begin() typ.Iterator[v] {
@@ -34,7 +33,7 @@ func (s *Vector[k, v]) Len() int {
 	return len(s.elements)
 }
 
-func (s *Vector[k, v]) Elements() []v {
+func (s *Vector[k, v]) Collect() []v {
 	refs := s.elements
 	elements := make([]v, len(refs))
 	for i, r := range refs {
@@ -45,13 +44,18 @@ func (s *Vector[k, v]) Elements() []v {
 	return elements
 }
 
-func (s *Vector[k, v]) ForEach(walker func(v)) {
+func (s *Vector[k, v]) TrackEach(tracker func(int, v)) error {
 	refs := s.elements
-	for _, r := range refs {
+	for i, r := range refs {
 		key := *r
 		val := s.uniques[key]
-		walker(val)
+		tracker(i, val)
 	}
+	return nil
+}
+
+func (s *Vector[k, v]) ForEach(walker func(v)) error {
+	return s.TrackEach(func(_ int, value v) { walker(value) })
 }
 
 func (s *Vector[k, v]) Get(index int) (v, bool) {
@@ -65,11 +69,11 @@ func (s *Vector[k, v]) Get(index int) (v, bool) {
 	return no, false
 }
 
-func (s *Vector[k, v]) Filter(filter typ.Predicate[v]) typ.Pipe[v, typ.Iterator[v]] {
+func (s *Vector[k, v]) Filter(filter typ.Predicate[v]) typ.Pipe[v, []v, typ.Iterator[v]] {
 	return it.NewPipe[v](it.Filter(s.Iter(), filter))
 }
 
-func (s *Vector[k, v]) Map(by typ.Converter[v, v]) typ.Pipe[v, typ.Iterator[v]] {
+func (s *Vector[k, v]) Map(by typ.Converter[v, v]) typ.Pipe[v, []v, typ.Iterator[v]] {
 	return it.NewPipe[v](it.Map(s.Iter(), by))
 }
 
@@ -78,5 +82,5 @@ func (s *Vector[k, v]) Reduce(by op.Binary[v]) v {
 }
 
 func (s *Vector[k, v]) String() string {
-	return slice.ToString(s.Elements())
+	return slice.ToString(s.Collect())
 }
