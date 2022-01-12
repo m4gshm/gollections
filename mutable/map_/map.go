@@ -98,20 +98,36 @@ func (s *OrderedMap[k, v]) Set(key k, value v) (bool, error) {
 	return false, nil
 }
 
-func (s *OrderedMap[k, v]) Keys() typ.Container[k, []k, int, typ.Iterator[k]] {
+func (s *OrderedMap[k, v]) Keys() typ.Container[k, []k, typ.Iterator[k]] {
 	return ref.Wrap(s.elements)
 }
 
-func (s *OrderedMap[k, v]) Values() typ.Container[v, []v, int, typ.Iterator[v]] {
+func (s *OrderedMap[k, v]) Values() typ.Container[v, []v, typ.Iterator[v]] {
 	return dict.Wrap(s.elements, s.uniques)
 }
 
-func (s *OrderedMap[k, v]) Filter(filter typ.Predicate[*typ.KV[k, v]]) typ.Pipe[*typ.KV[k, v], map[k]v, typ.Iterator[*typ.KV[k, v]]] {
-	return it.NewOrderedKVPipe[k, v](it.Filter(s.Iter(), filter), collect.Map[k, v])
+func (s *OrderedMap[k, v]) FilterKey(fit typ.Predicate[k]) typ.MapPipe[k, v, map[k]v] {
+	return it.NewKVPipe(it.Filter(s.Iter(), func(kv *typ.KV[k, v]) bool { return fit(kv.Key()) }), collect.Map[k, v])
 }
 
-func (s *OrderedMap[k, v]) Map(by typ.Converter[*typ.KV[k, v], *typ.KV[k, v]]) typ.Pipe[*typ.KV[k, v], map[k]v, typ.Iterator[*typ.KV[k, v]]] {
-	return it.NewOrderedKVPipe[k, v](it.Map(s.Iter(), by), collect.Map[k, v])
+func (s *OrderedMap[k, v]) MapKey(by typ.Converter[k, k]) typ.MapPipe[k, v, map[k]v] {
+	return it.NewKVPipe(it.Map(s.Iter(), func(kv *typ.KV[k, v]) *typ.KV[k, v] { return K.V(by(kv.Key()), kv.Value()) }), collect.Map[k, v])
+}
+
+func (s *OrderedMap[k, v]) FilterValue(fit typ.Predicate[v]) typ.MapPipe[k, v, map[k]v] {
+	return it.NewKVPipe(it.Filter(s.Iter(), func(kv *typ.KV[k, v]) bool { return fit(kv.Value()) }), collect.Map[k, v])
+}
+
+func (s *OrderedMap[k, v]) MapValue(by typ.Converter[v, v]) typ.MapPipe[k, v, map[k]v] {
+	return it.NewKVPipe(it.Map(s.Iter(), func(kv *typ.KV[k, v]) *typ.KV[k, v] { return K.V(kv.Key(), by(kv.Value())) }), collect.Map[k, v])
+}
+
+func (s *OrderedMap[k, v]) Filter(filter typ.Predicate[*typ.KV[k, v]]) typ.MapPipe[k, v, map[k]v] {
+	return it.NewKVPipe(it.Filter(s.Iter(), filter), collect.Map[k, v])
+}
+
+func (s *OrderedMap[k, v]) Map(by typ.Converter[*typ.KV[k, v], *typ.KV[k, v]]) typ.MapPipe[k, v, map[k]v] {
+	return it.NewKVPipe(it.Map(s.Iter(), by), collect.Map[k, v])
 }
 
 func (s *OrderedMap[k, v]) Reduce(by op.Binary[*typ.KV[k, v]]) *typ.KV[k, v] {

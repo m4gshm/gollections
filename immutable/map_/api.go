@@ -12,7 +12,3 @@ func Of[k comparable, v any](elements ...*typ.KV[k, v]) immutable.Map[k, v] {
 func New[k comparable, v any](elements []*typ.KV[k, v]) immutable.Map[k, v] {
 	return NewOrderedMap(elements)
 }
-
-func Group[k comparable, v any](elements []v, by typ.Converter[v, k]) immutable.Map[k, []v] {
-	return GroupOrderedMap(elements, by)
-}

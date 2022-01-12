@@ -90,6 +90,6 @@ func Slice[T any](elements typ.Iterator[T]) []T {
 }
 
 //Group groups elements to slices by a converter and returns map
-func Group[T any, K comparable, IT typ.Iterator[T]](elements IT, by typ.Converter[T, K]) typ.MapPipe[K, T, []T] {
-	return impl.NewOrderedKVPipe(impl.NewGrouper(elements, by), collect.Groups[K, T])
+func Group[T any, K comparable, IT typ.Iterator[T]](elements IT, by typ.Converter[T, K]) typ.MapPipe[K, T, map[K][]T] {
+	return impl.NewKVPipe(impl.NewKeyValuer(elements, by), collect.Groups[K, T])
 }

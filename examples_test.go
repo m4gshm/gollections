@@ -6,14 +6,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/m4gshm/gollections/K"
-	"github.com/m4gshm/gollections/check"
+	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/conv"
 	"github.com/m4gshm/gollections/immutable/set"
 	"github.com/m4gshm/gollections/it"
 	"github.com/m4gshm/gollections/op"
 	slc "github.com/m4gshm/gollections/slice"
-	"github.com/m4gshm/gollections/typ"
 	"github.com/m4gshm/gollections/walk/group"
 )
 
@@ -35,30 +33,23 @@ func Test_group_odd_even(t *testing.T) {
 }
 
 func Test_group_with_filtering_by_stirng_len(t *testing.T) {
-	var groups = it.Group(
-		set.Of(
-			"seventh",
-			"first", "second", "third", "fourth",
-			"fifth", "sixth", "eighth",
-			"ninth", "tenth", "one", "two", "three", "1",
-		).Begin(),
-		func(v string) int { return len(v) },
-	).Map(func(kv *typ.KV[int, string]) *typ.KV[int, string] {
-		val := kv.Value()
-		if val == "sixth" {
-			return nil
-		}
-		return K.V(kv.Key(), val+"_")
-	}).Filter(
-		check.NotNil[typ.KV[int, string]],
-	).Filter(
-		func(kv *typ.KV[int, string]) bool { return kv.Key() > 3 },
+	var groups = c.Group(set.Of(
+		"seventh", "seventh", //duplicated
+		"first", "second", "third", "fourth",
+		"fifth", "sixth", "eighth",
+		"ninth", "tenth", "one", "two", "three", "1",
+		"second", //duplicate
+	), func(v string) int { return len(v) },
+	).FilterKey(
+		func(k int) bool { return k > 3 },
+	).MapValue(
+		func(v string) string { return v + "_" },
 	).Collect()
 
-	fmt.Println(groups) //map[5:[first_ third_ fifth_ ninth_ tenth_ three_] 6:[second_ fourth_ eighth_] 7:[seventh_]]
+	fmt.Println(groups) //map[int][]string{5:[]string{"first_", "third_", "fifth_", "sixth_", "ninth_", "tenth_", "three_"}, 6:[]string{"second_", "fourth_", "eighth_"}, 7:[]string{"seventh_"}}
 
 	assert.Equal(t, map[int][]string{
-		5: {"first_", "third_", "fifth_", "ninth_", "tenth_", "three_"},
+		5: {"first_", "third_", "fifth_", "sixth_", "ninth_", "tenth_", "three_"},
 		6: {"second_", "fourth_", "eighth_"},
 		7: {"seventh_"},
 	}, groups)

@@ -7,15 +7,15 @@ import (
 )
 
 //Container - base interface for container interfaces
-type Container[T any, C any, L constraints.Integer, IT Iterator[T]] interface {
+type Container[T any, C any, IT Iterator[T]] interface {
 	Walk[T]
-	Collectable[C, L]
+	Collectable[C]
 	Iterable[T, IT]
 }
 
 //Vector - the container stores ordered elements, provides index access
 type Vector[T any, IT Iterator[T]] interface {
-	Container[T, []T, int, IT]
+	Container[T, []T, IT]
 	Track[T, int]
 	RandomAccess[int, T]
 	Transformable[T, []T, Iterator[T]]
@@ -23,20 +23,20 @@ type Vector[T any, IT Iterator[T]] interface {
 
 //Set - the container provides uniqueness (does't insert duplicated values)
 type Set[T any, IT Iterator[T]] interface {
-	Container[T, []T, int, IT]
+	Container[T, []T, IT]
 	Transformable[T, []T, Iterator[T]]
 	Checkable[T]
 }
 
 //Map - the container provides access to elements by key
 type Map[k comparable, v any, IT Iterator[*KV[k, v]]] interface {
-	Container[*KV[k, v], map[k]v, int, Iterator[*KV[k, v]]]
+	Container[*KV[k, v], map[k]v, Iterator[*KV[k, v]]]
 	Track[v, k]
 	Checkable[k]
 	KeyAccess[k, v]
-	Transformable[*KV[k, v], map[k]v, Iterator[*KV[k, v]]]
-	Keys() Container[k, []k, int, Iterator[k]]
-	Values() Container[v, []v, int, Iterator[v]]
+	MapTransformable[k, v, map[k]v]
+	Keys() Container[k, []k, Iterator[k]]
+	Values() Container[v, []v, Iterator[v]]
 }
 
 //Iterator base interface for containers, collections
@@ -73,7 +73,7 @@ type Checkable[T any] interface {
 }
 
 //Collectable not endless container that can be transformed to array or map of elements
-type Collectable[T any, L constraints.Integer] interface {
+type Collectable[T any] interface {
 	Collect() T
 }
 
@@ -85,17 +85,27 @@ type Transformable[T any, C any, IT Iterator[T]] interface {
 
 type Pipe[T any, C any, IT Iterator[T]] interface {
 	Transformable[T, C, IT]
-	Container[T, C, int, IT]
+	Container[T, C, IT]
 }
 
-type SlicePipe[T any, IT Iterator[T]] interface {
-	Pipe[T, []T, IT]
+type Pipeable[T any, C any, IT Iterator[T], P Pipe[T, C, IT]] interface {
+	Pipe() P
 }
 
-type MapPipe[k comparable, v any, c any] Pipe[*KV[k, v], map[k]c, Iterator[*KV[k, v]]]
+type MapPipe[k comparable, v any, m any] interface {
+	MapTransformable[k, v, m]
+	Container[*KV[k, v], m, Iterator[*KV[k, v]]]
+}
 
-type Pipeable[T any, C any, IT Iterator[T]] interface {
-	Pipe() Pipe[T, C, IT]
+type MapTransformable[k comparable, v any, m any] interface {
+	Filter(Predicate[*KV[k, v]]) MapPipe[k, v, m]
+	Map(Converter[*KV[k, v], *KV[k, v]]) MapPipe[k, v, m]
+
+	FilterKey(Predicate[k]) MapPipe[k, v, m]
+	MapKey(Converter[k, k]) MapPipe[k, v, m]
+
+	FilterValue(Predicate[v]) MapPipe[k, v, m]
+	MapValue(Converter[v, v]) MapPipe[k, v, m]
 }
 
 type Access[K any, V any] interface {

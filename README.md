@@ -20,7 +20,7 @@ The same interfaces as in the mutable package but for read-only purposes.
 ## Functions
 
 Consists of two groups of operations:
- * Intermediate - only defines a computation (Wrap, Map, Flatt, Filter).
+ * Intermediate - only defines a computation (Wrap, Map, Flatt, Filter, Group).
  * Final - applies intermediates and retrieves the result (ForEach, Slice, Reduce)
 
 Intermediates should wrap one by one to make a lazy computation chain that can be applied to the latest final operation.
@@ -63,13 +63,15 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
+	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/conv"
 	"github.com/m4gshm/gollections/immutable/set"
 	"github.com/m4gshm/gollections/it"
 	"github.com/m4gshm/gollections/op"
 	slc "github.com/m4gshm/gollections/slice"
-	"github.com/m4gshm/gollections/walk"
-	"github.com/stretchr/testify/assert"
+	"github.com/m4gshm/gollections/walk/group"
 )
 
 func Test_OrderedSet(t *testing.T) {
@@ -87,6 +89,29 @@ func Test_group_odd_even(t *testing.T) {
 	)
 	fmt.Println(groups) //map[false:[1 3] true:[2 4]]
 	assert.Equal(t, map[bool][]int{false: {1, 3}, true: {2, 4}}, groups)
+}
+
+func Test_group_with_filtering_by_stirng_len(t *testing.T) {
+	var groups = c.Group(set.Of(
+		"seventh", "seventh", //duplicated
+		"first", "second", "third", "fourth",
+		"fifth", "sixth", "eighth",
+		"ninth", "tenth", "one", "two", "three", "1",
+		"second", //duplicate
+	), func(v string) int { return len(v) },
+	).FilterKey(
+		func(k int) bool { return k > 3 },
+	).MapValue(
+		func(v string) string { return v + "_" },
+	).Collect()
+
+	fmt.Println(groups) //map[int][]string{5:[]string{"first_", "third_", "fifth_", "sixth_", "ninth_", "tenth_", "three_"}, 6:[]string{"second_", "fourth_", "eighth_"}, 7:[]string{"seventh_"}}
+
+	assert.Equal(t, map[int][]string{
+		5: {"first_", "third_", "fifth_", "sixth_", "ninth_", "tenth_", "three_"},
+		6: {"second_", "fourth_", "eighth_"},
+		7: {"seventh_"},
+	}, groups)
 }
 
 func Test_compute_odds_sum(t *testing.T) {
