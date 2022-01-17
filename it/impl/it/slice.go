@@ -9,7 +9,7 @@ import (
 const NoStarted = -1
 
 var (
-	Exhausted        = errors.New("interator exhausted")
+	Exhausted        = errors.New("exhausted interator")
 	GetBeforeHasNext = errors.New("'Get' called before 'HasNext'")
 )
 

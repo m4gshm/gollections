@@ -232,28 +232,26 @@ func Benchmark_NewKVHasNextGet(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		for iter := impliter.NewKV(values); iter.HasNext(); {
-			kv := iter.Get()
-			_ = kv.Key()
-			_ = kv.Value()
+			k, v, _ := iter.GetKV()
+			_ = k
+			_ = v
 		}
 	}
 	b.StopTimer()
 }
 
-func Benchmark_NewMap_HasNextGet_Reset(b *testing.B) {
+func Benchmark_NewReflectKVHasNextGet(b *testing.B) {
 	values := map[int]int{}
 	for i := 0; i < max; i++ {
 		values[i] = i
 	}
-	iter := impliter.NewKV(values)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		for iter.HasNext() {
-			kv := iter.Get()
-			_ = kv.Key()
-			_ = kv.Value()
+		for iter := impliter.NewReflectKV(values); iter.HasNext(); {
+			k, v, _ := iter.GetKV()
+			_ = k
+			_ = v
 		}
-		iter.Reset()
 	}
 	b.StopTimer()
 }

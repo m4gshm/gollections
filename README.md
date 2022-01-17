@@ -16,8 +16,7 @@ Supports write operations (append, delete, replace).
 
 The same interfaces as in the mutable package but for read-only purposes.
 
-
-## Functions
+## Container functions
 
 Consists of two groups of operations:
  * Intermediate - only defines a computation (Wrap, Map, Flatt, Filter, Group).
@@ -37,7 +36,9 @@ var (
 
 maxItemAttribute := it.Reduce(it.Map(c.Filer(items, condition), Item.GetAttribute), max)
 ```
-Functions grouped into packages by applicable type ([iterable container](./c/api.go), [iterator](./it/api.go), [walker](walk/api.go), [slice](slice/api.go))
+Functions grouped into packages by applicable type ([container](./c/api.go), [iterator](./it/api.go), [slice](slice/api.go))
+
+## Builder and util functions
 
 ## Packages
 ### [Common interfaces](./typ/iface.go)
@@ -52,7 +53,6 @@ Declarative style API over 'Iterator' interface.
 
 ### [Slice API](./slice/api.go)
 Same as 'Iterator API' but specifically for slices. Generally more performant than 'Iterator' but only as the first in a chain of intermediate operations.
-
 
 
 ## Examples
