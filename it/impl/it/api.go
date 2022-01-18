@@ -7,8 +7,8 @@ import (
 )
 
 //Map creates a lazy Iterator that converts elements with a converter and returns them
-func Map[From, To any, IT typ.Iterator[From]](elements IT, by typ.Converter[From, To]) *Convert[From, To] {
-	return &Convert[From, To]{Iter: elements, By: by}
+func Map[From, To any, IT typ.Iterator[From]](elements IT, by typ.Converter[From, To]) *Convert[From, To, IT, typ.Converter[From, To]] {
+	return &Convert[From, To, IT, typ.Converter[From, To]]{Iter: elements, By: by}
 }
 
 // additionally filters 'From' elements by filters
@@ -64,6 +64,20 @@ func Reduce[T any, IT typ.Iterator[T]](elements IT, by op.Binary[T]) T {
 	return result
 }
 
+func ReduceKV[k, v any, IT typ.KVIterator[k, v]](elements IT, by op.Quaternary[k, v]) (k, v) {
+	if !elements.HasNext() {
+		var key k
+		var val v
+		return key, val
+	}
+	key, val := getKV[k, v](elements)
+	for elements.HasNext() {
+		key2, val2 := getKV[k, v](elements)
+		key, val = by(key, val, key2, val2)
+	}
+	return key, val
+}
+
 //Slice converts Iterator to slice
 func Slice[T any, IT typ.Iterator[T]](elements IT) []T {
 	s := make([]T, 0)
@@ -76,9 +90,27 @@ func Slice[T any, IT typ.Iterator[T]](elements IT) []T {
 }
 
 func get[T any, IT typ.Iterator[T]](elements IT) T {
-	n, err := elements.Next()
+	n, err := elements.Get()
 	if err != nil {
 		panic(err)
 	}
 	return n
+}
+
+func getKV[k, v any, IT typ.KVIterator[k, v]](elements IT) (k, v) {
+	key, val, err := elements.Get()
+	if err != nil {
+		panic(err)
+	}
+	return key, val
+}
+
+//MapKV creates a lazy Iterator that converts elements with a converter and returns them
+func MapKV[k, v any, IT typ.KVIterator[k, v], k2, v2 any](elements IT, by typ.BiConverter[k, v, k2, v2]) *ConvertKV[k, v, IT, k2, v2, typ.BiConverter[k, v, k2, v2]] {
+	return &ConvertKV[k, v, IT, k2, v2, typ.BiConverter[k, v, k2, v2]]{Iter: elements, By: by}
+}
+
+//FilterKV creates a lazy Iterator that checks elements by filters and returns successful ones
+func FilterKV[k, v any, IT typ.KVIterator[k, v]](elements IT, filter typ.BiPredicate[k, v]) *FitKV[k, v] {
+	return &FitKV[k, v]{Iter: elements, By: filter}
 }

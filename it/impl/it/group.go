@@ -1,7 +1,6 @@
 package it
 
 import (
-	"github.com/m4gshm/gollections/K"
 	"github.com/m4gshm/gollections/typ"
 )
 
@@ -15,16 +14,18 @@ type KeyValuer[k comparable, v any] struct {
 	err    error
 }
 
-var _ typ.Iterator[*typ.KV[any, any]] = (*KeyValuer[any, any])(nil)
+var _ typ.KVIterator[any, any] = (*KeyValuer[any, any])(nil)
 
 func (s *KeyValuer[k, v]) HasNext() bool {
 	return s.iter.HasNext()
 }
 
-func (s *KeyValuer[k, v]) Next() (*typ.KV[k, v], error) {
-	val, err := s.iter.Next()
+func (s *KeyValuer[k, v]) Get() (k, v, error) {
+	val, err := s.iter.Get()
 	if err != nil {
-		return nil, err
+		var key k
+		var val v
+		return key, val, err
 	}
-	return K.V(s.getKey(val), val), nil
+	return s.getKey(val), val, nil
 }

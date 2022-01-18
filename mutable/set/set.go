@@ -62,11 +62,17 @@ func (s *OrderedSet[T]) Collect() []T {
 	return out
 }
 
-func (s *OrderedSet[T]) ForEach(walker func(T)) error {
+func (s *OrderedSet[T]) For(walker func(T) error) error {
 	for _, e := range s.elements {
-		walker(*e)
+		if err := walker(*e); err != nil {
+			return err
+		}
 	}
 	return nil
+}
+
+func (s *OrderedSet[T]) ForEach(walker func(T)) error {
+	return s.For(func(t T) error { walker(t); return nil })
 }
 
 func (s *OrderedSet[T]) Len() int {

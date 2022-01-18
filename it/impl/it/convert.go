@@ -26,38 +26,48 @@ func (s *ConvertFit[From, To]) HasNext() bool {
 	return false
 }
 
-func (s *ConvertFit[From, To]) Get() To {
-	v, err := s.Next()
-	if err != nil {
-		panic(err)
-	}
-	return v
-}
-
-func (s *ConvertFit[From, To]) Next() (To, error) {
+func (s *ConvertFit[From, To]) Get() (To, error) {
 	return s.current, s.err
 }
 
-func (s *ConvertFit[From, To]) Err() error {
-	return s.err
+type Convert[From, To any, IT typ.Iterator[From], C typ.Converter[From, To]] struct {
+	Iter IT
+	By   C
 }
 
-type Convert[From, To any] struct {
-	Iter typ.Iterator[From]
-	By   typ.Converter[From, To]
-}
+var _ typ.Iterator[any] = (*Convert[any, any, typ.Iterator[any], typ.Converter[any, any]])(nil)
 
-var _ typ.Iterator[interface{}] = (*Convert[interface{}, interface{}])(nil)
-
-func (s *Convert[From, To]) HasNext() bool {
+func (s *Convert[From, To, IT, C]) HasNext() bool {
 	return s.Iter.HasNext()
 }
 
-func (s *Convert[From, To]) Next() (To, error) {
-	v, err := s.Iter.Next()
+func (s *Convert[From, To, IT, C]) Get() (To, error) {
+	v, err := s.Iter.Get()
 	if err != nil {
 		var no To
 		return no, err
 	}
 	return s.By(v), nil
+}
+
+type ConvertKV[k, v any, IT typ.KVIterator[k, v], k2, v2 any, C typ.BiConverter[k, v, k2, v2]] struct {
+	Iter IT
+	By   C
+}
+
+var _ typ.KVIterator[any, any] = (*ConvertKV[any, any, typ.KVIterator[any, any], any, any, typ.BiConverter[any, any, any, any]])(nil)
+
+func (s *ConvertKV[k, v, IT, k1, v2, C]) HasNext() bool {
+	return s.Iter.HasNext()
+}
+
+func (s *ConvertKV[k, v, IT, k2, v2, C]) Get() (k2, v2, error) {
+	key, val, err := s.Iter.Get()
+	if err != nil {
+		var key k2
+		var val v2
+		return key, val, err
+	}
+	key1, val2 := s.By(key, val)
+	return key1, val2, nil
 }

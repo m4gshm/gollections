@@ -26,20 +26,8 @@ func (s *ConvertFit[From, To]) HasNext() bool {
 	return false
 }
 
-func (s *ConvertFit[From, To]) Get() To {
-	v, err := s.Next()
-	if err != nil {
-		panic(err)
-	}
-	return v
-}
-
-func (s *ConvertFit[From, To]) Next() (To, error) {
+func (s *ConvertFit[From, To]) Get() (To, error) {
 	return s.current, s.err
-}
-
-func (s *ConvertFit[From, To]) Err() error {
-	return s.err
 }
 
 type Convert[From, To any] struct {
@@ -67,20 +55,8 @@ func (s *Convert[From, To]) HasNext() bool {
 	return false
 }
 
-func (s *Convert[From, To]) Get() To {
-	v, err := s.Next()
-	if err != nil {
-		panic(err)
-	}
-	return v
-}
-
-func (s *Convert[From, To]) Next() (To, error) {
+func (s *Convert[From, To]) Get() (To, error) {
 	return s.current, s.err
-}
-
-func (s *Convert[From, To]) Err() error {
-	return s.err
 }
 
 func nextArrayElem[T any](elements []T, filter typ.Predicate[T], indexHolder *int) (T, bool) {

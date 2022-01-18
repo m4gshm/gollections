@@ -24,7 +24,7 @@ type Set[t comparable, IT Iterator[t]] interface {
 }
 
 //Map - the container provides access to elements by key
-type Map[k comparable, v any, IT typ.Iterator[*typ.KV[k, v]]] interface {
+type Map[k comparable, v any, IT typ.KVIterator[k, v]] interface {
 	typ.Map[k, v, IT]
 	Settable[k, v]
 }

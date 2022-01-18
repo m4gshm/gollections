@@ -33,16 +33,8 @@ func (s *Iter[T]) HasNext() bool {
 	return HasNext(s.elements, &s.current, &s.err)
 }
 
-func (s *Iter[T]) Next() (T, error) {
-	return Next(s.current, s.elements, s.err)
-}
-
-func (s *Iter[T]) Get() T {
+func (s *Iter[T]) Get() (T, error) {
 	return Get(s.current, s.elements, s.err)
-}
-
-func (s *Iter[T]) Err() error {
-	return s.err
 }
 
 func (s *Iter[T]) Position() int {
@@ -79,7 +71,7 @@ func HasNext[T any](elements []T, current *int, err *error) bool {
 	return false
 }
 
-func Next[T any](current int, elements []T, err error) (T, error) {
+func Get[T any](current int, elements []T, err error) (T, error) {
 	if err != nil {
 		var no T
 		return no, err
@@ -88,12 +80,4 @@ func Next[T any](current int, elements []T, err error) (T, error) {
 		return no, GetBeforeHasNext
 	}
 	return (elements)[current], nil
-}
-
-func Get[T any](current int, elements []T, err error) T {
-	v, err := Next(current, elements, err)
-	if err != nil {
-		panic(err)
-	}
-	return v
 }

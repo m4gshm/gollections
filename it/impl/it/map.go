@@ -66,7 +66,7 @@ func (iter *KV[k, v]) GetKV() (k, v, error) {
 	return *key, *value, nil
 }
 
-func (iter *KV[k, v]) Next() (*typ.KV[k, v], error) {
+func (iter *KV[k, v]) Get() (*typ.KV[k, v], error) {
 	key, val, err := iter.GetKV()
 	if err != nil {
 		return nil, err
@@ -139,16 +139,12 @@ func (iter *ReflectKV[k, v]) GetKV() (k, v, error) {
 	return key, value, nil
 }
 
-func (iter *ReflectKV[k, v]) Next() (*typ.KV[k, v], error) {
+func (iter *ReflectKV[k, v]) Get() (*typ.KV[k, v], error) {
 	key, value, err := iter.GetKV()
 	if err != nil {
 		return nil, err
 	}
 	return K.V(key, value), nil
-}
-
-func (s *ReflectKV[k, v]) Err() error {
-	return s.err
 }
 
 func (s *ReflectKV[k, v]) Reset() {
@@ -161,26 +157,19 @@ type OrderedKV[k comparable, v any] struct {
 	uniques  map[k]v
 }
 
-var _ typ.Iterator[*typ.KV[any, any]] = (*OrderedKV[any, any])(nil)
+var _ typ.KVIterator[any, any] = (*OrderedKV[any, any])(nil)
 
 func (s *OrderedKV[k, v]) HasNext() bool {
 	return s.elements.HasNext()
 }
 
-func (s *OrderedKV[k, v]) Get() *typ.KV[k, v] {
-	key := *s.elements.Get()
-	return K.V(key, s.uniques[key])
-}
-
-func (s *OrderedKV[k, v]) Next() (*typ.KV[k, v], error) {
-	ref, err := s.elements.Next()
+func (s *OrderedKV[k, v]) Get() (k, v, error) {
+	ref, err := s.elements.Get()
 	if err != nil {
-		return nil, err
+		var key k
+		var value v
+		return key, value, err
 	}
 	key := *ref
-	return K.V(key, s.uniques[key]), nil
-}
-
-func (s *OrderedKV[k, v]) Err() error {
-	return s.elements.Err()
+	return key, s.uniques[key], nil
 }

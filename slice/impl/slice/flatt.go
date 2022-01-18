@@ -50,20 +50,8 @@ func (s *FlattenFit[From, To]) HasNext() bool {
 	return false
 }
 
-func (s *FlattenFit[From, To]) Get() To {
-	v, err := s.Next()
-	if err != nil {
-		panic(err)
-	}
-	return v
-}
-
-func (s *FlattenFit[From, To]) Next() (To, error) {
+func (s *FlattenFit[From, To]) Get() (To, error) {
 	return s.current, s.err
-}
-
-func (s *FlattenFit[From, To]) Err() error {
-	return s.err
 }
 
 type Flatten[From, To any] struct {
@@ -108,18 +96,6 @@ func (s *Flatten[From, To]) HasNext() bool {
 	return false
 }
 
-func (s *Flatten[From, To]) Get() To {
-	v, err := s.Next()
-	if err != nil {
-		panic(err)
-	}
-	return v
-}
-
-func (s *Flatten[From, To]) Next() (To, error) {
+func (s *Flatten[From, To]) Get() (To, error) {
 	return s.current, s.err
-}
-
-func (s *Flatten[From, To]) Err() error {
-	return s.err
 }

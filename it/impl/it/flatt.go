@@ -35,7 +35,7 @@ func (s *FlattenFit[From, To]) HasNext() bool {
 		if !iter.HasNext() {
 			s.err = Exhausted
 			return false
-		} else if v, err := iter.Next(); err != nil {
+		} else if v, err := iter.Get(); err != nil {
 			s.err = err
 			return true
 		} else if s.Fit(v) {
@@ -49,20 +49,8 @@ func (s *FlattenFit[From, To]) HasNext() bool {
 	}
 }
 
-func (s *FlattenFit[From, To]) Get() To {
-	v, err := s.Next()
-	if err != nil {
-		panic(err)
-	}
-	return v
-}
-
-func (s *FlattenFit[From, To]) Next() (To, error) {
+func (s *FlattenFit[From, To]) Get() (To, error) {
 	return s.c, s.err
-}
-
-func (s *FlattenFit[From, To]) Err() error {
-	return s.err
 }
 
 type Flatten[From, To any] struct {
@@ -95,7 +83,7 @@ func (s *Flatten[From, To]) HasNext() bool {
 		if ok := iter.HasNext(); !ok {
 			s.err = Exhausted
 			return false
-		} else if v, err := iter.Next(); err != nil {
+		} else if v, err := iter.Get(); err != nil {
 			s.err = err
 			return true
 		} else if elementsTo := s.Flatt(v); len(elementsTo) > 0 {
@@ -107,18 +95,6 @@ func (s *Flatten[From, To]) HasNext() bool {
 	}
 }
 
-func (s *Flatten[From, To]) Get() To {
-	v, err := s.Next()
-	if err != nil {
-		panic(err)
-	}
-	return v
-}
-
-func (s *Flatten[From, To]) Next() (To, error) {
+func (s *Flatten[From, To]) Get() (To, error) {
 	return s.c, s.err
-}
-
-func (s *Flatten[From, To]) Err() error {
-	return s.err
 }

@@ -3,32 +3,32 @@ package collect
 import "github.com/m4gshm/gollections/typ"
 
 type Collector[T any, OUT any] typ.Converter[typ.Iterator[T], OUT]
+type CollectorKV[k, v any, OUT any] func(typ.KVIterator[k, v]) OUT
 
-func Map[k comparable, v any](it typ.Iterator[*typ.KV[k, v]]) map[k]v {
+func Map[k comparable, v any](it typ.KVIterator[k, v]) map[k]v {
 	e := map[k]v{}
 	for it.HasNext() {
-		n, err := it.Next()
+		key, val, err := it.Get()
 		if err != nil {
 			panic(err)
 		}
-		e[n.Key()] = n.Value()
+		e[key] = val
 	}
 	return e
 }
 
-func Groups[k comparable, v any](it typ.Iterator[*typ.KV[k, v]]) map[k][]v {
+func Groups[k comparable, v any](it typ.KVIterator[k, v]) map[k][]v {
 	e := map[k][]v{}
 	for it.HasNext() {
-		n, err := it.Next()
+		key, val, err := it.Get()
 		if err != nil {
 			panic(err)
 		}
-		key := n.Key()
 		group := e[key]
 		if group == nil {
 			group = make([]v, 0)
 		}
-		e[key] = append(group, n.Value())
+		e[key] = append(group, val)
 	}
 	return e
 }

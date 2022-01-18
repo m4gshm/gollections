@@ -18,9 +18,9 @@ func Test_Map_Iterate(t *testing.T) {
 	keys := make([]int, 0)
 	values := make([]string, 0)
 	for it := opdered.Begin(); it.HasNext(); {
-		e, _ := it.Next()
-		keys = append(keys, e.Key())
-		values = append(values, e.Value())
+		key, val, _ := it.Get()
+		keys = append(keys, key)
+		values = append(values, val)
 	}
 	assert.Equal(t, expectedK, keys)
 	assert.Equal(t, expectedV, values)

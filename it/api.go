@@ -66,7 +66,7 @@ func NotNil[T any](elements typ.Iterator[*T]) typ.Iterator[*T] {
 //ForEach applies func on elements
 func ForEach[T any](elements typ.Iterator[T], apply func(T)) error {
 	for elements.HasNext() {
-		n, err := elements.Next()
+		n, err := elements.Get()
 		if err != nil {
 			return err
 		}

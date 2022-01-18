@@ -25,8 +25,8 @@ func (i *Iter[T]) HasNext() bool {
 	return it.HasNext(*i.elements, &i.current, &i.err)
 }
 
-func (i *Iter[T]) Next() (T, error) {
-	v, err := it.Next(i.current, *i.elements, i.err)
+func (i *Iter[T]) Get() (T, error) {
+	v, err := it.Get(i.current, *i.elements, i.err)
 	if err != nil {
 		var no T
 		return no, err
@@ -34,13 +34,9 @@ func (i *Iter[T]) Next() (T, error) {
 	return *v, nil
 }
 
-func (i *Iter[T]) Get() T {
-	return *it.Get(i.current, *i.elements, i.err)
-}
-
 func (i *Iter[T]) Delete() (bool, error) {
 	pos := i.current
-	if e, err := i.Next(); err != nil {
+	if e, err := i.Get(); err != nil {
 		return false, err
 	} else if deleted, err := i.del(e); err != nil {
 		return false, err
@@ -49,8 +45,4 @@ func (i *Iter[T]) Delete() (bool, error) {
 		return true, nil
 	}
 	return false, nil
-}
-
-func (s *Iter[T]) Err() error {
-	return s.err
 }

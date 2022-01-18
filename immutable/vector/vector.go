@@ -37,18 +37,25 @@ func (s *Vector[T]) Collect() []T {
 	return slice.Copy(*s.elements)
 }
 
-func (s *Vector[T]) TrackEach(tracker func(int, T)) error {
+func (s *Vector[T]) Track(tracker func(int, T) error) error {
 	for i, e := range *s.elements {
-		tracker(i, e)
+		if err := tracker(i, e); err != nil {
+			return err
+		}
 	}
 	return nil
 }
 
+func (s *Vector[T]) TrackEach(tracker func(int, T)) error {
+	return s.Track(func(i int, value T) error { tracker(i, value); return nil })
+}
+
+func (s *Vector[T]) For(walker func(T) error) error {
+	return s.Track(func(i int, value T) error { return walker(value) })
+}
+
 func (s *Vector[T]) ForEach(walker func(T)) error {
-	for _, e := range *s.elements {
-		walker(e)
-	}
-	return nil
+	return s.TrackEach(func(_ int, value T) { walker(value) })
 }
 
 func (s *Vector[T]) Len() int {

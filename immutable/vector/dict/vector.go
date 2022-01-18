@@ -44,14 +44,24 @@ func (s *Vector[k, v]) Collect() []v {
 	return elements
 }
 
-func (s *Vector[k, v]) TrackEach(tracker func(int, v)) error {
+func (s *Vector[k, v]) Track(tracker func(int, v) error) error {
 	refs := s.elements
 	for i, r := range refs {
 		key := *r
 		val := s.uniques[key]
-		tracker(i, val)
+		if err := tracker(i, val); err != nil {
+			return err
+		}
 	}
 	return nil
+}
+
+func (s *Vector[k, v]) TrackEach(tracker func(int, v)) error {
+	return s.Track(func(i int, value v) error { tracker(i, value); return nil })
+}
+
+func (s *Vector[k, v]) For(walker func(v) error) error {
+	return s.Track(func(i int, value v) error { return walker(value) })
 }
 
 func (s *Vector[k, v]) ForEach(walker func(v)) error {

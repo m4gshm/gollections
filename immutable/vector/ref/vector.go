@@ -42,8 +42,16 @@ func (s *Vector[T]) Collect() []T {
 	return elements
 }
 
+func (s *Vector[T]) Track(tracker func(int, T) error) error {
+	return s.Vector.Track(func(index int, ref *T) error { return tracker(index, *ref) })
+}
+
 func (s *Vector[T]) TrackEach(tracker func(int, T)) error {
 	return s.Vector.TrackEach(func(index int, ref *T) { tracker(index, *ref) })
+}
+
+func (s *Vector[T]) For(walker func(T) error) error {
+	return s.Vector.For(func(ref *T) error { return walker(*ref) })
 }
 
 func (s *Vector[T]) ForEach(walker func(T)) error {

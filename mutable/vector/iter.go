@@ -25,12 +25,8 @@ func (i *Iter[T]) HasNext() bool {
 	return it.HasNext(**i.elements, &i.current, &i.err)
 }
 
-func (i *Iter[T]) Get() T {
+func (i *Iter[T]) Get() (T, error) {
 	return it.Get(i.current, **i.elements, i.err)
-}
-
-func (i *Iter[T]) Next() (T, error) {
-	return it.Next(i.current, **i.elements, i.err)
 }
 
 func (i *Iter[T]) Delete() (bool, error) {
@@ -44,10 +40,6 @@ func (i *Iter[T]) Delete() (bool, error) {
 	return false, nil
 }
 
-func (s *Iter[T]) Err() error {
-	return s.err
-}
-
 type RefIter[T any] struct {
 	*Iter[*T]
 }
@@ -59,12 +51,8 @@ func (i *RefIter[T]) HasNext() bool {
 	return i.Iter.HasNext()
 }
 
-func (i *RefIter[T]) Get() T {
-	return *i.Iter.Get()
-}
-
-func (i *RefIter[T]) Next() (T, error) {
-	v, err := i.Iter.Next()
+func (i *RefIter[T]) Get() (T, error) {
+	v, err := i.Iter.Get()
 	if err != nil {
 		var no T
 		return no, err

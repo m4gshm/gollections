@@ -24,13 +24,39 @@ func (s *Fit[T]) HasNext() bool {
 	return ok
 }
 
-func (s *Fit[T]) Next() (T, error) {
+func (s *Fit[T]) Get() (T, error) {
 	return s.current, s.err
+}
+
+type FitKV[k, v any] struct {
+	Iter typ.KVIterator[k, v]
+	By   typ.BiPredicate[k, v]
+
+	currentK k
+	currentV v
+	err      error
+}
+
+var _ typ.KVIterator[any, any] = (*FitKV[any, any])(nil)
+
+func (s *FitKV[k, v]) HasNext() bool {
+	key, val, ok, err := nextFilteredKV(s.Iter, s.By)
+	if err != nil {
+		s.err = err
+	} else {
+		s.currentK = key
+		s.currentV = val
+	}
+	return ok
+}
+
+func (s *FitKV[k, v]) Get() (k, v, error) {
+	return s.currentK, s.currentV, s.err
 }
 
 func nextFiltered[T any](iter typ.Iterator[T], filter typ.Predicate[T]) (T, bool, error) {
 	for iter.HasNext() {
-		if v, err := iter.Next(); err != nil {
+		if v, err := iter.Get(); err != nil {
 			var no T
 			return no, true, err
 		} else if filter(v) {
@@ -39,4 +65,18 @@ func nextFiltered[T any](iter typ.Iterator[T], filter typ.Predicate[T]) (T, bool
 	}
 	var v T
 	return v, false, nil
+}
+
+func nextFilteredKV[k any, v any](iter typ.KVIterator[k, v], filter typ.BiPredicate[k, v]) (k, v, bool, error) {
+	for iter.HasNext() {
+		if k, v, err := iter.Get(); err != nil {
+
+			return k, v, true, err
+		} else if filter(k, v) {
+			return k, v, true, nil
+		}
+	}
+	var key k
+	var val v
+	return key, val, false, nil
 }
