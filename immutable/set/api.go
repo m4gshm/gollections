@@ -8,10 +8,6 @@ func Of[T comparable](elements ...T) immutable.Set[T] {
 	return Convert(elements)
 }
 
-func Empty[T comparable]() immutable.Set[T] {
-	return NewImpl[T](0)
-}
-
-func New[T comparable](capacity int) immutable.Set[T] {
-	return NewImpl[T](capacity)
+func New[T comparable](elements []T) immutable.Set[T] {
+	return Convert(elements)
 }

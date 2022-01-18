@@ -17,10 +17,6 @@ func Convert[T comparable](elements []T) *Set[T] {
 	return Wrap(uniques)
 }
 
-func NewImpl[T comparable](capacity int) *Set[T] {
-	return Wrap(make(map[T]struct{}, capacity))
-}
-
 func Wrap[T comparable](uniques map[T]struct{}) *Set[T] {
 	return &Set[T]{uniques: uniques}
 }

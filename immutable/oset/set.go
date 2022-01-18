@@ -24,10 +24,6 @@ func Convert[T comparable](elements []T) *OrderedSet[T] {
 	return Wrap(order, uniques)
 }
 
-func NewImpl[T comparable](capacity int) *OrderedSet[T] {
-	return Wrap(make([]*T, 0, capacity), make(map[T]struct{}, capacity))
-}
-
 func Wrap[T comparable](elements []*T, uniques map[T]struct{}) *OrderedSet[T] {
 	return &OrderedSet[T]{elements: elements, uniques: uniques}
 }
