@@ -3,7 +3,7 @@ package benchmark
 import (
 	"testing"
 
-	"github.com/m4gshm/gollections/immutable/set"
+	"github.com/m4gshm/gollections/immutable/oset"
 	"github.com/m4gshm/gollections/immutable/vector"
 	"github.com/m4gshm/gollections/it"
 	impliter "github.com/m4gshm/gollections/it/impl/it"
@@ -62,7 +62,7 @@ func Benchmark_ForRange_of_Collect_Immutable_Vector_Impl_Values(b *testing.B) {
 }
 
 func Benchmark_ForEach_Immutable_OrdererSet(b *testing.B) {
-	c := set.Of(values...)
+	c := oset.Of(values...)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_ = c.ForEach(func(v int) { result = v })
@@ -72,7 +72,7 @@ func Benchmark_ForEach_Immutable_OrdererSet(b *testing.B) {
 }
 
 func Benchmark_ForEach_Immutable_OrdererSet_Impl(b *testing.B) {
-	c := set.ToOrderedSet(values)
+	c := oset.Convert(values)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_ = c.ForEach(func(v int) { result = v })
@@ -82,7 +82,7 @@ func Benchmark_ForEach_Immutable_OrdererSet_Impl(b *testing.B) {
 }
 
 func Benchmark_ForRange_of_Collect_Immutable_OrdererSet_Values(b *testing.B) {
-	c := set.Of(values...)
+	c := oset.Of(values...)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		for _, v := range c.Collect() {
@@ -94,7 +94,7 @@ func Benchmark_ForRange_of_Collect_Immutable_OrdererSet_Values(b *testing.B) {
 }
 
 func Benchmark_ForRange_of_Collect_Immutable_OrdererSet_Impl_Values(b *testing.B) {
-	c := set.Of(values...)
+	c := oset.Of(values...)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		for _, v := range c.Collect() {

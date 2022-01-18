@@ -5,13 +5,13 @@ import (
 )
 
 func Of[T comparable](elements ...T) immutable.Set[T] {
-	return ToOrderedSet(elements)
+	return Convert(elements)
 }
 
 func Empty[T comparable]() immutable.Set[T] {
-	return NewOrderedSet[T](0)
+	return NewImpl[T](0)
 }
 
 func New[T comparable](capacity int) immutable.Set[T] {
-	return NewOrderedSet[T](capacity)
+	return NewImpl[T](capacity)
 }

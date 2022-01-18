@@ -8,7 +8,7 @@ import (
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/conv"
-	"github.com/m4gshm/gollections/immutable/set"
+	"github.com/m4gshm/gollections/immutable/oset"
 	"github.com/m4gshm/gollections/it"
 	"github.com/m4gshm/gollections/op"
 	slc "github.com/m4gshm/gollections/slice"
@@ -16,24 +16,24 @@ import (
 )
 
 func Test_OrderedSet(t *testing.T) {
-	s := set.Of(1, 1, 2, 4, 3, 1)
+	s := oset.Of(1, 1, 2, 4, 3, 1)
 	values := s.Collect()
 	fmt.Println(s) //[1, 2, 4, 3]
 
 	assert.Equal(t, slc.Of(1, 2, 4, 3), values)
 }
 
-func Test_group_odd_even(t *testing.T) {
+func Test_group_orderset_odd_even(t *testing.T) {
 	var (
 		even   = func(v int) bool { return v%2 == 0 }
-		groups = group.Of(set.Of(1, 1, 2, 4, 3, 1), even)
+		groups = group.Of(oset.Of(1, 1, 2, 4, 3, 1), even)
 	)
 	fmt.Println(groups) //map[false:[1 3] true:[2 4]]
 	assert.Equal(t, map[bool][]int{false: {1, 3}, true: {2, 4}}, groups)
 }
 
-func Test_group_with_filtering_by_stirng_len(t *testing.T) {
-	var groups = c.Group(set.Of(
+func Test_group_orderset_with_filtering_by_stirng_len(t *testing.T) {
+	var groups = c.Group(oset.Of(
 		"seventh", "seventh", //duplicated
 		"first", "second", "third", "fourth",
 		"fifth", "sixth", "eighth",

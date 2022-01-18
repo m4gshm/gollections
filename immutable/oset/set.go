@@ -9,7 +9,7 @@ import (
 	"github.com/m4gshm/gollections/typ"
 )
 
-func ToOrderedSet[T comparable](elements []T) *OrderedSet[T] {
+func Convert[T comparable](elements []T) *OrderedSet[T] {
 	var (
 		uniques = make(map[T]struct{}, 0)
 		order   = make([]*T, 0, 0)
@@ -21,14 +21,14 @@ func ToOrderedSet[T comparable](elements []T) *OrderedSet[T] {
 			uniques[vv] = struct{}{}
 		}
 	}
-	return WrapOrderedSet(order, uniques)
+	return Wrap(order, uniques)
 }
 
-func NewOrderedSet[T comparable](capacity int) *OrderedSet[T] {
-	return WrapOrderedSet(make([]*T, 0, capacity), make(map[T]struct{}, capacity))
+func NewImpl[T comparable](capacity int) *OrderedSet[T] {
+	return Wrap(make([]*T, 0, capacity), make(map[T]struct{}, capacity))
 }
 
-func WrapOrderedSet[T comparable](elements []*T, uniques map[T]struct{}) *OrderedSet[T] {
+func Wrap[T comparable](elements []*T, uniques map[T]struct{}) *OrderedSet[T] {
 	return &OrderedSet[T]{elements: elements, uniques: uniques}
 }
 
