@@ -32,11 +32,11 @@ func (s *MapKeys[k, v]) Len() int {
 	return len(s.uniques)
 }
 
-func (s *MapKeys[k, v]) Collect() []v {
+func (s *MapKeys[k, v]) Collect() []k {
 	uniques := s.uniques
-	elements := make([]v, 0, len(s.uniques))
-	for _, val := range uniques {
-		elements = append(elements, val)
+	elements := make([]k, 0, len(s.uniques))
+	for key, _ := range uniques {
+		elements = append(elements, key)
 	}
 	return elements
 }

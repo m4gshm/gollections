@@ -24,7 +24,7 @@ func Convert[k comparable, v any](elements []*typ.KV[k, v]) *OrderedMap[k, v] {
 			uniques[key] = val
 		}
 	}
-	return Wrap[k, v](elements: order, uniques: uniques)
+	return Wrap(order, uniques)
 }
 
 func ConvertMap[k comparable, v any](elements map[k]v) *OrderedMap[k, v] {
