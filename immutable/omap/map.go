@@ -1,9 +1,7 @@
 package omap
 
 import (
-	"github.com/m4gshm/gollections/K"
 	"github.com/m4gshm/gollections/collect"
-	"github.com/m4gshm/gollections/immutable/vector/dict"
 	"github.com/m4gshm/gollections/immutable/vector/ref"
 	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/op"
@@ -68,14 +66,6 @@ func (s *OrderedMap[k, v]) Collect() map[k]v {
 	return out
 }
 
-func (s *OrderedMap[k, v]) For(walker func(*typ.KV[k, v]) error) error {
-	return s.Track(func(key k, value v) error { return walker(K.V(key, value)) })
-}
-
-func (s *OrderedMap[k, v]) ForEach(walker func(*typ.KV[k, v])) error {
-	return s.For(func(kv *typ.KV[k, v]) error { walker(kv); return nil })
-}
-
 func (s *OrderedMap[k, v]) Track(tracker func(k, v) error) error {
 	e := s.uniques
 	for _, ref := range s.elements {
@@ -105,12 +95,12 @@ func (s *OrderedMap[k, v]) Get(key k) (v, bool) {
 	return val, ok
 }
 
-func (s *OrderedMap[k, v]) Keys() typ.Container[[]k, typ.Iterator[k]] {
+func (s *OrderedMap[k, v]) Keys() typ.Collection[k, []k, typ.Iterator[k]] {
 	return ref.Wrap(s.elements)
 }
 
-func (s *OrderedMap[k, v]) Values() typ.Container[[]v, typ.Iterator[v]] {
-	return dict.Wrap(s.elements, s.uniques)
+func (s *OrderedMap[k, v]) Values() typ.Collection[v, []v, typ.Iterator[v]] {
+	return WrapVal(s.elements, s.uniques)
 }
 
 func (s *OrderedMap[k, v]) FilterKey(fit typ.Predicate[k]) typ.MapPipe[k, v, map[k]v] {

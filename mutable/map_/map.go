@@ -3,7 +3,7 @@ package map_
 import (
 	"github.com/m4gshm/gollections/K"
 	"github.com/m4gshm/gollections/collect"
-	"github.com/m4gshm/gollections/immutable/vector/dict"
+	"github.com/m4gshm/gollections/immutable/omap"
 	"github.com/m4gshm/gollections/immutable/vector/ref"
 	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/mutable"
@@ -112,12 +112,12 @@ func (s *OrderedMap[k, v]) Set(key k, value v) (bool, error) {
 	return false, nil
 }
 
-func (s *OrderedMap[k, v]) Keys() typ.Container[[]k, typ.Iterator[k]] {
+func (s *OrderedMap[k, v]) Keys() typ.Collection[k, []k, typ.Iterator[k]] {
 	return ref.Wrap(s.elements)
 }
 
-func (s *OrderedMap[k, v]) Values() typ.Container[[]v, typ.Iterator[v]] {
-	return dict.Wrap(s.elements, s.uniques)
+func (s *OrderedMap[k, v]) Values() typ.Collection[v, []v, typ.Iterator[v]] {
+	return omap.WrapVal(s.elements, s.uniques)
 }
 
 func (s *OrderedMap[k, v]) FilterKey(fit typ.Predicate[k]) typ.MapPipe[k, v, map[k]v] {

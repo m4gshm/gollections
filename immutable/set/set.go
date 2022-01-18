@@ -9,81 +9,81 @@ import (
 	"github.com/m4gshm/gollections/typ"
 )
 
-func Convert[T comparable](elements []T) *Set[T] {
-	uniques := make(map[T]struct{}, 0)
+func Convert[T comparable](elements []T) *Set[T, any] {
+	uniques := make(map[T]any, 0)
 	for _, v := range elements {
 		uniques[v] = struct{}{}
 	}
 	return Wrap(uniques)
 }
 
-func Wrap[T comparable](uniques map[T]struct{}) *Set[T] {
-	return &Set[T]{uniques: uniques}
+func Wrap[k comparable, v any, m map[k]v](uniques m) *Set[k, v] {
+	return &Set[k, v]{uniques: uniques}
 }
 
-type Set[T comparable] struct {
-	uniques map[T]struct{}
+type Set[k comparable, v any] struct {
+	uniques map[k]v
 }
 
-var _ typ.Set[any, typ.Iterator[any]] = (*Set[any])(nil)
-var _ fmt.Stringer = (*Set[any])(nil)
-var _ fmt.GoStringer = (*Set[any])(nil)
+var _ typ.Set[any, typ.Iterator[any]] = (*Set[any, any])(nil)
+var _ fmt.Stringer = (*Set[any, any])(nil)
+var _ fmt.GoStringer = (*Set[any, any])(nil)
 
-func (s *Set[T]) Begin() typ.Iterator[T] {
+func (s *Set[k, v]) Begin() typ.Iterator[k] {
 	return s.Iter()
 }
 
-func (s *Set[T]) Iter() *SetIter[T] {
-	return &SetIter[T]{KV: it.NewKV(s.uniques)}
+func (s *Set[k, v]) Iter() *it.Key[k, v] {
+	return it.NewKey(s.uniques)
 }
 
-func (s *Set[T]) Collect() []T {
-	e := s.uniques
-	out := make([]T, 0, len(e))
-	for k := range e {
-		out = append(out, k)
+func (s *Set[k, v]) Collect() []k {
+	uniques := s.uniques
+	out := make([]k, 0, len(uniques))
+	for e := range uniques {
+		out = append(out, e)
 	}
 	return out
 }
 
-func (s *Set[T]) For(walker func(T) error) error {
-	for k := range s.uniques {
-		if err := walker(k); err != nil {
+func (s *Set[k, v]) For(walker func(k) error) error {
+	for e := range s.uniques {
+		if err := walker(e); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (s *Set[T]) ForEach(walker func(T)) error {
-	return s.For(func(t T) error { walker(t); return nil })
+func (s *Set[k, v]) ForEach(walker func(k)) error {
+	return s.For(func(t k) error { walker(t); return nil })
 }
 
-func (s *Set[T]) Filter(filter typ.Predicate[T]) typ.Pipe[T, []T, typ.Iterator[T]] {
-	return it.NewPipe[T](it.Filter(s.Iter(), filter))
+func (s *Set[k, v]) Filter(filter typ.Predicate[k]) typ.Pipe[k, []k, typ.Iterator[k]] {
+	return it.NewPipe[k](it.Filter(s.Iter(), filter))
 }
 
-func (s *Set[T]) Map(by typ.Converter[T, T]) typ.Pipe[T, []T, typ.Iterator[T]] {
-	return it.NewPipe[T](it.Map(s.Iter(), by))
+func (s *Set[k, v]) Map(by typ.Converter[k, k]) typ.Pipe[k, []k, typ.Iterator[k]] {
+	return it.NewPipe[k](it.Map(s.Iter(), by))
 }
 
-func (s *Set[T]) Reduce(by op.Binary[T]) T {
+func (s *Set[k, v]) Reduce(by op.Binary[k]) k {
 	return it.Reduce(s.Iter(), by)
 }
 
-func (s *Set[T]) Len() int {
+func (s *Set[k, v]) Len() int {
 	return len(s.uniques)
 }
 
-func (s *Set[T]) Contains(v T) bool {
-	_, ok := s.uniques[v]
+func (s *Set[k, v]) Contains(val k) bool {
+	_, ok := s.uniques[val]
 	return ok
 }
 
-func (s *Set[T]) String() string {
+func (s *Set[k, v]) String() string {
 	return s.GoString()
 }
 
-func (s *Set[T]) GoString() string {
+func (s *Set[k, v]) GoString() string {
 	return slice.ToString(s.Collect())
 }

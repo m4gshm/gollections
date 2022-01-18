@@ -1,4 +1,4 @@
-package omap
+package map_
 
 import (
 	"github.com/m4gshm/gollections/immutable"

@@ -158,3 +158,33 @@ func (s *OrderedKV[k, v]) Get() (k, v, error) {
 	key := *ref
 	return key, s.uniques[key], nil
 }
+
+func NewKey[k comparable, v any](uniques map[k]v) *Key[k, v] {
+	return &Key[k, v]{KV: NewKV(uniques)}
+}
+
+type Key[k comparable, v any] struct {
+	*KV[k, v]
+}
+
+var _ typ.Iterator[any] = (*Key[any, any])(nil)
+
+func (iter *Key[k, v]) Get() (k, error) {
+	key, _, err := iter.KV.Get()
+	return key, err
+}
+
+func NewVal[k comparable, v any](uniques map[k]v) *Val[k, v] {
+	return &Val[k, v]{KV: NewKV(uniques)}
+}
+
+type Val[k comparable, v any] struct {
+	*KV[k, v]
+}
+
+var _ typ.Iterator[any] = (*Val[any, any])(nil)
+
+func (iter *Val[k, v]) Get() (v, error) {
+	_, val, err := iter.KV.Get()
+	return val, err
+}

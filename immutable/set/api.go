@@ -5,9 +5,9 @@ import (
 )
 
 func Of[T comparable](elements ...T) immutable.Set[T] {
-	return Convert(elements)
+	return Convert[T](elements)
 }
 
 func New[T comparable](elements []T) immutable.Set[T] {
-	return Convert(elements)
+	return Convert[T](elements)
 }

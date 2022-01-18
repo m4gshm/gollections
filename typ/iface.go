@@ -12,10 +12,14 @@ type Container[C any, IT Iter] interface {
 	Iterable[IT]
 }
 
+type Collection[T any, C any, IT Iter] interface {
+	Container[C, IT]
+	Walk[T]
+}
+
 //Vector - the container stores ordered elements, provides index access
 type Vector[T any, IT Iterator[T]] interface {
-	Walk[T]
-	Container[[]T, IT]
+	Collection[T, []T, IT]
 	Track[T, int]
 	RandomAccess[int, T]
 	Transformable[T, []T, Iterator[T]]
@@ -24,9 +28,7 @@ type Vector[T any, IT Iterator[T]] interface {
 
 //Set - the container provides uniqueness (does't insert duplicated values)
 type Set[T any, IT Iterator[T]] interface {
-	Iterable[IT]
-	Walk[T]
-	Container[[]T, IT]
+	Collection[T, []T, IT]
 	Transformable[T, []T, Iterator[T]]
 	Checkable[T]
 	Len() int
@@ -40,8 +42,8 @@ type Map[k comparable, v any, IT KVIterator[k, v]] interface {
 	Checkable[k]
 	KeyAccess[k, v]
 	MapTransformable[k, v, map[k]v]
-	Keys() Container[[]k, Iterator[k]]
-	Values() Container[[]v, Iterator[v]]
+	Keys() Collection[k, []k, Iterator[k]]
+	Values() Collection[v, []v, Iterator[v]]
 	Len() int
 }
 
