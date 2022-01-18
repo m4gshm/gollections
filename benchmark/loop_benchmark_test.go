@@ -216,9 +216,7 @@ func Benchmark_WrapMap_HasNextGet(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		iter := it.WrapMap(values)
 		for iter.HasNext() {
-			kv, _ := iter.Get()
-			_ = kv.Key()
-			_ = kv.Value()
+			_, _, _ = iter.Get()
 		}
 	}
 	b.StopTimer()
@@ -232,9 +230,7 @@ func Benchmark_NewKVHasNextGet(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		for iter := impliter.NewKV(values); iter.HasNext(); {
-			k, v, _ := iter.GetKV()
-			_ = k
-			_ = v
+			_, _, _ = iter.Get()
 		}
 	}
 	b.StopTimer()
@@ -248,9 +244,7 @@ func Benchmark_NewReflectKVHasNextGet(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		for iter := impliter.NewReflectKV(values); iter.HasNext(); {
-			k, v, _ := iter.GetKV()
-			_ = k
-			_ = v
+			_, _, _ = iter.Get()
 		}
 	}
 	b.StopTimer()

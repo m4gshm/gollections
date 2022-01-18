@@ -19,6 +19,7 @@ type Vector[T any, IT Iterator[T]] interface {
 	Track[T, int]
 	RandomAccess[int, T]
 	Transformable[T, []T, Iterator[T]]
+	Len() int
 }
 
 //Set - the container provides uniqueness (does't insert duplicated values)
@@ -28,6 +29,7 @@ type Set[T any, IT Iterator[T]] interface {
 	Container[[]T, IT]
 	Transformable[T, []T, Iterator[T]]
 	Checkable[T]
+	Len() int
 }
 
 //Map - the container provides access to elements by key
@@ -40,6 +42,7 @@ type Map[k comparable, v any, IT KVIterator[k, v]] interface {
 	MapTransformable[k, v, map[k]v]
 	Keys() Container[[]k, Iterator[k]]
 	Values() Container[[]v, Iterator[v]]
+	Len() int
 }
 
 type Iter interface {

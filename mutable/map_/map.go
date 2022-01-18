@@ -60,6 +60,10 @@ func (s *OrderedMap[k, v]) Collect() map[k]v {
 	return out
 }
 
+func (s *OrderedMap[k, v]) Len() int {
+	return len(s.elements)
+}
+
 func (s *OrderedMap[k, v]) For(walker func(*typ.KV[k, v]) error) error {
 	return s.Track(func(key k, value v) error { return walker(K.V(key, value)) })
 }

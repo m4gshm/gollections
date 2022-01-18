@@ -8,12 +8,30 @@ import (
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/conv"
+	"github.com/m4gshm/gollections/immutable"
 	"github.com/m4gshm/gollections/immutable/oset"
+	"github.com/m4gshm/gollections/immutable/set"
 	"github.com/m4gshm/gollections/it"
 	"github.com/m4gshm/gollections/op"
 	slc "github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/walk/group"
 )
+
+func Test_Set(t *testing.T) {
+	var (
+		s      immutable.Set[int] = set.Of(1, 1, 2, 4, 3, 1)
+		values []int              = s.Collect()
+	)
+
+	assert.Equal(t, 4, s.Len())
+	assert.Equal(t, 4, len(values))
+
+	assert.True(t, s.Contains(1))
+	assert.True(t, s.Contains(2))
+	assert.True(t, s.Contains(3))
+	assert.True(t, s.Contains(4))
+	assert.False(t, s.Contains(5))
+}
 
 func Test_OrderedSet(t *testing.T) {
 	s := oset.Of(1, 1, 2, 4, 3, 1)

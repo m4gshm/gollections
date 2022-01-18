@@ -29,7 +29,7 @@ func Pipe[T any](elements typ.Iterator[T]) typ.Pipe[T, []T, typ.Iterator[T]] {
 }
 
 // WrapMap Key, value Iterator constructor.
-func WrapMap[k comparable, v any](elements map[k]v) typ.Iterator[*typ.KV[k, v]] {
+func WrapMap[k comparable, v any](elements map[k]v) typ.KVIterator[k, v] {
 	return impl.NewKV(elements)
 }
 

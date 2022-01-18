@@ -42,11 +42,11 @@ var _ fmt.Stringer = (*OrderedSet[any])(nil)
 var _ fmt.GoStringer = (*OrderedSet[any])(nil)
 
 func (s *OrderedSet[T]) Begin() typ.Iterator[T] {
-	return &it.RefIter[T]{Iterator: s.newIter()}
+	return s.Iter()
 }
 
-func (s *OrderedSet[T]) newIter() *it.Iter[*T] {
-	return it.New(s.elements)
+func (s *OrderedSet[T]) Iter() *it.RefIter[T] {
+	return &it.RefIter[T]{Iterator: it.New(s.elements)}
 }
 
 func (s *OrderedSet[T]) Collect() []T {
@@ -72,18 +72,15 @@ func (s *OrderedSet[T]) ForEach(walker func(T)) error {
 }
 
 func (s *OrderedSet[T]) Filter(filter typ.Predicate[T]) typ.Pipe[T, []T, typ.Iterator[T]] {
-	return it.NewPipe[T](&it.RefIter[T]{Iterator: it.Filter(s.newIter(), func(ref *T) bool { return filter(*ref) })})
+	return it.NewPipe[T](it.Filter(s.Iter(), filter))
 }
 
 func (s *OrderedSet[T]) Map(by typ.Converter[T, T]) typ.Pipe[T, []T, typ.Iterator[T]] {
-	return it.NewPipe[T](&it.RefIter[T]{Iterator: it.Map(s.newIter(), func(ref *T) *T {
-		conv := by(*ref)
-		return &conv
-	})})
+	return it.NewPipe[T](it.Map(s.Iter(), by))
 }
 
 func (s *OrderedSet[T]) Reduce(by op.Binary[T]) T {
-	return it.Reduce(&it.RefIter[T]{Iterator: s.newIter()}, by)
+	return it.Reduce(s.Iter(), by)
 }
 
 func (s *OrderedSet[T]) Len() int {

@@ -4,7 +4,6 @@ import (
 	"reflect"
 	"unsafe"
 
-	"github.com/m4gshm/gollections/K"
 	"github.com/m4gshm/gollections/typ"
 )
 
@@ -33,6 +32,8 @@ type KV[k comparable, v any] struct {
 	err     error
 }
 
+var _ typ.KVIterator[any, any] = (*KV[any, any])(nil)
+
 func (iter *KV[k, v]) HasNext() bool {
 	if !iter.hiter.initialized() {
 		mapiterinit(iter.maptype, iter.hmap, &iter.hiter)
@@ -46,7 +47,7 @@ func (iter *KV[k, v]) HasNext() bool {
 	return mapiterkey(&iter.hiter) != nil
 }
 
-func (iter *KV[k, v]) GetKV() (k, v, error) {
+func (iter *KV[k, v]) Get() (k, v, error) {
 	if err := iter.err; err != nil {
 		var key k
 		var value v
@@ -64,14 +65,6 @@ func (iter *KV[k, v]) GetKV() (k, v, error) {
 	var key *k = (*k)(iterkey)
 	var value *v = (*v)(iterelem)
 	return *key, *value, nil
-}
-
-func (iter *KV[k, v]) Get() (*typ.KV[k, v], error) {
-	key, val, err := iter.GetKV()
-	if err != nil {
-		return nil, err
-	}
-	return K.V(key, val), nil
 }
 
 //go:linkname mapiterinit reflect.mapiterinit
@@ -118,7 +111,7 @@ type ReflectKV[k comparable, v any] struct {
 	err      error
 }
 
-var _ typ.Iterator[*typ.KV[any, any]] = (*ReflectKV[any, any])(nil)
+var _ typ.KVIterator[any, any] = (*ReflectKV[any, any])(nil)
 
 func (iter *ReflectKV[k, v]) HasNext() bool {
 	next := iter.iter.Next()
@@ -128,7 +121,7 @@ func (iter *ReflectKV[k, v]) HasNext() bool {
 	return next
 }
 
-func (iter *ReflectKV[k, v]) GetKV() (k, v, error) {
+func (iter *ReflectKV[k, v]) Get() (k, v, error) {
 	if err := iter.err; err != nil {
 		var key k
 		var value v
@@ -137,14 +130,6 @@ func (iter *ReflectKV[k, v]) GetKV() (k, v, error) {
 	key := iter.iter.Key().Interface().(k)
 	value := iter.iter.Value().Interface().(v)
 	return key, value, nil
-}
-
-func (iter *ReflectKV[k, v]) Get() (*typ.KV[k, v], error) {
-	key, value, err := iter.GetKV()
-	if err != nil {
-		return nil, err
-	}
-	return K.V(key, value), nil
 }
 
 func (s *ReflectKV[k, v]) Reset() {
