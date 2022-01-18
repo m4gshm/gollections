@@ -1,4 +1,4 @@
-package map_
+package omap
 
 import (
 	"testing"

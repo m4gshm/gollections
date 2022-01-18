@@ -1,4 +1,4 @@
-package map_
+package omap
 
 import (
 	"github.com/m4gshm/gollections/K"
@@ -11,7 +11,7 @@ import (
 	"github.com/m4gshm/gollections/typ"
 )
 
-func ToOrderedMap[k comparable, v any](elements []*typ.KV[k, v]) *OrderedMap[k, v] {
+func Convert[k comparable, v any](elements []*typ.KV[k, v]) *OrderedMap[k, v] {
 	var (
 		uniques = make(map[k]v, 0)
 		order   = make([]*k, 0, 0)
@@ -24,11 +24,23 @@ func ToOrderedMap[k comparable, v any](elements []*typ.KV[k, v]) *OrderedMap[k, 
 			uniques[key] = val
 		}
 	}
-	return &OrderedMap[k, v]{elements: order, uniques: uniques}
+	return Wrap[k, v](elements: order, uniques: uniques)
 }
 
-func NewOrderedMap[k comparable, v any](capacity int) *OrderedMap[k, v] {
-	return &OrderedMap[k, v]{elements: make([]*k, 0, capacity), uniques: make(map[k]v, capacity)}
+func ConvertMap[k comparable, v any](elements map[k]v) *OrderedMap[k, v] {
+	var (
+		uniques = make(map[k]v, len(elements))
+		order   = make([]*k, len(elements))
+	)
+	for key, val := range elements {
+		order = append(order, &key)
+		uniques[key] = val
+	}
+	return Wrap(order, uniques)
+}
+
+func Wrap[k comparable, v any](order []*k, uniques map[k]v) *OrderedMap[k, v] {
+	return &OrderedMap[k, v]{elements: order, uniques: uniques}
 }
 
 type OrderedMap[k comparable, v any] struct {
