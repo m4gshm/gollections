@@ -30,7 +30,7 @@ func (s *Vector[T]) Begin() typ.Iterator[T] {
 }
 
 func (s *Vector[T]) Iter() *it.RefIter[T] {
-	return &it.RefIter[T]{Iterator: s.Vector.Iter()}
+	return it.WrapRef(s.Vector.Iter())
 }
 
 func (s *Vector[T]) Collect() []T {

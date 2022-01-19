@@ -20,11 +20,11 @@ type ValIter[k comparable, v any] struct {
 var _ typ.Iterator[any] = (*ValIter[any, any])(nil)
 
 func (s *ValIter[k, v]) HasNext() bool {
-	return it.HasNext(s.elements, &s.current, &s.err)
+	return it.HasNext(&s.elements, &s.current, &s.err)
 }
 
 func (s *ValIter[k, v]) Get() (v, error) {
-	kref, err := it.Get(s.current, s.elements, s.err)
+	kref, err := it.Get(s.current, &s.elements, s.err)
 	if err != nil {
 		var no v
 		return no, err

@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/m4gshm/gollections/it/impl/it"
+	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/typ"
@@ -47,16 +48,11 @@ func (s *Set[k, v]) Collect() []k {
 }
 
 func (s *Set[k, v]) For(walker func(k) error) error {
-	for e := range s.uniques {
-		if err := walker(e); err != nil {
-			return err
-		}
-	}
-	return nil
+	return map_.ForKeys(s.uniques, walker)
 }
 
 func (s *Set[k, v]) ForEach(walker func(k)) error {
-	return s.For(func(t k) error { walker(t); return nil })
+	return map_.ForEachKey(s.uniques, walker)
 }
 
 func (s *Set[k, v]) Filter(filter typ.Predicate[k]) typ.Pipe[k, []k, typ.Iterator[k]] {

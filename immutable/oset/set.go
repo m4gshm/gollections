@@ -42,7 +42,7 @@ func (s *OrderedSet[T]) Begin() typ.Iterator[T] {
 }
 
 func (s *OrderedSet[T]) Iter() *it.RefIter[T] {
-	return &it.RefIter[T]{Iterator: it.New(s.elements)}
+	return it.NewRef(&s.elements)
 }
 
 func (s *OrderedSet[T]) Collect() []T {
@@ -55,16 +55,11 @@ func (s *OrderedSet[T]) Collect() []T {
 }
 
 func (s *OrderedSet[T]) For(walker func(T) error) error {
-	for _, e := range s.elements {
-		if err := walker(*e); err != nil {
-			return err
-		}
-	}
-	return nil
+	return slice.ForRefs(s.elements, walker)
 }
 
 func (s *OrderedSet[T]) ForEach(walker func(T)) error {
-	return s.For(func(t T) error { walker(t); return nil })
+	return slice.ForEachRef(s.elements, walker)
 }
 
 func (s *OrderedSet[T]) Filter(filter typ.Predicate[T]) typ.Pipe[T, []T, typ.Iterator[T]] {

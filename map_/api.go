@@ -1,7 +1,6 @@
-package slice
+package map_
 
 import (
-	"constraints"
 	"fmt"
 
 	"github.com/m4gshm/gollections/check"
@@ -9,100 +8,43 @@ import (
 	"github.com/m4gshm/gollections/typ"
 )
 
-//Of - constructor
-func Of[T any](elements ...T) []T {
-	return elements
-}
-
 //Copy - makes a new slice with copied elements
-func Copy[T any](elements []T) []T {
-	copied := make([]T, len(elements))
-	copy(copied, elements)
+func Copy[m map[k]v, k comparable, v any](elements m) m {
+	var copied m
+	for key, val := range elements {
+		copied[key] = val
+	}
 	return copied
 }
 
-func Delete[T any](index int, elements []T) []T {
-	return append(elements[0:index], elements[index+1:]...)
-}
-
-func Group[T any, K comparable](elements []T, by typ.Converter[T, K]) map[K][]T {
-	groups := map[K][]T{}
-	for _, e := range elements {
-		key := by(e)
-		group := groups[key]
-		if group == nil {
-			group = make([]T, 0)
-		}
-		groups[key] = append(group, e)
-
-	}
-	return groups
-}
-
-func Range[T constraints.Integer](from T, to T) []T {
-	if to == from {
-		return []T{to}
-	}
-	amount := to - from
-	delta := 1
-	if amount < 0 {
-		amount = -amount
-		delta = -1
-	}
-	amount = amount + 1
-	elements := make([]T, amount)
-	e := from
-	for i := 0; i < int(amount); i++ {
-		elements[i] = e
-		e = e + T(delta)
-	}
-	return elements
-}
-
-func Track[T any](elements []T, tracker func(int, T) error) error {
-	for i, e := range elements {
-		if err := tracker(i, e); err != nil {
+func Track[m map[k]v, k comparable, v any](elements m, tracker func(k, v) error) error {
+	for key, val := range elements {
+		if err := tracker(key, val); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func TrackEach[T any](elements []T, tracker func(int, T)) error {
-	for i, e := range elements {
-		tracker(i, e)
+func TrackEach[m map[k]v, k comparable, v any](elements m, tracker func(k, v)) error {
+	for key, val := range elements {
+		tracker(key, val)
 	}
 	return nil
 }
 
-func For[T any](elements []T, walker func(T) error) error {
-	for _, e := range elements {
-		if err := walker(e); err != nil {
+func ForKeys[m map[k]v, k comparable, v any](elements m, walker func(k) error) error {
+	for key := range elements {
+		if err := walker(key); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func ForEach[T any](elements []T, walker func(T)) error {
-	for _, e := range elements {
-		walker(e)
-	}
-	return nil
-}
-
-func ForRefs[T any](elements []*T, walker func(T) error) error {
-	for _, e := range elements {
-		if err := walker(*e); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func ForEachRef[T any](elements []*T, walker func(T)) error {
-	for _, e := range elements {
-		walker(*e)
+func ForEachKey[m map[k]v, k comparable, v any](elements m, walker func(k)) error {
+	for key := range elements {
+		walker(key)
 	}
 	return nil
 }

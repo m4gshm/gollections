@@ -22,11 +22,11 @@ var _ typ.Iterator[any] = (*Iter[any])(nil)
 var _ mutable.Iterator[any] = (*Iter[any])(nil)
 
 func (i *Iter[T]) HasNext() bool {
-	return it.HasNext(*i.elements, &i.current, &i.err)
+	return it.HasNext(i.elements, &i.current, &i.err)
 }
 
 func (i *Iter[T]) Get() (T, error) {
-	v, err := it.Get(i.current, *i.elements, i.err)
+	v, err := it.Get(i.current, i.elements, i.err)
 	if err != nil {
 		var no T
 		return no, err

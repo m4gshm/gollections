@@ -4,9 +4,11 @@ import (
 	"testing"
 
 	"github.com/m4gshm/gollections/immutable/oset"
+	"github.com/m4gshm/gollections/immutable/set"
 	"github.com/m4gshm/gollections/immutable/vector"
 	"github.com/m4gshm/gollections/it"
 	impliter "github.com/m4gshm/gollections/it/impl/it"
+
 	mset "github.com/m4gshm/gollections/mutable/set"
 	"github.com/m4gshm/gollections/slice/range_"
 )
@@ -17,7 +19,7 @@ var (
 	result = 0
 )
 
-func Benchmark_ForEach_Immutable_Vector(b *testing.B) {
+func Benchmark_ForEach_Immutable_Vector_ByOf(b *testing.B) {
 	c := vector.Of(values...)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -27,8 +29,18 @@ func Benchmark_ForEach_Immutable_Vector(b *testing.B) {
 	_ = result
 }
 
-func Benchmark_ForEach_Immutable_Vector_Impl(b *testing.B) {
+func Benchmark_ForEach_Immutable_Vector_ByNew(b *testing.B) {
 	c := vector.New(values)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_ = c.ForEach(func(v int) { result = v })
+	}
+	b.StopTimer()
+	_ = result
+}
+
+func Benchmark_ForEach_Immutable_Vector_Impl(b *testing.B) {
+	c := vector.Convert(values)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_ = c.ForEach(func(v int) { result = v })
@@ -56,6 +68,26 @@ func Benchmark_ForRange_of_Collect_Immutable_Vector_Impl_Values(b *testing.B) {
 		for _, v := range c.Collect() {
 			result = v
 		}
+	}
+	b.StopTimer()
+	_ = result
+}
+
+func Benchmark_ForEach_Immutable_Set(b *testing.B) {
+	c := set.Of(values...)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_ = c.ForEach(func(v int) { result = v })
+	}
+	b.StopTimer()
+	_ = result
+}
+
+func Benchmark_ForEach_Immutable_Set_Impl(b *testing.B) {
+	c := set.Convert(values)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_ = c.ForEach(func(v int) { result = v })
 	}
 	b.StopTimer()
 	_ = result
@@ -164,6 +196,17 @@ func Benchmark_HasNextGet_Iterator_Impl(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		for it := impliter.New(values); it.HasNext(); {
+			result, _ = it.Get()
+		}
+	}
+	b.StopTimer()
+	_ = result
+}
+
+func Benchmark_HasNextGet_Iterator_Impl_Point(b *testing.B) {
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		for it := impliter.NewP(&values); it.HasNext(); {
 			result, _ = it.Get()
 		}
 	}

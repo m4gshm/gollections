@@ -29,8 +29,8 @@ func (s *Vector[T]) Begin() typ.Iterator[T] {
 	return s.Iter()
 }
 
-func (s *Vector[T]) Iter() *it.Iter[T] {
-	return it.New(*s.elements)
+func (s *Vector[T]) Iter() *it.PIter[T] {
+	return it.NewP(s.elements)
 }
 
 func (s *Vector[T]) Collect() []T {
@@ -38,28 +38,23 @@ func (s *Vector[T]) Collect() []T {
 }
 
 func (s *Vector[T]) Track(tracker func(int, T) error) error {
-	for i, e := range *s.elements {
-		if err := tracker(i, e); err != nil {
-			return err
-		}
-	}
-	return nil
+	return slice.Track(*s.elements, tracker)
 }
 
 func (s *Vector[T]) TrackEach(tracker func(int, T)) error {
-	return s.Track(func(i int, value T) error { tracker(i, value); return nil })
+	return slice.TrackEach(*s.elements, tracker)
 }
 
 func (s *Vector[T]) For(walker func(T) error) error {
-	return s.Track(func(i int, value T) error { return walker(value) })
+	return slice.For(*s.elements, walker)
 }
 
 func (s *Vector[T]) ForEach(walker func(T)) error {
-	return s.TrackEach(func(_ int, value T) { walker(value) })
+	return slice.ForEach(*s.elements, walker)
 }
 
 func (s *Vector[T]) Len() int {
-	return len(*s.elements)
+	return it.GetLen(s.elements)
 }
 
 func (s *Vector[T]) Get(index int) (T, bool) {

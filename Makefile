@@ -18,7 +18,7 @@ build: gofmt govet errcheck
 .PHONY: bench
 bench:
 	$(info #Running benchmarks...)
-	go test -bench . -benchmem ./...
+	go test -benchtime 3s -bench . -benchmem ./...
 
 .PHONY: gofmt
 gofmt:
