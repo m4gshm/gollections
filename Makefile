@@ -22,6 +22,7 @@ bench:
 
 .PHONY: gofmt
 gofmt:
+	go version
 	go fmt ./...
 
 .PHONY: govet

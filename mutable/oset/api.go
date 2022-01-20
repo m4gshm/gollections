@@ -1,4 +1,4 @@
-package set
+package oset
 
 import (
 	"github.com/m4gshm/gollections/mutable"

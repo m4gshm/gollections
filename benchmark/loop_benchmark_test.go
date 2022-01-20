@@ -10,7 +10,7 @@ import (
 	"github.com/m4gshm/gollections/it"
 	impliter "github.com/m4gshm/gollections/it/impl/it"
 
-	mset "github.com/m4gshm/gollections/mutable/set"
+	moset "github.com/m4gshm/gollections/mutable/oset"
 	"github.com/m4gshm/gollections/slice/range_"
 )
 
@@ -166,7 +166,7 @@ func Benchmark_ForRange_of_Collect_Immutable_OrdererSet_Impl_Values(b *testing.B
 }
 
 func Benchmark_ForEach_Mutable_OrdererSet(b *testing.B) {
-	c := mset.ToOrderedSet(values)
+	c := moset.ToOrderedSet(values)
 	for _, case_ := range cases {
 		b.Run(case_.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
@@ -177,7 +177,7 @@ func Benchmark_ForEach_Mutable_OrdererSet(b *testing.B) {
 }
 
 func Benchmark_ForEach_Mutable_OrdererSet_Impl(b *testing.B) {
-	c := mset.ToOrderedSet(values)
+	c := moset.ToOrderedSet(values)
 	for _, case_ := range cases {
 		b.Run(case_.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
@@ -276,7 +276,7 @@ func Benchmark_ForRange_EmbeddedSlice(b *testing.B) {
 }
 
 func Benchmark_ForByIndex_EmbeddedSlice(b *testing.B) {
-	vector.Of(cases...).ForEach(func(case_ benchCase) {
+	for _, case_ := range cases {
 		b.Run(case_.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				for j := 0; j < len(values); j++ {
@@ -285,7 +285,7 @@ func Benchmark_ForByIndex_EmbeddedSlice(b *testing.B) {
 				}
 			}
 		})
-	})
+	}
 }
 
 func Benchmark_WrapMap_HasNextGet(b *testing.B) {
