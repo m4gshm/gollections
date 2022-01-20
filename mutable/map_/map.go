@@ -35,9 +35,9 @@ func Wrap[k comparable, v any](uniques map[k]v) *Map[k, v] {
 }
 
 type Map[k comparable, v any] struct {
-	changeMark int32
 	uniques    map[k]v
 	err        error
+	changeMark int32
 }
 
 var _ mutable.Map[any, any, typ.KVIterator[any, any]] = (*Map[any, any])(nil)
