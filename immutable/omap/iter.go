@@ -31,3 +31,7 @@ func (s *ValIter[k, v]) Get() (v, error) {
 	}
 	return s.uniques[*kref], nil
 }
+
+func (s *ValIter[k, v]) Next() v {
+	return it.Next[v](s)
+}

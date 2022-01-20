@@ -29,6 +29,10 @@ func (i *Iter[T]) Get() (T, error) {
 	return it.Get(i.current, *i.elements, i.err)
 }
 
+func (s *Iter[T]) Next() T {
+	return it.Next[T](s)
+}
+
 func (i *Iter[T]) Delete() (bool, error) {
 	pos := i.current
 	if deleted, err := i.del(pos); err != nil {
@@ -58,6 +62,10 @@ func (i *RefIter[T]) Get() (T, error) {
 		return no, err
 	}
 	return *v, nil
+}
+
+func (s *RefIter[T]) Next() T {
+	return it.Next[T](s)
 }
 
 func (i *RefIter[T]) Delete() (bool, error) {

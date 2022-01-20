@@ -28,6 +28,10 @@ func (s *Fit[T]) Get() (T, error) {
 	return s.current, s.err
 }
 
+func (s *Fit[T]) Next() T {
+	return Next[T](s)
+}
+
 type FitKV[k, v any] struct {
 	Iter typ.KVIterator[k, v]
 	By   typ.BiPredicate[k, v]
@@ -52,6 +56,10 @@ func (s *FitKV[k, v]) HasNext() bool {
 
 func (s *FitKV[k, v]) Get() (k, v, error) {
 	return s.currentK, s.currentV, s.err
+}
+
+func (s *FitKV[k, v]) Next() (k, v) {
+	return NextKV[k, v](s)
 }
 
 func nextFiltered[T any](iter typ.Iterator[T], filter typ.Predicate[T]) (T, bool, error) {

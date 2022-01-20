@@ -18,7 +18,7 @@ type FlattenFit[From, To any] struct {
 	err        error
 }
 
-var _ typ.Iterator[interface{}] = (*FlattenFit[interface{}, interface{}])(nil)
+var _ typ.Iterator[any] = (*FlattenFit[any, any])(nil)
 
 func (s *FlattenFit[From, To]) HasNext() bool {
 	if elementsTo := s.elementsTo; len(elementsTo) > 0 {
@@ -54,6 +54,10 @@ func (s *FlattenFit[From, To]) Get() (To, error) {
 	return s.current, s.err
 }
 
+func (s *FlattenFit[From, To]) Next() To {
+	return it.Next[To](s)
+}
+
 type Flatten[From, To any] struct {
 	Elements []From
 	Flatt    typ.Flatter[From, To]
@@ -65,7 +69,7 @@ type Flatten[From, To any] struct {
 	err        error
 }
 
-var _ typ.Iterator[interface{}] = (*Flatten[interface{}, interface{}])(nil)
+var _ typ.Iterator[any] = (*Flatten[any, any])(nil)
 
 func (s *Flatten[From, To]) HasNext() bool {
 	if elementsTo := s.elementsTo; len(elementsTo) > 0 {
@@ -98,4 +102,8 @@ func (s *Flatten[From, To]) HasNext() bool {
 
 func (s *Flatten[From, To]) Get() (To, error) {
 	return s.current, s.err
+}
+
+func (s *Flatten[From, To]) Next() To {
+	return it.Next[To](s)
 }

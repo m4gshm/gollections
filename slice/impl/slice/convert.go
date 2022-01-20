@@ -15,7 +15,7 @@ type ConvertFit[From, To any] struct {
 	err     error
 }
 
-var _ typ.Iterator[interface{}] = (*ConvertFit[interface{}, interface{}])(nil)
+var _ typ.Iterator[any] = (*ConvertFit[any, any])(nil)
 
 func (s *ConvertFit[From, To]) HasNext() bool {
 	if v, ok := nextArrayElem(s.Elements, s.Fit, &s.i); ok {
@@ -30,6 +30,10 @@ func (s *ConvertFit[From, To]) Get() (To, error) {
 	return s.current, s.err
 }
 
+func (s *ConvertFit[From, To]) Next() To {
+	return it.Next[To](s)
+}
+
 type Convert[From, To any] struct {
 	Elements []From
 	By       typ.Converter[From, To]
@@ -39,7 +43,7 @@ type Convert[From, To any] struct {
 	err     error
 }
 
-var _ typ.Iterator[interface{}] = (*Convert[interface{}, interface{}])(nil)
+var _ typ.Iterator[any] = (*Convert[any, any])(nil)
 
 func (s *Convert[From, To]) HasNext() bool {
 	e := s.Elements
@@ -57,6 +61,10 @@ func (s *Convert[From, To]) HasNext() bool {
 
 func (s *Convert[From, To]) Get() (To, error) {
 	return s.current, s.err
+}
+
+func (s *Convert[From, To]) Next() To {
+	return it.Next[To](s)
 }
 
 func nextArrayElem[T any](elements []T, filter typ.Predicate[T], indexHolder *int) (T, bool) {

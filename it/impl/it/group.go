@@ -29,3 +29,7 @@ func (s *KeyValuer[k, v]) Get() (k, v, error) {
 	}
 	return s.getKey(val), val, nil
 }
+
+func (s *KeyValuer[k, v]) Next() (k, v) {
+	return NextKV[k, v](s)
+}

@@ -56,6 +56,10 @@ func (s *Iter[T]) Get() (T, error) {
 	return r, nil
 }
 
+func (s *Iter[T]) Next() T {
+	return Next[T](s)
+}
+
 func (s *Iter[T]) Position() int {
 	return s.current
 }
@@ -100,6 +104,10 @@ func (s *PIter[T]) HasNext() bool {
 
 func (s *PIter[T]) Get() (T, error) {
 	return *GetArrayElem[T](s.array, s.current, s.arrayElementSize), nil
+}
+
+func (s *PIter[T]) Next() T {
+	return Next[T](s)
 }
 
 type sliceType struct {

@@ -12,7 +12,7 @@ type ConvertFit[From, To any] struct {
 	err     error
 }
 
-var _ typ.Iterator[interface{}] = (*ConvertFit[interface{}, interface{}])(nil)
+var _ typ.Iterator[any] = (*ConvertFit[any, any])(nil)
 
 func (s *ConvertFit[From, To]) HasNext() bool {
 	if v, ok, err := nextFiltered(s.Iter, s.Fit); err != nil {
@@ -28,6 +28,10 @@ func (s *ConvertFit[From, To]) HasNext() bool {
 
 func (s *ConvertFit[From, To]) Get() (To, error) {
 	return s.current, s.err
+}
+
+func (s *ConvertFit[From, To]) Next() To {
+	return Next[To](s)
 }
 
 type Convert[From, To any, IT typ.Iterator[From], C typ.Converter[From, To]] struct {
@@ -50,6 +54,14 @@ func (s *Convert[From, To, IT, C]) Get() (To, error) {
 	return s.By(v), nil
 }
 
+func (s *Convert[From, To, IT, C]) Next() To {
+	v, err := s.Iter.Get()
+	if err != nil {
+		panic(err)
+	}
+	return s.By(v)
+}
+
 type ConvertKV[k, v any, IT typ.KVIterator[k, v], k2, v2 any, C typ.BiConverter[k, v, k2, v2]] struct {
 	Iter IT
 	By   C
@@ -70,4 +82,8 @@ func (s *ConvertKV[k, v, IT, k2, v2, C]) Get() (k2, v2, error) {
 	}
 	key1, val2 := s.By(key, val)
 	return key1, val2, nil
+}
+
+func (s *ConvertKV[k, v, IT, k2, v2, C]) Next() (k2, v2) {
+	return NextKV[k2, v2](s)
 }

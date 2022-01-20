@@ -39,13 +39,13 @@ func NotNil[T any, IT typ.Iterator[*T]](elements IT) *Fit[*T] {
 //ForEach applies func on elements
 func ForEach[T any, IT typ.Iterator[T]](elements IT, apply func(T)) {
 	for elements.HasNext() {
-		apply(get[T](elements))
+		apply(Next[T](elements))
 	}
 }
 
 func ForEachFit[T any, IT typ.Iterator[T]](elements IT, apply func(T), fit typ.Predicate[T]) {
 	for elements.HasNext() {
-		if v := get[T](elements); fit(v) {
+		if v := Next[T](elements); fit(v) {
 			apply(v)
 		}
 	}
@@ -57,9 +57,9 @@ func Reduce[T any, IT typ.Iterator[T]](elements IT, by op.Binary[T]) T {
 		var nothing T
 		return nothing
 	}
-	result := get[T](elements)
+	result := Next[T](elements)
 	for elements.HasNext() {
-		result = by(result, get[T](elements))
+		result = by(result, Next[T](elements))
 	}
 	return result
 }
@@ -70,9 +70,9 @@ func ReduceKV[k, v any, IT typ.KVIterator[k, v]](elements IT, by op.Quaternary[k
 		var val v
 		return key, val
 	}
-	key, val := getKV[k, v](elements)
+	key, val := NextKV[k, v](elements)
 	for elements.HasNext() {
-		key2, val2 := getKV[k, v](elements)
+		key2, val2 := NextKV[k, v](elements)
 		key, val = by(key, val, key2, val2)
 	}
 	return key, val
@@ -83,13 +83,13 @@ func Slice[T any, IT typ.Iterator[T]](elements IT) []T {
 	s := make([]T, 0)
 
 	for elements.HasNext() {
-		s = append(s, get[T](elements))
+		s = append(s, Next[T](elements))
 	}
 
 	return s
 }
 
-func get[T any, IT typ.Iterator[T]](elements IT) T {
+func Next[T any, IT typ.Iterator[T]](elements IT) T {
 	n, err := elements.Get()
 	if err != nil {
 		panic(err)
@@ -97,7 +97,7 @@ func get[T any, IT typ.Iterator[T]](elements IT) T {
 	return n
 }
 
-func getKV[k, v any, IT typ.KVIterator[k, v]](elements IT) (k, v) {
+func NextKV[k, v any, IT typ.KVIterator[k, v]](elements IT) (k, v) {
 	key, val, err := elements.Get()
 	if err != nil {
 		panic(err)

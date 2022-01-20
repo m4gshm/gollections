@@ -34,6 +34,10 @@ func (i *Iter[T]) Get() (T, error) {
 	return *v, nil
 }
 
+func (s *Iter[T]) Next() T {
+	return it.Next[T](s)
+}
+
 func (i *Iter[T]) Delete() (bool, error) {
 	pos := i.current
 	if e, err := i.Get(); err != nil {

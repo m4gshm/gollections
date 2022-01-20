@@ -27,3 +27,7 @@ func (i *RefIter[T]) Get() (T, error) {
 	}
 	return *v, nil
 }
+
+func (i *RefIter[T]) Next() T {
+	return Next[T](i)
+}

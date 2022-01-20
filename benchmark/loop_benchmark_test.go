@@ -1,6 +1,7 @@
 package benchmark
 
 import (
+	"strconv"
 	"testing"
 
 	"github.com/m4gshm/gollections/immutable/oset"
@@ -14,255 +15,294 @@ import (
 )
 
 var (
-	max    = 100000
-	values = range_.Of(1, max)
-	result = 0
+	max       = 100000
+	values    = range_.Of(1, max)
+	ResultStr = strconv.Itoa(ResultInt)
+	ResultInt = 0
 )
+
+func HighLoad(v int) {
+	ResultStr = strconv.Itoa(v)
+}
+
+func LowLoad(v int) {
+	ResultInt = v * v
+}
+
+type benchCase struct {
+	name string
+	load func(int)
+}
+
+var cases = []benchCase{{"high", HighLoad}, {"low", LowLoad}}
 
 func Benchmark_ForEach_Immutable_Vector_ByOf(b *testing.B) {
 	c := vector.Of(values...)
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		_ = c.ForEach(func(v int) { result = v })
+	for _, case_ := range cases {
+		b.Run(case_.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				_ = c.ForEach(func(v int) { case_.load(v) })
+			}
+		})
 	}
-	b.StopTimer()
-	_ = result
 }
 
 func Benchmark_ForEach_Immutable_Vector_ByNew(b *testing.B) {
 	c := vector.New(values)
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		_ = c.ForEach(func(v int) { result = v })
+	for _, case_ := range cases {
+		b.Run(case_.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				_ = c.ForEach(func(v int) { case_.load(v) })
+			}
+		})
 	}
-	b.StopTimer()
-	_ = result
 }
 
 func Benchmark_ForEach_Immutable_Vector_Impl(b *testing.B) {
 	c := vector.Convert(values)
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		_ = c.ForEach(func(v int) { result = v })
+	for _, case_ := range cases {
+		b.Run(case_.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				_ = c.ForEach(func(v int) { case_.load(v) })
+			}
+		})
 	}
-	b.StopTimer()
-	_ = result
 }
 
 func Benchmark_ForRange_of_Collect_Immutable_Vector_Values(b *testing.B) {
 	c := vector.Of(values...)
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		for _, v := range c.Collect() {
-			result = v
-		}
+	for _, case_ := range cases {
+		b.Run(case_.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for _, v := range c.Collect() {
+					case_.load(v)
+				}
+			}
+		})
 	}
-	b.StopTimer()
-	_ = result
 }
 
 func Benchmark_ForRange_of_Collect_Immutable_Vector_Impl_Values(b *testing.B) {
 	c := vector.New(values)
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		for _, v := range c.Collect() {
-			result = v
-		}
+	for _, case_ := range cases {
+		b.Run(case_.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for _, v := range c.Collect() {
+					case_.load(v)
+				}
+			}
+		})
 	}
-	b.StopTimer()
-	_ = result
 }
 
 func Benchmark_ForEach_Immutable_Set(b *testing.B) {
 	c := set.Of(values...)
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		_ = c.ForEach(func(v int) { result = v })
+	for _, case_ := range cases {
+		b.Run(case_.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				_ = c.ForEach(func(v int) { case_.load(v) })
+			}
+		})
 	}
-	b.StopTimer()
-	_ = result
 }
 
 func Benchmark_ForEach_Immutable_Set_Impl(b *testing.B) {
 	c := set.Convert(values)
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		_ = c.ForEach(func(v int) { result = v })
+	for _, case_ := range cases {
+		b.Run(case_.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				_ = c.ForEach(func(v int) { case_.load(v) })
+			}
+		})
 	}
-	b.StopTimer()
-	_ = result
 }
 
 func Benchmark_ForEach_Immutable_OrdererSet(b *testing.B) {
 	c := oset.Of(values...)
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		_ = c.ForEach(func(v int) { result = v })
+	for _, case_ := range cases {
+		b.Run(case_.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				_ = c.ForEach(func(v int) { case_.load(v) })
+			}
+		})
 	}
-	b.StopTimer()
-	_ = result
 }
 
 func Benchmark_ForEach_Immutable_OrdererSet_Impl(b *testing.B) {
 	c := oset.Convert(values)
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		_ = c.ForEach(func(v int) { result = v })
+	for _, case_ := range cases {
+		b.Run(case_.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				_ = c.ForEach(func(v int) { case_.load(v) })
+			}
+		})
 	}
-	b.StopTimer()
-	_ = result
 }
 
 func Benchmark_ForRange_of_Collect_Immutable_OrdererSet_Values(b *testing.B) {
 	c := oset.Of(values...)
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		for _, v := range c.Collect() {
-			result = v
-		}
+	for _, case_ := range cases {
+		b.Run(case_.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for _, v := range c.Collect() {
+					case_.load(v)
+				}
+			}
+		})
 	}
-	b.StopTimer()
-	_ = result
 }
 
 func Benchmark_ForRange_of_Collect_Immutable_OrdererSet_Impl_Values(b *testing.B) {
 	c := oset.Of(values...)
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		for _, v := range c.Collect() {
-			result = v
-		}
+	for _, case_ := range cases {
+		b.Run(case_.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for _, v := range c.Collect() {
+					case_.load(v)
+				}
+			}
+		})
 	}
-	b.StopTimer()
-	_ = result
 }
 
 func Benchmark_ForEach_Mutable_OrdererSet(b *testing.B) {
-	set := mset.ToOrderedSet(values)
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		_ = set.ForEach(func(v int) { result = v })
+	c := mset.ToOrderedSet(values)
+	for _, case_ := range cases {
+		b.Run(case_.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				_ = c.ForEach(func(v int) { case_.load(v) })
+			}
+		})
 	}
-	b.StopTimer()
-	_ = result
 }
 
 func Benchmark_ForEach_Mutable_OrdererSet_Impl(b *testing.B) {
-	set := mset.ToOrderedSet(values)
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		_ = set.ForEach(func(v int) { result = v })
+	c := mset.ToOrderedSet(values)
+	for _, case_ := range cases {
+		b.Run(case_.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				_ = c.ForEach(func(v int) { case_.load(v) })
+			}
+		})
 	}
-	b.StopTimer()
-	_ = result
 }
 
 func Benchmark_HasNextGet_Iterator_Immutable_Vector(b *testing.B) {
 	c := vector.Of(values...)
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		for it := c.Begin(); it.HasNext(); {
-			result, _ = it.Get()
-		}
+	for _, case_ := range cases {
+		b.Run(case_.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for it := c.Begin(); it.HasNext(); {
+					case_.load(it.Next())
+				}
+			}
+		})
 	}
-	b.StopTimer()
-	_ = result
 }
 
 func Benchmark_HasNextGet_Iterator_Immutable_Vector_Impl(b *testing.B) {
 	c := vector.Convert(values)
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		for it := c.Iter(); it.HasNext(); {
-			result, _ = it.Get()
-		}
+	for _, case_ := range cases {
+		b.Run(case_.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for it := c.Iter(); it.HasNext(); {
+					case_.load(it.Next())
+				}
+			}
+		})
 	}
-	b.StopTimer()
-	_ = result
 }
 
 func Benchmark_HasNextGet_Iterator_WrapSlice(b *testing.B) {
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		for it := it.Wrap(values); it.HasNext(); {
-			result, _ = it.Get()
-		}
+	for _, case_ := range cases {
+		b.Run(case_.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for it := it.Wrap(values); it.HasNext(); {
+					case_.load(it.Next())
+				}
+			}
+		})
 	}
-	b.StopTimer()
-	_ = result
 }
 
 func Benchmark_HasNextGet_Iterator_Impl(b *testing.B) {
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		for it := impliter.New(values); it.HasNext(); {
-			result, _ = it.Get()
-		}
+	for _, case_ := range cases {
+		b.Run(case_.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for it := impliter.New(values); it.HasNext(); {
+					case_.load(it.Next())
+				}
+			}
+		})
 	}
-	b.StopTimer()
-	_ = result
 }
 
 func Benchmark_HasNextGet_Iterator_Impl_Point(b *testing.B) {
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		for it := impliter.NewP(&values); it.HasNext(); {
-			result, _ = it.Get()
-		}
+	for _, case_ := range cases {
+		b.Run(case_.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for it := impliter.NewP(&values); it.HasNext(); {
+					case_.load(it.Next())
+				}
+			}
+		})
 	}
-	b.StopTimer()
-	_ = result
 }
 
 func Benchmark_HasNextGet_Iterator_Impl_Reseteable(b *testing.B) {
 	it := impliter.NewReseteable(values)
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		for it.HasNext() {
-			result, _ = it.Get()
-		}
-		it.Reset()
+	for _, case_ := range cases {
+		b.Run(case_.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for it.HasNext() {
+					case_.load(it.Next())
+				}
+				it.Reset()
+			}
+		})
 	}
-	b.StopTimer()
-	_ = result
 }
 
 func Benchmark_ForRange_EmbeddedSlice(b *testing.B) {
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		for _, v := range values {
-			result = v
-		}
+	for _, case_ := range cases {
+		b.Run(case_.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for _, v := range values {
+					case_.load(v)
+				}
+			}
+		})
 	}
-	b.StopTimer()
-	_ = result
 }
 
 func Benchmark_ForByIndex_EmbeddedSlice(b *testing.B) {
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		for j := 0; j < len(values); j++ {
-			v := values[j]
-			result = v
-		}
-	}
-	b.StopTimer()
-	_ = result
+	vector.Of(cases...).ForEach(func(case_ benchCase) {
+		b.Run(case_.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for j := 0; j < len(values); j++ {
+					v := values[j]
+					case_.load(v)
+				}
+			}
+		})
+	})
 }
 
 func Benchmark_WrapMap_HasNextGet(b *testing.B) {
-	values := map[int]int{}
+	values := map[int]struct{}{}
 	for i := 0; i < max; i++ {
-		values[i] = i
+		values[i] = struct{}{}
 	}
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		iter := it.WrapMap(values)
-		for iter.HasNext() {
-			_, _, _ = iter.Get()
-		}
+	for _, case_ := range cases {
+		b.Run(case_.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for k, v := range values {
+					_ = v
+					case_.load(k)
+				}
+			}
+		})
 	}
-	b.StopTimer()
 }
 
 func Benchmark_NewKVHasNextGet(b *testing.B) {
@@ -270,13 +310,17 @@ func Benchmark_NewKVHasNextGet(b *testing.B) {
 	for i := 0; i < max; i++ {
 		values[i] = i
 	}
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		for iter := impliter.NewKV(values); iter.HasNext(); {
-			_, _, _ = iter.Get()
-		}
+	for _, case_ := range cases {
+		b.Run(case_.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for iter := impliter.NewKV(values); iter.HasNext(); {
+					k, v := iter.Next()
+					_ = v
+					case_.load(k)
+				}
+			}
+		})
 	}
-	b.StopTimer()
 }
 
 func Benchmark_NewReflectKVHasNextGet(b *testing.B) {
@@ -284,13 +328,17 @@ func Benchmark_NewReflectKVHasNextGet(b *testing.B) {
 	for i := 0; i < max; i++ {
 		values[i] = i
 	}
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		for iter := impliter.NewReflectKV(values); iter.HasNext(); {
-			_, _, _ = iter.Get()
-		}
+	for _, case_ := range cases {
+		b.Run(case_.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for iter := impliter.NewReflectKV(values); iter.HasNext(); {
+					k, v := iter.Next()
+					_ = v
+					case_.load(k)
+				}
+			}
+		})
 	}
-	b.StopTimer()
 }
 
 func Benchmark_EmbeddedMap_For(b *testing.B) {
@@ -298,12 +346,14 @@ func Benchmark_EmbeddedMap_For(b *testing.B) {
 	for i := 0; i < max; i++ {
 		values[i] = i
 	}
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		for k, v := range values {
-			_ = k
-			_ = v
-		}
+	for _, case_ := range cases {
+		b.Run(case_.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for k, v := range values {
+					_ = v
+					case_.load(k)
+				}
+			}
+		})
 	}
-	b.StopTimer()
 }

@@ -67,6 +67,10 @@ func (iter *KV[k, v]) Get() (k, v, error) {
 	return *key, *value, nil
 }
 
+func (iter *KV[k, v]) Next() (k, v) {
+	return NextKV[k, v](iter)
+}
+
 //go:linkname mapiterinit reflect.mapiterinit
 func mapiterinit(maptype, hmap unsafe.Pointer, it *hiter)
 
@@ -132,6 +136,10 @@ func (iter *ReflectKV[k, v]) Get() (k, v, error) {
 	return key, value, nil
 }
 
+func (iter *ReflectKV[k, v]) Next() (k, v) {
+	return NextKV[k, v](iter)
+}
+
 func (s *ReflectKV[k, v]) Reset() {
 	s.iter.Reset(s.refVal)
 	s.err = nil
@@ -159,6 +167,10 @@ func (s *OrderedKV[k, v]) Get() (k, v, error) {
 	return key, s.uniques[key], nil
 }
 
+func (iter *OrderedKV[k, v]) Next() (k, v) {
+	return NextKV[k, v](iter)
+}
+
 func NewKey[k comparable, v any](uniques map[k]v) *Key[k, v] {
 	return &Key[k, v]{KV: NewKV(uniques)}
 }
@@ -174,6 +186,10 @@ func (iter *Key[k, v]) Get() (k, error) {
 	return key, err
 }
 
+func (iter *Key[k, v]) Next() k {
+	return Next[k](iter)
+}
+
 func NewVal[k comparable, v any](uniques map[k]v) *Val[k, v] {
 	return &Val[k, v]{KV: NewKV(uniques)}
 }
@@ -187,4 +203,8 @@ var _ typ.Iterator[any] = (*Val[any, any])(nil)
 func (iter *Val[k, v]) Get() (v, error) {
 	_, val, err := iter.KV.Get()
 	return val, err
+}
+
+func (iter *Val[k, v]) Next() v {
+	return Next[v](iter)
 }

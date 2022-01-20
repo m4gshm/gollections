@@ -55,6 +55,10 @@ type Iter interface {
 //Iterator base interface for containers, collections
 type Iterator[T any] interface {
 	Iter
+	//retrieves next element
+	//must be called only after HasNext
+	//may raise panic. Calls Get() to prevent panic and checks an iteration error
+	Next() T
 	//retrieves next element or error
 	//must be called only after HasNext
 	Get() (T, error)
@@ -62,6 +66,10 @@ type Iterator[T any] interface {
 
 type KVIterator[k, v any] interface {
 	Iter
+	//retrieves next element
+	//must be called only after HasNext
+	//may raise panic. Calls Get() to prevent panic and checks an iteration error
+	Next() (k, v)
 	//retrieves next element or error
 	//must be called only after HasNext
 	Get() (k, v, error)
