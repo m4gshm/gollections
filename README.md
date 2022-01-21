@@ -8,9 +8,11 @@ Need use Go version 1.18 beta 1 or newer.
 
 Supports write operations (append, delete, replace).
 
-  * [Vector](./mutable/vector/api.go) - the simplest based on slices collection.
-  * [OrderedSet](./mutable/set/api.go) - collection of unique items, prevents duplicates, provides iteration in order of addition.
-  * [OrderedMap](./mutable/dict/api.go) - same as embedded map, but supports iteration in the order in which elements are added.
+  * [Vector](./mutable/vector/api.go) - the simplest based on built-in slice collection.
+  * [Set](./mutable/set/api.go) - collection of unique items, prevents duplicates.
+  * [Map](./mutable/map_/api.go) - built-in map wrapper that supports [container functions](#container-functions).
+  * [OrderedSet](./mutable/oset/api.go) - collection of unique items, prevents duplicates, provides iteration in order of addition.
+  * [OrderedMap](./mutable/omap/api.go) - same as the [Map](./mutable/map_/api.go), but supports iteration in the order in which elements are added.
 
 ## [Immutable containers](./immutable/api.go) 
 
@@ -20,7 +22,7 @@ The same interfaces as in the mutable package but for read-only purposes.
 
 Consists of two groups of operations:
  * Intermediate - only defines a computation (Wrap, Map, Flatt, Filter, Group).
- * Final - applies intermediates and retrieves the result (ForEach, Slice, Reduce)
+ * Final - applies intermediates and retrieves a result (ForEach, Slice, Reduce)
 
 Intermediates should wrap one by one to make a lazy computation chain that can be applied to the latest final operation.
 
@@ -56,7 +58,7 @@ Same as 'Iterator API' but specifically for slices. Generally more performant th
 
 
 ## Examples
-```go
+```go:examples_test.go
 package examples
 
 import (
@@ -67,6 +69,8 @@ import (
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/conv"
+	"github.com/m4gshm/gollections/immutable"
+	"github.com/m4gshm/gollections/immutable/oset"
 	"github.com/m4gshm/gollections/immutable/set"
 	"github.com/m4gshm/gollections/it"
 	"github.com/m4gshm/gollections/op"
@@ -74,25 +78,41 @@ import (
 	"github.com/m4gshm/gollections/walk/group"
 )
 
+func Test_Set(t *testing.T) {
+	var (
+		s      immutable.Set[int] = set.Of(1, 1, 2, 4, 3, 1)
+		values []int              = s.Collect()
+	)
+
+	assert.Equal(t, 4, s.Len())
+	assert.Equal(t, 4, len(values))
+
+	assert.True(t, s.Contains(1))
+	assert.True(t, s.Contains(2))
+	assert.True(t, s.Contains(3))
+	assert.True(t, s.Contains(4))
+	assert.False(t, s.Contains(5))
+}
+
 func Test_OrderedSet(t *testing.T) {
-	s := set.Of(1, 1, 2, 4, 3, 1)
+	s := oset.Of(1, 1, 2, 4, 3, 1)
 	values := s.Collect()
 	fmt.Println(s) //[1, 2, 4, 3]
 
 	assert.Equal(t, slc.Of(1, 2, 4, 3), values)
 }
 
-func Test_group_odd_even(t *testing.T) {
+func Test_group_orderset_odd_even(t *testing.T) {
 	var (
 		even   = func(v int) bool { return v%2 == 0 }
-		groups = group.Of(set.Of(1, 1, 2, 4, 3, 1), even)
+		groups = group.Of(oset.Of(1, 1, 2, 4, 3, 1), even)
 	)
 	fmt.Println(groups) //map[false:[1 3] true:[2 4]]
 	assert.Equal(t, map[bool][]int{false: {1, 3}, true: {2, 4}}, groups)
 }
 
-func Test_group_with_filtering_by_stirng_len(t *testing.T) {
-	var groups = c.Group(set.Of(
+func Test_group_orderset_with_filtering_by_stirng_len(t *testing.T) {
+	var groups = c.Group(oset.Of(
 		"seventh", "seventh", //duplicated
 		"first", "second", "third", "fourth",
 		"fifth", "sixth", "eighth",

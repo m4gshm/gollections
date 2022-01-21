@@ -6,18 +6,19 @@ import (
 	"github.com/m4gshm/gollections/op"
 )
 
-//Container - base interface for container interfaces
+//Container - base interface for container interfaces.
 type Container[C any, IT Iter] interface {
 	Collectable[C]
 	Iterable[IT]
 }
 
+//Collection - base finite-size container.
 type Collection[T any, C any, IT Iter] interface {
 	Container[C, IT]
 	Walk[T]
 }
 
-//Vector - the container stores ordered elements, provides index access
+//Vector - the container stores ordered elements, provides index access.
 type Vector[T any, IT Iterator[T]] interface {
 	Collection[T, []T, IT]
 	Track[T, int]
@@ -26,7 +27,7 @@ type Vector[T any, IT Iterator[T]] interface {
 	Len() int
 }
 
-//Set - the container provides uniqueness (does't insert duplicated values)
+//Set - the container provides uniqueness (does't insert duplicated values).
 type Set[T any, IT Iterator[T]] interface {
 	Collection[T, []T, IT]
 	Transformable[T, []T, Iterator[T]]
@@ -34,9 +35,9 @@ type Set[T any, IT Iterator[T]] interface {
 	Len() int
 }
 
-//Map - the container provides access to elements by key
+//Map - the container provides access to elements by key.
 type Map[k comparable, v any, IT KVIterator[k, v]] interface {
-	Container[map[k]v, IT]
+	Collection[*KV[k, v], map[k]v, IT]
 	Iterable[IT]
 	Track[v, k]
 	Checkable[k]
@@ -48,16 +49,16 @@ type Map[k comparable, v any, IT KVIterator[k, v]] interface {
 }
 
 type Iter interface {
-	//checks ability on next element or error
+	//checks ability on next element or error.
 	HasNext() bool
 }
 
-//Iterator base interface for containers, collections
+//Iterator base interface for containers, collections.
 type Iterator[T any] interface {
 	Iter
 	//retrieves next element
 	//must be called only after HasNext
-	//may raise panic. Calls Get() to prevent panic and checks an iteration error
+	//may raise panic. Calls Get() to prevent panic and checks an iteration error.
 	Next() T
 	//retrieves next element or error
 	//must be called only after HasNext
@@ -68,24 +69,24 @@ type KVIterator[k, v any] interface {
 	Iter
 	//retrieves next element
 	//must be called only after HasNext
-	//may raise panic. Calls Get() to prevent panic and checks an iteration error
+	//may raise panic. Calls Get() to prevent panic and checks an iteration error.
 	Next() (k, v)
 	//retrieves next element or error
 	//must be called only after HasNext
 	Get() (k, v, error)
 }
 
-//Resetable an object with resettable state (e.g. slice based iterator)
+//Resetable an object with resettable state (e.g. slice based iterator).
 type Resetable interface {
 	Reset()
 }
 
-//Iterable iterator supplier
+//Iterable iterator supplier.
 type Iterable[IT Iter] interface {
 	Begin() IT
 }
 
-//Walk touches all elements of the collection
+//Walk touches all elements of the collection.
 type Walk[T any] interface {
 	ForEach(func(element T)) error
 	For(func(element T) error) error
@@ -97,12 +98,12 @@ type Track[T any, P any] interface {
 	Track(func(position P, element T) error) error
 }
 
-//Checkable container with ability to check if an element is present
+//Checkable container with ability to check if an element is present.
 type Checkable[T any] interface {
 	Contains(T) bool
 }
 
-//Collectable not endless container that can be transformed to array or map of elements
+//Collectable not endless container that can be transformed to array or map of elements.
 type Collectable[T any] interface {
 	Collect() T
 }

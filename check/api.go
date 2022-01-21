@@ -6,7 +6,7 @@ import (
 	"github.com/m4gshm/gollections/typ"
 )
 
-//Not invert predicate
+//Not invert predicate.
 func Not[T any](p typ.Predicate[T]) typ.Predicate[T] {
 	return func(v T) bool { return !p(v) }
 }
@@ -37,7 +37,7 @@ func And[T any](p1, p2 typ.Predicate[T]) typ.Predicate[T] {
 	return func(v T) bool { return p1(v) && p2(v) }
 }
 
-//Union reduce predicates to an one
+//Union reduce predicates to an one.
 func Union[T any](predicates []typ.Predicate[T]) typ.Predicate[T] {
 	l := len(predicates)
 	if l == 0 {

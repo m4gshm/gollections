@@ -4,6 +4,7 @@ import (
 	"github.com/m4gshm/gollections/collect"
 	"github.com/m4gshm/gollections/immutable/vector/ref"
 	"github.com/m4gshm/gollections/it/impl/it"
+	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/typ"
 )
@@ -67,18 +68,19 @@ func (s *OrderedMap[k, v]) Collect() map[k]v {
 }
 
 func (s *OrderedMap[k, v]) Track(tracker func(k, v) error) error {
-	e := s.uniques
-	for _, ref := range s.elements {
-		key := *ref
-		if err := tracker(key, e[key]); err != nil {
-			return err
-		}
-	}
-	return nil
+	return map_.TrackOrdered(s.elements, s.uniques, tracker)
 }
 
 func (s *OrderedMap[k, v]) TrackEach(tracker func(k, v)) error {
-	return s.Track(func(key k, value v) error { tracker(key, value); return nil })
+	return map_.TrackEachOrdered(s.elements, s.uniques, tracker)
+}
+
+func (s *OrderedMap[k, v]) For(walker func(*typ.KV[k, v]) error) error {
+	return map_.ForOrdered(s.elements, s.uniques, walker)
+}
+
+func (s *OrderedMap[k, v]) ForEach(walker func(*typ.KV[k, v])) error {
+	return map_.ForEachOrdered(s.elements, s.uniques, walker)
 }
 
 func (s *OrderedMap[k, v]) Len() int {

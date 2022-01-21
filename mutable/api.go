@@ -8,7 +8,7 @@ import (
 
 var BadRW = errors.New("concurrent read and write")
 
-//Vector - the container stores ordered elements, provides index access
+//Vector - the container stores ordered elements, provides index access.
 type Vector[t any, IT Iterator[t]] interface {
 	typ.Vector[t, IT]
 	Addable[t]
@@ -16,14 +16,14 @@ type Vector[t any, IT Iterator[t]] interface {
 	Delete(index int) (bool, error)
 }
 
-//Set - the container provides uniqueness (does't insert duplicated values)
+//Set - the container provides uniqueness (does't insert duplicated values).
 type Set[t comparable, IT Iterator[t]] interface {
 	typ.Set[t, IT]
 	Addable[t]
 	Delete(...t) (bool, error)
 }
 
-//Map - the container provides access to elements by key
+//Map - the container provides access to elements by key.
 type Map[k comparable, v any, IT typ.KVIterator[k, v]] interface {
 	typ.Map[k, v, IT]
 	Settable[k, v]

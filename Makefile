@@ -29,7 +29,12 @@ gofmt:
 govet:
 	go vet ./...
 
+.PHONY: govet
+godot:
+#	go install github.com/tetafro/godot/cmd/godot@latest
+	godot ./
+
 .PHONY: errcheck
 errcheck:
-	# go install github.com/kisielk/errcheck@latest
+#	go install github.com/kisielk/errcheck@latest
 	errcheck ./...

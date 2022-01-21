@@ -47,7 +47,6 @@ func Test_Set_Iterate(t *testing.T) {
 	}
 }
 
-
 func Test_Set_Add(t *testing.T) {
 	set := set.New[int](0)
 	added, _ := set.Add(1, 2, 4, 3)
