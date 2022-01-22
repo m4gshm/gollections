@@ -6,9 +6,12 @@ import (
 	"github.com/m4gshm/gollections/op"
 )
 
-//Container - base interface for container interfaces.
+// Container - base interface for container interfaces.
+// Where:
+// 		C - array, slice, map, chain
+// 		IT - Iterator or KVIterator
 type Container[C any, IT Iter] interface {
-	Collectable[C]
+	Collect() C
 	Iterable[IT]
 }
 
@@ -48,12 +51,13 @@ type Map[k comparable, v any, IT KVIterator[k, v]] interface {
 	Len() int
 }
 
+//Iterator - base for Iterator, KVIterator.
 type Iter interface {
 	//checks ability on next element or error.
 	HasNext() bool
 }
 
-//Iterator base interface for containers, collections.
+//Iterator - provides iterate over all elements of a collection.
 type Iterator[T any] interface {
 	Iter
 	//retrieves next element
@@ -65,6 +69,7 @@ type Iterator[T any] interface {
 	Get() (T, error)
 }
 
+//KVIterator - provides iterate over all key/value pair of a map.
 type KVIterator[k, v any] interface {
 	Iter
 	//retrieves next element
@@ -81,7 +86,7 @@ type Resetable interface {
 	Reset()
 }
 
-//Iterable iterator supplier.
+//Iterable - iterator supplier.
 type Iterable[IT Iter] interface {
 	Begin() IT
 }
@@ -103,17 +108,14 @@ type Checkable[T any] interface {
 	Contains(T) bool
 }
 
-//Collectable not endless container that can be transformed to array or map of elements.
-type Collectable[T any] interface {
-	Collect() T
-}
-
+//Transformable -
 type Transformable[T any, C any, IT Iterator[T]] interface {
 	Filter(Predicate[T]) Pipe[T, C, IT]
 	Map(Converter[T, T]) Pipe[T, C, IT]
 	Reduce(op.Binary[T]) T
 }
 
+//Pipe - limited kit of container transformation methods. The full kit of transformer functions are in the package 'c'
 type Pipe[T any, C any, IT Iterator[T]] interface {
 	Transformable[T, C, IT]
 	Container[C, IT]
@@ -140,6 +142,7 @@ type MapTransformable[k comparable, v any, m any] interface {
 	MapValue(Converter[v, v]) MapPipe[k, v, m]
 }
 
+//Access - base for RandomAccess, KeyAccess.
 type Access[K any, V any] interface {
 	Get(K) (V, bool)
 }

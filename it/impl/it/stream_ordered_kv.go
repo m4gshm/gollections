@@ -19,7 +19,7 @@ type KVIterPipe[k comparable, v any, c any] struct {
 var _ typ.MapPipe[any, any, any] = (*KVIterPipe[any, any, any])(nil)
 
 func (s *KVIterPipe[k, v, c]) FilterKey(fit typ.Predicate[k]) typ.MapPipe[k, v, c] {
-	return NewKVPipe(FilterKV[k, v](s.it, func(key k, val v) bool { return fit(key) }), s.collector)
+	return NewKVPipe(FilterKV(s.it, func(key k, val v) bool { return fit(key) }), s.collector)
 }
 
 func (s *KVIterPipe[k, v, c]) MapKey(by typ.Converter[k, k]) typ.MapPipe[k, v, c] {

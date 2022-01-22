@@ -11,7 +11,7 @@ func Map[From, To any, IT typ.Iterator[From]](elements IT, by typ.Converter[From
 	return &Convert[From, To, IT, typ.Converter[From, To]]{Iter: elements, By: by}
 }
 
-// additionally filters 'From' elements by filters.
+//MapFit additionally filters 'From' elements.
 func MapFit[From, To any, IT typ.Iterator[From]](elements IT, fit typ.Predicate[From], by typ.Converter[From, To]) *ConvertFit[From, To] {
 	return &ConvertFit[From, To]{Iter: elements, By: by, Fit: fit}
 }
@@ -21,7 +21,7 @@ func Flatt[From, To any, IT typ.Iterator[From]](elements IT, by typ.Flatter[From
 	return &Flatten[From, To]{Iter: elements, Flatt: by}
 }
 
-// additionally checks 'From' elements by fit.
+//FlattFit additionally filters 'From' elements.
 func FlattFit[From, To any, IT typ.Iterator[From]](elements IT, fit typ.Predicate[From], flatt typ.Flatter[From, To]) *FlattenFit[From, To] {
 	return &FlattenFit[From, To]{Iter: elements, Flatt: flatt, Fit: fit}
 }
@@ -78,7 +78,7 @@ func ReduceKV[k, v any, IT typ.KVIterator[k, v]](elements IT, by op.Quaternary[k
 	return key, val
 }
 
-//Slice converts Iterator to slice.
+//Slice converts an Iterator to a slice.
 func Slice[T any, IT typ.Iterator[T]](elements IT) []T {
 	s := make([]T, 0)
 

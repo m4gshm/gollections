@@ -112,7 +112,7 @@ func Map[From, To any](elements []From, by typ.Converter[From, To]) typ.Iterator
 	return impl.Map(elements, by)
 }
 
-// additionally filters 'From' elements by filters.
+//MapFit additionally filters 'From' elements.
 func MapFit[From, To any](elements []From, fit typ.Predicate[From], by typ.Converter[From, To]) typ.Iterator[To] {
 	return impl.MapFit(elements, fit, by)
 }
@@ -122,7 +122,7 @@ func Flatt[From, To any](elements []From, by typ.Flatter[From, To]) typ.Iterator
 	return impl.Flatt(elements, by)
 }
 
-// additionally checks 'From' elements by fit.
+//FlattFit additionally filters 'From' elements.
 func FlattFit[From, To any](elements []From, fit typ.Predicate[From], flatt typ.Flatter[From, To]) typ.Iterator[To] {
 	return impl.FlattFit(elements, fit, flatt)
 }

@@ -10,7 +10,7 @@ func Map[From, To any](elements []From, by typ.Converter[From, To]) *Convert[Fro
 	return &Convert[From, To]{Elements: elements, By: by}
 }
 
-// additionally filters 'From' elements by filters.
+//MapFit additionally filters 'From' elements.
 func MapFit[From, To any](elements []From, fit typ.Predicate[From], by typ.Converter[From, To]) *ConvertFit[From, To] {
 	return &ConvertFit[From, To]{Elements: elements, By: by, Fit: fit}
 }
@@ -20,7 +20,7 @@ func Flatt[From, To any, FS ~[]From](elements FS, by typ.Flatter[From, To]) *Fla
 	return &Flatten[From, To]{Elements: elements, Flatt: by}
 }
 
-// additionally checks 'From' elements by fit.
+//FlattFit additionally filters 'From' elements.
 func FlattFit[From, To any](elements []From, fit typ.Predicate[From], flatt typ.Flatter[From, To]) *FlattenFit[From, To] {
 	return &FlattenFit[From, To]{Elements: elements, Flatt: flatt, Fit: fit}
 }

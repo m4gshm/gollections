@@ -13,7 +13,7 @@ func Map[From, To any, IT typ.Iterable[typ.Iterator[From]]](elements IT, by typ.
 	return impl.Map(elements.Begin(), by)
 }
 
-// additionally filters 'From' elements by filters.
+//MapFit additionally filters 'From' elements.
 func MapFit[From, To any, IT typ.Iterable[typ.Iterator[From]]](elements IT, fit typ.Predicate[From], by typ.Converter[From, To]) typ.Iterator[To] {
 	return impl.MapFit(elements.Begin(), fit, by)
 }
@@ -23,7 +23,7 @@ func Flatt[From, To any, IT typ.Iterable[typ.Iterator[From]]](elements IT, by ty
 	return impl.Flatt(elements.Begin(), by)
 }
 
-// additionally checks 'From' elements by fit.
+//FlattFit additionally filters 'From' elements.
 func FlattFit[From, To any, IT typ.Iterable[typ.Iterator[From]]](elements IT, fit typ.Predicate[From], flatt typ.Flatter[From, To]) typ.Iterator[To] {
 	return impl.FlattFit(elements.Begin(), fit, flatt)
 }
@@ -43,12 +43,12 @@ func Reduce[T any, IT typ.Iterable[typ.Iterator[T]]](elements IT, by op.Binary[T
 	return impl.Reduce(elements.Begin(), by)
 }
 
-//Slice converts Iterator to slice.
+//Slice converts an Iterator to a slice.
 func Slice[T any, IT typ.Iterable[typ.Iterator[T]]](elements IT) []T {
 	return impl.Slice[T](elements.Begin())
 }
 
-//Group groups elements to slices by a converter and returns map.
+//Group groups elements to slices by a converter and returns a map.
 func Group[T any, K comparable, IT typ.Iterable[typ.Iterator[T]]](elements IT, by typ.Converter[T, K]) typ.MapPipe[K, T, map[K][]T] {
 	return it.Group(elements.Begin(), by)
 }
