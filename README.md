@@ -58,7 +58,7 @@ Same as 'Iterator API' but specifically for slices. Generally more performant th
 
 
 ## Examples
-```go:examples_test.go
+```go
 package examples
 
 import (
@@ -67,14 +67,15 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/m4gshm/gollections/c"
+	cgroup "github.com/m4gshm/gollections/c/group"
 	"github.com/m4gshm/gollections/conv"
 	"github.com/m4gshm/gollections/immutable"
 	"github.com/m4gshm/gollections/immutable/oset"
 	"github.com/m4gshm/gollections/immutable/set"
 	"github.com/m4gshm/gollections/it"
+	slc "github.com/m4gshm/gollections/it/slice"
 	"github.com/m4gshm/gollections/op"
-	slc "github.com/m4gshm/gollections/slice"
+	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/walk/group"
 )
 
@@ -99,7 +100,7 @@ func Test_OrderedSet(t *testing.T) {
 	values := s.Collect()
 	fmt.Println(s) //[1, 2, 4, 3]
 
-	assert.Equal(t, slc.Of(1, 2, 4, 3), values)
+	assert.Equal(t, slice.Of(1, 2, 4, 3), values)
 }
 
 func Test_group_orderset_odd_even(t *testing.T) {
@@ -112,7 +113,7 @@ func Test_group_orderset_odd_even(t *testing.T) {
 }
 
 func Test_group_orderset_with_filtering_by_stirng_len(t *testing.T) {
-	var groups = c.Group(oset.Of(
+	var groups = cgroup.Of(oset.Of(
 		"seventh", "seventh", //duplicated
 		"first", "second", "third", "fourth",
 		"fifth", "sixth", "eighth",
