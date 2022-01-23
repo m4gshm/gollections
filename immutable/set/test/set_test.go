@@ -39,7 +39,7 @@ func Test_Set_Iterate(t *testing.T) {
 	}
 
 	out = make(map[int]int, 0)
-	_ = set.ForEach(func(n int) { out[n] = n })
+	set.ForEach(func(n int) { out[n] = n })
 
 	assert.Equal(t, len(expected), len(out))
 	for k := range out {

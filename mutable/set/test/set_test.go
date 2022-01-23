@@ -4,6 +4,7 @@ import (
 	"sort"
 	"testing"
 
+	cgroup "github.com/m4gshm/gollections/c/group"
 	"github.com/m4gshm/gollections/it"
 	"github.com/m4gshm/gollections/mutable/set"
 	"github.com/m4gshm/gollections/op"
@@ -23,7 +24,7 @@ func Test_Set_Iterate(t *testing.T) {
 	sort.Ints(values)
 	assert.Equal(t, expected, values)
 
-	iterSlice := it.Slice[int](set.Begin())
+	iterSlice := it.Slice(set.Begin())
 	sort.Ints(iterSlice)
 	assert.Equal(t, expected, iterSlice)
 
@@ -39,7 +40,7 @@ func Test_Set_Iterate(t *testing.T) {
 	}
 
 	out = make(map[int]int, 0)
-	_ = set.ForEach(func(n int) { out[n] = n })
+	set.ForEach(func(n int) { out[n] = n })
 
 	assert.Equal(t, len(expected), len(out))
 	for k := range out {
@@ -73,7 +74,7 @@ func Test_Set_Delete(t *testing.T) {
 
 func Test_Set_DeleteByIterator(t *testing.T) {
 	set := set.Of(1, 1, 2, 4, 3, 1)
-	iter := set.Begin()
+	iter := set.BeginEdit()
 
 	i := 0
 	for iter.HasNext() {
@@ -99,7 +100,7 @@ func Test_Set_FilterMapReduce(t *testing.T) {
 	sum := set.Of(1, 1, 2, 4, 3, 1).Filter(func(i int) bool { return i%2 == 0 }).Map(func(i int) int { return i * 2 }).Reduce(op.Sum[int])
 	assert.Equal(t, 12, sum)
 
-	sum = it.Pipe[int](set.Of(1, 1, 2, 4, 3, 1).Begin()).Filter(func(i int) bool { return i%2 == 0 }).Map(func(i int) int { return i * 2 }).Reduce(op.Sum[int])
+	sum = it.Pipe(set.Of(1, 1, 2, 4, 3, 1).Begin()).Filter(func(i int) bool { return i%2 == 0 }).Map(func(i int) int { return i * 2 }).Reduce(op.Sum[int])
 	assert.Equal(t, 12, sum)
 }
 
@@ -116,7 +117,7 @@ func Test_Set_Group_By_Walker(t *testing.T) {
 }
 
 func Test_Set_Group_By_Iterator(t *testing.T) {
-	groups := it.Group(set.Of(0, 1, 1, 2, 4, 3, 1, 6, 7).Begin(), func(e int) bool { return e%2 == 0 }).Collect()
+	groups := cgroup.Of(set.Of(0, 1, 1, 2, 4, 3, 1, 6, 7), func(e int) bool { return e%2 == 0 }).Collect()
 
 	assert.Equal(t, len(groups), 2)
 	fg := groups[false]

@@ -1,3 +1,4 @@
+//Package mutable provides implementations of mutable containers.
 package mutable
 
 import (
@@ -8,24 +9,26 @@ import (
 
 var BadRW = errors.New("concurrent read and write")
 
-//Vector - the container stores ordered elements, provides index access.
-type Vector[t any, IT Iterator[t]] interface {
-	typ.Vector[t, IT]
+//Vector stores ordered elements, provides index access.
+type Vector[t any] interface {
+	typ.Vector[t, typ.Iterator[t]]
 	Addable[t]
 	Settable[int, t]
+	BeginEdit() Iterator[t]
 	Delete(index int) (bool, error)
 }
 
-//Set - the container provides uniqueness (does't insert duplicated values).
-type Set[t comparable, IT Iterator[t]] interface {
-	typ.Set[t, IT]
+//Set provides uniqueness (does't insert duplicated values).
+type Set[t comparable] interface {
+	typ.Set[t, typ.Iterator[t]]
 	Addable[t]
+	BeginEdit() Iterator[t]
 	Delete(...t) (bool, error)
 }
 
-//Map - the container provides access to elements by key.
-type Map[k comparable, v any, IT typ.KVIterator[k, v]] interface {
-	typ.Map[k, v, IT]
+//Map provides access to elements by key.
+type Map[k comparable, v any] interface {
+	typ.Map[k, v, typ.KVIterator[k, v]]
 	Settable[k, v]
 }
 
@@ -35,10 +38,6 @@ type Addable[T any] interface {
 
 type Settable[k any, v any] interface {
 	Set(key k, value v) (bool, error)
-}
-
-type Iterable[T any, IT typ.Iterator[T]] interface {
-	Begin() IT
 }
 
 type Iterator[T any] interface {

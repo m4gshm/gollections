@@ -24,7 +24,7 @@ func Test_Vector_Iterate(t *testing.T) {
 	expected := slice.Of(1, 1, 2, 4, 3, 1)
 	assert.Equal(t, expected, values)
 
-	iterSlice := it.Slice[int](vec.Begin())
+	iterSlice := it.Slice(vec.Begin())
 	assert.Equal(t, expected, iterSlice)
 
 	out := make([]int, 0)
@@ -35,7 +35,7 @@ func Test_Vector_Iterate(t *testing.T) {
 	assert.Equal(t, expected, out)
 
 	out = make([]int, 0)
-	_ = vec.ForEach(func(v int) { out = append(out, v) })
+	vec.ForEach(func(v int) { out = append(out, v) })
 }
 
 func Test_Vector_Add(t *testing.T) {
@@ -65,7 +65,7 @@ func Test_Vector_Set(t *testing.T) {
 
 func Test_Vector_DeleteByIterator(t *testing.T) {
 	vec := vector.Of(1, 1, 2, 4, 3, 1)
-	iter := vec.Begin()
+	iter := vec.BeginEdit()
 
 	i := 0
 	for iter.HasNext() {
@@ -81,7 +81,7 @@ func Test_Vector_FilterMapReduce(t *testing.T) {
 	sum := vector.Of(1, 1, 2, 4, 3, 4).Filter(func(i int) bool { return i%2 == 0 }).Map(func(i int) int { return i * 2 }).Reduce(op.Sum[int])
 	assert.Equal(t, 20, sum)
 
-	sum = it.Pipe[int](vector.Of(1, 1, 2, 4, 3, 1, 4).Begin()).Filter(func(i int) bool { return i%2 == 0 }).Map(func(i int) int { return i * 2 }).Reduce(op.Sum[int])
+	sum = it.Pipe(vector.Of(1, 1, 2, 4, 3, 1, 4).Begin()).Filter(func(i int) bool { return i%2 == 0 }).Map(func(i int) int { return i * 2 }).Reduce(op.Sum[int])
 	assert.Equal(t, 20, sum)
 }
 
@@ -119,7 +119,7 @@ func Test_Vector_Concurrent_Update(t *testing.T) {
 	go func() {
 		defer wg.Done()
 		for {
-			for iter := vec.Begin(); iter.HasNext(); {
+			for iter := vec.BeginEdit(); iter.HasNext(); {
 				if _, err := iter.Delete(); err != nil {
 					if errors.Is(err, mutable.BadRW) {
 						delete = err

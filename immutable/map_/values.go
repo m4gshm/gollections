@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/m4gshm/gollections/it/impl/it"
+	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/typ"
@@ -42,16 +43,11 @@ func (s *MapValues[k, v]) Collect() []v {
 }
 
 func (s *MapValues[k, v]) For(walker func(v) error) error {
-	for _, val := range s.uniques {
-		if err := walker(val); err != nil {
-			return err
-		}
-	}
-	return nil
+	return map_.ForValues(s.uniques, walker)
 }
 
-func (s *MapValues[k, v]) ForEach(walker func(v)) error {
-	return s.For(func(value v) error { walker(value); return nil })
+func (s *MapValues[k, v]) ForEach(walker func(v)) {
+	map_.ForEachValue(s.uniques, walker)
 }
 
 func (s *MapValues[k, v]) Filter(filter typ.Predicate[v]) typ.Pipe[v, []v, typ.Iterator[v]] {

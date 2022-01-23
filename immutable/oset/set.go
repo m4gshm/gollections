@@ -58,8 +58,8 @@ func (s *OrderedSet[T]) For(walker func(T) error) error {
 	return slice.ForRefs(s.elements, walker)
 }
 
-func (s *OrderedSet[T]) ForEach(walker func(T)) error {
-	return slice.ForEachRef(s.elements, walker)
+func (s *OrderedSet[T]) ForEach(walker func(T)) {
+	slice.ForEachRef(s.elements, walker)
 }
 
 func (s *OrderedSet[T]) Filter(filter typ.Predicate[T]) typ.Pipe[T, []T, typ.Iterator[T]] {

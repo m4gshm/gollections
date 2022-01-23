@@ -2,13 +2,12 @@ package c
 
 import (
 	"github.com/m4gshm/gollections/check"
-	"github.com/m4gshm/gollections/it"
 	impl "github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/typ"
 )
 
-//Map creates a lazy Iterator that converts elements with a converter and returns them.
+//Map creates the Iterator that converts elements with a converter and returns them.
 func Map[From, To any, IT typ.Iterable[typ.Iterator[From]]](elements IT, by typ.Converter[From, To]) typ.Iterator[To] {
 	return impl.Map(elements.Begin(), by)
 }
@@ -18,7 +17,7 @@ func MapFit[From, To any, IT typ.Iterable[typ.Iterator[From]]](elements IT, fit 
 	return impl.MapFit(elements.Begin(), fit, by)
 }
 
-//Flatt creates a lazy Iterator that extracts slices of 'To' by a Flatter from elements of 'From' and flattens as one iterable collection of 'To' elements.
+//Flatt creates the Iterator that extracts slices of 'To' by a Flatter from elements of 'From' and flattens as one iterable collection of 'To' elements.
 func Flatt[From, To any, IT typ.Iterable[typ.Iterator[From]]](elements IT, by typ.Flatter[From, To]) typ.Iterator[To] {
 	return impl.Flatt(elements.Begin(), by)
 }
@@ -28,12 +27,12 @@ func FlattFit[From, To any, IT typ.Iterable[typ.Iterator[From]]](elements IT, fi
 	return impl.FlattFit(elements.Begin(), fit, flatt)
 }
 
-//Filter creates a lazy Iterator that checks elements by filters and returns successful ones.
+//Filter creates the Iterator that checks elements by filters and returns successful ones.
 func Filter[T any, IT typ.Iterable[typ.Iterator[T]]](elements IT, filter typ.Predicate[T]) typ.Iterator[T] {
 	return impl.Filter(elements.Begin(), filter)
 }
 
-//NotNil creates a lazy Iterator that filters nullable elements.
+//NotNil creates the Iterator that filters nullable elements.
 func NotNil[T any, IT typ.Iterable[typ.Iterator[*T]]](elements IT) typ.Iterator[*T] {
 	return Filter(elements, check.NotNil[T])
 }
@@ -49,6 +48,6 @@ func Slice[T any, IT typ.Iterable[typ.Iterator[T]]](elements IT) []T {
 }
 
 //Group groups elements to slices by a converter and returns a map.
-func Group[T any, K comparable, IT typ.Iterable[typ.Iterator[T]]](elements IT, by typ.Converter[T, K]) typ.MapPipe[K, T, map[K][]T] {
-	return it.Group(elements.Begin(), by)
+func Group[T any, K comparable, C typ.Iterable[IT], IT typ.Iterator[T]](elements C, by typ.Converter[T, K]) typ.MapPipe[K, T, map[K][]T] {
+	return impl.Group(elements.Begin(), by)
 }

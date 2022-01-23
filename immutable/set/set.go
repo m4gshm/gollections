@@ -51,8 +51,8 @@ func (s *Set[k, v]) For(walker func(k) error) error {
 	return map_.ForKeys(s.uniques, walker)
 }
 
-func (s *Set[k, v]) ForEach(walker func(k)) error {
-	return map_.ForEachKey(s.uniques, walker)
+func (s *Set[k, v]) ForEach(walker func(k)) {
+	map_.ForEachKey(s.uniques, walker)
 }
 
 func (s *Set[k, v]) Filter(filter typ.Predicate[k]) typ.Pipe[k, []k, typ.Iterator[k]] {

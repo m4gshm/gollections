@@ -41,16 +41,16 @@ func (s *Vector[T]) Track(tracker func(int, T) error) error {
 	return slice.Track(*s.elements, tracker)
 }
 
-func (s *Vector[T]) TrackEach(tracker func(int, T)) error {
-	return slice.TrackEach(*s.elements, tracker)
+func (s *Vector[T]) TrackEach(tracker func(int, T)) {
+	slice.TrackEach(*s.elements, tracker)
 }
 
 func (s *Vector[T]) For(walker func(T) error) error {
 	return slice.For(*s.elements, walker)
 }
 
-func (s *Vector[T]) ForEach(walker func(T)) error {
-	return slice.ForEach(*s.elements, walker)
+func (s *Vector[T]) ForEach(walker func(T)) {
+	slice.ForEach(*s.elements, walker)
 }
 
 func (s *Vector[T]) Len() int {

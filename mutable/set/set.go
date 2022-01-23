@@ -29,12 +29,16 @@ type Set[k comparable] struct {
 	changeMark int32
 }
 
-var _ mutable.Set[any, mutable.Iterator[any]] = (*Set[any])(nil)
-var _ typ.Set[any, mutable.Iterator[any]] = (*Set[any])(nil)
+var _ mutable.Set[any] = (*Set[any])(nil)
+var _ typ.Set[any, typ.Iterator[any]] = (*Set[any])(nil)
 var _ fmt.Stringer = (*Set[any])(nil)
 var _ fmt.GoStringer = (*Set[any])(nil)
 
-func (s *Set[k]) Begin() mutable.Iterator[k] {
+func (s *Set[k]) Begin() typ.Iterator[k] {
+	return s.Iter()
+}
+
+func (s *Set[k]) BeginEdit() mutable.Iterator[k] {
 	return s.Iter()
 }
 
@@ -124,8 +128,8 @@ func (s *Set[k]) For(walker func(k) error) error {
 	return map_.ForKeys(s.uniques, walker)
 }
 
-func (s *Set[k]) ForEach(walker func(k)) error {
-	return map_.ForEachKey(s.uniques, walker)
+func (s *Set[k]) ForEach(walker func(k)) {
+	map_.ForEachKey(s.uniques, walker)
 }
 
 func (s *Set[k]) Filter(filter typ.Predicate[k]) typ.Pipe[k, []k, typ.Iterator[k]] {

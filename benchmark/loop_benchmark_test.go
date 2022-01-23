@@ -41,7 +41,7 @@ func Benchmark_ForEach_Immutable_Vector_ByOf(b *testing.B) {
 	for _, case_ := range cases {
 		b.Run(case_.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				_ = c.ForEach(func(v int) { case_.load(v) })
+				c.ForEach(func(v int) { case_.load(v) })
 			}
 		})
 	}
@@ -52,7 +52,7 @@ func Benchmark_ForEach_Immutable_Vector_ByNew(b *testing.B) {
 	for _, case_ := range cases {
 		b.Run(case_.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				_ = c.ForEach(func(v int) { case_.load(v) })
+				c.ForEach(func(v int) { case_.load(v) })
 			}
 		})
 	}
@@ -63,7 +63,7 @@ func Benchmark_ForEach_Immutable_Vector_Impl(b *testing.B) {
 	for _, case_ := range cases {
 		b.Run(case_.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				_ = c.ForEach(func(v int) { case_.load(v) })
+				c.ForEach(func(v int) { case_.load(v) })
 			}
 		})
 	}
@@ -100,7 +100,7 @@ func Benchmark_ForEach_Immutable_Set(b *testing.B) {
 	for _, case_ := range cases {
 		b.Run(case_.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				_ = c.ForEach(func(v int) { case_.load(v) })
+				c.ForEach(func(v int) { case_.load(v) })
 			}
 		})
 	}
@@ -111,7 +111,7 @@ func Benchmark_ForEach_Immutable_Set_Impl(b *testing.B) {
 	for _, case_ := range cases {
 		b.Run(case_.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				_ = c.ForEach(func(v int) { case_.load(v) })
+				c.ForEach(func(v int) { case_.load(v) })
 			}
 		})
 	}
@@ -122,7 +122,7 @@ func Benchmark_ForEach_Immutable_OrdererSet(b *testing.B) {
 	for _, case_ := range cases {
 		b.Run(case_.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				_ = c.ForEach(func(v int) { case_.load(v) })
+				c.ForEach(func(v int) { case_.load(v) })
 			}
 		})
 	}
@@ -133,7 +133,7 @@ func Benchmark_ForEach_Immutable_OrdererSet_Impl(b *testing.B) {
 	for _, case_ := range cases {
 		b.Run(case_.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				_ = c.ForEach(func(v int) { case_.load(v) })
+				c.ForEach(func(v int) { case_.load(v) })
 			}
 		})
 	}
@@ -170,7 +170,7 @@ func Benchmark_ForEach_Mutable_OrdererSet(b *testing.B) {
 	for _, case_ := range cases {
 		b.Run(case_.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				_ = c.ForEach(func(v int) { case_.load(v) })
+				c.ForEach(func(v int) { case_.load(v) })
 			}
 		})
 	}
@@ -181,7 +181,7 @@ func Benchmark_ForEach_Mutable_OrdererSet_Impl(b *testing.B) {
 	for _, case_ := range cases {
 		b.Run(case_.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				_ = c.ForEach(func(v int) { case_.load(v) })
+				c.ForEach(func(v int) { case_.load(v) })
 			}
 		})
 	}

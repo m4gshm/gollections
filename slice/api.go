@@ -1,30 +1,31 @@
+//Package slice provides generic functions for slice types
 package slice
 
 import (
 	"constraints"
 	"fmt"
 
-	"github.com/m4gshm/gollections/check"
-	impl "github.com/m4gshm/gollections/slice/impl/slice"
 	"github.com/m4gshm/gollections/typ"
 )
 
-//Of - constructor.
+//Of transforms elements to the slice of them
 func Of[T any](elements ...T) []T {
 	return elements
 }
 
-//Copy - makes a new slice with copied elements.
+//Copy makes the new slice with copied elements.
 func Copy[T any](elements []T) []T {
 	copied := make([]T, len(elements))
 	copy(copied, elements)
 	return copied
 }
 
+//Delete removes an element by index from a slice
 func Delete[T any](index int, elements []T) []T {
 	return append(elements[0:index], elements[index+1:]...)
 }
 
+//Group converts elements into the map containing slices of the elements separated by keys, which are retrieved using a Converter object.
 func Group[T any, K comparable](elements []T, by typ.Converter[T, K]) map[K][]T {
 	groups := map[K][]T{}
 	for _, e := range elements {
@@ -39,6 +40,7 @@ func Group[T any, K comparable](elements []T, by typ.Converter[T, K]) map[K][]T 
 	return groups
 }
 
+//Range generates the sclie of integers in the range defined by from and to inclusive.
 func Range[T constraints.Integer](from T, to T) []T {
 	if to == from {
 		return []T{to}
@@ -59,6 +61,7 @@ func Range[T constraints.Integer](from T, to T) []T {
 	return elements
 }
 
+//Track applies tracker to elements with error checking
 func Track[T any](elements []T, tracker func(int, T) error) error {
 	for i, e := range elements {
 		if err := tracker(i, e); err != nil {
@@ -68,13 +71,14 @@ func Track[T any](elements []T, tracker func(int, T) error) error {
 	return nil
 }
 
-func TrackEach[T any](elements []T, tracker func(int, T)) error {
+//Track applies tracker to elements without error checking
+func TrackEach[T any](elements []T, tracker func(int, T)) {
 	for i, e := range elements {
 		tracker(i, e)
 	}
-	return nil
 }
 
+//For applies walker to elements with error checking
 func For[T any](elements []T, walker func(T) error) error {
 	for _, e := range elements {
 		if err := walker(e); err != nil {
@@ -84,15 +88,16 @@ func For[T any](elements []T, walker func(T) error) error {
 	return nil
 }
 
-func ForEach[T any](elements []T, walker func(T)) error {
+//ForEach applies walker to elements without error checking
+func ForEach[T any](elements []T, walker func(T)) {
 	for _, e := range elements {
 		walker(e)
 	}
-	return nil
 }
 
-func ForRefs[T any](elements []*T, walker func(T) error) error {
-	for _, e := range elements {
+//ForRefs applies walker to references with error checking
+func ForRefs[T any](references []*T, walker func(T) error) error {
+	for _, e := range references {
 		if err := walker(*e); err != nil {
 			return err
 		}
@@ -100,43 +105,14 @@ func ForRefs[T any](elements []*T, walker func(T) error) error {
 	return nil
 }
 
-func ForEachRef[T any](elements []*T, walker func(T)) error {
-	for _, e := range elements {
+//ForRefs applies walker to references without error checking
+func ForEachRef[T any](references []*T, walker func(T)) {
+	for _, e := range references {
 		walker(*e)
 	}
-	return nil
 }
 
-//Map creates a lazy Iterator that converts elements with a converter and returns them.
-func Map[From, To any](elements []From, by typ.Converter[From, To]) typ.Iterator[To] {
-	return impl.Map(elements, by)
-}
-
-//MapFit additionally filters 'From' elements.
-func MapFit[From, To any](elements []From, fit typ.Predicate[From], by typ.Converter[From, To]) typ.Iterator[To] {
-	return impl.MapFit(elements, fit, by)
-}
-
-//Flatt creates a lazy Iterator that extracts slices of 'To' by a Flatter from elements of 'From' and flattens as one iterable collection of 'To' elements.
-func Flatt[From, To any](elements []From, by typ.Flatter[From, To]) typ.Iterator[To] {
-	return impl.Flatt(elements, by)
-}
-
-//FlattFit additionally filters 'From' elements.
-func FlattFit[From, To any](elements []From, fit typ.Predicate[From], flatt typ.Flatter[From, To]) typ.Iterator[To] {
-	return impl.FlattFit(elements, fit, flatt)
-}
-
-//Filter creates a lazy Iterator that checks elements by filters and returns successful ones.
-func Filter[T any](elements []T, filter typ.Predicate[T]) typ.Iterator[T] {
-	return impl.Filter(elements, filter)
-}
-
-//NotNil creates a lazy Iterator that filters nullable elements.
-func NotNil[T any](elements []*T) typ.Iterator[*T] {
-	return Filter(elements, check.NotNil[T])
-}
-
+//ToString converts elements to the string representation
 func ToString[T any](elements []T) string {
 	str := ""
 	for _, v := range elements {
@@ -148,9 +124,10 @@ func ToString[T any](elements []T) string {
 	return "[" + str + "]"
 }
 
-func ToStringRefs[T any](elements []*T) string {
+//ToString converts references to the string representation
+func ToStringRefs[T any](references []*T) string {
 	str := ""
-	for _, ref := range elements {
+	for _, ref := range references {
 		if len(str) > 0 {
 			str += ", "
 		}

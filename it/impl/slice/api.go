@@ -5,7 +5,7 @@ import (
 	"github.com/m4gshm/gollections/typ"
 )
 
-//Map creates a lazy Iterator that converts elements with a converter and returns them.
+//Map creates the Iterator that converts elements with a converter and returns them.
 func Map[From, To any](elements []From, by typ.Converter[From, To]) *Convert[From, To] {
 	return &Convert[From, To]{Elements: elements, By: by}
 }
@@ -15,7 +15,7 @@ func MapFit[From, To any](elements []From, fit typ.Predicate[From], by typ.Conve
 	return &ConvertFit[From, To]{Elements: elements, By: by, Fit: fit}
 }
 
-//Flatt creates a lazy Iterator that extracts slices of 'To' by a Flatter from elements of 'From' and flattens as one iterable collection of 'To' elements.
+//Flatt creates the Iterator that extracts slices of 'To' by a Flatter from elements of 'From' and flattens as one iterable collection of 'To' elements.
 func Flatt[From, To any, FS ~[]From](elements FS, by typ.Flatter[From, To]) *Flatten[From, To] {
 	return &Flatten[From, To]{Elements: elements, Flatt: by}
 }
@@ -25,12 +25,12 @@ func FlattFit[From, To any](elements []From, fit typ.Predicate[From], flatt typ.
 	return &FlattenFit[From, To]{Elements: elements, Flatt: flatt, Fit: fit}
 }
 
-//Filter creates a lazy Iterator that checks elements by filters and returns successful ones.
+//Filter creates the Iterator that checks elements by filters and returns successful ones.
 func Filter[T any, TS []T](elements TS, filter typ.Predicate[T]) *Fit[T] {
 	return &Fit[T]{Elements: elements, By: filter}
 }
 
-//NotNil creates a lazy Iterator that filters nullable elements.
+//NotNil creates the Iterator that filters nullable elements.
 func NotNil[T any](elements []*T) *Fit[*T] {
 	return Filter(elements, check.NotNil[T])
 }

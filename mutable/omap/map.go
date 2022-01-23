@@ -50,7 +50,7 @@ type OrderedMap[k comparable, v any] struct {
 	err        error
 }
 
-var _ mutable.Map[any, any, typ.KVIterator[any, any]] = (*OrderedMap[any, any])(nil)
+var _ mutable.Map[any, any] = (*OrderedMap[any, any])(nil)
 var _ typ.Map[any, any, typ.KVIterator[any, any]] = (*OrderedMap[any, any])(nil)
 
 // var _ fmt.Stringer = (*OrderedMap[interface{}, interface{}])(nil)
@@ -80,16 +80,16 @@ func (s *OrderedMap[k, v]) For(walker func(*typ.KV[k, v]) error) error {
 	return map_.ForOrdered(s.elements, s.uniques, walker)
 }
 
-func (s *OrderedMap[k, v]) ForEach(walker func(*typ.KV[k, v])) error {
-	return map_.ForEachOrdered(s.elements, s.uniques, walker)
+func (s *OrderedMap[k, v]) ForEach(walker func(*typ.KV[k, v])) {
+	map_.ForEachOrdered(s.elements, s.uniques, walker)
 }
 
 func (s *OrderedMap[k, v]) Track(tracker func(k, v) error) error {
 	return map_.TrackOrdered(s.elements, s.uniques, tracker)
 }
 
-func (s *OrderedMap[k, v]) TrackEach(tracker func(k, v)) error {
-	return map_.TrackEachOrdered(s.elements, s.uniques, tracker)
+func (s *OrderedMap[k, v]) TrackEach(tracker func(k, v)) {
+	map_.TrackEachOrdered(s.elements, s.uniques, tracker)
 }
 
 func (s *OrderedMap[k, v]) Contains(key k) bool {

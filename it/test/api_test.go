@@ -6,6 +6,7 @@ import (
 
 	"github.com/m4gshm/gollections/conv"
 	"github.com/m4gshm/gollections/it"
+	sliceit "github.com/m4gshm/gollections/it/slice"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/stretchr/testify/assert"
@@ -21,7 +22,7 @@ func Test_MapAndFilter(t *testing.T) {
 	converted := it.MapFit(it.Wrap(items), func(v int) bool { return v%2 == 0 }, conv.And(toString, addTail))
 	assert.Equal(t, slice.Of("2_tail", "4_tail"), it.Slice(converted))
 
-	converted2 := slice.MapFit(items, func(v int) bool { return v%2 == 0 }, conv.And(toString, addTail))
+	converted2 := sliceit.MapFit(items, func(v int) bool { return v%2 == 0 }, conv.And(toString, addTail))
 	assert.Equal(t, slice.Of("2_tail", "4_tail"), it.Slice(converted2))
 
 	//plain old style
@@ -47,7 +48,7 @@ func Test_FlattSlices(t *testing.T) {
 	a := it.Slice(it.Filter(it.Flatt(it.Flatt(it.Wrap(multiDimension), conv.To[[][]int]), conv.To[[]int]), odds))
 	assert.Equal(t, e, a)
 
-	a = it.Slice(it.Filter(it.Flatt(slice.Flatt(multiDimension, conv.To[[][]int]), conv.To[[]int]), odds))
+	a = it.Slice(it.Filter(it.Flatt(sliceit.Flatt(multiDimension, conv.To[[][]int]), conv.To[[]int]), odds))
 	assert.Equal(t, e, a)
 
 	//plain old style
@@ -83,7 +84,7 @@ func Test_ReduceSlices(t *testing.T) {
 	oddSum := it.Reduce(it.Filter(it.Flatt(it.Flatt(it.Wrap(multiDimension), conv.To[[][]int]), conv.To[[]int]), odds), op.Sum[int])
 	assert.Equal(t, e, oddSum)
 
-	oddSum = it.Reduce(it.Filter(it.Flatt(slice.Flatt(multiDimension, conv.To[[][]int]), conv.To[[]int]), odds), op.Sum[int])
+	oddSum = it.Reduce(it.Filter(it.Flatt(sliceit.Flatt(multiDimension, conv.To[[][]int]), conv.To[[]int]), odds), op.Sum[int])
 	assert.Equal(t, e, oddSum)
 
 	//plain old style
@@ -129,7 +130,7 @@ func Test_MapFlattStructure_Iterable(t *testing.T) {
 	names := it.Slice(it.Map(it.Flatt(it.Wrap(items), (*Participant).GetAttributes), (*Attributes).GetName))
 	assert.Equal(t, expected, names)
 
-	names = it.Slice(it.Map(slice.Flatt(items, (*Participant).GetAttributes), (*Attributes).GetName))
+	names = it.Slice(it.Map(sliceit.Flatt(items, (*Participant).GetAttributes), (*Attributes).GetName))
 	assert.Equal(t, expected, names)
 }
 
@@ -144,10 +145,10 @@ func Test_Iterate(t *testing.T) {
 
 	result := make([]int, 0)
 
-	_ = stream.ForEach(func(i int) { result = append(result, i) })
+	stream.ForEach(func(i int) { result = append(result, i) })
 
 	result = make([]int, 0)
-	_ = it.ForEach(it.Wrap(values), func(i int) { result = append(result, i) })
+	_ = it.For(it.Wrap(values), func(i int) { result = append(result, i) })
 
 	assert.Equal(t, values, result)
 

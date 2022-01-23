@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/m4gshm/gollections/it/impl/it"
+	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/typ"
@@ -45,28 +46,12 @@ func (s *MapValues[k, v]) Collect() []v {
 	return elements
 }
 
-func (s *MapValues[k, v]) Track(tracker func(int, v) error) error {
-	refs := s.elements
-	for i, r := range refs {
-		key := *r
-		val := s.uniques[key]
-		if err := tracker(i, val); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (s *MapValues[k, v]) TrackEach(tracker func(int, v)) error {
-	return s.Track(func(i int, value v) error { tracker(i, value); return nil })
-}
-
 func (s *MapValues[k, v]) For(walker func(v) error) error {
-	return s.Track(func(i int, value v) error { return walker(value) })
+	return map_.ForOrderedValues(s.elements, s.uniques, walker)
 }
 
-func (s *MapValues[k, v]) ForEach(walker func(v)) error {
-	return s.TrackEach(func(_ int, value v) { walker(value) })
+func (s *MapValues[k, v]) ForEach(walker func(v)) {
+	map_.ForEachOrderedValues(s.elements, s.uniques, walker)
 }
 
 func (s *MapValues[k, v]) Get(index int) (v, bool) {

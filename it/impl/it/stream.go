@@ -2,6 +2,7 @@ package it
 
 import (
 	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/typ"
 )
 
@@ -35,8 +36,8 @@ func (s *IterPipe[T]) For(walker func(T) error) error {
 	return nil
 }
 
-func (s *IterPipe[T]) ForEach(walker func(T)) error {
-	return s.For(func(t T) error { walker(t); return nil })
+func (s *IterPipe[T]) ForEach(walker func(T)) {
+	slice.ForEach(s.elements, walker)
 }
 
 func (s *IterPipe[T]) Reduce(by op.Binary[T]) T {

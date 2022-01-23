@@ -34,11 +34,15 @@ type Vector[t any /*if replaces generic type by 'T' it raises compile-time error
 	err        error
 }
 
-var _ mutable.Vector[any, mutable.Iterator[any]] = (*Vector[any])(nil)
-var _ typ.Vector[any, mutable.Iterator[any]] = (*Vector[any])(nil)
+var _ mutable.Vector[any] = (*Vector[any])(nil)
+var _ typ.Vector[any, typ.Iterator[any]] = (*Vector[any])(nil)
 var _ fmt.Stringer = (*Vector[any])(nil)
 
-func (s *Vector[t]) Begin() mutable.Iterator[t] {
+func (s *Vector[t]) Begin() typ.Iterator[t] {
+	return s.Iter()
+}
+
+func (s *Vector[t]) BeginEdit() mutable.Iterator[t] {
 	return s.Iter()
 }
 

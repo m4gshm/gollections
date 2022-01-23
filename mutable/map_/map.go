@@ -1,10 +1,10 @@
 package omap
 
 import (
-	"github.com/m4gshm/gollections/K"
 	"github.com/m4gshm/gollections/collect"
 	"github.com/m4gshm/gollections/immutable/map_"
 	"github.com/m4gshm/gollections/it/impl/it"
+	m "github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/mutable"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/typ"
@@ -40,7 +40,7 @@ type Map[k comparable, v any] struct {
 	changeMark int32
 }
 
-var _ mutable.Map[any, any, typ.KVIterator[any, any]] = (*Map[any, any])(nil)
+var _ mutable.Map[any, any] = (*Map[any, any])(nil)
 var _ typ.Map[any, any, typ.KVIterator[any, any]] = (*Map[any, any])(nil)
 
 // var _ fmt.Stringer = (*Map[interface{}, interface{}])(nil)
@@ -67,25 +67,19 @@ func (s *Map[k, v]) Len() int {
 }
 
 func (s *Map[k, v]) For(walker func(*typ.KV[k, v]) error) error {
-	return s.Track(func(key k, value v) error { return walker(K.V(key, value)) })
+	return m.For(s.uniques, walker)
 }
 
-func (s *Map[k, v]) ForEach(walker func(*typ.KV[k, v])) error {
-	return s.For(func(kv *typ.KV[k, v]) error { walker(kv); return nil })
+func (s *Map[k, v]) ForEach(walker func(*typ.KV[k, v])) {
+	m.ForEach(s.uniques, walker)
 }
 
 func (s *Map[k, v]) Track(tracker func(k, v) error) error {
-	uniques := s.uniques
-	for key, val := range uniques {
-		if err := tracker(key, val); err != nil {
-			return err
-		}
-	}
-	return nil
+	return m.Track(s.uniques, tracker)
 }
 
-func (s *Map[k, v]) TrackEach(tracker func(k, v)) error {
-	return s.Track(func(key k, value v) error { tracker(key, value); return nil })
+func (s *Map[k, v]) TrackEach(tracker func(k, v)) {
+	m.TrackEach(s.uniques, tracker)
 }
 
 func (s *Map[k, v]) Contains(key k) bool {

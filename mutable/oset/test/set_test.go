@@ -20,7 +20,7 @@ func Test_Set_Iterate(t *testing.T) {
 	expected := slice.Of(1, 2, 4, 3)
 	assert.Equal(t, expected, values)
 
-	iterSlice := it.Slice[int](set.Begin())
+	iterSlice := it.Slice(set.Begin())
 	assert.Equal(t, expected, iterSlice)
 
 	out := make([]int, 0)
@@ -31,7 +31,7 @@ func Test_Set_Iterate(t *testing.T) {
 	assert.Equal(t, expected, out)
 
 	out = make([]int, 0)
-	_ = set.ForEach(func(v int) { out = append(out, v) })
+	set.ForEach(func(v int) { out = append(out, v) })
 }
 
 func Test_Set_Add(t *testing.T) {
@@ -59,7 +59,7 @@ func Test_Set_Delete(t *testing.T) {
 
 func Test_Set_DeleteByIterator(t *testing.T) {
 	set := oset.Of(1, 1, 2, 4, 3, 1)
-	iter := set.Begin()
+	iter := set.BeginEdit()
 
 	i := 0
 	for iter.HasNext() {
@@ -75,7 +75,7 @@ func Test_Set_FilterMapReduce(t *testing.T) {
 	sum := oset.Of(1, 1, 2, 4, 3, 1).Filter(func(i int) bool { return i%2 == 0 }).Map(func(i int) int { return i * 2 }).Reduce(op.Sum[int])
 	assert.Equal(t, 12, sum)
 
-	sum = it.Pipe[int](oset.Of(1, 1, 2, 4, 3, 1).Begin()).Filter(func(i int) bool { return i%2 == 0 }).Map(func(i int) int { return i * 2 }).Reduce(op.Sum[int])
+	sum = it.Pipe(oset.Of(1, 1, 2, 4, 3, 1).Begin()).Filter(func(i int) bool { return i%2 == 0 }).Map(func(i int) int { return i * 2 }).Reduce(op.Sum[int])
 	assert.Equal(t, 12, sum)
 }
 

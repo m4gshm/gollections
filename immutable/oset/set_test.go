@@ -31,7 +31,7 @@ func Test_Set_Iterate(t *testing.T) {
 	assert.Equal(t, expected, out)
 
 	out = make([]int, 0)
-	_ = set.ForEach(func(v int) { out = append(out, v) })
+	set.ForEach(func(v int) { out = append(out, v) })
 
 	assert.Equal(t, expected, out)
 }

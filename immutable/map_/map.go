@@ -58,16 +58,16 @@ func (s *Map[k, v]) Track(tracker func(k, v) error) error {
 	return map_.Track(s.uniques, tracker)
 }
 
-func (s *Map[k, v]) TrackEach(tracker func(k, v)) error {
-	return map_.TrackEach(s.uniques, tracker)
+func (s *Map[k, v]) TrackEach(tracker func(k, v)) {
+	map_.TrackEach(s.uniques, tracker)
 }
 
 func (s *Map[k, v]) For(walker func(*typ.KV[k, v]) error) error {
 	return map_.For(s.uniques, walker)
 }
 
-func (s *Map[k, v]) ForEach(walker func(*typ.KV[k, v])) error {
-	return map_.ForEach(s.uniques, walker)
+func (s *Map[k, v]) ForEach(walker func(*typ.KV[k, v])) {
+	map_.ForEach(s.uniques, walker)
 }
 
 func (s *Map[k, v]) Len() int {

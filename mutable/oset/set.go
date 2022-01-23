@@ -42,10 +42,15 @@ type OrderedSet[T comparable] struct {
 	err        error
 }
 
-var _ mutable.Set[any, mutable.Iterator[any]] = (*OrderedSet[any])(nil)
+var _ mutable.Set[any] = (*OrderedSet[any])(nil)
+var _ typ.Set[any, typ.Iterator[any]] = (*OrderedSet[any])(nil)
 var _ fmt.Stringer = (*OrderedSet[any])(nil)
 
-func (s *OrderedSet[T]) Begin() mutable.Iterator[T] {
+func (s *OrderedSet[T]) Begin() typ.Iterator[T] {
+	return s.Iter()
+}
+
+func (s *OrderedSet[T]) BeginEdit() mutable.Iterator[T] {
 	return s.Iter()
 }
 
@@ -63,16 +68,11 @@ func (s *OrderedSet[T]) Collect() []T {
 }
 
 func (s *OrderedSet[T]) For(walker func(T) error) error {
-	for _, e := range s.elements {
-		if err := walker(*e); err != nil {
-			return err
-		}
-	}
-	return nil
+	return slice.ForRefs(s.elements, walker)
 }
 
-func (s *OrderedSet[T]) ForEach(walker func(T)) error {
-	return s.For(func(t T) error { walker(t); return nil })
+func (s *OrderedSet[T]) ForEach(walker func(T)) {
+	slice.ForEachRef(s.elements, walker)
 }
 
 func (s *OrderedSet[T]) Len() int {
