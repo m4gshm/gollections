@@ -1,3 +1,4 @@
+//package collect provides util functions and types to implement the Collect method of a typ.Transformable implementation
 package collect
 
 import "github.com/m4gshm/gollections/typ"
