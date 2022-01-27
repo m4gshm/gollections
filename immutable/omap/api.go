@@ -1,3 +1,4 @@
+//package omap provides the ordered map container implementation
 package omap
 
 import (

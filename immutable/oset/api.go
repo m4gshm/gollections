@@ -1,3 +1,4 @@
+//package oset provides the ordered set container implementation
 package oset
 
 import (

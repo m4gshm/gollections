@@ -1,3 +1,4 @@
+//package set provides the unordered set container implementation
 package set
 
 import (

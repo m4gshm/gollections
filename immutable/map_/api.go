@@ -1,3 +1,4 @@
+//package oset provides the unordered map container implementation
 package map_
 
 import (

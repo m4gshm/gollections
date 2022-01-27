@@ -18,6 +18,34 @@ Supports write operations (append, delete, replace).
 
 The same interfaces as in the mutable package but for read-only purposes.
 
+## Constructors
+### Immutable
+```go
+vector.Of(1, 2, 3); vector.New([]int{1, 2, 3})
+	
+set.Of(1, 2, 3);   set.New([]int{1, 2, 3})
+oset.Of(1, 2, 3); oset.New([]int{1, 2, 3})
+
+map_.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3")); map_.New(map[int]string{1: "2", 2: "2", 3: "3"})
+
+omap.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3")); omap.New(map[int]string{1: "2", 2: "2", 3: "3"})
+```
+where [vector](./immutable/vector/api.go), [set](./immutable/set/api.go), [oset](./immutable/oset/api.go), [map_](./immutable/map_/api.go), [omap](./immutable/omap/api.go) are packages from [github.com/m4gshm/gollections/immutable](./immutable/) and [K.V](./K/v.go) is the method V from the package [K](./K/)
+### Mutable
+```go
+capacity := 10
+
+vector.Of(1, 2, 3); vector.New(capacity); vector.Empty()
+	
+set.Of(1, 2, 3);   set.New(capacity);  set.Empty()
+oset.Of(1, 2, 3); oset.New(capacity); oset.Empty()
+
+map_.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3")); map_.New(capacity); map_.Empty()
+
+omap.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3")); omap.New(capacity); omap.Empty()
+```
+where [vector](./mutable/vector/api.go), [set](./mutable/set/api.go), [oset](./mutable/oset/api.go), [map_](./mutable/map_/api.go), [omap](./mutable/omap/api.go) are packages from [github.com/m4gshm/gollections/mutable](./mutable/) and [K.V](./K/v.go) is the method V from the package [K](./K/)
+
 ## Container functions
 
 Consists of two groups of operations:
@@ -38,7 +66,7 @@ var (
 
 maxItemAttribute := it.Reduce(it.Map(c.Filer(items, condition), Item.GetAttribute), max)
 ```
-Functions grouped into packages by applicable type ([container](./c/api.go), [iterator](./it/api.go), [slice](slice/api.go))
+Functions grouped into packages by applicable type ([container](./c/api.go), [map](./c/map_/api.go), [iterator](./it/api.go), [slice](slice/api.go))
 
 ## Builder and util functions
 
