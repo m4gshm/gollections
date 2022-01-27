@@ -6,38 +6,42 @@ import (
 	"github.com/m4gshm/gollections/typ"
 )
 
-//Not invert predicate.
+//Not inverts a predicate.
 func Not[T any](p typ.Predicate[T]) typ.Predicate[T] {
 	return func(v T) bool { return !p(v) }
 }
 
-//Nil checker.
+//Nil checks a reference for nil value.
 func Nil[T any](val *T) bool {
 	return val == nil
 }
 
-//NotNil checker.
+//NotNil checks a reference for no nil value.
 func NotNil[T any](val *T) bool {
 	return !Nil(val)
 }
 
+//Zero checks that a value is zero.
 func Zero[T any](val T) bool {
 	return reflect.ValueOf(val).IsZero()
 }
 
-func Empty[T Array](val T) bool {
+//Empty checks that a slice is empty.
+func Empty[T Slice](val T) bool {
 	return len(val) == 0
 }
 
+//EmptyMap checks that a slice is ampty.
 func EmptyMap[K comparable, V any](val map[K]V) bool {
 	return len(val) == 0
 }
 
+//And makes a conjunction of two predicates
 func And[T any](p1, p2 typ.Predicate[T]) typ.Predicate[T] {
 	return func(v T) bool { return p1(v) && p2(v) }
 }
 
-//Union reduce predicates to an one.
+//Union applies And to predicates
 func Union[T any](predicates []typ.Predicate[T]) typ.Predicate[T] {
 	l := len(predicates)
 	if l == 0 {
@@ -57,15 +61,17 @@ func Union[T any](predicates []typ.Predicate[T]) typ.Predicate[T] {
 	}
 }
 
-func Always[T any](v bool) func(T) bool {
+//Always returns v every time
+func Always[T any](v bool) typ.Predicate[T] {
 	return func(_ T) bool { return v }
 }
 
-func Never[T any](v bool) func(T) bool {
+//Always returns the negative of v every time
+func Never[T any](v bool) typ.Predicate[T] {
 	return func(_ T) bool { return !v }
 }
 
-type Array interface {
+type Slice interface {
 	~[]any | ~[]uintptr |
 		~[]int | ~[]int8 | []int16 | []int32 | []int64 |
 		~[]uint | ~[]uint8 | ~[]uint16 | ~[]uint32 | ~[]uint64 |
