@@ -47,13 +47,43 @@ func Test_Vector_Add(t *testing.T) {
 	assert.Equal(t, slice.Of(1, 1, 2, 4, 3, 1, 1), vec.Collect())
 }
 
-func Test_Vector_Delete(t *testing.T) {
+func Test_Vector_DeleteOne(t *testing.T) {
 	vec := vector.Of("1", "1", "2", "4", "3", "1")
 	r, _ := vec.Delete(3)
 	assert.Equal(t, r, true)
 	assert.Equal(t, slice.Of("1", "1", "2", "3", "1"), vec.Collect())
 	r, _ = vec.Delete(5)
 	assert.Equal(t, r, false)
+}
+
+func Test_Vector_DeleteMany(t *testing.T) {
+	vec := vector.Of("0", "1", "2", "3", "4", "5", "6")
+	r, _ := vec.Delete(3, 0, 5)
+	assert.Equal(t, r, true)
+	assert.Equal(t, slice.Of("1", "2", "4", "6"), vec.Collect())
+	r, _ = vec.Delete(5, 4)
+	assert.Equal(t, r, false)
+}
+
+func Test_Vector_DeleteManyFromTail(t *testing.T) {
+	vec := vector.Of("0", "1", "2", "3", "4", "5", "6")
+	r, _ := vec.Delete(4, 5, 6)
+	assert.Equal(t, r, true)
+	assert.Equal(t, slice.Of("0", "1", "2", "3"), vec.Collect())
+}
+
+func Test_Vector_DeleteManyFromHead(t *testing.T) {
+	vec := vector.Of("0", "1", "2", "3", "4", "5", "6")
+	r, _ := vec.Delete(0, 1, 2)
+	assert.Equal(t, r, true)
+	assert.Equal(t, slice.Of("3", "4", "5", "6"), vec.Collect())
+}
+
+func Test_Vector_DeleteManyFromMiddle(t *testing.T) {
+	vec := vector.Of("0", "1", "2", "3", "4", "5", "6")
+	r, _ := vec.Delete(4, 3)
+	assert.Equal(t, r, true)
+	assert.Equal(t, slice.Of("0", "1", "2", "5", "6"), vec.Collect())
 }
 
 func Test_Vector_Set(t *testing.T) {

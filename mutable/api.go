@@ -14,16 +14,17 @@ type Vector[t any] interface {
 	typ.Vector[t, typ.Iterator[t]]
 	Addable[t]
 	Settable[int, t]
+	Deleteable[int]
+	Removable[int, t]
 	BeginEdit() Iterator[t]
-	Delete(index int) (bool, error)
 }
 
 //Set provides uniqueness (does't insert duplicated values).
 type Set[t comparable] interface {
 	typ.Set[t, typ.Iterator[t]]
 	Addable[t]
+	Deleteable[t]
 	BeginEdit() Iterator[t]
-	Delete(...t) (bool, error)
 }
 
 //Map provides access to elements by key.
@@ -38,6 +39,14 @@ type Addable[T any] interface {
 
 type Settable[k any, v any] interface {
 	Set(key k, value v) (bool, error)
+}
+
+type Deleteable[k any] interface {
+	Delete(...k) (bool, error)
+}
+
+type Removable[k any, v any] interface {
+	Remove(k) (v, bool, error)
 }
 
 type Iterator[T any] interface {

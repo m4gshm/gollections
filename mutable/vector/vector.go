@@ -3,6 +3,7 @@ package vector
 import (
 	"errors"
 	"fmt"
+	"sort"
 
 	"github.com/m4gshm/gollections/immutable/vector"
 	"github.com/m4gshm/gollections/it/impl/it"
@@ -47,7 +48,7 @@ func (s *Vector[t]) BeginEdit() mutable.Iterator[t] {
 }
 
 func (s *Vector[t]) Iter() *Iter[t] {
-	return NewIter(s.elements, &s.changeMark, s.Delete)
+	return NewIter(s.elements, &s.changeMark, s.DeleteOne)
 }
 
 func (s *Vector[t]) Add(v ...t) (bool, error) {
@@ -72,14 +73,68 @@ func (s *Vector[t]) AddOne(v t) (bool, error) {
 	return mutable.Commit(markOnStart, &s.changeMark, &s.err)
 }
 
-func (s *Vector[t]) Delete(index int) (bool, error) {
+func (s *Vector[t]) DeleteOne(index int) (bool, error) {
+	_, ok, err := s.Remove(index)
+	return ok, err
+}
+
+func (s *Vector[t]) Remove(index int) (t, bool, error) {
+	if err := s.err; err != nil {
+		var no t
+		return no, false, err
+	}
+	if e := **s.elements; index >= 0 && index < len(e) {
+		de := e[index]
+		markOnStart := s.changeMark
+		**s.elements = slice.Delete(index, e)
+		ok, err := mutable.Commit(markOnStart, &s.changeMark, &s.err)
+		return de, ok, err
+	}
+	var no t
+	return no, false, nil
+}
+
+func (s *Vector[t]) Delete(indexes ...int) (bool, error) {
 	if err := s.err; err != nil {
 		return false, err
 	}
+
+	l := len(indexes)
+	if l == 0 {
+		return false, nil
+	} else if l == 1 {
+		return s.DeleteOne(indexes[0])
+	}
+
+	markOnStart := s.changeMark
 	e := **s.elements
-	if index >= 0 && index < len(e) {
-		markOnStart := s.changeMark
-		**s.elements = slice.Delete(index, e)
+	el := len(e)
+
+	sort.Ints(indexes)
+
+	shift := 0
+	for i := 0; i < l; i++ {
+		index := indexes[i] - shift
+		delAmount := 1
+		if index >= 0 && index < el {
+			curIndex := index
+			for i < l-1 {
+				nextIndex := indexes[i+1]
+				if nextIndex-curIndex == 1 {
+					delAmount++
+					i++
+					curIndex = nextIndex
+				} else {
+					break
+				}
+			}
+
+			e = append(e[0:index], e[index+delAmount:]...)
+			shift += delAmount
+		}
+	}
+	if shift > 0 {
+		**s.elements = e
 		return mutable.Commit(markOnStart, &s.changeMark, &s.err)
 	}
 	return false, nil
