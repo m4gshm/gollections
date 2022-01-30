@@ -1,6 +1,9 @@
 package map_
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/m4gshm/gollections/K"
 	"github.com/m4gshm/gollections/typ"
 )
@@ -125,4 +128,43 @@ func ForEachOrderedValues[m map[k]v, k comparable, v any](elements []*k, uniques
 		val := uniques[key]
 		walker(val)
 	}
+}
+
+//ToStringOrdered converts elements to the string representation according to the order
+func ToStringOrdered[k comparable, v any](order []*k, elements map[k]v) string {
+	return ToStringOrderedf(order, elements, "%+v:%+v", " ")
+}
+
+func ToStringOrderedf[k comparable, v any](order []*k, elements map[k]v, kvFormat, delim string) string {
+	var str strings.Builder
+	str.WriteString("[")
+	for i, kr := range order {
+		if i > 0 {
+			_, _ = str.WriteString(delim)
+		}
+		k := *kr
+		str.WriteString(fmt.Sprintf(kvFormat, k, elements[k]))
+	}
+	str.WriteString("]")
+	return str.String()
+}
+
+//ToString converts elements to the string representation
+func ToString[k comparable, v any](elements map[k]v) string {
+	return ToStringf(elements, "%+v:%+v", " ")
+}
+
+func ToStringf[k comparable, v any](elements map[k]v, kvFormat, delim string) string {
+	var str strings.Builder
+	str.WriteString("[")
+	i := 0
+	for k, v := range elements {
+		if i > 0 {
+			_, _ = str.WriteString(delim)
+		}
+		str.WriteString(fmt.Sprintf(kvFormat, k, v))
+		i++
+	}
+	str.WriteString("]")
+	return str.String()
 }

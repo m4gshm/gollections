@@ -4,6 +4,7 @@ package slice
 import (
 	"constraints"
 	"fmt"
+	"strings"
 
 	"github.com/m4gshm/gollections/typ"
 )
@@ -114,28 +115,40 @@ func ForEachRef[T any](references []*T, walker func(T)) {
 
 //ToString converts elements to the string representation
 func ToString[T any](elements []T) string {
-	str := ""
-	for _, v := range elements {
-		if len(str) > 0 {
-			str += ", "
+	return ToStringf(elements, "%+v", " ")
+}
+
+func ToStringf[T any](elements []T, elementFormat, delimeter string) string {
+	var str strings.Builder
+	str.WriteString("[")
+	for i, v := range elements {
+		if i > 0 {
+			_, _ = str.WriteString(delimeter)
 		}
-		str += fmt.Sprintf("%+v", v)
+		str.WriteString(fmt.Sprintf(elementFormat, v))
 	}
-	return "[" + str + "]"
+	str.WriteString("]")
+	return str.String()
 }
 
 //ToString converts references to the string representation
 func ToStringRefs[T any](references []*T) string {
-	str := ""
-	for _, ref := range references {
-		if len(str) > 0 {
-			str += ", "
+	return ToStringRefsf(references, "%+v", "nil", " ")
+}
+
+func ToStringRefsf[T any](references []*T, elementFormat, nilValue, delimeter string) string {
+	var str strings.Builder
+	str.WriteString("[")
+	for i, ref := range references {
+		if i > 0 {
+			_, _ = str.WriteString(delimeter)
 		}
 		if ref == nil {
-			str += "nil"
+			str.WriteString(nilValue)
 		} else {
-			str += fmt.Sprintf("%+v", *ref)
+			str.WriteString(fmt.Sprintf(elementFormat, *ref))
 		}
 	}
-	return "[" + str + "]"
+	str.WriteString("]")
+	return str.String()
 }

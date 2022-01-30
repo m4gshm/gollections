@@ -1,6 +1,8 @@
 package map_
 
 import (
+	"fmt"
+
 	"github.com/m4gshm/gollections/collect"
 	"github.com/m4gshm/gollections/immutable/set"
 	"github.com/m4gshm/gollections/it/impl/it"
@@ -35,7 +37,7 @@ type Map[k comparable, v any] struct {
 
 var _ typ.Map[any, any, typ.KVIterator[any, any]] = (*Map[any, any])(nil)
 
-// var _ fmt.Stringer = (*Map[interface{}, interface{}])(nil)
+var _ fmt.Stringer = (*Map[any, any])(nil)
 
 func (s *Map[k, v]) Begin() typ.KVIterator[k, v] {
 	return s.Iter()
@@ -90,6 +92,10 @@ func (s *Map[k, v]) Keys() typ.Collection[k, []k, typ.Iterator[k]] {
 
 func (s *Map[k, v]) Values() typ.Collection[v, []v, typ.Iterator[v]] {
 	return WrapVal(s.uniques)
+}
+
+func (s *Map[k, v]) String() string {
+	return map_.ToString(s.uniques)
 }
 
 func (s *Map[k, v]) FilterKey(fit typ.Predicate[k]) typ.MapPipe[k, v, map[k]v] {

@@ -20,21 +20,15 @@ bench:
 	$(info #Running benchmarks...)
 	go test -benchtime 1s -bench . -benchmem ./...
 
-.PHONY: gofmt
-gofmt:
-	go version
-	go fmt ./...
-
-.PHONY: govet
-govet:
+.PHONY: lint
+lint:
+	$(info #Lints...)
+	go install golang.org/x/tools/cmd/goimports@latest
+	goimports -w .
 	go vet ./...
-
-.PHONY: govet
-godot:
-#	go install github.com/tetafro/godot/cmd/godot@latest
-	godot ./
-
-.PHONY: errcheck
-errcheck:
-#	go install github.com/kisielk/errcheck@latest
+	# go install github.com/tetafro/godot/cmd/godot@latest
+	# godot ./:
+	go install github.com/kisielk/errcheck@latest
 	errcheck ./...
+	go install github.com/alexkohler/nakedret@latest
+	nakedret ./...

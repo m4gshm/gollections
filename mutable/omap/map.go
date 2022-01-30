@@ -1,6 +1,8 @@
 package omap
 
 import (
+	"fmt"
+
 	"github.com/m4gshm/gollections/collect"
 	"github.com/m4gshm/gollections/immutable/omap"
 	"github.com/m4gshm/gollections/immutable/vector/ref"
@@ -52,8 +54,7 @@ type OrderedMap[k comparable, v any] struct {
 
 var _ mutable.Map[any, any] = (*OrderedMap[any, any])(nil)
 var _ typ.Map[any, any, typ.KVIterator[any, any]] = (*OrderedMap[any, any])(nil)
-
-// var _ fmt.Stringer = (*OrderedMap[interface{}, interface{}])(nil)
+var _ fmt.Stringer = (*OrderedMap[any, any])(nil)
 
 func (s *OrderedMap[k, v]) Begin() typ.KVIterator[k, v] {
 	return s.Iter()
@@ -123,6 +124,10 @@ func (s *OrderedMap[k, v]) Keys() typ.Collection[k, []k, typ.Iterator[k]] {
 
 func (s *OrderedMap[k, v]) Values() typ.Collection[v, []v, typ.Iterator[v]] {
 	return omap.WrapVal(s.elements, s.uniques)
+}
+
+func (s *OrderedMap[k, v]) String() string {
+	return map_.ToStringOrdered(s.elements, s.uniques)
 }
 
 func (s *OrderedMap[k, v]) FilterKey(fit typ.Predicate[k]) typ.MapPipe[k, v, map[k]v] {
