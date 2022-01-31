@@ -47,19 +47,8 @@ func Benchmark_ForEach_Immutable_Vector_ByOf(b *testing.B) {
 	}
 }
 
-func Benchmark_ForEach_Immutable_Vector_ByNew(b *testing.B) {
+func Benchmark_ForEach_Immutable_Vector(b *testing.B) {
 	c := vector.New(values)
-	for _, casee := range cases {
-		b.Run(casee.name, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
-				c.ForEach(func(v int) { casee.load(v) })
-			}
-		})
-	}
-}
-
-func Benchmark_ForEach_Immutable_Vector_Impl(b *testing.B) {
-	c := vector.Convert(values)
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
@@ -107,7 +96,7 @@ func Benchmark_ForEach_Immutable_Set(b *testing.B) {
 }
 
 func Benchmark_ForEach_Immutable_Set_Impl(b *testing.B) {
-	c := set.Convert(values)
+	c := set.New(values)
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
@@ -129,7 +118,7 @@ func Benchmark_ForEach_Immutable_OrdererSet(b *testing.B) {
 }
 
 func Benchmark_ForEach_Immutable_OrdererSet_Impl(b *testing.B) {
-	c := oset.Convert(values)
+	c := oset.New(values)
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {

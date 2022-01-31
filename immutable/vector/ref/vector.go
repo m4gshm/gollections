@@ -3,26 +3,26 @@ package ref
 import (
 	"fmt"
 
-	"github.com/m4gshm/gollections/immutable/vector"
+	"github.com/m4gshm/gollections/immutable"
 	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/typ"
 )
 
-func Convert[T any](elements []*T) *Vector[T] {
+func NewVector[T any](elements []*T) *Vector[T] {
 	return Wrap(slice.Copy(elements))
 }
 
 func Wrap[T any](elements []*T) *Vector[T] {
-	return &Vector[T]{vector.Wrap(&elements)}
+	return &Vector[T]{immutable.WrapVector(&elements)}
 }
 
 type Vector[T any] struct {
-	*vector.Vector[*T]
+	*immutable.Vector[*T]
 }
 
-var _ typ.Vector[any, typ.Iterator[any]] = (*Vector[any])(nil)
+var _ typ.Vector[any] = (*Vector[any])(nil)
 var _ fmt.Stringer = (*Vector[any])(nil)
 
 func (s *Vector[T]) Begin() typ.Iterator[T] {

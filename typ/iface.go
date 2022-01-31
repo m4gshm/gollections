@@ -22,8 +22,8 @@ type Collection[T any, C any, IT Iter] interface {
 }
 
 //Vector is the interface of a container stores ordered elements, provides index access.
-type Vector[T any, IT Iterator[T]] interface {
-	Collection[T, []T, IT]
+type Vector[T any] interface {
+	Collection[T, []T, Iterator[T]]
 	Track[T, int]
 	TrackEach[T, int]
 	Access[int, T]
@@ -32,16 +32,16 @@ type Vector[T any, IT Iterator[T]] interface {
 }
 
 //Set is the interface of a container provides uniqueness (does't insert duplicated values).
-type Set[T any, IT Iterator[T]] interface {
-	Collection[T, []T, IT]
+type Set[T any] interface {
+	Collection[T, []T, Iterator[T]]
 	Transformable[T, []T, Iterator[T]]
 	Checkable[T]
 	Len() int
 }
 
 //Map is the interface of a container provides access to elements by key.
-type Map[k comparable, v any, IT KVIterator[k, v]] interface {
-	Collection[*KV[k, v], map[k]v, IT]
+type Map[k comparable, v any] interface {
+	Collection[*KV[k, v], map[k]v, KVIterator[k, v]]
 	Track[v, k]
 	TrackEach[v, k]
 	Checkable[k]

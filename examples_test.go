@@ -20,7 +20,7 @@ import (
 
 func Test_Set(t *testing.T) {
 	var (
-		s      immutable.Set[int] = set.Of(1, 1, 2, 4, 3, 1)
+		s      *immutable.Set[int] = set.Of(1, 1, 2, 4, 3, 1)
 		values []int              = s.Collect()
 	)
 

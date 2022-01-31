@@ -29,10 +29,11 @@ type Set[k comparable] struct {
 	changeMark int32
 }
 
-var _ mutable.Set[any] = (*Set[any])(nil)
-var _ typ.Set[any, typ.Iterator[any]] = (*Set[any])(nil)
-var _ fmt.Stringer = (*Set[any])(nil)
-var _ fmt.GoStringer = (*Set[any])(nil)
+var (
+	_ mutable.Set[any] = (*Set[any])(nil)
+	_ typ.Set[any]     = (*Set[any])(nil)
+	_ fmt.Stringer     = (*Set[any])(nil)
+)
 
 func (s *Set[k]) Begin() typ.Iterator[k] {
 	return s.Iter()
@@ -154,9 +155,5 @@ func (s *Set[k]) Contains(val k) bool {
 }
 
 func (s *Set[k]) String() string {
-	return s.GoString()
-}
-
-func (s *Set[k]) GoString() string {
 	return slice.ToString(s.Collect())
 }

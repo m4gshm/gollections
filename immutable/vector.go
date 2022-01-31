@@ -1,4 +1,4 @@
-package vector
+package immutable
 
 import (
 	"fmt"
@@ -9,21 +9,24 @@ import (
 	"github.com/m4gshm/gollections/typ"
 )
 
-func Convert[T any](elements []T) *Vector[T] {
+func NewVector[T any](elements []T) *Vector[T] {
 	c := slice.Copy(elements)
-	return Wrap(&c)
+	return WrapVector(&c)
 }
 
-func Wrap[T any](elements *[]T) *Vector[T] {
+func WrapVector[T any](elements *[]T) *Vector[T] {
 	return &Vector[T]{elements: elements}
 }
 
+//Vector stores ordered elements, provides index access.
 type Vector[T any] struct {
 	elements *[]T
 }
 
-var _ typ.Vector[any, typ.Iterator[any]] = (*Vector[any])(nil)
-var _ fmt.Stringer = (*Vector[any])(nil)
+var (
+	_ typ.Vector[any] = (*Vector[any])(nil)
+	_ fmt.Stringer    = (*Vector[any])(nil)
+)
 
 func (s *Vector[T]) Begin() typ.Iterator[T] {
 	return s.Iter()

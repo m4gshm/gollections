@@ -11,7 +11,7 @@ var BadRW = errors.New("concurrent read and write")
 
 //Vector stores ordered elements, provides index access.
 type Vector[t any] interface {
-	typ.Vector[t, typ.Iterator[t]]
+	typ.Vector[t]
 	Addable[t]
 	Settable[int, t]
 	Deleteable[int]
@@ -21,7 +21,7 @@ type Vector[t any] interface {
 
 //Set provides uniqueness (does't insert duplicated values).
 type Set[t comparable] interface {
-	typ.Set[t, typ.Iterator[t]]
+	typ.Set[t]
 	Addable[t]
 	Deleteable[t]
 	BeginEdit() Iterator[t]
@@ -29,7 +29,7 @@ type Set[t comparable] interface {
 
 //Map provides access to elements by key.
 type Map[k comparable, v any] interface {
-	typ.Map[k, v, typ.KVIterator[k, v]]
+	typ.Map[k, v]
 	Settable[k, v]
 }
 

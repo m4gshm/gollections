@@ -1,4 +1,4 @@
-package map_
+package immutable
 
 import (
 	"fmt"
@@ -10,32 +10,35 @@ import (
 	"github.com/m4gshm/gollections/typ"
 )
 
-func Convert[k comparable, v any](elements []*typ.KV[k, v]) *Map[k, v] {
+func ConvertKVsToMap[k comparable, v any](elements []*typ.KV[k, v]) *Map[k, v] {
 	uniques := make(map[k]v, 0)
 	for _, kv := range elements {
 		uniques[kv.Key()] = kv.Value()
 	}
-	return Wrap(uniques)
+	return WrapMap(uniques)
 }
 
-func ConvertMap[k comparable, v any](elements map[k]v) *Map[k, v] {
+func NewMap[k comparable, v any](elements map[k]v) *Map[k, v] {
 	uniques := make(map[k]v, len(elements))
 	for key, val := range elements {
 		uniques[key] = val
 	}
-	return Wrap(uniques)
+	return WrapMap(uniques)
 }
 
-func Wrap[k comparable, v any](uniques map[k]v) *Map[k, v] {
+func WrapMap[k comparable, v any](uniques map[k]v) *Map[k, v] {
 	return &Map[k, v]{uniques: uniques}
 }
 
+//Map provides access to elements by key.
 type Map[k comparable, v any] struct {
 	uniques map[k]v
 }
 
-var _ typ.Map[any, any, typ.KVIterator[any, any]] = (*Map[any, any])(nil)
-var _ fmt.Stringer = (*Map[any, any])(nil)
+var (
+	_ typ.Map[any, any] = (*Map[any, any])(nil)
+	_ fmt.Stringer      = (*Map[any, any])(nil)
+)
 
 func (s *Map[k, v]) Begin() typ.KVIterator[k, v] {
 	return s.Iter()

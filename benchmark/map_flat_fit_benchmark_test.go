@@ -88,7 +88,7 @@ func Benchmark_Map_Vector_Iterator_No_Cache_Operation(b *testing.B) {
 
 func Benchmark_Map_Vector_Iterator_Impl(b *testing.B) {
 	op := conv.And(toString, addTail)
-	items := vector.Convert(values)
+	items := vector.New(values)
 	var s []string
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {

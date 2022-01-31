@@ -42,9 +42,11 @@ type OrderedSet[T comparable] struct {
 	err        error
 }
 
-var _ mutable.Set[any] = (*OrderedSet[any])(nil)
-var _ typ.Set[any, typ.Iterator[any]] = (*OrderedSet[any])(nil)
-var _ fmt.Stringer = (*OrderedSet[any])(nil)
+var (
+	_ mutable.Set[any] = (*OrderedSet[any])(nil)
+	_ typ.Set[any]     = (*OrderedSet[any])(nil)
+	_ fmt.Stringer     = (*OrderedSet[any])(nil)
+)
 
 func (s *OrderedSet[T]) Begin() typ.Iterator[T] {
 	return s.Iter()

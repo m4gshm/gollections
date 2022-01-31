@@ -1,4 +1,4 @@
-package omap
+package ordered
 
 import (
 	"github.com/m4gshm/gollections/it/impl/it"

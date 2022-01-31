@@ -34,9 +34,11 @@ type Vector[T any] struct {
 	err        error
 }
 
-var _ mutable.Vector[any] = (*Vector[any])(nil)
-var _ typ.Vector[any, typ.Iterator[any]] = (*Vector[any])(nil)
-var _ fmt.Stringer = (*Vector[any])(nil)
+var (
+	_ mutable.Vector[any] = (*Vector[any])(nil)
+	_ typ.Vector[any]       = (*Vector[any])(nil)
+	_ fmt.Stringer        = (*Vector[any])(nil)
+)
 
 func (s *Vector[T]) Begin() typ.Iterator[T] {
 	return s.Iter()

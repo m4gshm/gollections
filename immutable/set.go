@@ -1,4 +1,4 @@
-package set
+package immutable
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ import (
 	"github.com/m4gshm/gollections/typ"
 )
 
-func Convert[T comparable](elements []T) *Set[T] {
+func NewSet[T comparable](elements []T) *Set[T] {
 	uniques := make(map[T]struct{}, 0)
 	for _, v := range elements {
 		uniques[v] = struct{}{}
@@ -22,13 +22,15 @@ func Wrap[k comparable](uniques map[k]struct{}) *Set[k] {
 	return &Set[k]{uniques: uniques}
 }
 
+//Set provides uniqueness (does't insert duplicated values).
 type Set[k comparable] struct {
 	uniques map[k]struct{}
 }
 
-var _ typ.Set[any, typ.Iterator[any]] = (*Set[any])(nil)
-var _ fmt.Stringer = (*Set[any])(nil)
-var _ fmt.GoStringer = (*Set[any])(nil)
+var (
+	_ typ.Set[any] = (*Set[any])(nil)
+	_ fmt.Stringer = (*Set[any])(nil)
+)
 
 func (s *Set[k]) Begin() typ.Iterator[k] {
 	return s.Iter()
@@ -77,9 +79,5 @@ func (s *Set[k]) Contains(val k) bool {
 }
 
 func (s *Set[k]) String() string {
-	return s.GoString()
-}
-
-func (s *Set[k]) GoString() string {
 	return slice.ToString(s.Collect())
 }

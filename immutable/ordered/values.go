@@ -1,4 +1,4 @@
-package omap
+package ordered
 
 import (
 	"fmt"

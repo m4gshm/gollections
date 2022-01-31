@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/m4gshm/gollections/collect"
-	"github.com/m4gshm/gollections/immutable/map_"
+	"github.com/m4gshm/gollections/immutable"
 	"github.com/m4gshm/gollections/it/impl/it"
 	m "github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/mutable"
@@ -43,7 +43,7 @@ type Map[k comparable, v any] struct {
 }
 
 var _ mutable.Map[any, any] = (*Map[any, any])(nil)
-var _ typ.Map[any, any, typ.KVIterator[any, any]] = (*Map[any, any])(nil)
+var _ typ.Map[any, any] = (*Map[any, any])(nil)
 var _ fmt.Stringer = (*Map[any, any])(nil)
 
 func (s *Map[k, v]) Begin() typ.KVIterator[k, v] {
@@ -107,11 +107,11 @@ func (s *Map[k, v]) Set(key k, value v) (bool, error) {
 }
 
 func (s *Map[k, v]) Keys() typ.Collection[k, []k, typ.Iterator[k]] {
-	return map_.WrapKeys(s.uniques)
+	return immutable.WrapKeys(s.uniques)
 }
 
 func (s *Map[k, v]) Values() typ.Collection[v, []v, typ.Iterator[v]] {
-	return map_.WrapVal(s.uniques)
+	return immutable.WrapVal(s.uniques)
 }
 
 func (s *Map[k, v]) String() string {

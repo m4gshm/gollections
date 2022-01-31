@@ -1,10 +1,12 @@
 //package oset provides the ordered set container implementation
 package oset
 
-func Of[T comparable](elements ...T) *OrderedSet[T] {
-	return Convert(elements)
+import "github.com/m4gshm/gollections/immutable/ordered"
+
+func Of[T comparable](elements ...T) *ordered.Set[T] {
+	return ordered.NewSet(elements)
 }
 
-func New[T comparable](elements []T) *OrderedSet[T] {
-	return Convert(elements)
+func New[T comparable](elements []T) *ordered.Set[T] {
+	return ordered.NewSet(elements)
 }
