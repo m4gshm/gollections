@@ -44,7 +44,7 @@ type Map[k comparable, v any] struct {
 
 var _ mutable.Map[any, any] = (*Map[any, any])(nil)
 var _ typ.Map[any, any, typ.KVIterator[any, any]] = (*Map[any, any])(nil)
-var _ fmt.Stringer = (*Map[interface{}, interface{}])(nil)
+var _ fmt.Stringer = (*Map[any, any])(nil)
 
 func (s *Map[k, v]) Begin() typ.KVIterator[k, v] {
 	return s.Iter()

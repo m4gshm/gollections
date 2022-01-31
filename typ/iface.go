@@ -52,7 +52,7 @@ type Map[k comparable, v any, IT KVIterator[k, v]] interface {
 	Len() int
 }
 
-//Iterator - base for the Iterator and the KVIterator.
+//Iter is the base for Iterator and KVIterator.
 type Iter interface {
 	//checks ability on next element or error.
 	HasNext() bool
@@ -97,7 +97,7 @@ type Walk[T any] interface {
 	For(func(element T) error) error
 }
 
-//Walk touches all elements of the collection without error checking
+//WalkEach touches all elements of the collection without error checking
 type WalkEach[T any] interface {
 	ForEach(func(element T))
 }
@@ -107,7 +107,7 @@ type Track[T any, P any] interface {
 	Track(func(position P, element T) error) error
 }
 
-//Track traverses container elements with position tracking (index, key, coordinates, etc.) without error checking
+//TrackEach traverses container elements with position tracking (index, key, coordinates, etc.) without error checking
 type TrackEach[T any, P any] interface {
 	TrackEach(func(position P, element T))
 }
@@ -146,7 +146,7 @@ type MapTransformable[k comparable, v any, m any] interface {
 	MapValue(Converter[v, v]) MapPipe[k, v, m]
 }
 
-//Pipe extends MapTransformable by finalize methods like ForEach, Collect or Reduce.
+//MapPipe extends MapTransformable by finalize methods like ForEach, Collect or Reduce.
 type MapPipe[k comparable, v any, m any] interface {
 	MapTransformable[k, v, m]
 	Container[m, KVIterator[k, v]]

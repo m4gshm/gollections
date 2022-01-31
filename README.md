@@ -2,7 +2,7 @@
 
 Golang generic container data structures and functions.
 
-Need use Go version 1.18 beta 1 or newer.
+Need use Go version 1.18 beta 2 or newer.
 
 ## [Mutable containers](./mutable/api.go)
 

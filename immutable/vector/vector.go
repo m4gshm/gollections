@@ -58,13 +58,8 @@ func (s *Vector[T]) Len() int {
 }
 
 func (s *Vector[T]) Get(index int) (T, bool) {
-	elements := *s.elements
-	l := len(elements)
-	if l > 0 && (index >= 0 || index < l) {
-		return elements[index], true
-	}
-	var no T
-	return no, false
+	return slice.Get(*s.elements, index)
+
 }
 
 func (s *Vector[T]) Filter(filter typ.Predicate[T]) typ.Pipe[T, []T, typ.Iterator[T]] {

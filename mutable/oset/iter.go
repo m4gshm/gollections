@@ -26,7 +26,7 @@ func (i *Iter[T]) HasNext() bool {
 }
 
 func (i *Iter[T]) Get() (T, error) {
-	v, err := it.Get(i.current, i.elements, i.err)
+	v, err := it.Get(i.elements, i.current, i.err)
 	if err != nil {
 		var no T
 		return no, err

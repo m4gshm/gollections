@@ -1,14 +1,10 @@
 //package set provides the unordered set container implementation
 package set
 
-import (
-	"github.com/m4gshm/gollections/immutable"
-)
-
-func Of[T comparable](elements ...T) immutable.Set[T] {
+func Of[T comparable](elements ...T) *Set[T] {
 	return Convert(elements)
 }
 
-func New[T comparable](elements []T) immutable.Set[T] {
+func New[T comparable](elements []T) *Set[T] {
 	return Convert(elements)
 }

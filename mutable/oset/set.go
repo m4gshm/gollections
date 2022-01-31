@@ -10,7 +10,7 @@ import (
 	"github.com/m4gshm/gollections/typ"
 )
 
-func ToOrderedSet[T comparable](elements []T) *OrderedSet[T] {
+func Convert[T comparable](elements []T) *OrderedSet[T] {
 	var (
 		uniques = make(map[T]int, 0)
 		order   = make([]*T, 0, 0)

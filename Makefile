@@ -9,7 +9,7 @@ test:
 	go test ./...
 
 .PHONY: build
-build: gofmt govet errcheck
+build:
 	$(info #Building...)
 	# go build -gcflags -m ./...
 	go clean -cache
@@ -19,6 +19,12 @@ build: gofmt govet errcheck
 bench:
 	$(info #Running benchmarks...)
 	go test -benchtime 1s -bench . -benchmem ./...
+
+.PHONY: update
+update:
+	$(info #Undate tools...)
+	go install github.com/go-delve/delve/cmd/dlv@latest
+	go install golang.org/x/tools/gopls@latest
 
 .PHONY: lint
 lint:
@@ -32,3 +38,5 @@ lint:
 	errcheck ./...
 	go install github.com/alexkohler/nakedret@latest
 	nakedret ./...
+	go install golang.org/x/lint/golint@latest
+	golint ./...

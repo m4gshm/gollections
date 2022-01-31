@@ -26,7 +26,7 @@ func (i *Iter[T]) HasNext() bool {
 }
 
 func (i *Iter[T]) Get() (T, error) {
-	return it.Get(i.current, *i.elements, i.err)
+	return it.Get(*i.elements, i.current, i.err)
 }
 
 func (s *Iter[T]) Next() T {

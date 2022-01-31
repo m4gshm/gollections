@@ -62,6 +62,16 @@ func Range[T constraints.Integer](from T, to T) []T {
 	return elements
 }
 
+//Get returns the element by its index in elements, otherwise, if the provided index is ouf of the elements, returns zero T and false in the second result
+func Get[T any](elements []T, index int) (T, bool) {
+	l := len(elements)
+	if l > 0 && (index >= 0 || index < l) {
+		return elements[index], true
+	}
+	var no T
+	return no, false
+}
+
 //Track applies tracker to elements with error checking
 func Track[T any](elements []T, tracker func(int, T) error) error {
 	for i, e := range elements {
@@ -72,7 +82,7 @@ func Track[T any](elements []T, tracker func(int, T) error) error {
 	return nil
 }
 
-//Track applies tracker to elements without error checking
+//TrackEach applies tracker to elements without error checking
 func TrackEach[T any](elements []T, tracker func(int, T)) {
 	for i, e := range elements {
 		tracker(i, e)
@@ -106,18 +116,19 @@ func ForRefs[T any](references []*T, walker func(T) error) error {
 	return nil
 }
 
-//ForRefs applies walker to references without error checking
+//ForEachRef applies walker to references without error checking
 func ForEachRef[T any](references []*T, walker func(T)) {
 	for _, e := range references {
 		walker(*e)
 	}
 }
 
-//ToString converts elements to the string representation
+//ToString converts elements to their default string representation
 func ToString[T any](elements []T) string {
 	return ToStringf(elements, "%+v", " ")
 }
 
+//ToStringf converts elements to a string representation defined by a custom element format and a delimiter
 func ToStringf[T any](elements []T, elementFormat, delimeter string) string {
 	var str strings.Builder
 	str.WriteString("[")
@@ -131,11 +142,12 @@ func ToStringf[T any](elements []T, elementFormat, delimeter string) string {
 	return str.String()
 }
 
-//ToString converts references to the string representation
+//ToStringRefs converts references to the default string representation
 func ToStringRefs[T any](references []*T) string {
 	return ToStringRefsf(references, "%+v", "nil", " ")
 }
 
+//ToStringRefsf converts references to a string representation defined by a custom delimiter and a nil value representation
 func ToStringRefsf[T any](references []*T, elementFormat, nilValue, delimeter string) string {
 	var str strings.Builder
 	str.WriteString("[")

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/m4gshm/gollections/immutable/vector"
 	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/mutable"
 	"github.com/m4gshm/gollections/op"
@@ -25,12 +24,12 @@ func Convert[T any](elements []T) *Vector[T] {
 
 func Wrap[T any](elements []T) *Vector[T] {
 	r := &elements
-	return &Vector[T]{Vector: vector.Wrap(r), elements: &r}
+	return &Vector[T]{elements: r}
 }
 
-type Vector[t any /*if replaces generic type by 'T' it raises compile-time error 'type parameter bound more than once'*/] struct {
-	*vector.Vector[t]
-	elements   **[]t
+//Vector is the interface of a container stores ordered elements, provides index access.
+type Vector[T any] struct {
+	elements   *[]T
 	changeMark int32
 	err        error
 }
@@ -39,62 +38,90 @@ var _ mutable.Vector[any] = (*Vector[any])(nil)
 var _ typ.Vector[any, typ.Iterator[any]] = (*Vector[any])(nil)
 var _ fmt.Stringer = (*Vector[any])(nil)
 
-func (s *Vector[t]) Begin() typ.Iterator[t] {
+func (s *Vector[T]) Begin() typ.Iterator[T] {
 	return s.Iter()
 }
 
-func (s *Vector[t]) BeginEdit() mutable.Iterator[t] {
+func (s *Vector[T]) BeginEdit() mutable.Iterator[T] {
 	return s.Iter()
 }
 
-func (s *Vector[t]) Iter() *Iter[t] {
-	return NewIter(s.elements, &s.changeMark, s.DeleteOne)
+func (s *Vector[T]) Iter() *Iter[T] {
+	return NewIter(&s.elements, &s.changeMark, s.DeleteOne)
 }
 
-func (s *Vector[t]) Add(v ...t) (bool, error) {
+func (s *Vector[T]) Collect() []T {
+	return slice.Copy(*s.elements)
+}
+
+func (s *Vector[T]) Track(tracker func(int, T) error) error {
+	return slice.Track(*s.elements, tracker)
+}
+
+func (s *Vector[T]) TrackEach(tracker func(int, T)) {
+	slice.TrackEach(*s.elements, tracker)
+}
+
+func (s *Vector[T]) For(walker func(T) error) error {
+	return slice.For(*s.elements, walker)
+}
+
+func (s *Vector[T]) ForEach(walker func(T)) {
+	slice.ForEach(*s.elements, walker)
+}
+
+func (s *Vector[T]) Len() int {
+	return it.GetLen(s.elements)
+}
+
+func (s *Vector[T]) Get(index int) (T, bool) {
+	return slice.Get(*s.elements, index)
+}
+
+func (s *Vector[T]) Add(v ...T) (bool, error) {
 	return s.AddAll(v)
 }
 
-func (s *Vector[t]) AddAll(v []t) (bool, error) {
+func (s *Vector[T]) AddAll(v []T) (bool, error) {
 	if err := s.err; err != nil {
 		return false, err
 	}
 	markOnStart := s.changeMark
-	**s.elements = append(**s.elements, v...)
+	*s.elements = append(*s.elements, v...)
 	return mutable.Commit(markOnStart, &s.changeMark, &s.err)
 }
 
-func (s *Vector[t]) AddOne(v t) (bool, error) {
+func (s *Vector[T]) AddOne(v T) (bool, error) {
 	if err := s.err; err != nil {
 		return false, err
 	}
 	markOnStart := s.changeMark
-	**s.elements = append(**s.elements, v)
+	*s.elements = append(*s.elements, v)
 	return mutable.Commit(markOnStart, &s.changeMark, &s.err)
 }
 
-func (s *Vector[t]) DeleteOne(index int) (bool, error) {
+func (s *Vector[T]) DeleteOne(index int) (bool, error) {
 	_, ok, err := s.Remove(index)
 	return ok, err
 }
 
-func (s *Vector[t]) Remove(index int) (t, bool, error) {
+func (s *Vector[T]) Remove(index int) (T, bool, error) {
 	if err := s.err; err != nil {
-		var no t
+		var no T
 		return no, false, err
 	}
-	if e := **s.elements; index >= 0 && index < len(e) {
+	if e := *s.elements; index >= 0 && index < len(e) {
 		de := e[index]
 		markOnStart := s.changeMark
-		**s.elements = slice.Delete(index, e)
+		*s.elements = slice.Delete(index, e)
 		ok, err := mutable.Commit(markOnStart, &s.changeMark, &s.err)
 		return de, ok, err
 	}
-	var no t
+	var no T
 	return no, false, nil
 }
 
-func (s *Vector[t]) Delete(indexes ...int) (bool, error) {
+func (s *Vector[T]) Delete(indexes ...int) (bool, error) {
 	if err := s.err; err != nil {
 		return false, err
 	}
@@ -107,7 +134,7 @@ func (s *Vector[t]) Delete(indexes ...int) (bool, error) {
 	}
 
 	markOnStart := s.changeMark
-	e := **s.elements
+	e := *s.elements
 	el := len(e)
 
 	sort.Ints(indexes)
@@ -134,17 +161,17 @@ func (s *Vector[t]) Delete(indexes ...int) (bool, error) {
 		}
 	}
 	if shift > 0 {
-		**s.elements = e
+		*s.elements = e
 		return mutable.Commit(markOnStart, &s.changeMark, &s.err)
 	}
 	return false, nil
 }
 
-func (s *Vector[t]) Set(index int, value t) (bool, error) {
+func (s *Vector[T]) Set(index int, value T) (bool, error) {
 	if err := s.err; err != nil {
 		return false, err
 	}
-	e := **s.elements
+	e := *s.elements
 	if index < 0 {
 		return false, fmt.Errorf("%w: %d", BadIndex, index)
 	}
@@ -155,23 +182,27 @@ func (s *Vector[t]) Set(index int, value t) (bool, error) {
 		if l > c {
 			c = l
 		}
-		ne := make([]t, l, c)
+		ne := make([]T, l, c)
 		copy(ne, e)
 		e = ne
-		**s.elements = e
+		*s.elements = e
 	}
 	e[index] = value
 	return true, nil
 }
 
-func (s *Vector[t]) Filter(filter typ.Predicate[t]) typ.Pipe[t, []t, typ.Iterator[t]] {
-	return it.NewPipe[t](it.Filter(s.Iter(), filter))
+func (s *Vector[T]) Filter(filter typ.Predicate[T]) typ.Pipe[T, []T, typ.Iterator[T]] {
+	return it.NewPipe[T](it.Filter(s.Iter(), filter))
 }
 
-func (s *Vector[t]) Map(by typ.Converter[t, t]) typ.Pipe[t, []t, typ.Iterator[t]] {
-	return it.NewPipe[t](it.Map(s.Iter(), by))
+func (s *Vector[T]) Map(by typ.Converter[T, T]) typ.Pipe[T, []T, typ.Iterator[T]] {
+	return it.NewPipe[T](it.Map(s.Iter(), by))
 }
 
-func (s *Vector[t]) Reduce(by op.Binary[t]) t {
+func (s *Vector[T]) Reduce(by op.Binary[T]) T {
 	return it.Reduce(s.Iter(), by)
+}
+
+func (s *Vector[T]) String() string {
+	return slice.ToString(*s.elements)
 }

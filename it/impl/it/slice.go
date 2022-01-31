@@ -48,7 +48,7 @@ func (s *Iter[T]) HasNext() bool {
 }
 
 func (s *Iter[T]) Get() (T, error) {
-	r, err := Get(s.current, &s.elements, s.err)
+	r, err := Get(&s.elements, s.current, s.err)
 	if err != nil {
 		var no T
 		return no, err
@@ -154,7 +154,7 @@ func HasNextByLen(size int, index *int, err *error) bool {
 	return false
 }
 
-func Get[T any](current int, elements *[]T, err error) (T, error) {
+func Get[T any](elements *[]T, current int, err error) (T, error) {
 	if err != nil {
 		var no T
 		return no, err
@@ -169,13 +169,7 @@ func GetArrayPointer[T any](elements *[]T) unsafe.Pointer {
 	return unsafe.Pointer(GetSliceHeader(elements).Data)
 }
 
-func GetArrayElementSize2[T any](elements []T) uintptr {
-	a := any(elements)
-	typ := *(**sliceType)(unsafe.Pointer(&a))
-	return typ.elem.size
-}
-
-func GetArrayElementSize[T any](elements *[]T) uintptr {
+func GetArrayElementSize[T any](_ *[]T) uintptr {
 	var t T
 	return unsafe.Sizeof(t)
 }

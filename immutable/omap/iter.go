@@ -24,7 +24,7 @@ func (s *ValIter[k, v]) HasNext() bool {
 }
 
 func (s *ValIter[k, v]) Get() (v, error) {
-	kref, err := it.Get(s.current, &s.elements, s.err)
+	kref, err := it.Get(&s.elements, s.current, s.err)
 	if err != nil {
 		var no v
 		return no, err

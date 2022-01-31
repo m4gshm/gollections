@@ -4,9 +4,8 @@ import (
 	"fmt"
 
 	"github.com/m4gshm/gollections/collect"
-	"github.com/m4gshm/gollections/immutable/set"
 	"github.com/m4gshm/gollections/it/impl/it"
-	"github.com/m4gshm/gollections/map_"
+	m "github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/typ"
 )
@@ -36,7 +35,6 @@ type Map[k comparable, v any] struct {
 }
 
 var _ typ.Map[any, any, typ.KVIterator[any, any]] = (*Map[any, any])(nil)
-
 var _ fmt.Stringer = (*Map[any, any])(nil)
 
 func (s *Map[k, v]) Begin() typ.KVIterator[k, v] {
@@ -56,20 +54,24 @@ func (s *Map[k, v]) Collect() map[k]v {
 	return out
 }
 
+func (s *Map[k, v]) String() string {
+	return m.ToString(s.uniques)
+}
+
 func (s *Map[k, v]) Track(tracker func(k, v) error) error {
-	return map_.Track(s.uniques, tracker)
+	return m.Track(s.uniques, tracker)
 }
 
 func (s *Map[k, v]) TrackEach(tracker func(k, v)) {
-	map_.TrackEach(s.uniques, tracker)
+	m.TrackEach(s.uniques, tracker)
 }
 
 func (s *Map[k, v]) For(walker func(*typ.KV[k, v]) error) error {
-	return map_.For(s.uniques, walker)
+	return m.For(s.uniques, walker)
 }
 
 func (s *Map[k, v]) ForEach(walker func(*typ.KV[k, v])) {
-	map_.ForEach(s.uniques, walker)
+	m.ForEach(s.uniques, walker)
 }
 
 func (s *Map[k, v]) Len() int {
@@ -87,15 +89,11 @@ func (s *Map[k, v]) Get(key k) (v, bool) {
 }
 
 func (s *Map[k, v]) Keys() typ.Collection[k, []k, typ.Iterator[k]] {
-	return set.Wrap(s.uniques)
+	return WrapKeys(s.uniques)
 }
 
 func (s *Map[k, v]) Values() typ.Collection[v, []v, typ.Iterator[v]] {
 	return WrapVal(s.uniques)
-}
-
-func (s *Map[k, v]) String() string {
-	return map_.ToString(s.uniques)
 }
 
 func (s *Map[k, v]) FilterKey(fit typ.Predicate[k]) typ.MapPipe[k, v, map[k]v] {
