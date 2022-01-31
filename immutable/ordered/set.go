@@ -1,4 +1,4 @@
-package oset
+package ordered
 
 import (
 	"fmt"
@@ -9,7 +9,7 @@ import (
 	"github.com/m4gshm/gollections/typ"
 )
 
-func Convert[T comparable](elements []T) *Set[T] {
+func NewSet[T comparable](elements []T) *Set[T] {
 	var (
 		uniques = make(map[T]struct{}, 0)
 		order   = make([]*T, 0, 0)
@@ -21,10 +21,10 @@ func Convert[T comparable](elements []T) *Set[T] {
 			uniques[vv] = struct{}{}
 		}
 	}
-	return Wrap(order, uniques)
+	return WrapSet(order, uniques)
 }
 
-func Wrap[T comparable](elements []*T, uniques map[T]struct{}) *Set[T] {
+func WrapSet[T comparable](elements []*T, uniques map[T]struct{}) *Set[T] {
 	return &Set[T]{elements: elements, uniques: uniques}
 }
 
@@ -33,7 +33,7 @@ type Set[T comparable] struct {
 	uniques  map[T]struct{}
 }
 
-var _ typ.Set[any, typ.Iterator[any]] = (*Set[any])(nil)
+var _ typ.Set[any] = (*Set[any])(nil)
 var _ fmt.Stringer = (*Set[any])(nil)
 var _ fmt.GoStringer = (*Set[any])(nil)
 
