@@ -22,18 +22,8 @@ func Benchmark_Vector_Add(b *testing.B) {
 	_ = v
 }
 
-func Benchmark_VectorImpl_Add(b *testing.B) {
-	v := vector.Create[int](max)
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		_, _ = v.Add(values...)
-	}
-	b.StopTimer()
-	_ = v
-}
-
-func Benchmark_VectorImpl_Add_ByOne(b *testing.B) {
-	v := vector.Create[int](max)
+func Benchmark_Vector_Add_ByOne(b *testing.B) {
+	v := vector.New[int](max)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		for _, i := range values {
@@ -44,20 +34,8 @@ func Benchmark_VectorImpl_Add_ByOne(b *testing.B) {
 	_ = v
 }
 
-func Benchmark_VectorImpl_Add_One(b *testing.B) {
-	v := vector.Create[int](max)
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		for _, i := range values {
-			_, _ = v.AddOne(i)
-		}
-	}
-	b.StopTimer()
-	_ = v
-}
-
-func Benchmark_VectorImpl_Add_All(b *testing.B) {
-	v := vector.Create[int](max)
+func Benchmark_Vector_Add_All(b *testing.B) {
+	v := vector.New[int](max)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_, _ = v.AddAll(values)

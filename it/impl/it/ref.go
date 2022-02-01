@@ -13,7 +13,6 @@ func WrapRef[T any](it *PIter[*T]) *RefIter[T] {
 }
 
 type RefIter[T any] struct {
-	// typ.Iterator[*T]
 	*PIter[*T]
 }
 

@@ -12,6 +12,7 @@ import (
 	iterimpl "github.com/m4gshm/gollections/it/impl/it"
 	sliceitimpl "github.com/m4gshm/gollections/it/impl/slice"
 	sliceit "github.com/m4gshm/gollections/it/slice"
+	"github.com/m4gshm/gollections/mutable"
 	mvector "github.com/m4gshm/gollections/mutable/vector"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
@@ -102,10 +103,10 @@ func Benchmark_Map_Vector_ForEach_(b *testing.B) {
 	op := conv.And(toString, addTail)
 	items := vector.Of(values...)
 	c := len(values)
-	var s *mvector.Vector[string]
+	var s *mutable.Vector[string]
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		s = mvector.Create[string](c)
+		s = mvector.New[string](c)
 		items.ForEach(func(element int) { _, _ = s.Add(op(element)) })
 	}
 	_ = s

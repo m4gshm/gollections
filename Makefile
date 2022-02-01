@@ -11,9 +11,14 @@ test:
 .PHONY: build
 build:
 	$(info #Building...)
-	# go build -gcflags -m ./...
 	go clean -cache
 	go build ./...
+
+.PHONY: builda
+builda:
+	$(info #Building...)
+	go clean -cache
+	go build -gcflags -m ./...
 
 .PHONY: bench
 bench:

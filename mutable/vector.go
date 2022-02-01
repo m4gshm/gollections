@@ -6,7 +6,6 @@ import (
 	"sort"
 
 	"github.com/m4gshm/gollections/it/impl/it"
-	"github.com/m4gshm/gollections/mutable"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/typ"
@@ -35,21 +34,23 @@ type Vector[T any] struct {
 }
 
 var (
-	_ mutable.Vector[any] = (*Vector[any])(nil)
-	_ typ.Vector[any]     = (*Vector[any])(nil)
-	_ fmt.Stringer        = (*Vector[any])(nil)
+	_ Addable[any]       = (*Vector[any])(nil)
+	_ Deleteable[int]    = (*Vector[any])(nil)
+	_ Settable[int, any] = (*Vector[any])(nil)
+	_ typ.Vector[any]    = (*Vector[any])(nil)
+	_ fmt.Stringer       = (*Vector[any])(nil)
 )
 
 func (s *Vector[T]) Begin() typ.Iterator[T] {
 	return s.Iter()
 }
 
-func (s *Vector[T]) BeginEdit() mutable.Iterator[T] {
+func (s *Vector[T]) BeginEdit() Iterator[T] {
 	return s.Iter()
 }
 
-func (s *Vector[T]) Iter() *SetIter[T] {
-	return NewSetIter(&s.elements, &s.changeMark, s.DeleteOne)
+func (s *Vector[T]) Iter() *Iter[T] {
+	return NewIter(&s.elements, &s.changeMark, s.DeleteOne)
 }
 
 func (s *Vector[T]) Collect() []T {
@@ -90,7 +91,7 @@ func (s *Vector[T]) AddAll(v []T) (bool, error) {
 	}
 	markOnStart := s.changeMark
 	*s.elements = append(*s.elements, v...)
-	return mutable.Commit(markOnStart, &s.changeMark, &s.err)
+	return Commit(markOnStart, &s.changeMark, &s.err)
 }
 
 func (s *Vector[T]) AddOne(v T) (bool, error) {
@@ -99,7 +100,7 @@ func (s *Vector[T]) AddOne(v T) (bool, error) {
 	}
 	markOnStart := s.changeMark
 	*s.elements = append(*s.elements, v)
-	return mutable.Commit(markOnStart, &s.changeMark, &s.err)
+	return Commit(markOnStart, &s.changeMark, &s.err)
 }
 
 func (s *Vector[T]) DeleteOne(index int) (bool, error) {
@@ -116,7 +117,7 @@ func (s *Vector[T]) Remove(index int) (T, bool, error) {
 		de := e[index]
 		markOnStart := s.changeMark
 		*s.elements = slice.Delete(index, e)
-		ok, err := mutable.Commit(markOnStart, &s.changeMark, &s.err)
+		ok, err := Commit(markOnStart, &s.changeMark, &s.err)
 		return de, ok, err
 	}
 	var no T
@@ -164,7 +165,7 @@ func (s *Vector[T]) Delete(indexes ...int) (bool, error) {
 	}
 	if shift > 0 {
 		*s.elements = e
-		return mutable.Commit(markOnStart, &s.changeMark, &s.err)
+		return Commit(markOnStart, &s.changeMark, &s.err)
 	}
 	return false, nil
 }

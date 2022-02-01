@@ -10,87 +10,82 @@ import (
 	"github.com/m4gshm/gollections/typ"
 )
 
-func Convert[T comparable](elements []T) *OrderedSet[T] {
+func ToSet[T comparable](elements []T) *Set[T] {
 	var (
 		uniques = make(map[T]int, 0)
-		order   = make([]*T, 0, 0)
+		order   = make([]T, 0, 0)
 	)
 	pos := 0
 	for _, v := range elements {
 		if _, ok := uniques[v]; !ok {
-			vv := v
-			order = append(order, &vv)
-			uniques[vv] = pos
+			order = append(order, v)
+			uniques[v] = pos
 			pos++
 		}
 	}
-	return WrapOrderedSet(order, uniques)
+	return WrapSet(order, uniques)
 }
 
-func NewOrderedSet[T comparable](capacity int) *OrderedSet[T] {
-	return WrapOrderedSet(make([]*T, 0, capacity), make(map[T]int, capacity))
+func NewSet[T comparable](capacity int) *Set[T] {
+	return WrapSet(make([]T, 0, capacity), make(map[T]int, capacity))
 }
 
-func WrapOrderedSet[T comparable](elements []*T, uniques map[T]int) *OrderedSet[T] {
-	return &OrderedSet[T]{elements: elements, uniques: uniques}
+func WrapSet[T comparable](elements []T, uniques map[T]int) *Set[T] {
+	return &Set[T]{elements: elements, uniques: uniques}
 }
 
-type OrderedSet[T comparable] struct {
-	elements   []*T
+type Set[T comparable] struct {
+	elements   []T
 	uniques    map[T]int
 	changeMark int32
 	err        error
 }
 
 var (
-	_ mutable.Set[any] = (*OrderedSet[any])(nil)
-	_ typ.Set[any]     = (*OrderedSet[any])(nil)
-	_ fmt.Stringer     = (*OrderedSet[any])(nil)
+	_ mutable.Addable[any]    = (*Set[any])(nil)
+	_ mutable.Deleteable[any] = (*Set[any])(nil)
+	_ typ.Set[any]            = (*Set[any])(nil)
+	_ fmt.Stringer            = (*Set[any])(nil)
 )
 
-func (s *OrderedSet[T]) Begin() typ.Iterator[T] {
+func (s *Set[T]) Begin() typ.Iterator[T] {
 	return s.Iter()
 }
 
-func (s *OrderedSet[T]) BeginEdit() mutable.Iterator[T] {
+func (s *Set[T]) BeginEdit() mutable.Iterator[T] {
 	return s.Iter()
 }
 
-func (s *OrderedSet[T]) Iter() *Iter[T] {
-	return NewIter(&s.elements, &s.changeMark, s.DeleteOne)
+func (s *Set[T]) Iter() *SetIter[T] {
+	return NewSetIter(&s.elements, &s.changeMark, s.DeleteOne)
 }
 
-func (s *OrderedSet[T]) Collect() []T {
-	e := s.elements
-	out := make([]T, len(e))
-	for i, v := range e {
-		out[i] = *v
-	}
-	return out
+func (s *Set[T]) Collect() []T {
+	return slice.Copy(s.elements)
 }
 
-func (s *OrderedSet[T]) For(walker func(T) error) error {
-	return slice.ForRefs(s.elements, walker)
+func (s *Set[T]) For(walker func(T) error) error {
+	return slice.For(s.elements, walker)
 }
 
-func (s *OrderedSet[T]) ForEach(walker func(T)) {
-	slice.ForEachRef(s.elements, walker)
+func (s *Set[T]) ForEach(walker func(T)) {
+	slice.ForEach(s.elements, walker)
 }
 
-func (s *OrderedSet[T]) Len() int {
+func (s *Set[T]) Len() int {
 	return len(s.elements)
 }
 
-func (s *OrderedSet[T]) Contains(v T) bool {
+func (s *Set[T]) Contains(v T) bool {
 	_, ok := s.uniques[v]
 	return ok
 }
 
-func (s *OrderedSet[T]) Add(elements ...T) (bool, error) {
+func (s *Set[T]) Add(elements ...T) (bool, error) {
 	return s.AddAll(elements)
 }
 
-func (s *OrderedSet[T]) AddAll(elements []T) (bool, error) {
+func (s *Set[T]) AddAll(elements []T) (bool, error) {
 	if err := s.err; err != nil {
 		return false, err
 	}
@@ -102,7 +97,7 @@ func (s *OrderedSet[T]) AddAll(elements []T) (bool, error) {
 		if _, ok := u[v]; !ok {
 			e := s.elements
 			u[v] = len(e)
-			s.elements = append(e, &v)
+			s.elements = append(e, v)
 			cmt, err := mutable.Commit(markOnStart, &s.changeMark, &s.err)
 			if err != nil {
 				return false, err
@@ -113,7 +108,7 @@ func (s *OrderedSet[T]) AddAll(elements []T) (bool, error) {
 	return result, nil
 }
 
-func (s *OrderedSet[T]) AddOne(v T) (bool, error) {
+func (s *Set[T]) AddOne(v T) (bool, error) {
 	if err := s.err; err != nil {
 		return false, err
 	}
@@ -122,17 +117,17 @@ func (s *OrderedSet[T]) AddOne(v T) (bool, error) {
 	if _, ok := u[v]; !ok {
 		e := s.elements
 		u[v] = len(e)
-		s.elements = append(e, &v)
+		s.elements = append(e, v)
 		return mutable.Commit(markOnStart, &s.changeMark, &s.err)
 	}
 	return false, nil
 }
 
-func (s *OrderedSet[T]) Delete(elements ...T) (bool, error) {
+func (s *Set[T]) Delete(elements ...T) (bool, error) {
 	return s.DeleteAll(elements)
 }
 
-func (s *OrderedSet[T]) DeleteAll(elements []T) (bool, error) {
+func (s *Set[T]) DeleteAll(elements []T) (bool, error) {
 	if err := s.err; err != nil {
 		return false, err
 	}
@@ -147,7 +142,7 @@ func (s *OrderedSet[T]) DeleteAll(elements []T) (bool, error) {
 			e := s.elements
 			ne := slice.Delete(pos, e)
 			for i := pos; i < len(ne); i++ {
-				u[*ne[i]]--
+				u[ne[i]]--
 			}
 			s.elements = ne
 			ok, err := mutable.Commit(markOnStart, &s.changeMark, &s.err)
@@ -160,7 +155,7 @@ func (s *OrderedSet[T]) DeleteAll(elements []T) (bool, error) {
 	return result, nil
 }
 
-func (s *OrderedSet[T]) DeleteOne(v T) (bool, error) {
+func (s *Set[T]) DeleteOne(v T) (bool, error) {
 	if err := s.err; err != nil {
 		return false, err
 	}
@@ -172,7 +167,7 @@ func (s *OrderedSet[T]) DeleteOne(v T) (bool, error) {
 		e := s.elements
 		ne := slice.Delete(pos, e)
 		for i := pos; i < len(ne); i++ {
-			u[*ne[i]]--
+			u[ne[i]]--
 		}
 		s.elements = ne
 		return mutable.Commit(markOnStart, &s.changeMark, &s.err)
@@ -180,18 +175,18 @@ func (s *OrderedSet[T]) DeleteOne(v T) (bool, error) {
 	return false, nil
 }
 
-func (s *OrderedSet[T]) Filter(filter typ.Predicate[T]) typ.Pipe[T, []T, typ.Iterator[T]] {
+func (s *Set[T]) Filter(filter typ.Predicate[T]) typ.Pipe[T, []T, typ.Iterator[T]] {
 	return it.NewPipe[T](it.Filter(s.Iter(), filter))
 }
 
-func (s *OrderedSet[T]) Map(by typ.Converter[T, T]) typ.Pipe[T, []T, typ.Iterator[T]] {
+func (s *Set[T]) Map(by typ.Converter[T, T]) typ.Pipe[T, []T, typ.Iterator[T]] {
 	return it.NewPipe[T](it.Map(s.Iter(), by))
 }
 
-func (s *OrderedSet[T]) Reduce(by op.Binary[T]) T {
+func (s *Set[T]) Reduce(by op.Binary[T]) T {
 	return it.Reduce(s.Iter(), by)
 }
 
-func (s *OrderedSet[T]) String() string {
+func (s *Set[T]) String() string {
 	return slice.ToString(s.elements)
 }

@@ -5,12 +5,12 @@ import (
 	"github.com/m4gshm/gollections/typ"
 )
 
-func NewValIter[k comparable, v any](elements []*k, uniques map[k]v) *ValIter[k, v] {
+func NewValIter[k comparable, v any](elements []k, uniques map[k]v) *ValIter[k, v] {
 	return &ValIter[k, v]{elements: elements, uniques: uniques}
 }
 
 type ValIter[k comparable, v any] struct {
-	elements []*k
+	elements []k
 	uniques  map[k]v
 
 	err     error
@@ -24,12 +24,12 @@ func (s *ValIter[k, v]) HasNext() bool {
 }
 
 func (s *ValIter[k, v]) Get() (v, error) {
-	kref, err := it.Get(&s.elements, s.current, s.err)
+	key, err := it.Get(&s.elements, s.current, s.err)
 	if err != nil {
 		var no v
 		return no, err
 	}
-	return s.uniques[*kref], nil
+	return s.uniques[key], nil
 }
 
 func (s *ValIter[k, v]) Next() v {

@@ -12,8 +12,7 @@ import (
 func Test_StringRepresentation(t *testing.T) {
 	expected := fmt.Sprint(slice.Of(1, 2, 3, 4))
 
-	var i1, i2, i3, i4 = 1, 2, 3, 4
-	order := slice.Of(&i4, &i3, &i2, &i1)
+	order := slice.Of(4, 3, 2, 1)
 
 	elements := map[int]string{4: "4", 2: "2", 1: "1", 3: "3"}
 

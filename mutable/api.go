@@ -9,12 +9,6 @@ import (
 
 var BadRW = errors.New("concurrent read and write")
 
-//Map provides access to elements by key.
-type Map[k comparable, v any] interface {
-	typ.Map[k, v]
-	Settable[k, v]
-}
-
 type Addable[T any] interface {
 	Add(...T) (bool, error)
 }

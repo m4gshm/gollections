@@ -2,9 +2,9 @@
 package slice
 
 import (
+	"bytes"
 	"constraints"
 	"fmt"
-	"strings"
 
 	"github.com/m4gshm/gollections/typ"
 )
@@ -130,7 +130,7 @@ func ToString[T any](elements []T) string {
 
 //ToStringf converts elements to a string representation defined by a custom element format and a delimiter
 func ToStringf[T any](elements []T, elementFormat, delimeter string) string {
-	var str strings.Builder
+	str := bytes.Buffer{}
 	str.WriteString("[")
 	for i, v := range elements {
 		if i > 0 {
@@ -149,7 +149,7 @@ func ToStringRefs[T any](references []*T) string {
 
 //ToStringRefsf converts references to a string representation defined by a custom delimiter and a nil value representation
 func ToStringRefsf[T any](references []*T, elementFormat, nilValue, delimeter string) string {
-	var str strings.Builder
+	str := bytes.Buffer{}
 	str.WriteString("[")
 	for i, ref := range references {
 		if i > 0 {

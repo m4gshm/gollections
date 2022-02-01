@@ -1,8 +1,7 @@
-package vector
+package mutable
 
 import (
 	"github.com/m4gshm/gollections/it/impl/it"
-	"github.com/m4gshm/gollections/mutable"
 	"github.com/m4gshm/gollections/typ"
 )
 
@@ -19,7 +18,7 @@ type Iter[T any] struct {
 }
 
 var _ typ.Iterator[any] = (*Iter[any])(nil)
-var _ mutable.Iterator[any] = (*Iter[any])(nil)
+var _ Iterator[any] = (*Iter[any])(nil)
 
 func (i *Iter[T]) HasNext() bool {
 	return it.HasNext(*i.elements, &i.current, &i.err)
@@ -49,7 +48,7 @@ type RefIter[T any] struct {
 }
 
 var _ typ.Iterator[any] = (*RefIter[any])(nil)
-var _ mutable.Iterator[any] = (*RefIter[any])(nil)
+var _ Iterator[any] = (*RefIter[any])(nil)
 
 func (i *RefIter[T]) HasNext() bool {
 	return i.Iter.HasNext()

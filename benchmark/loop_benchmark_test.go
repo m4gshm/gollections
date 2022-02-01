@@ -34,7 +34,7 @@ type benchCase struct {
 	load func(int)
 }
 
-var cases = []benchCase{{"high", HighLoad}, {"low", LowLoad}}
+var cases = []benchCase{/*{"high", HighLoad}, */{"low", LowLoad}}
 
 func Benchmark_ForEach_Immutable_Vector_ByOf(b *testing.B) {
 	c := vector.Of(values...)
@@ -233,20 +233,6 @@ func Benchmark_HasNextGet_Iterator_Impl_Point(b *testing.B) {
 				for it := impliter.NewP(&values); it.HasNext(); {
 					casee.load(it.Next())
 				}
-			}
-		})
-	}
-}
-
-func Benchmark_HasNextGet_Iterator_Impl_Reseteable(b *testing.B) {
-	it := impliter.NewReseteable(values)
-	for _, casee := range cases {
-		b.Run(casee.name, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
-				for it.HasNext() {
-					casee.load(it.Next())
-				}
-				it.Reset()
 			}
 		})
 	}

@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/m4gshm/gollections/collect"
-	"github.com/m4gshm/gollections/immutable/vector/ref"
+	"github.com/m4gshm/gollections/immutable/vector"
 	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/op"
@@ -14,13 +14,13 @@ import (
 func ConvertKVsToMap[k comparable, v any](elements []*typ.KV[k, v]) *Map[k, v] {
 	var (
 		uniques = make(map[k]v, 0)
-		order   = make([]*k, 0, 0)
+		order   = make([]k, 0, 0)
 	)
 	for _, kv := range elements {
 		key := kv.Key()
 		val := kv.Value()
 		if _, ok := uniques[key]; !ok {
-			order = append(order, &key)
+			order = append(order, key)
 			uniques[key] = val
 		}
 	}
@@ -30,21 +30,21 @@ func ConvertKVsToMap[k comparable, v any](elements []*typ.KV[k, v]) *Map[k, v] {
 func NewMap[k comparable, v any](elements map[k]v) *Map[k, v] {
 	var (
 		uniques = make(map[k]v, len(elements))
-		order   = make([]*k, len(elements))
+		order   = make([]k, len(elements))
 	)
 	for key, val := range elements {
-		order = append(order, &key)
+		order = append(order, key)
 		uniques[key] = val
 	}
 	return WrapMap(order, uniques)
 }
 
-func WrapMap[k comparable, v any](order []*k, uniques map[k]v) *Map[k, v] {
+func WrapMap[k comparable, v any](order []k, uniques map[k]v) *Map[k, v] {
 	return &Map[k, v]{elements: order, uniques: uniques}
 }
 
 type Map[k comparable, v any] struct {
-	elements []*k
+	elements []k
 	uniques  map[k]v
 }
 
@@ -105,7 +105,7 @@ func (s *Map[k, v]) Get(key k) (v, bool) {
 }
 
 func (s *Map[k, v]) Keys() typ.Collection[k, []k, typ.Iterator[k]] {
-	return ref.Wrap(s.elements)
+	return vector.New(s.elements)
 }
 
 func (s *Map[k, v]) Values() typ.Collection[v, []v, typ.Iterator[v]] {

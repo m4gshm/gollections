@@ -10,12 +10,12 @@ import (
 	"github.com/m4gshm/gollections/typ"
 )
 
-func WrapVal[k comparable, v any](elements []*k, uniques map[k]v) *MapValues[k, v] {
+func WrapVal[k comparable, v any](elements []k, uniques map[k]v) *MapValues[k, v] {
 	return &MapValues[k, v]{elements, uniques}
 }
 
 type MapValues[k comparable, v any] struct {
-	elements []*k
+	elements []k
 
 	uniques map[k]v
 }
@@ -38,8 +38,7 @@ func (s *MapValues[k, v]) Len() int {
 func (s *MapValues[k, v]) Collect() []v {
 	refs := s.elements
 	elements := make([]v, len(refs))
-	for i, r := range refs {
-		key := *r
+	for i, key := range refs {
 		val := s.uniques[key]
 		elements[i] = val
 	}
@@ -55,9 +54,9 @@ func (s *MapValues[k, v]) ForEach(walker func(v)) {
 }
 
 func (s *MapValues[k, v]) Get(index int) (v, bool) {
-	refs := s.elements
-	if index >= 0 && index < len(refs) {
-		key := *refs[index]
+	keys := s.elements
+	if index >= 0 && index < len(keys) {
+		key := keys[index]
 		val, ok := s.uniques[key]
 		return val, ok
 	}

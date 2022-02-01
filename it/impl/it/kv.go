@@ -12,7 +12,7 @@ func NewReflectKV[k comparable, v any](elements map[k]v) *ReflectKV[k, v] {
 	return &ReflectKV[k, v]{elements: elements, refVal: refVal, iter: refVal.MapRange()}
 }
 
-func NewOrderedKV[k comparable, v any](order []*k, uniques map[k]v) *OrderedKV[k, v] {
+func NewOrderedKV[k comparable, v any](order []k, uniques map[k]v) *OrderedKV[k, v] {
 	return &OrderedKV[k, v]{elements: New(order), uniques: uniques}
 }
 
@@ -146,7 +146,7 @@ func (s *ReflectKV[k, v]) Reset() {
 }
 
 type OrderedKV[k comparable, v any] struct {
-	elements *Iter[*k]
+	elements *Iter[k]
 	uniques  map[k]v
 }
 
@@ -157,13 +157,12 @@ func (s *OrderedKV[k, v]) HasNext() bool {
 }
 
 func (s *OrderedKV[k, v]) Get() (k, v, error) {
-	ref, err := s.elements.Get()
+	key, err := s.elements.Get()
 	if err != nil {
-		var key k
-		var value v
-		return key, value, err
+		var nokey k
+		var novalue v
+		return nokey, novalue, err
 	}
-	key := *ref
 	return key, s.uniques[key], nil
 }
 

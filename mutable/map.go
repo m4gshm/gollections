@@ -1,4 +1,4 @@
-package omap
+package mutable
 
 import (
 	"fmt"
@@ -7,12 +7,11 @@ import (
 	"github.com/m4gshm/gollections/immutable"
 	"github.com/m4gshm/gollections/it/impl/it"
 	m "github.com/m4gshm/gollections/map_"
-	"github.com/m4gshm/gollections/mutable"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/typ"
 )
 
-func Convert[k comparable, v any](elements []*typ.KV[k, v]) *Map[k, v] {
+func AsMap[k comparable, v any](elements []*typ.KV[k, v]) *Map[k, v] {
 	var (
 		uniques = make(map[k]v, 0)
 	)
@@ -21,18 +20,18 @@ func Convert[k comparable, v any](elements []*typ.KV[k, v]) *Map[k, v] {
 		val := kv.Value()
 		uniques[key] = val
 	}
-	return Wrap(uniques)
+	return WrapMap(uniques)
 }
 
-func ConvertMap[k comparable, v any](elements map[k]v) *Map[k, v] {
+func ToMap[k comparable, v any](elements map[k]v) *Map[k, v] {
 	uniques := make(map[k]v, len(elements))
 	for key, val := range elements {
 		uniques[key] = val
 	}
-	return Wrap(uniques)
+	return WrapMap(uniques)
 }
 
-func Wrap[k comparable, v any](uniques map[k]v) *Map[k, v] {
+func WrapMap[k comparable, v any](uniques map[k]v) *Map[k, v] {
 	return &Map[k, v]{uniques: uniques}
 }
 
@@ -42,7 +41,7 @@ type Map[k comparable, v any] struct {
 	changeMark int32
 }
 
-var _ mutable.Map[any, any] = (*Map[any, any])(nil)
+var _ Settable[any, any] = (*Map[any, any])(nil)
 var _ typ.Map[any, any] = (*Map[any, any])(nil)
 var _ fmt.Stringer = (*Map[any, any])(nil)
 
@@ -101,7 +100,7 @@ func (s *Map[k, v]) Set(key k, value v) (bool, error) {
 	if _, ok := u[key]; !ok {
 		markOnStart := s.changeMark
 		u[key] = value
-		return mutable.Commit(markOnStart, &s.changeMark, &s.err)
+		return Commit(markOnStart, &s.changeMark, &s.err)
 	}
 	return false, nil
 }

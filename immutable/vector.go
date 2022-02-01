@@ -10,17 +10,16 @@ import (
 )
 
 func NewVector[T any](elements []T) *Vector[T] {
-	c := slice.Copy(elements)
-	return WrapVector(&c)
+	return WrapVector(slice.Copy(elements))
 }
 
-func WrapVector[T any](elements *[]T) *Vector[T] {
+func WrapVector[T any](elements []T) *Vector[T] {
 	return &Vector[T]{elements: elements}
 }
 
 //Vector stores ordered elements, provides index access.
 type Vector[T any] struct {
-	elements *[]T
+	elements []T
 }
 
 var (
@@ -33,35 +32,35 @@ func (s *Vector[T]) Begin() typ.Iterator[T] {
 }
 
 func (s *Vector[T]) Iter() *it.PIter[T] {
-	return it.NewP(s.elements)
+	return it.NewP(&s.elements)
 }
 
 func (s *Vector[T]) Collect() []T {
-	return slice.Copy(*s.elements)
+	return slice.Copy(s.elements)
 }
 
 func (s *Vector[T]) Track(tracker func(int, T) error) error {
-	return slice.Track(*s.elements, tracker)
+	return slice.Track(s.elements, tracker)
 }
 
 func (s *Vector[T]) TrackEach(tracker func(int, T)) {
-	slice.TrackEach(*s.elements, tracker)
+	slice.TrackEach(s.elements, tracker)
 }
 
 func (s *Vector[T]) For(walker func(T) error) error {
-	return slice.For(*s.elements, walker)
+	return slice.For(s.elements, walker)
 }
 
 func (s *Vector[T]) ForEach(walker func(T)) {
-	slice.ForEach(*s.elements, walker)
+	slice.ForEach(s.elements, walker)
 }
 
 func (s *Vector[T]) Len() int {
-	return it.GetLen(s.elements)
+	return it.GetLen(&s.elements)
 }
 
 func (s *Vector[T]) Get(index int) (T, bool) {
-	return slice.Get(*s.elements, index)
+	return slice.Get(s.elements, index)
 
 }
 
@@ -78,5 +77,5 @@ func (s *Vector[T]) Reduce(by op.Binary[T]) T {
 }
 
 func (s *Vector[T]) String() string {
-	return slice.ToString(*s.elements)
+	return slice.ToString(s.elements)
 }

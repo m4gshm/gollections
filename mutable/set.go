@@ -44,7 +44,7 @@ func (s *Set[k]) Begin() typ.Iterator[k] {
 	return s.Iter()
 }
 
-func (s *Set[k]) BeginEdit() mutable.Iterator[k] {
+func (s *Set[k]) BeginEdit() Iterator[k] {
 	return s.Iter()
 }
 
@@ -72,7 +72,7 @@ func (s *Set[k]) AddAll(elements []k) (bool, error) {
 	if !added {
 		return false, nil
 	}
-	return mutable.Commit(markOnStart, &s.changeMark, &s.err)
+	return Commit(markOnStart, &s.changeMark, &s.err)
 }
 
 func (s *Set[k]) AddOne(element k) (bool, error) {
@@ -86,7 +86,7 @@ func (s *Set[k]) AddOne(element k) (bool, error) {
 	}
 	uniques[element] = struct{}{}
 
-	return mutable.Commit(markOnStart, &s.changeMark, &s.err)
+	return Commit(markOnStart, &s.changeMark, &s.err)
 }
 
 func (s *Set[k]) Delete(elements ...k) (bool, error) {
@@ -103,7 +103,7 @@ func (s *Set[k]) Delete(elements ...k) (bool, error) {
 
 		delete(uniques, element)
 	}
-	return mutable.Commit(markOnStart, &s.changeMark, &s.err)
+	return Commit(markOnStart, &s.changeMark, &s.err)
 }
 
 func (s *Set[k]) DeleteOne(element k) (bool, error) {
@@ -118,7 +118,7 @@ func (s *Set[k]) DeleteOne(element k) (bool, error) {
 	}
 
 	delete(uniques, element)
-	return mutable.Commit(markOnStart, &s.changeMark, &s.err)
+	return Commit(markOnStart, &s.changeMark, &s.err)
 }
 
 func (s *Set[k]) Collect() []k {

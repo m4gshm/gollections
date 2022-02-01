@@ -1,4 +1,4 @@
-package oset
+package ordered
 
 import (
 	"github.com/m4gshm/gollections/it/impl/it"
@@ -6,39 +6,39 @@ import (
 	"github.com/m4gshm/gollections/typ"
 )
 
-func NewIter[T any](elements *[]*T, changeMark *int32, del func(v T) (bool, error)) *Iter[T] {
-	return &Iter[T]{elements: elements, current: it.NoStarted, changeMark: changeMark, del: del}
+func NewSetIter[T any](elements *[]T, changeMark *int32, del func(v T) (bool, error)) *SetIter[T] {
+	return &SetIter[T]{elements: elements, current: it.NoStarted, changeMark: changeMark, del: del}
 }
 
-type Iter[T any] struct {
-	elements   *[]*T
+type SetIter[T any] struct {
+	elements   *[]T
 	err        error
 	current    int
 	changeMark *int32
 	del        func(v T) (bool, error)
 }
 
-var _ typ.Iterator[any] = (*Iter[any])(nil)
-var _ mutable.Iterator[any] = (*Iter[any])(nil)
+var _ typ.Iterator[any] = (*SetIter[any])(nil)
+var _ mutable.Iterator[any] = (*SetIter[any])(nil)
 
-func (i *Iter[T]) HasNext() bool {
+func (i *SetIter[T]) HasNext() bool {
 	return it.HasNext(i.elements, &i.current, &i.err)
 }
 
-func (i *Iter[T]) Get() (T, error) {
+func (i *SetIter[T]) Get() (T, error) {
 	v, err := it.Get(i.elements, i.current, i.err)
 	if err != nil {
 		var no T
 		return no, err
 	}
-	return *v, nil
+	return v, nil
 }
 
-func (s *Iter[T]) Next() T {
+func (s *SetIter[T]) Next() T {
 	return it.Next[T](s)
 }
 
-func (i *Iter[T]) Delete() (bool, error) {
+func (i *SetIter[T]) Delete() (bool, error) {
 	pos := i.current
 	if e, err := i.Get(); err != nil {
 		return false, err

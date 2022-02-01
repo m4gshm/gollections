@@ -11,14 +11,14 @@ import (
 )
 
 func NewSet[T comparable](elements []T) *Set[T] {
-	uniques := make(map[T]struct{}, 0)
+	uniques := map[T]struct{}{}
 	for _, v := range elements {
 		uniques[v] = struct{}{}
 	}
-	return Wrap(uniques)
+	return WrapSet(uniques)
 }
 
-func Wrap[k comparable](uniques map[k]struct{}) *Set[k] {
+func WrapSet[k comparable](uniques map[k]struct{}) *Set[k] {
 	return &Set[k]{uniques: uniques}
 }
 

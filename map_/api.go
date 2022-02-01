@@ -1,8 +1,8 @@
 package map_
 
 import (
+	"bytes"
 	"fmt"
-	"strings"
 
 	"github.com/m4gshm/gollections/K"
 	"github.com/m4gshm/gollections/typ"
@@ -47,9 +47,8 @@ func ForEach[m map[k]v, k comparable, v any](elements m, walker func(*typ.KV[k, 
 	}
 }
 
-func TrackOrdered[m map[k]v, k comparable, v any](elements []*k, uniques m, tracker func(k, v) error) error {
-	for _, ref := range elements {
-		key := *ref
+func TrackOrdered[m map[k]v, k comparable, v any](elements []k, uniques m, tracker func(k, v) error) error {
+	for _, key := range elements {
 		if err := tracker(key, uniques[key]); err != nil {
 			return err
 		}
@@ -57,16 +56,14 @@ func TrackOrdered[m map[k]v, k comparable, v any](elements []*k, uniques m, trac
 	return nil
 }
 
-func TrackEachOrdered[m map[k]v, k comparable, v any](elements []*k, uniques m, tracker func(k, v)) {
-	for _, ref := range elements {
-		key := *ref
+func TrackEachOrdered[m map[k]v, k comparable, v any](elements []k, uniques m, tracker func(k, v)) {
+	for _, key := range elements {
 		tracker(key, uniques[key])
 	}
 }
 
-func ForOrdered[m map[k]v, k comparable, v any](elements []*k, uniques m, walker func(*typ.KV[k, v]) error) error {
-	for _, ref := range elements {
-		key := *ref
+func ForOrdered[m map[k]v, k comparable, v any](elements []k, uniques m, walker func(*typ.KV[k, v]) error) error {
+	for _, key := range elements {
 		if err := walker(K.V(key, uniques[key])); err != nil {
 			return err
 		}
@@ -74,9 +71,8 @@ func ForOrdered[m map[k]v, k comparable, v any](elements []*k, uniques m, walker
 	return nil
 }
 
-func ForEachOrdered[m map[k]v, k comparable, v any](elements []*k, uniques m, walker func(*typ.KV[k, v])) {
-	for _, ref := range elements {
-		key := *ref
+func ForEachOrdered[m map[k]v, k comparable, v any](elements []k, uniques m, walker func(*typ.KV[k, v])) {
+	for _, key := range elements {
 		walker(K.V(key, uniques[key]))
 	}
 }
@@ -111,9 +107,8 @@ func ForEachValue[m map[k]v, k comparable, v any](elements m, walker func(v)) {
 	}
 }
 
-func ForOrderedValues[m map[k]v, k comparable, v any](elements []*k, uniques m, walker func(v) error) error {
-	for _, r := range elements {
-		key := *r
+func ForOrderedValues[m map[k]v, k comparable, v any](elements []k, uniques m, walker func(v) error) error {
+	for _, key := range elements {
 		val := uniques[key]
 		if err := walker(val); err != nil {
 			return err
@@ -122,27 +117,25 @@ func ForOrderedValues[m map[k]v, k comparable, v any](elements []*k, uniques m, 
 	return nil
 }
 
-func ForEachOrderedValues[m map[k]v, k comparable, v any](elements []*k, uniques m, walker func(v)) {
-	for _, r := range elements {
-		key := *r
+func ForEachOrderedValues[m map[k]v, k comparable, v any](elements []k, uniques m, walker func(v)) {
+	for _, key := range elements {
 		val := uniques[key]
 		walker(val)
 	}
 }
 
 //ToStringOrdered converts elements to the string representation according to the order
-func ToStringOrdered[k comparable, v any](order []*k, elements map[k]v) string {
+func ToStringOrdered[k comparable, v any](order []k, elements map[k]v) string {
 	return ToStringOrderedf(order, elements, "%+v:%+v", " ")
 }
 
-func ToStringOrderedf[k comparable, v any](order []*k, elements map[k]v, kvFormat, delim string) string {
-	var str strings.Builder
+func ToStringOrderedf[k comparable, v any](order []k, elements map[k]v, kvFormat, delim string) string {
+	str := bytes.Buffer{}
 	str.WriteString("[")
-	for i, kr := range order {
+	for i, k := range order {
 		if i > 0 {
 			_, _ = str.WriteString(delim)
 		}
-		k := *kr
 		str.WriteString(fmt.Sprintf(kvFormat, k, elements[k]))
 	}
 	str.WriteString("]")
@@ -155,7 +148,7 @@ func ToString[k comparable, v any](elements map[k]v) string {
 }
 
 func ToStringf[k comparable, v any](elements map[k]v, kvFormat, delim string) string {
-	var str strings.Builder
+	str := bytes.Buffer{}
 	str.WriteString("[")
 	i := 0
 	for k, v := range elements {
