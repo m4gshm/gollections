@@ -1,33 +1,32 @@
-package set
+package mutable
 
 import (
 	"github.com/m4gshm/gollections/it/impl/it"
-	"github.com/m4gshm/gollections/mutable"
 	"github.com/m4gshm/gollections/typ"
 )
 
-func NewIter[k comparable](uniques map[k]struct{}, del func(element k) (bool, error)) *Iter[k] {
-	return &Iter[k]{it.NewKey(uniques), del}
+func NewSetIter[k comparable](uniques map[k]struct{}, del func(element k) (bool, error)) *SetIter[k] {
+	return &SetIter[k]{it.NewKey(uniques), del}
 }
 
-type Iter[k comparable] struct {
+type SetIter[k comparable] struct {
 	*it.Key[k, struct{}]
 	del func(element k) (bool, error)
 }
 
-var _ typ.Iterator[any] = (*Iter[any])(nil)
-var _ mutable.Iterator[any] = (*Iter[any])(nil)
+var _ typ.Iterator[any] = (*SetIter[any])(nil)
+var _ Iterator[any] = (*SetIter[any])(nil)
 
-func (iter *Iter[k]) Get() (k, error) {
+func (iter *SetIter[k]) Get() (k, error) {
 	key, _, err := iter.KV.Get()
 	return key, err
 }
 
-func (iter *Iter[k]) Next() k {
+func (iter *SetIter[k]) Next() k {
 	return it.Next[k](iter)
 }
 
-func (iter *Iter[k]) Delete() (bool, error) {
+func (iter *SetIter[k]) Delete() (bool, error) {
 	e, err := iter.Get()
 	if err != nil {
 		return false, err

@@ -25,9 +25,12 @@ func _() {
 		_ *ordered.Set[int] = oset.Of(1, 2, 3)
 		_ typ.Set[int]      = oset.New([]int{1, 2, 3})
 	)
-	
-	map_.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3"))
-	map_.New(map[int]string{1: "2", 2: "2", 3: "3"})
-	omap.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3"))
-	omap.New(map[int]string{1: "2", 2: "2", 3: "3"})
+	var (
+		_ *immutable.Map[int, string] = map_.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3"))
+		_ typ.Map[int, string]        = map_.New(map[int]string{1: "2", 2: "2", 3: "3"})
+	)
+	var (
+		_ *ordered.Map[int, string] = omap.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3"))
+		_ typ.Map[int, string]      = omap.New(map[int]string{1: "2", 2: "2", 3: "3"})
+	)
 }

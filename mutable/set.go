@@ -1,28 +1,32 @@
-package set
+package mutable
 
 import (
 	"fmt"
 
 	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/map_"
-	"github.com/m4gshm/gollections/mutable"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/typ"
 )
 
-func Convert[T comparable](elements []T) *Set[T] {
+func NewSet[T comparable](capacity int) *Set[T] {
+	return WrapSet[T](make(map[T]struct{}, capacity))
+}
+
+func ToSet[T comparable](elements []T) *Set[T] {
 	uniques := make(map[T]struct{}, 0)
 	for _, v := range elements {
 		uniques[v] = struct{}{}
 	}
-	return Wrap(uniques)
+	return WrapSet(uniques)
 }
 
-func Wrap[k comparable](uniques map[k]struct{}) *Set[k] {
+func WrapSet[k comparable](uniques map[k]struct{}) *Set[k] {
 	return &Set[k]{uniques: uniques}
 }
 
+//Set provides uniqueness (does't insert duplicated values).
 type Set[k comparable] struct {
 	uniques    map[k]struct{}
 	err        error
@@ -30,7 +34,8 @@ type Set[k comparable] struct {
 }
 
 var (
-	_ mutable.Set[any] = (*Set[any])(nil)
+	_ Addable[any] = (*Set[any])(nil)
+	_ Deleteable[any] = (*Set[any])(nil)
 	_ typ.Set[any]     = (*Set[any])(nil)
 	_ fmt.Stringer     = (*Set[any])(nil)
 )
@@ -43,8 +48,8 @@ func (s *Set[k]) BeginEdit() mutable.Iterator[k] {
 	return s.Iter()
 }
 
-func (s *Set[k]) Iter() *Iter[k] {
-	return NewIter(s.uniques, s.DeleteOne)
+func (s *Set[k]) Iter() *SetIter[k] {
+	return NewSetIter(s.uniques, s.DeleteOne)
 }
 
 func (s *Set[k]) Add(elements ...k) (bool, error) {

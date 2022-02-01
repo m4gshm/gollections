@@ -1,13 +1,15 @@
 package vector
 
-func Of[T any](elements ...T) *Vector[T] {
-	return Convert(elements)
+import "github.com/m4gshm/gollections/mutable"
+
+func Of[T any](elements ...T) *mutable.Vector[T] {
+	return mutable.ToVector(elements)
 }
 
-func Empty[T any]() *Vector[T] {
+func Empty[T any]() *mutable.Vector[T] {
 	return New[T](0)
 }
 
-func New[T any](capacity int) *Vector[T] {
-	return Create[T](capacity)
+func New[T any](capacity int) *mutable.Vector[T] {
+	return mutable.NewVector[T](capacity)
 }

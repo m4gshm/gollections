@@ -1,4 +1,4 @@
-package vector
+package mutable
 
 import (
 	"errors"
@@ -14,20 +14,20 @@ import (
 
 var BadIndex = errors.New("bad index")
 
-func Create[T any](capacity int) *Vector[T] {
-	return Wrap(make([]T, 0, capacity))
+func NewVector[T any](capacity int) *Vector[T] {
+	return WrapVector(make([]T, 0, capacity))
 }
 
-func Convert[T any](elements []T) *Vector[T] {
-	return Wrap(slice.Copy(elements))
+func ToVector[T any](elements []T) *Vector[T] {
+	return WrapVector(slice.Copy(elements))
 }
 
-func Wrap[T any](elements []T) *Vector[T] {
+func WrapVector[T any](elements []T) *Vector[T] {
 	r := &elements
 	return &Vector[T]{elements: r}
 }
 
-//Vector is the interface of a container stores ordered elements, provides index access.
+//Vector stores ordered elements, provides index access.
 type Vector[T any] struct {
 	elements   *[]T
 	changeMark int32
@@ -36,7 +36,7 @@ type Vector[T any] struct {
 
 var (
 	_ mutable.Vector[any] = (*Vector[any])(nil)
-	_ typ.Vector[any]       = (*Vector[any])(nil)
+	_ typ.Vector[any]     = (*Vector[any])(nil)
 	_ fmt.Stringer        = (*Vector[any])(nil)
 )
 
@@ -48,8 +48,8 @@ func (s *Vector[T]) BeginEdit() mutable.Iterator[T] {
 	return s.Iter()
 }
 
-func (s *Vector[T]) Iter() *Iter[T] {
-	return NewIter(&s.elements, &s.changeMark, s.DeleteOne)
+func (s *Vector[T]) Iter() *SetIter[T] {
+	return NewSetIter(&s.elements, &s.changeMark, s.DeleteOne)
 }
 
 func (s *Vector[T]) Collect() []T {

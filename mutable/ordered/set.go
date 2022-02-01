@@ -1,4 +1,4 @@
-package oset
+package ordered
 
 import (
 	"fmt"

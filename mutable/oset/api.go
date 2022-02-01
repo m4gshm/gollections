@@ -1,15 +1,15 @@
 package oset
 
-// "github.com/m4gshm/gollections/mutable"
+import "github.com/m4gshm/gollections/mutable/ordered"
 
-func Of[T comparable](elements ...T) *OrderedSet[T] {
-	return Convert(elements)
+func Of[T comparable](elements ...T) *ordered.OrderedSet[T] {
+	return ordered.Convert(elements)
 }
 
-func Empty[T comparable]() *OrderedSet[T] {
+func Empty[T comparable]() *ordered.OrderedSet[T] {
 	return New[T](0)
 }
 
-func New[T comparable](capacity int) *OrderedSet[T] {
-	return NewOrderedSet[T](capacity)
+func New[T comparable](capacity int) *ordered.OrderedSet[T] {
+	return ordered.NewOrderedSet[T](capacity)
 }
