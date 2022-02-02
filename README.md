@@ -132,11 +132,11 @@ Functions grouped into packages by applicable type ([container](./c/api.go), [ma
 ## Builder and util functions
 
 ## Packages
-### [Common interfaces](./typ/iface.go)
+### [Common interfaces](./c/iface.go)
 
 Iterator, Iterable, Container, Vector, Map, Set and so on.
 
-### [Iterable container API](./c/api.go)
+### [Iterable container API](./c/op/api.go)
 Declarative style API over 'Iterable' interface. Based on 'Iterator API' (see below).
 
 ### [Iterator API](./it/api.go)
