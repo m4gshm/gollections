@@ -3,6 +3,7 @@ package ordered
 import (
 	"fmt"
 
+	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/collect"
 	"github.com/m4gshm/gollections/immutable/ordered"
 	"github.com/m4gshm/gollections/immutable/vector"
@@ -10,10 +11,9 @@ import (
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/mutable"
 	"github.com/m4gshm/gollections/op"
-	"github.com/m4gshm/gollections/typ"
 )
 
-func AsMap[k comparable, v any](elements []*typ.KV[k, v]) *Map[k, v] {
+func AsMap[k comparable, v any](elements []*map_.KV[k, v]) *Map[k, v] {
 	var (
 		uniques = make(map[k]v, 0)
 		order   = make([]k, 0, 0)
@@ -54,12 +54,12 @@ type Map[k comparable, v any] struct {
 }
 
 var (
-	_ mutable.Settable[any, any] = (*Map[any, any])(nil)
-	_ typ.Map[any, any]          = (*Map[any, any])(nil)
-	_ fmt.Stringer               = (*Map[any, any])(nil)
+	_ mutable.Settable[int, any] = (*Map[int, any])(nil)
+	_ c.Map[int, any]            = (*Map[int, any])(nil)
+	_ fmt.Stringer               = (*Map[int, any])(nil)
 )
 
-func (s *Map[k, v]) Begin() typ.KVIterator[k, v] {
+func (s *Map[k, v]) Begin() c.KVIterator[k, v] {
 	return s.Iter()
 }
 
@@ -80,11 +80,11 @@ func (s *Map[k, v]) Len() int {
 	return len(s.elements)
 }
 
-func (s *Map[k, v]) For(walker func(*typ.KV[k, v]) error) error {
+func (s *Map[k, v]) For(walker func(*map_.KV[k, v]) error) error {
 	return map_.ForOrdered(s.elements, s.uniques, walker)
 }
 
-func (s *Map[k, v]) ForEach(walker func(*typ.KV[k, v])) {
+func (s *Map[k, v]) ForEach(walker func(*map_.KV[k, v])) {
 	map_.ForEachOrdered(s.elements, s.uniques, walker)
 }
 
@@ -121,11 +121,11 @@ func (s *Map[k, v]) Set(key k, value v) (bool, error) {
 	return false, nil
 }
 
-func (s *Map[k, v]) Keys() typ.Collection[k, []k, typ.Iterator[k]] {
+func (s *Map[k, v]) Keys() c.Collection[k, []k, c.Iterator[k]] {
 	return vector.New(s.elements)
 }
 
-func (s *Map[k, v]) Values() typ.Collection[v, []v, typ.Iterator[v]] {
+func (s *Map[k, v]) Values() c.Collection[v, []v, c.Iterator[v]] {
 	return ordered.WrapVal(s.elements, s.uniques)
 }
 
@@ -133,27 +133,27 @@ func (s *Map[k, v]) String() string {
 	return map_.ToStringOrdered(s.elements, s.uniques)
 }
 
-func (s *Map[k, v]) FilterKey(fit typ.Predicate[k]) typ.MapPipe[k, v, map[k]v] {
+func (s *Map[k, v]) FilterKey(fit c.Predicate[k]) c.MapPipe[k, v, map[k]v] {
 	return it.NewKVPipe(it.FilterKV(s.Iter(), func(key k, val v) bool { return fit(key) }), collect.Map[k, v])
 }
 
-func (s *Map[k, v]) MapKey(by typ.Converter[k, k]) typ.MapPipe[k, v, map[k]v] {
+func (s *Map[k, v]) MapKey(by c.Converter[k, k]) c.MapPipe[k, v, map[k]v] {
 	return it.NewKVPipe(it.MapKV(s.Iter(), func(key k, val v) (k, v) { return by(key), val }), collect.Map[k, v])
 }
 
-func (s *Map[k, v]) FilterValue(fit typ.Predicate[v]) typ.MapPipe[k, v, map[k]v] {
+func (s *Map[k, v]) FilterValue(fit c.Predicate[v]) c.MapPipe[k, v, map[k]v] {
 	return it.NewKVPipe(it.FilterKV(s.Iter(), func(key k, val v) bool { return fit(val) }), collect.Map[k, v])
 }
 
-func (s *Map[k, v]) MapValue(by typ.Converter[v, v]) typ.MapPipe[k, v, map[k]v] {
+func (s *Map[k, v]) MapValue(by c.Converter[v, v]) c.MapPipe[k, v, map[k]v] {
 	return it.NewKVPipe(it.MapKV(s.Iter(), func(key k, val v) (k, v) { return key, by(val) }), collect.Map[k, v])
 }
 
-func (s *Map[k, v]) Filter(filter typ.BiPredicate[k, v]) typ.MapPipe[k, v, map[k]v] {
+func (s *Map[k, v]) Filter(filter c.BiPredicate[k, v]) c.MapPipe[k, v, map[k]v] {
 	return it.NewKVPipe(it.FilterKV(s.Iter(), filter), collect.Map[k, v])
 }
 
-func (s *Map[k, v]) Map(by typ.BiConverter[k, v, k, v]) typ.MapPipe[k, v, map[k]v] {
+func (s *Map[k, v]) Map(by c.BiConverter[k, v, k, v]) c.MapPipe[k, v, map[k]v] {
 	return it.NewKVPipe(it.MapKV(s.Iter(), by), collect.Map[k, v])
 }
 

@@ -1,8 +1,8 @@
 package ordered
 
 import (
+	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/it/impl/it"
-	"github.com/m4gshm/gollections/typ"
 )
 
 func NewValIter[k comparable, v any](elements []k, uniques map[k]v) *ValIter[k, v] {
@@ -17,7 +17,7 @@ type ValIter[k comparable, v any] struct {
 	current int
 }
 
-var _ typ.Iterator[any] = (*ValIter[any, any])(nil)
+var _ c.Iterator[any] = (*ValIter[int, any])(nil)
 
 func (s *ValIter[k, v]) HasNext() bool {
 	return it.HasNext(&s.elements, &s.current, &s.err)

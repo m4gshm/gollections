@@ -1,8 +1,6 @@
 package it
 
-import (
-	"github.com/m4gshm/gollections/typ"
-)
+import "github.com/m4gshm/gollections/c"
 
 func NewRef[T any](elements *[]*T) *RefIter[T] {
 	return WrapRef(NewP(elements))
@@ -16,7 +14,7 @@ type RefIter[T any] struct {
 	*PIter[*T]
 }
 
-var _ typ.Iterator[any] = (*RefIter[any])(nil)
+var _ c.Iterator[any] = (*RefIter[any])(nil)
 
 func (i *RefIter[T]) Get() (T, error) {
 	v, err := i.PIter.Get()

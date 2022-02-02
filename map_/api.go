@@ -3,12 +3,9 @@ package map_
 import (
 	"bytes"
 	"fmt"
-
-	"github.com/m4gshm/gollections/K"
-	"github.com/m4gshm/gollections/typ"
 )
 
-//Copy - makes a new slice with copied elements.
+//Copy makes a map copy.
 func Copy[m map[k]v, k comparable, v any](elements m) m {
 	var copied m
 	for key, val := range elements {
@@ -32,18 +29,18 @@ func TrackEach[m map[k]v, k comparable, v any](elements m, tracker func(k, v)) {
 	}
 }
 
-func For[m map[k]v, k comparable, v any](elements m, walker func(*typ.KV[k, v]) error) error {
+func For[m map[k]v, k comparable, v any](elements m, walker func(*KV[k, v]) error) error {
 	for key, val := range elements {
-		if err := walker(K.V(key, val)); err != nil {
+		if err := walker(NewKV(key, val)); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func ForEach[m map[k]v, k comparable, v any](elements m, walker func(*typ.KV[k, v])) {
+func ForEach[m map[k]v, k comparable, v any](elements m, walker func(*KV[k, v])) {
 	for key, val := range elements {
-		walker(K.V(key, val))
+		walker(NewKV(key, val))
 	}
 }
 
@@ -62,18 +59,18 @@ func TrackEachOrdered[m map[k]v, k comparable, v any](elements []k, uniques m, t
 	}
 }
 
-func ForOrdered[m map[k]v, k comparable, v any](elements []k, uniques m, walker func(*typ.KV[k, v]) error) error {
+func ForOrdered[m map[k]v, k comparable, v any](elements []k, uniques m, walker func(*KV[k, v]) error) error {
 	for _, key := range elements {
-		if err := walker(K.V(key, uniques[key])); err != nil {
+		if err := walker(NewKV(key, uniques[key])); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func ForEachOrdered[m map[k]v, k comparable, v any](elements []k, uniques m, walker func(*typ.KV[k, v])) {
+func ForEachOrdered[m map[k]v, k comparable, v any](elements []k, uniques m, walker func(*KV[k, v])) {
 	for _, key := range elements {
-		walker(K.V(key, uniques[key]))
+		walker(NewKV(key, uniques[key]))
 	}
 }
 

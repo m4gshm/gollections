@@ -1,8 +1,8 @@
 package mutable
 
 import (
+	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/it/impl/it"
-	"github.com/m4gshm/gollections/typ"
 )
 
 func NewIter[T any](elements **[]T, changeMark *int32, del func(int) (bool, error)) *Iter[T] {
@@ -17,7 +17,7 @@ type Iter[T any] struct {
 	del        func(index int) (bool, error)
 }
 
-var _ typ.Iterator[any] = (*Iter[any])(nil)
+var _ c.Iterator[any] = (*Iter[any])(nil)
 var _ Iterator[any] = (*Iter[any])(nil)
 
 func (i *Iter[T]) HasNext() bool {
@@ -47,7 +47,7 @@ type RefIter[T any] struct {
 	*Iter[*T]
 }
 
-var _ typ.Iterator[any] = (*RefIter[any])(nil)
+var _ c.Iterator[any] = (*RefIter[any])(nil)
 var _ Iterator[any] = (*RefIter[any])(nil)
 
 func (i *RefIter[T]) HasNext() bool {

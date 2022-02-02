@@ -1,27 +1,27 @@
 package it
 
 import (
+	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
-	"github.com/m4gshm/gollections/typ"
 )
 
-func NewPipe[T any](it typ.Iterator[T]) *IterPipe[T] {
+func NewPipe[T any](it c.Iterator[T]) *IterPipe[T] {
 	return &IterPipe[T]{it: it}
 }
 
 type IterPipe[T any] struct {
-	it       typ.Iterator[T]
+	it       c.Iterator[T]
 	elements []T
 }
 
-var _ typ.Pipe[any, []any, typ.Iterator[any]] = (*IterPipe[any])(nil)
+var _ c.Pipe[any, []any, c.Iterator[any]] = (*IterPipe[any])(nil)
 
-func (s *IterPipe[T]) Filter(fit typ.Predicate[T]) typ.Pipe[T, []T, typ.Iterator[T]] {
+func (s *IterPipe[T]) Filter(fit c.Predicate[T]) c.Pipe[T, []T, c.Iterator[T]] {
 	return NewPipe[T](Filter(s.it, fit))
 }
 
-func (s *IterPipe[T]) Map(by typ.Converter[T, T]) typ.Pipe[T, []T, typ.Iterator[T]] {
+func (s *IterPipe[T]) Map(by c.Converter[T, T]) c.Pipe[T, []T, c.Iterator[T]] {
 	return NewPipe[T](Map(s.it, by))
 }
 
@@ -44,7 +44,7 @@ func (s *IterPipe[T]) Reduce(by op.Binary[T]) T {
 	return Reduce(s.it, by)
 }
 
-func (s *IterPipe[T]) Begin() typ.Iterator[T] {
+func (s *IterPipe[T]) Begin() c.Iterator[T] {
 	return s.it
 }
 

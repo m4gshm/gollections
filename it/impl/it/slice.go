@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"unsafe"
 
-	"github.com/m4gshm/gollections/typ"
+	"github.com/m4gshm/gollections/c"
 )
 
 const NoStarted = -1
@@ -30,7 +30,7 @@ type Iter[T any] struct {
 	current  int
 }
 
-var _ typ.Iterator[any] = (*Iter[any])(nil)
+var _ c.Iterator[any] = (*Iter[any])(nil)
 
 func (s *Iter[T]) HasNext() bool {
 	size := s.size
@@ -72,7 +72,7 @@ type Reseteable[T any] struct {
 	*Iter[T]
 }
 
-var _ typ.Resetable = (*Reseteable[interface{}])(nil)
+var _ c.Resetable = (*Reseteable[interface{}])(nil)
 
 func (s *Reseteable[T]) Reset() {
 	s.SetPosition(NoStarted)
@@ -96,7 +96,7 @@ type PIter[T any] struct {
 	current int
 }
 
-var _ typ.Iterator[any] = (*PIter[any])(nil)
+var _ c.Iterator[any] = (*PIter[any])(nil)
 
 func (s *PIter[T]) HasNext() bool {
 	return HasNextByLen(s.arraySize, &s.current, &s.err)

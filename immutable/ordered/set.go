@@ -3,10 +3,10 @@ package ordered
 import (
 	"fmt"
 
+	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
-	"github.com/m4gshm/gollections/typ"
 )
 
 func NewSet[T comparable](elements []T) *Set[T] {
@@ -33,11 +33,11 @@ type Set[T comparable] struct {
 }
 
 var (
-	_ typ.Set[any]   = (*Set[any])(nil)
-	_ fmt.Stringer   = (*Set[any])(nil)
+	_ c.Set[int]   = (*Set[int])(nil)
+	_ fmt.Stringer   = (*Set[int])(nil)
 )
 
-func (s *Set[T]) Begin() typ.Iterator[T] {
+func (s *Set[T]) Begin() c.Iterator[T] {
 	return s.Iter()
 }
 
@@ -57,11 +57,11 @@ func (s *Set[T]) ForEach(walker func(T)) {
 	slice.ForEach(s.elements, walker)
 }
 
-func (s *Set[T]) Filter(filter typ.Predicate[T]) typ.Pipe[T, []T, typ.Iterator[T]] {
+func (s *Set[T]) Filter(filter c.Predicate[T]) c.Pipe[T, []T, c.Iterator[T]] {
 	return it.NewPipe[T](it.Filter(s.Iter(), filter))
 }
 
-func (s *Set[T]) Map(by typ.Converter[T, T]) typ.Pipe[T, []T, typ.Iterator[T]] {
+func (s *Set[T]) Map(by c.Converter[T, T]) c.Pipe[T, []T, c.Iterator[T]] {
 	return it.NewPipe[T](it.Map(s.Iter(), by))
 }
 

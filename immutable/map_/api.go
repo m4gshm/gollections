@@ -3,10 +3,10 @@ package map_
 
 import (
 	"github.com/m4gshm/gollections/immutable"
-	"github.com/m4gshm/gollections/typ"
+	"github.com/m4gshm/gollections/map_"
 )
 
-func Of[k comparable, v any](elements ...*typ.KV[k, v]) *immutable.Map[k, v] {
+func Of[k comparable, v any](elements ...*map_.KV[k, v]) *immutable.Map[k, v] {
 	return immutable.ConvertKVsToMap(elements)
 }
 

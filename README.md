@@ -60,7 +60,7 @@ Intermediates should wrap one by one to make a lazy computation chain that can b
 var items immutable.Vector[Item]
 
 var (
-    condition typ.Predicate[Item]  = func(item Item) ...
+    condition c.Predicate[Item]  = func(item Item) ...
     max       op.Binary[Attribute] = func(attribute1 Attribute, attribute2 Attribute) ...
 ) 
 
@@ -171,7 +171,7 @@ func Test_compute_odds_sum(t *testing.T) {
 	)
 
 	//declarative style
-	oddSum := it.Reduce(it.Filter(it.Flatt(slc.Flatt(multiDimension, conv.To[[][]int]), conv.To[[]int]), odds), op.Sum[int])
+	oddSum := it.Reduce(it.Filter(it.Flatt(slc.Flatt(multiDimension, conv.To[[][]int]), conv.To[[]int]), odds), sum.Of[int])
 	assert.Equal(t, expected, oddSum)
 
 	//plain old style

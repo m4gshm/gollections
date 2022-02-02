@@ -7,8 +7,8 @@ import (
 	"github.com/m4gshm/gollections/conv"
 	"github.com/m4gshm/gollections/it"
 	sliceit "github.com/m4gshm/gollections/it/slice"
-	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
+	"github.com/m4gshm/gollections/sum"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -81,10 +81,10 @@ func Test_ReduceSlices(t *testing.T) {
 
 	e := 1 + 3 + 5 + 7
 
-	oddSum := it.Reduce(it.Filter(it.Flatt(it.Flatt(it.Wrap(multiDimension), conv.To[[][]int]), conv.To[[]int]), odds), op.Sum[int])
+	oddSum := it.Reduce(it.Filter(it.Flatt(it.Flatt(it.Wrap(multiDimension), conv.To[[][]int]), conv.To[[]int]), odds), sum.Of[int])
 	assert.Equal(t, e, oddSum)
 
-	oddSum = it.Reduce(it.Filter(it.Flatt(sliceit.Flatt(multiDimension, conv.To[[][]int]), conv.To[[]int]), odds), op.Sum[int])
+	oddSum = it.Reduce(it.Filter(it.Flatt(sliceit.Flatt(multiDimension, conv.To[[][]int]), conv.To[[]int]), odds), sum.Of[int])
 	assert.Equal(t, e, oddSum)
 
 	//plain old style

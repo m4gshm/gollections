@@ -6,7 +6,7 @@ import (
 	"constraints"
 	"fmt"
 
-	"github.com/m4gshm/gollections/typ"
+	"github.com/m4gshm/gollections/c"
 )
 
 //Of transforms elements to the slice of them
@@ -27,7 +27,7 @@ func Delete[T any](index int, elements []T) []T {
 }
 
 //Group converts elements into the map containing slices of the elements separated by keys, which are retrieved using a Converter object.
-func Group[T any, K comparable](elements []T, by typ.Converter[T, K]) map[K][]T {
+func Group[T any, K comparable](elements []T, by c.Converter[T, K]) map[K][]T {
 	groups := map[K][]T{}
 	for _, e := range elements {
 		key := by(e)

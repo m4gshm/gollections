@@ -1,12 +1,12 @@
-//package collect provides util functions and types to implement the Collect method of a typ.Transformable implementation
+//package collect provides util functions and types to implement the Collect method of a c.Transformable implementation
 package collect
 
-import "github.com/m4gshm/gollections/typ"
+import "github.com/m4gshm/gollections/c"
 
-type Collector[T any, OUT any] typ.Converter[typ.Iterator[T], OUT]
-type CollectorKV[k, v any, OUT any] func(typ.KVIterator[k, v]) OUT
+type Collector[T any, OUT any] c.Converter[c.Iterator[T], OUT]
+type CollectorKV[k, v any, OUT any] func(c.KVIterator[k, v]) OUT
 
-func Map[k comparable, v any](it typ.KVIterator[k, v]) map[k]v {
+func Map[k comparable, v any](it c.KVIterator[k, v]) map[k]v {
 	e := map[k]v{}
 	for it.HasNext() {
 		key, val, err := it.Get()
@@ -18,7 +18,7 @@ func Map[k comparable, v any](it typ.KVIterator[k, v]) map[k]v {
 	return e
 }
 
-func Groups[k comparable, v any](it typ.KVIterator[k, v]) map[k][]v {
+func Groups[k comparable, v any](it c.KVIterator[k, v]) map[k][]v {
 	e := map[k][]v{}
 	for it.HasNext() {
 		key, val, err := it.Get()

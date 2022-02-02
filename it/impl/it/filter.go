@@ -1,18 +1,16 @@
 package it
 
-import (
-	"github.com/m4gshm/gollections/typ"
-)
+import "github.com/m4gshm/gollections/c"
 
 type Fit[T any] struct {
-	Iter typ.Iterator[T]
-	By   typ.Predicate[T]
+	Iter c.Iterator[T]
+	By   c.Predicate[T]
 
 	current T
 	err     error
 }
 
-var _ typ.Iterator[any] = (*Fit[any])(nil)
+var _ c.Iterator[any] = (*Fit[any])(nil)
 
 func (s *Fit[T]) HasNext() bool {
 	v, ok, err := nextFiltered(s.Iter, s.By)
@@ -33,15 +31,15 @@ func (s *Fit[T]) Next() T {
 }
 
 type FitKV[k, v any] struct {
-	Iter typ.KVIterator[k, v]
-	By   typ.BiPredicate[k, v]
+	Iter c.KVIterator[k, v]
+	By   c.BiPredicate[k, v]
 
 	currentK k
 	currentV v
 	err      error
 }
 
-var _ typ.KVIterator[any, any] = (*FitKV[any, any])(nil)
+var _ c.KVIterator[any, any] = (*FitKV[any, any])(nil)
 
 func (s *FitKV[k, v]) HasNext() bool {
 	key, val, ok, err := nextFilteredKV(s.Iter, s.By)
@@ -62,7 +60,7 @@ func (s *FitKV[k, v]) Next() (k, v) {
 	return NextKV[k, v](s)
 }
 
-func nextFiltered[T any](iter typ.Iterator[T], filter typ.Predicate[T]) (T, bool, error) {
+func nextFiltered[T any](iter c.Iterator[T], filter c.Predicate[T]) (T, bool, error) {
 	for iter.HasNext() {
 		if v, err := iter.Get(); err != nil {
 			var no T
@@ -75,7 +73,7 @@ func nextFiltered[T any](iter typ.Iterator[T], filter typ.Predicate[T]) (T, bool
 	return v, false, nil
 }
 
-func nextFilteredKV[k any, v any](iter typ.KVIterator[k, v], filter typ.BiPredicate[k, v]) (k, v, bool, error) {
+func nextFilteredKV[k any, v any](iter c.KVIterator[k, v], filter c.BiPredicate[k, v]) (k, v, bool, error) {
 	for iter.HasNext() {
 		if k, v, err := iter.Get(); err != nil {
 

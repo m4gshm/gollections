@@ -1,4 +1,4 @@
-package typ
+package c
 
 //Converter convert From -> To.
 type Converter[From, To any] func(From) To

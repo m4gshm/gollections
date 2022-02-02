@@ -2,10 +2,10 @@ package group
 
 import (
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/typ"
+	"github.com/m4gshm/gollections/it"
 )
 
 //Of - group.Of synonym of the c.Group.
-func Of[T any, K comparable, IT typ.Iterable[typ.Iterator[T]]](elements IT, by typ.Converter[T, K]) typ.MapPipe[K, T, map[K][]T] {
-	return c.Group[T, K, typ.Iterable[typ.Iterator[T]], typ.Iterator[T]](elements, by)
+func Of[T any, K comparable, IT c.Iterable[c.Iterator[T]]](elements IT, by c.Converter[T, K]) c.MapPipe[K, T, map[K][]T] {
+	return it.Group(elements.Begin(), by)
 }

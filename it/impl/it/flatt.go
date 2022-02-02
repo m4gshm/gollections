@@ -1,13 +1,11 @@
 package it
 
-import (
-	"github.com/m4gshm/gollections/typ"
-)
+import "github.com/m4gshm/gollections/c"
 
 type FlattenFit[From, To any] struct {
-	Iter  typ.Iterator[From]
-	Flatt typ.Flatter[From, To]
-	Fit   typ.Predicate[From]
+	Iter  c.Iterator[From]
+	Flatt c.Flatter[From, To]
+	Fit   c.Predicate[From]
 
 	elementsTo []To
 	indTo      int
@@ -15,7 +13,7 @@ type FlattenFit[From, To any] struct {
 	err        error
 }
 
-var _ typ.Iterator[any] = (*FlattenFit[any, any])(nil)
+var _ c.Iterator[any] = (*FlattenFit[any, any])(nil)
 
 func (s *FlattenFit[From, To]) HasNext() bool {
 	if elementsTo := s.elementsTo; len(elementsTo) > 0 {
@@ -58,8 +56,8 @@ func (s *FlattenFit[From, To]) Next() To {
 }
 
 type Flatten[From, To any] struct {
-	Iter  typ.Iterator[From]
-	Flatt typ.Flatter[From, To]
+	Iter  c.Iterator[From]
+	Flatt c.Flatter[From, To]
 
 	elementsTo []To
 	indTo      int
@@ -67,7 +65,7 @@ type Flatten[From, To any] struct {
 	err        error
 }
 
-var _ typ.Iterator[any] = (*Flatten[any, any])(nil)
+var _ c.Iterator[any] = (*Flatten[any, any])(nil)
 
 func (s *Flatten[From, To]) HasNext() bool {
 	if elementsTo := s.elementsTo; len(elementsTo) > 0 {

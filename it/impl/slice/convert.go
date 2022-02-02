@@ -1,21 +1,21 @@
 package slice
 
 import (
+	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/it/impl/it"
-	"github.com/m4gshm/gollections/typ"
 )
 
 type ConvertFit[From, To any] struct {
 	Elements []From
-	By       typ.Converter[From, To]
-	Fit      typ.Predicate[From]
+	By       c.Converter[From, To]
+	Fit      c.Predicate[From]
 
 	i       int
 	current To
 	err     error
 }
 
-var _ typ.Iterator[any] = (*ConvertFit[any, any])(nil)
+var _ c.Iterator[any] = (*ConvertFit[any, any])(nil)
 
 func (s *ConvertFit[From, To]) HasNext() bool {
 	if v, ok := nextArrayElem(s.Elements, s.Fit, &s.i); ok {
@@ -36,14 +36,14 @@ func (s *ConvertFit[From, To]) Next() To {
 
 type Convert[From, To any] struct {
 	Elements []From
-	By       typ.Converter[From, To]
+	By       c.Converter[From, To]
 
 	i       int
 	current To
 	err     error
 }
 
-var _ typ.Iterator[any] = (*Convert[any, any])(nil)
+var _ c.Iterator[any] = (*Convert[any, any])(nil)
 
 func (s *Convert[From, To]) HasNext() bool {
 	e := s.Elements
@@ -67,7 +67,7 @@ func (s *Convert[From, To]) Next() To {
 	return it.Next[To](s)
 }
 
-func nextArrayElem[T any](elements []T, filter typ.Predicate[T], indexHolder *int) (T, bool) {
+func nextArrayElem[T any](elements []T, filter c.Predicate[T], indexHolder *int) (T, bool) {
 	l := len(elements)
 	for i := *indexHolder; i < l; i++ {
 		if v := elements[i]; filter(v) {

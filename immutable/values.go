@@ -3,11 +3,11 @@ package immutable
 import (
 	"fmt"
 
+	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
-	"github.com/m4gshm/gollections/typ"
 )
 
 func WrapVal[k comparable, v any](uniques map[k]v) *MapValues[k, v] {
@@ -18,10 +18,10 @@ type MapValues[k comparable, v any] struct {
 	uniques map[k]v
 }
 
-var _ typ.Collection[any, []any, typ.Iterator[any]] = (*MapValues[any, any])(nil)
-var _ fmt.Stringer = (*MapValues[any, any])(nil)
+var _ c.Collection[any, []any, c.Iterator[any]] = (*MapValues[int, any])(nil)
+var _ fmt.Stringer = (*MapValues[int, any])(nil)
 
-func (s *MapValues[k, v]) Begin() typ.Iterator[v] {
+func (s *MapValues[k, v]) Begin() c.Iterator[v] {
 	return s.Iter()
 }
 
@@ -50,11 +50,11 @@ func (s *MapValues[k, v]) ForEach(walker func(v)) {
 	map_.ForEachValue(s.uniques, walker)
 }
 
-func (s *MapValues[k, v]) Filter(filter typ.Predicate[v]) typ.Pipe[v, []v, typ.Iterator[v]] {
+func (s *MapValues[k, v]) Filter(filter c.Predicate[v]) c.Pipe[v, []v, c.Iterator[v]] {
 	return it.NewPipe[v](it.Filter(s.Iter(), filter))
 }
 
-func (s *MapValues[k, v]) Map(by typ.Converter[v, v]) typ.Pipe[v, []v, typ.Iterator[v]] {
+func (s *MapValues[k, v]) Map(by c.Converter[v, v]) c.Pipe[v, []v, c.Iterator[v]] {
 	return it.NewPipe[v](it.Map(s.Iter(), by))
 }
 

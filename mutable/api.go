@@ -4,7 +4,7 @@ package mutable
 import (
 	"errors"
 
-	"github.com/m4gshm/gollections/typ"
+	"github.com/m4gshm/gollections/c"
 )
 
 var BadRW = errors.New("concurrent read and write")
@@ -26,7 +26,7 @@ type Removable[k any, v any] interface {
 }
 
 type Iterator[T any] interface {
-	typ.Iterator[T]
+	c.Iterator[T]
 	Delete() (bool, error)
 }
 

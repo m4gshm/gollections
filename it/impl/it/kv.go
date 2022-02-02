@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"unsafe"
 
-	"github.com/m4gshm/gollections/typ"
+	"github.com/m4gshm/gollections/c"
 )
 
 func NewReflectKV[k comparable, v any](elements map[k]v) *ReflectKV[k, v] {
@@ -32,7 +32,7 @@ type KV[k comparable, v any] struct {
 	err     error
 }
 
-var _ typ.KVIterator[any, any] = (*KV[any, any])(nil)
+var _ c.KVIterator[int, any] = (*KV[int, any])(nil)
 
 func (iter *KV[k, v]) HasNext() bool {
 	if !iter.hiter.initialized() {
@@ -115,7 +115,7 @@ type ReflectKV[k comparable, v any] struct {
 	err      error
 }
 
-var _ typ.KVIterator[any, any] = (*ReflectKV[any, any])(nil)
+var _ c.KVIterator[int, any] = (*ReflectKV[int, any])(nil)
 
 func (iter *ReflectKV[k, v]) HasNext() bool {
 	next := iter.iter.Next()
@@ -150,7 +150,7 @@ type OrderedKV[k comparable, v any] struct {
 	uniques  map[k]v
 }
 
-var _ typ.KVIterator[any, any] = (*OrderedKV[any, any])(nil)
+var _ c.KVIterator[string, any] = (*OrderedKV[string, any])(nil)
 
 func (s *OrderedKV[k, v]) HasNext() bool {
 	return s.elements.HasNext()
@@ -178,7 +178,7 @@ type Key[k comparable, v any] struct {
 	*KV[k, v]
 }
 
-var _ typ.Iterator[any] = (*Key[any, any])(nil)
+var _ c.Iterator[string] = (*Key[string, any])(nil)
 
 func (iter *Key[k, v]) Get() (k, error) {
 	key, _, err := iter.KV.Get()
@@ -197,7 +197,7 @@ type Val[k comparable, v any] struct {
 	*KV[k, v]
 }
 
-var _ typ.Iterator[any] = (*Val[any, any])(nil)
+var _ c.Iterator[any] = (*Val[int, any])(nil)
 
 func (iter *Val[k, v]) Get() (v, error) {
 	_, val, err := iter.KV.Get()

@@ -3,11 +3,11 @@ package check
 import (
 	"reflect"
 
-	"github.com/m4gshm/gollections/typ"
+	"github.com/m4gshm/gollections/c"
 )
 
 //Not inverts a predicate.
-func Not[T any](p typ.Predicate[T]) typ.Predicate[T] {
+func Not[T any](p c.Predicate[T]) c.Predicate[T] {
 	return func(v T) bool { return !p(v) }
 }
 
@@ -37,12 +37,12 @@ func EmptyMap[K comparable, V any](val map[K]V) bool {
 }
 
 //And makes a conjunction of two predicates
-func And[T any](p1, p2 typ.Predicate[T]) typ.Predicate[T] {
+func And[T any](p1, p2 c.Predicate[T]) c.Predicate[T] {
 	return func(v T) bool { return p1(v) && p2(v) }
 }
 
 //Union applies And to predicates
-func Union[T any](predicates []typ.Predicate[T]) typ.Predicate[T] {
+func Union[T any](predicates []c.Predicate[T]) c.Predicate[T] {
 	l := len(predicates)
 	if l == 0 {
 		return func(_ T) bool { return false }
@@ -62,12 +62,12 @@ func Union[T any](predicates []typ.Predicate[T]) typ.Predicate[T] {
 }
 
 //Always returns v every time
-func Always[T any](v bool) typ.Predicate[T] {
+func Always[T any](v bool) c.Predicate[T] {
 	return func(_ T) bool { return v }
 }
 
 //Always returns the negative of v every time
-func Never[T any](v bool) typ.Predicate[T] {
+func Never[T any](v bool) c.Predicate[T] {
 	return func(_ T) bool { return !v }
 }
 

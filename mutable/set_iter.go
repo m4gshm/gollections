@@ -1,8 +1,8 @@
 package mutable
 
 import (
+	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/it/impl/it"
-	"github.com/m4gshm/gollections/typ"
 )
 
 func NewSetIter[k comparable](uniques map[k]struct{}, del func(element k) (bool, error)) *SetIter[k] {
@@ -14,8 +14,8 @@ type SetIter[k comparable] struct {
 	del func(element k) (bool, error)
 }
 
-var _ typ.Iterator[any] = (*SetIter[any])(nil)
-var _ Iterator[any] = (*SetIter[any])(nil)
+var _ c.Iterator[int] = (*SetIter[int])(nil)
+var _ Iterator[int] = (*SetIter[int])(nil)
 
 func (iter *SetIter[k]) Get() (k, error) {
 	key, _, err := iter.KV.Get()

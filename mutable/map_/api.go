@@ -1,11 +1,11 @@
 package omap
 
 import (
-	"github.com/m4gshm/gollections/typ"
+	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/mutable"
 )
 
-func Of[k comparable, v any](elements ...*typ.KV[k, v]) *mutable.Map[k, v] {
+func Of[k comparable, v any](elements ...*map_.KV[k, v]) *mutable.Map[k, v] {
 	return mutable.AsMap(elements)
 }
 

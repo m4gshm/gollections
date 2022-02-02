@@ -1,9 +1,9 @@
 package ordered
 
 import (
+	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/mutable"
-	"github.com/m4gshm/gollections/typ"
 )
 
 func NewSetIter[T any](elements *[]T, changeMark *int32, del func(v T) (bool, error)) *SetIter[T] {
@@ -18,7 +18,7 @@ type SetIter[T any] struct {
 	del        func(v T) (bool, error)
 }
 
-var _ typ.Iterator[any] = (*SetIter[any])(nil)
+var _ c.Iterator[any] = (*SetIter[any])(nil)
 var _ mutable.Iterator[any] = (*SetIter[any])(nil)
 
 func (i *SetIter[T]) HasNext() bool {

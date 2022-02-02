@@ -3,11 +3,11 @@ package mutable
 import (
 	"fmt"
 
+	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
-	"github.com/m4gshm/gollections/typ"
 )
 
 func NewSet[T comparable](capacity int) *Set[T] {
@@ -34,13 +34,13 @@ type Set[k comparable] struct {
 }
 
 var (
-	_ Addable[any] = (*Set[any])(nil)
-	_ Deleteable[any] = (*Set[any])(nil)
-	_ typ.Set[any]     = (*Set[any])(nil)
-	_ fmt.Stringer     = (*Set[any])(nil)
+	_ Addable[int] = (*Set[int])(nil)
+	_ Deleteable[int] = (*Set[int])(nil)
+	_ c.Set[int]     = (*Set[int])(nil)
+	_ fmt.Stringer     = (*Set[int])(nil)
 )
 
-func (s *Set[k]) Begin() typ.Iterator[k] {
+func (s *Set[k]) Begin() c.Iterator[k] {
 	return s.Iter()
 }
 
@@ -138,11 +138,11 @@ func (s *Set[k]) ForEach(walker func(k)) {
 	map_.ForEachKey(s.uniques, walker)
 }
 
-func (s *Set[k]) Filter(filter typ.Predicate[k]) typ.Pipe[k, []k, typ.Iterator[k]] {
+func (s *Set[k]) Filter(filter c.Predicate[k]) c.Pipe[k, []k, c.Iterator[k]] {
 	return it.NewPipe[k](it.Filter(s.Iter(), filter))
 }
 
-func (s *Set[k]) Map(by typ.Converter[k, k]) typ.Pipe[k, []k, typ.Iterator[k]] {
+func (s *Set[k]) Map(by c.Converter[k, k]) c.Pipe[k, []k, c.Iterator[k]] {
 	return it.NewPipe[k](it.Map(s.Iter(), by))
 }
 

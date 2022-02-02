@@ -1,7 +1,8 @@
-//Package typ provides common types of containers, utility types and functions.
-package typ
+//Package c provides common types of containers, utility types and functions.
+package c
 
 import (
+	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/op"
 )
 
@@ -41,7 +42,7 @@ type Set[T any] interface {
 
 //Map is the interface of a container provides access to elements by key.
 type Map[k comparable, v any] interface {
-	Collection[*KV[k, v], map[k]v, KVIterator[k, v]]
+	Collection[*map_.KV[k, v], map[k]v, KVIterator[k, v]]
 	Track[v, k]
 	TrackEach[v, k]
 	Checkable[k]
