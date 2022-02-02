@@ -18,31 +18,92 @@ Supports write operations (append, delete, replace).
 
 The same interfaces as in the mutable package but for read-only purposes.
 
-## Constructors
+## Usages
 ### Immutable
 ```go
-vector.Of(1, 2, 3); vector.New([]int{1, 2, 3})
-	
-set.Of(1, 2, 3);   set.New([]int{1, 2, 3})
-oset.Of(1, 2, 3); oset.New([]int{1, 2, 3})
+package examples
 
-map_.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3")); map_.New(map[int]string{1: "2", 2: "2", 3: "3"})
+import (
+	"github.com/m4gshm/gollections/K"
+	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/immutable"
+	"github.com/m4gshm/gollections/immutable/map_"
+	"github.com/m4gshm/gollections/immutable/omap"
+	"github.com/m4gshm/gollections/immutable/ordered"
+	"github.com/m4gshm/gollections/immutable/oset"
+	"github.com/m4gshm/gollections/immutable/set"
+	"github.com/m4gshm/gollections/immutable/vector"
+)
 
-omap.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3")); omap.New(map[int]string{1: "2", 2: "2", 3: "3"})
+func _() {
+	var (
+		_ *immutable.Vector[int] = vector.Of(1, 2, 3)
+		_ c.Vector[int]          = vector.New([]int{1, 2, 3})
+	)
+	var (
+		_ *immutable.Set[int] = set.Of(1, 2, 3)
+		_ c.Set[int]          = set.New([]int{1, 2, 3})
+	)
+	var (
+		_ *ordered.Set[int] = oset.Of(1, 2, 3)
+		_ c.Set[int]        = oset.New([]int{1, 2, 3})
+	)
+	var (
+		_ *immutable.Map[int, string] = map_.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3"))
+		_ c.Map[int, string]          = map_.New(map[int]string{1: "2", 2: "2", 3: "3"})
+	)
+	var (
+		_ *ordered.Map[int, string] = omap.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3"))
+		_ c.Map[int, string]        = omap.New(map[int]string{1: "2", 2: "2", 3: "3"})
+	)
+}
 ```
 where [vector](./immutable/vector/api.go), [set](./immutable/set/api.go), [oset](./immutable/oset/api.go), [map_](./immutable/map_/api.go), [omap](./immutable/omap/api.go) are packages from [github.com/m4gshm/gollections/immutable](./immutable/) and [K.V](./K/v.go) is the method V from the package [K](./K/)
 ### Mutable
 ```go
-capacity := 10
+package examples
 
-vector.Of(1, 2, 3); vector.New(capacity); vector.Empty()
-	
-set.Of(1, 2, 3);   set.New(capacity);  set.Empty()
-oset.Of(1, 2, 3); oset.New(capacity); oset.Empty()
+import (
+	"github.com/m4gshm/gollections/K"
+	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/mutable"
+	"github.com/m4gshm/gollections/mutable/map_"
+	"github.com/m4gshm/gollections/mutable/omap"
+	"github.com/m4gshm/gollections/mutable/ordered"
+	"github.com/m4gshm/gollections/mutable/oset"
+	"github.com/m4gshm/gollections/mutable/set"
+	"github.com/m4gshm/gollections/mutable/vector"
+)
 
-map_.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3")); map_.New(capacity); map_.Empty()
+func _() {
+	capacity := 10
 
-omap.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3")); omap.New(capacity); omap.Empty()
+	var (
+		_ *mutable.Vector[int] = vector.Of(1, 2, 3)
+		_ c.Vector[int]        = vector.New[int](capacity)
+		_ c.Vector[int]        = vector.Empty[int]()
+	)
+	var (
+		_ *mutable.Set[int] = set.Of(1, 2, 3)
+		_ c.Set[int]        = set.New[int](capacity)
+		_ c.Set[int]        = set.Empty[int]()
+	)
+	var (
+		_ *ordered.Set[int] = oset.Of(1, 2, 3)
+		_ c.Set[int]        = oset.New[int](capacity)
+		_ c.Set[int]        = oset.Empty[int]()
+	)
+	var (
+		_ *mutable.Map[int, string] = map_.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3"))
+		_ c.Map[int, string]        = map_.New[int, string](capacity)
+		_ c.Map[int, string]        = map_.Empty[int, string]()
+	)
+	var (
+		_ *ordered.Map[int, string] = omap.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3"))
+		_ c.Map[int, string]        = omap.New[int, string](capacity)
+		_ c.Map[int, string]        = omap.Empty[int, string]()
+	)
+}
 ```
 where [vector](./mutable/vector/api.go), [set](./mutable/set/api.go), [oset](./mutable/oset/api.go), [map_](./mutable/map_/api.go), [omap](./mutable/omap/api.go) are packages from [github.com/m4gshm/gollections/mutable](./mutable/) and [K.V](./K/v.go) is the method V from the package [K](./K/)
 
@@ -102,15 +163,15 @@ import (
 	"github.com/m4gshm/gollections/immutable/set"
 	"github.com/m4gshm/gollections/it"
 	slc "github.com/m4gshm/gollections/it/slice"
-	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
+	"github.com/m4gshm/gollections/sum"
 	"github.com/m4gshm/gollections/walk/group"
 )
 
 func Test_Set(t *testing.T) {
 	var (
-		s      immutable.Set[int] = set.Of(1, 1, 2, 4, 3, 1)
-		values []int              = s.Collect()
+		s      *immutable.Set[int] = set.Of(1, 1, 2, 4, 3, 1)
+		values []int               = s.Collect()
 	)
 
 	assert.Equal(t, 4, s.Len())
