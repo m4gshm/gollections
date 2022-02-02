@@ -22,27 +22,16 @@ var _ c.Iterator[any] = (*SetIter[any])(nil)
 var _ mutable.Iterator[any] = (*SetIter[any])(nil)
 
 func (i *SetIter[T]) HasNext() bool {
-	return it.HasNext(i.elements, &i.current, &i.err)
+	return it.HasNext(i.elements, &i.current)
 }
 
-func (i *SetIter[T]) Get() (T, error) {
-	v, err := it.Get(i.elements, i.current, i.err)
-	if err != nil {
-		var no T
-		return no, err
-	}
-	return v, nil
-}
-
-func (s *SetIter[T]) Next() T {
-	return it.Next[T](s)
+func (i *SetIter[T]) Next() T {
+	return it.Get(i.elements, i.current)
 }
 
 func (i *SetIter[T]) Delete() (bool, error) {
 	pos := i.current
-	if e, err := i.Get(); err != nil {
-		return false, err
-	} else if deleted, err := i.del(e); err != nil {
+	if deleted, err := i.del(i.Next()); err != nil {
 		return false, err
 	} else if deleted {
 		i.current = pos - 1

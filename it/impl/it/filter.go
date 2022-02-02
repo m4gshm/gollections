@@ -13,21 +13,13 @@ type Fit[T any] struct {
 var _ c.Iterator[any] = (*Fit[any])(nil)
 
 func (s *Fit[T]) HasNext() bool {
-	v, ok, err := nextFiltered(s.Iter, s.By)
-	if err != nil {
-		s.err = err
-	} else {
-		s.current = v
-	}
+	v, ok := nextFiltered(s.Iter, s.By)
+	s.current = v
 	return ok
 }
 
-func (s *Fit[T]) Get() (T, error) {
-	return s.current, s.err
-}
-
 func (s *Fit[T]) Next() T {
-	return Next[T](s)
+	return s.current
 }
 
 type FitKV[k, v any] struct {
@@ -36,53 +28,38 @@ type FitKV[k, v any] struct {
 
 	currentK k
 	currentV v
-	err      error
 }
 
 var _ c.KVIterator[any, any] = (*FitKV[any, any])(nil)
 
 func (s *FitKV[k, v]) HasNext() bool {
-	key, val, ok, err := nextFilteredKV(s.Iter, s.By)
-	if err != nil {
-		s.err = err
-	} else {
-		s.currentK = key
-		s.currentV = val
-	}
+	key, val, ok := nextFilteredKV(s.Iter, s.By)
+	s.currentK = key
+	s.currentV = val
 	return ok
 }
 
-func (s *FitKV[k, v]) Get() (k, v, error) {
-	return s.currentK, s.currentV, s.err
-}
-
 func (s *FitKV[k, v]) Next() (k, v) {
-	return NextKV[k, v](s)
+	return s.currentK, s.currentV
 }
 
-func nextFiltered[T any](iter c.Iterator[T], filter c.Predicate[T]) (T, bool, error) {
+func nextFiltered[T any](iter c.Iterator[T], filter c.Predicate[T]) (T, bool) {
 	for iter.HasNext() {
-		if v, err := iter.Get(); err != nil {
-			var no T
-			return no, true, err
-		} else if filter(v) {
-			return v, true, nil
+		if v := iter.Next(); filter(v) {
+			return v, true
 		}
 	}
 	var v T
-	return v, false, nil
+	return v, false
 }
 
-func nextFilteredKV[k any, v any](iter c.KVIterator[k, v], filter c.BiPredicate[k, v]) (k, v, bool, error) {
+func nextFilteredKV[k any, v any](iter c.KVIterator[k, v], filter c.BiPredicate[k, v]) (k, v, bool) {
 	for iter.HasNext() {
-		if k, v, err := iter.Get(); err != nil {
-
-			return k, v, true, err
-		} else if filter(k, v) {
-			return k, v, true, nil
+		if k, v := iter.Next(); filter(k, v) {
+			return k, v, true
 		}
 	}
 	var key k
 	var val v
-	return key, val, false, nil
+	return key, val, false
 }

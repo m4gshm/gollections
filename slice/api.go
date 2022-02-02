@@ -128,6 +128,13 @@ func ToString[T any](elements []T) string {
 	return ToStringf(elements, "%+v", " ")
 }
 
+func ToStringE[T any](elements []T, err error) string {
+	if err != nil {
+		return "Stringer: " + err.Error()
+	}
+	return ToStringf(elements, "%+v", " ")
+}
+
 //ToStringf converts elements to a string representation defined by a custom element format and a delimiter
 func ToStringf[T any](elements []T, elementFormat, delimeter string) string {
 	str := bytes.Buffer{}

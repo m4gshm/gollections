@@ -11,7 +11,6 @@ func NewIter[T any](elements **[]T, changeMark *int32, del func(int) (bool, erro
 
 type Iter[T any] struct {
 	elements   **[]T
-	err        error
 	current    int
 	changeMark *int32
 	del        func(index int) (bool, error)
@@ -21,15 +20,11 @@ var _ c.Iterator[any] = (*Iter[any])(nil)
 var _ Iterator[any] = (*Iter[any])(nil)
 
 func (i *Iter[T]) HasNext() bool {
-	return it.HasNext(*i.elements, &i.current, &i.err)
+	return it.HasNext(*i.elements, &i.current)
 }
 
-func (i *Iter[T]) Get() (T, error) {
-	return it.Get(*i.elements, i.current, i.err)
-}
-
-func (s *Iter[T]) Next() T {
-	return it.Next[T](s)
+func (i *Iter[T]) Next() T {
+	return it.Get(*i.elements, i.current)
 }
 
 func (i *Iter[T]) Delete() (bool, error) {
@@ -41,32 +36,4 @@ func (i *Iter[T]) Delete() (bool, error) {
 		return true, nil
 	}
 	return false, nil
-}
-
-type RefIter[T any] struct {
-	*Iter[*T]
-}
-
-var _ c.Iterator[any] = (*RefIter[any])(nil)
-var _ Iterator[any] = (*RefIter[any])(nil)
-
-func (i *RefIter[T]) HasNext() bool {
-	return i.Iter.HasNext()
-}
-
-func (i *RefIter[T]) Get() (T, error) {
-	v, err := i.Iter.Get()
-	if err != nil {
-		var no T
-		return no, err
-	}
-	return *v, nil
-}
-
-func (s *RefIter[T]) Next() T {
-	return it.Next[T](s)
-}
-
-func (i *RefIter[T]) Delete() (bool, error) {
-	return i.Iter.Delete()
 }

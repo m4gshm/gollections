@@ -10,7 +10,7 @@ type BiConverter[From1, From2, To1, To2 any] func(From1, From2) (To1, To2)
 type Flatter[From, To any] Converter[From, []To]
 
 //Predicate tests value (converts to true or false).
-type Predicate[T any] Converter[T, bool]
+type Predicate[T any] func(T) bool
 
 //BiPredicate tests values pair (converts to true or false).
 type BiPredicate[v1, v2 any] func(v1, v2) bool

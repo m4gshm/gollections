@@ -21,7 +21,7 @@ func Test_Map_Iterate(t *testing.T) {
 	keys := make([]int, 0)
 	values := make([]string, 0)
 	for it := dict.Begin(); it.HasNext(); {
-		key, val, _ := it.Get()
+		key, val := it.Next()
 		keys = append(keys, key)
 		values = append(values, val)
 	}

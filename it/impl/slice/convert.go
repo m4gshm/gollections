@@ -2,7 +2,6 @@ package slice
 
 import (
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/it/impl/it"
 )
 
 type ConvertFit[From, To any] struct {
@@ -12,7 +11,6 @@ type ConvertFit[From, To any] struct {
 
 	i       int
 	current To
-	err     error
 }
 
 var _ c.Iterator[any] = (*ConvertFit[any, any])(nil)
@@ -22,16 +20,11 @@ func (s *ConvertFit[From, To]) HasNext() bool {
 		s.current = s.By(v)
 		return true
 	}
-	s.err = it.Exhausted
 	return false
 }
 
-func (s *ConvertFit[From, To]) Get() (To, error) {
-	return s.current, s.err
-}
-
 func (s *ConvertFit[From, To]) Next() To {
-	return it.Next[To](s)
+	return s.current
 }
 
 type Convert[From, To any] struct {
@@ -55,17 +48,13 @@ func (s *Convert[From, To]) HasNext() bool {
 		s.current = s.By(v)
 		return true
 	}
-	s.err = it.Exhausted
 	return false
 }
 
-func (s *Convert[From, To]) Get() (To, error) {
-	return s.current, s.err
+func (s *Convert[From, To]) Next() To {
+	return s.current
 }
 
-func (s *Convert[From, To]) Next() To {
-	return it.Next[To](s)
-}
 
 func nextArrayElem[T any](elements []T, filter c.Predicate[T], indexHolder *int) (T, bool) {
 	l := len(elements)

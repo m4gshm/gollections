@@ -29,7 +29,6 @@ type KV[k comparable, v any] struct {
 	hiter
 	maptype unsafe.Pointer
 	hmap    unsafe.Pointer
-	err     error
 }
 
 var _ c.KVIterator[int, any] = (*KV[int, any])(nil)
@@ -39,7 +38,6 @@ func (iter *KV[k, v]) HasNext() bool {
 		mapiterinit(iter.maptype, iter.hmap, &iter.hiter)
 	} else {
 		if mapiterkey(&iter.hiter) == nil {
-			iter.err = Exhausted
 			return false
 		}
 		mapiternext(&iter.hiter)
@@ -47,28 +45,17 @@ func (iter *KV[k, v]) HasNext() bool {
 	return mapiterkey(&iter.hiter) != nil
 }
 
-func (iter *KV[k, v]) Get() (k, v, error) {
-	if err := iter.err; err != nil {
-		var key k
-		var value v
-		return key, value, err
-	}
+func (iter *KV[k, v]) Next() (k, v) {
 	iterkey := mapiterkey(&iter.hiter)
 	if iterkey == nil {
-		err := Exhausted
-		iter.err = err
 		var key k
 		var value v
-		return key, value, err
+		return key, value
 	}
 	iterelem := mapiterelem(&iter.hiter)
 	var key *k = (*k)(iterkey)
 	var value *v = (*v)(iterelem)
-	return *key, *value, nil
-}
-
-func (iter *KV[k, v]) Next() (k, v) {
-	return NextKV[k, v](iter)
+	return *key, *value
 }
 
 //go:linkname mapiterinit reflect.mapiterinit
@@ -112,37 +99,22 @@ type ReflectKV[k comparable, v any] struct {
 	elements map[k]v
 	iter     *reflect.MapIter
 	refVal   reflect.Value
-	err      error
 }
 
 var _ c.KVIterator[int, any] = (*ReflectKV[int, any])(nil)
 
 func (iter *ReflectKV[k, v]) HasNext() bool {
-	next := iter.iter.Next()
-	if !next {
-		iter.err = Exhausted
-	}
-	return next
-}
-
-func (iter *ReflectKV[k, v]) Get() (k, v, error) {
-	if err := iter.err; err != nil {
-		var key k
-		var value v
-		return key, value, err
-	}
-	key := iter.iter.Key().Interface().(k)
-	value := iter.iter.Value().Interface().(v)
-	return key, value, nil
+	return iter.iter.Next()
 }
 
 func (iter *ReflectKV[k, v]) Next() (k, v) {
-	return NextKV[k, v](iter)
+	key := iter.iter.Key().Interface().(k)
+	value := iter.iter.Value().Interface().(v)
+	return key, value
 }
 
 func (s *ReflectKV[k, v]) Reset() {
 	s.iter.Reset(s.refVal)
-	s.err = nil
 }
 
 type OrderedKV[k comparable, v any] struct {
@@ -156,18 +128,9 @@ func (s *OrderedKV[k, v]) HasNext() bool {
 	return s.elements.HasNext()
 }
 
-func (s *OrderedKV[k, v]) Get() (k, v, error) {
-	key, err := s.elements.Get()
-	if err != nil {
-		var nokey k
-		var novalue v
-		return nokey, novalue, err
-	}
-	return key, s.uniques[key], nil
-}
-
-func (iter *OrderedKV[k, v]) Next() (k, v) {
-	return NextKV[k, v](iter)
+func (s *OrderedKV[k, v]) Next() (k, v) {
+	key := s.elements.Next()
+	return key, s.uniques[key]
 }
 
 func NewKey[k comparable, v any](uniques map[k]v) *Key[k, v] {
@@ -180,13 +143,9 @@ type Key[k comparable, v any] struct {
 
 var _ c.Iterator[string] = (*Key[string, any])(nil)
 
-func (iter *Key[k, v]) Get() (k, error) {
-	key, _, err := iter.KV.Get()
-	return key, err
-}
-
 func (iter *Key[k, v]) Next() k {
-	return Next[k](iter)
+	key, _ := iter.KV.Next()
+	return key
 }
 
 func NewVal[k comparable, v any](uniques map[k]v) *Val[k, v] {
@@ -199,11 +158,7 @@ type Val[k comparable, v any] struct {
 
 var _ c.Iterator[any] = (*Val[int, any])(nil)
 
-func (iter *Val[k, v]) Get() (v, error) {
-	_, val, err := iter.KV.Get()
-	return val, err
-}
-
 func (iter *Val[k, v]) Next() v {
-	return Next[v](iter)
+	_, val := iter.KV.Next()
+	return val
 }

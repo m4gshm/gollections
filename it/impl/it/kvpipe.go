@@ -44,19 +44,12 @@ func (s *KVIterPipe[k, v, C]) Map(by c.BiConverter[k, v, k, v]) c.MapPipe[k, v, 
 
 func (s *KVIterPipe[k, v, C]) Track(tracker func(k, v) error) error {
 	for s.it.HasNext() {
-		key, val, err := s.it.Get()
-		if err != nil {
-			return err
-		}
+		key, val := s.it.Next()
 		if err := tracker(key, val); err != nil {
 			return err
 		}
 	}
 	return nil
-}
-
-func (s *KVIterPipe[k, v, C]) TrackEach(tracker func(k, v)) error {
-	return s.Track(func(key k, val v) error { tracker(key, val); return nil })
 }
 
 func (s *KVIterPipe[k, v, C]) Reduce(by op.Quaternary[k, v]) (k, v) {

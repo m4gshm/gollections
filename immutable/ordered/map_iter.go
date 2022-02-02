@@ -12,26 +12,15 @@ func NewValIter[k comparable, v any](elements []k, uniques map[k]v) *ValIter[k, 
 type ValIter[k comparable, v any] struct {
 	elements []k
 	uniques  map[k]v
-
-	err     error
-	current int
+	current  int
 }
 
 var _ c.Iterator[any] = (*ValIter[int, any])(nil)
 
 func (s *ValIter[k, v]) HasNext() bool {
-	return it.HasNext(&s.elements, &s.current, &s.err)
-}
-
-func (s *ValIter[k, v]) Get() (v, error) {
-	key, err := it.Get(&s.elements, s.current, s.err)
-	if err != nil {
-		var no v
-		return no, err
-	}
-	return s.uniques[key], nil
+	return it.HasNext(&s.elements, &s.current)
 }
 
 func (s *ValIter[k, v]) Next() v {
-	return it.Next[v](s)
+	return s.uniques[it.Get(&s.elements, s.current)]
 }

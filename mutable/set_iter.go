@@ -17,19 +17,11 @@ type SetIter[k comparable] struct {
 var _ c.Iterator[int] = (*SetIter[int])(nil)
 var _ Iterator[int] = (*SetIter[int])(nil)
 
-func (iter *SetIter[k]) Get() (k, error) {
-	key, _, err := iter.KV.Get()
-	return key, err
-}
-
-func (iter *SetIter[k]) Next() k {
-	return it.Next[k](iter)
+func (iter *SetIter[k]) Next() (k) {
+	key, _ := iter.KV.Next()
+	return key
 }
 
 func (iter *SetIter[k]) Delete() (bool, error) {
-	e, err := iter.Get()
-	if err != nil {
-		return false, err
-	}
-	return iter.del(e)
+	return iter.del(iter.Next())
 }

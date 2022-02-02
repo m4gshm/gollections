@@ -3,7 +3,6 @@ package it
 import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/op"
-	"github.com/m4gshm/gollections/slice"
 )
 
 func NewPipe[T any](it c.Iterator[T]) *IterPipe[T] {
@@ -25,19 +24,12 @@ func (s *IterPipe[T]) Map(by c.Converter[T, T]) c.Pipe[T, []T, c.Iterator[T]] {
 	return NewPipe[T](Map(s.it, by))
 }
 
-func (s *IterPipe[T]) For(walker func(T) error) error {
-	for s.it.HasNext() {
-		if n, err := s.it.Get(); err != nil {
-			return err
-		} else if err = walker(n); err != nil {
-			return err
-		}
-	}
-	return nil
+func (s *IterPipe[T]) ForEach(walker func(T)) {
+	ForEach(s.it, walker)
 }
 
-func (s *IterPipe[T]) ForEach(walker func(T)) {
-	slice.ForEach(s.elements, walker)
+func (s *IterPipe[T]) For(walker func(T) error) error {
+	return For(s.it, walker)
 }
 
 func (s *IterPipe[T]) Reduce(by op.Binary[T]) T {
@@ -54,11 +46,7 @@ func (s *IterPipe[T]) Collect() []T {
 		e = make([]T, 0)
 		it := s.it
 		for it.HasNext() {
-			n, err := it.Get()
-			if err != nil {
-				panic(err)
-			}
-			e = append(e, n)
+			e = append(e, it.Next())
 		}
 		s.elements = e
 	}

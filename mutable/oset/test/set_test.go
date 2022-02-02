@@ -2,15 +2,14 @@ package test
 
 import (
 	"testing"
-		
+
 	"github.com/stretchr/testify/assert"
 
 	"github.com/m4gshm/gollections/it"
 	"github.com/m4gshm/gollections/mutable/oset"
-	"github.com/m4gshm/gollections/sum"
 	"github.com/m4gshm/gollections/slice"
+	"github.com/m4gshm/gollections/sum"
 	"github.com/m4gshm/gollections/walk/group"
-
 )
 
 func Test_Set_Iterate(t *testing.T) {
@@ -27,7 +26,7 @@ func Test_Set_Iterate(t *testing.T) {
 
 	out := make([]int, 0)
 	for it := set.Begin(); it.HasNext(); {
-		n, _ := it.Get()
+		n := it.Next()
 		out = append(out, n)
 	}
 	assert.Equal(t, expected, out)

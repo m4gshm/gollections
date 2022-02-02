@@ -31,12 +31,8 @@ func (s *FlattenFit[From, To]) HasNext() bool {
 	iter := s.Iter
 	for {
 		if !iter.HasNext() {
-			s.err = Exhausted
 			return false
-		} else if v, err := iter.Get(); err != nil {
-			s.err = err
-			return true
-		} else if s.Fit(v) {
+		} else if v := iter.Next(); s.Fit(v) {
 			if elementsTo := s.Flatt(v); len(elementsTo) > 0 {
 				s.c = elementsTo[0]
 				s.elementsTo = elementsTo
@@ -47,12 +43,8 @@ func (s *FlattenFit[From, To]) HasNext() bool {
 	}
 }
 
-func (s *FlattenFit[From, To]) Get() (To, error) {
-	return s.c, s.err
-}
-
 func (s *FlattenFit[From, To]) Next() To {
-	return Next[To](s)
+	return s.c
 }
 
 type Flatten[From, To any] struct {
@@ -62,7 +54,6 @@ type Flatten[From, To any] struct {
 	elementsTo []To
 	indTo      int
 	c          To
-	err        error
 }
 
 var _ c.Iterator[any] = (*Flatten[any, any])(nil)
@@ -83,12 +74,8 @@ func (s *Flatten[From, To]) HasNext() bool {
 	iter := s.Iter
 	for {
 		if ok := iter.HasNext(); !ok {
-			s.err = Exhausted
 			return false
-		} else if v, err := iter.Get(); err != nil {
-			s.err = err
-			return true
-		} else if elementsTo := s.Flatt(v); len(elementsTo) > 0 {
+		} else if elementsTo := s.Flatt(iter.Next()); len(elementsTo) > 0 {
 			s.c = elementsTo[0]
 			s.elementsTo = elementsTo
 			s.indTo = 1
@@ -97,10 +84,6 @@ func (s *Flatten[From, To]) HasNext() bool {
 	}
 }
 
-func (s *Flatten[From, To]) Get() (To, error) {
-	return s.c, s.err
-}
-
 func (s *Flatten[From, To]) Next() To {
-	return Next[To](s)
+	return s.c
 }

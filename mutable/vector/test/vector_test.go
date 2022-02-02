@@ -29,7 +29,7 @@ func Test_Vector_Iterate(t *testing.T) {
 
 	out := make([]int, 0)
 	for it := vec.Begin(); it.HasNext(); {
-		n, _ := it.Get()
+		n := it.Next()
 		out = append(out, n)
 	}
 	assert.Equal(t, expected, out)
@@ -116,7 +116,7 @@ func Test_Vector_FilterMapReduce(t *testing.T) {
 }
 
 func Test_Vector_Group(t *testing.T) {
-	groups := group.Of(vector.Of(0, 1, 1, 2, 4, 3, 1, 6, 7), func(e int) bool { return e%2 == 0 })
+	groups := group.Of(vector.Of(0, 1, 1, 2, 4, 3, 1, 6, 7), func(e int) (bool) { return e%2 == 0 })
 
 	assert.Equal(t, len(groups), 2)
 	assert.Equal(t, []int{1, 1, 3, 1, 7}, groups[false])

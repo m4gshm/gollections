@@ -53,35 +53,34 @@ func Group[T any, K comparable, IT c.Iterator[T]](elements IT, by c.Converter[T,
 }
 
 //For applies func on elements.
-func For[T any, IT c.Iterator[T]](elements IT, apply func(T)) error {
+func For[T any, IT c.Iterator[T]](elements IT, apply func(T) error) error {
 	for elements.HasNext() {
-		v, err := elements.Get()
+		err:= apply(elements.Next())
 		if err != nil {
 			return err
 		}
-		apply(v)
 	}
 	return nil
 }
 
-func ForFit[T any, IT c.Iterator[T]](elements IT, apply func(T), fit c.Predicate[T]) error {
+//ForEach applies func on elements.
+func ForEach[T any, IT c.Iterator[T]](elements IT, apply func(T)) {
 	for elements.HasNext() {
-		if v, err := elements.Get(); err != nil {
-			return err
-		} else if fit(v) {
+		apply(elements.Next())
+	}
+}
+
+func ForEachFit[T any, IT c.Iterator[T]](elements IT, apply func(T), fit c.Predicate[T]) {
+	for elements.HasNext() {
+		if v := elements.Next(); fit(v) {
 			apply(v)
 		}
 	}
-	return nil
 }
 
 //Reduce reduces elements to an one.
 func Reduce[T any, IT c.Iterator[T]](elements IT, by op.Binary[T]) T {
-	if !elements.HasNext() {
-		var nothing T
-		return nothing
-	}
-	result := Next[T](elements)
+	var result T
 	for elements.HasNext() {
 		result = by(result, Next[T](elements))
 	}
@@ -105,26 +104,17 @@ func ReduceKV[k, v any, IT c.KVIterator[k, v]](elements IT, by op.Quaternary[k, 
 //Slice converts an Iterator to a slice.
 func Slice[T any, IT c.Iterator[T]](elements IT) []T {
 	s := make([]T, 0)
-
 	for elements.HasNext() {
 		s = append(s, Next[T](elements))
 	}
-
 	return s
 }
 
 func Next[T any, IT c.Iterator[T]](elements IT) T {
-	n, err := elements.Get()
-	if err != nil {
-		panic(err)
-	}
-	return n
+	return elements.Next()
+
 }
 
 func NextKV[k, v any, IT c.KVIterator[k, v]](elements IT) (k, v) {
-	key, val, err := elements.Get()
-	if err != nil {
-		panic(err)
-	}
-	return key, val
+	return elements.Next()
 }

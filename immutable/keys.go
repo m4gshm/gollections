@@ -36,7 +36,7 @@ func (s *MapKeys[k, v]) Len() int {
 func (s *MapKeys[k, v]) Collect() []k {
 	uniques := s.uniques
 	elements := make([]k, 0, len(s.uniques))
-	for key, _ := range uniques {
+	for key := range uniques {
 		elements = append(elements, key)
 	}
 	return elements

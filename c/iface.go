@@ -62,25 +62,17 @@ type Iter interface {
 //Iterator is the interface provides iterate over elements of a collection.
 type Iterator[T any] interface {
 	Iter
-	//retrieves next element
+	//retrieves next element or zero value if no more elements
 	//must be called only after HasNext
-	//may raise panic. Calls Get() to prevent panic and checks an iteration error.
 	Next() T
-	//retrieves next element or error
-	//must be called only after HasNext
-	Get() (T, error)
 }
 
 //KVIterator is the interface provides iterate over all key/value pair of a map.
 type KVIterator[k, v any] interface {
 	Iter
-	//retrieves next element
+	//retrieves next elements or zero values if no more elements
 	//must be called only after HasNext
-	//may raise panic. Calls Get() to prevent panic and checks an iteration error.
 	Next() (k, v)
-	//retrieves next element or error
-	//must be called only after HasNext
-	Get() (k, v, error)
 }
 
 //Resetable is the interface of an object with resettable state (e.g. slice based iterator).

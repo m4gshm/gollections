@@ -2,7 +2,6 @@ package slice
 
 import (
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/it/impl/it"
 )
 
 type FlattenFit[From, To any] struct {
@@ -15,7 +14,6 @@ type FlattenFit[From, To any] struct {
 	elementsTo []To
 	indTo      int
 	current    To
-	err        error
 }
 
 var _ c.Iterator[any] = (*FlattenFit[any, any])(nil)
@@ -46,16 +44,11 @@ func (s *FlattenFit[From, To]) HasNext() bool {
 			}
 		}
 	}
-	s.err = it.Exhausted
 	return false
 }
 
-func (s *FlattenFit[From, To]) Get() (To, error) {
-	return s.current, s.err
-}
-
 func (s *FlattenFit[From, To]) Next() To {
-	return it.Next[To](s)
+	return s.current
 }
 
 type Flatten[From, To any] struct {
@@ -66,7 +59,6 @@ type Flatten[From, To any] struct {
 	elementsTo []To
 	indTo      int
 	current    To
-	err        error
 }
 
 var _ c.Iterator[any] = (*Flatten[any, any])(nil)
@@ -96,14 +88,9 @@ func (s *Flatten[From, To]) HasNext() bool {
 			return true
 		}
 	}
-	s.err = it.Exhausted
 	return false
 }
 
-func (s *Flatten[From, To]) Get() (To, error) {
-	return s.current, s.err
-}
-
 func (s *Flatten[From, To]) Next() To {
-	return it.Next[To](s)
+	return s.current
 }

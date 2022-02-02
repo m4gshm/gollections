@@ -18,16 +18,7 @@ func (s *KeyValuer[k, v]) HasNext() bool {
 	return s.iter.HasNext()
 }
 
-func (s *KeyValuer[k, v]) Get() (k, v, error) {
-	val, err := s.iter.Get()
-	if err != nil {
-		var key k
-		var val v
-		return key, val, err
-	}
-	return s.getKey(val), val, nil
-}
-
 func (s *KeyValuer[k, v]) Next() (k, v) {
-	return NextKV[k, v](s)
+	val := s.iter.Next()
+	return s.getKey(val), val
 }

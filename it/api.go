@@ -9,8 +9,6 @@ import (
 
 const NoStarted = impl.NoStarted
 
-var Exhausted = impl.Exhausted
-
 //Of - the Iterator constructor.
 func Of[T any](elements ...T) c.Iterator[T] {
 	return impl.NewReseteable(elements)
@@ -80,11 +78,11 @@ func Group[T any, K comparable](elements c.Iterator[T], by c.Converter[T, K]) c.
 	return impl.Group(elements, by)
 }
 
-//For applies func on elements.
-func For[T any](elements c.Iterator[T], apply func(T)) error {
-	return impl.For(elements, apply)
+//ForEach applies func on elements.
+func ForEach[T any](elements c.Iterator[T], apply func(T)) {
+	impl.ForEach(elements, apply)
 }
 
-func ForFit[T any](elements c.Iterator[T], apply func(T), fit c.Predicate[T]) error {
-	return impl.ForFit(elements, apply, fit)
+func ForEachFit[T any](elements c.Iterator[T], apply func(T), fit c.Predicate[T]) {
+	impl.ForEachFit(elements, apply, fit)
 }

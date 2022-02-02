@@ -1,7 +1,6 @@
 package it
 
 import (
-	"errors"
 	"reflect"
 	"unsafe"
 
@@ -9,11 +8,6 @@ import (
 )
 
 const NoStarted = -1
-
-var (
-	Exhausted        = errors.New("exhausted interator")
-	GetBeforeHasNext = errors.New("'Get' called before 'HasNext'")
-)
 
 func New[T any](elements []T) *Iter[T] {
 	return &Iter[T]{elements: elements, size: len(elements), current: NoStarted}
@@ -26,7 +20,6 @@ func NewReseteable[T any](elements []T) *Reseteable[T] {
 type Iter[T any] struct {
 	elements []T
 	size     int
-	err      error
 	current  int
 }
 
@@ -35,7 +28,6 @@ var _ c.Iterator[any] = (*Iter[any])(nil)
 func (s *Iter[T]) HasNext() bool {
 	size := s.size
 	if size == 0 {
-		s.err = Exhausted
 		return false
 	}
 	c := s.current
@@ -43,21 +35,11 @@ func (s *Iter[T]) HasNext() bool {
 		s.current++
 		return true
 	}
-	s.err = Exhausted
 	return false
 }
 
-func (s *Iter[T]) Get() (T, error) {
-	r, err := Get(&s.elements, s.current, s.err)
-	if err != nil {
-		var no T
-		return no, err
-	}
-	return r, nil
-}
-
 func (s *Iter[T]) Next() T {
-	return Next[T](s)
+	return Get(&s.elements, s.current)
 }
 
 func (s *Iter[T]) Position() int {
@@ -72,11 +54,10 @@ type Reseteable[T any] struct {
 	*Iter[T]
 }
 
-var _ c.Resetable = (*Reseteable[interface{}])(nil)
+var _ c.Resetable = (*Reseteable[any])(nil)
 
 func (s *Reseteable[T]) Reset() {
 	s.SetPosition(NoStarted)
-	s.err = nil
 }
 
 func NewP[T any](elements *[]T) *PIter[T] {
@@ -91,23 +72,17 @@ type PIter[T any] struct {
 	array            unsafe.Pointer
 	arraySize        int
 	arrayElementSize uintptr
-
-	err     error
-	current int
+	current          int
 }
 
 var _ c.Iterator[any] = (*PIter[any])(nil)
 
 func (s *PIter[T]) HasNext() bool {
-	return HasNextByLen(s.arraySize, &s.current, &s.err)
-}
-
-func (s *PIter[T]) Get() (T, error) {
-	return *GetArrayElem[T](s.array, s.current, s.arrayElementSize), nil
+	return HasNextByLen(s.arraySize, &s.current)
 }
 
 func (s *PIter[T]) Next() T {
-	return Next[T](s)
+	return *GetArrayElem[T](s.array, s.current, s.arrayElementSize)
 }
 
 type sliceType struct {
@@ -136,13 +111,12 @@ type rtype struct {
 	ptrToThis typeOff // type for pointer to this type, may be zero
 }
 
-func HasNext[T any](elements *[]T, current *int, err *error) bool {
-	return HasNextByLen(GetLen(elements), current, err)
+func HasNext[T any](elements *[]T, current *int) bool {
+	return HasNextByLen(GetLen(elements), current)
 }
 
-func HasNextByLen(size int, index *int, err *error) bool {
+func HasNextByLen(size int, index *int) bool {
 	if size == 0 {
-		*err = Exhausted
 		return false
 	}
 	c := *index
@@ -150,19 +124,18 @@ func HasNextByLen(size int, index *int, err *error) bool {
 		*index++
 		return true
 	}
-	*err = Exhausted
 	return false
 }
 
-func Get[T any](elements *[]T, current int, err error) (T, error) {
-	if err != nil {
+func Get[T any](elements *[]T, current int) T {
+	if current >= len(*elements) {
 		var no T
-		return no, err
+		return no
 	} else if current == NoStarted {
 		var no T
-		return no, GetBeforeHasNext
+		return no
 	}
-	return (*elements)[current], nil
+	return (*elements)[current]
 }
 
 func GetArrayPointer[T any](elements *[]T) unsafe.Pointer {

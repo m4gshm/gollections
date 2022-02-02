@@ -148,7 +148,7 @@ func Test_Iterate(t *testing.T) {
 	stream.ForEach(func(i int) { result = append(result, i) })
 
 	result = make([]int, 0)
-	_ = it.For(it.Wrap(values), func(i int) { result = append(result, i) })
+	it.ForEach(it.Wrap(values), func(i int) { result = append(result, i) })
 
 	assert.Equal(t, values, result)
 
