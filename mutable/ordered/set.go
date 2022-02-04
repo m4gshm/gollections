@@ -37,8 +37,6 @@ func WrapSet[T comparable](elements []T, uniques map[T]int) *Set[T] {
 type Set[T comparable] struct {
 	elements   []T
 	uniques    map[T]int
-	changeMark int32
-	err        error
 }
 
 var (
@@ -57,7 +55,7 @@ func (s *Set[T]) BeginEdit() mutable.Iterator[T] {
 }
 
 func (s *Set[T]) Iter() *SetIter[T] {
-	return NewSetIter(&s.elements, &s.changeMark, s.DeleteOne)
+	return NewSetIter(&s.elements, s.DeleteOne)
 }
 
 func (s *Set[T]) Collect() []T {
@@ -81,62 +79,46 @@ func (s *Set[T]) Contains(v T) bool {
 	return ok
 }
 
-func (s *Set[T]) Add(elements ...T) (bool, error) {
+func (s *Set[T]) Add(elements ...T) bool {
 	return s.AddAll(elements)
 }
 
-func (s *Set[T]) AddAll(elements []T) (bool, error) {
-	if err := s.err; err != nil {
-		return false, err
-	}
+func (s *Set[T]) AddAll(elements []T) bool {
 	u := s.uniques
 	result := false
 	for i := range elements {
-		markOnStart := s.changeMark
 		v := elements[i]
 		if _, ok := u[v]; !ok {
 			e := s.elements
 			u[v] = len(e)
 			s.elements = append(e, v)
-			cmt, err := mutable.Commit(markOnStart, &s.changeMark, &s.err)
-			if err != nil {
-				return false, err
-			}
-			result = result || cmt
+			result = true
 		}
 	}
-	return result, nil
+	return result
 }
 
-func (s *Set[T]) AddOne(v T) (bool, error) {
-	if err := s.err; err != nil {
-		return false, err
-	}
-	markOnStart := s.changeMark
+func (s *Set[T]) AddOne(v T) bool {
 	u := s.uniques
 	if _, ok := u[v]; !ok {
 		e := s.elements
 		u[v] = len(e)
 		s.elements = append(e, v)
-		return mutable.Commit(markOnStart, &s.changeMark, &s.err)
+		return true
 	}
-	return false, nil
+	return false
 }
 
-func (s *Set[T]) Delete(elements ...T) (bool, error) {
+func (s *Set[T]) Delete(elements ...T) bool {
 	return s.DeleteAll(elements)
 }
 
-func (s *Set[T]) DeleteAll(elements []T) (bool, error) {
-	if err := s.err; err != nil {
-		return false, err
-	}
+func (s *Set[T]) DeleteAll(elements []T) bool {
 	u := s.uniques
 	result := false
 	for i := range elements {
 		v := elements[i]
 		if pos, ok := u[v]; ok {
-			markOnStart := s.changeMark
 			delete(u, v)
 			//todo: need optimize
 			e := s.elements
@@ -145,23 +127,15 @@ func (s *Set[T]) DeleteAll(elements []T) (bool, error) {
 				u[ne[i]]--
 			}
 			s.elements = ne
-			ok, err := mutable.Commit(markOnStart, &s.changeMark, &s.err)
-			if err != nil {
-				return false, err
-			}
-			result = result || ok
+			result = true
 		}
 	}
-	return result, nil
+	return result
 }
 
-func (s *Set[T]) DeleteOne(v T) (bool, error) {
-	if err := s.err; err != nil {
-		return false, err
-	}
+func (s *Set[T]) DeleteOne(v T) bool {
 	u := s.uniques
 	if pos, ok := u[v]; ok {
-		markOnStart := s.changeMark
 		delete(u, v)
 		//todo: need optimize
 		e := s.elements
@@ -170,9 +144,9 @@ func (s *Set[T]) DeleteOne(v T) (bool, error) {
 			u[ne[i]]--
 		}
 		s.elements = ne
-		return mutable.Commit(markOnStart, &s.changeMark, &s.err)
+		return true
 	}
-	return false, nil
+	return false
 }
 
 func (s *Set[T]) Filter(filter c.Predicate[T]) c.Pipe[T, []T, c.Iterator[T]] {

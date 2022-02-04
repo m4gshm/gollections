@@ -39,15 +39,15 @@ func Test_Map_Iterate(t *testing.T) {
 
 func Test_Map_Add(t *testing.T) {
 	d := New[int, string](4)
-	s, _ := d.Set(1, "1")
+	s:= d.Set(1, "1")
 	assert.Equal(t, s, true)
-	s, _ = d.Set(2, "2")
+	s= d.Set(2, "2")
 	assert.Equal(t, s, true)
-	s, _ = d.Set(4, "4")
+	s= d.Set(4, "4")
 	assert.Equal(t, s, true)
-	s, _ = d.Set(3, "3")
+	s= d.Set(3, "3")
 	assert.Equal(t, s, true)
-	s, _ = d.Set(1, "11")
+	s= d.Set(1, "11")
 	assert.Equal(t, s, false)
 
 	keys := d.Keys().Collect()

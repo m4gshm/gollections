@@ -1,7 +1,7 @@
 package range_
 
 import (
-	"constraints"
+	"golang.org/x/exp/constraints"
 
 	"github.com/m4gshm/gollections/slice"
 )

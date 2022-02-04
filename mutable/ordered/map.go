@@ -50,7 +50,6 @@ type Map[k comparable, v any] struct {
 	changeMark int32
 	elements   []k
 	uniques    map[k]v
-	err        error
 }
 
 var (
@@ -106,19 +105,15 @@ func (s *Map[k, v]) Get(key k) (v, bool) {
 	return val, ok
 }
 
-func (s *Map[k, v]) Set(key k, value v) (bool, error) {
-	if err := s.err; err != nil {
-		return false, err
-	}
+func (s *Map[k, v]) Set(key k, value v) bool {
 	u := s.uniques
 	if _, ok := u[key]; !ok {
-		markOnStart := s.changeMark
 		e := s.elements
 		u[key] = value
 		s.elements = append(e, key)
-		return mutable.Commit(markOnStart, &s.changeMark, &s.err)
+		return true
 	}
-	return false, nil
+	return false
 }
 
 func (s *Map[k, v]) Keys() c.Collection[k, []k, c.Iterator[k]] {

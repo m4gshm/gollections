@@ -36,19 +36,8 @@ type benchCase struct {
 
 var cases = []benchCase{/*{"high", HighLoad}, */{"low", LowLoad}}
 
-func Benchmark_ForEach_Immutable_Vector_ByOf(b *testing.B) {
-	c := vector.Of(values...)
-	for _, casee := range cases {
-		b.Run(casee.name, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
-				c.ForEach(func(v int) { casee.load(v) })
-			}
-		})
-	}
-}
-
 func Benchmark_ForEach_Immutable_Vector(b *testing.B) {
-	c := vector.New(values)
+	c := vector.Of(values...)
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {

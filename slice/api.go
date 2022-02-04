@@ -3,8 +3,9 @@ package slice
 
 import (
 	"bytes"
-	"constraints"
 	"fmt"
+
+	"golang.org/x/exp/constraints"
 
 	"github.com/m4gshm/gollections/c"
 )

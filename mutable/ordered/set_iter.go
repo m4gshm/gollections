@@ -6,16 +6,14 @@ import (
 	"github.com/m4gshm/gollections/mutable"
 )
 
-func NewSetIter[T any](elements *[]T, changeMark *int32, del func(v T) (bool, error)) *SetIter[T] {
-	return &SetIter[T]{elements: elements, current: it.NoStarted, changeMark: changeMark, del: del}
+func NewSetIter[T any](elements *[]T, del func(v T) bool) *SetIter[T] {
+	return &SetIter[T]{elements: elements, current: it.NoStarted, del: del}
 }
 
 type SetIter[T any] struct {
-	elements   *[]T
-	err        error
-	current    int
-	changeMark *int32
-	del        func(v T) (bool, error)
+	elements *[]T
+	current  int
+	del      func(v T) bool
 }
 
 var _ c.Iterator[any] = (*SetIter[any])(nil)
@@ -29,13 +27,11 @@ func (i *SetIter[T]) Next() T {
 	return it.Get(i.elements, i.current)
 }
 
-func (i *SetIter[T]) Delete() (bool, error) {
+func (i *SetIter[T]) Delete() bool {
 	pos := i.current
-	if deleted, err := i.del(i.Next()); err != nil {
-		return false, err
-	} else if deleted {
+	if deleted := i.del(i.Next()); deleted {
 		i.current = pos - 1
-		return true, nil
+		return true
 	}
-	return false, nil
+	return false
 }

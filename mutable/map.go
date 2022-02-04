@@ -38,8 +38,6 @@ func WrapMap[k comparable, v any](uniques map[k]v) *Map[k, v] {
 
 type Map[k comparable, v any] struct {
 	uniques    map[k]v
-	err        error
-	changeMark int32
 }
 
 var _ Settable[int, any] = (*Map[int, any])(nil)
@@ -93,17 +91,13 @@ func (s *Map[k, v]) Get(key k) (v, bool) {
 	return val, ok
 }
 
-func (s *Map[k, v]) Set(key k, value v) (bool, error) {
-	if err := s.err; err != nil {
-		return false, err
-	}
+func (s *Map[k, v]) Set(key k, value v) bool {
 	u := s.uniques
 	if _, ok := u[key]; !ok {
-		markOnStart := s.changeMark
 		u[key] = value
-		return Commit(markOnStart, &s.changeMark, &s.err)
+		return true
 	}
-	return false, nil
+	return false
 }
 
 func (s *Map[k, v]) Keys() c.Collection[k, []k, c.Iterator[k]] {

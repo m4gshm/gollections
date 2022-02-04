@@ -107,7 +107,7 @@ func Benchmark_Map_Vector_ForEach_(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		s = mvector.New[string](c)
-		items.ForEach(func(element int) { _, _ = s.Add(op(element)) })
+		items.ForEach(func(element int) { _ = s.Add(op(element)) })
 	}
 	_ = s
 	b.StopTimer()

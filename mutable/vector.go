@@ -29,8 +29,6 @@ func WrapVector[T any](elements []T) *Vector[T] {
 //Vector stores ordered elements, provides index access.
 type Vector[T any] struct {
 	elements   *[]T
-	changeMark int32
-	err        error
 }
 
 var (
@@ -50,7 +48,7 @@ func (s *Vector[T]) BeginEdit() Iterator[T] {
 }
 
 func (s *Vector[T]) Iter() *Iter[T] {
-	return NewIter(&s.elements, &s.changeMark, s.DeleteOne)
+	return NewIter(&s.elements, s.DeleteOne)
 }
 
 func (s *Vector[T]) Collect() []T {
@@ -81,62 +79,43 @@ func (s *Vector[T]) Get(index int) (T, bool) {
 	return slice.Get(*s.elements, index)
 }
 
-func (s *Vector[T]) Add(v ...T) (bool, error) {
+func (s *Vector[T]) Add(v ...T) bool {
 	return s.AddAll(v)
 }
 
-func (s *Vector[T]) AddAll(v []T) (bool, error) {
-	if err := s.err; err != nil {
-		return false, err
-	}
-	markOnStart := s.changeMark
+func (s *Vector[T]) AddAll(v []T) bool {
 	*s.elements = append(*s.elements, v...)
-	return Commit(markOnStart, &s.changeMark, &s.err)
+	return true
 }
 
-func (s *Vector[T]) AddOne(v T) (bool, error) {
-	if err := s.err; err != nil {
-		return false, err
-	}
-	markOnStart := s.changeMark
+func (s *Vector[T]) AddOne(v T) (bool) {
 	*s.elements = append(*s.elements, v)
-	return Commit(markOnStart, &s.changeMark, &s.err)
+	return true
 }
 
-func (s *Vector[T]) DeleteOne(index int) (bool, error) {
-	_, ok, err := s.Remove(index)
-	return ok, err
+func (s *Vector[T]) DeleteOne(index int) bool {
+	_, ok := s.Remove(index)
+	return ok
 }
 
-func (s *Vector[T]) Remove(index int) (T, bool, error) {
-	if err := s.err; err != nil {
-		var no T
-		return no, false, err
-	}
+func (s *Vector[T]) Remove(index int) (T, bool) {
 	if e := *s.elements; index >= 0 && index < len(e) {
 		de := e[index]
-		markOnStart := s.changeMark
 		*s.elements = slice.Delete(index, e)
-		ok, err := Commit(markOnStart, &s.changeMark, &s.err)
-		return de, ok, err
+		return de, true
 	}
 	var no T
-	return no, false, nil
+	return no, false
 }
 
-func (s *Vector[T]) Delete(indexes ...int) (bool, error) {
-	if err := s.err; err != nil {
-		return false, err
-	}
-
+func (s *Vector[T]) Delete(indexes ...int) (bool) {
 	l := len(indexes)
 	if l == 0 {
-		return false, nil
+		return false
 	} else if l == 1 {
 		return s.DeleteOne(indexes[0])
 	}
 
-	markOnStart := s.changeMark
 	e := *s.elements
 	el := len(e)
 
@@ -165,18 +144,15 @@ func (s *Vector[T]) Delete(indexes ...int) (bool, error) {
 	}
 	if shift > 0 {
 		*s.elements = e
-		return Commit(markOnStart, &s.changeMark, &s.err)
+		return true
 	}
-	return false, nil
+	return false
 }
 
-func (s *Vector[T]) Set(index int, value T) (bool, error) {
-	if err := s.err; err != nil {
-		return false, err
-	}
+func (s *Vector[T]) Set(index int, value T) (bool) {
 	e := *s.elements
 	if index < 0 {
-		return false, fmt.Errorf("%w: %d", BadIndex, index)
+		return false
 	}
 	l := len(e)
 	if index >= l {
@@ -191,7 +167,7 @@ func (s *Vector[T]) Set(index int, value T) (bool, error) {
 		*s.elements = e
 	}
 	e[index] = value
-	return true, nil
+	return true
 }
 
 func (s *Vector[T]) Filter(filter c.Predicate[T]) c.Pipe[T, []T, c.Iterator[T]] {

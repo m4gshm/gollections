@@ -5,15 +5,14 @@ import (
 	"github.com/m4gshm/gollections/it/impl/it"
 )
 
-func NewIter[T any](elements **[]T, changeMark *int32, del func(int) (bool, error)) *Iter[T] {
-	return &Iter[T]{elements: elements, current: it.NoStarted, changeMark: changeMark, del: del}
+func NewIter[T any](elements **[]T, del func(int) bool) *Iter[T] {
+	return &Iter[T]{elements: elements, current: it.NoStarted, del: del}
 }
 
 type Iter[T any] struct {
-	elements   **[]T
-	current    int
-	changeMark *int32
-	del        func(index int) (bool, error)
+	elements **[]T
+	current  int
+	del      func(index int) bool
 }
 
 var _ c.Iterator[any] = (*Iter[any])(nil)
@@ -27,13 +26,11 @@ func (i *Iter[T]) Next() T {
 	return it.Get(*i.elements, i.current)
 }
 
-func (i *Iter[T]) Delete() (bool, error) {
+func (i *Iter[T]) Delete() bool {
 	pos := i.current
-	if deleted, err := i.del(pos); err != nil {
-		return false, err
-	} else if deleted {
+	if deleted := i.del(pos); deleted {
 		i.current = pos - 1
-		return true, nil
+		return true
 	}
-	return false, nil
+	return false
 }

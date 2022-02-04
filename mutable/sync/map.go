@@ -24,9 +24,9 @@ func (m *Map[k, v]) TrackEach(traker func(key k, value v)) {
 	})
 }
 
-func (m *Map[k, v]) Set(key k, value v) (bool, error) {
+func (m *Map[k, v]) Set(key k, value v) bool {
 	m.m.Store(key, value)
-	return true, nil
+	return true
 }
 
 func (m *Map[k, v]) Get(key k) (v, bool) {
@@ -34,14 +34,14 @@ func (m *Map[k, v]) Get(key k) (v, bool) {
 	return value.(v), ok
 }
 
-func (m *Map[k, v]) Delete(keys ...k) (bool, error) {
+func (m *Map[k, v]) Delete(keys ...k) bool {
 	for _, key := range keys {
 		m.m.Delete(key)
 	}
-	return true, nil
+	return true
 }
 
-func (m *Map[k, v]) Remove(key k) (v, bool, error) {
+func (m *Map[k, v]) Remove(key k) (v, bool) {
 	rawVal, ok := m.m.LoadAndDelete(key)
-	return rawVal.(v), ok, nil
+	return rawVal.(v), ok
 }

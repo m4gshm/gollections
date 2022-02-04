@@ -2,41 +2,27 @@
 package mutable
 
 import (
-	"errors"
-
 	"github.com/m4gshm/gollections/c"
 )
 
-var BadRW = errors.New("concurrent read and write")
-
 type Addable[T any] interface {
-	Add(...T) (bool, error)
+	Add(...T) bool
 }
 
 type Settable[k any, v any] interface {
-	Set(key k, value v) (bool, error)
+	Set(key k, value v) bool
 }
 
 type Deleteable[k any] interface {
-	Delete(...k) (bool, error)
+	Delete(...k) bool
 }
 
 type Removable[k any, v any] interface {
-	Remove(k) (v, bool, error)
+	Remove(k) (v, bool)
 }
 
 type Iterator[T any] interface {
 	c.Iterator[T]
-	Delete() (bool, error)
+	Delete() bool
 }
 
-func Commit(markOnStart int32, mark *int32, err *error) (bool, error) {
-	markOnFinish := *mark
-	if markOnFinish != markOnStart {
-		e := BadRW
-		*err = e
-		return false, e
-	}
-	(*mark)++
-	return true, nil
-}

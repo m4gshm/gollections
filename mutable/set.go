@@ -29,8 +29,6 @@ func WrapSet[k comparable](uniques map[k]struct{}) *Set[k] {
 //Set provides uniqueness (does't insert duplicated values).
 type Set[k comparable] struct {
 	uniques    map[k]struct{}
-	err        error
-	changeMark int32
 }
 
 var (
@@ -52,15 +50,11 @@ func (s *Set[k]) Iter() *SetIter[k] {
 	return NewSetIter(s.uniques, s.DeleteOne)
 }
 
-func (s *Set[k]) Add(elements ...k) (bool, error) {
+func (s *Set[k]) Add(elements ...k) bool {
 	return s.AddAll(elements)
 }
 
-func (s *Set[k]) AddAll(elements []k) (bool, error) {
-	if err := s.err; err != nil {
-		return false, err
-	}
-	markOnStart := s.changeMark
+func (s *Set[k]) AddAll(elements []k) bool {
 	uniques := s.uniques
 	added := false
 	for _, element := range elements {
@@ -69,56 +63,36 @@ func (s *Set[k]) AddAll(elements []k) (bool, error) {
 			added = true
 		}
 	}
-	if !added {
-		return false, nil
-	}
-	return Commit(markOnStart, &s.changeMark, &s.err)
+	return added
 }
 
-func (s *Set[k]) AddOne(element k) (bool, error) {
-	if err := s.err; err != nil {
-		return false, err
-	}
-	markOnStart := s.changeMark
+func (s *Set[k]) AddOne(element k) bool {
 	uniques := s.uniques
 	if _, ok := uniques[element]; ok {
-		return false, nil
+		return false
 	}
 	uniques[element] = struct{}{}
-
-	return Commit(markOnStart, &s.changeMark, &s.err)
+	return true
 }
 
-func (s *Set[k]) Delete(elements ...k) (bool, error) {
-	if err := s.err; err != nil {
-		return false, err
-	}
-
-	markOnStart := s.changeMark
+func (s *Set[k]) Delete(elements ...k) bool {
 	uniques := s.uniques
 	for _, element := range elements {
 		if _, ok := uniques[element]; !ok {
-			return false, nil
+			return false
 		}
-
 		delete(uniques, element)
 	}
-	return Commit(markOnStart, &s.changeMark, &s.err)
+	return true
 }
 
-func (s *Set[k]) DeleteOne(element k) (bool, error) {
-	if err := s.err; err != nil {
-		return false, err
-	}
-
-	markOnStart := s.changeMark
+func (s *Set[k]) DeleteOne(element k) bool {
 	uniques := s.uniques
 	if _, ok := uniques[element]; !ok {
-		return false, nil
+		return false
 	}
-
 	delete(uniques, element)
-	return Commit(markOnStart, &s.changeMark, &s.err)
+	return true
 }
 
 func (s *Set[k]) Collect() []k {
