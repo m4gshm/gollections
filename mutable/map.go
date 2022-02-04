@@ -37,7 +37,7 @@ func WrapMap[k comparable, v any](uniques map[k]v) *Map[k, v] {
 }
 
 type Map[k comparable, v any] struct {
-	uniques    map[k]v
+	uniques map[k]v
 }
 
 var _ Settable[int, any] = (*Map[int, any])(nil)

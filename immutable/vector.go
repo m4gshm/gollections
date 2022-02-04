@@ -24,15 +24,15 @@ type Vector[T any] struct {
 
 var (
 	_ c.Vector[any] = (*Vector[any])(nil)
-	_ fmt.Stringer    = (*Vector[any])(nil)
+	_ fmt.Stringer  = (*Vector[any])(nil)
 )
 
 func (s *Vector[T]) Begin() c.Iterator[T] {
 	return s.Iter()
 }
 
-func (s *Vector[T]) Iter() *it.PIter[T] {
-	return it.NewP(&s.elements)
+func (s *Vector[T]) Iter() *it.Iter[T] {
+	return it.New(s.elements)
 }
 
 func (s *Vector[T]) Collect() []T {

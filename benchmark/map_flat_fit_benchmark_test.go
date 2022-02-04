@@ -419,7 +419,7 @@ func Benchmark_MapFlattStructure_IterableFit(b *testing.B) {
 }
 
 func Benchmark_MapFlattStructure_IterableFitReset_Impl(b *testing.B) {
-	items := iterimpl.NewReseteable([]*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil})
+	items := iterimpl.New([]*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil})
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_ = iterimpl.Slice[string](iterimpl.MapFit(iterimpl.FlattFit(items, check.NotNil[Participant], (*Participant).GetAttributes), check.NotNil[Attributes], (*Attributes).GetName))

@@ -1,8 +1,8 @@
 package group
 
 import (
-	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/slice"
 )
 
 //Of - group.Of synonym of the slice.Group.

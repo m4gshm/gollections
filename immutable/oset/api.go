@@ -1,4 +1,4 @@
-//package oset provides the ordered set container implementation
+//Package oset provides the ordered set container implementation
 package oset
 
 import "github.com/m4gshm/gollections/immutable/ordered"

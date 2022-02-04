@@ -1,5 +1,5 @@
-//map_ package oset provides the unordered map container implementation
-package map_
+//Package map_ provides the unordered map container implementation
+package map_ //nilint
 
 import (
 	"github.com/m4gshm/gollections/immutable"

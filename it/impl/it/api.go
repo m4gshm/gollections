@@ -55,7 +55,7 @@ func Group[T any, K comparable, IT c.Iterator[T]](elements IT, by c.Converter[T,
 //For applies func on elements.
 func For[T any, IT c.Iterator[T]](elements IT, apply func(T) error) error {
 	for elements.HasNext() {
-		err:= apply(elements.Next())
+		err := apply(elements.Next())
 		if err != nil {
 			return err
 		}

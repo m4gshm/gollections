@@ -1,4 +1,4 @@
-//package set provides the unordered set container implementation
+//Package set provides the unordered set container implementation
 package set
 
 import "github.com/m4gshm/gollections/immutable"

@@ -55,7 +55,6 @@ func (s *Convert[From, To]) Next() To {
 	return s.current
 }
 
-
 func nextArrayElem[T any](elements []T, filter c.Predicate[T], indexHolder *int) (T, bool) {
 	l := len(elements)
 	for i := *indexHolder; i < l; i++ {

@@ -34,7 +34,7 @@ type benchCase struct {
 	load func(int)
 }
 
-var cases = []benchCase{/*{"high", HighLoad}, */{"low", LowLoad}}
+var cases = []benchCase{ /*{"high", HighLoad}, */ {"low", LowLoad}}
 
 func Benchmark_ForEach_Immutable_Vector(b *testing.B) {
 	c := vector.Of(values...)
@@ -215,18 +215,6 @@ func Benchmark_HasNextGet_Iterator_Impl(b *testing.B) {
 	}
 }
 
-func Benchmark_HasNextGet_Iterator_Impl_Point(b *testing.B) {
-	for _, casee := range cases {
-		b.Run(casee.name, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
-				for it := impliter.NewP(&values); it.HasNext(); {
-					casee.load(it.Next())
-				}
-			}
-		})
-	}
-}
-
 func Benchmark_ForRange_EmbeddedSlice(b *testing.B) {
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
@@ -278,24 +266,6 @@ func Benchmark_NewKVHasNextGet(b *testing.B) {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				for iter := impliter.NewKV(values); iter.HasNext(); {
-					k, v := iter.Next()
-					_ = v
-					casee.load(k)
-				}
-			}
-		})
-	}
-}
-
-func Benchmark_NewReflectKVHasNextGet(b *testing.B) {
-	values := map[int]int{}
-	for i := 0; i < max; i++ {
-		values[i] = i
-	}
-	for _, casee := range cases {
-		b.Run(casee.name, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
-				for iter := impliter.NewReflectKV(values); iter.HasNext(); {
 					k, v := iter.Next()
 					_ = v
 					casee.load(k)

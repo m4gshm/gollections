@@ -35,14 +35,14 @@ func WrapSet[T comparable](elements []T, uniques map[T]int) *Set[T] {
 }
 
 type Set[T comparable] struct {
-	elements   []T
-	uniques    map[T]int
+	elements []T
+	uniques  map[T]int
 }
 
 var (
 	_ mutable.Addable[int]    = (*Set[int])(nil)
 	_ mutable.Deleteable[int] = (*Set[int])(nil)
-	_ c.Set[int]            = (*Set[int])(nil)
+	_ c.Set[int]              = (*Set[int])(nil)
 	_ fmt.Stringer            = (*Set[int])(nil)
 )
 

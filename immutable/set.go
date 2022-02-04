@@ -28,7 +28,7 @@ type Set[k comparable] struct {
 }
 
 var (
-	_ c.Set[int] = (*Set[int])(nil)
+	_ c.Set[int]   = (*Set[int])(nil)
 	_ fmt.Stringer = (*Set[int])(nil)
 )
 

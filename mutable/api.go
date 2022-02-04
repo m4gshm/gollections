@@ -25,4 +25,3 @@ type Iterator[T any] interface {
 	c.Iterator[T]
 	Delete() bool
 }
-

@@ -34,15 +34,15 @@ type Set[T comparable] struct {
 
 var (
 	_ c.Set[int]   = (*Set[int])(nil)
-	_ fmt.Stringer   = (*Set[int])(nil)
+	_ fmt.Stringer = (*Set[int])(nil)
 )
 
 func (s *Set[T]) Begin() c.Iterator[T] {
 	return s.Iter()
 }
 
-func (s *Set[T]) Iter() *it.PIter[T] {
-	return it.NewP(&s.elements)
+func (s *Set[T]) Iter() *it.Iter[T] {
+	return it.New(s.elements)
 }
 
 func (s *Set[T]) Collect() []T {

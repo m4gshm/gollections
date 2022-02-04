@@ -66,11 +66,12 @@ func Always[T any](v bool) c.Predicate[T] {
 	return func(_ T) bool { return v }
 }
 
-//Always returns the negative of v every time
+//Never returns the negative of v every time
 func Never[T any](v bool) c.Predicate[T] {
 	return func(_ T) bool { return !v }
 }
 
+//Slice is the constraint included all slice types
 type Slice interface {
 	~[]any | ~[]uintptr |
 		~[]int | ~[]int8 | []int16 | []int32 | []int64 |

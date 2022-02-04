@@ -28,14 +28,14 @@ func WrapVector[T any](elements []T) *Vector[T] {
 
 //Vector stores ordered elements, provides index access.
 type Vector[T any] struct {
-	elements   *[]T
+	elements *[]T
 }
 
 var (
 	_ Addable[any]       = (*Vector[any])(nil)
 	_ Deleteable[int]    = (*Vector[any])(nil)
 	_ Settable[int, any] = (*Vector[any])(nil)
-	_ c.Vector[any]    = (*Vector[any])(nil)
+	_ c.Vector[any]      = (*Vector[any])(nil)
 	_ fmt.Stringer       = (*Vector[any])(nil)
 )
 
@@ -88,7 +88,7 @@ func (s *Vector[T]) AddAll(v []T) bool {
 	return true
 }
 
-func (s *Vector[T]) AddOne(v T) (bool) {
+func (s *Vector[T]) AddOne(v T) bool {
 	*s.elements = append(*s.elements, v)
 	return true
 }
@@ -108,7 +108,7 @@ func (s *Vector[T]) Remove(index int) (T, bool) {
 	return no, false
 }
 
-func (s *Vector[T]) Delete(indexes ...int) (bool) {
+func (s *Vector[T]) Delete(indexes ...int) bool {
 	l := len(indexes)
 	if l == 0 {
 		return false
@@ -149,7 +149,7 @@ func (s *Vector[T]) Delete(indexes ...int) (bool) {
 	return false
 }
 
-func (s *Vector[T]) Set(index int, value T) (bool) {
+func (s *Vector[T]) Set(index int, value T) bool {
 	e := *s.elements
 	if index < 0 {
 		return false

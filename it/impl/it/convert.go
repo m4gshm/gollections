@@ -49,7 +49,6 @@ func (s *ConvertKV[k, v, IT, k1, v2, C]) HasNext() bool {
 	return s.Iter.HasNext()
 }
 
-func (s *ConvertKV[k, v, IT, k2, v2, C]) Next() (k2, v2) { 
+func (s *ConvertKV[k, v, IT, k2, v2, C]) Next() (k2, v2) {
 	return s.By(s.Iter.Next())
 }
-

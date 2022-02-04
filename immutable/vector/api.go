@@ -12,4 +12,3 @@ func Of[T any](elements ...T) *immutable.Vector[T] {
 func New[T any](elements []T) *immutable.Vector[T] {
 	return immutable.NewVector(elements)
 }
-

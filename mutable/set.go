@@ -28,14 +28,14 @@ func WrapSet[k comparable](uniques map[k]struct{}) *Set[k] {
 
 //Set provides uniqueness (does't insert duplicated values).
 type Set[k comparable] struct {
-	uniques    map[k]struct{}
+	uniques map[k]struct{}
 }
 
 var (
-	_ Addable[int] = (*Set[int])(nil)
+	_ Addable[int]    = (*Set[int])(nil)
 	_ Deleteable[int] = (*Set[int])(nil)
-	_ c.Set[int]     = (*Set[int])(nil)
-	_ fmt.Stringer     = (*Set[int])(nil)
+	_ c.Set[int]      = (*Set[int])(nil)
+	_ fmt.Stringer    = (*Set[int])(nil)
 )
 
 func (s *Set[k]) Begin() c.Iterator[k] {

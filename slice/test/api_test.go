@@ -16,18 +16,18 @@ func Test_Range(t *testing.T) {
 }
 
 func Test_StringRepresentation(t *testing.T) {
-
-	expected := fmt.Sprint(slice.Of(1, 2, 3, 4))
-	actual := slice.ToString(slice.Of(1, 2, 3, 4))
-
+	var (
+		expected = fmt.Sprint(slice.Of(1, 2, 3, 4))
+		actual   = slice.ToString(slice.Of(1, 2, 3, 4))
+	)
 	assert.Equal(t, expected, actual)
 }
 
 func Test_StringReferencesRepresentation(t *testing.T) {
-
-	expected := fmt.Sprint(slice.Of(1, 2, 3, 4))
-	var i1, i2, i3, i4 = 1, 2, 3, 4
-	actual := slice.ToStringRefs(slice.Of(&i1, &i2, &i3, &i4))
-
+	var (
+		expected       = fmt.Sprint(slice.Of(1, 2, 3, 4))
+		i1, i2, i3, i4 = 1, 2, 3, 4
+		actual         = slice.ToStringRefs(slice.Of(&i1, &i2, &i3, &i4))
+	)
 	assert.Equal(t, expected, actual)
 }

@@ -22,10 +22,9 @@ func (s *FlattenFit[From, To]) HasNext() bool {
 			s.c = c
 			s.indTo = indTo + 1
 			return true
-		} else {
-			s.indTo = 0
-			s.elementsTo = nil
 		}
+		s.indTo = 0
+		s.elementsTo = nil
 	}
 
 	iter := s.Iter
@@ -65,10 +64,9 @@ func (s *Flatten[From, To]) HasNext() bool {
 			s.c = c
 			s.indTo = indTo + 1
 			return true
-		} else {
-			s.indTo = 0
-			s.elementsTo = nil
 		}
+		s.indTo = 0
+		s.elementsTo = nil
 	}
 
 	iter := s.Iter

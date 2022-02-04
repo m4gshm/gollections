@@ -14,7 +14,7 @@ func Test_PointerBasedIter(t *testing.T) {
 	}
 
 	expected := []someType{{"123", 123}, {"2", 2}, {"3", 3}, {"4", 4}}
-	iter := NewP(&expected)
+	iter := New(expected)
 	result := make([]someType, 0)
 	for iter.HasNext() {
 		n := iter.Next()

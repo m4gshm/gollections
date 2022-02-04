@@ -1,16 +1,10 @@
 package it
 
 import (
-	"reflect"
 	"unsafe"
 
 	"github.com/m4gshm/gollections/c"
 )
-
-func NewReflectKV[k comparable, v any](elements map[k]v) *ReflectKV[k, v] {
-	refVal := reflect.ValueOf(elements)
-	return &ReflectKV[k, v]{elements: elements, refVal: refVal, iter: refVal.MapRange()}
-}
 
 func NewOrderedKV[k comparable, v any](order []k, uniques map[k]v) *OrderedKV[k, v] {
 	return &OrderedKV[k, v]{elements: New(order), uniques: uniques}
@@ -95,28 +89,6 @@ func (h *hiter) initialized() bool {
 	return h.t != nil
 }
 
-type ReflectKV[k comparable, v any] struct {
-	elements map[k]v
-	iter     *reflect.MapIter
-	refVal   reflect.Value
-}
-
-var _ c.KVIterator[int, any] = (*ReflectKV[int, any])(nil)
-
-func (iter *ReflectKV[k, v]) HasNext() bool {
-	return iter.iter.Next()
-}
-
-func (iter *ReflectKV[k, v]) Next() (k, v) {
-	key := iter.iter.Key().Interface().(k)
-	value := iter.iter.Value().Interface().(v)
-	return key, value
-}
-
-func (s *ReflectKV[k, v]) Reset() {
-	s.iter.Reset(s.refVal)
-}
-
 type OrderedKV[k comparable, v any] struct {
 	elements *Iter[k]
 	uniques  map[k]v
@@ -124,13 +96,13 @@ type OrderedKV[k comparable, v any] struct {
 
 var _ c.KVIterator[string, any] = (*OrderedKV[string, any])(nil)
 
-func (s *OrderedKV[k, v]) HasNext() bool {
-	return s.elements.HasNext()
+func (i *OrderedKV[k, v]) HasNext() bool {
+	return i.elements.HasNext()
 }
 
-func (s *OrderedKV[k, v]) Next() (k, v) {
-	key := s.elements.Next()
-	return key, s.uniques[key]
+func (i *OrderedKV[k, v]) Next() (k, v) {
+	key := i.elements.Next()
+	return key, i.uniques[key]
 }
 
 func NewKey[k comparable, v any](uniques map[k]v) *Key[k, v] {
@@ -143,8 +115,8 @@ type Key[k comparable, v any] struct {
 
 var _ c.Iterator[string] = (*Key[string, any])(nil)
 
-func (iter *Key[k, v]) Next() k {
-	key, _ := iter.KV.Next()
+func (i *Key[k, v]) Next() k {
+	key, _ := i.KV.Next()
 	return key
 }
 
@@ -158,7 +130,7 @@ type Val[k comparable, v any] struct {
 
 var _ c.Iterator[any] = (*Val[int, any])(nil)
 
-func (iter *Val[k, v]) Next() v {
-	_, val := iter.KV.Next()
+func (i *Val[k, v]) Next() v {
+	_, val := i.KV.Next()
 	return val
 }

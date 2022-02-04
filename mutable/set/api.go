@@ -11,5 +11,5 @@ func Empty[T comparable]() *mutable.Set[T] {
 }
 
 func New[T comparable](capacity int) *mutable.Set[T] {
-	return mutable.NewSet[T]( capacity)
+	return mutable.NewSet[T](capacity)
 }

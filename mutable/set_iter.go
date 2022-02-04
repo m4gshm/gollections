@@ -17,7 +17,7 @@ type SetIter[k comparable] struct {
 var _ c.Iterator[int] = (*SetIter[int])(nil)
 var _ Iterator[int] = (*SetIter[int])(nil)
 
-func (iter *SetIter[k]) Next() (k) {
+func (iter *SetIter[k]) Next() k {
 	key, _ := iter.KV.Next()
 	return key
 }

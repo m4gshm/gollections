@@ -11,12 +11,12 @@ const NoStarted = impl.NoStarted
 
 //Of - the Iterator constructor.
 func Of[T any](elements ...T) c.Iterator[T] {
-	return impl.NewReseteable(elements)
+	return impl.New(elements)
 }
 
 //Wrap the same as 'Of' but for a slice.
 func Wrap[T any](elements []T) c.Iterator[T] {
-	return impl.NewReseteable(elements)
+	return impl.New(elements)
 }
 
 //Pipe returns the Pipe based on iterable elements.

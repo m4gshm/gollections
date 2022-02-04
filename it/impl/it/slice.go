@@ -10,36 +10,29 @@ import (
 const NoStarted = -1
 
 func New[T any](elements []T) *Iter[T] {
-	return &Iter[T]{elements: elements, size: len(elements), current: NoStarted}
+	return NewPP[T](GetArrayPointer(&elements), GetLen(&elements), GetArrayElementSize(&elements))
 }
 
-func NewReseteable[T any](elements []T) *Reseteable[T] {
-	return &Reseteable[T]{New(elements)}
+func NewPP[T any](array unsafe.Pointer, arraySize int, arrayElementSize uintptr) *Iter[T] {
+	return &Iter[T]{array: array, arraySize: arraySize, arrayElementSize: arrayElementSize, current: NoStarted}
 }
 
 type Iter[T any] struct {
-	elements []T
-	size     int
-	current  int
+	array            unsafe.Pointer
+	arraySize        int
+	arrayElementSize uintptr
+	current          int
 }
 
 var _ c.Iterator[any] = (*Iter[any])(nil)
+var _ c.Resetable = (*Iter[any])(nil)
 
 func (s *Iter[T]) HasNext() bool {
-	size := s.size
-	if size == 0 {
-		return false
-	}
-	c := s.current
-	if c == NoStarted || c < (size-1) {
-		s.current++
-		return true
-	}
-	return false
+	return HasNextByLen(s.arraySize, &s.current)
 }
 
 func (s *Iter[T]) Next() T {
-	return Get(&s.elements, s.current)
+	return *GetArrayElem[T](s.array, s.current, s.arrayElementSize)
 }
 
 func (s *Iter[T]) Position() int {
@@ -50,39 +43,8 @@ func (s *Iter[T]) SetPosition(pos int) {
 	s.current = pos
 }
 
-type Reseteable[T any] struct {
-	*Iter[T]
-}
-
-var _ c.Resetable = (*Reseteable[any])(nil)
-
-func (s *Reseteable[T]) Reset() {
+func (s *Iter[T]) Reset() {
 	s.SetPosition(NoStarted)
-}
-
-func NewP[T any](elements *[]T) *PIter[T] {
-	return NewPP[T](GetArrayPointer(elements), GetLen(elements), GetArrayElementSize(elements))
-}
-
-func NewPP[T any](array unsafe.Pointer, arraySize int, arrayElementSize uintptr) *PIter[T] {
-	return &PIter[T]{array: array, arraySize: arraySize, arrayElementSize: arrayElementSize, current: NoStarted}
-}
-
-type PIter[T any] struct {
-	array            unsafe.Pointer
-	arraySize        int
-	arrayElementSize uintptr
-	current          int
-}
-
-var _ c.Iterator[any] = (*PIter[any])(nil)
-
-func (s *PIter[T]) HasNext() bool {
-	return HasNextByLen(s.arraySize, &s.current)
-}
-
-func (s *PIter[T]) Next() T {
-	return *GetArrayElem[T](s.array, s.current, s.arrayElementSize)
 }
 
 type sliceType struct {
