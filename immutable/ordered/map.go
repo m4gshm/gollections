@@ -5,7 +5,7 @@ import (
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/collect"
-	"github.com/m4gshm/gollections/immutable/vector"
+
 	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/op"
@@ -105,7 +105,7 @@ func (s *Map[k, v]) Get(key k) (v, bool) {
 }
 
 func (s *Map[k, v]) Keys() c.Collection[k, []k, c.Iterator[k]] {
-	return vector.New(s.elements)
+	return WrapKeys(s.elements)
 }
 
 func (s *Map[k, v]) Values() c.Collection[v, []v, c.Iterator[v]] {

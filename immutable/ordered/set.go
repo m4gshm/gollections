@@ -2,6 +2,7 @@ package ordered
 
 import (
 	"fmt"
+	"sort"
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/it/impl/it"
@@ -76,6 +77,16 @@ func (s *Set[T]) Len() int {
 func (s *Set[T]) Contains(v T) bool {
 	_, ok := s.uniques[v]
 	return ok
+}
+
+func (s *Set[t]) Sort(less func(e1, e2 t) bool) *Set[t] {
+	var (
+		elements = s.elements
+		dest     = make([]t, len(elements))
+	)
+	copy(dest, elements)
+	sort.Slice(dest, func(i, j int) bool { return less(dest[i], dest[j]) })
+	return WrapSet(dest, s.uniques)
 }
 
 func (s *Set[T]) String() string {

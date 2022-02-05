@@ -2,6 +2,7 @@ package immutable
 
 import (
 	"fmt"
+	"sort"
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/it/impl/it"
@@ -60,6 +61,12 @@ func (s *MapValues[k, v]) Map(by c.Converter[v, v]) c.Pipe[v, []v, c.Iterator[v]
 
 func (s *MapValues[k, v]) Reduce(by op.Binary[v]) v {
 	return it.Reduce(s.Iter(), by)
+}
+
+func (s *MapValues[k, v]) Sort(less func(e1, e2 v) bool) *Vector[v] {
+	var dest = s.Collect()
+	sort.Slice(dest, func(i, j int) bool { return less(dest[i], dest[j]) })
+	return WrapVector(dest)
 }
 
 func (s *MapValues[k, v]) String() string {

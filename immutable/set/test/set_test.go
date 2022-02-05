@@ -6,6 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/m4gshm/gollections/immutable/oset"
 	"github.com/m4gshm/gollections/immutable/set"
 	"github.com/m4gshm/gollections/it"
 	"github.com/m4gshm/gollections/slice"
@@ -89,4 +90,12 @@ func Test_Set_Group_By_Iterator(t *testing.T) {
 
 	assert.Equal(t, []int{1, 3, 7}, fg)
 	assert.Equal(t, []int{0, 2, 4, 6}, tg)
+}
+
+func Test_Set_Sort(t *testing.T) {
+	var (
+		elements = set.Of(3, 3, 1, 1, 1, 5, 6, 8, 8, 0, -2, -2)
+		sorted   = elements.Sort(func(e1, e2 int) bool { return e1 < e2 })
+	)
+	assert.Equal(t, oset.Of(-2, 0, 1, 3, 5, 6, 8), sorted)
 }
