@@ -28,57 +28,57 @@ var (
 	_ fmt.Stringer  = (*Vector[any])(nil)
 )
 
-func (s *Vector[t]) Begin() c.Iterator[t] {
-	return s.Iter()
+func (v *Vector[t]) Begin() c.Iterator[t] {
+	return v.Iter()
 }
 
-func (s *Vector[t]) Iter() *it.Iter[t] {
-	return it.New(s.elements)
+func (v *Vector[t]) Iter() *it.Iter[t] {
+	return it.New(v.elements)
 }
 
-func (s *Vector[t]) Collect() []t {
-	return slice.Copy(s.elements)
+func (v *Vector[t]) Collect() []t {
+	return slice.Copy(v.elements)
 }
 
-func (s *Vector[t]) Len() int {
-	return it.GetLen(&s.elements)
+func (v *Vector[t]) Len() int {
+	return it.GetLen(&v.elements)
 }
 
-func (s *Vector[t]) Get(index int) (t, bool) {
-	return slice.Get(s.elements, index)
+func (v *Vector[t]) Get(index int) (t, bool) {
+	return slice.Get(v.elements, index)
 }
 
-func (s *Vector[t]) Track(tracker func(int, t) error) error {
-	return slice.Track(s.elements, tracker)
+func (v *Vector[t]) Track(tracker func(int, t) error) error {
+	return slice.Track(v.elements, tracker)
 }
 
-func (s *Vector[t]) TrackEach(tracker func(int, t)) {
-	slice.TrackEach(s.elements, tracker)
+func (v *Vector[t]) TrackEach(tracker func(int, t)) {
+	slice.TrackEach(v.elements, tracker)
 }
 
-func (s *Vector[t]) For(walker func(t) error) error {
-	return slice.For(s.elements, walker)
+func (v *Vector[t]) For(walker func(t) error) error {
+	return slice.For(v.elements, walker)
 }
 
-func (s *Vector[t]) ForEach(walker func(t)) {
-	slice.ForEach(s.elements, walker)
+func (v *Vector[t]) ForEach(walker func(t)) {
+	slice.ForEach(v.elements, walker)
 }
 
-func (s *Vector[t]) Filter(filter c.Predicate[t]) c.Pipe[t, []t, c.Iterator[t]] {
-	return it.NewPipe[t](it.Filter(s.Iter(), filter))
+func (v *Vector[t]) Filter(filter c.Predicate[t]) c.Pipe[t, []t, c.Iterator[t]] {
+	return it.NewPipe[t](it.Filter(v.Iter(), filter))
 }
 
-func (s *Vector[t]) Map(by c.Converter[t, t]) c.Pipe[t, []t, c.Iterator[t]] {
-	return it.NewPipe[t](it.Map(s.Iter(), by))
+func (v *Vector[t]) Map(by c.Converter[t, t]) c.Pipe[t, []t, c.Iterator[t]] {
+	return it.NewPipe[t](it.Map(v.Iter(), by))
 }
 
-func (s *Vector[t]) Reduce(by op.Binary[t]) t {
-	return it.Reduce(s.Iter(), by)
+func (v *Vector[t]) Reduce(by op.Binary[t]) t {
+	return it.Reduce(v.Iter(), by)
 }
 
-func (s *Vector[t]) Sort(less func(e1, e2 t) bool) *Vector[t] {
+func (v *Vector[t]) Sort(less func(e1, e2 t) bool) *Vector[t] {
 	var (
-		elements = s.elements
+		elements = v.elements
 		dest     = make([]t, len(elements))
 	)
 	copy(dest, elements)
@@ -86,6 +86,6 @@ func (s *Vector[t]) Sort(less func(e1, e2 t) bool) *Vector[t] {
 	return WrapVector(dest)
 }
 
-func (s *Vector[t]) String() string {
-	return slice.ToString(s.elements)
+func (v *Vector[t]) String() string {
+	return slice.ToString(v.elements)
 }

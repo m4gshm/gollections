@@ -77,3 +77,25 @@ func Test_Set_Sort(t *testing.T) {
 	)
 	assert.Equal(t, Of(-2, 0, 1, 3, 5, 6, 8), sorted)
 }
+func Test_Set_SortStructByField(t *testing.T) {
+	var (
+		anonymous = &user{"Anonymous", 0}
+		cherlie   = &user{"Cherlie", 25}
+		alise     = &user{"Alise", 20}
+		bob       = &user{"Bob", 19}
+
+		elements     = Of(anonymous, cherlie, alise, bob)
+		sortedByName = Sort(elements, (*user).Name)
+		sortedByAge  = Sort(elements, (*user).Age)
+	)
+	assert.Equal(t, Of(alise, anonymous, bob, cherlie), sortedByName)
+	assert.Equal(t, Of(anonymous, bob, alise, cherlie), sortedByAge)
+}
+
+type user struct {
+	name string
+	age  int
+}
+
+func (u *user) Name() string { return u.name }
+func (u *user) Age() int     { return u.age }
