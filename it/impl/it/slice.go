@@ -27,24 +27,28 @@ type Iter[T any] struct {
 var _ c.Iterator[any] = (*Iter[any])(nil)
 var _ c.Resetable = (*Iter[any])(nil)
 
-func (s *Iter[T]) HasNext() bool {
-	return HasNextByLen(s.arraySize, &s.current)
+func (i *Iter[T]) HasNext() bool {
+	if n, has := HasNextByLen(i.arraySize, i.current); has {
+		i.current = n
+		return true
+	}
+	return false
 }
 
-func (s *Iter[T]) Next() T {
-	return *GetArrayElem[T](s.array, s.current, s.arrayElementSize)
+func (i *Iter[T]) Next() T {
+	return *GetArrayElem[T](i.array, i.current, i.arrayElementSize)
 }
 
-func (s *Iter[T]) Position() int {
-	return s.current
+func (i *Iter[T]) Position() int {
+	return i.current
 }
 
-func (s *Iter[T]) SetPosition(pos int) {
-	s.current = pos
+func (i *Iter[T]) SetPosition(pos int) {
+	i.current = pos
 }
 
-func (s *Iter[T]) Reset() {
-	s.SetPosition(NoStarted)
+func (i *Iter[T]) Reset() {
+	i.SetPosition(NoStarted)
 }
 
 type sliceType struct {
@@ -73,31 +77,29 @@ type rtype struct {
 	ptrToThis typeOff // type for pointer to this type, may be zero
 }
 
-func HasNext[T any](elements *[]T, current *int) bool {
-	return HasNextByLen(GetLen(elements), current)
+func HasNext[T any](elements []T, current int) (int, bool) {
+	return HasNextByLen(GetLen(&elements), current)
 }
 
-func HasNextByLen(size int, index *int) bool {
+func HasNextByLen(size int, index int) (int, bool) {
 	if size == 0 {
-		return false
+		return 0, false
 	}
-	c := *index
-	if c == NoStarted || c < (size-1) {
-		*index++
-		return true
+	if index == NoStarted || index < (size-1) {
+		return index + 1, true
 	}
-	return false
+	return 0, false
 }
 
-func Get[T any](elements *[]T, current int) T {
-	if current >= len(*elements) {
+func Get[T any](elements []T, current int) T {
+	if current >= len(elements) {
 		var no T
 		return no
 	} else if current == NoStarted {
 		var no T
 		return no
 	}
-	return (*elements)[current]
+	return (elements)[current]
 }
 
 func GetArrayPointer[T any](elements *[]T) unsafe.Pointer {

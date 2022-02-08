@@ -15,7 +15,7 @@ func NewSet[T comparable](capacity int) *Set[T] {
 }
 
 func ToSet[T comparable](elements []T) *Set[T] {
-	uniques := make(map[T]struct{}, 0)
+	uniques := make(map[T]struct{}, len(elements))
 	for _, v := range elements {
 		uniques[v] = struct{}{}
 	}

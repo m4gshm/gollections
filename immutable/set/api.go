@@ -7,7 +7,6 @@ import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/immutable"
 	"github.com/m4gshm/gollections/immutable/ordered"
-
 )
 
 func Of[t comparable](elements ...t) *immutable.Set[t] {

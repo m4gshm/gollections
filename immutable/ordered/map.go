@@ -13,8 +13,9 @@ import (
 
 func ConvertKVsToMap[k comparable, v any](elements []*map_.KV[k, v]) *Map[k, v] {
 	var (
-		uniques = make(map[k]v, 0)
-		order   = make([]k, 0, 0)
+		l       = len(elements)
+		uniques = make(map[k]v, l)
+		order   = make([]k, 0, l)
 	)
 	for _, kv := range elements {
 		key := kv.Key()

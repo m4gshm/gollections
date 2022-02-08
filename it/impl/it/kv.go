@@ -27,26 +27,26 @@ type KV[k comparable, v any] struct {
 
 var _ c.KVIterator[int, any] = (*KV[int, any])(nil)
 
-func (iter *KV[k, v]) HasNext() bool {
-	if !iter.hiter.initialized() {
-		mapiterinit(iter.maptype, iter.hmap, &iter.hiter)
+func (i *KV[k, v]) HasNext() bool {
+	if !i.hiter.initialized() {
+		mapiterinit(i.maptype, i.hmap, &i.hiter)
 	} else {
-		if mapiterkey(&iter.hiter) == nil {
+		if mapiterkey(&i.hiter) == nil {
 			return false
 		}
-		mapiternext(&iter.hiter)
+		mapiternext(&i.hiter)
 	}
-	return mapiterkey(&iter.hiter) != nil
+	return mapiterkey(&i.hiter) != nil
 }
 
-func (iter *KV[k, v]) Next() (k, v) {
-	iterkey := mapiterkey(&iter.hiter)
+func (i *KV[k, v]) Next() (k, v) {
+	iterkey := mapiterkey(&i.hiter)
 	if iterkey == nil {
 		var key k
 		var value v
 		return key, value
 	}
-	iterelem := mapiterelem(&iter.hiter)
+	iterelem := mapiterelem(&i.hiter)
 	var key *k = (*k)(iterkey)
 	var value *v = (*v)(iterelem)
 	return *key, *value

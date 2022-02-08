@@ -12,7 +12,7 @@ import (
 )
 
 func ConvertKVsToMap[k comparable, v any](elements []*map_.KV[k, v]) *Map[k, v] {
-	uniques := make(map[k]v, 0)
+	uniques := make(map[k]v, len(elements))
 	for _, kv := range elements {
 		uniques[kv.Key()] = kv.Value()
 	}

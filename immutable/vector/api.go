@@ -1,4 +1,4 @@
-//package vector provides the Vector (ordered) implementation
+//Package vector provides the Vector (ordered) implementation
 package vector
 
 import (

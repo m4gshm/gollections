@@ -20,11 +20,15 @@ var _ c.Iterator[any] = (*SetIter[any])(nil)
 var _ mutable.Iterator[any] = (*SetIter[any])(nil)
 
 func (i *SetIter[T]) HasNext() bool {
-	return it.HasNext(i.elements, &i.current)
+	if n, has := it.HasNext(*i.elements, i.current); has {
+		i.current = n
+		return true
+	}
+	return false
 }
 
 func (i *SetIter[T]) Next() T {
-	return it.Get(i.elements, i.current)
+	return it.Get(*i.elements, i.current)
 }
 
 func (i *SetIter[T]) Delete() bool {

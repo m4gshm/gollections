@@ -1,7 +1,6 @@
 package mutable
 
 import (
-	"errors"
 	"fmt"
 	"sort"
 
@@ -10,8 +9,6 @@ import (
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
 )
-
-var BadIndex = errors.New("bad index")
 
 func NewVector[T any](capacity int) *Vector[T] {
 	return WrapVector(make([]T, 0, capacity))
@@ -22,13 +19,12 @@ func ToVector[T any](elements []T) *Vector[T] {
 }
 
 func WrapVector[T any](elements []T) *Vector[T] {
-	r := &elements
-	return &Vector[T]{elements: r}
+	return &Vector[T]{elements: elements}
 }
 
 //Vector stores ordered elements, provides index access.
 type Vector[T any] struct {
-	elements *[]T
+	elements []T
 }
 
 var (
@@ -39,84 +35,84 @@ var (
 	_ fmt.Stringer       = (*Vector[any])(nil)
 )
 
-func (s *Vector[T]) Begin() c.Iterator[T] {
-	return s.Iter()
+func (v *Vector[T]) Begin() c.Iterator[T] {
+	return v.Iter()
 }
 
-func (s *Vector[T]) BeginEdit() Iterator[T] {
-	return s.Iter()
+func (v *Vector[T]) BeginEdit() Iterator[T] {
+	return v.Iter()
 }
 
-func (s *Vector[T]) Iter() *Iter[T] {
-	return NewIter(&s.elements, s.DeleteOne)
+func (v *Vector[T]) Iter() *Iter[T] {
+	return NewIter(&v.elements, v.DeleteOne)
 }
 
-func (s *Vector[T]) Collect() []T {
-	return slice.Copy(*s.elements)
+func (v *Vector[T]) Collect() []T {
+	return slice.Copy(v.elements)
 }
 
-func (s *Vector[T]) Track(tracker func(int, T) error) error {
-	return slice.Track(*s.elements, tracker)
+func (v *Vector[T]) Track(tracker func(int, T) error) error {
+	return slice.Track(v.elements, tracker)
 }
 
-func (s *Vector[T]) TrackEach(tracker func(int, T)) {
-	slice.TrackEach(*s.elements, tracker)
+func (v *Vector[T]) TrackEach(tracker func(int, T)) {
+	slice.TrackEach(v.elements, tracker)
 }
 
-func (s *Vector[T]) For(walker func(T) error) error {
-	return slice.For(*s.elements, walker)
+func (v *Vector[T]) For(walker func(T) error) error {
+	return slice.For(v.elements, walker)
 }
 
-func (s *Vector[T]) ForEach(walker func(T)) {
-	slice.ForEach(*s.elements, walker)
+func (v *Vector[T]) ForEach(walker func(T)) {
+	slice.ForEach(v.elements, walker)
 }
 
-func (s *Vector[T]) Len() int {
-	return it.GetLen(s.elements)
+func (v *Vector[T]) Len() int {
+	return it.GetLen(&v.elements)
 }
 
-func (s *Vector[T]) Get(index int) (T, bool) {
-	return slice.Get(*s.elements, index)
+func (v *Vector[T]) Get(index int) (T, bool) {
+	return slice.Get(v.elements, index)
 }
 
-func (s *Vector[T]) Add(v ...T) bool {
-	return s.AddAll(v)
+func (v *Vector[T]) Add(elements ...T) bool {
+	return v.AddAll(elements)
 }
 
-func (s *Vector[T]) AddAll(v []T) bool {
-	*s.elements = append(*s.elements, v...)
+func (v *Vector[T]) AddAll(elements []T) bool {
+	v.elements = append(v.elements, elements...)
 	return true
 }
 
-func (s *Vector[T]) AddOne(v T) bool {
-	*s.elements = append(*s.elements, v)
+func (v *Vector[T]) AddOne(element T) bool {
+	v.elements = append(v.elements, element)
 	return true
 }
 
-func (s *Vector[T]) DeleteOne(index int) bool {
-	_, ok := s.Remove(index)
+func (v *Vector[T]) DeleteOne(index int) bool {
+	_, ok := v.Remove(index)
 	return ok
 }
 
-func (s *Vector[T]) Remove(index int) (T, bool) {
-	if e := *s.elements; index >= 0 && index < len(e) {
+func (v *Vector[T]) Remove(index int) (T, bool) {
+	if e := v.elements; index >= 0 && index < len(e) {
 		de := e[index]
-		*s.elements = slice.Delete(index, e)
+		v.elements = slice.Delete(index, e)
 		return de, true
 	}
 	var no T
 	return no, false
 }
 
-func (s *Vector[T]) Delete(indexes ...int) bool {
+func (v *Vector[T]) Delete(indexes ...int) bool {
 	l := len(indexes)
 	if l == 0 {
 		return false
 	} else if l == 1 {
-		return s.DeleteOne(indexes[0])
+		return v.DeleteOne(indexes[0])
 	}
 
-	e := *s.elements
+	e := v.elements
 	el := len(e)
 
 	sort.Ints(indexes)
@@ -143,14 +139,14 @@ func (s *Vector[T]) Delete(indexes ...int) bool {
 		}
 	}
 	if shift > 0 {
-		*s.elements = e
+		v.elements = e
 		return true
 	}
 	return false
 }
 
-func (s *Vector[T]) Set(index int, value T) bool {
-	e := *s.elements
+func (v *Vector[T]) Set(index int, value T) bool {
+	e := v.elements
 	if index < 0 {
 		return false
 	}
@@ -164,24 +160,30 @@ func (s *Vector[T]) Set(index int, value T) bool {
 		ne := make([]T, l, c)
 		copy(ne, e)
 		e = ne
-		*s.elements = e
+		v.elements = e
 	}
 	e[index] = value
 	return true
 }
 
-func (s *Vector[T]) Filter(filter c.Predicate[T]) c.Pipe[T, []T, c.Iterator[T]] {
-	return it.NewPipe[T](it.Filter(s.Iter(), filter))
+func (v *Vector[T]) Filter(filter c.Predicate[T]) c.Pipe[T, []T, c.Iterator[T]] {
+	return it.NewPipe[T](it.Filter(v.Iter(), filter))
 }
 
-func (s *Vector[T]) Map(by c.Converter[T, T]) c.Pipe[T, []T, c.Iterator[T]] {
-	return it.NewPipe[T](it.Map(s.Iter(), by))
+func (v *Vector[T]) Map(by c.Converter[T, T]) c.Pipe[T, []T, c.Iterator[T]] {
+	return it.NewPipe[T](it.Map(v.Iter(), by))
 }
 
-func (s *Vector[T]) Reduce(by op.Binary[T]) T {
-	return it.Reduce(s.Iter(), by)
+func (v *Vector[T]) Reduce(by op.Binary[T]) T {
+	return it.Reduce(v.Iter(), by)
 }
 
-func (s *Vector[T]) String() string {
-	return slice.ToString(*s.elements)
+func (v *Vector[t]) Sort(less func(e1, e2 t) bool) *Vector[t] {
+	var dest = v.elements
+	sort.Slice(dest, func(i, j int) bool { return less(dest[i], dest[j]) })
+	return v
+}
+
+func (v *Vector[T]) String() string {
+	return slice.ToString(v.elements)
 }

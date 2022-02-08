@@ -1,8 +1,8 @@
 package map_
 
 import (
-	"bytes"
 	"fmt"
+	"strings"
 )
 
 //Copy makes a map copy.
@@ -127,7 +127,7 @@ func ToStringOrdered[k comparable, v any](order []k, elements map[k]v) string {
 }
 
 func ToStringOrderedf[k comparable, v any](order []k, elements map[k]v, kvFormat, delim string) string {
-	str := bytes.Buffer{}
+	str := strings.Builder{}
 	str.WriteString("[")
 	for i, k := range order {
 		if i > 0 {
@@ -145,7 +145,7 @@ func ToString[k comparable, v any](elements map[k]v) string {
 }
 
 func ToStringf[k comparable, v any](elements map[k]v, kvFormat, delim string) string {
-	str := bytes.Buffer{}
+	str := strings.Builder{}
 	str.WriteString("[")
 	i := 0
 	for k, v := range elements {

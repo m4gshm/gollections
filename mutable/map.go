@@ -14,7 +14,7 @@ import (
 
 func AsMap[k comparable, v any](elements []*map_.KV[k, v]) *Map[k, v] {
 	var (
-		uniques = make(map[k]v, 0)
+		uniques = make(map[k]v, len(elements))
 	)
 	for _, kv := range elements {
 		key := kv.Key()

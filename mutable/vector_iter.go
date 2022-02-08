@@ -5,12 +5,12 @@ import (
 	"github.com/m4gshm/gollections/it/impl/it"
 )
 
-func NewIter[T any](elements **[]T, del func(int) bool) *Iter[T] {
+func NewIter[T any](elements *[]T, del func(int) bool) *Iter[T] {
 	return &Iter[T]{elements: elements, current: it.NoStarted, del: del}
 }
 
 type Iter[T any] struct {
-	elements **[]T
+	elements *[]T
 	current  int
 	del      func(index int) bool
 }
@@ -19,7 +19,11 @@ var _ c.Iterator[any] = (*Iter[any])(nil)
 var _ Iterator[any] = (*Iter[any])(nil)
 
 func (i *Iter[T]) HasNext() bool {
-	return it.HasNext(*i.elements, &i.current)
+	if n, has := it.HasNext(*i.elements, i.current); has {
+		i.current = n
+		return true
+	}
+	return false
 }
 
 func (i *Iter[T]) Next() T {

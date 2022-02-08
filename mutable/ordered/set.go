@@ -12,8 +12,9 @@ import (
 
 func ToSet[T comparable](elements []T) *Set[T] {
 	var (
-		uniques = make(map[T]int, 0)
-		order   = make([]T, 0, 0)
+		l       = len(elements)
+		uniques = make(map[T]int, l)
+		order   = make([]T, 0, l)
 	)
 	pos := 0
 	for _, v := range elements {
