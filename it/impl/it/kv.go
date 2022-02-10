@@ -10,6 +10,7 @@ func NewOrderedKV[k comparable, v any](order []k, uniques map[k]v) *OrderedKV[k,
 	return &OrderedKV[k, v]{elements: New(order), uniques: uniques}
 }
 
+//NewKV returns the KVIterator based on map elements.
 func NewKV[k comparable, v any](elements map[k]v) *KV[k, v] {
 	m := elements
 	hmap := *(*unsafe.Pointer)(unsafe.Pointer(&m))

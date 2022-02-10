@@ -61,9 +61,6 @@ func Test_Set_Contains(t *testing.T) {
 func Test_Set_FilterMapReduce(t *testing.T) {
 	s := set.Of(1, 1, 2, 4, 3, 1).Filter(func(i int) bool { return i%2 == 0 }).Map(func(i int) int { return i * 2 }).Reduce(sum.Of[int])
 	assert.Equal(t, 12, s)
-
-	s = it.Pipe(set.Of(1, 1, 2, 4, 3, 1).Begin()).Filter(func(i int) bool { return i%2 == 0 }).Map(func(i int) int { return i * 2 }).Reduce(sum.Of[int])
-	assert.Equal(t, 12, s)
 }
 
 func Test_Set_Group_By_Walker(t *testing.T) {

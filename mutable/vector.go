@@ -51,6 +51,10 @@ func (v *Vector[T]) Collect() []T {
 	return slice.Copy(v.elements)
 }
 
+func (v *Vector[T]) Copy() *Vector[T] {
+	return WrapVector(slice.Copy(v.elements))
+}
+
 func (v *Vector[T]) Track(tracker func(int, T) error) error {
 	return slice.Track(v.elements, tracker)
 }
@@ -179,8 +183,7 @@ func (v *Vector[T]) Reduce(by op.Binary[T]) T {
 }
 
 func (v *Vector[t]) Sort(less func(e1, e2 t) bool) *Vector[t] {
-	var dest = v.elements
-	sort.Slice(dest, func(i, j int) bool { return less(dest[i], dest[j]) })
+	v.elements = slice.Sort(v.elements, less)
 	return v
 }
 

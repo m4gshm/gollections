@@ -4,6 +4,7 @@ package slice
 import (
 	"bytes"
 	"fmt"
+	"sort"
 
 	"golang.org/x/exp/constraints"
 
@@ -61,6 +62,21 @@ func Range[T constraints.Integer](from T, to T) []T {
 		e = e + T(delta)
 	}
 	return elements
+}
+
+func Sort[t any](elements []t, less func(e1, e2 t) bool) []t {
+	sort.Slice(elements, func(i, j int) bool { return less(elements[i], elements[j]) })
+	return elements
+}
+
+func SortByOrdered[t any, o constraints.Ordered](elements []t, by c.Converter[t, o]) []t {
+	return Sort(elements, func(e1, e2 t) bool { return by(e1) < by(e2) })
+}
+
+func SortCopy[t any](elements []t, less func(e1, e2 t) bool) []t {
+	var dest = make([]t, len(elements))
+	copy(dest, elements)
+	return Sort(dest, less)
 }
 
 //Get returns the element by its index in elements, otherwise, if the provided index is ouf of the elements, returns zero T and false in the second result

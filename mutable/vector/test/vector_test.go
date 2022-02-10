@@ -35,6 +35,39 @@ func Test_Vector_Iterate(t *testing.T) {
 	vec.ForEach(func(v int) { out = append(out, v) })
 }
 
+func Test_Vector_Sort(t *testing.T) {
+	var (
+		elements = vector.Of(3, 1, 5, 6, 8, 0, -2)
+		sorted   = elements.Sort(func(e1, e2 int) bool { return e1 < e2 })
+	)
+	assert.Equal(t, vector.Of(-2, 0, 1, 3, 5, 6, 8), sorted)
+	assert.Equal(t, vector.Of(-2, 0, 1, 3, 5, 6, 8), elements)
+	assert.Equal(t,  elements, sorted)
+}
+
+func Test_Vector_SortStructByField(t *testing.T) {
+	var (
+		anonymous = &user{"Anonymous", 0}
+		cherlie   = &user{"Cherlie", 25}
+		alise     = &user{"Alise", 20}
+		bob       = &user{"Bob", 19}
+
+		elements     = vector.Of(anonymous, cherlie, alise, bob)
+		sortedByName = vector.Sort(elements.Copy(), (*user).Name)
+		sortedByAge  = vector.Sort(elements.Copy(), (*user).Age)
+	)
+	assert.Equal(t, vector.Of(alise, anonymous, bob, cherlie), sortedByName)
+	assert.Equal(t, vector.Of(anonymous, bob, alise, cherlie), sortedByAge)
+}
+
+type user struct {
+	name string
+	age  int
+}
+
+func (u *user) Name() string { return u.name }
+func (u *user) Age() int     { return u.age }
+
 func Test_Vector_Add(t *testing.T) {
 	vec := vector.New[int](0)
 	added := vec.Add(1, 1, 2, 4, 3, 1)
@@ -106,9 +139,6 @@ func Test_Vector_DeleteByIterator(t *testing.T) {
 
 func Test_Vector_FilterMapReduce(t *testing.T) {
 	s := vector.Of(1, 1, 2, 4, 3, 4).Filter(func(i int) bool { return i%2 == 0 }).Map(func(i int) int { return i * 2 }).Reduce(sum.Of[int])
-	assert.Equal(t, 20, s)
-
-	s = it.Pipe(vector.Of(1, 1, 2, 4, 3, 1, 4).Begin()).Filter(func(i int) bool { return i%2 == 0 }).Map(func(i int) int { return i * 2 }).Reduce(sum.Of[int])
 	assert.Equal(t, 20, s)
 }
 

@@ -2,7 +2,6 @@ package immutable
 
 import (
 	"fmt"
-	"sort"
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/immutable/ordered"
@@ -81,9 +80,7 @@ func (s *Set[t]) Contains(val t) bool {
 }
 
 func (s *Set[t]) Sort(less func(e1, e2 t) bool) *ordered.Set[t] {
-	var dest = s.Collect()
-	sort.Slice(dest, func(i, j int) bool { return less(dest[i], dest[j]) })
-	return ordered.WrapSet(dest, s.uniques)
+	return ordered.WrapSet(slice.Sort(s.Collect(), less), s.uniques)
 }
 
 func (s *Set[t]) String() string {

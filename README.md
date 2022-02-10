@@ -4,6 +4,12 @@ Golang generic container data structures and functions.
 
 Need use Go version 1.18 beta 2 or newer.
 
+## Installation
+
+```bash
+go get -u https://github.com/m4gshm/gollections
+```
+
 ## [Mutable containers](./mutable/api.go)
 
 Supports write operations (append, delete, replace).
@@ -109,7 +115,7 @@ where [vector](./mutable/vector/api.go), [set](./mutable/set/api.go), [oset](./m
 
 ## Container functions
 
-Consists of two groups of operations:
+There are two groups of operations:
  * Intermediate - only defines a computation (Wrap, Map, Flatt, Filter, Group).
  * Final - applies intermediates and retrieves a result (ForEach, Slice, Reduce)
 

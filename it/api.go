@@ -19,16 +19,6 @@ func Wrap[T any](elements []T) c.Iterator[T] {
 	return impl.New(elements)
 }
 
-//Pipe returns the Pipe based on iterable elements.
-func Pipe[T any](elements c.Iterator[T]) c.Pipe[T, []T, c.Iterator[T]] {
-	return impl.NewPipe(elements)
-}
-
-//WrapMap returns the KVIterator based on map elements.
-func WrapMap[k comparable, v any](elements map[k]v) c.KVIterator[k, v] {
-	return impl.NewKV(elements)
-}
-
 //Map creates the Iterator that converts elements with a converter and returns them.
 func Map[From, To any](elements c.Iterator[From], by c.Converter[From, To]) c.Iterator[To] {
 	return impl.Map(elements, by)

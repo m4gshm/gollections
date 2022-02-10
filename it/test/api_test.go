@@ -6,6 +6,7 @@ import (
 
 	"github.com/m4gshm/gollections/conv"
 	"github.com/m4gshm/gollections/it"
+	impl "github.com/m4gshm/gollections/it/impl/it"
 	sliceit "github.com/m4gshm/gollections/it/slice"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/sum"
@@ -141,7 +142,7 @@ func Test_Iterate(t *testing.T) {
 		values[i] = i
 	}
 
-	stream := it.Pipe(it.Wrap(values))
+	stream := impl.NewPipe[int](impl.New(values))
 
 	result := make([]int, 0)
 
