@@ -101,10 +101,18 @@ func (s *Map[k, v]) Set(key k, value v) bool {
 }
 
 func (s *Map[k, v]) Keys() c.Collection[k, []k, c.Iterator[k]] {
+	return s.K()
+}
+
+func (s *Map[k, v]) K() *immutable.MapKeys[k, v] {
 	return immutable.WrapKeys(s.uniques)
 }
 
 func (s *Map[k, v]) Values() c.Collection[v, []v, c.Iterator[v]] {
+	return s.V()
+}
+
+func (s *Map[k, v]) V() *immutable.MapValues[k, v] {
 	return immutable.WrapVal(s.uniques)
 }
 

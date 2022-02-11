@@ -5,6 +5,7 @@ import (
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/collect"
+	"github.com/m4gshm/gollections/slice"
 
 	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/map_"
@@ -71,6 +72,10 @@ func (s *Map[k, v]) Collect() map[k]v {
 	return out
 }
 
+func (s *Map[k, v]) Sort(less func(k1, k2 k) bool) *Map[k, v] {
+	return WrapMap(slice.SortCopy(s.elements, less), s.uniques)
+}
+
 func (s *Map[k, v]) String() string {
 	return map_.ToStringOrdered(s.elements, s.uniques)
 }
@@ -106,10 +111,18 @@ func (s *Map[k, v]) Get(key k) (v, bool) {
 }
 
 func (s *Map[k, v]) Keys() c.Collection[k, []k, c.Iterator[k]] {
+	return s.K()
+}
+
+func (s *Map[k, v]) K() *MapKeys[k] {
 	return WrapKeys(s.elements)
 }
 
 func (s *Map[k, v]) Values() c.Collection[v, []v, c.Iterator[v]] {
+	return s.V()
+}
+
+func (s *Map[k, v]) V() *MapValues[k, v] {
 	return WrapVal(s.elements, s.uniques)
 }
 

@@ -162,6 +162,11 @@ func (s *Set[T]) Reduce(by op.Binary[T]) T {
 	return it.Reduce(s.Iter(), by)
 }
 
+func (s *Set[t]) Sort(less func(e1, e2 t) bool) *Set[t] {
+	s.elements = slice.Sort(s.elements, less)
+	return s
+}
+
 func (s *Set[T]) String() string {
 	return slice.ToString(s.elements)
 }

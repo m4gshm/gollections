@@ -22,4 +22,3 @@ func New[T any](capacity int) *mutable.Vector[T] {
 func Sort[t any, f constraints.Ordered](v *mutable.Vector[t], by c.Converter[t, f]) *mutable.Vector[t] {
 	return v.Sort(func(e1, e2 t) bool { return by(e1) < by(e2) })
 }
-

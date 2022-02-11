@@ -10,10 +10,12 @@ import (
 	"github.com/m4gshm/gollections/slice"
 )
 
+//WrapKeys is non-copy constructor
 func WrapKeys[k comparable, v any](uniques map[k]v) *MapKeys[k, v] {
 	return &MapKeys[k, v]{uniques}
 }
 
+//MapKeys is the container reveal keys of a map and hides values.
 type MapKeys[k comparable, v any] struct {
 	uniques map[k]v
 }

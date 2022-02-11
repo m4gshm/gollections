@@ -5,10 +5,12 @@ import (
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/collect"
+	"github.com/m4gshm/gollections/immutable/ordered"
 	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/map_"
 	m "github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/slice"
 )
 
 func ConvertKVsToMap[k comparable, v any](elements []*map_.KV[k, v]) *Map[k, v] {
@@ -58,6 +60,10 @@ func (s *Map[k, v]) Collect() map[k]v {
 	return out
 }
 
+func (s *Map[k, v]) Sort(less func(k1, k2 k) bool) *ordered.Map[k, v] {
+	return ordered.WrapMap(slice.Sort(s.Keys().Collect(), less), s.uniques)
+}
+
 func (s *Map[k, v]) String() string {
 	return m.ToString(s.uniques)
 }
@@ -93,10 +99,18 @@ func (s *Map[k, v]) Get(key k) (v, bool) {
 }
 
 func (s *Map[k, v]) Keys() c.Collection[k, []k, c.Iterator[k]] {
+	return s.K()
+}
+
+func (s *Map[k, v]) K() *MapKeys[k, v] {
 	return WrapKeys(s.uniques)
 }
 
 func (s *Map[k, v]) Values() c.Collection[v, []v, c.Iterator[v]] {
+	return s.V()
+}
+
+func (s *Map[k, v]) V() *MapValues[k, v] {
 	return WrapVal(s.uniques)
 }
 

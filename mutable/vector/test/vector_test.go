@@ -42,7 +42,7 @@ func Test_Vector_Sort(t *testing.T) {
 	)
 	assert.Equal(t, vector.Of(-2, 0, 1, 3, 5, 6, 8), sorted)
 	assert.Equal(t, vector.Of(-2, 0, 1, 3, 5, 6, 8), elements)
-	assert.Equal(t,  elements, sorted)
+	assert.Equal(t, elements, sorted)
 }
 
 func Test_Vector_SortStructByField(t *testing.T) {

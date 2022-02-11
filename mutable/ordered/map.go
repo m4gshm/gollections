@@ -6,11 +6,11 @@ import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/collect"
 	"github.com/m4gshm/gollections/immutable/ordered"
-	"github.com/m4gshm/gollections/immutable/vector"
 	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/mutable"
 	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/slice"
 )
 
 func AsMap[k comparable, v any](elements []*map_.KV[k, v]) *Map[k, v] {
@@ -76,6 +76,11 @@ func (s *Map[k, v]) Collect() map[k]v {
 	return out
 }
 
+func (s *Map[k, v]) Sort(less func(k1, k2 k) bool) *Map[k, v] {
+	s.elements = slice.SortCopy(s.elements, less)
+	return s
+}
+
 func (s *Map[k, v]) Len() int {
 	return len(s.elements)
 }
@@ -118,10 +123,18 @@ func (s *Map[k, v]) Set(key k, value v) bool {
 }
 
 func (s *Map[k, v]) Keys() c.Collection[k, []k, c.Iterator[k]] {
-	return vector.New(s.elements)
+	return s.K()
+}
+
+func (s *Map[k, v]) K() *ordered.MapKeys[k] {
+	return ordered.WrapKeys(s.elements)
 }
 
 func (s *Map[k, v]) Values() c.Collection[v, []v, c.Iterator[v]] {
+	return s.V()
+}
+
+func (s *Map[k, v]) V() *ordered.MapValues[k, v] {
 	return ordered.WrapVal(s.elements, s.uniques)
 }
 

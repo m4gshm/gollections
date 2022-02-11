@@ -115,9 +115,10 @@ where [vector](./mutable/vector/api.go), [set](./mutable/set/api.go), [oset](./m
 
 ## Container functions
 
-There are two groups of operations:
+There are three groups of operations:
+ * Immediate - retrieves the result in place (Sort, Reduce (of containers), Track, For, ForEach)
  * Intermediate - only defines a computation (Wrap, Map, Flatt, Filter, Group).
- * Final - applies intermediates and retrieves a result (ForEach, Slice, Reduce)
+ * Final - applies intermediates and retrieves a result (ForEach, Slice, Reduce (of iterators))
 
 Intermediates should wrap one by one to make a lazy computation chain that can be applied to the latest final operation.
 

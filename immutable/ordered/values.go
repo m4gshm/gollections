@@ -16,8 +16,7 @@ func WrapVal[k comparable, v any](elements []k, uniques map[k]v) *MapValues[k, v
 
 type MapValues[k comparable, v any] struct {
 	elements []k
-
-	uniques map[k]v
+	uniques  map[k]v
 }
 
 var _ c.Collection[any, []any, c.Iterator[any]] = (*MapValues[int, any])(nil)

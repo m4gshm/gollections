@@ -1,7 +1,6 @@
 package benchmark
 
 import (
-	"strconv"
 	"testing"
 
 	"github.com/m4gshm/gollections/immutable/oset"
@@ -17,12 +16,17 @@ import (
 var (
 	max       = 100000
 	values    = range_.Of(1, max)
-	ResultStr = strconv.Itoa(ResultInt)
 	ResultInt = 0
 )
 
 func HighLoad(v int) {
-	ResultStr = strconv.Itoa(v)
+	ResultInt = v *
+		v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v *
+		v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v *
+		v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v *
+		v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v *
+		v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v *
+		v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v
 }
 
 func LowLoad(v int) {
@@ -34,7 +38,7 @@ type benchCase struct {
 	load func(int)
 }
 
-var cases = []benchCase{ /*{"high", HighLoad}, */ {"low", LowLoad}}
+var cases = []benchCase{{"high", HighLoad}, {"low", LowLoad}}
 
 func Benchmark_ForEach_Immutable_Vector(b *testing.B) {
 	c := vector.Of(values...)
