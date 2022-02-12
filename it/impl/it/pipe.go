@@ -47,7 +47,7 @@ func (s *IterPipe[t]) Collect() []t {
 		e = make([]t, 0)
 		it := s.it
 		for it.HasNext() {
-			e = append(e, it.Next())
+			e = append(e, it.Get())
 		}
 		s.elements = e
 	}

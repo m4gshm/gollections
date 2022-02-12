@@ -23,7 +23,7 @@ func (s *ConvertFit[From, To]) HasNext() bool {
 	return false
 }
 
-func (s *ConvertFit[From, To]) Next() To {
+func (s *ConvertFit[From, To]) Get() To {
 	return s.current
 }
 
@@ -51,7 +51,7 @@ func (s *Convert[From, To]) HasNext() bool {
 	return false
 }
 
-func (s *Convert[From, To]) Next() To {
+func (s *Convert[From, To]) Get() To {
 	return s.current
 }
 

@@ -31,7 +31,7 @@ func (s *FlattenFit[From, To]) HasNext() bool {
 	for {
 		if !iter.HasNext() {
 			return false
-		} else if v := iter.Next(); s.Fit(v) {
+		} else if v := iter.Get(); s.Fit(v) {
 			if elementsTo := s.Flatt(v); len(elementsTo) > 0 {
 				s.c = elementsTo[0]
 				s.elementsTo = elementsTo
@@ -42,7 +42,7 @@ func (s *FlattenFit[From, To]) HasNext() bool {
 	}
 }
 
-func (s *FlattenFit[From, To]) Next() To {
+func (s *FlattenFit[From, To]) Get() To {
 	return s.c
 }
 
@@ -73,7 +73,7 @@ func (s *Flatten[From, To]) HasNext() bool {
 	for {
 		if ok := iter.HasNext(); !ok {
 			return false
-		} else if elementsTo := s.Flatt(iter.Next()); len(elementsTo) > 0 {
+		} else if elementsTo := s.Flatt(iter.Get()); len(elementsTo) > 0 {
 			s.c = elementsTo[0]
 			s.elementsTo = elementsTo
 			s.indTo = 1
@@ -82,6 +82,6 @@ func (s *Flatten[From, To]) HasNext() bool {
 	}
 }
 
-func (s *Flatten[From, To]) Next() To {
+func (s *Flatten[From, To]) Get() To {
 	return s.c
 }

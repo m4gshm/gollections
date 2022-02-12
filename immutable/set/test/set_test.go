@@ -30,7 +30,7 @@ func Test_Set_Iterate(t *testing.T) {
 
 	out := make(map[int]int, 0)
 	for it := set.Begin(); it.HasNext(); {
-		n := it.Next()
+		n := it.Get()
 		out[n] = n
 	}
 

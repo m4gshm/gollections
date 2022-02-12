@@ -44,7 +44,7 @@ func (s *KVIterPipe[k, v, C]) Map(by c.BiConverter[k, v, k, v]) c.MapPipe[k, v, 
 
 func (s *KVIterPipe[k, v, C]) Track(tracker func(k, v) error) error {
 	for s.it.HasNext() {
-		key, val := s.it.Next()
+		key, val := s.it.Get()
 		if err := tracker(key, val); err != nil {
 			return err
 		}

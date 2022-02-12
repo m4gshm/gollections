@@ -6,9 +6,13 @@ import (
 	"github.com/m4gshm/gollections/c"
 )
 
-func NewOrderedKV[k comparable, v any](order []k, uniques map[k]v) *OrderedKV[k, v] {
-	return &OrderedKV[k, v]{elements: New(order), uniques: uniques}
+func NewOrderedKV[k comparable, v any](order []k, uniques map[k]v, factory func([]k) *Iter[k]) *OrderedKV[k, v] {
+	return &OrderedKV[k, v]{elements: factory(order), uniques: uniques}
 }
+
+// func NewReverseOrderedKV[k comparable, v any](order []k, uniques map[k]v) *OrderedKV[k, v] {
+// 	return &OrderedKV[k, v]{elements: NewRevert(order), uniques: uniques}
+// }
 
 //NewKV returns the KVIterator based on map elements.
 func NewKV[k comparable, v any](elements map[k]v) *KV[k, v] {
@@ -40,7 +44,7 @@ func (i *KV[k, v]) HasNext() bool {
 	return mapiterkey(&i.hiter) != nil
 }
 
-func (i *KV[k, v]) Next() (k, v) {
+func (i *KV[k, v]) Get() (k, v) {
 	iterkey := mapiterkey(&i.hiter)
 	if iterkey == nil {
 		var key k
@@ -101,8 +105,8 @@ func (i *OrderedKV[k, v]) HasNext() bool {
 	return i.elements.HasNext()
 }
 
-func (i *OrderedKV[k, v]) Next() (k, v) {
-	key := i.elements.Next()
+func (i *OrderedKV[k, v]) Get() (k, v) {
+	key := i.elements.Get()
 	return key, i.uniques[key]
 }
 
@@ -116,8 +120,8 @@ type Key[k comparable, v any] struct {
 
 var _ c.Iterator[string] = (*Key[string, any])(nil)
 
-func (i *Key[k, v]) Next() k {
-	key, _ := i.KV.Next()
+func (i *Key[k, v]) Get() k {
+	key, _ := i.KV.Get()
 	return key
 }
 
@@ -131,7 +135,7 @@ type Val[k comparable, v any] struct {
 
 var _ c.Iterator[any] = (*Val[int, any])(nil)
 
-func (i *Val[k, v]) Next() v {
-	_, val := i.KV.Next()
+func (i *Val[k, v]) Get() v {
+	_, val := i.KV.Get()
 	return val
 }

@@ -24,10 +24,10 @@ var _ c.Collection[int, []int, c.Iterator[int]] = (*MapKeys[int, any])(nil)
 var _ fmt.Stringer = (*MapValues[int, any])(nil)
 
 func (s *MapKeys[k, v]) Begin() c.Iterator[k] {
-	return s.Iter()
+	return s.Head()
 }
 
-func (s *MapKeys[k, v]) Iter() *it.Key[k, v] {
+func (s *MapKeys[k, v]) Head() *it.Key[k, v] {
 	return it.NewKey(s.uniques)
 }
 
@@ -53,15 +53,15 @@ func (s *MapKeys[k, v]) ForEach(walker func(k)) {
 }
 
 func (s *MapKeys[k, v]) Filter(filter c.Predicate[k]) c.Pipe[k, []k, c.Iterator[k]] {
-	return it.NewPipe[k](it.Filter(s.Iter(), filter))
+	return it.NewPipe[k](it.Filter(s.Head(), filter))
 }
 
 func (s *MapKeys[k, v]) Map(by c.Converter[k, k]) c.Pipe[k, []k, c.Iterator[k]] {
-	return it.NewPipe[k](it.Map(s.Iter(), by))
+	return it.NewPipe[k](it.Map(s.Head(), by))
 }
 
 func (s *MapKeys[k, v]) Reduce(by op.Binary[k]) k {
-	return it.Reduce(s.Iter(), by)
+	return it.Reduce(s.Head(), by)
 }
 
 func (s *MapKeys[k, v]) String() string {

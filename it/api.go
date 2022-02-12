@@ -11,12 +11,12 @@ const NoStarted = impl.NoStarted
 
 //Of - the Iterator constructor.
 func Of[T any](elements ...T) c.Iterator[T] {
-	return impl.New(elements)
+	return impl.NewHead(elements)
 }
 
 //Wrap the same as 'Of' but for a slice.
 func Wrap[T any](elements []T) c.Iterator[T] {
-	return impl.New(elements)
+	return impl.NewHead(elements)
 }
 
 //Map creates the Iterator that converts elements with a converter and returns them.

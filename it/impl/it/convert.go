@@ -19,7 +19,7 @@ func (s *ConvertFit[From, To]) HasNext() bool {
 	return false
 }
 
-func (s *ConvertFit[From, To]) Next() To {
+func (s *ConvertFit[From, To]) Get() To {
 	return s.current
 }
 
@@ -34,8 +34,8 @@ func (s *Convert[From, To, IT, C]) HasNext() bool {
 	return s.Iter.HasNext()
 }
 
-func (s *Convert[From, To, IT, C]) Next() To {
-	return s.By(s.Iter.Next())
+func (s *Convert[From, To, IT, C]) Get() To {
+	return s.By(s.Iter.Get())
 }
 
 type ConvertKV[k, v any, IT c.KVIterator[k, v], k2, v2 any, C c.BiConverter[k, v, k2, v2]] struct {
@@ -49,6 +49,6 @@ func (s *ConvertKV[k, v, IT, k1, v2, C]) HasNext() bool {
 	return s.Iter.HasNext()
 }
 
-func (s *ConvertKV[k, v, IT, k2, v2, C]) Next() (k2, v2) {
-	return s.By(s.Iter.Next())
+func (s *ConvertKV[k, v, IT, k2, v2, C]) Get() (k2, v2) {
+	return s.By(s.Iter.Get())
 }

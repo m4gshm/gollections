@@ -3,20 +3,33 @@ package vector
 import (
 	"testing"
 
+	"github.com/m4gshm/gollections/slice"
 	"github.com/stretchr/testify/assert"
 )
 
 func Test_VectorIterate(t *testing.T) {
+	expected := slice.Of(1, 2, 3, 4)
 	v := Of(1, 2, 3, 4)
+	result := make([]int, v.Len())
 	i := 0
-	for it := v.Iter(); it.HasNext(); {
-		n := it.Next()
-		expected, _ := v.Get(i)
-		assert.Equal(t, expected, n)
+	for it := v.Head(); it.HasNext(); {
+		result[i] = it.Get()
 		i++
 	}
+	assert.Equal(t, expected, result)
 }
 
+func Test_VectorReverseIteration(t *testing.T) {
+	expected := slice.Of(4, 3, 2, 1)
+	v := Of(1, 2, 3, 4)
+	result := make([]int, v.Len())
+	i := 0
+	for it := v.Tail(); it.HasPrev(); {
+		result[i] = it.Get()
+		i++
+	}
+	assert.Equal(t, expected, result)
+}
 func Test_Vector_Sort(t *testing.T) {
 	var (
 		elements = Of(3, 1, 5, 6, 8, 0, -2)

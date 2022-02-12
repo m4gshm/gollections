@@ -48,14 +48,14 @@ var (
 )
 
 func (s *Set[T]) Begin() c.Iterator[T] {
-	return s.Iter()
+	return s.Head()
 }
 
 func (s *Set[T]) BeginEdit() mutable.Iterator[T] {
-	return s.Iter()
+	return s.Head()
 }
 
-func (s *Set[T]) Iter() *SetIter[T] {
+func (s *Set[T]) Head() *SetIter[T] {
 	return NewSetIter(&s.elements, s.DeleteOne)
 }
 
@@ -151,15 +151,15 @@ func (s *Set[T]) DeleteOne(v T) bool {
 }
 
 func (s *Set[T]) Filter(filter c.Predicate[T]) c.Pipe[T, []T, c.Iterator[T]] {
-	return it.NewPipe[T](it.Filter(s.Iter(), filter))
+	return it.NewPipe[T](it.Filter(s.Head(), filter))
 }
 
 func (s *Set[T]) Map(by c.Converter[T, T]) c.Pipe[T, []T, c.Iterator[T]] {
-	return it.NewPipe[T](it.Map(s.Iter(), by))
+	return it.NewPipe[T](it.Map(s.Head(), by))
 }
 
 func (s *Set[T]) Reduce(by op.Binary[T]) T {
-	return it.Reduce(s.Iter(), by)
+	return it.Reduce(s.Head(), by)
 }
 
 func (s *Set[t]) Sort(less func(e1, e2 t) bool) *Set[t] {

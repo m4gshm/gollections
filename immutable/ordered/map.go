@@ -12,11 +12,11 @@ import (
 	"github.com/m4gshm/gollections/op"
 )
 
-func ConvertKVsToMap[k comparable, v any](elements []*map_.KV[k, v]) *Map[k, v] {
+func ConvertKVsToMap[K comparable, V any](elements []*map_.KV[K, V]) *Map[K, V] {
 	var (
 		l       = len(elements)
-		uniques = make(map[k]v, l)
-		order   = make([]k, 0, l)
+		uniques = make(map[K]V, l)
+		order   = make([]K, 0, l)
 	)
 	for _, kv := range elements {
 		key := kv.Key()
@@ -29,10 +29,10 @@ func ConvertKVsToMap[k comparable, v any](elements []*map_.KV[k, v]) *Map[k, v] 
 	return WrapMap(order, uniques)
 }
 
-func NewMap[k comparable, v any](elements map[k]v) *Map[k, v] {
+func NewMap[K comparable, V any](elements map[K]V) *Map[K, V] {
 	var (
-		uniques = make(map[k]v, len(elements))
-		order   = make([]k, len(elements))
+		uniques = make(map[K]V, len(elements))
+		order   = make([]K, len(elements))
 	)
 	for key, val := range elements {
 		order = append(order, key)
@@ -41,13 +41,13 @@ func NewMap[k comparable, v any](elements map[k]v) *Map[k, v] {
 	return WrapMap(order, uniques)
 }
 
-func WrapMap[k comparable, v any](order []k, uniques map[k]v) *Map[k, v] {
-	return &Map[k, v]{elements: order, uniques: uniques}
+func WrapMap[K comparable, V any](order []K, uniques map[K]V) *Map[K, V] {
+	return &Map[K, V]{elements: order, uniques: uniques}
 }
 
-type Map[k comparable, v any] struct {
-	elements []k
-	uniques  map[k]v
+type Map[K comparable, V any] struct {
+	elements []K
+	uniques  map[K]V
 }
 
 var (
@@ -55,101 +55,105 @@ var (
 	_ fmt.Stringer    = (*Map[int, any])(nil)
 )
 
-func (s *Map[k, v]) Begin() c.KVIterator[k, v] {
-	return s.Iter()
+func (s *Map[K, V]) Begin() c.KVIterator[K, V] {
+	return s.Head()
 }
 
-func (s *Map[k, v]) Iter() *it.OrderedKV[k, v] {
-	return it.NewOrderedKV(s.elements, s.uniques)
+func (s *Map[K, V]) Head() *it.OrderedKV[K, V] {
+	return it.NewOrderedKV(s.elements, s.uniques, it.NewHead[K])
 }
 
-func (s *Map[k, v]) Collect() map[k]v {
+func (s *Map[K, V]) Tail() *it.OrderedKV[K, V] {
+	return it.NewOrderedKV(s.elements, s.uniques, it.NewTail[K])
+}
+
+func (s *Map[K, V]) Collect() map[K]V {
 	e := s.uniques
-	out := make(map[k]v, len(e))
+	out := make(map[K]V, len(e))
 	for key, val := range e {
 		out[key] = val
 	}
 	return out
 }
 
-func (s *Map[k, v]) Sort(less func(k1, k2 k) bool) *Map[k, v] {
+func (s *Map[K, V]) Sort(less func(k1, k2 K) bool) *Map[K, V] {
 	return WrapMap(slice.SortCopy(s.elements, less), s.uniques)
 }
 
-func (s *Map[k, v]) String() string {
+func (s *Map[K, V]) String() string {
 	return map_.ToStringOrdered(s.elements, s.uniques)
 }
 
-func (s *Map[k, v]) Track(tracker func(k, v) error) error {
+func (s *Map[K, V]) Track(tracker func(K, V) error) error {
 	return map_.TrackOrdered(s.elements, s.uniques, tracker)
 }
 
-func (s *Map[k, v]) TrackEach(tracker func(k, v)) {
+func (s *Map[K, V]) TrackEach(tracker func(K, V)) {
 	map_.TrackEachOrdered(s.elements, s.uniques, tracker)
 }
 
-func (s *Map[k, v]) For(walker func(*map_.KV[k, v]) error) error {
+func (s *Map[K, V]) For(walker func(*map_.KV[K, V]) error) error {
 	return map_.ForOrdered(s.elements, s.uniques, walker)
 }
 
-func (s *Map[k, v]) ForEach(walker func(*map_.KV[k, v])) {
+func (s *Map[K, V]) ForEach(walker func(*map_.KV[K, V])) {
 	map_.ForEachOrdered(s.elements, s.uniques, walker)
 }
 
-func (s *Map[k, v]) Len() int {
+func (s *Map[K, V]) Len() int {
 	return len(s.elements)
 }
 
-func (s *Map[k, v]) Contains(key k) bool {
+func (s *Map[K, V]) Contains(key K) bool {
 	_, ok := s.uniques[key]
 	return ok
 }
 
-func (s *Map[k, v]) Get(key k) (v, bool) {
+func (s *Map[K, V]) Get(key K) (V, bool) {
 	val, ok := s.uniques[key]
 	return val, ok
 }
 
-func (s *Map[k, v]) Keys() c.Collection[k, []k, c.Iterator[k]] {
+func (s *Map[K, V]) Keys() c.Collection[K, []K, c.Iterator[K]] {
 	return s.K()
 }
 
-func (s *Map[k, v]) K() *MapKeys[k] {
+func (s *Map[K, V]) K() *MapKeys[K] {
 	return WrapKeys(s.elements)
 }
 
-func (s *Map[k, v]) Values() c.Collection[v, []v, c.Iterator[v]] {
+func (s *Map[K, V]) Values() c.Collection[V, []V, c.Iterator[V]] {
 	return s.V()
 }
 
-func (s *Map[k, v]) V() *MapValues[k, v] {
+func (s *Map[K, V]) V() *MapValues[K, V] {
 	return WrapVal(s.elements, s.uniques)
 }
 
-func (s *Map[k, v]) FilterKey(fit c.Predicate[k]) c.MapPipe[k, v, map[k]v] {
-	return it.NewKVPipe(it.FilterKV(s.Iter(), func(key k, val v) bool { return fit(key) }), collect.Map[k, v])
+func (s *Map[K, V]) FilterKey(fit c.Predicate[K]) c.MapPipe[K, V, map[K]V] {
+	return it.NewKVPipe(it.FilterKV(s.Head(), func(key K, val V) bool { return fit(key) }), collect.Map[K, V])
 }
 
-func (s *Map[k, v]) MapKey(by c.Converter[k, k]) c.MapPipe[k, v, map[k]v] {
-	return it.NewKVPipe(it.MapKV(s.Iter(), func(key k, val v) (k, v) { return by(key), val }), collect.Map[k, v])
+func (s *Map[K, V]) MapKey(by c.Converter[K, K]) c.MapPipe[K, V, map[K]V] {
+	return it.NewKVPipe(it.MapKV(s.Head(), func(key K, val V) (K, V) { return by(key), val }), collect.Map[K, V])
 }
 
-func (s *Map[k, v]) FilterValue(fit c.Predicate[v]) c.MapPipe[k, v, map[k]v] {
-	return it.NewKVPipe(it.FilterKV(s.Iter(), func(key k, val v) bool { return fit(val) }), collect.Map[k, v])
+func (s *Map[K, V]) FilterValue(fit c.Predicate[V]) c.MapPipe[K, V, map[K]V] {
+	return it.NewKVPipe(it.FilterKV(s.Head(), func(key K, val V) bool { return fit(val) }), collect.Map[K, V])
 }
 
-func (s *Map[k, v]) MapValue(by c.Converter[v, v]) c.MapPipe[k, v, map[k]v] {
-	return it.NewKVPipe(it.MapKV(s.Iter(), func(key k, val v) (k, v) { return key, by(val) }), collect.Map[k, v])
+func (s *Map[K, V]) MapValue(by c.Converter[V, V]) c.MapPipe[K, V, map[K]V] {
+	return it.NewKVPipe(it.MapKV(s.Head(), func(key K, val V) (K, V) { return key, by(val) }), collect.Map[K, V])
 }
 
-func (s *Map[k, v]) Filter(filter c.BiPredicate[k, v]) c.MapPipe[k, v, map[k]v] {
-	return it.NewKVPipe(it.FilterKV(s.Iter(), filter), collect.Map[k, v])
+func (s *Map[K, V]) Filter(filter c.BiPredicate[K, V]) c.MapPipe[K, V, map[K]V] {
+	return it.NewKVPipe(it.FilterKV(s.Head(), filter), collect.Map[K, V])
 }
 
-func (s *Map[k, v]) Map(by c.BiConverter[k, v, k, v]) c.MapPipe[k, v, map[k]v] {
-	return it.NewKVPipe(it.MapKV(s.Iter(), by), collect.Map[k, v])
+func (s *Map[K, V]) Map(by c.BiConverter[K, V, K, V]) c.MapPipe[K, V, map[K]V] {
+	return it.NewKVPipe(it.MapKV(s.Head(), by), collect.Map[K, V])
 }
 
-func (s *Map[k, v]) Reduce(by op.Quaternary[k, v]) (k, v) {
-	return it.ReduceKV(s.Iter(), by)
+func (s *Map[K, V]) Reduce(by op.Quaternary[K, V]) (K, V) {
+	return it.ReduceKV(s.Head(), by)
 }

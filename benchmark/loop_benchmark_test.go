@@ -40,6 +40,146 @@ type benchCase struct {
 
 var cases = []benchCase{{"high", HighLoad}, {"low", LowLoad}}
 
+func Benchmark_HasNextGet_Iterator_Immutable_Vector(b *testing.B) {
+	c := vector.Of(values...)
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for it := c.Begin(); it.HasNext(); {
+					casee.load(it.Get())
+				}
+			}
+		})
+	}
+}
+
+func Benchmark_HasNextGet_Iterator_Immutable_Vector_Impl(b *testing.B) {
+	c := vector.Of(values...)
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for it := c.Head(); it.HasNext(); {
+					casee.load(it.Get())
+				}
+			}
+		})
+	}
+}
+
+func Benchmark_HasNextGet_RevertIterator_Immutable_Vector_Impl(b *testing.B) {
+	c := vector.Of(values...)
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for it := c.Tail(); it.HasPrev(); {
+					casee.load(it.Get())
+				}
+			}
+		})
+	}
+}
+
+func Benchmark_HasNextGet_Iterator_WrapSlice(b *testing.B) {
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for it := it.Wrap(values); it.HasNext(); {
+					casee.load(it.Get())
+				}
+			}
+		})
+	}
+}
+
+func Benchmark_HasNextGet_Iterator_Impl(b *testing.B) {
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for it := impliter.NewHead(values); it.HasNext(); {
+					casee.load(it.Get())
+				}
+			}
+		})
+	}
+}
+
+func Benchmark_ForRange_EmbeddedSlice(b *testing.B) {
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for _, v := range values {
+					casee.load(v)
+				}
+			}
+		})
+	}
+}
+
+func Benchmark_ForByIndex_EmbeddedSlice(b *testing.B) {
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for j := 0; j < len(values); j++ {
+					v := values[j]
+					casee.load(v)
+				}
+			}
+		})
+	}
+}
+
+func Benchmark_WrapMap_HasNextGet(b *testing.B) {
+	values := map[int]struct{}{}
+	for i := 0; i < max; i++ {
+		values[i] = struct{}{}
+	}
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for k, v := range values {
+					_ = v
+					casee.load(k)
+				}
+			}
+		})
+	}
+}
+
+func Benchmark_NewKVHasNextGet(b *testing.B) {
+	values := map[int]int{}
+	for i := 0; i < max; i++ {
+		values[i] = i
+	}
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for iter := impliter.NewKV(values); iter.HasNext(); {
+					k, v := iter.Get()
+					_ = v
+					casee.load(k)
+				}
+			}
+		})
+	}
+}
+
+func Benchmark_EmbeddedMap_For(b *testing.B) {
+	values := map[int]int{}
+	for i := 0; i < max; i++ {
+		values[i] = i
+	}
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for k, v := range values {
+					_ = v
+					casee.load(k)
+				}
+			}
+		})
+	}
+}
+
 func Benchmark_ForEach_Immutable_Vector(b *testing.B) {
 	c := vector.Of(values...)
 	for _, casee := range cases {
@@ -164,133 +304,6 @@ func Benchmark_ForEach_Mutable_OrdererSet_Impl(b *testing.B) {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				c.ForEach(func(v int) { casee.load(v) })
-			}
-		})
-	}
-}
-
-func Benchmark_HasNextGet_Iterator_Immutable_Vector(b *testing.B) {
-	c := vector.Of(values...)
-	for _, casee := range cases {
-		b.Run(casee.name, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
-				for it := c.Begin(); it.HasNext(); {
-					casee.load(it.Next())
-				}
-			}
-		})
-	}
-}
-
-func Benchmark_HasNextGet_Iterator_Immutable_Vector_Impl(b *testing.B) {
-	c := vector.Of(values...)
-	for _, casee := range cases {
-		b.Run(casee.name, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
-				for it := c.Iter(); it.HasNext(); {
-					casee.load(it.Next())
-				}
-			}
-		})
-	}
-}
-
-func Benchmark_HasNextGet_Iterator_WrapSlice(b *testing.B) {
-	for _, casee := range cases {
-		b.Run(casee.name, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
-				for it := it.Wrap(values); it.HasNext(); {
-					casee.load(it.Next())
-				}
-			}
-		})
-	}
-}
-
-func Benchmark_HasNextGet_Iterator_Impl(b *testing.B) {
-	for _, casee := range cases {
-		b.Run(casee.name, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
-				for it := impliter.New(values); it.HasNext(); {
-					casee.load(it.Next())
-				}
-			}
-		})
-	}
-}
-
-func Benchmark_ForRange_EmbeddedSlice(b *testing.B) {
-	for _, casee := range cases {
-		b.Run(casee.name, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
-				for _, v := range values {
-					casee.load(v)
-				}
-			}
-		})
-	}
-}
-
-func Benchmark_ForByIndex_EmbeddedSlice(b *testing.B) {
-	for _, casee := range cases {
-		b.Run(casee.name, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
-				for j := 0; j < len(values); j++ {
-					v := values[j]
-					casee.load(v)
-				}
-			}
-		})
-	}
-}
-
-func Benchmark_WrapMap_HasNextGet(b *testing.B) {
-	values := map[int]struct{}{}
-	for i := 0; i < max; i++ {
-		values[i] = struct{}{}
-	}
-	for _, casee := range cases {
-		b.Run(casee.name, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
-				for k, v := range values {
-					_ = v
-					casee.load(k)
-				}
-			}
-		})
-	}
-}
-
-func Benchmark_NewKVHasNextGet(b *testing.B) {
-	values := map[int]int{}
-	for i := 0; i < max; i++ {
-		values[i] = i
-	}
-	for _, casee := range cases {
-		b.Run(casee.name, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
-				for iter := impliter.NewKV(values); iter.HasNext(); {
-					k, v := iter.Next()
-					_ = v
-					casee.load(k)
-				}
-			}
-		})
-	}
-}
-
-func Benchmark_EmbeddedMap_For(b *testing.B) {
-	values := map[int]int{}
-	for i := 0; i < max; i++ {
-		values[i] = i
-	}
-	for _, casee := range cases {
-		b.Run(casee.name, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
-				for k, v := range values {
-					_ = v
-					casee.load(k)
-				}
 			}
 		})
 	}

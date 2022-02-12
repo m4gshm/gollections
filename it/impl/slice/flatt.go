@@ -46,7 +46,7 @@ func (s *FlattenFit[From, To]) HasNext() bool {
 	return false
 }
 
-func (s *FlattenFit[From, To]) Next() To {
+func (s *FlattenFit[From, To]) Get() To {
 	return s.current
 }
 
@@ -89,6 +89,6 @@ func (s *Flatten[From, To]) HasNext() bool {
 	return false
 }
 
-func (s *Flatten[From, To]) Next() To {
+func (s *Flatten[From, To]) Get() To {
 	return s.current
 }

@@ -39,14 +39,14 @@ var (
 )
 
 func (s *Set[k]) Begin() c.Iterator[k] {
-	return s.Iter()
+	return s.Head()
 }
 
 func (s *Set[k]) BeginEdit() Iterator[k] {
-	return s.Iter()
+	return s.Head()
 }
 
-func (s *Set[k]) Iter() *SetIter[k] {
+func (s *Set[k]) Head() *SetIter[k] {
 	return NewSetIter(s.uniques, s.DeleteOne)
 }
 
@@ -113,15 +113,15 @@ func (s *Set[k]) ForEach(walker func(k)) {
 }
 
 func (s *Set[k]) Filter(filter c.Predicate[k]) c.Pipe[k, []k, c.Iterator[k]] {
-	return it.NewPipe[k](it.Filter(s.Iter(), filter))
+	return it.NewPipe[k](it.Filter(s.Head(), filter))
 }
 
 func (s *Set[k]) Map(by c.Converter[k, k]) c.Pipe[k, []k, c.Iterator[k]] {
-	return it.NewPipe[k](it.Map(s.Iter(), by))
+	return it.NewPipe[k](it.Map(s.Head(), by))
 }
 
 func (s *Set[k]) Reduce(by op.Binary[k]) k {
-	return it.Reduce(s.Iter(), by)
+	return it.Reduce(s.Head(), by)
 }
 
 func (s *Set[k]) Len() int {

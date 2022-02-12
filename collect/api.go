@@ -13,7 +13,7 @@ type CollectorKV[k, v any, out any] func(c.KVIterator[k, v]) out
 func Map[k comparable, v any](it c.KVIterator[k, v]) map[k]v {
 	e := map[k]v{}
 	for it.HasNext() {
-		key, val := it.Next()
+		key, val := it.Get()
 		e[key] = val
 	}
 	return e
@@ -23,7 +23,7 @@ func Map[k comparable, v any](it c.KVIterator[k, v]) map[k]v {
 func Groups[k comparable, v any](it c.KVIterator[k, v]) map[k][]v {
 	e := map[k][]v{}
 	for it.HasNext() {
-		key, val := it.Next()
+		key, val := it.Get()
 		group := e[key]
 		if group == nil {
 			group = make([]v, 0)

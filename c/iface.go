@@ -8,52 +8,52 @@ import (
 
 // Container is the base interface of implementations.
 // Where:
-// 		col - a collection type (may be slice, map or chain)
-// 		it - a iterator type  (Iterator, KVIterator)
-type Container[col any, it Iter] interface {
-	Collect() col
-	Iterable[it]
+// 		Collection - a collection type (may be slice, map or chain)
+// 		IT - a iterator type  (Iterator, KVIterator)
+type Container[Collection any, IT Iter] interface {
+	Collect() Collection
+	Iterable[IT]
 }
 
 //Collection is the interface of a finite-size container.
 // Where:
-//		t - any arbitrary type
-// 		col - a collection type (may be slice, map or chain)
-// 		it - a iterator type  (Iterator, KVIterator)
-type Collection[t any, col any, it Iter] interface {
-	Container[col, it]
-	Walk[t]
-	WalkEach[t]
+//		T - any arbitrary type
+// 		Collection - a collection type (may be slice, map or chain)
+// 		IT - a iterator type  (Iterator, KVIterator)
+type Collection[T any, Collection any, IT Iter] interface {
+	Container[Collection, IT]
+	Walk[T]
+	WalkEach[T]
 }
 
 //Vector is the interface of a container stores ordered elements, provides index access.
-type Vector[t any] interface {
-	Collection[t, []t, Iterator[t]]
-	Track[t, int]
-	TrackEach[t, int]
-	Access[int, t]
-	Transformable[t, []t, Iterator[t]]
+type Vector[T any] interface {
+	Collection[T, []T, Iterator[T]]
+	Track[T, int]
+	TrackEach[T, int]
+	Access[int, T]
+	Transformable[T, []T, Iterator[T]]
 	Len() int
 }
 
 //Set is the interface of a container provides uniqueness (does't insert duplicated values).
-type Set[t any] interface {
-	Collection[t, []t, Iterator[t]]
-	Transformable[t, []t, Iterator[t]]
-	Checkable[t]
+type Set[T any] interface {
+	Collection[T, []T, Iterator[T]]
+	Transformable[T, []T, Iterator[T]]
+	Checkable[T]
 	Len() int
 }
 
 //Map is the interface of a container provides access to elements by key.
-type Map[k comparable, v any] interface {
-	Collection[*map_.KV[k, v], map[k]v, KVIterator[k, v]]
-	Track[v, k]
-	TrackEach[v, k]
-	Checkable[k]
-	Access[k, v]
-	MapTransformable[k, v, map[k]v]
-	Keys() Collection[k, []k, Iterator[k]]
-	Values() Collection[v, []v, Iterator[v]]
+type Map[K comparable, V any] interface {
+	Collection[*map_.KV[K, V], map[K]V, KVIterator[K, V]]
+	Track[V, K]
+	TrackEach[V, K]
+	Checkable[K]
+	Access[K, V]
+	MapTransformable[K, V, map[K]V]
+	Keys() Collection[K, []K, Iterator[K]]
+	Values() Collection[V, []V, Iterator[V]]
 	Len() int
 }
 
@@ -64,95 +64,90 @@ type Iter interface {
 }
 
 //Iterator is the interface provides iterate over elements of a collection.
-type Iterator[t any] interface {
+type Iterator[T any] interface {
 	Iter
 	//retrieves next element or zero value if no more elements
 	//must be called only after HasNext
-	Next() t
+	Get() T
 }
 
 //KVIterator is the interface provides iterate over all key/value pair of a map.
-type KVIterator[k, v any] interface {
+type KVIterator[K, V any] interface {
 	Iter
 	//retrieves next elements or zero values if no more elements
 	//must be called only after HasNext
-	Next() (k, v)
-}
-
-//Resetable is the interface of an object with resettable state (e.g. slice based iterator).
-type Resetable interface {
-	Reset()
+	Get() (K, V)
 }
 
 //Iterable is an iterator supplier interface
-type Iterable[it Iter] interface {
-	Begin() it
+type Iterable[IT Iter] interface {
+	Begin() IT
 }
 
 //Walk touches elements of the collection.
-type Walk[it any] interface {
-	For(func(element it) error) error
+type Walk[IT any] interface {
+	For(func(element IT) error) error
 }
 
 //WalkEach touches all elements of the collection without error checking
-type WalkEach[t any] interface {
-	ForEach(func(element t))
+type WalkEach[T any] interface {
+	ForEach(func(element T))
 }
 
 //Track traverses container elements with position tracking (index, key, coordinates, etc.)
-type Track[t any, p any] interface {
-	Track(func(position p, element t) error) error
+type Track[T any, P any] interface {
+	Track(func(position P, element T) error) error
 }
 
 //TrackEach traverses container elements with position tracking (index, key, coordinates, etc.) without error checking
-type TrackEach[T any, t any] interface {
-	TrackEach(func(position t, element T))
+type TrackEach[T any, P any] interface {
+	TrackEach(func(position P, element T))
 }
 
 //Checkable container with ability to check if an element is present.
-type Checkable[t any] interface {
-	Contains(t) bool
+type Checkable[T any] interface {
+	Contains(T) bool
 }
 
 //Transformable is the interface that provides limited kit of container transformation methods.
 //The full kit of transformer functions are in the package 'c'
-type Transformable[t any, col any, it Iterator[t]] interface {
-	Filter(Predicate[t]) Pipe[t, col, it]
-	Map(Converter[t, t]) Pipe[t, col, it]
+type Transformable[T any, Collection any, IT Iterator[T]] interface {
+	Filter(Predicate[T]) Pipe[T, Collection, IT]
+	Map(Converter[T, T]) Pipe[T, Collection, IT]
 }
 
 //Pipe extends Transformable by finalize methods like ForEach, Collect or Reduce.
-type Pipe[t any, col any, it Iterator[t]] interface {
-	Transformable[t, col, it]
-	Container[col, it]
-	Walk[t]
-	WalkEach[t]
-	Reduce(op.Binary[t]) t
+type Pipe[T any, Collection any, IT Iterator[T]] interface {
+	Transformable[T, Collection, IT]
+	Container[Collection, IT]
+	Walk[T]
+	WalkEach[T]
+	Reduce(op.Binary[T]) T
 }
 
 //MapTransformable is the interface that provides limited kit of map transformation methods.
 //The full kit of transformer functions are in the package 'c/map_'
-type MapTransformable[k comparable, v any, m any] interface {
-	Filter(BiPredicate[k, v]) MapPipe[k, v, m]
-	Map(BiConverter[k, v, k, v]) MapPipe[k, v, m]
+type MapTransformable[K comparable, V any, Map any] interface {
+	Filter(BiPredicate[K, V]) MapPipe[K, V, Map]
+	Map(BiConverter[K, V, K, V]) MapPipe[K, V, Map]
 
-	FilterKey(Predicate[k]) MapPipe[k, v, m]
-	MapKey(Converter[k, k]) MapPipe[k, v, m]
+	FilterKey(Predicate[K]) MapPipe[K, V, Map]
+	MapKey(Converter[K, K]) MapPipe[K, V, Map]
 
-	FilterValue(Predicate[v]) MapPipe[k, v, m]
-	MapValue(Converter[v, v]) MapPipe[k, v, m]
+	FilterValue(Predicate[V]) MapPipe[K, V, Map]
+	MapValue(Converter[V, V]) MapPipe[K, V, Map]
 }
 
 //MapPipe extends MapTransformable by finalize methods like ForEach, Collect or Reduce.
-type MapPipe[k comparable, v any, m any] interface {
-	MapTransformable[k, v, m]
-	Container[m, KVIterator[k, v]]
+type MapPipe[K comparable, V any, Map any] interface {
+	MapTransformable[K, V, Map]
+	Container[Map, KVIterator[K, V]]
 }
 
 //Access is the interface that provides access to an element by its pointer (index, key, coordinate, etc.)
 // Where:
-//		p - a type of pointer to a value (index, map key, coordinates)
-// 		a - any arbitrary type of the value
-type Access[p any, v any] interface {
-	Get(p) (v, bool)
+//		P - a type of pointer to a value (index, map key, coordinates)
+// 		V - any arbitrary type of the value
+type Access[P any, V any] interface {
+	Get(P) (V, bool)
 }

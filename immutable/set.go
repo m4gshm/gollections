@@ -34,10 +34,10 @@ var (
 )
 
 func (s *Set[t]) Begin() c.Iterator[t] {
-	return s.Iter()
+	return s.Head()
 }
 
-func (s *Set[t]) Iter() *it.Key[t, struct{}] {
+func (s *Set[t]) Head() *it.Key[t, struct{}] {
 	return it.NewKey(s.uniques)
 }
 
@@ -63,15 +63,15 @@ func (s *Set[t]) ForEach(walker func(t)) {
 }
 
 func (s *Set[t]) Filter(filter c.Predicate[t]) c.Pipe[t, []t, c.Iterator[t]] {
-	return it.NewPipe[t](it.Filter(s.Iter(), filter))
+	return it.NewPipe[t](it.Filter(s.Head(), filter))
 }
 
 func (s *Set[t]) Map(by c.Converter[t, t]) c.Pipe[t, []t, c.Iterator[t]] {
-	return it.NewPipe[t](it.Map(s.Iter(), by))
+	return it.NewPipe[t](it.Map(s.Head(), by))
 }
 
 func (s *Set[t]) Reduce(by op.Binary[t]) t {
-	return it.Reduce(s.Iter(), by)
+	return it.Reduce(s.Head(), by)
 }
 
 func (s *Set[t]) Contains(val t) bool {

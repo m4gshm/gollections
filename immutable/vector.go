@@ -9,17 +9,17 @@ import (
 	"github.com/m4gshm/gollections/slice"
 )
 
-func NewVector[t any](elements []t) *Vector[t] {
+func NewVector[T any](elements []T) *Vector[T] {
 	return WrapVector(slice.Copy(elements))
 }
 
-func WrapVector[t any](elements []t) *Vector[t] {
-	return &Vector[t]{elements: elements}
+func WrapVector[T any](elements []T) *Vector[T] {
+	return &Vector[T]{elements: elements}
 }
 
 //Vector stores ordered elements, provides index access.
-type Vector[t any] struct {
-	elements []t
+type Vector[T any] struct {
+	elements []T
 }
 
 var (
@@ -27,58 +27,62 @@ var (
 	_ fmt.Stringer  = (*Vector[any])(nil)
 )
 
-func (v *Vector[t]) Begin() c.Iterator[t] {
-	return v.Iter()
+func (v *Vector[T]) Begin() c.Iterator[T] {
+	return v.Head()
 }
 
-func (v *Vector[t]) Iter() *it.Iter[t] {
-	return it.New(v.elements)
+func (v *Vector[T]) Head() *it.Iter[T] {
+	return it.NewHead(v.elements)
 }
 
-func (v *Vector[t]) Collect() []t {
+func (v *Vector[T]) Tail() *it.Iter[T] {
+	return it.NewTail(v.elements)
+}
+
+func (v *Vector[T]) Collect() []T {
 	return slice.Copy(v.elements)
 }
 
-func (v *Vector[t]) Len() int {
-	return it.GetLen(&v.elements)
+func (v *Vector[T]) Len() int {
+	return it.GetLen(v.elements)
 }
 
-func (v *Vector[t]) Get(index int) (t, bool) {
+func (v *Vector[T]) Get(index int) (T, bool) {
 	return slice.Get(v.elements, index)
 }
 
-func (v *Vector[t]) Track(tracker func(int, t) error) error {
+func (v *Vector[T]) Track(tracker func(int, T) error) error {
 	return slice.Track(v.elements, tracker)
 }
 
-func (v *Vector[t]) TrackEach(tracker func(int, t)) {
+func (v *Vector[T]) TrackEach(tracker func(int, T)) {
 	slice.TrackEach(v.elements, tracker)
 }
 
-func (v *Vector[t]) For(walker func(t) error) error {
+func (v *Vector[T]) For(walker func(T) error) error {
 	return slice.For(v.elements, walker)
 }
 
-func (v *Vector[t]) ForEach(walker func(t)) {
+func (v *Vector[T]) ForEach(walker func(T)) {
 	slice.ForEach(v.elements, walker)
 }
 
-func (v *Vector[t]) Filter(filter c.Predicate[t]) c.Pipe[t, []t, c.Iterator[t]] {
-	return it.NewPipe[t](it.Filter(v.Iter(), filter))
+func (v *Vector[T]) Filter(filter c.Predicate[T]) c.Pipe[T, []T, c.Iterator[T]] {
+	return it.NewPipe[T](it.Filter(v.Head(), filter))
 }
 
-func (v *Vector[t]) Map(by c.Converter[t, t]) c.Pipe[t, []t, c.Iterator[t]] {
-	return it.NewPipe[t](it.Map(v.Iter(), by))
+func (v *Vector[T]) Map(by c.Converter[T, T]) c.Pipe[T, []T, c.Iterator[T]] {
+	return it.NewPipe[T](it.Map(v.Head(), by))
 }
 
-func (v *Vector[t]) Reduce(by op.Binary[t]) t {
-	return it.Reduce(v.Iter(), by)
+func (v *Vector[T]) Reduce(by op.Binary[T]) T {
+	return it.Reduce(v.Head(), by)
 }
 
-func (v *Vector[t]) Sort(less func(e1, e2 t) bool) *Vector[t] {
+func (v *Vector[T]) Sort(less func(e1, e2 T) bool) *Vector[T] {
 	return WrapVector(slice.SortCopy(v.elements, less))
 }
 
-func (v *Vector[t]) String() string {
+func (v *Vector[T]) String() string {
 	return slice.ToString(v.elements)
 }

@@ -26,7 +26,7 @@ func Test_Vector_Iterate(t *testing.T) {
 
 	out := make([]int, 0)
 	for it := vec.Begin(); it.HasNext(); {
-		n := it.Next()
+		n := it.Get()
 		out = append(out, n)
 	}
 	assert.Equal(t, expected, out)

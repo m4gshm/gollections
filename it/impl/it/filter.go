@@ -18,7 +18,7 @@ func (s *Fit[T]) HasNext() bool {
 	return ok
 }
 
-func (s *Fit[T]) Next() T {
+func (s *Fit[T]) Get() T {
 	return s.current
 }
 
@@ -39,13 +39,13 @@ func (s *FitKV[k, v]) HasNext() bool {
 	return ok
 }
 
-func (s *FitKV[k, v]) Next() (k, v) {
+func (s *FitKV[k, v]) Get() (k, v) {
 	return s.currentK, s.currentV
 }
 
 func nextFiltered[T any](iter c.Iterator[T], filter c.Predicate[T]) (T, bool) {
 	for iter.HasNext() {
-		if v := iter.Next(); filter(v) {
+		if v := iter.Get(); filter(v) {
 			return v, true
 		}
 	}
@@ -55,7 +55,7 @@ func nextFiltered[T any](iter c.Iterator[T], filter c.Predicate[T]) (T, bool) {
 
 func nextFilteredKV[k any, v any](iter c.KVIterator[k, v], filter c.BiPredicate[k, v]) (k, v, bool) {
 	for iter.HasNext() {
-		if k, v := iter.Next(); filter(k, v) {
+		if k, v := iter.Get(); filter(k, v) {
 			return k, v, true
 		}
 	}

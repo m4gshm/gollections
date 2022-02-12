@@ -55,7 +55,7 @@ func Group[T any, K comparable, IT c.Iterator[T]](elements IT, by c.Converter[T,
 //For applies func on elements.
 func For[T any, IT c.Iterator[T]](elements IT, apply func(T) error) error {
 	for elements.HasNext() {
-		err := apply(elements.Next())
+		err := apply(elements.Get())
 		if err != nil {
 			return err
 		}
@@ -66,13 +66,13 @@ func For[T any, IT c.Iterator[T]](elements IT, apply func(T) error) error {
 //ForEach applies func on elements.
 func ForEach[T any, IT c.Iterator[T]](elements IT, apply func(T)) {
 	for elements.HasNext() {
-		apply(elements.Next())
+		apply(elements.Get())
 	}
 }
 
 func ForEachFit[T any, IT c.Iterator[T]](elements IT, apply func(T), fit c.Predicate[T]) {
 	for elements.HasNext() {
-		if v := elements.Next(); fit(v) {
+		if v := elements.Get(); fit(v) {
 			apply(v)
 		}
 	}
@@ -111,10 +111,10 @@ func Slice[T any, IT c.Iterator[T]](elements IT) []T {
 }
 
 func Next[T any, IT c.Iterator[T]](elements IT) T {
-	return elements.Next()
+	return elements.Get()
 
 }
 
 func NextKV[k, v any, IT c.KVIterator[k, v]](elements IT) (k, v) {
-	return elements.Next()
+	return elements.Get()
 }

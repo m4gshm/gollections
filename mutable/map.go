@@ -45,10 +45,10 @@ var _ c.Map[int, any] = (*Map[int, any])(nil)
 var _ fmt.Stringer = (*Map[int, any])(nil)
 
 func (s *Map[k, v]) Begin() c.KVIterator[k, v] {
-	return s.Iter()
+	return s.Head()
 }
 
-func (s *Map[k, v]) Iter() *it.KV[k, v] {
+func (s *Map[k, v]) Head() *it.KV[k, v] {
 	return it.NewKV(s.uniques)
 }
 
@@ -121,29 +121,29 @@ func (s *Map[k, v]) String() string {
 }
 
 func (s *Map[k, v]) FilterKey(fit c.Predicate[k]) c.MapPipe[k, v, map[k]v] {
-	return it.NewKVPipe(it.FilterKV(s.Iter(), func(key k, val v) bool { return fit(key) }), collect.Map[k, v])
+	return it.NewKVPipe(it.FilterKV(s.Head(), func(key k, val v) bool { return fit(key) }), collect.Map[k, v])
 }
 
 func (s *Map[k, v]) MapKey(by c.Converter[k, k]) c.MapPipe[k, v, map[k]v] {
-	return it.NewKVPipe(it.MapKV(s.Iter(), func(key k, val v) (k, v) { return by(key), val }), collect.Map[k, v])
+	return it.NewKVPipe(it.MapKV(s.Head(), func(key k, val v) (k, v) { return by(key), val }), collect.Map[k, v])
 }
 
 func (s *Map[k, v]) FilterValue(fit c.Predicate[v]) c.MapPipe[k, v, map[k]v] {
-	return it.NewKVPipe(it.FilterKV(s.Iter(), func(key k, val v) bool { return fit(val) }), collect.Map[k, v])
+	return it.NewKVPipe(it.FilterKV(s.Head(), func(key k, val v) bool { return fit(val) }), collect.Map[k, v])
 }
 
 func (s *Map[k, v]) MapValue(by c.Converter[v, v]) c.MapPipe[k, v, map[k]v] {
-	return it.NewKVPipe(it.MapKV(s.Iter(), func(key k, val v) (k, v) { return key, by(val) }), collect.Map[k, v])
+	return it.NewKVPipe(it.MapKV(s.Head(), func(key k, val v) (k, v) { return key, by(val) }), collect.Map[k, v])
 }
 
 func (s *Map[k, v]) Filter(filter c.BiPredicate[k, v]) c.MapPipe[k, v, map[k]v] {
-	return it.NewKVPipe(it.FilterKV(s.Iter(), filter), collect.Map[k, v])
+	return it.NewKVPipe(it.FilterKV(s.Head(), filter), collect.Map[k, v])
 }
 
 func (s *Map[k, v]) Map(by c.BiConverter[k, v, k, v]) c.MapPipe[k, v, map[k]v] {
-	return it.NewKVPipe(it.MapKV(s.Iter(), by), collect.Map[k, v])
+	return it.NewKVPipe(it.MapKV(s.Head(), by), collect.Map[k, v])
 }
 
 func (s *Map[k, v]) Reduce(by op.Quaternary[k, v]) (k, v) {
-	return it.ReduceKV(s.Iter(), by)
+	return it.ReduceKV(s.Head(), by)
 }

@@ -64,17 +64,29 @@ func Range[T constraints.Integer](from T, to T) []T {
 	return elements
 }
 
-func Sort[t any](elements []t, less func(e1, e2 t) bool) []t {
+func Reverse[T any](elements []T) []T {
+	l := 0
+	h := len(elements) - 1
+	for l < h {
+		le, he := elements[l], elements[h]
+		elements[l], elements[h] = he, le
+		l++
+		h--
+	}
+	return elements
+}
+
+func Sort[T any](elements []T, less func(e1, e2 T) bool) []T {
 	sort.Slice(elements, func(i, j int) bool { return less(elements[i], elements[j]) })
 	return elements
 }
 
-func SortByOrdered[t any, o constraints.Ordered](elements []t, by c.Converter[t, o]) []t {
-	return Sort(elements, func(e1, e2 t) bool { return by(e1) < by(e2) })
+func SortByOrdered[O any, o constraints.Ordered](elements []O, by c.Converter[O, o]) []O {
+	return Sort(elements, func(e1, e2 O) bool { return by(e1) < by(e2) })
 }
 
-func SortCopy[t any](elements []t, less func(e1, e2 t) bool) []t {
-	var dest = make([]t, len(elements))
+func SortCopy[T any](elements []T, less func(e1, e2 T) bool) []T {
+	var dest = make([]T, len(elements))
 	copy(dest, elements)
 	return Sort(dest, less)
 }

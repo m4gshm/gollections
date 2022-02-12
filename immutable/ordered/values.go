@@ -23,10 +23,10 @@ var _ c.Collection[any, []any, c.Iterator[any]] = (*MapValues[int, any])(nil)
 var _ fmt.Stringer = (*MapValues[int, any])(nil)
 
 func (s *MapValues[k, v]) Begin() c.Iterator[v] {
-	return s.Iter()
+	return s.Head()
 }
 
-func (s *MapValues[k, v]) Iter() *ValIter[k, v] {
+func (s *MapValues[k, v]) Head() *ValIter[k, v] {
 	return NewValIter(s.elements, s.uniques)
 }
 
@@ -64,15 +64,15 @@ func (s *MapValues[k, v]) Get(index int) (v, bool) {
 }
 
 func (s *MapValues[k, v]) Filter(filter c.Predicate[v]) c.Pipe[v, []v, c.Iterator[v]] {
-	return it.NewPipe[v](it.Filter(s.Iter(), filter))
+	return it.NewPipe[v](it.Filter(s.Head(), filter))
 }
 
 func (s *MapValues[k, v]) Map(by c.Converter[v, v]) c.Pipe[v, []v, c.Iterator[v]] {
-	return it.NewPipe[v](it.Map(s.Iter(), by))
+	return it.NewPipe[v](it.Map(s.Head(), by))
 }
 
 func (s *MapValues[k, v]) Reduce(by op.Binary[v]) v {
-	return it.Reduce(s.Iter(), by)
+	return it.Reduce(s.Head(), by)
 }
 
 func (s *MapValues[k, v]) String() string {

@@ -19,14 +19,14 @@ var _ c.Iterator[any] = (*Iter[any])(nil)
 var _ Iterator[any] = (*Iter[any])(nil)
 
 func (i *Iter[T]) HasNext() bool {
-	if n, has := it.HasNext(*i.elements, i.current); has {
-		i.current = n
+	if it.HasNext(*i.elements, i.current) {
+		i.current++
 		return true
 	}
 	return false
 }
 
-func (i *Iter[T]) Next() T {
+func (i *Iter[T]) Get() T {
 	return it.Get(*i.elements, i.current)
 }
 

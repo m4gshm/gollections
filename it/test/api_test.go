@@ -142,7 +142,7 @@ func Test_Iterate(t *testing.T) {
 		values[i] = i
 	}
 
-	stream := impl.NewPipe[int](impl.New(values))
+	stream := impl.NewPipe[int](impl.NewHead(values))
 
 	result := make([]int, 0)
 

@@ -36,14 +36,14 @@ var (
 )
 
 func (v *Vector[T]) Begin() c.Iterator[T] {
-	return v.Iter()
+	return v.Head()
 }
 
 func (v *Vector[T]) BeginEdit() Iterator[T] {
-	return v.Iter()
+	return v.Head()
 }
 
-func (v *Vector[T]) Iter() *Iter[T] {
+func (v *Vector[T]) Head() *Iter[T] {
 	return NewIter(&v.elements, v.DeleteOne)
 }
 
@@ -72,7 +72,7 @@ func (v *Vector[T]) ForEach(walker func(T)) {
 }
 
 func (v *Vector[T]) Len() int {
-	return it.GetLen(&v.elements)
+	return it.GetLen(v.elements)
 }
 
 func (v *Vector[T]) Get(index int) (T, bool) {
@@ -171,15 +171,15 @@ func (v *Vector[T]) Set(index int, value T) bool {
 }
 
 func (v *Vector[T]) Filter(filter c.Predicate[T]) c.Pipe[T, []T, c.Iterator[T]] {
-	return it.NewPipe[T](it.Filter(v.Iter(), filter))
+	return it.NewPipe[T](it.Filter(v.Head(), filter))
 }
 
 func (v *Vector[T]) Map(by c.Converter[T, T]) c.Pipe[T, []T, c.Iterator[T]] {
-	return it.NewPipe[T](it.Map(v.Iter(), by))
+	return it.NewPipe[T](it.Map(v.Head(), by))
 }
 
 func (v *Vector[T]) Reduce(by op.Binary[T]) T {
-	return it.Reduce(v.Iter(), by)
+	return it.Reduce(v.Head(), by)
 }
 
 func (v *Vector[t]) Sort(less func(e1, e2 t) bool) *Vector[t] {

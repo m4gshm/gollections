@@ -22,6 +22,6 @@ func (s *Fit[T]) HasNext() bool {
 	return ok
 }
 
-func (s *Fit[T]) Next() T {
+func (s *Fit[T]) Get() T {
 	return s.current
 }

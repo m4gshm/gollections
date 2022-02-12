@@ -14,10 +14,10 @@ func Test_PointerBasedIter(t *testing.T) {
 	}
 
 	expected := []someType{{"123", 123}, {"2", 2}, {"3", 3}, {"4", 4}}
-	iter := New(expected)
+	iter := NewHead(expected)
 	result := make([]someType, 0)
 	for iter.HasNext() {
-		n := iter.Next()
+		n := iter.Get()
 		result = append(result, n)
 	}
 

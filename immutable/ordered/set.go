@@ -38,11 +38,15 @@ var (
 )
 
 func (s *Set[T]) Begin() c.Iterator[T] {
-	return s.Iter()
+	return s.Head()
 }
 
-func (s *Set[T]) Iter() *it.Iter[T] {
-	return it.New(s.elements)
+func (s *Set[T]) Head() *it.Iter[T] {
+	return it.NewHead(s.elements)
+}
+
+func (v *Set[T]) Revert() *it.Iter[T] {
+	return it.NewTail(v.elements)
 }
 
 func (s *Set[T]) Collect() []T {
@@ -58,15 +62,15 @@ func (s *Set[T]) ForEach(walker func(T)) {
 }
 
 func (s *Set[T]) Filter(filter c.Predicate[T]) c.Pipe[T, []T, c.Iterator[T]] {
-	return it.NewPipe[T](it.Filter(s.Iter(), filter))
+	return it.NewPipe[T](it.Filter(s.Head(), filter))
 }
 
 func (s *Set[T]) Map(by c.Converter[T, T]) c.Pipe[T, []T, c.Iterator[T]] {
-	return it.NewPipe[T](it.Map(s.Iter(), by))
+	return it.NewPipe[T](it.Map(s.Head(), by))
 }
 
 func (s *Set[T]) Reduce(by op.Binary[T]) T {
-	return it.Reduce(s.Iter(), by)
+	return it.Reduce(s.Head(), by)
 }
 
 func (s *Set[T]) Len() int {
@@ -78,7 +82,7 @@ func (s *Set[T]) Contains(v T) bool {
 	return ok
 }
 
-func (s *Set[t]) Sort(less func(e1, e2 t) bool) *Set[t] {
+func (s *Set[T]) Sort(less func(e1, e2 T) bool) *Set[T] {
 	return WrapSet(slice.SortCopy(s.elements, less), s.uniques)
 }
 
