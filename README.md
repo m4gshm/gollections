@@ -136,8 +136,6 @@ maxItemAttribute := it.Reduce(it.Map(c.Filer(items, condition), Item.GetAttribut
 ```
 Functions grouped into packages by applicable type ([container](./c/api.go), [map](./c/map_/api.go), [iterator](./it/api.go), [slice](slice/api.go))
 
-## Builder and util functions
-
 ## Packages
 ### [Common interfaces](./c/iface.go)
 

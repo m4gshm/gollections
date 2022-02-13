@@ -6,8 +6,8 @@ import (
 	"github.com/m4gshm/gollections/c"
 )
 
-func NewOrderedKV[k comparable, v any](order []k, uniques map[k]v, factory func([]k) *Iter[k]) *OrderedKV[k, v] {
-	return &OrderedKV[k, v]{elements: factory(order), uniques: uniques}
+func NewOrderedKV[k comparable, v any](uniques map[k]v, elements *Iter[k]) *OrderedKV[k, v] {
+	return &OrderedKV[k, v]{elements: elements, uniques: uniques}
 }
 
 // func NewReverseOrderedKV[k comparable, v any](order []k, uniques map[k]v) *OrderedKV[k, v] {

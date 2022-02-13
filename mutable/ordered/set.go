@@ -75,6 +75,10 @@ func (s *Set[T]) Len() int {
 	return len(s.elements)
 }
 
+func (s *Set[T]) IsEmpty() bool {
+	return s.Len() == 0
+}
+
 func (s *Set[T]) Contains(v T) bool {
 	_, ok := s.uniques[v]
 	return ok
@@ -150,11 +154,11 @@ func (s *Set[T]) DeleteOne(v T) bool {
 	return false
 }
 
-func (s *Set[T]) Filter(filter c.Predicate[T]) c.Pipe[T, []T, c.Iterator[T]] {
+func (s *Set[T]) Filter(filter c.Predicate[T]) c.Pipe[T, []T] {
 	return it.NewPipe[T](it.Filter(s.Head(), filter))
 }
 
-func (s *Set[T]) Map(by c.Converter[T, T]) c.Pipe[T, []T, c.Iterator[T]] {
+func (s *Set[T]) Map(by c.Converter[T, T]) c.Pipe[T, []T] {
 	return it.NewPipe[T](it.Map(s.Head(), by))
 }
 

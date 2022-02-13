@@ -10,35 +10,46 @@ import (
 const NoStarted = -1
 
 func NewHead[T any](elements []T) *Iter[T] {
+	return NewHeadS(elements, GetTypeSize[T]())
+}
+
+func NewHeadS[T any](elements []T, elementSize uintptr) *Iter[T] {
+	header := GetSliceHeader(elements)
 	return &Iter[T]{
-		array:            GetArrayPointer(elements),
-		arraySize:        GetLen(elements),
-		arrayElementSize: GetArrayElementSize(elements),
-		current:          NoStarted,
+		array:       unsafe.Pointer(header.Data),
+		elementSize: elementSize,
+		size:        header.Len,
+		current:     NoStarted,
 	}
 }
 
 func NewTail[T any](elements []T) *Iter[T] {
-	l := GetLen(elements)
+	return NewTailS(elements, GetTypeSize[T]())
+}
+
+func NewTailS[T any](elements []T, elementSize uintptr) *Iter[T] {
+	var (
+		header = GetSliceHeader(elements)
+		size   = header.Len
+	)
 	return &Iter[T]{
-		array:            GetArrayPointer(elements),
-		arraySize:        l,
-		arrayElementSize: GetArrayElementSize(elements),
-		current:          l,
+		array:       unsafe.Pointer(header.Data),
+		elementSize: elementSize,
+		size:        size,
+		current:     size,
 	}
 }
 
 type Iter[T any] struct {
-	array            unsafe.Pointer
-	arraySize        int
-	arrayElementSize uintptr
-	current          int
+	array         unsafe.Pointer
+	elementSize   uintptr
+	size, current int
 }
 
 var _ c.Iterator[any] = (*Iter[any])(nil)
 
 func (i *Iter[T]) HasNext() bool {
-	if HasNextByLen(i.arraySize, i.current) {
+	if HasNextBySize(i.size, i.current) {
 		i.current++
 		return true
 	}
@@ -46,7 +57,7 @@ func (i *Iter[T]) HasNext() bool {
 }
 
 func (i *Iter[T]) HasPrev() bool {
-	if HasPrevByLen(i.arraySize, i.current) {
+	if HasPrevBySize(i.size, i.current) {
 		i.current--
 		return true
 	}
@@ -54,33 +65,23 @@ func (i *Iter[T]) HasPrev() bool {
 }
 
 func (i *Iter[T]) Get() T {
-	return GetArrayElem[T](i.array, i.current, i.arrayElementSize)
-}
-
-type RevertIter[T any] struct {
-	Iter[T]
-}
-
-var _ c.Iterator[any] = (*RevertIter[any])(nil)
-
-func (i *RevertIter[T]) HasNext() bool {
-	if HasPrevByLen(i.arraySize, i.current) {
-		i.current--
-		return true
-	}
-	return false
+	return GetArrayElem[T](i.array, i.current, i.elementSize)
 }
 
 func HasNext[T any](elements []T, current int) bool {
-	return HasNextByLen(GetLen(elements), current)
+	return HasNextBySize(GetLen(elements), current)
 }
 
-func HasPrevByLen(size, current int) bool {
-	return HasNextByRange(1, size, current)
+func HasPrev[T any](elements []T, current int) bool {
+	return HasPrevBySize(GetLen(elements), current)
 }
 
-func HasNextByLen(size, current int) bool {
+func HasNextBySize(size int, current int) bool {
 	return HasNextByRange(NoStarted, size-2, current)
+}
+
+func HasPrevBySize(size, current int) bool {
+	return HasNextByRange(1, size, current)
 }
 
 func HasNextByRange(first, last, current int) bool {
@@ -102,7 +103,11 @@ func GetArrayPointer[T any](elements []T) unsafe.Pointer {
 	return unsafe.Pointer(GetSliceHeader(elements).Data)
 }
 
-func GetArrayElementSize[T any](_ []T) uintptr {
+func GetArrayPointer2[T any](elements []T) uintptr {
+	return GetSliceHeader(elements).Data
+}
+
+func GetTypeSize[T any]() uintptr {
 	var t T
 	return unsafe.Sizeof(t)
 }

@@ -11,7 +11,7 @@ import (
 )
 
 func NewSet[T comparable](capacity int) *Set[T] {
-	return WrapSet[T](make(map[T]struct{}, capacity))
+	return WrapSet(make(map[T]struct{}, capacity))
 }
 
 func ToSet[T comparable](elements []T) *Set[T] {
@@ -22,13 +22,13 @@ func ToSet[T comparable](elements []T) *Set[T] {
 	return WrapSet(uniques)
 }
 
-func WrapSet[k comparable](uniques map[k]struct{}) *Set[k] {
-	return &Set[k]{uniques: uniques}
+func WrapSet[K comparable](uniques map[K]struct{}) *Set[K] {
+	return &Set[K]{uniques: uniques}
 }
 
 //Set provides uniqueness (does't insert duplicated values).
-type Set[k comparable] struct {
-	uniques map[k]struct{}
+type Set[K comparable] struct {
+	uniques map[K]struct{}
 }
 
 var (
@@ -38,23 +38,49 @@ var (
 	_ fmt.Stringer    = (*Set[int])(nil)
 )
 
-func (s *Set[k]) Begin() c.Iterator[k] {
+func (s *Set[K]) Begin() c.Iterator[K] {
 	return s.Head()
 }
 
-func (s *Set[k]) BeginEdit() Iterator[k] {
+func (s *Set[K]) BeginEdit() Iterator[K] {
 	return s.Head()
 }
 
-func (s *Set[k]) Head() *SetIter[k] {
+func (s *Set[K]) Head() *SetIter[K] {
 	return NewSetIter(s.uniques, s.DeleteOne)
 }
 
-func (s *Set[k]) Add(elements ...k) bool {
+func (s *Set[K]) Collect() []K {
+	uniques := s.uniques
+	out := make([]K, 0, len(uniques))
+	for e := range uniques {
+		out = append(out, e)
+	}
+	return out
+}
+
+func (s *Set[T]) Copy() *Set[T] {
+	return WrapSet(map_.Copy(s.uniques))
+}
+
+func (s *Set[T]) IsEmpty() bool {
+	return s.Len() == 0
+}
+
+func (s *Set[K]) Len() int {
+	return len(s.uniques)
+}
+
+func (s *Set[K]) Contains(val K) bool {
+	_, ok := s.uniques[val]
+	return ok
+}
+
+func (s *Set[K]) Add(elements ...K) bool {
 	return s.AddAll(elements)
 }
 
-func (s *Set[k]) AddAll(elements []k) bool {
+func (s *Set[K]) AddAll(elements []K) bool {
 	uniques := s.uniques
 	added := false
 	for _, element := range elements {
@@ -66,7 +92,7 @@ func (s *Set[k]) AddAll(elements []k) bool {
 	return added
 }
 
-func (s *Set[k]) AddOne(element k) bool {
+func (s *Set[K]) AddOne(element K) bool {
 	uniques := s.uniques
 	if _, ok := uniques[element]; ok {
 		return false
@@ -75,7 +101,7 @@ func (s *Set[k]) AddOne(element k) bool {
 	return true
 }
 
-func (s *Set[k]) Delete(elements ...k) bool {
+func (s *Set[K]) Delete(elements ...K) bool {
 	uniques := s.uniques
 	for _, element := range elements {
 		if _, ok := uniques[element]; !ok {
@@ -86,7 +112,7 @@ func (s *Set[k]) Delete(elements ...k) bool {
 	return true
 }
 
-func (s *Set[k]) DeleteOne(element k) bool {
+func (s *Set[K]) DeleteOne(element K) bool {
 	uniques := s.uniques
 	if _, ok := uniques[element]; !ok {
 		return false
@@ -95,44 +121,26 @@ func (s *Set[k]) DeleteOne(element k) bool {
 	return true
 }
 
-func (s *Set[k]) Collect() []k {
-	uniques := s.uniques
-	out := make([]k, 0, len(uniques))
-	for e := range uniques {
-		out = append(out, e)
-	}
-	return out
-}
-
-func (s *Set[k]) For(walker func(k) error) error {
+func (s *Set[K]) For(walker func(K) error) error {
 	return map_.ForKeys(s.uniques, walker)
 }
 
-func (s *Set[k]) ForEach(walker func(k)) {
+func (s *Set[K]) ForEach(walker func(K)) {
 	map_.ForEachKey(s.uniques, walker)
 }
 
-func (s *Set[k]) Filter(filter c.Predicate[k]) c.Pipe[k, []k, c.Iterator[k]] {
-	return it.NewPipe[k](it.Filter(s.Head(), filter))
+func (s *Set[K]) Filter(filter c.Predicate[K]) c.Pipe[K, []K] {
+	return it.NewPipe[K](it.Filter(s.Head(), filter))
 }
 
-func (s *Set[k]) Map(by c.Converter[k, k]) c.Pipe[k, []k, c.Iterator[k]] {
-	return it.NewPipe[k](it.Map(s.Head(), by))
+func (s *Set[K]) Map(by c.Converter[K, K]) c.Pipe[K, []K] {
+	return it.NewPipe[K](it.Map(s.Head(), by))
 }
 
-func (s *Set[k]) Reduce(by op.Binary[k]) k {
+func (s *Set[K]) Reduce(by op.Binary[K]) K {
 	return it.Reduce(s.Head(), by)
 }
 
-func (s *Set[k]) Len() int {
-	return len(s.uniques)
-}
-
-func (s *Set[k]) Contains(val k) bool {
-	_, ok := s.uniques[val]
-	return ok
-}
-
-func (s *Set[k]) String() string {
+func (s *Set[K]) String() string {
 	return slice.ToString(s.Collect())
 }

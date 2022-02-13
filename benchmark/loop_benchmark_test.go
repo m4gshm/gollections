@@ -8,6 +8,7 @@ import (
 	"github.com/m4gshm/gollections/immutable/vector"
 	"github.com/m4gshm/gollections/it"
 	impliter "github.com/m4gshm/gollections/it/impl/it"
+	mvector "github.com/m4gshm/gollections/mutable/vector"
 
 	moset "github.com/m4gshm/gollections/mutable/oset"
 	"github.com/m4gshm/gollections/slice/range_"
@@ -55,6 +56,19 @@ func Benchmark_HasNextGet_Iterator_Immutable_Vector(b *testing.B) {
 
 func Benchmark_HasNextGet_Iterator_Immutable_Vector_Impl(b *testing.B) {
 	c := vector.Of(values...)
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for it := c.Head(); it.HasNext(); {
+					casee.load(it.Get())
+				}
+			}
+		})
+	}
+}
+
+func Benchmark_HasNextGet_Iterator_Mutable_Vector_Impl(b *testing.B) {
+	c := mvector.Of(values...)
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {

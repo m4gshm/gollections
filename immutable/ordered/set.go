@@ -24,12 +24,13 @@ func NewSet[T comparable](elements []T) *Set[T] {
 }
 
 func WrapSet[T comparable](elements []T, uniques map[T]struct{}) *Set[T] {
-	return &Set[T]{elements: elements, uniques: uniques}
+	return &Set[T]{elements: elements, uniques: uniques, esize: it.GetTypeSize[T]()}
 }
 
 type Set[T comparable] struct {
 	elements []T
 	uniques  map[T]struct{}
+	esize    uintptr
 }
 
 var (
@@ -42,11 +43,11 @@ func (s *Set[T]) Begin() c.Iterator[T] {
 }
 
 func (s *Set[T]) Head() *it.Iter[T] {
-	return it.NewHead(s.elements)
+	return it.NewHeadS(s.elements, s.esize)
 }
 
-func (v *Set[T]) Revert() *it.Iter[T] {
-	return it.NewTail(v.elements)
+func (s *Set[T]) Revert() *it.Iter[T] {
+	return it.NewTailS(s.elements, s.esize)
 }
 
 func (s *Set[T]) Collect() []T {
@@ -61,11 +62,11 @@ func (s *Set[T]) ForEach(walker func(T)) {
 	slice.ForEach(s.elements, walker)
 }
 
-func (s *Set[T]) Filter(filter c.Predicate[T]) c.Pipe[T, []T, c.Iterator[T]] {
+func (s *Set[T]) Filter(filter c.Predicate[T]) c.Pipe[T, []T] {
 	return it.NewPipe[T](it.Filter(s.Head(), filter))
 }
 
-func (s *Set[T]) Map(by c.Converter[T, T]) c.Pipe[T, []T, c.Iterator[T]] {
+func (s *Set[T]) Map(by c.Converter[T, T]) c.Pipe[T, []T] {
 	return it.NewPipe[T](it.Map(s.Head(), by))
 }
 
@@ -75,6 +76,10 @@ func (s *Set[T]) Reduce(by op.Binary[T]) T {
 
 func (s *Set[T]) Len() int {
 	return len(s.elements)
+}
+
+func (s *Set[T]) IsEmpty() bool {
+	return s.Len() == 0
 }
 
 func (s *Set[T]) Contains(v T) bool {

@@ -6,45 +6,45 @@ import (
 )
 
 //NewPipe returns the Pipe based on iterable elements.
-func NewPipe[t any, it c.Iterator[t]](iter it) *IterPipe[t] {
-	return &IterPipe[t]{it: iter}
+func NewPipe[T any, IT c.Iterator[T]](iter IT) *IterPipe[T] {
+	return &IterPipe[T]{it: iter}
 }
 
-type IterPipe[t any] struct {
-	it       c.Iterator[t]
-	elements []t
+type IterPipe[T any] struct {
+	it       c.Iterator[T]
+	elements []T
 }
 
-var _ c.Pipe[any, []any, c.Iterator[any]] = (*IterPipe[any])(nil)
+var _ c.Pipe[any, []any] = (*IterPipe[any])(nil)
 
-func (s *IterPipe[t]) Filter(fit c.Predicate[t]) c.Pipe[t, []t, c.Iterator[t]] {
-	return NewPipe[t](Filter(s.it, fit))
+func (s *IterPipe[T]) Filter(fit c.Predicate[T]) c.Pipe[T, []T] {
+	return NewPipe[T](Filter(s.it, fit))
 }
 
-func (s *IterPipe[t]) Map(by c.Converter[t, t]) c.Pipe[t, []t, c.Iterator[t]] {
-	return NewPipe[t](Map(s.it, by))
+func (s *IterPipe[T]) Map(by c.Converter[T, T]) c.Pipe[T, []T] {
+	return NewPipe[T](Map(s.it, by))
 }
 
-func (s *IterPipe[t]) ForEach(walker func(t)) {
+func (s *IterPipe[T]) ForEach(walker func(T)) {
 	ForEach(s.it, walker)
 }
 
-func (s *IterPipe[t]) For(walker func(t) error) error {
+func (s *IterPipe[T]) For(walker func(T) error) error {
 	return For(s.it, walker)
 }
 
-func (s *IterPipe[t]) Reduce(by op.Binary[t]) t {
+func (s *IterPipe[T]) Reduce(by op.Binary[T]) T {
 	return Reduce(s.it, by)
 }
 
-func (s *IterPipe[t]) Begin() c.Iterator[t] {
+func (s *IterPipe[T]) Begin() c.Iterator[T] {
 	return s.it
 }
 
-func (s *IterPipe[t]) Collect() []t {
+func (s *IterPipe[T]) Collect() []T {
 	e := s.elements
 	if e == nil {
-		e = make([]t, 0)
+		e = make([]T, 0)
 		it := s.it
 		for it.HasNext() {
 			e = append(e, it.Get())

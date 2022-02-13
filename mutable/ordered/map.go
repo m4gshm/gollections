@@ -15,42 +15,43 @@ import (
 
 func AsMap[K comparable, V any](elements []*map_.KV[K, V]) *Map[K, V] {
 	var (
-		l       = len(elements)
-		uniques = make(map[K]V, l)
-		order   = make([]K, 0, l)
+		l           = len(elements)
+		uniques     = make(map[K]V, l)
+		orderedKeys = make([]K, 0, l)
 	)
 	for _, kv := range elements {
 		key := kv.Key()
 		val := kv.Value()
 		if _, ok := uniques[key]; !ok {
-			order = append(order, key)
+			orderedKeys = append(orderedKeys, key)
 			uniques[key] = val
 		}
 	}
-	return WrapMap(order, uniques)
+	return WrapMap(orderedKeys, uniques)
 }
 
 func ToMap[K comparable, V any](elements map[K]V) *Map[K, V] {
 	var (
-		uniques = make(map[K]V, len(elements))
-		order   = make([]K, len(elements))
+		uniques     = make(map[K]V, len(elements))
+		orderedKeys = make([]K, len(elements))
 	)
 	for key, val := range elements {
-		order = append(order, key)
+		orderedKeys = append(orderedKeys, key)
 		uniques[key] = val
 	}
-	return WrapMap(order, uniques)
+	return WrapMap(orderedKeys, uniques)
 }
 
-func WrapMap[K comparable, V any](order []K, uniques map[K]V) *Map[K, V] {
-	return &Map[K, V]{elements: order, uniques: uniques}
+func WrapMap[K comparable, V any](orderedKeys []K, uniques map[K]V) *Map[K, V] {
+	return &Map[K, V]{keys: orderedKeys, uniques: uniques, ksize: it.GetTypeSize[K]()}
 }
 
 //Map provides access to elements by key.
 type Map[K comparable, V any] struct {
-	changeMark int32
-	elements   []K
+	keys       []K
 	uniques    map[K]V
+	changeMark int32
+	ksize      uintptr
 }
 
 var (
@@ -64,11 +65,11 @@ func (s *Map[K, V]) Begin() c.KVIterator[K, V] {
 }
 
 func (s *Map[K, V]) Head() *it.OrderedKV[K, V] {
-	return it.NewOrderedKV(s.elements, s.uniques, it.NewHead[K])
+	return it.NewOrderedKV(s.uniques, it.NewHeadS(s.keys, s.ksize))
 }
 
 func (s *Map[K, V]) Tail() *it.OrderedKV[K, V] {
-	return it.NewOrderedKV(s.elements, s.uniques, it.NewTail[K])
+	return it.NewOrderedKV(s.uniques, it.NewTailS(s.keys, s.ksize))
 }
 
 func (s *Map[K, V]) Collect() map[K]V {
@@ -81,28 +82,32 @@ func (s *Map[K, V]) Collect() map[K]V {
 }
 
 func (s *Map[K, V]) Sort(less func(k1, k2 K) bool) *Map[K, V] {
-	s.elements = slice.SortCopy(s.elements, less)
+	s.keys = slice.SortCopy(s.keys, less)
 	return s
 }
 
 func (s *Map[K, V]) Len() int {
-	return len(s.elements)
+	return len(s.keys)
+}
+
+func (s *Map[K, V]) IsEmpty() bool {
+	return s.Len() == 0
 }
 
 func (s *Map[K, V]) For(walker func(*map_.KV[K, V]) error) error {
-	return map_.ForOrdered(s.elements, s.uniques, walker)
+	return map_.ForOrdered(s.keys, s.uniques, walker)
 }
 
 func (s *Map[K, V]) ForEach(walker func(*map_.KV[K, V])) {
-	map_.ForEachOrdered(s.elements, s.uniques, walker)
+	map_.ForEachOrdered(s.keys, s.uniques, walker)
 }
 
 func (s *Map[K, V]) Track(tracker func(K, V) error) error {
-	return map_.TrackOrdered(s.elements, s.uniques, tracker)
+	return map_.TrackOrdered(s.keys, s.uniques, tracker)
 }
 
 func (s *Map[K, V]) TrackEach(tracker func(K, V)) {
-	map_.TrackEachOrdered(s.elements, s.uniques, tracker)
+	map_.TrackEachOrdered(s.keys, s.uniques, tracker)
 }
 
 func (s *Map[K, V]) Contains(key K) bool {
@@ -118,9 +123,9 @@ func (s *Map[K, V]) Get(key K) (V, bool) {
 func (s *Map[K, V]) Set(key K, value V) bool {
 	u := s.uniques
 	if _, ok := u[key]; !ok {
-		e := s.elements
+		e := s.keys
 		u[key] = value
-		s.elements = append(e, key)
+		s.keys = append(e, key)
 		return true
 	}
 	return false
@@ -131,7 +136,7 @@ func (s *Map[K, V]) Keys() c.Collection[K, []K, c.Iterator[K]] {
 }
 
 func (s *Map[K, V]) K() *ordered.MapKeys[K] {
-	return ordered.WrapKeys(s.elements)
+	return ordered.WrapKeys(s.keys)
 }
 
 func (s *Map[K, V]) Values() c.Collection[V, []V, c.Iterator[V]] {
@@ -139,11 +144,11 @@ func (s *Map[K, V]) Values() c.Collection[V, []V, c.Iterator[V]] {
 }
 
 func (s *Map[K, V]) V() *ordered.MapValues[K, V] {
-	return ordered.WrapVal(s.elements, s.uniques)
+	return ordered.WrapVal(s.keys, s.uniques)
 }
 
 func (s *Map[K, V]) String() string {
-	return map_.ToStringOrdered(s.elements, s.uniques)
+	return map_.ToStringOrdered(s.keys, s.uniques)
 }
 
 func (s *Map[K, V]) FilterKey(fit c.Predicate[K]) c.MapPipe[K, V, map[K]V] {

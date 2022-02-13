@@ -24,6 +24,8 @@ type Collection[T any, Collection any, IT Iter] interface {
 	Container[Collection, IT]
 	Walk[T]
 	WalkEach[T]
+	Len() int
+	IsEmpty() bool
 }
 
 //Vector is the interface of a container stores ordered elements, provides index access.
@@ -32,16 +34,14 @@ type Vector[T any] interface {
 	Track[T, int]
 	TrackEach[T, int]
 	Access[int, T]
-	Transformable[T, []T, Iterator[T]]
-	Len() int
+	Transformable[T, []T]
 }
 
 //Set is the interface of a container provides uniqueness (does't insert duplicated values).
 type Set[T any] interface {
 	Collection[T, []T, Iterator[T]]
-	Transformable[T, []T, Iterator[T]]
+	Transformable[T, []T]
 	Checkable[T]
-	Len() int
 }
 
 //Map is the interface of a container provides access to elements by key.
@@ -54,7 +54,6 @@ type Map[K comparable, V any] interface {
 	MapTransformable[K, V, map[K]V]
 	Keys() Collection[K, []K, Iterator[K]]
 	Values() Collection[V, []V, Iterator[V]]
-	Len() int
 }
 
 //Iter is the base for Iterator and KVIterator.
@@ -111,15 +110,15 @@ type Checkable[T any] interface {
 
 //Transformable is the interface that provides limited kit of container transformation methods.
 //The full kit of transformer functions are in the package 'c'
-type Transformable[T any, Collection any, IT Iterator[T]] interface {
-	Filter(Predicate[T]) Pipe[T, Collection, IT]
-	Map(Converter[T, T]) Pipe[T, Collection, IT]
+type Transformable[T any, Collection any] interface {
+	Filter(Predicate[T]) Pipe[T, Collection]
+	Map(Converter[T, T]) Pipe[T, Collection]
 }
 
 //Pipe extends Transformable by finalize methods like ForEach, Collect or Reduce.
-type Pipe[T any, Collection any, IT Iterator[T]] interface {
-	Transformable[T, Collection, IT]
-	Container[Collection, IT]
+type Pipe[T any, Collection any] interface {
+	Transformable[T, Collection]
+	Container[Collection, Iterator[T]]
 	Walk[T]
 	WalkEach[T]
 	Reduce(op.Binary[T]) T

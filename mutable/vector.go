@@ -44,7 +44,11 @@ func (v *Vector[T]) BeginEdit() Iterator[T] {
 }
 
 func (v *Vector[T]) Head() *Iter[T] {
-	return NewIter(&v.elements, v.DeleteOne)
+	return NewHead(&v.elements, v.DeleteOne)
+}
+
+func (v *Vector[T]) Tail() *Iter[T] {
+	return NewTail(&v.elements, v.DeleteOne)
 }
 
 func (v *Vector[T]) Collect() []T {
@@ -53,6 +57,14 @@ func (v *Vector[T]) Collect() []T {
 
 func (v *Vector[T]) Copy() *Vector[T] {
 	return WrapVector(slice.Copy(v.elements))
+}
+
+func (v *Vector[T]) IsEmpty() bool {
+	return v.Len() == 0
+}
+
+func (v *Vector[T]) Len() int {
+	return it.GetLen(v.elements)
 }
 
 func (v *Vector[T]) Track(tracker func(int, T) error) error {
@@ -69,10 +81,6 @@ func (v *Vector[T]) For(walker func(T) error) error {
 
 func (v *Vector[T]) ForEach(walker func(T)) {
 	slice.ForEach(v.elements, walker)
-}
-
-func (v *Vector[T]) Len() int {
-	return it.GetLen(v.elements)
 }
 
 func (v *Vector[T]) Get(index int) (T, bool) {
@@ -170,11 +178,11 @@ func (v *Vector[T]) Set(index int, value T) bool {
 	return true
 }
 
-func (v *Vector[T]) Filter(filter c.Predicate[T]) c.Pipe[T, []T, c.Iterator[T]] {
+func (v *Vector[T]) Filter(filter c.Predicate[T]) c.Pipe[T, []T] {
 	return it.NewPipe[T](it.Filter(v.Head(), filter))
 }
 
-func (v *Vector[T]) Map(by c.Converter[T, T]) c.Pipe[T, []T, c.Iterator[T]] {
+func (v *Vector[T]) Map(by c.Converter[T, T]) c.Pipe[T, []T] {
 	return it.NewPipe[T](it.Map(v.Head(), by))
 }
 

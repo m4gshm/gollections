@@ -14,12 +14,13 @@ func NewVector[T any](elements []T) *Vector[T] {
 }
 
 func WrapVector[T any](elements []T) *Vector[T] {
-	return &Vector[T]{elements: elements}
+	return &Vector[T]{elements: elements, esize: it.GetTypeSize[T]()}
 }
 
 //Vector stores ordered elements, provides index access.
 type Vector[T any] struct {
 	elements []T
+	esize    uintptr
 }
 
 var (
@@ -32,11 +33,11 @@ func (v *Vector[T]) Begin() c.Iterator[T] {
 }
 
 func (v *Vector[T]) Head() *it.Iter[T] {
-	return it.NewHead(v.elements)
+	return it.NewHeadS(v.elements, v.esize)
 }
 
 func (v *Vector[T]) Tail() *it.Iter[T] {
-	return it.NewTail(v.elements)
+	return it.NewTailS(v.elements, v.esize)
 }
 
 func (v *Vector[T]) Collect() []T {
@@ -45,6 +46,10 @@ func (v *Vector[T]) Collect() []T {
 
 func (v *Vector[T]) Len() int {
 	return it.GetLen(v.elements)
+}
+
+func (v *Vector[T]) IsEmpty() bool {
+	return v.Len() == 0
 }
 
 func (v *Vector[T]) Get(index int) (T, bool) {
@@ -67,11 +72,11 @@ func (v *Vector[T]) ForEach(walker func(T)) {
 	slice.ForEach(v.elements, walker)
 }
 
-func (v *Vector[T]) Filter(filter c.Predicate[T]) c.Pipe[T, []T, c.Iterator[T]] {
+func (v *Vector[T]) Filter(filter c.Predicate[T]) c.Pipe[T, []T] {
 	return it.NewPipe[T](it.Filter(v.Head(), filter))
 }
 
-func (v *Vector[T]) Map(by c.Converter[T, T]) c.Pipe[T, []T, c.Iterator[T]] {
+func (v *Vector[T]) Map(by c.Converter[T, T]) c.Pipe[T, []T] {
 	return it.NewPipe[T](it.Map(v.Head(), by))
 }
 

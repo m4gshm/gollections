@@ -6,6 +6,7 @@ import (
 	"github.com/m4gshm/gollections/it"
 	"github.com/m4gshm/gollections/mutable/vector"
 	"github.com/m4gshm/gollections/slice"
+	"github.com/m4gshm/gollections/slice/range_"
 	"github.com/m4gshm/gollections/sum"
 	"github.com/m4gshm/gollections/walk/group"
 
@@ -67,6 +68,27 @@ type user struct {
 
 func (u *user) Name() string { return u.name }
 func (u *user) Age() int     { return u.age }
+
+func Test_Vector_AddAndDelete(t *testing.T) {
+	vec := vector.New[int](0)
+	added := vec.AddAll(range_.Of(0, 1000))
+	assert.Equal(t, added, true)
+	deleted := false
+	for i := vec.Head(); i.HasNext(); {
+		deleted = i.Delete()
+	}
+	assert.Equal(t, added, true)
+	assert.Equal(t, deleted, true)
+	assert.True(t, vec.IsEmpty())
+
+	added = vec.AddAll(range_.Of(0, 10000))
+	for i := vec.Tail(); i.HasPrev(); {
+		deleted = i.Delete()
+	}
+	assert.Equal(t, added, true)
+	assert.Equal(t, deleted, true)
+	assert.True(t, vec.IsEmpty())
+}
 
 func Test_Vector_Add(t *testing.T) {
 	vec := vector.New[int](0)
