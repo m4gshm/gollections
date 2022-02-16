@@ -166,7 +166,7 @@ func ForEachOrderedValues[M map[K]V, K comparable, V any](elements []K, uniques 
 
 //ToStringOrdered converts elements to the string representation according to the order.
 func ToStringOrdered[K comparable, V any](order []K, elements map[K]V) string {
-	return ToStringOrderedf(order, elements, "%+V:%+V", " ")
+	return ToStringOrderedf(order, elements, "%+v:%+v", " ")
 }
 
 //ToStringOrderedf converts elements to a string representation using a key/value pair format and a delimeter. In order.
