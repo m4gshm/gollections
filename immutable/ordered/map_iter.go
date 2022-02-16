@@ -5,19 +5,21 @@ import (
 	"github.com/m4gshm/gollections/it/impl/it"
 )
 
-func NewValIter[k comparable, v any](elements []k, uniques map[k]v) *ValIter[k, v] {
-	return &ValIter[k, v]{elements: elements, uniques: uniques}
+//NewValIter is default ValIter constructor.
+func NewValIter[K comparable, V any](elements []K, uniques map[K]V) *ValIter[K, V] {
+	return &ValIter[K, V]{elements: elements, uniques: uniques}
 }
 
-type ValIter[k comparable, v any] struct {
-	elements []k
-	uniques  map[k]v
+//ValIter is the Iteratoc over Map values.
+type ValIter[K comparable, V any] struct {
+	elements []K
+	uniques  map[K]V
 	current  int
 }
 
 var _ c.Iterator[any] = (*ValIter[int, any])(nil)
 
-func (s *ValIter[k, v]) HasNext() bool {
+func (s *ValIter[K, V]) HasNext() bool {
 	if it.HasNext(s.elements, s.current) {
 		s.current++
 		return true
@@ -25,6 +27,6 @@ func (s *ValIter[k, v]) HasNext() bool {
 	return false
 }
 
-func (s *ValIter[k, v]) Get() v {
+func (s *ValIter[K, V]) Get() V {
 	return s.uniques[it.Get(s.elements, s.current)]
 }

@@ -5,11 +5,11 @@ import (
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/it/impl/it"
-	"github.com/m4gshm/gollections/mutable"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
 )
 
+//ToSet converts an elements slice to the set containing them.
 func ToSet[T comparable](elements []T) *Set[T] {
 	var (
 		l       = len(elements)
@@ -27,31 +27,34 @@ func ToSet[T comparable](elements []T) *Set[T] {
 	return WrapSet(order, uniques)
 }
 
+//NewSet creates a set with a predefined capacity.
 func NewSet[T comparable](capacity int) *Set[T] {
 	return WrapSet(make([]T, 0, capacity), make(map[T]int, capacity))
 }
 
+//WrapSet creates a set using a map and an order slice as the internal storage.
 func WrapSet[T comparable](elements []T, uniques map[T]int) *Set[T] {
 	return &Set[T]{elements: elements, uniques: uniques}
 }
 
+//Set is the Collection implementation that provides element uniqueness and access order. Elements must be comparable.
 type Set[T comparable] struct {
 	elements []T
 	uniques  map[T]int
 }
 
 var (
-	_ mutable.Addable[int]    = (*Set[int])(nil)
-	_ mutable.Deleteable[int] = (*Set[int])(nil)
-	_ c.Set[int]              = (*Set[int])(nil)
-	_ fmt.Stringer            = (*Set[int])(nil)
+	_ c.Addable[int]    = (*Set[int])(nil)
+	_ c.Deleteable[int] = (*Set[int])(nil)
+	_ c.Set[int]        = (*Set[int])(nil)
+	_ fmt.Stringer      = (*Set[int])(nil)
 )
 
 func (s *Set[T]) Begin() c.Iterator[T] {
 	return s.Head()
 }
 
-func (s *Set[T]) BeginEdit() mutable.Iterator[T] {
+func (s *Set[T]) BeginEdit() c.DelIterator[T] {
 	return s.Head()
 }
 

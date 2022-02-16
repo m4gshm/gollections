@@ -9,12 +9,13 @@ import (
 	"golang.org/x/exp/constraints"
 
 	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/it/impl/it"
 )
 
-//Of transforms elements to the slice of them
-func Of[T any](elements ...T) []T {
-	return elements
-}
+var ErrBreak = it.ErrBreak
+
+//Of is generic sclie constructor
+func Of[T any](elements ...T) []T { return elements }
 
 //Copy makes the new slice with copied elements.
 func Copy[T any](elements []T) []T {
@@ -83,7 +84,7 @@ func Sort[T any](elements []T, less func(e1, e2 T) bool) []T {
 	return elements
 }
 
-//SortsByOrdered sorts elements by a converter that thransforms a element to an Ordered (int, string and so on)
+//SortByOrdered sorts elements by a converter that thransforms a element to an Ordered (int, string and so on).
 func SortByOrdered[O any, o constraints.Ordered](elements []O, by c.Converter[O, o]) []O {
 	return Sort(elements, func(e1, e2 O) bool { return by(e1) < by(e2) })
 }
@@ -105,34 +106,38 @@ func Get[T any](elements []T, index int) (T, bool) {
 	return no, false
 }
 
-//Track applies tracker to elements with error checking
+//Track applies tracker to elements with error checking. To stop traking just return the ErrBreak.
 func Track[T any](elements []T, tracker func(int, T) error) error {
 	for i, e := range elements {
-		if err := tracker(i, e); err != nil {
+		if err := tracker(i, e); err != ErrBreak {
+			return nil
+		} else if err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-//TrackEach applies tracker to elements without error checking
+//TrackEach applies tracker to elements without error checking.
 func TrackEach[T any](elements []T, tracker func(int, T)) {
 	for i, e := range elements {
 		tracker(i, e)
 	}
 }
 
-//For applies walker to elements with error checking
+//For applies a walker to elements of an slice. To stop walking just return the ErrBreak.
 func For[T any](elements []T, walker func(T) error) error {
 	for _, e := range elements {
-		if err := walker(e); err != nil {
+		if err := walker(e); err != ErrBreak {
+			return nil
+		} else if err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-//ForEach applies walker to elements without error checking
+//ForEach applies walker to elements without error checking.
 func ForEach[T any](elements []T, walker func(T)) {
 	for _, e := range elements {
 		walker(e)

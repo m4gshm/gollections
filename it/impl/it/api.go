@@ -1,11 +1,16 @@
 package it
 
 import (
+	"errors"
+
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/collect"
 	"github.com/m4gshm/gollections/op"
 )
+
+//ErrBreak is For, Track breaker
+var ErrBreak = errors.New("Break")
 
 //Map creates the Iterator that converts elements with a converter and returns them.
 func Map[From, To any, IT c.Iterator[From]](elements IT, by c.Converter[From, To]) *Convert[From, To, IT, c.Converter[From, To]] {
@@ -38,8 +43,8 @@ func NotNil[T any, IT c.Iterator[*T]](elements IT) *Fit[*T, IT] {
 }
 
 //MapKV creates the Iterator that converts elements with a converter and returns them.
-func MapKV[k, v any, IT c.KVIterator[k, v], k2, v2 any](elements IT, by c.BiConverter[k, v, k2, v2]) *ConvertKV[k, v, IT, k2, v2, c.BiConverter[k, v, k2, v2]] {
-	return &ConvertKV[k, v, IT, k2, v2, c.BiConverter[k, v, k2, v2]]{Iter: elements, By: by}
+func MapKV[K, V any, IT c.KVIterator[K, V], k2, v2 any](elements IT, by c.BiConverter[K, V, k2, v2]) *ConvertKV[K, V, IT, k2, v2, c.BiConverter[K, V, k2, v2]] {
+	return &ConvertKV[K, V, IT, k2, v2, c.BiConverter[K, V, k2, v2]]{Iter: elements, By: by}
 }
 
 //FilterKV creates the Iterator that checks elements by filters and returns successful ones.
@@ -52,28 +57,30 @@ func Group[T any, K comparable, IT c.Iterator[T]](elements IT, by c.Converter[T,
 	return NewKVPipe(NewKeyValuer(elements, by), collect.Groups[K, T])
 }
 
-//For applies func on elements.
-func For[T any, IT c.Iterator[T]](elements IT, apply func(T) error) error {
+//For applies a walker to elements of an Iterator. To stop walking just return the ErrBreak.
+func For[T any, IT c.Iterator[T]](elements IT, walker func(T) error) error {
 	for elements.HasNext() {
-		err := apply(elements.Get())
-		if err != nil {
+		if err := walker(elements.Get()); err == ErrBreak {
+			return nil
+		} else if err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-//ForEach applies func on elements.
-func ForEach[T any, IT c.Iterator[T]](elements IT, apply func(T)) {
+//ForEach applies a walker to elements of an Iterator.
+func ForEach[T any, IT c.Iterator[T]](elements IT, walker func(T)) {
 	for elements.HasNext() {
-		apply(elements.Get())
+		walker(elements.Get())
 	}
 }
 
-func ForEachFit[T any, IT c.Iterator[T]](elements IT, apply func(T), fit c.Predicate[T]) {
+//ForEachFit applies a walker to elements that satisfy a predicate condition.
+func ForEachFit[T any, IT c.Iterator[T]](elements IT, walker func(T), fit c.Predicate[T]) {
 	for elements.HasNext() {
-		if v := elements.Get(); fit(v) {
-			apply(v)
+		if V := elements.Get(); fit(V) {
+			walker(V)
 		}
 	}
 }
@@ -82,20 +89,21 @@ func ForEachFit[T any, IT c.Iterator[T]](elements IT, apply func(T), fit c.Predi
 func Reduce[T any, IT c.Iterator[T]](elements IT, by op.Binary[T]) T {
 	var result T
 	for elements.HasNext() {
-		result = by(result, Next[T](elements))
+		result = by(result, elements.Get())
 	}
 	return result
 }
 
-func ReduceKV[k, v any, IT c.KVIterator[k, v]](elements IT, by op.Quaternary[k, v]) (k, v) {
+//ReduceKV reduces key/values elements to an one.
+func ReduceKV[K, V any, IT c.KVIterator[K, V]](elements IT, by op.Quaternary[K, V]) (K, V) {
 	if !elements.HasNext() {
-		var key k
-		var val v
+		var key K
+		var val V
 		return key, val
 	}
-	key, val := NextKV[k, v](elements)
+	key, val := elements.Get()
 	for elements.HasNext() {
-		key2, val2 := NextKV[k, v](elements)
+		key2, val2 := elements.Get()
 		key, val = by(key, val, key2, val2)
 	}
 	return key, val
@@ -105,16 +113,7 @@ func ReduceKV[k, v any, IT c.KVIterator[k, v]](elements IT, by op.Quaternary[k, 
 func Slice[T any, IT c.Iterator[T]](elements IT) []T {
 	s := make([]T, 0)
 	for elements.HasNext() {
-		s = append(s, Next[T](elements))
+		s = append(s, elements.Get())
 	}
 	return s
-}
-
-func Next[T any, IT c.Iterator[T]](elements IT) T {
-	return elements.Get()
-
-}
-
-func NextKV[k, v any, IT c.KVIterator[k, v]](elements IT) (k, v) {
-	return elements.Get()
 }

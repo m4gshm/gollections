@@ -6,61 +6,60 @@ import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/map_"
+	"github.com/m4gshm/gollections/mutable/ordered"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
 )
 
+//NewSet creates a set with a predefined capacity.
 func NewSet[T comparable](capacity int) *Set[T] {
 	return WrapSet(make(map[T]struct{}, capacity))
 }
 
+//ToSet converts an elements slice to the set containing them.
 func ToSet[T comparable](elements []T) *Set[T] {
-	uniques := make(map[T]struct{}, len(elements))
+	internal := make(map[T]struct{}, len(elements))
 	for _, v := range elements {
-		uniques[v] = struct{}{}
+		internal[v] = struct{}{}
 	}
-	return WrapSet(uniques)
+	return WrapSet(internal)
 }
 
-func WrapSet[K comparable](uniques map[K]struct{}) *Set[K] {
-	return &Set[K]{uniques: uniques}
+//WrapSet creates a set using a map as the internal storage.
+func WrapSet[K comparable](elements map[K]struct{}) *Set[K] {
+	return &Set[K]{elements: elements}
 }
 
-//Set provides uniqueness (does't insert duplicated values).
+//Set is the Collection implementation that provides element uniqueness. The elements must be comparable.
 type Set[K comparable] struct {
-	uniques map[K]struct{}
+	elements map[K]struct{}
 }
 
 var (
-	_ Addable[int]    = (*Set[int])(nil)
-	_ Deleteable[int] = (*Set[int])(nil)
-	_ c.Set[int]      = (*Set[int])(nil)
-	_ fmt.Stringer    = (*Set[int])(nil)
+	_ c.Addable[int]    = (*Set[int])(nil)
+	_ c.Deleteable[int] = (*Set[int])(nil)
+	_ c.Set[int]        = (*Set[int])(nil)
+	_ fmt.Stringer      = (*Set[int])(nil)
 )
 
 func (s *Set[K]) Begin() c.Iterator[K] {
 	return s.Head()
 }
 
-func (s *Set[K]) BeginEdit() Iterator[K] {
+func (s *Set[K]) BeginEdit() c.DelIterator[K] {
 	return s.Head()
 }
 
 func (s *Set[K]) Head() *SetIter[K] {
-	return NewSetIter(s.uniques, s.DeleteOne)
+	return NewSetIter(s.elements, s.DeleteOne)
 }
 
 func (s *Set[K]) Collect() []K {
-	uniques := s.uniques
-	out := make([]K, 0, len(uniques))
-	for e := range uniques {
-		out = append(out, e)
-	}
-	return out
+	return map_.Keys(s.elements)
 }
 
 func (s *Set[T]) Copy() *Set[T] {
-	return WrapSet(map_.Copy(s.uniques))
+	return WrapSet(map_.Copy(s.elements))
 }
 
 func (s *Set[T]) IsEmpty() bool {
@@ -68,11 +67,11 @@ func (s *Set[T]) IsEmpty() bool {
 }
 
 func (s *Set[K]) Len() int {
-	return len(s.uniques)
+	return len(s.elements)
 }
 
 func (s *Set[K]) Contains(val K) bool {
-	_, ok := s.uniques[val]
+	_, ok := s.elements[val]
 	return ok
 }
 
@@ -81,11 +80,10 @@ func (s *Set[K]) Add(elements ...K) bool {
 }
 
 func (s *Set[K]) AddAll(elements []K) bool {
-	uniques := s.uniques
 	added := false
 	for _, element := range elements {
-		if _, ok := uniques[element]; !ok {
-			uniques[element] = struct{}{}
+		if _, ok := s.elements[element]; !ok {
+			s.elements[element] = struct{}{}
 			added = true
 		}
 	}
@@ -93,40 +91,37 @@ func (s *Set[K]) AddAll(elements []K) bool {
 }
 
 func (s *Set[K]) AddOne(element K) bool {
-	uniques := s.uniques
-	if _, ok := uniques[element]; ok {
+	if _, ok := s.elements[element]; ok {
 		return false
 	}
-	uniques[element] = struct{}{}
+	s.elements[element] = struct{}{}
 	return true
 }
 
 func (s *Set[K]) Delete(elements ...K) bool {
-	uniques := s.uniques
 	for _, element := range elements {
-		if _, ok := uniques[element]; !ok {
+		if _, ok := s.elements[element]; !ok {
 			return false
 		}
-		delete(uniques, element)
+		delete(s.elements, element)
 	}
 	return true
 }
 
 func (s *Set[K]) DeleteOne(element K) bool {
-	uniques := s.uniques
-	if _, ok := uniques[element]; !ok {
+	if _, ok := s.elements[element]; !ok {
 		return false
 	}
-	delete(uniques, element)
+	delete(s.elements, element)
 	return true
 }
 
 func (s *Set[K]) For(walker func(K) error) error {
-	return map_.ForKeys(s.uniques, walker)
+	return map_.ForKeys(s.elements, walker)
 }
 
 func (s *Set[K]) ForEach(walker func(K)) {
-	map_.ForEachKey(s.uniques, walker)
+	map_.ForEachKey(s.elements, walker)
 }
 
 func (s *Set[K]) Filter(filter c.Predicate[K]) c.Pipe[K, []K] {
@@ -139,6 +134,11 @@ func (s *Set[K]) Map(by c.Converter[K, K]) c.Pipe[K, []K] {
 
 func (s *Set[K]) Reduce(by op.Binary[K]) K {
 	return it.Reduce(s.Head(), by)
+}
+
+//Sort transforms to the ordered Set contains sorted elements.
+func (s *Set[T]) Sort(less func(e1, e2 T) bool) *ordered.Set[T] {
+	return ordered.ToSet(slice.Sort(s.Collect(), less))
 }
 
 func (s *Set[K]) String() string {

@@ -4,18 +4,20 @@ import (
 	"sync"
 
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/mutable"
 )
 
+//Map is typed wrapper of sync.Map
 type Map[k comparable, v any] struct {
 	m sync.Map
 }
 
-var _ mutable.Settable[int, any] = (*Map[int, any])(nil)
-var _ mutable.Deleteable[int] = (*Map[int, any])(nil)
-var _ mutable.Removable[int, any] = (*Map[int, any])(nil)
-var _ c.TrackEach[any, int] = (*Map[int, any])(nil)
-var _ c.Access[int, any] = (*Map[int, any])(nil)
+var (
+	_ c.Settable[int, any]  = (*Map[int, any])(nil)
+	_ c.Deleteable[int]     = (*Map[int, any])(nil)
+	_ c.Removable[int, any] = (*Map[int, any])(nil)
+	_ c.TrackEach[any, int] = (*Map[int, any])(nil)
+	_ c.Access[int, any]    = (*Map[int, any])(nil)
+)
 
 func (m *Map[k, v]) TrackEach(traker func(key k, value v)) {
 	m.m.Range(func(key, value any) bool {

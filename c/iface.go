@@ -2,7 +2,6 @@
 package c
 
 import (
-	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/op"
 )
 
@@ -28,7 +27,7 @@ type Collection[T any, Collection any, IT Iter] interface {
 	IsEmpty() bool
 }
 
-//Vector is the interface of a container stores ordered elements, provides index access.
+//Vector - collection interface that provides elements order and access by index to the elements.
 type Vector[T any] interface {
 	Collection[T, []T, Iterator[T]]
 	Track[T, int]
@@ -37,16 +36,16 @@ type Vector[T any] interface {
 	Transformable[T, []T]
 }
 
-//Set is the interface of a container provides uniqueness (does't insert duplicated values).
+//Set - collection interface that ensures the uniqueness of elements (does not insert duplicate values).
 type Set[T any] interface {
 	Collection[T, []T, Iterator[T]]
 	Transformable[T, []T]
 	Checkable[T]
 }
 
-//Map is the interface of a container provides access to elements by key.
+//Map - collection interface that stores key/value pairs and provide access to an element by its key.
 type Map[K comparable, V any] interface {
-	Collection[*map_.KV[K, V], map[K]V, KVIterator[K, V]]
+	Collection[*KV[K, V], map[K]V, KVIterator[K, V]]
 	Track[V, K]
 	TrackEach[V, K]
 	Checkable[K]
@@ -62,7 +61,7 @@ type Iter interface {
 	HasNext() bool
 }
 
-//Iterator is the interface provides iterate over elements of a collection.
+//Iterator is the interface that provides iterate over elements of a collection.
 type Iterator[T any] interface {
 	Iter
 	//retrieves next element or zero value if no more elements
@@ -70,7 +69,7 @@ type Iterator[T any] interface {
 	Get() T
 }
 
-//KVIterator is the interface provides iterate over all key/value pair of a map.
+//KVIterator is the interface that provides iterate over all key/value pair of a map.
 type KVIterator[K, V any] interface {
 	Iter
 	//retrieves next elements or zero values if no more elements
@@ -83,27 +82,27 @@ type Iterable[IT Iter] interface {
 	Begin() IT
 }
 
-//Walk touches elements of the collection.
+//Walk is the interface of a collection that provides traversing of the elements.
 type Walk[IT any] interface {
 	For(func(element IT) error) error
 }
 
-//WalkEach touches all elements of the collection without error checking
+//WalkEach is the interface of a collection that provides traversing of the elements without error checking.
 type WalkEach[T any] interface {
 	ForEach(func(element T))
 }
 
-//Track traverses container elements with position tracking (index, key, coordinates, etc.)
+//Track is the interface of a collection that provides traversing of the elements with position tracking (index, key, coordinates, etc.).
 type Track[T any, P any] interface {
 	Track(func(position P, element T) error) error
 }
 
-//TrackEach traverses container elements with position tracking (index, key, coordinates, etc.) without error checking
+//TrackEach is the interface of a collection that provides traversing of the elements with position tracking (index, key, coordinates, etc.) without error checking
 type TrackEach[T any, P any] interface {
 	TrackEach(func(position P, element T))
 }
 
-//Checkable container with ability to check if an element is present.
+//Checkable is container with ability to check if an element is present.
 type Checkable[T any] interface {
 	Contains(T) bool
 }
@@ -149,4 +148,30 @@ type MapPipe[K comparable, V any, Map any] interface {
 // 		V - any arbitrary type of the value
 type Access[P any, V any] interface {
 	Get(P) (V, bool)
+}
+
+//Addable is the interface that provides appending the collection by elements.
+type Addable[T any] interface {
+	Add(...T) bool
+}
+
+//Settable is the interface that provides replacing an element by its pointer (index or key).
+type Settable[P any, V any] interface {
+	Set(key P, value V) bool
+}
+
+//Deleteable is the interface that provides removing any elements from the collection.
+type Deleteable[k any] interface {
+	Delete(...k) bool
+}
+
+//Removable is the interface that provides removing an element by its pointer (index or key).
+type Removable[P any, V any] interface {
+	Remove(P) (V, bool)
+}
+
+//DelIterator is the Iterator provides deleting of current element.
+type DelIterator[T any] interface {
+	Iterator[T]
+	Delete() bool
 }

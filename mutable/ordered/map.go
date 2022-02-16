@@ -8,56 +8,45 @@ import (
 	"github.com/m4gshm/gollections/immutable/ordered"
 	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/map_"
-	"github.com/m4gshm/gollections/mutable"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
 )
 
-func AsMap[K comparable, V any](elements []*map_.KV[K, V]) *Map[K, V] {
+//AsMap converts a slice of key/value pairs to teh Map.
+func AsMap[K comparable, V any](elements []*c.KV[K, V]) *Map[K, V] {
 	var (
-		l           = len(elements)
-		uniques     = make(map[K]V, l)
-		orderedKeys = make([]K, 0, l)
+		l       = len(elements)
+		uniques = make(map[K]V, l)
+		order   = make([]K, 0, l)
 	)
 	for _, kv := range elements {
 		key := kv.Key()
 		val := kv.Value()
 		if _, ok := uniques[key]; !ok {
-			orderedKeys = append(orderedKeys, key)
+			order = append(order, key)
 			uniques[key] = val
 		}
 	}
-	return WrapMap(orderedKeys, uniques)
+	return WrapMap(order, uniques)
 }
 
-func ToMap[K comparable, V any](elements map[K]V) *Map[K, V] {
-	var (
-		uniques     = make(map[K]V, len(elements))
-		orderedKeys = make([]K, len(elements))
-	)
-	for key, val := range elements {
-		orderedKeys = append(orderedKeys, key)
-		uniques[key] = val
-	}
-	return WrapMap(orderedKeys, uniques)
+//WrapMap creates the ordered Map using a map and an order slice as internal storage.
+func WrapMap[K comparable, V any](order []K, elements map[K]V) *Map[K, V] {
+	return &Map[K, V]{order: order, elements: elements, ksize: it.GetTypeSize[K]()}
 }
 
-func WrapMap[K comparable, V any](orderedKeys []K, uniques map[K]V) *Map[K, V] {
-	return &Map[K, V]{keys: orderedKeys, uniques: uniques, ksize: it.GetTypeSize[K]()}
-}
-
-//Map provides access to elements by key.
+//Map is the Collection implementation that provides element access by an unique key..
 type Map[K comparable, V any] struct {
-	keys       []K
-	uniques    map[K]V
+	order      []K
+	elements   map[K]V
 	changeMark int32
 	ksize      uintptr
 }
 
 var (
-	_ mutable.Settable[int, any] = (*Map[int, any])(nil)
-	_ c.Map[int, any]            = (*Map[int, any])(nil)
-	_ fmt.Stringer               = (*Map[int, any])(nil)
+	// _ mutable.Settable[int, any] = (*Map[int, any])(nil)
+	_ c.Map[int, any] = (*Map[int, any])(nil)
+	_ fmt.Stringer    = (*Map[int, any])(nil)
 )
 
 func (s *Map[K, V]) Begin() c.KVIterator[K, V] {
@@ -65,15 +54,15 @@ func (s *Map[K, V]) Begin() c.KVIterator[K, V] {
 }
 
 func (s *Map[K, V]) Head() *it.OrderedKV[K, V] {
-	return it.NewOrderedKV(s.uniques, it.NewHeadS(s.keys, s.ksize))
+	return it.NewOrderedKV(s.elements, it.NewHeadS(s.order, s.ksize))
 }
 
 func (s *Map[K, V]) Tail() *it.OrderedKV[K, V] {
-	return it.NewOrderedKV(s.uniques, it.NewTailS(s.keys, s.ksize))
+	return it.NewOrderedKV(s.elements, it.NewTailS(s.order, s.ksize))
 }
 
 func (s *Map[K, V]) Collect() map[K]V {
-	e := s.uniques
+	e := s.elements
 	out := make(map[K]V, len(e))
 	for key, val := range e {
 		out[key] = val
@@ -82,50 +71,50 @@ func (s *Map[K, V]) Collect() map[K]V {
 }
 
 func (s *Map[K, V]) Sort(less func(k1, k2 K) bool) *Map[K, V] {
-	s.keys = slice.SortCopy(s.keys, less)
+	s.order = slice.SortCopy(s.order, less)
 	return s
 }
 
 func (s *Map[K, V]) Len() int {
-	return len(s.keys)
+	return len(s.order)
 }
 
 func (s *Map[K, V]) IsEmpty() bool {
 	return s.Len() == 0
 }
 
-func (s *Map[K, V]) For(walker func(*map_.KV[K, V]) error) error {
-	return map_.ForOrdered(s.keys, s.uniques, walker)
+func (s *Map[K, V]) For(walker func(*c.KV[K, V]) error) error {
+	return map_.ForOrdered(s.order, s.elements, walker)
 }
 
-func (s *Map[K, V]) ForEach(walker func(*map_.KV[K, V])) {
-	map_.ForEachOrdered(s.keys, s.uniques, walker)
+func (s *Map[K, V]) ForEach(walker func(*c.KV[K, V])) {
+	map_.ForEachOrdered(s.order, s.elements, walker)
 }
 
 func (s *Map[K, V]) Track(tracker func(K, V) error) error {
-	return map_.TrackOrdered(s.keys, s.uniques, tracker)
+	return map_.TrackOrdered(s.order, s.elements, tracker)
 }
 
 func (s *Map[K, V]) TrackEach(tracker func(K, V)) {
-	map_.TrackEachOrdered(s.keys, s.uniques, tracker)
+	map_.TrackEachOrdered(s.order, s.elements, tracker)
 }
 
 func (s *Map[K, V]) Contains(key K) bool {
-	_, ok := s.uniques[key]
+	_, ok := s.elements[key]
 	return ok
 }
 
 func (s *Map[K, V]) Get(key K) (V, bool) {
-	val, ok := s.uniques[key]
+	val, ok := s.elements[key]
 	return val, ok
 }
 
 func (s *Map[K, V]) Set(key K, value V) bool {
-	u := s.uniques
+	u := s.elements
 	if _, ok := u[key]; !ok {
-		e := s.keys
+		e := s.order
 		u[key] = value
-		s.keys = append(e, key)
+		s.order = append(e, key)
 		return true
 	}
 	return false
@@ -136,7 +125,7 @@ func (s *Map[K, V]) Keys() c.Collection[K, []K, c.Iterator[K]] {
 }
 
 func (s *Map[K, V]) K() *ordered.MapKeys[K] {
-	return ordered.WrapKeys(s.keys)
+	return ordered.WrapKeys(s.order)
 }
 
 func (s *Map[K, V]) Values() c.Collection[V, []V, c.Iterator[V]] {
@@ -144,11 +133,11 @@ func (s *Map[K, V]) Values() c.Collection[V, []V, c.Iterator[V]] {
 }
 
 func (s *Map[K, V]) V() *ordered.MapValues[K, V] {
-	return ordered.WrapVal(s.keys, s.uniques)
+	return ordered.WrapVal(s.order, s.elements)
 }
 
 func (s *Map[K, V]) String() string {
-	return map_.ToStringOrdered(s.keys, s.uniques)
+	return map_.ToStringOrdered(s.order, s.elements)
 }
 
 func (s *Map[K, V]) FilterKey(fit c.Predicate[K]) c.MapPipe[K, V, map[K]V] {

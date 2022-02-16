@@ -205,21 +205,8 @@ func Benchmark_ForEach_Immutable_Vector(b *testing.B) {
 	}
 }
 
-func Benchmark_ForRange_of_Collect_Immutable_Vector_Values(b *testing.B) {
-	c := vector.Of(values...)
-	for _, casee := range cases {
-		b.Run(casee.name, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
-				for _, v := range c.Collect() {
-					casee.load(v)
-				}
-			}
-		})
-	}
-}
-
 func Benchmark_ForRange_of_Collect_Immutable_Vector_Impl_Values(b *testing.B) {
-	c := vector.New(values)
+	c := vector.Of(values...)
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
@@ -301,19 +288,8 @@ func Benchmark_ForRange_of_Collect_Immutable_OrdererSet_Impl_Values(b *testing.B
 	}
 }
 
-func Benchmark_ForEach_Mutable_OrdererSet(b *testing.B) {
-	c := moset.Convert(values)
-	for _, casee := range cases {
-		b.Run(casee.name, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
-				c.ForEach(func(v int) { casee.load(v) })
-			}
-		})
-	}
-}
-
 func Benchmark_ForEach_Mutable_OrdererSet_Impl(b *testing.B) {
-	c := moset.Convert(values)
+	c := moset.Of(values...)
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {

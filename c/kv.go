@@ -1,4 +1,4 @@
-package map_
+package c
 
 //NewKV creates a key/value pair holder.
 func NewKV[K any, V any](key K, value V) *KV[K, V] {

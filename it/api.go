@@ -7,14 +7,12 @@ import (
 	"github.com/m4gshm/gollections/op"
 )
 
-const NoStarted = impl.NoStarted
-
-//Of - the Iterator constructor.
+//Of creates the Iterator of predefined elements.
 func Of[T any](elements ...T) c.Iterator[T] {
 	return impl.NewHead(elements)
 }
 
-//Wrap the same as 'Of' but for a slice.
+//Wrap creates the Iterator using sclie as the elements source.
 func Wrap[T any](elements []T) c.Iterator[T] {
 	return impl.NewHead(elements)
 }
@@ -36,12 +34,12 @@ func Flatt[From, To any](elements c.Iterator[From], by c.Flatter[From, To]) c.It
 
 //FlattFit additionally filters 'From' elements.
 func FlattFit[From, To any](elements c.Iterator[From], fit c.Predicate[From], flatt c.Flatter[From, To]) c.Iterator[To] {
-	return impl.FlattFit(elements, fit, flatt)
+	return impl.FlattFit[From, To](elements, fit, flatt)
 }
 
 //Filter creates the Iterator that checks elements by a filter and returns successful ones.
 func Filter[T any](elements c.Iterator[T], filter c.Predicate[T]) c.Iterator[T] {
-	return impl.Filter(elements, filter)
+	return impl.Filter[T](elements, filter)
 }
 
 //NotNil creates the Iterator that filters nullable elements.
@@ -54,6 +52,7 @@ func Reduce[T any](elements c.Iterator[T], by op.Binary[T]) T {
 	return impl.Reduce(elements, by)
 }
 
+//ReduceKV reduces key/value elements to an one.
 func ReduceKV[k, v any](elements c.KVIterator[k, v], by op.Quaternary[k, v]) (k, v) {
 	return impl.ReduceKV(elements, by)
 }
@@ -65,14 +64,15 @@ func Slice[T any](elements c.Iterator[T]) []T {
 
 //Group transforms iterable elements to the MapPipe based on applying key extractor to the elements
 func Group[T any, K comparable](elements c.Iterator[T], by c.Converter[T, K]) c.MapPipe[K, T, map[K][]T] {
-	return impl.Group(elements, by)
+	return impl.Group[T, K](elements, by)
 }
 
-//ForEach applies func on elements.
-func ForEach[T any](elements c.Iterator[T], apply func(T)) {
-	impl.ForEach(elements, apply)
+//ForEach applies a walker to elements of an Iterator.
+func ForEach[T any](elements c.Iterator[T], walker func(T)) {
+	impl.ForEach(elements, walker)
 }
 
-func ForEachFit[T any](elements c.Iterator[T], apply func(T), fit c.Predicate[T]) {
-	impl.ForEachFit(elements, apply, fit)
+//ForEachFit applies a walker to elements that satisfy a predicate condition.
+func ForEachFit[T any](elements c.Iterator[T], walker func(T), fit c.Predicate[T]) {
+	impl.ForEachFit(elements, walker, fit)
 }

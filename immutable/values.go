@@ -11,27 +11,31 @@ import (
 	"github.com/m4gshm/gollections/slice"
 )
 
-func WrapVal[K comparable, V any](uniques map[K]V) *MapValues[K, V] {
-	return &MapValues[K, V]{uniques}
+//WrapVal creates the MapValues using elements as internal storage.
+func WrapVal[K comparable, V any](elements map[K]V) *MapValues[K, V] {
+	return &MapValues[K, V]{elements}
 }
 
+//MapValues is the wrapper for Map's values.
 type MapValues[K comparable, V any] struct {
-	uniques map[K]V
+	elements map[K]V
 }
 
-var _ c.Collection[any, []any, c.Iterator[any]] = (*MapValues[int, any])(nil)
-var _ fmt.Stringer = (*MapValues[int, any])(nil)
+var (
+	_ c.Collection[any, []any, c.Iterator[any]] = (*MapValues[int, any])(nil)
+	_ fmt.Stringer                              = (*MapValues[int, any])(nil)
+)
 
 func (s *MapValues[K, V]) Begin() c.Iterator[V] {
 	return s.Head()
 }
 
 func (s *MapValues[K, V]) Head() *it.Val[K, V] {
-	return it.NewVal(s.uniques)
+	return it.NewVal(s.elements)
 }
 
 func (s *MapValues[K, V]) Len() int {
-	return len(s.uniques)
+	return len(s.elements)
 }
 
 func (s *MapValues[K, V]) IsEmpty() bool {
@@ -39,20 +43,19 @@ func (s *MapValues[K, V]) IsEmpty() bool {
 }
 
 func (s *MapValues[K, V]) Collect() []V {
-	uniques := s.uniques
-	elements := make([]V, 0, len(s.uniques))
-	for _, val := range uniques {
+	elements := make([]V, 0, len(s.elements))
+	for _, val := range s.elements {
 		elements = append(elements, val)
 	}
 	return elements
 }
 
 func (s *MapValues[K, V]) For(walker func(V) error) error {
-	return map_.ForValues(s.uniques, walker)
+	return map_.ForValues(s.elements, walker)
 }
 
 func (s *MapValues[K, V]) ForEach(walker func(V)) {
-	map_.ForEachValue(s.uniques, walker)
+	map_.ForEachValue(s.elements, walker)
 }
 
 func (s *MapValues[K, V]) Filter(filter c.Predicate[V]) c.Pipe[V, []V] {

@@ -9,15 +9,17 @@ import (
 	"github.com/m4gshm/gollections/slice"
 )
 
+//NewVector creates the Vector and copies elements to it.
 func NewVector[T any](elements []T) *Vector[T] {
 	return WrapVector(slice.Copy(elements))
 }
 
+//WrapVector creates the Vector using a slise as internal storage.
 func WrapVector[T any](elements []T) *Vector[T] {
 	return &Vector[T]{elements: elements, esize: it.GetTypeSize[T]()}
 }
 
-//Vector stores ordered elements, provides index access.
+//Vector is the Collection implementation that provides elements order and index access.
 type Vector[T any] struct {
 	elements []T
 	esize    uintptr

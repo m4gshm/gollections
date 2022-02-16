@@ -50,6 +50,8 @@ func (s *FlattenFit[From, To]) Get() To {
 	return s.current
 }
 
+//Flatten is the Iterator impelementation that converts an element to a slice.
+//For example, Flatten can be used to convert a multi-dimensional array to a one-dimensional array ([][]int -> []int).
 type Flatten[From, To any] struct {
 	Elements []From
 	Flatt    c.Flatter[From, To]

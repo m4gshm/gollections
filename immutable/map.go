@@ -13,8 +13,8 @@ import (
 	"github.com/m4gshm/gollections/slice"
 )
 
-//ConvertKVsToMap converts a slice of key/value pairs to the unordered Map of these pairs.
-func ConvertKVsToMap[K comparable, V any](elements []*map_.KV[K, V]) *Map[K, V] {
+//ConvertKVsToMap converts a slice of key/value pairs to the Map.
+func ConvertKVsToMap[K comparable, V any](elements []*c.KV[K, V]) *Map[K, V] {
 	uniques := make(map[K]V, len(elements))
 	for _, kv := range elements {
 		uniques[kv.Key()] = kv.Value()
@@ -22,7 +22,7 @@ func ConvertKVsToMap[K comparable, V any](elements []*map_.KV[K, V]) *Map[K, V] 
 	return WrapMap(uniques)
 }
 
-//NewMap converts an embedded map to the unordered Map.
+//NewMap creates the Map with values copied from an map.
 func NewMap[K comparable, V any](elements map[K]V) *Map[K, V] {
 	uniques := make(map[K]V, len(elements))
 	for key, val := range elements {
@@ -31,14 +31,14 @@ func NewMap[K comparable, V any](elements map[K]V) *Map[K, V] {
 	return WrapMap(uniques)
 }
 
-//WrapMap creates the unordered Map using an map as internal storage.
-func WrapMap[K comparable, V any](uniques map[K]V) *Map[K, V] {
-	return &Map[K, V]{uniques: uniques}
+//WrapMap creates the Map using a map as internal storage.
+func WrapMap[K comparable, V any](elements map[K]V) *Map[K, V] {
+	return &Map[K, V]{elements: elements}
 }
 
-//Map provides access to elements by a key.
+//Map is the Collection implementation that provides element access by an unique key.
 type Map[K comparable, V any] struct {
-	uniques map[K]V
+	elements map[K]V
 }
 
 var (
@@ -53,49 +53,48 @@ func (s *Map[K, V]) Begin() c.KVIterator[K, V] {
 
 //Head creates a key/value iterator implementation started from the head.
 func (s *Map[K, V]) Head() *it.KV[K, V] {
-	return it.NewKV(s.uniques)
+	return it.NewKV(s.elements)
 }
 
 //Collect exports the content as a map.
 func (s *Map[K, V]) Collect() map[K]V {
-	e := s.uniques
-	out := make(map[K]V, len(e))
-	for key, val := range e {
+	out := make(map[K]V, len(s.elements))
+	for key, val := range s.elements {
 		out[key] = val
 	}
 	return out
 }
 
-//Sort transforms to the ordered Map.
+//Sort transforms to the ordered Map contains sorted elements.
 func (s *Map[K, V]) Sort(less func(k1, k2 K) bool) *ordered.Map[K, V] {
-	return ordered.WrapMap(slice.Sort(s.Keys().Collect(), less), s.uniques)
+	return ordered.WrapMap(slice.Sort(map_.Keys(s.elements), less), s.elements)
 }
 
 //String is part of the Stringer interface for printing the string representation of this Map.
 func (s *Map[K, V]) String() string {
-	return m.ToString(s.uniques)
+	return m.ToString(s.elements)
 }
 
 //Track apply a tracker to touch key, value from the inside. To stop traking just return the m.Break.
 func (s *Map[K, V]) Track(tracker func(K, V) error) error {
-	return m.Track(s.uniques, tracker)
+	return m.Track(s.elements, tracker)
 }
 
 //Track apply a tracker to touch each key, value from the inside.
 func (s *Map[K, V]) TrackEach(tracker func(K, V)) {
-	m.TrackEach(s.uniques, tracker)
+	m.TrackEach(s.elements, tracker)
 }
 
-func (s *Map[K, V]) For(walker func(*map_.KV[K, V]) error) error {
-	return m.For(s.uniques, walker)
+func (s *Map[K, V]) For(walker func(*c.KV[K, V]) error) error {
+	return m.For(s.elements, walker)
 }
 
-func (s *Map[K, V]) ForEach(walker func(*map_.KV[K, V])) {
-	m.ForEach(s.uniques, walker)
+func (s *Map[K, V]) ForEach(walker func(*c.KV[K, V])) {
+	m.ForEach(s.elements, walker)
 }
 
 func (s *Map[K, V]) Len() int {
-	return len(s.uniques)
+	return len(s.elements)
 }
 
 func (s *Map[K, V]) IsEmpty() bool {
@@ -103,12 +102,12 @@ func (s *Map[K, V]) IsEmpty() bool {
 }
 
 func (s *Map[K, V]) Contains(key K) bool {
-	_, ok := s.uniques[key]
+	_, ok := s.elements[key]
 	return ok
 }
 
 func (s *Map[K, V]) Get(key K) (V, bool) {
-	val, ok := s.uniques[key]
+	val, ok := s.elements[key]
 	return val, ok
 }
 
@@ -117,7 +116,7 @@ func (s *Map[K, V]) Keys() c.Collection[K, []K, c.Iterator[K]] {
 }
 
 func (s *Map[K, V]) K() *MapKeys[K, V] {
-	return WrapKeys(s.uniques)
+	return WrapKeys(s.elements)
 }
 
 func (s *Map[K, V]) Values() c.Collection[V, []V, c.Iterator[V]] {
@@ -125,7 +124,7 @@ func (s *Map[K, V]) Values() c.Collection[V, []V, c.Iterator[V]] {
 }
 
 func (s *Map[K, V]) V() *MapValues[K, V] {
-	return WrapVal(s.uniques)
+	return WrapVal(s.elements)
 }
 
 func (s *Map[K, V]) FilterKey(fit c.Predicate[K]) c.MapPipe[K, V, map[K]V] {

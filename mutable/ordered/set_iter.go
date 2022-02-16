@@ -3,21 +3,24 @@ package ordered
 import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/it/impl/it"
-	"github.com/m4gshm/gollections/mutable"
 )
 
+//NewSetIter creates a set's iterator.
 func NewSetIter[T any](elements *[]T, del func(v T) bool) *SetIter[T] {
 	return &SetIter[T]{elements: elements, current: it.NoStarted, del: del}
 }
 
+//SetIter set iterator
 type SetIter[T any] struct {
 	elements *[]T
 	current  int
 	del      func(v T) bool
 }
 
-var _ c.Iterator[any] = (*SetIter[any])(nil)
-var _ mutable.Iterator[any] = (*SetIter[any])(nil)
+var (
+	_ c.Iterator[any]    = (*SetIter[any])(nil)
+	_ c.DelIterator[any] = (*SetIter[any])(nil)
+)
 
 func (i *SetIter[T]) HasNext() bool {
 	if it.HasNext(*i.elements, i.current) {

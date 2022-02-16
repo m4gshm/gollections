@@ -11,21 +11,23 @@ import (
 	"github.com/m4gshm/gollections/slice"
 )
 
+//NewSet creates the Set and copies elements to it.
 func NewSet[T comparable](elements []T) *Set[T] {
-	uniques := map[T]struct{}{}
+	internal := map[T]struct{}{}
 	for _, T := range elements {
-		uniques[T] = struct{}{}
+		internal[T] = struct{}{}
 	}
-	return WrapSet(uniques)
+	return WrapSet(internal)
 }
 
-func WrapSet[T comparable](uniques map[T]struct{}) *Set[T] {
-	return &Set[T]{uniques: uniques}
+//WrapSet creates a set using a map as the internal storage.
+func WrapSet[T comparable](elements map[T]struct{}) *Set[T] {
+	return &Set[T]{elements: elements}
 }
 
-//Set provides uniqueness (does'T insert duplicated values).
+//Set is the Collection implementation that provides the uniqueness of its elements. Elements must be comparable.
 type Set[T comparable] struct {
-	uniques map[T]struct{}
+	elements map[T]struct{}
 }
 
 var (
@@ -38,20 +40,20 @@ func (s *Set[T]) Begin() c.Iterator[T] {
 }
 
 func (s *Set[T]) Head() *it.Key[T, struct{}] {
-	return it.NewKey(s.uniques)
+	return it.NewKey(s.elements)
 }
 
 func (s *Set[T]) Collect() []T {
-	uniques := s.uniques
-	out := make([]T, 0, len(uniques))
-	for e := range uniques {
+	elements := s.elements
+	out := make([]T, 0, len(elements))
+	for e := range elements {
 		out = append(out, e)
 	}
 	return out
 }
 
 func (s *Set[T]) Len() int {
-	return len(s.uniques)
+	return len(s.elements)
 }
 
 func (s *Set[T]) IsEmpty() bool {
@@ -59,11 +61,11 @@ func (s *Set[T]) IsEmpty() bool {
 }
 
 func (s *Set[T]) For(walker func(T) error) error {
-	return map_.ForKeys(s.uniques, walker)
+	return map_.ForKeys(s.elements, walker)
 }
 
 func (s *Set[T]) ForEach(walker func(T)) {
-	map_.ForEachKey(s.uniques, walker)
+	map_.ForEachKey(s.elements, walker)
 }
 
 func (s *Set[T]) Filter(filter c.Predicate[T]) c.Pipe[T, []T] {
@@ -79,12 +81,13 @@ func (s *Set[T]) Reduce(by op.Binary[T]) T {
 }
 
 func (s *Set[T]) Contains(val T) bool {
-	_, ok := s.uniques[val]
+	_, ok := s.elements[val]
 	return ok
 }
 
+//Sort transforms to the ordered Set.
 func (s *Set[T]) Sort(less func(e1, e2 T) bool) *ordered.Set[T] {
-	return ordered.WrapSet(slice.Sort(s.Collect(), less), s.uniques)
+	return ordered.WrapSet(slice.Sort(s.Collect(), less), s.elements)
 }
 
 func (s *Set[T]) String() string {

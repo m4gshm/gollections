@@ -7,12 +7,12 @@ import (
 	"github.com/m4gshm/gollections/collect"
 	"github.com/m4gshm/gollections/immutable"
 	"github.com/m4gshm/gollections/it/impl/it"
-	"github.com/m4gshm/gollections/map_"
 	m "github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/op"
 )
 
-func AsMap[K comparable, V any](elements []*map_.KV[K, V]) *Map[K, V] {
+//AsMap converts a slice of key/value pairs to teh Map.
+func AsMap[K comparable, V any](elements []*c.KV[K, V]) *Map[K, V] {
 	var (
 		uniques = make(map[K]V, len(elements))
 	)
@@ -24,6 +24,7 @@ func AsMap[K comparable, V any](elements []*map_.KV[K, V]) *Map[K, V] {
 	return WrapMap(uniques)
 }
 
+//ToMap creates the Map and copies elements to it.
 func ToMap[K comparable, V any](elements map[K]V) *Map[K, V] {
 	uniques := make(map[K]V, len(elements))
 	for key, val := range elements {
@@ -32,15 +33,17 @@ func ToMap[K comparable, V any](elements map[K]V) *Map[K, V] {
 	return WrapMap(uniques)
 }
 
-func WrapMap[K comparable, V any](uniques map[K]V) *Map[K, V] {
-	return &Map[K, V]{uniques: uniques}
+//WrapMap creates the Map using a map as internal storage.
+func WrapMap[K comparable, V any](elements map[K]V) *Map[K, V] {
+	return &Map[K, V]{elements: elements}
 }
 
+//Map is the Collection implementation that provides element access by an unique key.
 type Map[K comparable, V any] struct {
-	uniques map[K]V
+	elements map[K]V
 }
 
-var _ Settable[int, any] = (*Map[int, any])(nil)
+var _ c.Settable[int, any] = (*Map[int, any])(nil)
 var _ c.Map[int, any] = (*Map[int, any])(nil)
 var _ fmt.Stringer = (*Map[int, any])(nil)
 
@@ -49,11 +52,11 @@ func (s *Map[K, V]) Begin() c.KVIterator[K, V] {
 }
 
 func (s *Map[K, V]) Head() *it.KV[K, V] {
-	return it.NewKV(s.uniques)
+	return it.NewKV(s.elements)
 }
 
 func (s *Map[K, V]) Collect() map[K]V {
-	e := s.uniques
+	e := s.elements
 	out := make(map[K]V, len(e))
 	for key, val := range e {
 		out[key] = val
@@ -62,41 +65,41 @@ func (s *Map[K, V]) Collect() map[K]V {
 }
 
 func (s *Map[K, V]) Len() int {
-	return len(s.uniques)
+	return len(s.elements)
 }
 
 func (s *Map[K, V]) IsEmpty() bool {
 	return s.Len() == 0
 }
 
-func (s *Map[K, V]) For(walker func(*map_.KV[K, V]) error) error {
-	return m.For(s.uniques, walker)
+func (s *Map[K, V]) For(walker func(*c.KV[K, V]) error) error {
+	return m.For(s.elements, walker)
 }
 
-func (s *Map[K, V]) ForEach(walker func(*map_.KV[K, V])) {
-	m.ForEach(s.uniques, walker)
+func (s *Map[K, V]) ForEach(walker func(*c.KV[K, V])) {
+	m.ForEach(s.elements, walker)
 }
 
 func (s *Map[K, V]) Track(tracker func(K, V) error) error {
-	return m.Track(s.uniques, tracker)
+	return m.Track(s.elements, tracker)
 }
 
 func (s *Map[K, V]) TrackEach(tracker func(K, V)) {
-	m.TrackEach(s.uniques, tracker)
+	m.TrackEach(s.elements, tracker)
 }
 
 func (s *Map[K, V]) Contains(key K) bool {
-	_, ok := s.uniques[key]
+	_, ok := s.elements[key]
 	return ok
 }
 
 func (s *Map[K, V]) Get(key K) (V, bool) {
-	val, ok := s.uniques[key]
+	val, ok := s.elements[key]
 	return val, ok
 }
 
 func (s *Map[K, V]) Set(key K, value V) bool {
-	u := s.uniques
+	u := s.elements
 	if _, ok := u[key]; !ok {
 		u[key] = value
 		return true
@@ -109,7 +112,7 @@ func (s *Map[K, V]) Keys() c.Collection[K, []K, c.Iterator[K]] {
 }
 
 func (s *Map[K, V]) K() *immutable.MapKeys[K, V] {
-	return immutable.WrapKeys(s.uniques)
+	return immutable.WrapKeys(s.elements)
 }
 
 func (s *Map[K, V]) Values() c.Collection[V, []V, c.Iterator[V]] {
@@ -117,11 +120,11 @@ func (s *Map[K, V]) Values() c.Collection[V, []V, c.Iterator[V]] {
 }
 
 func (s *Map[K, V]) V() *immutable.MapValues[K, V] {
-	return immutable.WrapVal(s.uniques)
+	return immutable.WrapVal(s.elements)
 }
 
 func (s *Map[K, V]) String() string {
-	return m.ToString(s.uniques)
+	return m.ToString(s.elements)
 }
 
 func (s *Map[K, V]) FilterKey(fit c.Predicate[K]) c.MapPipe[K, V, map[K]V] {

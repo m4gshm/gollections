@@ -10,36 +10,39 @@ import (
 	"github.com/m4gshm/gollections/slice"
 )
 
+//NewVector creates the Vector with a predefined capacity.
 func NewVector[T any](capacity int) *Vector[T] {
 	return WrapVector(make([]T, 0, capacity))
 }
 
+//ToVector creates the Vector based on copy of elements slice
 func ToVector[T any](elements []T) *Vector[T] {
 	return WrapVector(slice.Copy(elements))
 }
 
+//WrapVector creates the Vector using a slise as internal storage.
 func WrapVector[T any](elements []T) *Vector[T] {
 	return &Vector[T]{elements: elements}
 }
 
-//Vector stores ordered elements, provides index access.
+//Vector is the Collection implementation that provides elements order and index access.
 type Vector[T any] struct {
 	elements []T
 }
 
 var (
-	_ Addable[any]       = (*Vector[any])(nil)
-	_ Deleteable[int]    = (*Vector[any])(nil)
-	_ Settable[int, any] = (*Vector[any])(nil)
-	_ c.Vector[any]      = (*Vector[any])(nil)
-	_ fmt.Stringer       = (*Vector[any])(nil)
+	_ c.Addable[any]       = (*Vector[any])(nil)
+	_ c.Deleteable[int]    = (*Vector[any])(nil)
+	_ c.Settable[int, any] = (*Vector[any])(nil)
+	_ c.Vector[any]        = (*Vector[any])(nil)
+	_ fmt.Stringer         = (*Vector[any])(nil)
 )
 
 func (v *Vector[T]) Begin() c.Iterator[T] {
 	return v.Head()
 }
 
-func (v *Vector[T]) BeginEdit() Iterator[T] {
+func (v *Vector[T]) BeginEdit() c.DelIterator[T] {
 	return v.Head()
 }
 

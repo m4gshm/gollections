@@ -2,14 +2,16 @@
 package omap
 
 import (
+	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/immutable/ordered"
-	"github.com/m4gshm/gollections/map_"
 )
 
-func Of[k comparable, v any](elements ...*map_.KV[k, v]) *ordered.Map[k, v] {
+//Of creates the Map with predefined elements.
+func Of[K comparable, V any](elements ...*c.KV[K, V]) *ordered.Map[K, V] {
 	return ordered.ConvertKVsToMap(elements)
 }
 
-func New[k comparable, v any](elements map[k]v) *ordered.Map[k, v] {
+//New creates the Map and copies elements to it.
+func New[K comparable, V any](elements map[K]V) *ordered.Map[K, V] {
 	return ordered.NewMap(elements)
 }

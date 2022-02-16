@@ -10,13 +10,15 @@ import (
 	"github.com/m4gshm/gollections/slice"
 )
 
-func WrapVal[K comparable, V any](elements []K, uniques map[K]V) *MapValues[K, V] {
-	return &MapValues[K, V]{elements, uniques}
+//WrapVal creates the MapValues using elements as internal storage.
+func WrapVal[K comparable, V any](order []K, elements map[K]V) *MapValues[K, V] {
+	return &MapValues[K, V]{order, elements}
 }
 
+//MapValues is the wrapper for Map's values.
 type MapValues[K comparable, V any] struct {
-	elements []K
-	uniques  map[K]V
+	order    []K
+	elements map[K]V
 }
 
 var _ c.Collection[any, []any, c.Iterator[any]] = (*MapValues[int, any])(nil)
@@ -27,11 +29,11 @@ func (s *MapValues[K, V]) Begin() c.Iterator[V] {
 }
 
 func (s *MapValues[K, V]) Head() *ValIter[K, V] {
-	return NewValIter(s.elements, s.uniques)
+	return NewValIter(s.order, s.elements)
 }
 
 func (s *MapValues[K, V]) Len() int {
-	return len(s.uniques)
+	return len(s.elements)
 }
 
 func (s *MapValues[K, V]) IsEmpty() bool {
@@ -39,28 +41,27 @@ func (s *MapValues[K, V]) IsEmpty() bool {
 }
 
 func (s *MapValues[K, V]) Collect() []V {
-	refs := s.elements
-	elements := make([]V, len(refs))
-	for i, key := range refs {
-		val := s.uniques[key]
+	elements := make([]V, len(s.order))
+	for i, key := range s.order {
+		val := s.elements[key]
 		elements[i] = val
 	}
 	return elements
 }
 
 func (s *MapValues[K, V]) For(walker func(V) error) error {
-	return map_.ForOrderedValues(s.elements, s.uniques, walker)
+	return map_.ForOrderedValues(s.order, s.elements, walker)
 }
 
 func (s *MapValues[K, V]) ForEach(walker func(V)) {
-	map_.ForEachOrderedValues(s.elements, s.uniques, walker)
+	map_.ForEachOrderedValues(s.order, s.elements, walker)
 }
 
 func (s *MapValues[K, V]) Get(index int) (V, bool) {
-	keys := s.elements
+	keys := s.order
 	if index >= 0 && index < len(keys) {
 		key := keys[index]
-		val, ok := s.uniques[key]
+		val, ok := s.elements[key]
 		return val, ok
 	}
 	var no V
