@@ -64,6 +64,7 @@ func Range[T constraints.Integer](from T, to T) []T {
 	return elements
 }
 
+//Reverse inverts slice elements
 func Reverse[T any](elements []T) []T {
 	l := 0
 	h := len(elements) - 1
@@ -76,15 +77,18 @@ func Reverse[T any](elements []T) []T {
 	return elements
 }
 
+//Sort sorts a slice and returns the one.
 func Sort[T any](elements []T, less func(e1, e2 T) bool) []T {
 	sort.Slice(elements, func(i, j int) bool { return less(elements[i], elements[j]) })
 	return elements
 }
 
+//SortsByOrdered sorts elements by a converter that thransforms a element to an Ordered (int, string and so on)
 func SortByOrdered[O any, o constraints.Ordered](elements []O, by c.Converter[O, o]) []O {
 	return Sort(elements, func(e1, e2 O) bool { return by(e1) < by(e2) })
 }
 
+//SortCopy sorts copied slices
 func SortCopy[T any](elements []T, less func(e1, e2 T) bool) []T {
 	var dest = make([]T, len(elements))
 	copy(dest, elements)
@@ -154,13 +158,6 @@ func ForEachRef[T any](references []*T, walker func(T)) {
 
 //ToString converts elements to their default string representation
 func ToString[T any](elements []T) string {
-	return ToStringf(elements, "%+v", " ")
-}
-
-func ToStringE[T any](elements []T, err error) string {
-	if err != nil {
-		return "Stringer: " + err.Error()
-	}
 	return ToStringf(elements, "%+v", " ")
 }
 

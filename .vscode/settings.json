@@ -1,3 +1,7 @@
 {
-    "go.autocompleteUnimportedPackages": true
+    "go.autocompleteUnimportedPackages": true,
+    "go.goroot": "C:\\Users\\mfour\\go\\src\\github.com\\golang\\go",
+    "terminal.integrated.env.windows": {
+        "GOROOT": "C:\\Users\\mfour\\go\\src\\github.com\\golang\\go"
+    },
 }

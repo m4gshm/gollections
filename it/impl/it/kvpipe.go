@@ -6,43 +6,45 @@ import (
 	"github.com/m4gshm/gollections/op"
 )
 
-func NewKVPipe[k comparable, v any, C any, IT c.KVIterator[k, v]](it IT, collector collect.CollectorKV[k, v, C]) *KVIterPipe[k, v, C] {
-	return &KVIterPipe[k, v, C]{it: it, collector: collector}
+func NewKVPipe[K comparable, V any, C any, Iter c.KVIterator[K, V]](it Iter, collector collect.CollectorKV[K, V, C]) *KVIterPipe[K, V, C] {
+	return &KVIterPipe[K, V, C]{it: it, collector: collector}
 }
 
-type KVIterPipe[k comparable, v any, C any] struct {
-	it        c.KVIterator[k, v]
-	collector collect.CollectorKV[k, v, C]
-	elements  *C
+type KVIterPipe[K comparable, V any, C any] struct {
+	it        c.KVIterator[K, V]
+	collector collect.CollectorKV[K, V, C]
+	out       *C
 }
 
 var _ c.MapPipe[string, any, any] = (*KVIterPipe[string, any, any])(nil)
 
-func (s *KVIterPipe[k, v, C]) FilterKey(fit c.Predicate[k]) c.MapPipe[k, v, C] {
-	return NewKVPipe(FilterKV(s.it, func(key k, val v) bool { return fit(key) }), s.collector)
+func (s *KVIterPipe[K, V, C]) FilterKey(fit c.Predicate[K]) c.MapPipe[K, V, C] {
+	var kvFit c.BiPredicate[K, V] = func(key K, val V) bool { return fit(key) }
+	return NewKVPipe[K, V](FilterKV[K, V](s.it, kvFit), s.collector)
 }
 
-func (s *KVIterPipe[k, v, C]) MapKey(by c.Converter[k, k]) c.MapPipe[k, v, C] {
-	return NewKVPipe(MapKV(s.it, func(key k, val v) (k, v) { return by(key), val }), s.collector)
+func (s *KVIterPipe[K, V, C]) MapKey(by c.Converter[K, K]) c.MapPipe[K, V, C] {
+	return NewKVPipe[K, V](MapKV(s.it, func(key K, val V) (K, V) { return by(key), val }), s.collector)
 }
 
-func (s *KVIterPipe[k, v, C]) FilterValue(fit c.Predicate[v]) c.MapPipe[k, v, C] {
-	return NewKVPipe(FilterKV(s.it, func(key k, val v) bool { return fit(val) }), s.collector)
+func (s *KVIterPipe[K, V, C]) FilterValue(fit c.Predicate[V]) c.MapPipe[K, V, C] {
+	var kvFit c.BiPredicate[K, V] = func(key K, val V) bool { return fit(val) }
+	return NewKVPipe[K, V](FilterKV(s.it, kvFit), s.collector)
 }
 
-func (s *KVIterPipe[k, v, C]) MapValue(by c.Converter[v, v]) c.MapPipe[k, v, C] {
-	return NewKVPipe(MapKV(s.it, func(key k, val v) (k, v) { return key, by(val) }), s.collector)
+func (s *KVIterPipe[K, V, C]) MapValue(by c.Converter[V, V]) c.MapPipe[K, V, C] {
+	return NewKVPipe(MapKV(s.it, func(key K, val V) (K, V) { return key, by(val) }), s.collector)
 }
 
-func (s *KVIterPipe[k, v, C]) Filter(fit c.BiPredicate[k, v]) c.MapPipe[k, v, C] {
-	return NewKVPipe(FilterKV(s.it, fit), s.collector)
+func (s *KVIterPipe[K, V, C]) Filter(fit c.BiPredicate[K, V]) c.MapPipe[K, V, C] {
+	return NewKVPipe[K, V](FilterKV[K, V](s.it, fit), s.collector)
 }
 
-func (s *KVIterPipe[k, v, C]) Map(by c.BiConverter[k, v, k, v]) c.MapPipe[k, v, C] {
+func (s *KVIterPipe[K, V, C]) Map(by c.BiConverter[K, V, K, V]) c.MapPipe[K, V, C] {
 	return NewKVPipe(MapKV(s.it, by), s.collector)
 }
 
-func (s *KVIterPipe[k, v, C]) Track(tracker func(k, v) error) error {
+func (s *KVIterPipe[K, V, C]) Track(tracker func(K, V) error) error {
 	for s.it.HasNext() {
 		key, val := s.it.Get()
 		if err := tracker(key, val); err != nil {
@@ -52,20 +54,19 @@ func (s *KVIterPipe[k, v, C]) Track(tracker func(k, v) error) error {
 	return nil
 }
 
-func (s *KVIterPipe[k, v, C]) Reduce(by op.Quaternary[k, v]) (k, v) {
+func (s *KVIterPipe[K, V, C]) Reduce(by op.Quaternary[K, V]) (K, V) {
 	return ReduceKV(s.it, by)
 }
 
-func (s *KVIterPipe[k, v, C]) Begin() c.KVIterator[k, v] {
+func (s *KVIterPipe[K, V, C]) Begin() c.KVIterator[K, V] {
 	return s.it
 }
 
-func (s *KVIterPipe[k, v, C]) Collect() C {
-	ref := s.elements
+func (s *KVIterPipe[K, V, C]) Collect() C {
 	var e C
-	if ref == nil {
+	if s.out == nil {
 		e = s.collector(s.it)
-		ref = &e
+		s.out = &e
 	}
 	return e
 }

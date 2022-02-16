@@ -190,11 +190,13 @@ func (v *Vector[T]) Reduce(by op.Binary[T]) T {
 	return it.Reduce(v.Head(), by)
 }
 
+//Sotr sorts the Vector in-place and returns it.
 func (v *Vector[t]) Sort(less func(e1, e2 t) bool) *Vector[t] {
 	v.elements = slice.Sort(v.elements, less)
 	return v
 }
 
+//String returns then string representation.
 func (v *Vector[T]) String() string {
 	return slice.ToString(v.elements)
 }

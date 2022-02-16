@@ -54,7 +54,6 @@ func (s *Set[T]) Len() int {
 	return len(s.uniques)
 }
 
-
 func (s *Set[T]) IsEmpty() bool {
 	return s.IsEmpty()
 }

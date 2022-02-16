@@ -28,12 +28,12 @@ func FlattFit[From, To any, IT c.Iterator[From]](elements IT, fit c.Predicate[Fr
 }
 
 //Filter creates the Iterator that checks elements by filters and returns successful ones.
-func Filter[T any, IT c.Iterator[T]](elements IT, filter c.Predicate[T]) *Fit[T] {
-	return &Fit[T]{Iter: elements, By: filter}
+func Filter[T any, IT c.Iterator[T]](elements IT, filter c.Predicate[T]) *Fit[T, IT] {
+	return &Fit[T, IT]{Iter: elements, By: filter}
 }
 
 //NotNil creates the Iterator that filters nullable elements.
-func NotNil[T any, IT c.Iterator[*T]](elements IT) *Fit[*T] {
+func NotNil[T any, IT c.Iterator[*T]](elements IT) *Fit[*T, IT] {
 	return Filter(elements, check.NotNil[T])
 }
 
@@ -43,8 +43,8 @@ func MapKV[k, v any, IT c.KVIterator[k, v], k2, v2 any](elements IT, by c.BiConv
 }
 
 //FilterKV creates the Iterator that checks elements by filters and returns successful ones.
-func FilterKV[k, v any, IT c.KVIterator[k, v]](elements IT, filter c.BiPredicate[k, v]) *FitKV[k, v] {
-	return &FitKV[k, v]{Iter: elements, By: filter}
+func FilterKV[K, V any, IT c.KVIterator[K, V]](elements IT, filter c.BiPredicate[K, V]) *FitKV[K, V, IT] {
+	return &FitKV[K, V, IT]{Iter: elements, By: filter}
 }
 
 //Group transforms iterable elements to the MapPipe based on applying key extractor to the elements

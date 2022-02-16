@@ -2,64 +2,64 @@ package it
 
 import "github.com/m4gshm/gollections/c"
 
-type Fit[T any] struct {
-	Iter c.Iterator[T]
+type Fit[T any, IT c.Iterator[T]] struct {
+	Iter IT
 	By   c.Predicate[T]
 
 	current T
 	err     error
 }
 
-var _ c.Iterator[any] = (*Fit[any])(nil)
+var _ c.Iterator[any] = (*Fit[any, c.Iterator[any]])(nil)
 
-func (s *Fit[T]) HasNext() bool {
-	v, ok := nextFiltered(s.Iter, s.By)
-	s.current = v
+func (s *Fit[T, IT]) HasNext() bool {
+	V, ok := nextFiltered[T](s.Iter, s.By)
+	s.current = V
 	return ok
 }
 
-func (s *Fit[T]) Get() T {
+func (s *Fit[T, IT]) Get() T {
 	return s.current
 }
 
-type FitKV[k, v any] struct {
-	Iter c.KVIterator[k, v]
-	By   c.BiPredicate[k, v]
+type FitKV[K, V any, IT c.KVIterator[K, V]] struct {
+	Iter IT
+	By   c.BiPredicate[K, V]
 
-	currentK k
-	currentV v
+	currentK K
+	currentV V
 }
 
-var _ c.KVIterator[any, any] = (*FitKV[any, any])(nil)
+var _ c.KVIterator[any, any] = (*FitKV[any, any, c.KVIterator[any, any]])(nil)
 
-func (s *FitKV[k, v]) HasNext() bool {
-	key, val, ok := nextFilteredKV(s.Iter, s.By)
+func (s *FitKV[K, V, IT]) HasNext() bool {
+	key, val, ok := nextFilteredKV[K, V](s.Iter, s.By)
 	s.currentK = key
 	s.currentV = val
 	return ok
 }
 
-func (s *FitKV[k, v]) Get() (k, v) {
+func (s *FitKV[K, V, IT]) Get() (K, V) {
 	return s.currentK, s.currentV
 }
 
-func nextFiltered[T any](iter c.Iterator[T], filter c.Predicate[T]) (T, bool) {
+func nextFiltered[T any, IT c.Iterator[T], F c.Predicate[T]](iter IT, filter F) (T, bool) {
 	for iter.HasNext() {
-		if v := iter.Get(); filter(v) {
-			return v, true
+		if V := iter.Get(); filter(V) {
+			return V, true
 		}
 	}
-	var v T
-	return v, false
+	var V T
+	return V, false
 }
 
-func nextFilteredKV[k any, v any](iter c.KVIterator[k, v], filter c.BiPredicate[k, v]) (k, v, bool) {
+func nextFilteredKV[K any, V any, IT c.KVIterator[K, V], F c.BiPredicate[K, V]](iter IT, filter F) (K, V, bool) {
 	for iter.HasNext() {
-		if k, v := iter.Get(); filter(k, v) {
-			return k, v, true
+		if K, V := iter.Get(); filter(K, V) {
+			return K, V, true
 		}
 	}
-	var key k
-	var val v
+	var key K
+	var val V
 	return key, val, false
 }

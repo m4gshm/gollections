@@ -13,6 +13,7 @@ import (
 	"github.com/m4gshm/gollections/slice"
 )
 
+//ConvertKVsToMap converts a slice of key/value pairs to the unordered Map of these pairs.
 func ConvertKVsToMap[K comparable, V any](elements []*map_.KV[K, V]) *Map[K, V] {
 	uniques := make(map[K]V, len(elements))
 	for _, kv := range elements {
@@ -21,6 +22,7 @@ func ConvertKVsToMap[K comparable, V any](elements []*map_.KV[K, V]) *Map[K, V] 
 	return WrapMap(uniques)
 }
 
+//NewMap converts an embedded map to the unordered Map.
 func NewMap[K comparable, V any](elements map[K]V) *Map[K, V] {
 	uniques := make(map[K]V, len(elements))
 	for key, val := range elements {
@@ -29,11 +31,12 @@ func NewMap[K comparable, V any](elements map[K]V) *Map[K, V] {
 	return WrapMap(uniques)
 }
 
+//WrapMap creates the unordered Map using an map as internal storage.
 func WrapMap[K comparable, V any](uniques map[K]V) *Map[K, V] {
 	return &Map[K, V]{uniques: uniques}
 }
 
-//Map provides access to elements by key.
+//Map provides access to elements by a key.
 type Map[K comparable, V any] struct {
 	uniques map[K]V
 }
@@ -43,14 +46,17 @@ var (
 	_ fmt.Stringer    = (*Map[int, any])(nil)
 )
 
+//Begin creates a key/value iterator interface.
 func (s *Map[K, V]) Begin() c.KVIterator[K, V] {
 	return s.Head()
 }
 
+//Head creates a key/value iterator implementation started from the head.
 func (s *Map[K, V]) Head() *it.KV[K, V] {
 	return it.NewKV(s.uniques)
 }
 
+//Collect exports the content as a map.
 func (s *Map[K, V]) Collect() map[K]V {
 	e := s.uniques
 	out := make(map[K]V, len(e))
@@ -60,18 +66,22 @@ func (s *Map[K, V]) Collect() map[K]V {
 	return out
 }
 
+//Sort transforms to the ordered Map.
 func (s *Map[K, V]) Sort(less func(k1, k2 K) bool) *ordered.Map[K, V] {
 	return ordered.WrapMap(slice.Sort(s.Keys().Collect(), less), s.uniques)
 }
 
+//String is part of the Stringer interface for printing the string representation of this Map.
 func (s *Map[K, V]) String() string {
 	return m.ToString(s.uniques)
 }
 
+//Track apply a tracker to touch key, value from the inside. To stop traking just return the m.Break.
 func (s *Map[K, V]) Track(tracker func(K, V) error) error {
 	return m.Track(s.uniques, tracker)
 }
 
+//Track apply a tracker to touch each key, value from the inside.
 func (s *Map[K, V]) TrackEach(tracker func(K, V)) {
 	m.TrackEach(s.uniques, tracker)
 }
@@ -119,7 +129,8 @@ func (s *Map[K, V]) V() *MapValues[K, V] {
 }
 
 func (s *Map[K, V]) FilterKey(fit c.Predicate[K]) c.MapPipe[K, V, map[K]V] {
-	return it.NewKVPipe(it.FilterKV(s.Head(), func(key K, val V) bool { return fit(key) }), collect.Map[K, V])
+	var kvFit c.BiPredicate[K, V] = func(key K, val V) bool { return fit(key) }
+	return it.NewKVPipe(it.FilterKV(s.Head(), kvFit), collect.Map[K, V])
 }
 
 func (s *Map[K, V]) MapKey(by c.Converter[K, K]) c.MapPipe[K, V, map[K]V] {
@@ -127,7 +138,8 @@ func (s *Map[K, V]) MapKey(by c.Converter[K, K]) c.MapPipe[K, V, map[K]V] {
 }
 
 func (s *Map[K, V]) FilterValue(fit c.Predicate[V]) c.MapPipe[K, V, map[K]V] {
-	return it.NewKVPipe(it.FilterKV(s.Head(), func(key K, val V) bool { return fit(val) }), collect.Map[K, V])
+	var kvFit c.BiPredicate[K, V] = func(key K, val V) bool { return fit(val) }
+	return it.NewKVPipe(it.FilterKV(s.Head(), kvFit), collect.Map[K, V])
 }
 
 func (s *Map[K, V]) MapValue(by c.Converter[V, V]) c.MapPipe[K, V, map[K]V] {
