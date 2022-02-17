@@ -20,13 +20,14 @@ type ValIter[K comparable, V any] struct {
 var _ c.Iterator[any] = (*ValIter[int, any])(nil)
 
 func (s *ValIter[K, V]) HasNext() bool {
-	if it.HasNext(s.elements, s.current) {
-		s.current++
-		return true
-	}
-	return false
+	return it.HasNext(s.elements, s.current)
 }
 
-func (s *ValIter[K, V]) Get() V {
-	return s.uniques[it.Get(s.elements, s.current)]
+func (s *ValIter[K, V]) Next() V {
+	if s.HasNext() {
+		s.current++
+		return s.uniques[it.Get(s.elements, s.current)]
+	}
+	var no V
+	return no
 }

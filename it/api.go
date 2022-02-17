@@ -34,12 +34,12 @@ func Flatt[From, To any](elements c.Iterator[From], by c.Flatter[From, To]) c.It
 
 //FlattFit additionally filters 'From' elements.
 func FlattFit[From, To any](elements c.Iterator[From], fit c.Predicate[From], flatt c.Flatter[From, To]) c.Iterator[To] {
-	return impl.FlattFit[From, To](elements, fit, flatt)
+	return impl.FlattFit(elements, fit, flatt)
 }
 
 //Filter creates the Iterator that checks elements by a filter and returns successful ones.
 func Filter[T any](elements c.Iterator[T], filter c.Predicate[T]) c.Iterator[T] {
-	return impl.Filter[T](elements, filter)
+	return impl.Filter(elements, filter)
 }
 
 //NotNil creates the Iterator that filters nullable elements.
@@ -64,7 +64,7 @@ func Slice[T any](elements c.Iterator[T]) []T {
 
 //Group transforms iterable elements to the MapPipe based on applying key extractor to the elements
 func Group[T any, K comparable](elements c.Iterator[T], by c.Converter[T, K]) c.MapPipe[K, T, map[K][]T] {
-	return impl.Group[T, K](elements, by)
+	return impl.Group(elements, by)
 }
 
 //ForEach applies a walker to elements of an Iterator.

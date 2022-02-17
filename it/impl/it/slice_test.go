@@ -17,7 +17,7 @@ func Test_PointerBasedIter(t *testing.T) {
 	iter := NewHead(expected)
 	result := make([]someType, 0)
 	for iter.HasNext() {
-		n := iter.Get()
+		n := iter.Next()
 		result = append(result, n)
 	}
 

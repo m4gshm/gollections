@@ -8,9 +8,8 @@ import (
 	"github.com/m4gshm/gollections/immutable/vector"
 	"github.com/m4gshm/gollections/it"
 	impliter "github.com/m4gshm/gollections/it/impl/it"
-	mvector "github.com/m4gshm/gollections/mutable/vector"
-
 	moset "github.com/m4gshm/gollections/mutable/oset"
+	mvector "github.com/m4gshm/gollections/mutable/vector"
 	"github.com/m4gshm/gollections/slice/range_"
 )
 
@@ -41,76 +40,104 @@ type benchCase struct {
 
 var cases = []benchCase{{"high", HighLoad}, {"low", LowLoad}}
 
-func Benchmark_HasNextGet_Iterator_Immutable_Vector(b *testing.B) {
+func Benchmark_HasNext_Iterator_Immutable_Vector(b *testing.B) {
 	c := vector.Of(values...)
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				for it := c.Begin(); it.HasNext(); {
-					casee.load(it.Get())
+					casee.load(it.Next())
 				}
 			}
 		})
 	}
 }
 
-func Benchmark_HasNextGet_Iterator_Immutable_Vector_Impl(b *testing.B) {
+func Benchmark_HasNext_Iterator_Immutable_Vector_Impl(b *testing.B) {
 	c := vector.Of(values...)
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				for it := c.Head(); it.HasNext(); {
-					casee.load(it.Get())
+					casee.load(it.Next())
 				}
 			}
 		})
 	}
 }
 
-func Benchmark_HasNextGet_Iterator_Mutable_Vector_Impl(b *testing.B) {
+func Benchmark_GetNext_Iterator_Immutable_Vector_Impl(b *testing.B) {
+	c := vector.Of(values...)
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				it := c.Head()
+				for v, ok := it.GetNext(); ok; v, ok = it.GetNext() {
+					casee.load(v)
+				}
+			}
+		})
+	}
+}
+
+func Benchmark_GetPrev_Iterator_Immutable_Vector_Impl(b *testing.B) {
+	c := vector.Of(values...)
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				it := c.Tail()
+				for v, ok := it.GetPrev(); ok; v, ok = it.GetPrev() {
+					casee.load(v)
+				}
+			}
+		})
+	}
+}
+
+func Benchmark_HasNext_Iterator_Mutable_Vector_Impl(b *testing.B) {
 	c := mvector.Of(values...)
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				for it := c.Head(); it.HasNext(); {
-					casee.load(it.Get())
+					casee.load(it.Next())
 				}
 			}
 		})
 	}
 }
 
-func Benchmark_HasNextGet_RevertIterator_Immutable_Vector_Impl(b *testing.B) {
+func Benchmark_HasPrev_Immutable_Vector_Impl(b *testing.B) {
 	c := vector.Of(values...)
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				for it := c.Tail(); it.HasPrev(); {
-					casee.load(it.Get())
+					casee.load(it.Prev())
 				}
 			}
 		})
 	}
 }
 
-func Benchmark_HasNextGet_Iterator_WrapSlice(b *testing.B) {
+func Benchmark_HasNext_Iterator_WrapSlice(b *testing.B) {
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				for it := it.Wrap(values); it.HasNext(); {
-					casee.load(it.Get())
+					casee.load(it.Next())
 				}
 			}
 		})
 	}
 }
 
-func Benchmark_HasNextGet_Iterator_Impl(b *testing.B) {
+func Benchmark_HasNext_Iterator_Impl(b *testing.B) {
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				for it := impliter.NewHead(values); it.HasNext(); {
-					casee.load(it.Get())
+					casee.load(it.Next())
 				}
 			}
 		})
@@ -142,7 +169,7 @@ func Benchmark_ForByIndex_EmbeddedSlice(b *testing.B) {
 	}
 }
 
-func Benchmark_WrapMap_HasNextGet(b *testing.B) {
+func Benchmark_WrapMap_HasNext(b *testing.B) {
 	values := map[int]struct{}{}
 	for i := 0; i < max; i++ {
 		values[i] = struct{}{}
@@ -159,7 +186,7 @@ func Benchmark_WrapMap_HasNextGet(b *testing.B) {
 	}
 }
 
-func Benchmark_NewKVHasNextGet(b *testing.B) {
+func Benchmark_NewKVHasNext(b *testing.B) {
 	values := map[int]int{}
 	for i := 0; i < max; i++ {
 		values[i] = i
@@ -168,7 +195,7 @@ func Benchmark_NewKVHasNextGet(b *testing.B) {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				for iter := impliter.NewKV(values); iter.HasNext(); {
-					k, v := iter.Get()
+					k, v := iter.Next()
 					_ = v
 					casee.load(k)
 				}

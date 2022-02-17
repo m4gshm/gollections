@@ -2,16 +2,16 @@ package it
 
 import "github.com/m4gshm/gollections/c"
 
-type ConvertFit[From, To any] struct {
-	Iter    c.Iterator[From]
+type ConvertFit[From, To any, IT c.Iterator[From]] struct {
+	Iter    IT
 	By      c.Converter[From, To]
 	Fit     c.Predicate[From]
 	current To
 }
 
-var _ c.Iterator[any] = (*ConvertFit[any, any])(nil)
+var _ c.Iterator[any] = (*ConvertFit[any, any, c.Iterator[any]])(nil)
 
-func (s *ConvertFit[From, To]) HasNext() bool {
+func (s *ConvertFit[From, To, IT]) HasNext() bool {
 	if v, ok := nextFiltered(s.Iter, s.Fit); ok {
 		s.current = s.By(v)
 		return true
@@ -19,7 +19,7 @@ func (s *ConvertFit[From, To]) HasNext() bool {
 	return false
 }
 
-func (s *ConvertFit[From, To]) Get() To {
+func (s *ConvertFit[From, To, IT]) Next() To {
 	return s.current
 }
 
@@ -34,8 +34,8 @@ func (s *Convert[From, To, IT, C]) HasNext() bool {
 	return s.Iter.HasNext()
 }
 
-func (s *Convert[From, To, IT, C]) Get() To {
-	return s.By(s.Iter.Get())
+func (s *Convert[From, To, IT, C]) Next() To {
+	return s.By(s.Iter.Next())
 }
 
 type ConvertKV[k, v any, IT c.KVIterator[k, v], k2, v2 any, C c.BiConverter[k, v, k2, v2]] struct {
@@ -49,6 +49,6 @@ func (s *ConvertKV[k, v, IT, k1, v2, C]) HasNext() bool {
 	return s.Iter.HasNext()
 }
 
-func (s *ConvertKV[k, v, IT, k2, v2, C]) Get() (k2, v2) {
-	return s.By(s.Iter.Get())
+func (s *ConvertKV[k, v, IT, k2, v2, C]) Next() (k2, v2) {
+	return s.By(s.Iter.Next())
 }

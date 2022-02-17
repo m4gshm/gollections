@@ -3,14 +3,14 @@ package vector
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/m4gshm/gollections/it"
 	"github.com/m4gshm/gollections/mutable/vector"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/range_"
 	"github.com/m4gshm/gollections/sum"
 	"github.com/m4gshm/gollections/walk/group"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func Test_Vector_Iterate(t *testing.T) {
@@ -27,7 +27,7 @@ func Test_Vector_Iterate(t *testing.T) {
 
 	out := make([]int, 0)
 	for it := vec.Begin(); it.HasNext(); {
-		n := it.Get()
+		n := it.Next()
 		out = append(out, n)
 	}
 	assert.Equal(t, expected, out)
@@ -75,7 +75,7 @@ func Test_Vector_AddAndDelete(t *testing.T) {
 	assert.Equal(t, added, true)
 	deleted := false
 	for i := vec.Head(); i.HasNext(); {
-		deleted = i.Delete()
+		deleted = i.DeleteNext()
 	}
 	assert.Equal(t, added, true)
 	assert.Equal(t, deleted, true)
@@ -83,7 +83,7 @@ func Test_Vector_AddAndDelete(t *testing.T) {
 
 	added = vec.AddAll(range_.Of(0, 10000))
 	for i := vec.Tail(); i.HasPrev(); {
-		deleted = i.Delete()
+		deleted = i.DeletePrev()
 	}
 	assert.Equal(t, added, true)
 	assert.Equal(t, deleted, true)
@@ -152,7 +152,7 @@ func Test_Vector_DeleteByIterator(t *testing.T) {
 	i := 0
 	for iter.HasNext() {
 		i++
-		_ = iter.Delete()
+		_ = iter.DeleteNext()
 	}
 
 	assert.Equal(t, 6, i)

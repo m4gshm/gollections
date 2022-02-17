@@ -3,8 +3,9 @@ package vector
 import (
 	"testing"
 
-	"github.com/m4gshm/gollections/slice"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/m4gshm/gollections/slice"
 )
 
 func Test_VectorIterate(t *testing.T) {
@@ -13,7 +14,7 @@ func Test_VectorIterate(t *testing.T) {
 	result := make([]int, v.Len())
 	i := 0
 	for it := v.Head(); it.HasNext(); {
-		result[i] = it.Get()
+		result[i] = it.Next()
 		i++
 	}
 	assert.Equal(t, expected, result)
@@ -25,7 +26,7 @@ func Test_VectorReverseIteration(t *testing.T) {
 	result := make([]int, v.Len())
 	i := 0
 	for it := v.Tail(); it.HasPrev(); {
-		result[i] = it.Get()
+		result[i] = it.Prev()
 		i++
 	}
 	assert.Equal(t, expected, result)

@@ -6,12 +6,12 @@ import (
 )
 
 //Map creates the Iterator that converts elements with a converter and returns them.
-func Map[From, To any](elements []From, by c.Converter[From, To]) *Convert[From, To] {
+func Map[From, To any, FS ~[]From](elements FS, by c.Converter[From, To]) *Convert[From, To] {
 	return &Convert[From, To]{Elements: elements, By: by}
 }
 
 //MapFit additionally filters 'From' elements.
-func MapFit[From, To any](elements []From, fit c.Predicate[From], by c.Converter[From, To]) *ConvertFit[From, To] {
+func MapFit[From, To any, FS ~[]From](elements FS, fit c.Predicate[From], by c.Converter[From, To]) *ConvertFit[From, To] {
 	return &ConvertFit[From, To]{Elements: elements, By: by, Fit: fit}
 }
 
@@ -20,17 +20,17 @@ func Flatt[From, To any, FS ~[]From](elements FS, by c.Flatter[From, To]) *Flatt
 	return &Flatten[From, To]{Elements: elements, Flatt: by}
 }
 
-//FlattFit additionally filters 'From' elements.
-func FlattFit[From, To any](elements []From, fit c.Predicate[From], flatt c.Flatter[From, To]) *FlattenFit[From, To] {
+//FlattFit additionally filters –'From' elements.
+func FlattFit[From, To any, FS ~[]From](elements FS, fit c.Predicate[From], flatt c.Flatter[From, To]) *FlattenFit[From, To] {
 	return &FlattenFit[From, To]{Elements: elements, Flatt: flatt, Fit: fit}
 }
 
 //Filter creates the Iterator that checks elements by filters and returns successful ones.
-func Filter[T any, TS []T](elements TS, filter c.Predicate[T]) *Fit[T] {
+func Filter[T any, TS ~[]T](elements TS, filter c.Predicate[T]) *Fit[T] {
 	return &Fit[T]{Elements: elements, By: filter}
 }
 
 //NotNil creates the Iterator that filters nullable elements.
-func NotNil[T any](elements []*T) *Fit[*T] {
+func NotNil[T any, TRS ~[]*T](elements TRS) *Fit[*T] {
 	return Filter(elements, check.NotNil[T])
 }

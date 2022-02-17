@@ -30,7 +30,7 @@ func Test_Set_Iterate(t *testing.T) {
 
 	out := make(map[int]int, 0)
 	for it := set.Begin(); it.HasNext(); {
-		n := it.Get()
+		n := it.Next()
 		out[n] = n
 	}
 
@@ -79,7 +79,7 @@ func Test_Set_DeleteByIterator(t *testing.T) {
 	i := 0
 	for iter.HasNext() {
 		i++
-		_ = iter.Delete()
+		_ = iter.DeleteNext()
 	}
 
 	assert.Equal(t, 4, i)

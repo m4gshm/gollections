@@ -18,8 +18,8 @@ func Map[From, To any, IT c.Iterator[From]](elements IT, by c.Converter[From, To
 }
 
 //MapFit additionally filters 'From' elements.
-func MapFit[From, To any, IT c.Iterator[From]](elements IT, fit c.Predicate[From], by c.Converter[From, To]) *ConvertFit[From, To] {
-	return &ConvertFit[From, To]{Iter: elements, By: by, Fit: fit}
+func MapFit[From, To any, IT c.Iterator[From]](elements IT, fit c.Predicate[From], by c.Converter[From, To]) *ConvertFit[From, To, IT] {
+	return &ConvertFit[From, To, IT]{Iter: elements, By: by, Fit: fit}
 }
 
 //Flatt creates the Iterator that extracts slices of 'To' by a Flatter from elements of 'From' and flattens as one iterable collection of 'To' elements.
@@ -60,7 +60,7 @@ func Group[T any, K comparable, IT c.Iterator[T]](elements IT, by c.Converter[T,
 //For applies a walker to elements of an Iterator. To stop walking just return the ErrBreak.
 func For[T any, IT c.Iterator[T]](elements IT, walker func(T) error) error {
 	for elements.HasNext() {
-		if err := walker(elements.Get()); err == ErrBreak {
+		if err := walker(elements.Next()); err == ErrBreak {
 			return nil
 		} else if err != nil {
 			return err
@@ -72,14 +72,14 @@ func For[T any, IT c.Iterator[T]](elements IT, walker func(T) error) error {
 //ForEach applies a walker to elements of an Iterator.
 func ForEach[T any, IT c.Iterator[T]](elements IT, walker func(T)) {
 	for elements.HasNext() {
-		walker(elements.Get())
+		walker(elements.Next())
 	}
 }
 
 //ForEachFit applies a walker to elements that satisfy a predicate condition.
 func ForEachFit[T any, IT c.Iterator[T]](elements IT, walker func(T), fit c.Predicate[T]) {
 	for elements.HasNext() {
-		if V := elements.Get(); fit(V) {
+		if V := elements.Next(); fit(V) {
 			walker(V)
 		}
 	}
@@ -89,7 +89,7 @@ func ForEachFit[T any, IT c.Iterator[T]](elements IT, walker func(T), fit c.Pred
 func Reduce[T any, IT c.Iterator[T]](elements IT, by op.Binary[T]) T {
 	var result T
 	for elements.HasNext() {
-		result = by(result, elements.Get())
+		result = by(result, elements.Next())
 	}
 	return result
 }
@@ -101,9 +101,9 @@ func ReduceKV[K, V any, IT c.KVIterator[K, V]](elements IT, by op.Quaternary[K, 
 		var val V
 		return key, val
 	}
-	key, val := elements.Get()
+	key, val := elements.Next()
 	for elements.HasNext() {
-		key2, val2 := elements.Get()
+		key2, val2 := elements.Next()
 		key, val = by(key, val, key2, val2)
 	}
 	return key, val
@@ -113,7 +113,7 @@ func ReduceKV[K, V any, IT c.KVIterator[K, V]](elements IT, by op.Quaternary[K, 
 func Slice[T any, IT c.Iterator[T]](elements IT) []T {
 	s := make([]T, 0)
 	for elements.HasNext() {
-		s = append(s, elements.Get())
+		s = append(s, elements.Next())
 	}
 	return s
 }

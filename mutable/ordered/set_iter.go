@@ -23,22 +23,24 @@ var (
 )
 
 func (i *SetIter[T]) HasNext() bool {
-	if it.HasNext(*i.elements, i.current) {
+	return it.HasNext(*i.elements, i.current)
+}
+
+func (i *SetIter[T]) Next() T {
+	if i.HasNext() {
 		i.current++
-		return true
+		return it.Get(*i.elements, i.current)
 	}
-	return false
+	var no T
+	return no
 }
 
-func (i *SetIter[T]) Get() T {
-	return it.Get(*i.elements, i.current)
-}
-
-func (i *SetIter[T]) Delete() bool {
-	pos := i.current
-	if deleted := i.del(i.Get()); deleted {
-		i.current = pos - 1
-		return true
+func (i *SetIter[T]) DeleteNext() bool {
+	if i.HasNext() {
+		if deleted := i.del(i.Next()); deleted {
+			i.current--
+			return true
+		}
 	}
 	return false
 }

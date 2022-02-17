@@ -44,7 +44,7 @@ func (i *KV[k, v]) HasNext() bool {
 	return mapiterkey(&i.hiter) != nil
 }
 
-func (i *KV[k, v]) Get() (k, v) {
+func (i *KV[k, v]) Next() (k, v) {
 	iterkey := mapiterkey(&i.hiter)
 	if iterkey == nil {
 		var key k
@@ -105,8 +105,8 @@ func (i *OrderedKV[k, v]) HasNext() bool {
 	return i.elements.HasNext()
 }
 
-func (i *OrderedKV[k, v]) Get() (k, v) {
-	key := i.elements.Get()
+func (i *OrderedKV[k, v]) Next() (k, v) {
+	key := i.elements.Next()
 	return key, i.uniques[key]
 }
 
@@ -120,8 +120,8 @@ type Key[k comparable, v any] struct {
 
 var _ c.Iterator[string] = (*Key[string, any])(nil)
 
-func (i *Key[k, v]) Get() k {
-	key, _ := i.KV.Get()
+func (i *Key[k, v]) Next() k {
+	key, _ := i.KV.Next()
 	return key
 }
 
@@ -135,7 +135,7 @@ type Val[k comparable, v any] struct {
 
 var _ c.Iterator[any] = (*Val[int, any])(nil)
 
-func (i *Val[k, v]) Get() v {
-	_, val := i.KV.Get()
+func (i *Val[k, v]) Next() v {
+	_, val := i.KV.Next()
 	return val
 }

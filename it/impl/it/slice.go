@@ -48,22 +48,45 @@ type Iter[T any] struct {
 	size, current int
 }
 
-var _ c.Iterator[any] = (*Iter[any])(nil)
+var (
+	_ c.Iterator[any]     = (*Iter[any])(nil)
+	_ c.PrevIterator[any] = (*Iter[any])(nil)
+)
 
 func (i *Iter[T]) HasNext() bool {
-	if HasNextBySize(i.size, i.current) {
-		i.current++
-		return true
-	}
-	return false
+	return HasNextBySize(i.size, i.current)
 }
 
 func (i *Iter[T]) HasPrev() bool {
-	if HasPrevBySize(i.size, i.current) {
-		i.current--
-		return true
+	return HasPrevBySize(i.size, i.current)
+}
+
+func (i *Iter[T]) Next() T {
+	t, _ := i.GetNext()
+	return t
+}
+
+func (i *Iter[T]) GetNext() (T, bool) {
+	if i.HasNext() {
+		i.current++
+		return GetArrayElem[T](i.array, i.current, i.elementSize), true
 	}
-	return false
+	var no T
+	return no, false
+}
+
+func (i *Iter[T]) Prev() T {
+	t, _ := i.GetPrev()
+	return t
+}
+
+func (i *Iter[T]) GetPrev() (T, bool) {
+	if i.HasPrev() {
+		i.current--
+		return GetArrayElem[T](i.array, i.current, i.elementSize), true
+	}
+	var no T
+	return no, false
 }
 
 func (i *Iter[T]) Get() T {

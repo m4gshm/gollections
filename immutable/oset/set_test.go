@@ -25,7 +25,7 @@ func Test_Set_Iterate(t *testing.T) {
 
 	out := make([]int, 0)
 	for it := set.Begin(); it.HasNext(); {
-		n := it.Get()
+		n := it.Next()
 		out = append(out, n)
 	}
 	assert.Equal(t, expected, out)

@@ -66,7 +66,21 @@ type Iterator[T any] interface {
 	Iter
 	//retrieves next element or zero value if no more elements
 	//must be called only after HasNext
-	Get() T
+	Next() T
+}
+
+//PrevIterator is the Iterator that provides reverse iteration over elements of a collection.
+type PrevIterator[T any] interface {
+	Iterator[T]
+	//retrieves next element or zero value if no more elements
+	//must be called only after HasNext
+	Prev() T
+}
+
+//DelIterator is the Iterator provides deleting of current element.
+type DelIterator[T any] interface {
+	Iterator[T]
+	DeleteNext() bool
 }
 
 //KVIterator is the interface that provides iterate over all key/value pair of a map.
@@ -74,7 +88,7 @@ type KVIterator[K, V any] interface {
 	Iter
 	//retrieves next elements or zero values if no more elements
 	//must be called only after HasNext
-	Get() (K, V)
+	Next() (K, V)
 }
 
 //Iterable is an iterator supplier interface
@@ -168,10 +182,4 @@ type Deleteable[k any] interface {
 //Removable is the interface that provides removing an element by its pointer (index or key).
 type Removable[P any, V any] interface {
 	Remove(P) (V, bool)
-}
-
-//DelIterator is the Iterator provides deleting of current element.
-type DelIterator[T any] interface {
-	Iterator[T]
-	Delete() bool
 }
