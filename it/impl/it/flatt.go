@@ -9,41 +9,32 @@ type FlattenFit[From, To any] struct {
 
 	elementsTo []To
 	indTo      int
-	c          To
-	err        error
 }
 
 var _ c.Iterator[any] = (*FlattenFit[any, any])(nil)
 
-func (s *FlattenFit[From, To]) HasNext() bool {
+func (s *FlattenFit[From, To]) GetNext() (To, bool) {
 	if elementsTo := s.elementsTo; len(elementsTo) > 0 {
 		if indTo := s.indTo; indTo < len(elementsTo) {
 			c := elementsTo[indTo]
-			s.c = c
 			s.indTo = indTo + 1
-			return true
+			return c, true
 		}
 		s.indTo = 0
 		s.elementsTo = nil
 	}
 
 	iter := s.Iter
-	for {
-		if !iter.HasNext() {
-			return false
-		} else if v := iter.Next(); s.Fit(v) {
-			if elementsTo := s.Flatt(v); len(elementsTo) > 0 {
-				s.c = elementsTo[0]
-				s.elementsTo = elementsTo
-				s.indTo = 1
-				return true
-			}
+	for v, ok := iter.GetNext(); ok && s.Fit(v); v, ok = iter.GetNext() {
+		if elementsTo := s.Flatt(v); len(elementsTo) > 0 {
+			c := elementsTo[0]
+			s.elementsTo = elementsTo
+			s.indTo = 1
+			return c, true
 		}
 	}
-}
-
-func (s *FlattenFit[From, To]) Next() To {
-	return s.c
+	var no To
+	return no, false
 }
 
 type Flatten[From, To any] struct {
@@ -52,36 +43,30 @@ type Flatten[From, To any] struct {
 
 	elementsTo []To
 	indTo      int
-	c          To
 }
 
 var _ c.Iterator[any] = (*Flatten[any, any])(nil)
 
-func (s *Flatten[From, To]) HasNext() bool {
+func (s *Flatten[From, To]) GetNext() (To, bool) {
 	if elementsTo := s.elementsTo; len(elementsTo) > 0 {
 		if indTo := s.indTo; indTo < len(elementsTo) {
 			c := elementsTo[indTo]
-			s.c = c
 			s.indTo = indTo + 1
-			return true
+			return c, true
 		}
 		s.indTo = 0
 		s.elementsTo = nil
 	}
 
-	iter := s.Iter
 	for {
-		if ok := iter.HasNext(); !ok {
-			return false
-		} else if elementsTo := s.Flatt(iter.Next()); len(elementsTo) > 0 {
-			s.c = elementsTo[0]
+		if v, ok := s.Iter.GetNext(); !ok {
+			var no To
+			return no, false
+		} else if elementsTo := s.Flatt(v); len(elementsTo) > 0 {
+			c := elementsTo[0]
 			s.elementsTo = elementsTo
 			s.indTo = 1
-			return true
+			return c, true
 		}
 	}
-}
-
-func (s *Flatten[From, To]) Next() To {
-	return s.c
 }

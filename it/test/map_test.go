@@ -14,9 +14,8 @@ func Test_KVIter_Iterate(t *testing.T) {
 
 	values := map[string]*s{"first": {"first_name"}, "second": {"first_second"}}
 	result := map[string]*s{}
-
-	for it := it.NewKV(values); it.HasNext(); {
-		k, v := it.Next()
+	it := it.NewKV(values)
+	for k, v, ok := it.GetNext(); ok; k, v, ok = it.GetNext() {
 		result[k] = v
 	}
 	assert.Equal(t, len(values), len(values))

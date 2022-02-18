@@ -31,14 +31,15 @@ var (
 )
 
 func (v *Vector[T]) Begin() c.Iterator[T] {
-	return v.Head()
+	iter := v.Head()
+	return &iter
 }
 
-func (v *Vector[T]) Head() *it.Iter[T] {
+func (v *Vector[T]) Head() it.Iter[T] {
 	return it.NewHeadS(v.elements, v.esize)
 }
 
-func (v *Vector[T]) Tail() *it.Iter[T] {
+func (v *Vector[T]) Tail() it.Iter[T] {
 	return it.NewTailS(v.elements, v.esize)
 }
 
@@ -75,15 +76,18 @@ func (v *Vector[T]) ForEach(walker func(T)) {
 }
 
 func (v *Vector[T]) Filter(filter c.Predicate[T]) c.Pipe[T, []T] {
-	return it.NewPipe[T](it.Filter(v.Head(), filter))
+	iter := v.Head()
+	return it.NewPipe[T](it.Filter(&iter, filter))
 }
 
 func (v *Vector[T]) Map(by c.Converter[T, T]) c.Pipe[T, []T] {
-	return it.NewPipe[T](it.Map(v.Head(), by))
+	iter := v.Head()
+	return it.NewPipe[T](it.Map(&iter, by))
 }
 
 func (v *Vector[T]) Reduce(by op.Binary[T]) T {
-	return it.Reduce(v.Head(), by)
+	iter := v.Head()
+	return it.Reduce(&iter, by)
 }
 
 func (v *Vector[T]) Sort(less func(e1, e2 T) bool) *Vector[T] {

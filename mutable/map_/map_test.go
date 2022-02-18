@@ -18,8 +18,8 @@ func Test_Map_Iterate(t *testing.T) {
 
 	keys := make([]int, 0)
 	values := make([]string, 0)
-	for it := ordered.Begin(); it.HasNext(); {
-		key, val := it.Next()
+	it := ordered.Begin()
+	for key, val, ok := it.GetNext(); ok; key, val, ok = it.GetNext() {
 		keys = append(keys, key)
 		values = append(values, val)
 	}

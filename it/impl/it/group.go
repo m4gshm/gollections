@@ -2,23 +2,25 @@ package it
 
 import "github.com/m4gshm/gollections/c"
 
-func NewKeyValuer[k comparable, v any, IT c.Iterator[v]](iter IT, keyExtractor c.Converter[v, k]) *KeyValuer[k, v] {
-	return &KeyValuer[k, v]{iter: iter, getKey: keyExtractor}
+func NewKeyValuer[K comparable, V any, IT c.Iterator[V]](iter IT, keyExtractor c.Converter[V, K]) *KeyValuer[K, V, IT] {
+	return &KeyValuer[K, V, IT]{iter: iter, getKey: keyExtractor}
 }
 
-type KeyValuer[k comparable, v any] struct {
-	iter   c.Iterator[v]
-	getKey c.Converter[v, k]
+type KeyValuer[K comparable, V any, IT c.Iterator[V]] struct {
+	iter   IT
+	getKey c.Converter[V, K]
 	err    error
 }
 
-var _ c.KVIterator[int, any] = (*KeyValuer[int, any])(nil)
+var _ c.KVIterator[int, any] = (*KeyValuer[int, any, c.Iterator[any]])(nil)
 
-func (s *KeyValuer[k, v]) HasNext() bool {
-	return s.iter.HasNext()
-}
-
-func (s *KeyValuer[k, v]) Next() (k, v) {
-	val := s.iter.Next()
-	return s.getKey(val), val
+func (s *KeyValuer[K, V, IT]) GetNext() (K, V, bool) {
+	v, ok := s.iter.GetNext()
+	if !ok {
+		var k K
+		var v V
+		return k, v, false
+	}
+	k := s.getKey(v)
+	return k, v, true
 }

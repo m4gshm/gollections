@@ -10,25 +10,19 @@ type Collector[t any, out any] c.Converter[c.Iterator[t], out]
 type CollectorKV[k, v any, out any] func(c.KVIterator[k, v]) out
 
 //Map collects the map of key/value pairs obtained by passing over a key/value iterator.
-func Map[k comparable, v any](it c.KVIterator[k, v]) map[k]v {
-	e := map[k]v{}
-	for it.HasNext() {
-		key, val := it.Next()
-		e[key] = val
+func Map[K comparable, V any](it c.KVIterator[K, V]) map[K]V {
+	e := map[K]V{}
+	for k, v, ok := it.GetNext(); ok; k, v, ok = it.GetNext() {
+		e[k] = v
 	}
 	return e
 }
 
 //Groups collects sets of values grouped by keys obtained by passing a key/value iterator.
-func Groups[k comparable, v any](it c.KVIterator[k, v]) map[k][]v {
-	e := map[k][]v{}
-	for it.HasNext() {
-		key, val := it.Next()
-		group := e[key]
-		if group == nil {
-			group = make([]v, 0)
-		}
-		e[key] = append(group, val)
+func Groups[K comparable, V any](it c.KVIterator[K, V]) map[K][]V {
+	e := map[K][]V{}
+	for k, v, ok := it.GetNext(); ok; k, v, ok = it.GetNext() {
+		e[k] = append(e[k], v)
 	}
 	return e
 }

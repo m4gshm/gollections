@@ -7,13 +7,15 @@ import (
 
 //NewSetIter is the default SetIter constructor.
 func NewSetIter[K comparable](uniques map[K]struct{}, del func(element K) bool) *SetIter[K] {
-	return &SetIter[K]{it.NewKey(uniques), del}
+	return &SetIter[K]{Key: it.NewKey(uniques), del: del}
 }
 
 //SetIter is the Set Iterator implementation.
 type SetIter[K comparable] struct {
 	*it.Key[K, struct{}]
-	del func(element K) bool
+	del        func(element K) bool
+	currentKey K
+	ok         bool
 }
 
 var (
@@ -21,11 +23,16 @@ var (
 	_ c.DelIterator[int] = (*SetIter[int])(nil)
 )
 
-func (i *SetIter[K]) Next() K {
-	key, _ := i.KV.Next()
-	return key
+func (i *SetIter[K]) GetNext() (K, bool) {
+	key, _, ok := i.KV.GetNext()
+	i.currentKey = key
+	i.ok = ok
+	return key, ok
 }
 
-func (i *SetIter[K]) DeleteNext() bool {
-	return i.del(i.Next())
+func (i *SetIter[K]) Delete() bool {
+	if i.ok {
+		return i.del(i.currentKey)
+	}
+	return false
 }

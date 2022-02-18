@@ -42,14 +42,15 @@ var (
 )
 
 func (s *Set[T]) Begin() c.Iterator[T] {
-	return s.Head()
+	iter := s.Head()
+	return &iter
 }
 
-func (s *Set[T]) Head() *it.Iter[T] {
+func (s *Set[T]) Head() it.Iter[T] {
 	return it.NewHeadS(s.order, s.esize)
 }
 
-func (s *Set[T]) Revert() *it.Iter[T] {
+func (s *Set[T]) Revert() it.Iter[T] {
 	return it.NewTailS(s.order, s.esize)
 }
 
@@ -66,15 +67,18 @@ func (s *Set[T]) ForEach(walker func(T)) {
 }
 
 func (s *Set[T]) Filter(filter c.Predicate[T]) c.Pipe[T, []T] {
-	return it.NewPipe[T](it.Filter(s.Head(), filter))
+	iter := s.Head()
+	return it.NewPipe[T](it.Filter(&iter, filter))
 }
 
 func (s *Set[T]) Map(by c.Converter[T, T]) c.Pipe[T, []T] {
-	return it.NewPipe[T](it.Map(s.Head(), by))
+	iter := s.Head()
+	return it.NewPipe[T](it.Map(&iter, by))
 }
 
 func (s *Set[T]) Reduce(by op.Binary[T]) T {
-	return it.Reduce(s.Head(), by)
+	iter := s.Head()
+	return it.Reduce(&iter, by)
 }
 
 func (s *Set[T]) Len() int {

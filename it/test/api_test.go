@@ -46,10 +46,10 @@ func Test_FlattSlices(t *testing.T) {
 
 	e := slice.Of(1, 3, 5, 7)
 
-	a := it.Slice(it.Filter(it.Flatt(it.Flatt(it.Wrap(multiDimension), conv.To[[][]int]), conv.To[[]int]), odds))
+	a := it.Slice[int](it.Filter(it.Flatt(it.Flatt(it.Wrap(multiDimension), conv.To[[][]int]), conv.To[[]int]), odds))
 	assert.Equal(t, e, a)
 
-	a = it.Slice(it.Filter(it.Flatt(sliceit.Flatt(multiDimension, conv.To[[][]int]), conv.To[[]int]), odds))
+	a = it.Slice[int](it.Filter(it.Flatt(sliceit.Flatt(multiDimension, conv.To[[][]int]), conv.To[[]int]), odds))
 	assert.Equal(t, e, a)
 
 	//plain old style
@@ -142,7 +142,8 @@ func Test_Iterate(t *testing.T) {
 		values[i] = i
 	}
 
-	stream := impl.NewPipe[int](impl.NewHead(values))
+	iter:=impl.NewHead(values)
+	stream := impl.NewPipe[int](&iter)
 
 	result := make([]int, 0)
 
@@ -156,7 +157,7 @@ func Test_Iterate(t *testing.T) {
 }
 
 func Test_Group(t *testing.T) {
-	groups := it.Group(it.Of(0, 1, 1, 2, 4, 3, 1, 6, 7), func(e int) bool { return e%2 == 0 }).Collect()
+	groups := it.Group[int](it.Of(0, 1, 1, 2, 4, 3, 1, 6, 7), func(e int) bool { return e%2 == 0 }).Collect()
 
 	assert.Equal(t, len(groups), 2)
 	assert.Equal(t, []int{1, 1, 3, 1, 7}, groups[false])

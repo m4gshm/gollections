@@ -8,52 +8,41 @@ type ConvertFit[From, To any] struct {
 	Elements []From
 	By       c.Converter[From, To]
 	Fit      c.Predicate[From]
-
-	i       int
-	current To
+	i        int
 }
 
 var _ c.Iterator[any] = (*ConvertFit[any, any])(nil)
 
-func (s *ConvertFit[From, To]) HasNext() bool {
+func (s *ConvertFit[From, To]) GetNext() (To, bool) {
 	if v, ok := nextArrayElem(s.Elements, s.Fit, &s.i); ok {
-		s.current = s.By(v)
-		return true
+		return s.By(v), true
 	}
-	return false
-}
-
-func (s *ConvertFit[From, To]) Next() To {
-	return s.current
+	var no To
+	return no, false
 }
 
 type Convert[From, To any] struct {
 	Elements []From
 	By       c.Converter[From, To]
-
-	i       int
-	current To
-	err     error
+	i        int
+	err      error
 }
 
 var _ c.Iterator[any] = (*Convert[any, any])(nil)
 
-func (s *Convert[From, To]) HasNext() bool {
+func (s *Convert[From, To]) GetNext() (To, bool) {
 	e := s.Elements
 	l := len(s.Elements)
 	i := s.i
 	if i < l {
 		v := e[i]
 		s.i = i + 1
-		s.current = s.By(v)
-		return true
+		return s.By(v), true
 	}
-	return false
+	var no To
+	return no, false
 }
 
-func (s *Convert[From, To]) Next() To {
-	return s.current
-}
 
 func nextArrayElem[T any](elements []T, filter c.Predicate[T], indexHolder *int) (T, bool) {
 	l := len(elements)
