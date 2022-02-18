@@ -26,9 +26,9 @@ func Test_Vector_Iterate(t *testing.T) {
 	assert.Equal(t, expected, iterSlice)
 
 	out := make([]int, 0)
-	for it := vec.Begin(); it.HasNext(); {
-		n := it.Next()
-		out = append(out, n)
+	it := vec.Begin()
+	for v, ok := it.GetNext(); ok; v, ok = it.GetNext() {
+		out = append(out, v)
 	}
 	assert.Equal(t, expected, out)
 
@@ -150,10 +150,32 @@ func Test_Vector_DeleteByIterator(t *testing.T) {
 	iter := vec.BeginEdit()
 
 	i := 0
-	for iter.HasNext() {
+	var v int
+	var ok, deleted bool
+	for v, ok = iter.GetNext(); ok; v, ok = iter.GetNext() {
 		i++
-		_ = iter.DeleteNext()
+		deleted = iter.Delete()
 	}
+
+	_, _, _ = v, ok, deleted
+
+	assert.Equal(t, 6, i)
+	assert.Equal(t, 0, len(vec.Collect()))
+}
+
+func Test_Vector_DeleteByIterator_Reverse(t *testing.T) {
+	vec := vector.Of(1, 1, 2, 4, 3, 1)
+	iter := vec.Tail()
+
+	i := 0
+	var v int
+	var ok, deleted bool
+	for v, ok = iter.GetPrev(); ok; v, ok = iter.GetPrev() {
+		i++
+		deleted = iter.Delete()
+	}
+
+	_, _, _ = v, ok, deleted
 
 	assert.Equal(t, 6, i)
 	assert.Equal(t, 0, len(vec.Collect()))

@@ -17,7 +17,8 @@ func MapFit[From, To any, FS ~[]From](elements FS, fit c.Predicate[From], by c.C
 
 //Flatt creates the Iterator that extracts slices of 'To' by a Flatter from elements of 'From' and flattens as one iterable collection of 'To' elements.
 func Flatt[From, To any, FS ~[]From](elements FS, by c.Flatter[From, To]) *Flatten[From, To] {
-	return &Flatten[From, To]{Elements: elements, Flatt: by}
+	var indFrom, indTo int
+	return &Flatten[From, To]{Elements: elements, Flatt: by, indFrom: &indFrom, indTo: &indTo}
 }
 
 //FlattFit additionally filters –'From' elements.

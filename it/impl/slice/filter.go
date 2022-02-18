@@ -7,21 +7,11 @@ import (
 type Fit[T any] struct {
 	Elements []T
 	By       c.Predicate[T]
-
-	current T
 	i       int
 }
 
 var _ c.Iterator[any] = (*Fit[any])(nil)
 
-func (s *Fit[T]) HasNext() bool {
-	v, ok := nextArrayElem(s.Elements, s.By, &s.i)
-	if ok {
-		s.current = v
-	}
-	return ok
-}
-
-func (s *Fit[T]) Next() T {
-	return s.current
+func (s *Fit[T]) GetNext() (T, bool) {
+	return nextArrayElem(s.Elements, s.By, &s.i)
 }

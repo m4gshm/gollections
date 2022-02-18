@@ -24,9 +24,9 @@ func Test_Set_Iterate(t *testing.T) {
 	assert.Equal(t, expected, iterSlice)
 
 	out := make([]int, 0)
-	for it := set.Begin(); it.HasNext(); {
-		n := it.Next()
-		out = append(out, n)
+	it := set.Begin()
+	for v, ok := it.GetNext(); ok; v, ok = it.GetNext() {
+		out = append(out, v)
 	}
 	assert.Equal(t, expected, out)
 

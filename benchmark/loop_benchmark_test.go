@@ -45,8 +45,9 @@ func Benchmark_HasNext_Iterator_Immutable_Vector(b *testing.B) {
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				for it := c.Begin(); it.HasNext(); {
-					casee.load(it.Next())
+				it := c.Begin()
+				for v, ok := it.GetNext(); ok; v, ok = it.GetNext() {
+					casee.load(v)
 				}
 			}
 		})
@@ -99,8 +100,9 @@ func Benchmark_HasNext_Iterator_Mutable_Vector_Impl(b *testing.B) {
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				for it := c.Head(); it.HasNext(); {
-					casee.load(it.Next())
+				it := c.Head()
+				for v, ok := it.GetNext(); ok; v, ok = it.GetNext() {
+					casee.load(v)
 				}
 			}
 		})
@@ -194,9 +196,8 @@ func Benchmark_NewKVHasNext(b *testing.B) {
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				for iter := impliter.NewKV(values); iter.HasNext(); {
-					k, v := iter.Next()
-					_ = v
+				iter := impliter.NewKV(values)
+				for k, _, ok := iter.GetNext(); ok; k, _, ok = iter.GetNext() {
 					casee.load(k)
 				}
 			}

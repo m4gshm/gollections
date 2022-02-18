@@ -23,10 +23,11 @@ var _ c.Collection[int, []int, c.Iterator[int]] = (*MapKeys[int])(nil)
 var _ fmt.Stringer = (*MapKeys[int])(nil)
 
 func (s *MapKeys[T]) Begin() c.Iterator[T] {
-	return s.Head()
+	iter := s.Head()
+	return &iter
 }
 
-func (s *MapKeys[T]) Head() *it.Iter[T] {
+func (s *MapKeys[T]) Head() it.Iter[T] {
 	return it.NewHead(s.elements)
 }
 
@@ -58,15 +59,18 @@ func (s *MapKeys[T]) Get(index int) (T, bool) {
 }
 
 func (s *MapKeys[T]) Filter(filter c.Predicate[T]) c.Pipe[T, []T] {
-	return it.NewPipe[T](it.Filter(s.Head(), filter))
+	iter := s.Head()
+	return it.NewPipe[T](it.Filter(&iter, filter))
 }
 
 func (s *MapKeys[T]) Map(by c.Converter[T, T]) c.Pipe[T, []T] {
-	return it.NewPipe[T](it.Map(s.Head(), by))
+	iter := s.Head()
+	return it.NewPipe[T](it.Map(&iter, by))
 }
 
 func (s *MapKeys[T]) Reduce(by op.Binary[T]) T {
-	return it.Reduce(s.Head(), by)
+	iter:=s.Head()
+	return it.Reduce(&iter, by)
 }
 
 func (s *MapKeys[T]) String() string {

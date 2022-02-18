@@ -59,8 +59,8 @@ func Group[T any, K comparable, IT c.Iterator[T]](elements IT, by c.Converter[T,
 
 //For applies a walker to elements of an Iterator. To stop walking just return the ErrBreak.
 func For[T any, IT c.Iterator[T]](elements IT, walker func(T) error) error {
-	for elements.HasNext() {
-		if err := walker(elements.Next()); err == ErrBreak {
+	for v, ok := elements.GetNext(); ok; v, ok = elements.GetNext() {
+		if err := walker(v); err == ErrBreak {
 			return nil
 		} else if err != nil {
 			return err
@@ -71,49 +71,52 @@ func For[T any, IT c.Iterator[T]](elements IT, walker func(T) error) error {
 
 //ForEach applies a walker to elements of an Iterator.
 func ForEach[T any, IT c.Iterator[T]](elements IT, walker func(T)) {
-	for elements.HasNext() {
-		walker(elements.Next())
+	for v, ok := elements.GetNext(); ok; v, ok = elements.GetNext() {
+		walker(v)
 	}
 }
 
 //ForEachFit applies a walker to elements that satisfy a predicate condition.
 func ForEachFit[T any, IT c.Iterator[T]](elements IT, walker func(T), fit c.Predicate[T]) {
-	for elements.HasNext() {
-		if V := elements.Next(); fit(V) {
-			walker(V)
-		}
+	for v, ok := elements.GetNext(); ok && fit(v); v, ok = elements.GetNext() {
+		walker(v)
 	}
 }
 
 //Reduce reduces elements to an one.
 func Reduce[T any, IT c.Iterator[T]](elements IT, by op.Binary[T]) T {
 	var result T
-	for elements.HasNext() {
-		result = by(result, elements.Next())
+	if v, ok := elements.GetNext(); ok {
+		result = v
+	} else {
+		return result
+	}
+	for v, ok := elements.GetNext(); ok; v, ok = elements.GetNext() {
+		result = by(result, v)
 	}
 	return result
 }
 
 //ReduceKV reduces key/values elements to an one.
 func ReduceKV[K, V any, IT c.KVIterator[K, V]](elements IT, by op.Quaternary[K, V]) (K, V) {
-	if !elements.HasNext() {
-		var key K
-		var val V
-		return key, val
+	var rk K
+	var rv V
+	if k, v, ok := elements.GetNext(); ok {
+		rk, rv = k, v
+	} else {
+		return rk, rv
 	}
-	key, val := elements.Next()
-	for elements.HasNext() {
-		key2, val2 := elements.Next()
-		key, val = by(key, val, key2, val2)
+	for k, v, ok := elements.GetNext(); ok; k, v, ok = elements.GetNext() {
+		rk, rv = by(rk, rv, k, v)
 	}
-	return key, val
+	return rk, rv
 }
 
 //Slice converts an Iterator to a slice.
 func Slice[T any, IT c.Iterator[T]](elements IT) []T {
 	s := make([]T, 0)
-	for elements.HasNext() {
-		s = append(s, elements.Next())
+	for v, ok := elements.GetNext(); ok; v, ok = elements.GetNext() {
+		s = append(s, v)
 	}
 	return s
 }

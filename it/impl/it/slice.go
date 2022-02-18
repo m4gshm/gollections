@@ -10,13 +10,13 @@ import (
 //NoStarted is the head Iterator position.
 const NoStarted = -1
 
-func NewHead[T any](elements []T) *Iter[T] {
-	return NewHeadS(elements, GetTypeSize[T]())
+func NewHead[T any, TS ~[]T](elements TS) Iter[T] {
+	return NewHeadS[T](elements, GetTypeSize[T]())
 }
 
-func NewHeadS[T any](elements []T, elementSize uintptr) *Iter[T] {
-	header := GetSliceHeader(elements)
-	return &Iter[T]{
+func NewHeadS[T any, TS ~[]T](elements TS, elementSize uintptr) Iter[T] {
+	header := GetSliceHeader[T](elements)
+	return Iter[T]{
 		array:       unsafe.Pointer(header.Data),
 		elementSize: elementSize,
 		size:        header.Len,
@@ -24,16 +24,16 @@ func NewHeadS[T any](elements []T, elementSize uintptr) *Iter[T] {
 	}
 }
 
-func NewTail[T any](elements []T) *Iter[T] {
+func NewTail[T any](elements []T) Iter[T] {
 	return NewTailS(elements, GetTypeSize[T]())
 }
 
-func NewTailS[T any](elements []T, elementSize uintptr) *Iter[T] {
+func NewTailS[T any](elements []T, elementSize uintptr) Iter[T] {
 	var (
 		header = GetSliceHeader(elements)
 		size   = header.Len
 	)
-	return &Iter[T]{
+	return Iter[T]{
 		array:       unsafe.Pointer(header.Data),
 		elementSize: elementSize,
 		size:        size,
@@ -120,14 +120,20 @@ func HasNextByRange(first, last, current int) bool {
 
 //Get safely returns an element of a slice by an index or zero value of T if the index is out of range.
 func Get[T any](elements []T, current int) T {
+	v, _ := Gett(elements, current)
+	return v
+}
+
+//Gett safely returns an element of a slice adn true by an index or zero value of T and false if the index is out of range.
+func Gett[T any](elements []T, current int) (T, bool) {
 	if current >= len(elements) {
 		var no T
-		return no
+		return no, false
 	} else if current == NoStarted {
 		var no T
-		return no
+		return no, false
 	}
-	return (elements)[current]
+	return (elements)[current], true
 }
 
 //GetArrayPointer retrieves the pointer of a slice underlying array
@@ -152,6 +158,6 @@ func GetLen[T any](elements []T) int {
 }
 
 //GetSliceHeader retrieves the SliceHeader of elements
-func GetSliceHeader[T any](elements []T) *reflect.SliceHeader {
+func GetSliceHeader[T any, TS ~[]T](elements TS) *reflect.SliceHeader {
 	return (*reflect.SliceHeader)(unsafe.Pointer(&elements))
 }

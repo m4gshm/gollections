@@ -29,9 +29,9 @@ func Test_Set_Iterate(t *testing.T) {
 	assert.Equal(t, expected, iterSlice)
 
 	out := make(map[int]int, 0)
-	for it := set.Begin(); it.HasNext(); {
-		n := it.Next()
-		out[n] = n
+	it := set.Begin()
+	for v, ok:=it.GetNext(); ok; v,ok=it.GetNext() {
+		out[v] = v
 	}
 
 	assert.Equal(t, len(expected), len(out))
@@ -77,9 +77,9 @@ func Test_Set_DeleteByIterator(t *testing.T) {
 	iter := set.BeginEdit()
 
 	i := 0
-	for iter.HasNext() {
+	for _, ok := iter.GetNext(); ok; _, ok = iter.GetNext() {
 		i++
-		_ = iter.DeleteNext()
+		_ = iter.Delete()
 	}
 
 	assert.Equal(t, 4, i)

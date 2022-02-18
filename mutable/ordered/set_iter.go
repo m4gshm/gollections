@@ -22,25 +22,19 @@ var (
 	_ c.DelIterator[any] = (*SetIter[any])(nil)
 )
 
-func (i *SetIter[T]) HasNext() bool {
-	return it.HasNext(*i.elements, i.current)
-}
-
-func (i *SetIter[T]) Next() T {
-	if i.HasNext() {
+func (i *SetIter[T]) GetNext() (T, bool) {
+	if it.HasNext(*i.elements, i.current) {
 		i.current++
-		return it.Get(*i.elements, i.current)
+		return it.Gett(*i.elements, i.current)
 	}
 	var no T
-	return no
+	return no, false
 }
 
-func (i *SetIter[T]) DeleteNext() bool {
-	if i.HasNext() {
-		if deleted := i.del(i.Next()); deleted {
-			i.current--
-			return true
-		}
+func (i *SetIter[T]) Delete() bool {
+	if v, ok := it.Gett(*i.elements, i.current); ok {
+		i.current--
+		return i.del(v)
 	}
 	return false
 }

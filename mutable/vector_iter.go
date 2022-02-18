@@ -17,8 +17,8 @@ func NewTail[T any](elements *[]T, del func(int) bool) *Iter[T] {
 
 //Iter is the Iterator implementation for mutable containers.
 type Iter[T any] struct {
-	current  int
 	elements *[]T
+	current, step  int
 	del      func(index int) bool
 }
 
@@ -36,26 +36,30 @@ func (i *Iter[T]) HasPrev() bool {
 	return it.HasPrev(*i.elements, i.current)
 }
 
-func (i *Iter[T]) Next() T {
+func (i *Iter[T]) GetNext() (T, bool) {
 	if i.HasNext() {
 		i.current++
-		return it.Get(*i.elements, i.current)
+		i.step = 1
+		return it.Get(*i.elements, i.current), true
 	}
 	var no T
-	return no
+	return no, false
 }
 
-func (i *Iter[T]) Prev() T {
+func (i *Iter[T]) GetPrev() (T, bool) {
 	if i.HasPrev() {
 		i.current--
-		return it.Get(*i.elements, i.current)
+		i.step = 0
+		return it.Get(*i.elements, i.current), true
 	}
 	var no T
-	return no
+	return no, false
 }
 
 func (i *Iter[T]) Delete() bool {
 	if deleted := i.del(i.current); deleted {
+		i.current -= i.step
+		// i.deleted = true
 		return true
 	}
 	return false

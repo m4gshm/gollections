@@ -9,7 +9,7 @@ import (
 // Where:
 // 		Collection - a collection type (may be slice, map or chain)
 // 		IT - a iterator type  (Iterator, KVIterator)
-type Container[Collection any, IT Iter] interface {
+type Container[Collection any, IT any] interface {
 	Collect() Collection
 	Iterable[IT]
 }
@@ -19,7 +19,7 @@ type Container[Collection any, IT Iter] interface {
 //		T - any arbitrary type
 // 		Collection - a collection type (may be slice, map or chain)
 // 		IT - a iterator type  (Iterator, KVIterator)
-type Collection[T any, Collection any, IT Iter] interface {
+type Collection[T any, Collection any, IT any] interface {
 	Container[Collection, IT]
 	Walk[T]
 	WalkEach[T]
@@ -55,44 +55,33 @@ type Map[K comparable, V any] interface {
 	Values() Collection[V, []V, Iterator[V]]
 }
 
-//Iter is the base for Iterator and KVIterator.
-type Iter interface {
-	//checks ability on next element or error.
-	HasNext() bool
-}
-
 //Iterator is the interface that provides iterate over elements of a collection.
 type Iterator[T any] interface {
-	Iter
-	//retrieves next element or zero value if no more elements
-	//must be called only after HasNext
-	Next() T
+	//retrieves a next element and true or zero value of T and false if no more elements.
+	GetNext() (T, bool)
 }
 
 //PrevIterator is the Iterator that provides reverse iteration over elements of a collection.
 type PrevIterator[T any] interface {
 	Iterator[T]
-	//retrieves next element or zero value if no more elements
-	//must be called only after HasNext
-	Prev() T
+	//retrieves a prev element and true or zero value of T and false if no more elements.
+	GetPrev() (T, bool)
 }
 
 //DelIterator is the Iterator provides deleting of current element.
 type DelIterator[T any] interface {
 	Iterator[T]
-	DeleteNext() bool
+	Delete() bool
 }
 
 //KVIterator is the interface that provides iterate over all key/value pair of a map.
 type KVIterator[K, V any] interface {
-	Iter
 	//retrieves next elements or zero values if no more elements
-	//must be called only after HasNext
-	Next() (K, V)
+	GetNext() (K, V, bool)
 }
 
 //Iterable is an iterator supplier interface
-type Iterable[IT Iter] interface {
+type Iterable[IT any] interface {
 	Begin() IT
 }
 

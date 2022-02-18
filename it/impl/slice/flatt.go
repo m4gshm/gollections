@@ -13,18 +13,16 @@ type FlattenFit[From, To any] struct {
 
 	elementsTo []To
 	indTo      int
-	current    To
 }
 
 var _ c.Iterator[any] = (*FlattenFit[any, any])(nil)
 
-func (s *FlattenFit[From, To]) HasNext() bool {
+func (s *FlattenFit[From, To]) GetNext() (To, bool) {
 	if elementsTo := s.elementsTo; len(elementsTo) > 0 {
 		if indTo := s.indTo; indTo < len(elementsTo) {
 			c := elementsTo[indTo]
-			s.current = c
 			s.indTo = indTo + 1
-			return true
+			return c, true
 		}
 		s.indTo = 0
 		s.elementsTo = nil
@@ -36,18 +34,15 @@ func (s *FlattenFit[From, To]) HasNext() bool {
 		s.indFrom = indFrom + 1
 		if v := elements[indFrom]; s.Fit(v) {
 			if elementsTo := s.Flatt(v); len(elementsTo) > 0 {
-				s.current = elementsTo[0]
+				c := elementsTo[0]
 				s.elementsTo = elementsTo
 				s.indTo = 1
-				return true
+				return c, true
 			}
 		}
 	}
-	return false
-}
-
-func (s *FlattenFit[From, To]) Next() To {
-	return s.current
+	var no To
+	return no, false
 }
 
 //Flatten is the Iterator impelementation that converts an element to a slice.
@@ -56,41 +51,35 @@ type Flatten[From, To any] struct {
 	Elements []From
 	Flatt    c.Flatter[From, To]
 
-	indFrom    int
-	elementsTo []To
-	indTo      int
-	current    To
+	indFrom, indTo *int
+	elementsTo     []To
 }
 
 var _ c.Iterator[any] = (*Flatten[any, any])(nil)
 
-func (s *Flatten[From, To]) HasNext() bool {
-	if elementsTo := s.elementsTo; len(elementsTo) > 0 {
-		if indTo := s.indTo; indTo < len(elementsTo) {
-			c := elementsTo[indTo]
-			s.current = c
-			s.indTo = indTo + 1
-			return true
+func (s *Flatten[From, To]) GetNext() (To, bool) {
+	if s.elementsTo != nil &&  len(s.elementsTo) > 0 {
+		if indTo := *s.indTo; indTo < len(s.elementsTo) {
+			c := (s.elementsTo)[indTo]
+			*s.indTo = indTo + 1
+			return c, true
 		}
-		s.indTo = 0
+		*s.indTo = 0
 		s.elementsTo = nil
 	}
 
 	elements := s.Elements
 	le := len(elements)
-	for indFrom := s.indFrom; indFrom < le; indFrom++ {
-		s.indFrom = indFrom + 1
+	for indFrom := *s.indFrom; indFrom < le; indFrom++ {
+		*s.indFrom = indFrom + 1
 		v := elements[indFrom]
 		if elementsTo := s.Flatt(v); len(elementsTo) > 0 {
-			s.current = elementsTo[0]
+			c := elementsTo[0]
 			s.elementsTo = elementsTo
-			s.indTo = 1
-			return true
+			*s.indTo = 1
+			return c, true
 		}
 	}
-	return false
-}
-
-func (s *Flatten[From, To]) Next() To {
-	return s.current
+	var no To
+	return no, false
 }
