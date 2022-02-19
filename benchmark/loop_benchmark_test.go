@@ -38,7 +38,7 @@ type benchCase struct {
 	load func(int)
 }
 
-var cases = []benchCase{{"high", HighLoad}, {"low", LowLoad}}
+var cases = []benchCase{/*{"high", HighLoad}, */{"low", LowLoad}}
 
 func Benchmark_HasNext_Iterator_Immutable_Vector(b *testing.B) {
 	c := vector.Of(values...)
