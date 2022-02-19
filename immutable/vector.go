@@ -43,6 +43,22 @@ func (v *Vector[T]) Tail() it.Iter[T] {
 	return it.NewTailS(v.elements, v.esize)
 }
 
+func (v *Vector[T]) GoForward() (it.Iter[T], T, bool) {
+	var (
+		iter      = it.NewHeadS(v.elements, v.esize)
+		first, ok = iter.GetNext()
+	)
+	return iter, first, ok
+}
+
+func (v *Vector[T]) GoBack() (it.Iter[T], T, bool) {
+	var (
+		iter      = it.NewTailS(v.elements, v.esize)
+		first, ok = iter.GetPrev()
+	)
+	return iter, first, ok
+}
+
 func (v *Vector[T]) Collect() []T {
 	return slice.Copy(v.elements)
 }

@@ -15,7 +15,7 @@ func Of[T any](elements ...T) *impl.Iter[T] {
 
 //Wrap creates the Iterator using sclie as the elements source.
 func Wrap[T any, TS ~[]T](elements TS) *impl.Iter[T] {
-	iter := impl.NewHead[T](elements)
+	iter := impl.NewHead(elements)
 	return &iter
 }
 
