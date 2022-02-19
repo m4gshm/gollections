@@ -23,3 +23,21 @@ func Test_PointerBasedIter(t *testing.T) {
 
 	assert.Equal(t, expected, result)
 }
+
+func Test_PointerBasedIter2(t *testing.T) {
+
+	type someType struct {
+		field1 string
+		field2 int64
+	}
+
+	expected := []someType{{"123", 123}, {"2", 2}, {"3", 3}, {"4", 4}}
+	iter := NewHead(expected)
+	result := make([]someType, 0)
+	for v, ok:= iter.GetNext(); ok; v,ok=iter.GetNext() {
+		result = append(result, v)
+	}
+
+	assert.Equal(t, expected, result)
+}
+
