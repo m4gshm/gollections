@@ -14,27 +14,27 @@ var ErrBreak = errors.New("Break")
 
 //Map creates the Iterator that converts elements with a converter and returns them.
 func Map[From, To any, IT c.Iterator[From]](elements IT, by c.Converter[From, To]) *Convert[From, To, IT, c.Converter[From, To]] {
-	return &Convert[From, To, IT, c.Converter[From, To]]{Iter: elements, By: by}
+	return &Convert[From, To, IT, c.Converter[From, To]]{iter: elements, by: by}
 }
 
 //MapFit additionally filters 'From' elements.
 func MapFit[From, To any, IT c.Iterator[From]](elements IT, fit c.Predicate[From], by c.Converter[From, To]) *ConvertFit[From, To, IT] {
-	return &ConvertFit[From, To, IT]{Iter: elements, By: by, Fit: fit}
+	return &ConvertFit[From, To, IT]{iter: elements, by: by, fit: fit}
 }
 
 //Flatt creates the Iterator that extracts slices of 'To' by a Flatter from elements of 'From' and flattens as one iterable collection of 'To' elements.
-func Flatt[From, To any, IT c.Iterator[From]](elements IT, by c.Flatter[From, To]) *Flatten[From, To] {
-	return &Flatten[From, To]{Iter: elements, Flatt: by}
+func Flatt[From, To any, IT c.Iterator[From]](elements IT, by c.Flatter[From, To]) *Flatten[From, To, IT] {
+	return &Flatten[From, To, IT]{iter: elements, flatt: by}
 }
 
 //FlattFit additionally filters 'From' elements.
-func FlattFit[From, To any, IT c.Iterator[From]](elements IT, fit c.Predicate[From], flatt c.Flatter[From, To]) *FlattenFit[From, To] {
-	return &FlattenFit[From, To]{Iter: elements, Flatt: flatt, Fit: fit}
+func FlattFit[From, To any, IT c.Iterator[From]](elements IT, fit c.Predicate[From], flatt c.Flatter[From, To]) *FlattenFit[From, To, IT] {
+	return &FlattenFit[From, To, IT]{iter: elements, flatt: flatt, fit: fit}
 }
 
 //Filter creates the Iterator that checks elements by filters and returns successful ones.
 func Filter[T any, IT c.Iterator[T]](elements IT, filter c.Predicate[T]) *Fit[T, IT] {
-	return &Fit[T, IT]{Iter: elements, By: filter}
+	return &Fit[T, IT]{iter: elements, by: filter}
 }
 
 //NotNil creates the Iterator that filters nullable elements.
@@ -44,12 +44,12 @@ func NotNil[T any, IT c.Iterator[*T]](elements IT) *Fit[*T, IT] {
 
 //MapKV creates the Iterator that converts elements with a converter and returns them.
 func MapKV[K, V any, IT c.KVIterator[K, V], k2, v2 any](elements IT, by c.BiConverter[K, V, k2, v2]) *ConvertKV[K, V, IT, k2, v2, c.BiConverter[K, V, k2, v2]] {
-	return &ConvertKV[K, V, IT, k2, v2, c.BiConverter[K, V, k2, v2]]{Iter: elements, By: by}
+	return &ConvertKV[K, V, IT, k2, v2, c.BiConverter[K, V, k2, v2]]{iter: elements, by: by}
 }
 
 //FilterKV creates the Iterator that checks elements by filters and returns successful ones.
 func FilterKV[K, V any, IT c.KVIterator[K, V]](elements IT, filter c.BiPredicate[K, V]) *FitKV[K, V, IT] {
-	return &FitKV[K, V, IT]{Iter: elements, By: filter}
+	return &FitKV[K, V, IT]{iter: elements, by: filter}
 }
 
 //Group transforms iterable elements to the MapPipe based on applying key extractor to the elements
@@ -114,7 +114,7 @@ func ReduceKV[K, V any, IT c.KVIterator[K, V]](elements IT, by op.Quaternary[K, 
 
 //Slice converts an Iterator to a slice.
 func Slice[T any, IT c.Iterator[T]](elements IT) []T {
-	s := make([]T, 0)
+	s := make([]T, 0, elements.Cap())
 	for v, ok := elements.Next(); ok; v, ok = elements.Next() {
 		s = append(s, v)
 	}

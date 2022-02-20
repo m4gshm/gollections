@@ -5,8 +5,8 @@ import (
 )
 
 type ConvertFit[From, To any] struct {
-	Elements []From
-	By       c.Converter[From, To]
+	elements []From
+	by       c.Converter[From, To]
 	Fit      c.Predicate[From]
 	i        int
 }
@@ -14,16 +14,20 @@ type ConvertFit[From, To any] struct {
 var _ c.Iterator[any] = (*ConvertFit[any, any])(nil)
 
 func (s *ConvertFit[From, To]) Next() (To, bool) {
-	if v, ok := nextArrayElem(s.Elements, s.Fit, &s.i); ok {
-		return s.By(v), true
+	if v, ok := nextArrayElem(s.elements, s.Fit, &s.i); ok {
+		return s.by(v), true
 	}
 	var no To
 	return no, false
 }
 
+func (s *ConvertFit[From, To]) Cap() int {
+	return len(s.elements)
+}
+
 type Convert[From, To any] struct {
-	Elements []From
-	By       c.Converter[From, To]
+	elements []From
+	by       c.Converter[From, To]
 	i        int
 	err      error
 }
@@ -31,16 +35,20 @@ type Convert[From, To any] struct {
 var _ c.Iterator[any] = (*Convert[any, any])(nil)
 
 func (s *Convert[From, To]) Next() (To, bool) {
-	e := s.Elements
-	l := len(s.Elements)
+	e := s.elements
+	l := len(s.elements)
 	i := s.i
 	if i < l {
 		v := e[i]
 		s.i = i + 1
-		return s.By(v), true
+		return s.by(v), true
 	}
 	var no To
 	return no, false
+}
+
+func (s *Convert[From, To]) Cap() int {
+	return len(s.elements)
 }
 
 func nextArrayElem[T any](elements []T, filter c.Predicate[T], indexHolder *int) (T, bool) {

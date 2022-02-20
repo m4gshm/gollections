@@ -107,6 +107,10 @@ func (i *Iter[T]) Get() (T, bool) {
 	return no, false
 }
 
+func (i *Iter[T]) Cap() int {
+	return i.size
+}
+
 //HasNext checks the next element in an iterator by indexs of a current element and slice length.
 func HasNext[T any](elements []T, current int) bool {
 	return HasNextBySize(GetLen(elements), current)

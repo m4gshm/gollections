@@ -21,33 +21,38 @@ func NewKV[K comparable, V any](elements map[K]V) *KV[K, V] {
 	i := any(m)
 	maptype := *(*unsafe.Pointer)(unsafe.Pointer(&i))
 
-	return &KV[K, V]{maptype: maptype, hmap: hmap}
+	return &KV[K, V]{maptype: maptype, hmap: hmap, size: len(elements)}
 }
 
 type KV[K comparable, V any] struct {
-	hiter
+	iter    hiter
 	maptype unsafe.Pointer
 	hmap    unsafe.Pointer
+	size    int
 }
 
 var _ c.KVIterator[int, any] = (*KV[int, any])(nil)
 
 func (i *KV[K, V]) Next() (K, V, bool) {
-	if !i.hiter.initialized() {
-		mapiterinit(i.maptype, i.hmap, &i.hiter)
+	if !i.iter.initialized() {
+		mapiterinit(i.maptype, i.hmap, &i.iter)
 	} else {
-		mapiternext(&i.hiter)
+		mapiternext(&i.iter)
 	}
-	iterkey := mapiterkey(&i.hiter)
+	iterkey := mapiterkey(&i.iter)
 	if iterkey == nil {
 		var key K
 		var value V
 		return key, value, false
 	}
-	iterelem := mapiterelem(&i.hiter)
+	iterelem := mapiterelem(&i.iter)
 	var key *K = (*K)(iterkey)
 	var value *V = (*V)(iterelem)
 	return *key, *value, true
+}
+
+func (i *KV[K, V]) Cap() int {
+	return i.size
 }
 
 //go:linkname mapiterinit reflect.mapiterinit
@@ -103,6 +108,10 @@ func (i *OrderedKV[K, V]) Next() (K, V, bool) {
 	return k, v, false
 }
 
+func (i *OrderedKV[K, V]) Cap() int {
+	return i.elements.Cap()
+}
+
 func NewKey[K comparable, V any](uniques map[K]V) *Key[K, V] {
 	return &Key[K, V]{KV: NewKV(uniques)}
 }
@@ -131,4 +140,8 @@ var _ c.Iterator[any] = (*Val[int, any])(nil)
 func (i *Val[K, V]) Next() (V, bool) {
 	_, val, ok := i.KV.Next()
 	return val, ok
+}
+
+func (i *Val[K, V]) Cap() int {
+	return i.KV.Cap()
 }

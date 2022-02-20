@@ -31,6 +31,10 @@ func (i *SetIter[T]) Next() (T, bool) {
 	return no, false
 }
 
+func (i *SetIter[T]) Cap() int {
+	return len(*i.elements)
+}
+
 func (i *SetIter[T]) Delete() bool {
 	if v, ok := it.Gett(*i.elements, i.current); ok {
 		i.current--

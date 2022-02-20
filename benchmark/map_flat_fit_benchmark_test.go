@@ -345,6 +345,8 @@ func Benchmark_ReduceSum_Slice_Impl(b *testing.B) {
 
 func Benchmark_ReduceSum_Slice_PlainOld(b *testing.B) {
 	multiDimension := [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
+	isOdd := func(val int) bool { return val%2 != 0 }
+	sum := func(a, v int) int { return a + v }
 	b.ResetTimer()
 	oddSum := 0
 	for j := 0; j < b.N; j++ {
@@ -352,8 +354,8 @@ func Benchmark_ReduceSum_Slice_PlainOld(b *testing.B) {
 		for _, i := range multiDimension {
 			for _, ii := range i {
 				for _, iii := range ii {
-					if iii%2 != 0 {
-						oddSum += iii
+					if isOdd(iii % 2) {
+						oddSum = sum(oddSum, iii)
 					}
 				}
 			}
@@ -438,12 +440,9 @@ func Benchmark_MapFlattStructure_SliceWithoutNilCheck(b *testing.B) {
 }
 
 func Benchmark_MapFlattStructure_Slice_PlainOld(b *testing.B) {
-
 	items := []*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil}
 
-	b.ResetTimer()
-	for j := 0; j < b.N; j++ {
-
+	flatt := func(items []*Participant) []string {
 		names := make([]string, 0)
 		for _, i := range items {
 			if check.NotNil(i) {
@@ -454,6 +453,11 @@ func Benchmark_MapFlattStructure_Slice_PlainOld(b *testing.B) {
 				}
 			}
 		}
+		return names
+	}
+	b.ResetTimer()
+	for j := 0; j < b.N; j++ {
+		_ = flatt(items)
 	}
 	b.StopTimer()
 }

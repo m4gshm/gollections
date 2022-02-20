@@ -59,6 +59,7 @@ type Map[K comparable, V any] interface {
 type Iterator[T any] interface {
 	//retrieves a next element and true or zero value of T and false if no more elements.
 	Next() (T, bool)
+	Cap() int
 }
 
 //PrevIterator is the Iterator that provides reverse iteration over elements of a collection.
@@ -78,6 +79,7 @@ type DelIterator[T any] interface {
 type KVIterator[K, V any] interface {
 	//retrieves next elements or zero values if no more elements
 	Next() (K, V, bool)
+	Cap() int
 }
 
 //Iterable is an iterator supplier interface

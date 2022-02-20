@@ -2,18 +2,17 @@ package it
 
 import "github.com/m4gshm/gollections/c"
 
-type FlattenFit[From, To any] struct {
-	Iter  c.Iterator[From]
-	Flatt c.Flatter[From, To]
-	Fit   c.Predicate[From]
-
+type FlattenFit[From, To any, IT c.Iterator[From]] struct {
+	iter       IT
+	flatt      c.Flatter[From, To]
+	fit        c.Predicate[From]
 	elementsTo []To
 	indTo      int
 }
 
-var _ c.Iterator[any] = (*FlattenFit[any, any])(nil)
+var _ c.Iterator[any] = (*FlattenFit[any, any, c.Iterator[any]])(nil)
 
-func (s *FlattenFit[From, To]) Next() (To, bool) {
+func (s *FlattenFit[From, To, IT]) Next() (To, bool) {
 	if elementsTo := s.elementsTo; len(elementsTo) > 0 {
 		if indTo := s.indTo; indTo < len(elementsTo) {
 			c := elementsTo[indTo]
@@ -24,9 +23,9 @@ func (s *FlattenFit[From, To]) Next() (To, bool) {
 		s.elementsTo = nil
 	}
 
-	iter := s.Iter
-	for v, ok := iter.Next(); ok && s.Fit(v); v, ok = iter.Next() {
-		if elementsTo := s.Flatt(v); len(elementsTo) > 0 {
+	iter := s.iter
+	for v, ok := iter.Next(); ok && s.fit(v); v, ok = iter.Next() {
+		if elementsTo := s.flatt(v); len(elementsTo) > 0 {
 			c := elementsTo[0]
 			s.elementsTo = elementsTo
 			s.indTo = 1
@@ -37,17 +36,20 @@ func (s *FlattenFit[From, To]) Next() (To, bool) {
 	return no, false
 }
 
-type Flatten[From, To any] struct {
-	Iter  c.Iterator[From]
-	Flatt c.Flatter[From, To]
+func (s *FlattenFit[From, To, IT]) Cap() int {
+	return s.iter.Cap()
+}
 
+type Flatten[From, To any, IT c.Iterator[From]] struct {
+	iter       IT
+	flatt      c.Flatter[From, To]
 	elementsTo []To
 	indTo      int
 }
 
-var _ c.Iterator[any] = (*Flatten[any, any])(nil)
+var _ c.Iterator[any] = (*Flatten[any, any, c.Iterator[any]])(nil)
 
-func (s *Flatten[From, To]) Next() (To, bool) {
+func (s *Flatten[From, To, IT]) Next() (To, bool) {
 	if elementsTo := s.elementsTo; len(elementsTo) > 0 {
 		if indTo := s.indTo; indTo < len(elementsTo) {
 			c := elementsTo[indTo]
@@ -59,14 +61,18 @@ func (s *Flatten[From, To]) Next() (To, bool) {
 	}
 
 	for {
-		if v, ok := s.Iter.Next(); !ok {
+		if v, ok := s.iter.Next(); !ok {
 			var no To
 			return no, false
-		} else if elementsTo := s.Flatt(v); len(elementsTo) > 0 {
+		} else if elementsTo := s.flatt(v); len(elementsTo) > 0 {
 			c := elementsTo[0]
 			s.elementsTo = elementsTo
 			s.indTo = 1
 			return c, true
 		}
 	}
+}
+
+func (s *Flatten[From, To, IT]) Cap() int {
+	return s.iter.Cap()
 }

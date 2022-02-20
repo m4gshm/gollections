@@ -3,34 +3,36 @@ package it
 import "github.com/m4gshm/gollections/c"
 
 type Fit[T any, IT c.Iterator[T]] struct {
-	Iter IT
-	By   c.Predicate[T]
-
-	current T
-	err     error
+	iter IT
+	by   c.Predicate[T]
 }
 
 var _ c.Iterator[any] = (*Fit[any, c.Iterator[any]])(nil)
 
 func (s *Fit[T, IT]) Next() (T, bool) {
-	return nextFiltered(s.Iter, s.By)
+	return nextFiltered(s.iter, s.by)
+}
+
+func (s *Fit[T, IT]) Cap() int {
+	return s.iter.Cap()
 }
 
 type FitKV[K, V any, IT c.KVIterator[K, V]] struct {
-	Iter IT
-	By   c.BiPredicate[K, V]
-
-	currentK K
-	currentV V
+	iter IT
+	by   c.BiPredicate[K, V]
 }
 
 var _ c.KVIterator[any, any] = (*FitKV[any, any, c.KVIterator[any, any]])(nil)
 
 func (s *FitKV[K, V, IT]) Next() (K, V, bool) {
-	return nextFilteredKV(s.Iter, s.By)
+	return nextFilteredKV(s.iter, s.by)
 }
 
-func nextFiltered[T any, IT c.Iterator[T], F c.Predicate[T]](iter IT, filter F) (T, bool) {
+func (s *FitKV[K, V, IT]) Cap() int {
+	return s.iter.Cap()
+}
+
+func nextFiltered[T any, IT c.Iterator[T]](iter IT, filter c.Predicate[T]) (T, bool) {
 	for v, ok := iter.Next(); ok; v, ok = iter.Next() {
 		if filter(v) {
 			return v, true
@@ -40,12 +42,11 @@ func nextFiltered[T any, IT c.Iterator[T], F c.Predicate[T]](iter IT, filter F) 
 	return v, false
 }
 
-func nextFilteredKV[K any, V any, IT c.KVIterator[K, V], F c.BiPredicate[K, V]](iter IT, filter F) (K, V, bool) {
+func nextFilteredKV[K any, V any, IT c.KVIterator[K, V]](iter IT, filter c.BiPredicate[K, V]) (K, V, bool) {
 	for key, val, ok := iter.Next(); ok; key, val, ok = iter.Next() {
 		if filter(key, val) {
 			return key, val, true
 		}
-
 	}
 	var key K
 	var val V

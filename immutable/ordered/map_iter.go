@@ -27,3 +27,7 @@ func (s *ValIter[K, V]) Next() (V, bool) {
 	var no V
 	return no, false
 }
+
+func (s *ValIter[K, V]) Cap() int {
+	return len(s.elements)
+}

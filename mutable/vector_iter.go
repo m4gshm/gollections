@@ -79,3 +79,7 @@ func (i *Iter[T]) DeletePrev() bool {
 	}
 	return false
 }
+
+func (i *Iter[T]) Cap() int {
+	return len(*i.elements)
+}
