@@ -23,8 +23,8 @@ var (
 	_ c.DelIterator[int] = (*SetIter[int])(nil)
 )
 
-func (i *SetIter[K]) GetNext() (K, bool) {
-	key, _, ok := i.KV.GetNext()
+func (i *SetIter[K]) Next() (K, bool) {
+	key, _, ok := i.KV.Next()
 	i.currentKey = key
 	i.ok = ok
 	return key, ok

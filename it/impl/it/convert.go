@@ -11,7 +11,7 @@ type ConvertFit[From, To any, IT c.Iterator[From]] struct {
 
 var _ c.Iterator[any] = (*ConvertFit[any, any, c.Iterator[any]])(nil)
 
-func (s *ConvertFit[From, To, IT]) GetNext() (To, bool) {
+func (s *ConvertFit[From, To, IT]) Next() (To, bool) {
 	if v, ok := nextFiltered(s.Iter, s.Fit); ok {
 		return s.By(v), true
 	}
@@ -19,7 +19,7 @@ func (s *ConvertFit[From, To, IT]) GetNext() (To, bool) {
 	return no, false
 }
 
-func (s *ConvertFit[From, To, IT]) Next() To {
+func (s *ConvertFit[From, To, IT]) GetNext() To {
 	return s.current
 }
 
@@ -30,8 +30,8 @@ type Convert[From, To any, IT c.Iterator[From], C c.Converter[From, To]] struct 
 
 var _ c.Iterator[any] = (*Convert[any, any, c.Iterator[any], c.Converter[any, any]])(nil)
 
-func (s *Convert[From, To, IT, C]) GetNext() (To, bool) {
-	if v, ok := s.Iter.GetNext(); ok {
+func (s *Convert[From, To, IT, C]) Next() (To, bool) {
+	if v, ok := s.Iter.Next(); ok {
 		return s.By(v), true
 	}
 	var no To
@@ -45,8 +45,8 @@ type ConvertKV[k, v any, IT c.KVIterator[k, v], k2, v2 any, C c.BiConverter[k, v
 
 var _ c.KVIterator[any, any] = (*ConvertKV[any, any, c.KVIterator[any, any], any, any, c.BiConverter[any, any, any, any]])(nil)
 
-func (s *ConvertKV[K, V, IT, K2, V2, C]) GetNext() (K2, V2, bool) {
-	k, v, ok := s.Iter.GetNext()
+func (s *ConvertKV[K, V, IT, K2, V2, C]) Next() (K2, V2, bool) {
+	k, v, ok := s.Iter.Next()
 	if ok {
 		k2, v2 := s.By(k, v)
 		return k2, v2, true

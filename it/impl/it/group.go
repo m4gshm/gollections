@@ -14,8 +14,8 @@ type KeyValuer[K comparable, V any, IT c.Iterator[V]] struct {
 
 var _ c.KVIterator[int, any] = (*KeyValuer[int, any, c.Iterator[any]])(nil)
 
-func (s *KeyValuer[K, V, IT]) GetNext() (K, V, bool) {
-	v, ok := s.iter.GetNext()
+func (s *KeyValuer[K, V, IT]) Next() (K, V, bool) {
+	v, ok := s.iter.Next()
 	if !ok {
 		var k K
 		var v V

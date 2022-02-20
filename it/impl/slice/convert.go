@@ -13,7 +13,7 @@ type ConvertFit[From, To any] struct {
 
 var _ c.Iterator[any] = (*ConvertFit[any, any])(nil)
 
-func (s *ConvertFit[From, To]) GetNext() (To, bool) {
+func (s *ConvertFit[From, To]) Next() (To, bool) {
 	if v, ok := nextArrayElem(s.Elements, s.Fit, &s.i); ok {
 		return s.By(v), true
 	}
@@ -30,7 +30,7 @@ type Convert[From, To any] struct {
 
 var _ c.Iterator[any] = (*Convert[any, any])(nil)
 
-func (s *Convert[From, To]) GetNext() (To, bool) {
+func (s *Convert[From, To]) Next() (To, bool) {
 	e := s.Elements
 	l := len(s.Elements)
 	i := s.i
@@ -42,7 +42,6 @@ func (s *Convert[From, To]) GetNext() (To, bool) {
 	var no To
 	return no, false
 }
-
 
 func nextArrayElem[T any](elements []T, filter c.Predicate[T], indexHolder *int) (T, bool) {
 	l := len(elements)

@@ -19,6 +19,6 @@ func (k *KV[K, V]) Value() V {
 	return k.V
 }
 
-func (k *KV[K, V]) Next() (K, V) {
+func (k *KV[K, V]) GetNext() (K, V) {
 	return k.K, k.V
 }

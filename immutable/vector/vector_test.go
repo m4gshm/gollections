@@ -14,7 +14,7 @@ func Test_VectorIterate(t *testing.T) {
 	result := make([]int, v.Len())
 	i := 0
 	for it := v.Head(); it.HasNext(); {
-		result[i] = it.Next()
+		result[i] = it.GetNext()
 		i++
 	}
 	assert.Equal(t, expected, result)
@@ -26,7 +26,7 @@ func Test_VectorReverseIteration(t *testing.T) {
 	result := make([]int, v.Len())
 	i := 0
 	for it := v.Tail(); it.HasPrev(); {
-		result[i] = it.Prev()
+		result[i] = it.GetPrev()
 		i++
 	}
 	assert.Equal(t, expected, result)

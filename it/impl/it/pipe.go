@@ -44,7 +44,7 @@ func (s *IterPipe[T]) Begin() c.Iterator[T] {
 func (s *IterPipe[T]) Collect() []T {
 	e := s.elements
 	if e == nil {
-		for v, ok := s.it.GetNext(); ok; v, ok = s.it.GetNext() {
+		for v, ok := s.it.Next(); ok; v, ok = s.it.Next() {
 			e = append(e, v)
 		}
 		s.elements = e

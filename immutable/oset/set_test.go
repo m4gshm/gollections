@@ -25,7 +25,7 @@ func Test_Set_Iterate(t *testing.T) {
 
 	out := make([]int, 0)
 	it := set.Begin()
-	for v, ok := it.GetNext(); ok; v, ok = it.GetNext() {
+	for v, ok := it.Next(); ok; v, ok = it.Next() {
 		out = append(out, v)
 	}
 	assert.Equal(t, expected, out)

@@ -54,6 +54,22 @@ func (s *Set[T]) Revert() it.Iter[T] {
 	return it.NewTailS(s.order, s.esize)
 }
 
+func (s *Set[T]) First() (it.Iter[T], T, bool) {
+	var (
+		iter      = it.NewHeadS(s.order, s.esize)
+		first, ok = iter.Next()
+	)
+	return iter, first, ok
+}
+
+func (s *Set[T]) Last() (it.Iter[T], T, bool) {
+	var (
+		iter      = it.NewTailS(s.order, s.esize)
+		first, ok = iter.Prev()
+	)
+	return iter, first, ok
+}
+
 func (s *Set[T]) Collect() []T {
 	return slice.Copy(s.order)
 }

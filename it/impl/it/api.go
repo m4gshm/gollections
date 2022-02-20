@@ -59,7 +59,7 @@ func Group[T any, K comparable, IT c.Iterator[T]](elements IT, by c.Converter[T,
 
 //For applies a walker to elements of an Iterator. To stop walking just return the ErrBreak.
 func For[T any, IT c.Iterator[T]](elements IT, walker func(T) error) error {
-	for v, ok := elements.GetNext(); ok; v, ok = elements.GetNext() {
+	for v, ok := elements.Next(); ok; v, ok = elements.Next() {
 		if err := walker(v); err == ErrBreak {
 			return nil
 		} else if err != nil {
@@ -71,14 +71,14 @@ func For[T any, IT c.Iterator[T]](elements IT, walker func(T) error) error {
 
 //ForEach applies a walker to elements of an Iterator.
 func ForEach[T any, IT c.Iterator[T]](elements IT, walker func(T)) {
-	for v, ok := elements.GetNext(); ok; v, ok = elements.GetNext() {
+	for v, ok := elements.Next(); ok; v, ok = elements.Next() {
 		walker(v)
 	}
 }
 
 //ForEachFit applies a walker to elements that satisfy a predicate condition.
 func ForEachFit[T any, IT c.Iterator[T]](elements IT, walker func(T), fit c.Predicate[T]) {
-	for v, ok := elements.GetNext(); ok && fit(v); v, ok = elements.GetNext() {
+	for v, ok := elements.Next(); ok && fit(v); v, ok = elements.Next() {
 		walker(v)
 	}
 }
@@ -86,12 +86,12 @@ func ForEachFit[T any, IT c.Iterator[T]](elements IT, walker func(T), fit c.Pred
 //Reduce reduces elements to an one.
 func Reduce[T any, IT c.Iterator[T]](elements IT, by op.Binary[T]) T {
 	var result T
-	if v, ok := elements.GetNext(); ok {
+	if v, ok := elements.Next(); ok {
 		result = v
 	} else {
 		return result
 	}
-	for v, ok := elements.GetNext(); ok; v, ok = elements.GetNext() {
+	for v, ok := elements.Next(); ok; v, ok = elements.Next() {
 		result = by(result, v)
 	}
 	return result
@@ -101,12 +101,12 @@ func Reduce[T any, IT c.Iterator[T]](elements IT, by op.Binary[T]) T {
 func ReduceKV[K, V any, IT c.KVIterator[K, V]](elements IT, by op.Quaternary[K, V]) (K, V) {
 	var rk K
 	var rv V
-	if k, v, ok := elements.GetNext(); ok {
+	if k, v, ok := elements.Next(); ok {
 		rk, rv = k, v
 	} else {
 		return rk, rv
 	}
-	for k, v, ok := elements.GetNext(); ok; k, v, ok = elements.GetNext() {
+	for k, v, ok := elements.Next(); ok; k, v, ok = elements.Next() {
 		rk, rv = by(rk, rv, k, v)
 	}
 	return rk, rv
@@ -115,7 +115,7 @@ func ReduceKV[K, V any, IT c.KVIterator[K, V]](elements IT, by op.Quaternary[K, 
 //Slice converts an Iterator to a slice.
 func Slice[T any, IT c.Iterator[T]](elements IT) []T {
 	s := make([]T, 0)
-	for v, ok := elements.GetNext(); ok; v, ok = elements.GetNext() {
+	for v, ok := elements.Next(); ok; v, ok = elements.Next() {
 		s = append(s, v)
 	}
 	return s

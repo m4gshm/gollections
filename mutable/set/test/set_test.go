@@ -30,7 +30,7 @@ func Test_Set_Iterate(t *testing.T) {
 
 	out := make(map[int]int, 0)
 	it := set.Begin()
-	for v, ok:=it.GetNext(); ok; v,ok=it.GetNext() {
+	for v, ok := it.Next(); ok; v, ok = it.Next() {
 		out[v] = v
 	}
 
@@ -77,7 +77,7 @@ func Test_Set_DeleteByIterator(t *testing.T) {
 	iter := set.BeginEdit()
 
 	i := 0
-	for _, ok := iter.GetNext(); ok; _, ok = iter.GetNext() {
+	for _, ok := iter.Next(); ok; _, ok = iter.Next() {
 		i++
 		_ = iter.Delete()
 	}

@@ -17,7 +17,7 @@ type FlattenFit[From, To any] struct {
 
 var _ c.Iterator[any] = (*FlattenFit[any, any])(nil)
 
-func (s *FlattenFit[From, To]) GetNext() (To, bool) {
+func (s *FlattenFit[From, To]) Next() (To, bool) {
 	if elementsTo := s.elementsTo; len(elementsTo) > 0 {
 		if indTo := s.indTo; indTo < len(elementsTo) {
 			c := elementsTo[indTo]
@@ -57,8 +57,8 @@ type Flatten[From, To any] struct {
 
 var _ c.Iterator[any] = (*Flatten[any, any])(nil)
 
-func (s *Flatten[From, To]) GetNext() (To, bool) {
-	if s.elementsTo != nil &&  len(s.elementsTo) > 0 {
+func (s *Flatten[From, To]) Next() (To, bool) {
+	if s.elementsTo != nil && len(s.elementsTo) > 0 {
 		if indTo := *s.indTo; indTo < len(s.elementsTo) {
 			c := (s.elementsTo)[indTo]
 			*s.indTo = indTo + 1

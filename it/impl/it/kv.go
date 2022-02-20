@@ -32,30 +32,7 @@ type KV[K comparable, V any] struct {
 
 var _ c.KVIterator[int, any] = (*KV[int, any])(nil)
 
-// func (i *KV[K, V]) GetNext() (K, V, bool) {
-// 	ok := i.HasNext()
-// 	if ok {
-// 		k, v := i.Next()
-// 		return k, v, true
-// 	}
-// 	var k K
-// 	var v V
-// 	return k, v, false
-// }
-
-// func (i *KV[K, V]) HasNext() bool {
-// 	if !i.hiter.initialized() {
-// 		mapiterinit(i.maptype, i.hmap, &i.hiter)
-// 	} else {
-// 		if mapiterkey(&i.hiter) == nil {
-// 			return false
-// 		}
-// 		mapiternext(&i.hiter)
-// 	}
-// 	return mapiterkey(&i.hiter) != nil
-// }
-
-func (i *KV[K, V]) GetNext() (K, V, bool) {
+func (i *KV[K, V]) Next() (K, V, bool) {
 	if !i.hiter.initialized() {
 		mapiterinit(i.maptype, i.hmap, &i.hiter)
 	} else {
@@ -117,8 +94,8 @@ type OrderedKV[K comparable, V any] struct {
 
 var _ c.KVIterator[string, any] = (*OrderedKV[string, any])(nil)
 
-func (i *OrderedKV[K, V]) GetNext() (K, V, bool) {
-	if key, ok := i.elements.GetNext(); ok {
+func (i *OrderedKV[K, V]) Next() (K, V, bool) {
+	if key, ok := i.elements.Next(); ok {
 		return key, i.uniques[key], true
 	}
 	var k K
@@ -136,8 +113,8 @@ type Key[K comparable, V any] struct {
 
 var _ c.Iterator[string] = (*Key[string, any])(nil)
 
-func (i *Key[K, V]) GetNext() (K, bool) {
-	key, _, ok := i.KV.GetNext()
+func (i *Key[K, V]) Next() (K, bool) {
+	key, _, ok := i.KV.Next()
 	return key, ok
 }
 
@@ -151,7 +128,7 @@ type Val[K comparable, V any] struct {
 
 var _ c.Iterator[any] = (*Val[int, any])(nil)
 
-func (i *Val[K, V]) GetNext() (V, bool) {
-	_, val, ok := i.KV.GetNext()
+func (i *Val[K, V]) Next() (V, bool) {
+	_, val, ok := i.KV.Next()
 	return val, ok
 }

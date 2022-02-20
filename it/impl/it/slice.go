@@ -66,12 +66,12 @@ func (i *Iter[T]) HasPrev() bool {
 	return CanIterateByRange(1, i.size, i.current)
 }
 
-func (i *Iter[T]) Next() T {
-	t, _ := i.GetNext()
+func (i *Iter[T]) GetNext() T {
+	t, _ := i.Next()
 	return t
 }
 
-func (i *Iter[T]) GetNext() (T, bool) {
+func (i *Iter[T]) Next() (T, bool) {
 	current := i.current
 	if CanIterateByRange(NoStarted, i.maxHasNext, current) {
 		current++
@@ -82,12 +82,12 @@ func (i *Iter[T]) GetNext() (T, bool) {
 	return no, false
 }
 
-func (i *Iter[T]) Prev() T {
-	t, _ := i.GetPrev()
+func (i *Iter[T]) GetPrev() T {
+	t, _ := i.Prev()
 	return t
 }
 
-func (i *Iter[T]) GetPrev() (T, bool) {
+func (i *Iter[T]) Prev() (T, bool) {
 	current := i.current
 	if CanIterateByRange(1, i.size, current) {
 		current--
@@ -138,7 +138,7 @@ func IsValidIndex(size, index int) bool {
 }
 
 func IsValidIndex2(size, index int) bool {
-	return !((index ^ size == 0) || index < 0)
+	return !((index^size == 0) || index < 0)
 }
 
 //Get safely returns an element of a slice by an index or zero value of T if the index is out of range.

@@ -22,7 +22,7 @@ var (
 	_ c.DelIterator[any] = (*SetIter[any])(nil)
 )
 
-func (i *SetIter[T]) GetNext() (T, bool) {
+func (i *SetIter[T]) Next() (T, bool) {
 	if it.HasNext(*i.elements, i.current) {
 		i.current++
 		return it.Gett(*i.elements, i.current)

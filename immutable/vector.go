@@ -43,18 +43,18 @@ func (v *Vector[T]) Tail() it.Iter[T] {
 	return it.NewTailS(v.elements, v.esize)
 }
 
-func (v *Vector[T]) GoForward() (it.Iter[T], T, bool) {
+func (v *Vector[T]) First() (it.Iter[T], T, bool) {
 	var (
 		iter      = it.NewHeadS(v.elements, v.esize)
-		first, ok = iter.GetNext()
+		first, ok = iter.Next()
 	)
 	return iter, first, ok
 }
 
-func (v *Vector[T]) GoBack() (it.Iter[T], T, bool) {
+func (v *Vector[T]) Last() (it.Iter[T], T, bool) {
 	var (
 		iter      = it.NewTailS(v.elements, v.esize)
-		first, ok = iter.GetPrev()
+		first, ok = iter.Prev()
 	)
 	return iter, first, ok
 }

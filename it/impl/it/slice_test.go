@@ -17,7 +17,7 @@ func Test_PointerBasedIter(t *testing.T) {
 	iter := NewHead(expected)
 	result := make([]someType, 0)
 	for iter.HasNext() {
-		n := iter.Next()
+		n := iter.GetNext()
 		result = append(result, n)
 	}
 
@@ -34,7 +34,7 @@ func Test_PointerBasedIter2(t *testing.T) {
 	expected := []someType{{"123", 123}, {"2", 2}, {"3", 3}, {"4", 4}}
 	iter := NewHead(expected)
 	result := make([]someType, 0)
-	for v, ok := iter.GetNext(); ok; v, ok = iter.GetNext() {
+	for v, ok := iter.Next(); ok; v, ok = iter.Next() {
 		result = append(result, v)
 	}
 
@@ -52,7 +52,7 @@ func Test_PointerBasedIter2Reverse(t *testing.T) {
 	expected := []someType{{"4", 4}, {"3", 3}, {"2", 2}, {"123", 123}}
 	iter := NewTail(values)
 	result := make([]someType, 0)
-	for v, ok := iter.GetPrev(); ok; v, ok = iter.GetPrev() {
+	for v, ok := iter.Prev(); ok; v, ok = iter.Prev() {
 		result = append(result, v)
 	}
 
@@ -73,11 +73,11 @@ func Test_PointerBasedIterTailGetNext(t *testing.T) {
 	_ = v
 	assert.False(t, ok)
 
-	v, ok = iter.GetNext() //no more elements, because the iterator has not been started
+	v, ok = iter.Next() //no more elements, because the iterator has not been started
 	_ = v
 	assert.False(t, ok)
 
-	v, ok = iter.GetPrev() //start from the latest element
+	v, ok = iter.Prev() //start from the latest element
 	assert.True(t, ok)
 	assert.Equal(t, someType{"4", 4}, v)
 
@@ -85,11 +85,11 @@ func Test_PointerBasedIterTailGetNext(t *testing.T) {
 	assert.True(t, ok)
 	assert.Equal(t, someType{"4", 4}, v)
 
-	v, ok = iter.GetNext()
+	v, ok = iter.Next()
 	_ = v
 	assert.False(t, ok) //no more elements after the latest
 
-	v, ok = iter.GetPrev() //gets prev
+	v, ok = iter.Prev() //gets prev
 	assert.Equal(t, someType{"3", 3}, v)
 	assert.True(t, ok)
 
@@ -97,7 +97,7 @@ func Test_PointerBasedIterTailGetNext(t *testing.T) {
 	assert.True(t, ok)
 	assert.Equal(t, someType{"3", 3}, v)
 
-	v, ok = iter.GetNext()
+	v, ok = iter.Next()
 	assert.True(t, ok) //returns to the latest
 	assert.Equal(t, someType{"4", 4}, v)
 
@@ -116,11 +116,11 @@ func Test_PointerBasedIterHeadGetPrev(t *testing.T) {
 	values := []someType{{"123", 123}, {"2", 2}, {"3", 3}, {"4", 4}}
 	iter := NewHead(values)
 
-	v, ok := iter.GetPrev()
+	v, ok := iter.Prev()
 	_ = v
 	assert.False(t, ok)
 
-	v, ok = iter.GetNext()
+	v, ok = iter.Next()
 	assert.True(t, ok)
 	assert.Equal(t, someType{"123", 123}, v)
 
@@ -128,11 +128,11 @@ func Test_PointerBasedIterHeadGetPrev(t *testing.T) {
 	assert.True(t, ok)
 	assert.Equal(t, someType{"123", 123}, v)
 
-	v, ok = iter.GetPrev()
+	v, ok = iter.Prev()
 	_ = v
 	assert.False(t, ok)
 
-	v, ok = iter.GetNext()
+	v, ok = iter.Next()
 	assert.True(t, ok)
 	assert.Equal(t, someType{"2", 2}, v)
 
@@ -140,7 +140,7 @@ func Test_PointerBasedIterHeadGetPrev(t *testing.T) {
 	assert.True(t, ok)
 	assert.Equal(t, someType{"2", 2}, v)
 
-	v, ok = iter.GetPrev()
+	v, ok = iter.Prev()
 	assert.True(t, ok)
 	assert.Equal(t, someType{"123", 123}, v)
 
@@ -160,11 +160,11 @@ func Test_PointerBasedEmptyIter(t *testing.T) {
 
 	iter := NewHead(values)
 
-	v, ok := iter.GetPrev()
+	v, ok := iter.Prev()
 	_ = v
 	assert.False(t, ok)
 
-	v, ok = iter.GetNext()
+	v, ok = iter.Next()
 	assert.False(t, ok)
 
 	v, ok = iter.Get()
@@ -174,11 +174,11 @@ func Test_PointerBasedEmptyIter(t *testing.T) {
 
 	iter = NewTail(values)
 
-	v, ok = iter.GetPrev()
+	v, ok = iter.Prev()
 	_ = v
 	assert.False(t, ok)
 
-	v, ok = iter.GetNext()
+	v, ok = iter.Next()
 	assert.False(t, ok)
 
 	v, ok = iter.Get()
@@ -195,11 +195,11 @@ func Test_PointerBasedOneElementIter(t *testing.T) {
 	values := []someType{{"only one", 1}}
 	iter := NewHead(values)
 
-	v, ok := iter.GetPrev()
+	v, ok := iter.Prev()
 	_ = v
 	assert.False(t, ok)
 
-	v, ok = iter.GetNext()
+	v, ok = iter.Next()
 	assert.True(t, ok)
 
 	v, ok = iter.Get()
@@ -207,11 +207,11 @@ func Test_PointerBasedOneElementIter(t *testing.T) {
 
 	iter = NewTail(values)
 
-	v, ok = iter.GetNext()
+	v, ok = iter.Next()
 	_ = v
 	assert.False(t, ok)
 
-	v, ok = iter.GetPrev()
+	v, ok = iter.Prev()
 	assert.True(t, ok)
 
 	v, ok = iter.Get()

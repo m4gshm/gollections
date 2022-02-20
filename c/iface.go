@@ -58,14 +58,14 @@ type Map[K comparable, V any] interface {
 //Iterator is the interface that provides iterate over elements of a collection.
 type Iterator[T any] interface {
 	//retrieves a next element and true or zero value of T and false if no more elements.
-	GetNext() (T, bool)
+	Next() (T, bool)
 }
 
 //PrevIterator is the Iterator that provides reverse iteration over elements of a collection.
 type PrevIterator[T any] interface {
 	Iterator[T]
 	//retrieves a prev element and true or zero value of T and false if no more elements.
-	GetPrev() (T, bool)
+	Prev() (T, bool)
 }
 
 //DelIterator is the Iterator provides deleting of current element.
@@ -77,7 +77,7 @@ type DelIterator[T any] interface {
 //KVIterator is the interface that provides iterate over all key/value pair of a map.
 type KVIterator[K, V any] interface {
 	//retrieves next elements or zero values if no more elements
-	GetNext() (K, V, bool)
+	Next() (K, V, bool)
 }
 
 //Iterable is an iterator supplier interface
