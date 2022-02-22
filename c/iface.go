@@ -59,6 +59,7 @@ type Map[K comparable, V any] interface {
 type Iterator[T any] interface {
 	//retrieves a next element and true or zero value of T and false if no more elements.
 	Next() (T, bool)
+	//returns an estimated internal storage capacity
 	Cap() int
 }
 
