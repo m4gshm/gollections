@@ -2,6 +2,8 @@ package it
 
 import (
 	"testing"
+
+	sunsafe "github.com/m4gshm/gollections/slice/unsafe"
 )
 
 type someType struct {
@@ -13,7 +15,7 @@ func Benchmark_GetTypeSize(b *testing.B) {
 
 	var size uintptr
 	for i := 0; i < b.N; i++ {
-		size = GetTypeSize[someType]()
+		size = sunsafe.GetTypeSize[someType]()
 	}
 
 	_ = size

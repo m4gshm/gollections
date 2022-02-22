@@ -8,6 +8,7 @@ import (
 	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
+	sunsafe "github.com/m4gshm/gollections/slice/unsafe"
 )
 
 //NewVector creates the Vector with a predefined capacity.
@@ -67,7 +68,7 @@ func (v *Vector[T]) IsEmpty() bool {
 }
 
 func (v *Vector[T]) Len() int {
-	return it.GetLen(v.elements)
+	return sunsafe.GetLen(v.elements)
 }
 
 func (v *Vector[T]) Track(tracker func(int, T) error) error {
