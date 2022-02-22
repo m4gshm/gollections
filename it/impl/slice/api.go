@@ -1,8 +1,11 @@
 package slice
 
 import (
+	"unsafe"
+
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/check"
+	"github.com/m4gshm/gollections/it/impl/it"
 )
 
 //Map creates the Iterator that converts elements with a converter and returns them.
@@ -17,7 +20,14 @@ func MapFit[From, To any, FS ~[]From](elements FS, fit c.Predicate[From], by c.C
 
 //Flatt creates the Iterator that extracts slices of 'To' by a Flatter from elements of 'From' and flattens as one iterable collection of 'To' elements.
 func Flatt[From, To any, FS ~[]From](elements FS, by c.Flatter[From, To]) *Flatten[From, To] {
-	return &Flatten[From, To]{elements: elements, flatt: by}
+	var (
+		header       = it.GetSliceHeaderByRef(unsafe.Pointer(&elements))
+		array        = unsafe.Pointer(header.Data)
+		size         = header.Len
+		elemSizeFrom = it.GetTypeSize[From]()
+		elemSizeTo   = it.GetTypeSize[To]()
+	)
+	return &Flatten[From, To]{arrayFrom: array, sizeFrom: size, elemSizeFrom: elemSizeFrom, elemSizeTo: elemSizeTo, flatt: by}
 }
 
 //FlattFit additionally filters –'From' elements.

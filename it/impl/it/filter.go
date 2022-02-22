@@ -7,13 +7,16 @@ type Fit[T any, IT c.Iterator[T]] struct {
 	by   c.Predicate[T]
 }
 
-var _ c.Iterator[any] = (*Fit[any, c.Iterator[any]])(nil)
+var (
+	_ c.Iterator[any] = (*Fit[any, c.Iterator[any]])(nil)
+	_ c.Iterator[any] = Fit[any, c.Iterator[any]]{}
+)
 
-func (s *Fit[T, IT]) Next() (T, bool) {
+func (s Fit[T, IT]) Next() (T, bool) {
 	return nextFiltered(s.iter, s.by)
 }
 
-func (s *Fit[T, IT]) Cap() int {
+func (s Fit[T, IT]) Cap() int {
 	return s.iter.Cap()
 }
 
@@ -22,13 +25,16 @@ type FitKV[K, V any, IT c.KVIterator[K, V]] struct {
 	by   c.BiPredicate[K, V]
 }
 
-var _ c.KVIterator[any, any] = (*FitKV[any, any, c.KVIterator[any, any]])(nil)
+var (
+	_ c.KVIterator[any, any] = (*FitKV[any, any, c.KVIterator[any, any]])(nil)
+	_ c.KVIterator[any, any] = FitKV[any, any, c.KVIterator[any, any]]{}
+)
 
-func (s *FitKV[K, V, IT]) Next() (K, V, bool) {
+func (s FitKV[K, V, IT]) Next() (K, V, bool) {
 	return nextFilteredKV(s.iter, s.by)
 }
 
-func (s *FitKV[K, V, IT]) Cap() int {
+func (s FitKV[K, V, IT]) Cap() int {
 	return s.iter.Cap()
 }
 
