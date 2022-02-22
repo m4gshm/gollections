@@ -9,7 +9,7 @@ on:
 jobs:
   build:
 
-    runs-on: 1.18rc1-bullseye
+    runs-on: golang:1.18rc1-bullseye
 
     steps:
     - uses: actions/checkout@main
