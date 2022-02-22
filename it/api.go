@@ -31,12 +31,14 @@ func MapFit[From, To any, IT c.Iterator[From]](elements IT, fit c.Predicate[From
 
 //Flatt creates the Iterator that extracts slices of 'To' by a Flatter from elements of 'From' and flattens as one iterable collection of 'To' elements.
 func Flatt[From, To any, IT c.Iterator[From]](elements IT, by c.Flatter[From, To]) c.Iterator[To] {
-	return impl.Flatt(elements, by)
+	iter := impl.Flatt(elements, by)
+	return &iter
 }
 
 //FlattFit additionally filters 'From' elements.
 func FlattFit[From, To any, IT c.Iterator[From]](elements IT, fit c.Predicate[From], flatt c.Flatter[From, To]) c.Iterator[To] {
-	return impl.FlattFit(elements, fit, flatt)
+	iter := impl.FlattFit(elements, fit, flatt)
+	return &iter
 }
 
 //Filter creates the Iterator that checks elements by a filter and returns successful ones.

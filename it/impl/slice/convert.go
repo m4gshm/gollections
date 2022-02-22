@@ -25,6 +25,10 @@ func (s *ConvertFit[From, To]) Cap() int {
 	return len(s.elements)
 }
 
+func (s ConvertFit[From, To]) R() *ConvertFit[From, To] {
+	return (*ConvertFit[From, To])(noescape(&s))
+}
+
 type Convert[From, To any] struct {
 	elements []From
 	by       c.Converter[From, To]
@@ -49,6 +53,10 @@ func (s *Convert[From, To]) Next() (To, bool) {
 
 func (s *Convert[From, To]) Cap() int {
 	return len(s.elements)
+}
+
+func (s Convert[From, To]) R() *Convert[From, To] {
+	return (*Convert[From, To])(noescape(&s))
 }
 
 func nextArrayElem[T any](elements []T, filter c.Predicate[T], indexHolder *int) (T, bool) {

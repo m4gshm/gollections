@@ -4,7 +4,7 @@ import (
 	"unsafe"
 
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/it/impl/it"
+	sunsafe "github.com/m4gshm/gollections/slice/unsafe"
 )
 
 type FlattenFit[From, To any] struct {
@@ -50,6 +50,10 @@ func (s *FlattenFit[From, To]) Cap() int {
 	return s.cap
 }
 
+func (s FlattenFit[From, To]) R() *FlattenFit[From, To] {
+	return (*FlattenFit[From, To])(noescape(&s))
+}
+
 //Flatten is the Iterator impelementation that converts an element to a slice.
 //For example, Flatten can be used to convert a multi-dimensional array to a one-dimensional array ([][]int -> []int).
 type Flatten[From, To any] struct {
@@ -67,20 +71,20 @@ func (s *Flatten[From, To]) Next() (To, bool) {
 	if sizeTo > 0 {
 		if indTo := s.indTo; indTo < sizeTo {
 			s.indTo++
-			return *(*To)(it.GetArrayElemRef(s.arrayTo, indTo, s.elemSizeTo)), true
+			return *(*To)(sunsafe.GetArrayElemRef(s.arrayTo, indTo, s.elemSizeTo)), true
 		}
 		s.indTo = 0
 		s.arrayTo = nil
 		s.sizeTo = 0
 	}
 	for indFrom := s.indFrom; indFrom < s.sizeFrom; indFrom++ {
-		if elementsTo := s.flatt(*(*From)(it.GetArrayElemRef(s.arrayFrom, indFrom, s.elemSizeFrom))); len(elementsTo) > 0 {
+		if elementsTo := s.flatt(*(*From)(sunsafe.GetArrayElemRef(s.arrayFrom, indFrom, s.elemSizeFrom))); len(elementsTo) > 0 {
 			s.indFrom = indFrom + 1
 			s.indTo = 1
-			header := it.GetSliceHeaderByRef(unsafe.Pointer(&elementsTo))
+			header := sunsafe.GetSliceHeaderByRef(unsafe.Pointer(&elementsTo))
 			s.arrayTo = unsafe.Pointer(header.Data)
 			s.sizeTo = header.Len
-			return  *(*To)(it.GetArrayElemRef(s.arrayTo, 0, s.elemSizeTo)), true
+			return *(*To)(sunsafe.GetArrayElemRef(s.arrayTo, 0, s.elemSizeTo)), true
 		}
 	}
 	var no To
@@ -89,4 +93,15 @@ func (s *Flatten[From, To]) Next() (To, bool) {
 
 func (s *Flatten[From, To]) Cap() int {
 	return s.sizeFrom
+}
+
+func (s Flatten[From, To]) R() *Flatten[From, To] {
+	return (*Flatten[From, To])(noescape(&s))
+}
+
+//go:nosplit
+//go:nocheckptr
+func noescape[T any](t *T) unsafe.Pointer {
+	x := uintptr(unsafe.Pointer(t))
+	return unsafe.Pointer(x ^ 0)
 }

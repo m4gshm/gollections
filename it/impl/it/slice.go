@@ -1,22 +1,22 @@
 package it
 
 import (
-	"reflect"
 	"unsafe"
 
 	"github.com/m4gshm/gollections/c"
+	sunsafe "github.com/m4gshm/gollections/slice/unsafe"
 )
 
 //NoStarted is the head Iterator position.
 const NoStarted = -1
 
 func NewHead[T any, TS ~[]T](elements TS) Iter[T] {
-	return NewHeadS(elements, GetTypeSize[T]())
+	return NewHeadS(elements, sunsafe.GetTypeSize[T]())
 }
 
 func NewHeadS[T any, TS ~[]T](elements TS, elementSize uintptr) Iter[T] {
 	var (
-		header = GetSliceHeaderByRef(unsafe.Pointer(&elements))
+		header = sunsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
 		array  = unsafe.Pointer(header.Data)
 		size   = header.Len
 	)
@@ -30,12 +30,12 @@ func NewHeadS[T any, TS ~[]T](elements TS, elementSize uintptr) Iter[T] {
 }
 
 func NewTail[T any](elements []T) Iter[T] {
-	return NewTailS(elements, GetTypeSize[T]())
+	return NewTailS(elements, sunsafe.GetTypeSize[T]())
 }
 
 func NewTailS[T any](elements []T, elementSize uintptr) Iter[T] {
 	var (
-		header = GetSliceHeaderByRef(unsafe.Pointer(&elements))
+		header = sunsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
 		array  = unsafe.Pointer(header.Data)
 		size   = header.Len
 	)
@@ -56,8 +56,8 @@ type Iter[T any] struct {
 }
 
 var (
-	_ c.Iterator[any]     = (*Iter[any])(nil)
-	_ c.PrevIterator[any] = (*Iter[any])(nil)
+	_ c.Iterator[any]        = (*Iter[any])(nil)
+	_ c.PrevIterator[any]    = (*Iter[any])(nil)
 )
 
 func (i *Iter[T]) HasNext() bool {
@@ -78,7 +78,7 @@ func (i *Iter[T]) Next() (T, bool) {
 	if CanIterateByRange(NoStarted, i.maxHasNext, current) {
 		current++
 		i.current = current
-		return *(*T)(GetArrayElemRef(i.array, current, i.elementSize)), true
+		return *(*T)(sunsafe.GetArrayElemRef(i.array, current, i.elementSize)), true
 	}
 	var no T
 	return no, false
@@ -94,7 +94,7 @@ func (i *Iter[T]) Prev() (T, bool) {
 	if CanIterateByRange(1, i.size, current) {
 		current--
 		i.current = current
-		return *(*T)(GetArrayElemRef(i.array, current, i.elementSize)), true
+		return *(*T)(sunsafe.GetArrayElemRef(i.array, current, i.elementSize)), true
 	}
 	var no T
 	return no, false
@@ -103,7 +103,7 @@ func (i *Iter[T]) Prev() (T, bool) {
 func (i *Iter[T]) Get() (T, bool) {
 	current := i.current
 	if IsValidIndex(i.size, current) {
-		return *(*T)(GetArrayElemRef(i.array, current, i.elementSize)), true
+		return *(*T)(sunsafe.GetArrayElemRef(i.array, current, i.elementSize)), true
 	}
 	var no T
 	return no, false
@@ -113,14 +113,18 @@ func (i *Iter[T]) Cap() int {
 	return i.size
 }
 
+func (i Iter[T]) R() *Iter[T] {
+	return (*Iter[T])(noescape(&i))
+}
+
 //HasNext checks the next element in an iterator by indexs of a current element and slice length.
 func HasNext[T any](elements []T, current int) bool {
-	return HasNextBySize(GetLen(elements), current)
+	return HasNextBySize(sunsafe.GetLen(elements), current)
 }
 
 //HasPrev checks the previos element in an iterator by indexs of a current element and slice length.
 func HasPrev[T any](elements []T, current int) bool {
-	return HasPrevBySize(GetLen(elements), current)
+	return HasPrevBySize(sunsafe.GetLen(elements), current)
 }
 
 //HasNextBySize checks the next element in an iterator by indexs of a current element and slice length.
@@ -163,38 +167,4 @@ func Gett[T any](elements []T, current int) (T, bool) {
 		return no, false
 	}
 	return (elements)[current], true
-}
-
-//GetArrayPointer retrieves the pointer of a slice underlying array
-func GetArrayPointer[T any](elements []T) unsafe.Pointer {
-	return unsafe.Pointer(GetSliceHeader(elements).Data)
-}
-
-//GetTypeSize retrieves size of a type T
-func GetTypeSize[T any]() uintptr {
-	var t T
-	return unsafe.Sizeof(t)
-}
-
-//GetArrayElem returns an element by index from the array referenced by an unsafe pointer
-func GetArrayElem[T any](array unsafe.Pointer, index int, elemSize uintptr) T {
-	return *(*T)(GetArrayElemRef(array, index, elemSize))
-}
-
-func GetArrayElemRef(array unsafe.Pointer, index int, elemSize uintptr) unsafe.Pointer {
-	return unsafe.Pointer(uintptr(array) + uintptr(index)*elemSize)
-}
-
-//GetLen returns the length of elements
-func GetLen[T any](elements []T) int {
-	return GetSliceHeader(elements).Len
-}
-
-//GetSliceHeader retrieves the SliceHeader of elements
-func GetSliceHeader[T any](elements []T) *reflect.SliceHeader {
-	return GetSliceHeaderByRef(unsafe.Pointer(&elements))
-}
-
-func GetSliceHeaderByRef(elements unsafe.Pointer) *reflect.SliceHeader {
-	return (*reflect.SliceHeader)(elements)
 }

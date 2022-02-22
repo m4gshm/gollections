@@ -7,6 +7,7 @@ import (
 	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/collect"
 	"github.com/m4gshm/gollections/op"
+	sunsafe "github.com/m4gshm/gollections/slice/unsafe"
 )
 
 //ErrBreak is For, Track breaker
@@ -23,13 +24,13 @@ func MapFit[From, To any, IT c.Iterator[From]](elements IT, fit c.Predicate[From
 }
 
 //Flatt creates the Iterator that extracts slices of 'To' by a Flatter from elements of 'From' and flattens as one iterable collection of 'To' elements.
-func Flatt[From, To any, IT c.Iterator[From]](elements IT, by c.Flatter[From, To]) *Flatten[From, To, IT] {
-	return &Flatten[From, To, IT]{iter: elements, flatt: by}
+func Flatt[From, To any, IT c.Iterator[From]](elements IT, by c.Flatter[From, To]) Flatten[From, To, IT] {
+	return Flatten[From, To, IT]{iter: elements, flatt: by, elemSizeTo: sunsafe.GetTypeSize[To]()}
 }
 
 //FlattFit additionally filters 'From' elements.
-func FlattFit[From, To any, IT c.Iterator[From]](elements IT, fit c.Predicate[From], flatt c.Flatter[From, To]) *FlattenFit[From, To, IT] {
-	return &FlattenFit[From, To, IT]{iter: elements, flatt: flatt, fit: fit}
+func FlattFit[From, To any, IT c.Iterator[From]](elements IT, fit c.Predicate[From], flatt c.Flatter[From, To]) FlattenFit[From, To, IT] {
+	return FlattenFit[From, To, IT]{iter: elements, flatt: flatt, fit: fit}
 }
 
 //Filter creates the Iterator that checks elements by filters and returns successful ones.
@@ -43,13 +44,13 @@ func NotNil[T any, IT c.Iterator[*T]](elements IT) Fit[*T, IT] {
 }
 
 //MapKV creates the Iterator that converts elements with a converter and returns them.
-func MapKV[K, V any, IT c.KVIterator[K, V], k2, v2 any](elements IT, by c.BiConverter[K, V, k2, v2]) *ConvertKV[K, V, IT, k2, v2, c.BiConverter[K, V, k2, v2]] {
-	return &ConvertKV[K, V, IT, k2, v2, c.BiConverter[K, V, k2, v2]]{iter: elements, by: by}
+func MapKV[K, V any, IT c.KVIterator[K, V], k2, v2 any](elements IT, by c.BiConverter[K, V, k2, v2]) ConvertKV[K, V, IT, k2, v2, c.BiConverter[K, V, k2, v2]] {
+	return ConvertKV[K, V, IT, k2, v2, c.BiConverter[K, V, k2, v2]]{iter: elements, by: by}
 }
 
 //FilterKV creates the Iterator that checks elements by filters and returns successful ones.
-func FilterKV[K, V any, IT c.KVIterator[K, V]](elements IT, filter c.BiPredicate[K, V]) *FitKV[K, V, IT] {
-	return &FitKV[K, V, IT]{iter: elements, by: filter}
+func FilterKV[K, V any, IT c.KVIterator[K, V]](elements IT, filter c.BiPredicate[K, V]) FitKV[K, V, IT] {
+	return FitKV[K, V, IT]{iter: elements, by: filter}
 }
 
 //Group transforms iterable elements to the MapPipe based on applying key extractor to the elements

@@ -19,3 +19,7 @@ func (s *Fit[T]) Next() (T, bool) {
 func (s *Fit[T]) Cap() int {
 	return len(s.elements)
 }
+
+func (s Fit[T]) R() *Fit[T] {
+	return (*Fit[T])(noescape(&s))
+}
