@@ -20,16 +20,16 @@ var _ c.MapPipe[string, any, any] = (*KVIterPipe[string, any, any])(nil)
 
 func (s *KVIterPipe[K, V, C]) FilterKey(fit c.Predicate[K]) c.MapPipe[K, V, C] {
 	var kvFit c.BiPredicate[K, V] = func(key K, val V) bool { return fit(key) }
-	return NewKVPipe[K, V](FilterKV[K, V](s.it, kvFit), s.collector)
+	return NewKVPipe(FilterKV(s.it, kvFit), s.collector)
 }
 
 func (s *KVIterPipe[K, V, C]) MapKey(by c.Converter[K, K]) c.MapPipe[K, V, C] {
-	return NewKVPipe[K, V](MapKV(s.it, func(key K, val V) (K, V) { return by(key), val }), s.collector)
+	return NewKVPipe(MapKV(s.it, func(key K, val V) (K, V) { return by(key), val }), s.collector)
 }
 
 func (s *KVIterPipe[K, V, C]) FilterValue(fit c.Predicate[V]) c.MapPipe[K, V, C] {
 	var kvFit c.BiPredicate[K, V] = func(key K, val V) bool { return fit(val) }
-	return NewKVPipe[K, V](FilterKV(s.it, kvFit), s.collector)
+	return NewKVPipe(FilterKV(s.it, kvFit), s.collector)
 }
 
 func (s *KVIterPipe[K, V, C]) MapValue(by c.Converter[V, V]) c.MapPipe[K, V, C] {
@@ -37,7 +37,7 @@ func (s *KVIterPipe[K, V, C]) MapValue(by c.Converter[V, V]) c.MapPipe[K, V, C] 
 }
 
 func (s *KVIterPipe[K, V, C]) Filter(fit c.BiPredicate[K, V]) c.MapPipe[K, V, C] {
-	return NewKVPipe[K, V](FilterKV[K, V](s.it, fit), s.collector)
+	return NewKVPipe(FilterKV(s.it, fit), s.collector)
 }
 
 func (s *KVIterPipe[K, V, C]) Map(by c.BiConverter[K, V, K, V]) c.MapPipe[K, V, C] {

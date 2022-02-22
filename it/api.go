@@ -40,12 +40,12 @@ func FlattFit[From, To any, IT c.Iterator[From]](elements IT, fit c.Predicate[Fr
 }
 
 //Filter creates the Iterator that checks elements by a filter and returns successful ones.
-func Filter[T any, IT c.Iterator[T]](elements IT, filter c.Predicate[T]) *impl.Fit[T, IT] {
+func Filter[T any, IT c.Iterator[T]](elements IT, filter c.Predicate[T]) impl.Fit[T, IT] {
 	return impl.Filter(elements, filter)
 }
 
 //NotNil creates the Iterator that filters nullable elements.
-func NotNil[T any, IT c.Iterator[*T]](elements IT) *impl.Fit[*T, IT] {
+func NotNil[T any, IT c.Iterator[*T]](elements IT) impl.Fit[*T, IT] {
 	return Filter(elements, check.NotNil[T])
 }
 
@@ -55,7 +55,7 @@ func Reduce[T any, IT c.Iterator[T]](elements IT, by op.Binary[T]) T {
 }
 
 //ReduceKV reduces key/value elements to an one.
-func ReduceKV[K, V any](elements c.KVIterator[K, V], by op.Quaternary[K, V]) (K, V) {
+func ReduceKV[K, V any, IT c.KVIterator[K, V]](elements IT, by op.Quaternary[K, V]) (K, V) {
 	return impl.ReduceKV(elements, by)
 }
 

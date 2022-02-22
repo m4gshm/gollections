@@ -17,10 +17,11 @@ func NewHead[T any, TS ~[]T](elements TS) Iter[T] {
 func NewHeadS[T any, TS ~[]T](elements TS, elementSize uintptr) Iter[T] {
 	var (
 		header = GetSliceHeaderByRef(unsafe.Pointer(&elements))
+		array  = unsafe.Pointer(header.Data)
 		size   = header.Len
 	)
 	return Iter[T]{
-		array:       unsafe.Pointer(header.Data),
+		array:       array,
 		elementSize: elementSize,
 		size:        size,
 		maxHasNext:  size - 2,
@@ -35,10 +36,11 @@ func NewTail[T any](elements []T) Iter[T] {
 func NewTailS[T any](elements []T, elementSize uintptr) Iter[T] {
 	var (
 		header = GetSliceHeaderByRef(unsafe.Pointer(&elements))
+		array  = unsafe.Pointer(header.Data)
 		size   = header.Len
 	)
 	return Iter[T]{
-		array:       unsafe.Pointer(header.Data),
+		array:       array,
 		elementSize: elementSize,
 		size:        size,
 		maxHasNext:  size - 2,

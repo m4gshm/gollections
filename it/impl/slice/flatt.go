@@ -1,7 +1,10 @@
 package slice
 
 import (
+	"unsafe"
+
 	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/it/impl/it"
 )
 
 type FlattenFit[From, To any] struct {
@@ -50,40 +53,34 @@ func (s *FlattenFit[From, To]) Cap() int {
 //Flatten is the Iterator impelementation that converts an element to a slice.
 //For example, Flatten can be used to convert a multi-dimensional array to a one-dimensional array ([][]int -> []int).
 type Flatten[From, To any] struct {
-	elements       []From
-	flatt          c.Flatter[From, To]
-	indFrom, indTo int
-	elementsTo     []To
+	arrayFrom, arrayTo       unsafe.Pointer
+	elemSizeFrom, elemSizeTo uintptr
+	sizeFrom, sizeTo         int
+	indFrom, indTo           int
+	flatt                    c.Flatter[From, To]
 }
 
 var _ c.Iterator[any] = (*Flatten[any, any])(nil)
 
 func (s *Flatten[From, To]) Next() (To, bool) {
-	var (
-		elementsTo = s.elementsTo
-		let        = len(elementsTo)
-	)
-	if let > 0 {
-		if indTo := s.indTo; indTo < let {
-			c := elementsTo[indTo]
+	sizeTo := s.sizeTo
+	if sizeTo > 0 {
+		if indTo := s.indTo; indTo < sizeTo {
 			s.indTo++
-			return c, true
+			return *(*To)(it.GetArrayElemRef(s.arrayTo, indTo, s.elemSizeTo)), true
 		}
 		s.indTo = 0
-		s.elementsTo = nil
+		s.arrayTo = nil
+		s.sizeTo = 0
 	}
-	var (
-		elements = s.elements
-		le       = len(elements)
-	)
-	for indFrom := s.indFrom; indFrom < le; indFrom++ {
-		s.indFrom++
-		v := elements[indFrom]
-		if elementsTo := s.flatt(v); len(elementsTo) > 0 {
-			c := elementsTo[0]
-			s.elementsTo = elementsTo
+	for indFrom := s.indFrom; indFrom < s.sizeFrom; indFrom++ {
+		if elementsTo := s.flatt(*(*From)(it.GetArrayElemRef(s.arrayFrom, indFrom, s.elemSizeFrom))); len(elementsTo) > 0 {
+			s.indFrom = indFrom + 1
 			s.indTo = 1
-			return c, true
+			header := it.GetSliceHeaderByRef(unsafe.Pointer(&elementsTo))
+			s.arrayTo = unsafe.Pointer(header.Data)
+			s.sizeTo = header.Len
+			return  *(*To)(it.GetArrayElemRef(s.arrayTo, 0, s.elemSizeTo)), true
 		}
 	}
 	var no To
@@ -91,5 +88,5 @@ func (s *Flatten[From, To]) Next() (To, bool) {
 }
 
 func (s *Flatten[From, To]) Cap() int {
-	return len(s.elements)
+	return s.sizeFrom
 }

@@ -13,13 +13,13 @@ import (
 var ErrBreak = errors.New("Break")
 
 //Map creates the Iterator that converts elements with a converter and returns them.
-func Map[From, To any, IT c.Iterator[From]](elements IT, by c.Converter[From, To]) *Convert[From, To, IT, c.Converter[From, To]] {
-	return &Convert[From, To, IT, c.Converter[From, To]]{iter: elements, by: by}
+func Map[From, To any, IT c.Iterator[From]](elements IT, by c.Converter[From, To]) Convert[From, To, IT, c.Converter[From, To]] {
+	return Convert[From, To, IT, c.Converter[From, To]]{iter: elements, by: by}
 }
 
 //MapFit additionally filters 'From' elements.
-func MapFit[From, To any, IT c.Iterator[From]](elements IT, fit c.Predicate[From], by c.Converter[From, To]) *ConvertFit[From, To, IT] {
-	return &ConvertFit[From, To, IT]{iter: elements, by: by, fit: fit}
+func MapFit[From, To any, IT c.Iterator[From]](elements IT, fit c.Predicate[From], by c.Converter[From, To]) ConvertFit[From, To, IT] {
+	return ConvertFit[From, To, IT]{iter: elements, by: by, fit: fit}
 }
 
 //Flatt creates the Iterator that extracts slices of 'To' by a Flatter from elements of 'From' and flattens as one iterable collection of 'To' elements.
@@ -33,12 +33,12 @@ func FlattFit[From, To any, IT c.Iterator[From]](elements IT, fit c.Predicate[Fr
 }
 
 //Filter creates the Iterator that checks elements by filters and returns successful ones.
-func Filter[T any, IT c.Iterator[T]](elements IT, filter c.Predicate[T]) *Fit[T, IT] {
-	return &Fit[T, IT]{iter: elements, by: filter}
+func Filter[T any, IT c.Iterator[T]](elements IT, filter c.Predicate[T]) Fit[T, IT] {
+	return Fit[T, IT]{iter: elements, by: filter}
 }
 
 //NotNil creates the Iterator that filters nullable elements.
-func NotNil[T any, IT c.Iterator[*T]](elements IT) *Fit[*T, IT] {
+func NotNil[T any, IT c.Iterator[*T]](elements IT) Fit[*T, IT] {
 	return Filter(elements, check.NotNil[T])
 }
 

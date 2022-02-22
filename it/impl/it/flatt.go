@@ -53,7 +53,7 @@ func (s *Flatten[From, To, IT]) Next() (To, bool) {
 	if elementsTo := s.elementsTo; len(elementsTo) > 0 {
 		if indTo := s.indTo; indTo < len(elementsTo) {
 			c := elementsTo[indTo]
-			s.indTo = indTo + 1
+			s.indTo++
 			return c, true
 		}
 		s.indTo = 0

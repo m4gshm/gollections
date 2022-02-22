@@ -3,15 +3,17 @@ package it
 import "github.com/m4gshm/gollections/c"
 
 type ConvertFit[From, To any, IT c.Iterator[From]] struct {
-	iter    IT
-	by      c.Converter[From, To]
-	fit     c.Predicate[From]
-	current To
+	iter IT
+	by   c.Converter[From, To]
+	fit  c.Predicate[From]
 }
 
-var _ c.Iterator[any] = (*ConvertFit[any, any, c.Iterator[any]])(nil)
+var (
+	_ c.Iterator[any] = ConvertFit[any, any, c.Iterator[any]]{}
+	_ c.Iterator[any] = (*ConvertFit[any, any, c.Iterator[any]])(nil)
+)
 
-func (s *ConvertFit[From, To, IT]) Next() (To, bool) {
+func (s ConvertFit[From, To, IT]) Next() (To, bool) {
 	if V, ok := nextFiltered(s.iter, s.fit); ok {
 		return s.by(V), true
 	}
@@ -19,7 +21,7 @@ func (s *ConvertFit[From, To, IT]) Next() (To, bool) {
 	return no, false
 }
 
-func (s *ConvertFit[From, To, IT]) Cap() int {
+func (s ConvertFit[From, To, IT]) Cap() int {
 	return s.iter.Cap()
 }
 
@@ -28,17 +30,20 @@ type Convert[From, To any, IT c.Iterator[From], C c.Converter[From, To]] struct 
 	by   C
 }
 
-var _ c.Iterator[any] = (*Convert[any, any, c.Iterator[any], c.Converter[any, any]])(nil)
+var (
+	_ c.Iterator[any] = Convert[any, any, c.Iterator[any], c.Converter[any, any]]{}
+	_ c.Iterator[any] = (*Convert[any, any, c.Iterator[any], c.Converter[any, any]])(nil)
+)
 
-func (s *Convert[From, To, IT, C]) Next() (To, bool) {
-	if V, ok := s.iter.Next(); ok {
-		return s.by(V), true
+func (s Convert[From, To, IT, C]) Next() (To, bool) {
+	if v, ok := s.iter.Next(); ok {
+		return s.by(v), true
 	}
 	var no To
 	return no, false
 }
 
-func (s *Convert[From, To, IT, C]) Cap() int {
+func (s Convert[From, To, IT, C]) Cap() int {
 	return s.iter.Cap()
 }
 
@@ -47,9 +52,12 @@ type ConvertKV[K, V any, IT c.KVIterator[K, V], K2, V2 any, C c.BiConverter[K, V
 	by   C
 }
 
-var _ c.KVIterator[any, any] = (*ConvertKV[any, any, c.KVIterator[any, any], any, any, c.BiConverter[any, any, any, any]])(nil)
+var (
+	_ c.KVIterator[any, any] = ConvertKV[any, any, c.KVIterator[any, any], any, any, c.BiConverter[any, any, any, any]]{}
+	_ c.KVIterator[any, any] = (*ConvertKV[any, any, c.KVIterator[any, any], any, any, c.BiConverter[any, any, any, any]])(nil)
+)
 
-func (s *ConvertKV[K, V, IT, K2, V2, C]) Next() (K2, V2, bool) {
+func (s ConvertKV[K, V, IT, K2, V2, C]) Next() (K2, V2, bool) {
 	if K, V, ok := s.iter.Next(); ok {
 		k2, v2 := s.by(K, V)
 		return k2, v2, true
@@ -59,6 +67,6 @@ func (s *ConvertKV[K, V, IT, K2, V2, C]) Next() (K2, V2, bool) {
 	return k2, v2, false
 }
 
-func (s *ConvertKV[K, V, IT, K2, V2, C]) Cap() int {
+func (s ConvertKV[K, V, IT, K2, V2, C]) Cap() int {
 	return s.iter.Cap()
 }

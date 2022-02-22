@@ -42,15 +42,14 @@ func Test_FlattSlices(t *testing.T) {
 	var (
 		odds           = func(v int) bool { return v%2 != 0 }
 		multiDimension = [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
+		expected = slice.Of(1, 3, 5, 7)
 	)
 
-	e := slice.Of(1, 3, 5, 7)
-
 	a := it.Slice[int](it.Filter(it.Flatt(it.Flatt(it.Wrap(multiDimension), conv.To[[][]int]), conv.To[[]int]), odds))
-	assert.Equal(t, e, a)
+	assert.Equal(t, expected, a)
 
 	a = it.Slice[int](it.Filter(it.Flatt(sliceit.Flatt(multiDimension, conv.To[[][]int]), conv.To[[]int]), odds))
-	assert.Equal(t, e, a)
+	assert.Equal(t, expected, a)
 
 	//plain old style
 	oneDimensionOld := make([]int, 0)
