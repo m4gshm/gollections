@@ -78,6 +78,11 @@ func (i *Iter[T]) GetNext() T {
 	return t
 }
 
+func (i *Iter[T]) GetPrev() T {
+	t, _ := i.Prev()
+	return t
+}
+
 func (i *Iter[T]) Next() (T, bool) {
 	current := i.current
 	if CanIterateByRange(NoStarted, i.maxHasNext, current) {
@@ -87,11 +92,6 @@ func (i *Iter[T]) Next() (T, bool) {
 	}
 	var no T
 	return no, false
-}
-
-func (i *Iter[T]) GetPrev() T {
-	t, _ := i.Prev()
-	return t
 }
 
 func (i *Iter[T]) Prev() (T, bool) {

@@ -40,19 +40,37 @@ var (
 )
 
 func (v *Vector[T]) Begin() c.Iterator[T] {
-	return v.Head()
+	iter := v.Head()
+	return &iter
 }
 
 func (v *Vector[T]) BeginEdit() c.DelIterator[T] {
-	return v.Head()
+	iter := v.Head()
+	return &iter
 }
 
-func (v *Vector[T]) Head() *Iter[T] {
+func (v *Vector[T]) Head() Iter[T] {
 	return NewHead(&v.elements, v.DeleteOne)
 }
 
-func (v *Vector[T]) Tail() *Iter[T] {
+func (v *Vector[T]) Tail() Iter[T] {
 	return NewTail(&v.elements, v.DeleteOne)
+}
+
+func (v *Vector[T]) First() (Iter[T], T, bool) {
+	var (
+		iter      = NewHead(&v.elements, v.DeleteOne)
+		first, ok = iter.Next()
+	)
+	return iter, first, ok
+}
+
+func (v *Vector[T]) Last() (Iter[T], T, bool) {
+	var (
+		iter      = NewTail(&v.elements, v.DeleteOne)
+		first, ok = iter.Prev()
+	)
+	return iter, first, ok
 }
 
 func (v *Vector[T]) Collect() []T {
@@ -183,15 +201,18 @@ func (v *Vector[T]) Set(index int, value T) bool {
 }
 
 func (v *Vector[T]) Filter(filter c.Predicate[T]) c.Pipe[T, []T] {
-	return it.NewPipe[T](it.Filter(v.Head(), filter))
+	iter := v.Head()
+	return it.NewPipe[T](it.Filter(&iter, filter))
 }
 
 func (v *Vector[T]) Map(by c.Converter[T, T]) c.Pipe[T, []T] {
-	return it.NewPipe[T](it.Map(v.Head(), by))
+	iter := v.Head()
+	return it.NewPipe[T](it.Map(&iter, by))
 }
 
 func (v *Vector[T]) Reduce(by op.Binary[T]) T {
-	return it.Reduce(v.Head(), by)
+	iter := v.Head()
+	return it.Reduce(&iter, by)
 }
 
 //Sotr sorts the Vector in-place and returns it.
