@@ -51,8 +51,8 @@ func (s *FlattenFit[From, To, IT]) Cap() int {
 }
 
 func (s FlattenFit[From, To, IT]) R() *FlattenFit[From, To, IT] {
-	// return (*FlattenFit[From, To, IT])(notsafe.Noescape2(unsafe.Pointer(&s)))
-	return notsafe.Noescape(&s)
+	return &s
+	// return notsafe.Noescape(&s)
 }
 
 type Flatten[From, To any, IT c.Iterator[From]] struct {
@@ -96,5 +96,6 @@ func (s *Flatten[From, To, IT]) Cap() int {
 }
 
 func (s Flatten[From, To, IT]) R() *Flatten[From, To, IT] {
-	return notsafe.Noescape(&s)
+	return &s
+	// return notsafe.Noescape(&s)
 }

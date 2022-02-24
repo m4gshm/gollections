@@ -115,7 +115,8 @@ func (i *Iter[T]) Cap() int {
 
 //go:nosplit
 func (i Iter[T]) R() *Iter[T] {
-	return notsafe.Noescape(&i)
+	return &i
+	// return notsafe.Noescape(&i)
 }
 
 //HasNext checks the next element in an iterator by indexs of a current element and slice length.

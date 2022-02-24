@@ -146,6 +146,18 @@ func Test_MapFlattFitStructure_Iterable(t *testing.T) {
 	assert.Equal(t, expected, names)
 }
 
+func Test_MapFlattFitStructure_Iterable_Impl_Unsafe(t *testing.T) {
+	expected := slice.Of("first", "second", "", "third", "")
+
+	items := []*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil, {attributes: []*Attributes{{name: "third"}, nil}}}
+
+	names := impl.Slice[string](impl.Map(impl.FlattFit(impl.NewHead(items).R(), check.NotNil[Participant], (*Participant).GetAttributes).R(), (*Attributes).GetName))
+	assert.Equal(t, expected, names)
+
+	names = it.Slice(it.Map(sliceit.FlattFit(items, check.NotNil[Participant], (*Participant).GetAttributes), (*Attributes).GetName))
+	assert.Equal(t, expected, names)
+}
+
 func Test_Iterate(t *testing.T) {
 	amount := 100
 	values := make([]int, amount)
