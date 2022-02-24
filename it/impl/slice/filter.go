@@ -2,8 +2,10 @@ package slice
 
 import (
 	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/notsafe"
 )
 
+//go:notinheap
 type Fit[T any] struct {
 	elements []T
 	by       c.Predicate[T]
@@ -21,5 +23,5 @@ func (s *Fit[T]) Cap() int {
 }
 
 func (s Fit[T]) R() *Fit[T] {
-	return (*Fit[T])(noescape(&s))
+	return notsafe.Noescape(&s)
 }

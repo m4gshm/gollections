@@ -1,4 +1,4 @@
-package slice
+package notsafe
 
 import (
 	"reflect"
@@ -38,3 +38,14 @@ func GetSliceHeader[T any](elements []T) *reflect.SliceHeader {
 func GetSliceHeaderByRef(elements unsafe.Pointer) *reflect.SliceHeader {
 	return (*reflect.SliceHeader)(elements)
 }
+
+//Noescape prevent escaping of t
+//must be inlined
+//go:nosplit
+func Noescape[T any](t *T) *T {
+	x := uintptr(unsafe.Pointer(t))
+	return (*T)(unsafe.Pointer(x ^ 0))
+}
+
+//go:linkname VerifyNotInHeapPtr reflect.verifyNotInHeapPtr
+func VerifyNotInHeapPtr(p uintptr) bool

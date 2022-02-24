@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/conv"
 	"github.com/m4gshm/gollections/it"
 	impl "github.com/m4gshm/gollections/it/impl/it"
@@ -42,13 +43,12 @@ func Test_FlattSlices(t *testing.T) {
 	var (
 		odds           = func(v int) bool { return v%2 != 0 }
 		multiDimension = [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
-		expected = slice.Of(1, 3, 5, 7)
+		expected       = slice.Of(1, 3, 5, 7)
 	)
-
-	a := it.Slice[int](it.Filter(it.Flatt(it.Flatt(it.Wrap(multiDimension), conv.To[[][]int]), conv.To[[]int]), odds))
+	a := it.Slice(it.Filter(it.Flatt(it.Flatt(it.Wrap(multiDimension), conv.To[[][]int]), conv.To[[]int]), odds))
 	assert.Equal(t, expected, a)
 
-	a = it.Slice[int](it.Filter(it.Flatt(sliceit.Flatt(multiDimension, conv.To[[][]int]), conv.To[[]int]), odds))
+	a = it.Slice(it.Filter(it.Flatt(sliceit.Flatt(multiDimension, conv.To[[][]int]), conv.To[[]int]), odds))
 	assert.Equal(t, expected, a)
 
 	//plain old style
@@ -123,14 +123,26 @@ func (p *Participant) GetAttributes() []*Attributes {
 }
 
 func Test_MapFlattStructure_Iterable(t *testing.T) {
-	expected := slice.Of("first", "second", "")
+	expected := slice.Of("first", "second", "", "third", "")
 
-	items := []*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil}
+	items := []*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil, {attributes: []*Attributes{{name: "third"}, nil}}}
 
 	names := it.Slice(it.Map(it.Flatt(it.Wrap(items), (*Participant).GetAttributes), (*Attributes).GetName))
 	assert.Equal(t, expected, names)
 
 	names = it.Slice(it.Map(sliceit.Flatt(items, (*Participant).GetAttributes), (*Attributes).GetName))
+	assert.Equal(t, expected, names)
+}
+
+func Test_MapFlattFitStructure_Iterable(t *testing.T) {
+	expected := slice.Of("first", "second", "", "third", "")
+
+	items := []*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil, {attributes: []*Attributes{{name: "third"}, nil}}}
+
+	names := it.Slice(it.Map(it.FlattFit(it.Wrap(items), check.NotNil[Participant], (*Participant).GetAttributes), (*Attributes).GetName))
+	assert.Equal(t, expected, names)
+
+	names = it.Slice(it.Map(sliceit.FlattFit(items, check.NotNil[Participant], (*Participant).GetAttributes), (*Attributes).GetName))
 	assert.Equal(t, expected, names)
 }
 
@@ -141,7 +153,7 @@ func Test_Iterate(t *testing.T) {
 		values[i] = i
 	}
 
-	iter:=impl.NewHead(values)
+	iter := impl.NewHead(values)
 	stream := impl.NewPipe[int](&iter)
 
 	result := make([]int, 0)

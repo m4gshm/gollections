@@ -14,7 +14,7 @@ func Of[T any](elements ...T) *impl.Iter[T] {
 }
 
 //Wrap creates the Iterator using sclie as the elements source.
-func Wrap[T any, TS ~[]T](elements TS) *impl.Iter[T] {
+func Wrap[T any, TS ~[]T](elements TS) c.Iterator[T] {
 	iter := impl.NewHead(elements)
 	return &iter
 }
@@ -42,12 +42,12 @@ func FlattFit[From, To any, IT c.Iterator[From]](elements IT, fit c.Predicate[Fr
 }
 
 //Filter creates the Iterator that checks elements by a filter and returns successful ones.
-func Filter[T any, IT c.Iterator[T]](elements IT, filter c.Predicate[T]) impl.Fit[T, IT] {
+func Filter[T any, IT c.Iterator[T]](elements IT, filter c.Predicate[T]) c.Iterator[T] {
 	return impl.Filter(elements, filter)
 }
 
 //NotNil creates the Iterator that filters nullable elements.
-func NotNil[T any, IT c.Iterator[*T]](elements IT) impl.Fit[*T, IT] {
+func NotNil[T any, IT c.Iterator[*T]](elements IT) c.Iterator[*T] {
 	return Filter(elements, check.NotNil[T])
 }
 

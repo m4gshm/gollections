@@ -10,7 +10,7 @@ import (
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
-	sunsafe "github.com/m4gshm/gollections/slice/unsafe"
+	"github.com/m4gshm/gollections/notsafe"
 )
 
 //AsMap converts a slice of key/value pairs to teh Map.
@@ -33,7 +33,7 @@ func AsMap[K comparable, V any](elements []*c.KV[K, V]) *Map[K, V] {
 
 //WrapMap creates the ordered Map using a map and an order slice as internal storage.
 func WrapMap[K comparable, V any](order []K, elements map[K]V) *Map[K, V] {
-	return &Map[K, V]{order: order, elements: elements, ksize: sunsafe.GetTypeSize[K]()}
+	return &Map[K, V]{order: order, elements: elements, ksize: notsafe.GetTypeSize[K]()}
 }
 
 //Map is the Collection implementation that provides element access by an unique key..

@@ -4,41 +4,41 @@ import (
 	"unsafe"
 
 	"github.com/m4gshm/gollections/c"
-	sunsafe "github.com/m4gshm/gollections/slice/unsafe"
+	"github.com/m4gshm/gollections/notsafe"
 )
 
 type FlattenFit[From, To any] struct {
-	elements            []From
-	flatt               c.Flatter[From, To]
-	fit                 c.Predicate[From]
-	elementsTo          []To
-	indFrom, indTo, cap int
+	arrayFrom, arrayTo       unsafe.Pointer
+	elemSizeFrom, elemSizeTo uintptr
+	sizeFrom, sizeTo         int
+	indFrom, indTo, cap      int
+	flatt                    c.Flatter[From, To]
+	fit                      c.Predicate[From]
 }
 
 var _ c.Iterator[any] = (*FlattenFit[any, any])(nil)
 
 func (s *FlattenFit[From, To]) Next() (To, bool) {
-	if elementsTo := s.elementsTo; len(elementsTo) > 0 {
-		if indTo := s.indTo; indTo < len(elementsTo) {
-			c := elementsTo[indTo]
-			s.indTo = indTo + 1
-			return c, true
+	sizeTo := s.sizeTo
+	if sizeTo > 0 {
+		if indTo := s.indTo; indTo < sizeTo {
+			s.indTo++
+			return *(*To)(notsafe.GetArrayElemRef(s.arrayTo, indTo, s.elemSizeTo)), true
 		}
 		s.indTo = 0
-		s.elementsTo = nil
+		s.arrayTo = nil
+		s.sizeTo = 0
 	}
 
-	elements := s.elements
-	le := len(elements)
-	for indFrom := s.indFrom; indFrom < le; indFrom++ {
-		s.indFrom = indFrom + 1
-		if v := elements[indFrom]; s.fit(v) {
+	for indFrom := s.indFrom; indFrom < s.sizeFrom; indFrom++ {
+		if v := *(*From)(notsafe.GetArrayElemRef(s.arrayFrom, indFrom, s.elemSizeFrom)); s.fit(v) {
 			if elementsTo := s.flatt(v); len(elementsTo) > 0 {
-				c := elementsTo[0]
-				s.elementsTo = elementsTo
-				s.cap += len(elementsTo)
+				s.indFrom = indFrom + 1
 				s.indTo = 1
-				return c, true
+				header := notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elementsTo))
+				s.arrayTo = unsafe.Pointer(header.Data)
+				s.sizeTo = header.Len
+				return *(*To)(notsafe.GetArrayElemRef(s.arrayTo, 0, s.elemSizeTo)), true
 			}
 		}
 	}
@@ -51,7 +51,7 @@ func (s *FlattenFit[From, To]) Cap() int {
 }
 
 func (s FlattenFit[From, To]) R() *FlattenFit[From, To] {
-	return (*FlattenFit[From, To])(noescape(&s))
+	return notsafe.Noescape(&s)
 }
 
 //Flatten is the Iterator impelementation that converts an element to a slice.
@@ -71,20 +71,20 @@ func (s *Flatten[From, To]) Next() (To, bool) {
 	if sizeTo > 0 {
 		if indTo := s.indTo; indTo < sizeTo {
 			s.indTo++
-			return *(*To)(sunsafe.GetArrayElemRef(s.arrayTo, indTo, s.elemSizeTo)), true
+			return *(*To)(notsafe.GetArrayElemRef(s.arrayTo, indTo, s.elemSizeTo)), true
 		}
 		s.indTo = 0
 		s.arrayTo = nil
 		s.sizeTo = 0
 	}
 	for indFrom := s.indFrom; indFrom < s.sizeFrom; indFrom++ {
-		if elementsTo := s.flatt(*(*From)(sunsafe.GetArrayElemRef(s.arrayFrom, indFrom, s.elemSizeFrom))); len(elementsTo) > 0 {
+		if elementsTo := s.flatt(*(*From)(notsafe.GetArrayElemRef(s.arrayFrom, indFrom, s.elemSizeFrom))); len(elementsTo) > 0 {
 			s.indFrom = indFrom + 1
 			s.indTo = 1
-			header := sunsafe.GetSliceHeaderByRef(unsafe.Pointer(&elementsTo))
+			header := notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elementsTo))
 			s.arrayTo = unsafe.Pointer(header.Data)
 			s.sizeTo = header.Len
-			return *(*To)(sunsafe.GetArrayElemRef(s.arrayTo, 0, s.elemSizeTo)), true
+			return *(*To)(notsafe.GetArrayElemRef(s.arrayTo, 0, s.elemSizeTo)), true
 		}
 	}
 	var no To
@@ -96,12 +96,5 @@ func (s *Flatten[From, To]) Cap() int {
 }
 
 func (s Flatten[From, To]) R() *Flatten[From, To] {
-	return (*Flatten[From, To])(noescape(&s))
-}
-
-//go:nosplit
-//go:nocheckptr
-func noescape[T any](t *T) unsafe.Pointer {
-	x := uintptr(unsafe.Pointer(t))
-	return unsafe.Pointer(x ^ 0)
+	return notsafe.Noescape(&s)
 }

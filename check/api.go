@@ -27,13 +27,23 @@ func Zero[T any](val T) bool {
 }
 
 //Empty checks that a slice is empty.
-func Empty[T Slice](val T) bool {
+func Empty[T Slice | []any](val T) bool {
 	return len(val) == 0
+}
+
+//NotEmpty checks that a slice is not empty.
+func NotEmpty[C []T, T any](val C) bool {
+	return len(val) > 0
 }
 
 //EmptyMap checks that a slice is ampty.
 func EmptyMap[K comparable, V any](val map[K]V) bool {
 	return len(val) == 0
+}
+
+//NotEmptyMap checks that a slice is not empty.
+func NotEmptyMap[K comparable, V any](val map[K]V) bool {
+	return len(val) > 0
 }
 
 //And makes a conjunction of two predicates

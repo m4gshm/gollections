@@ -2,6 +2,7 @@ package benchmark
 
 import (
 	"fmt"
+	"reflect"
 	"testing"
 
 	"github.com/m4gshm/gollections/c/op"
@@ -221,7 +222,7 @@ func Benchmark_MapFit_Iterable(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		s = it.Slice(it.MapFit(it.Wrap(items), even, conv.And(toString, addTail)))
-		
+
 	}
 	_ = s
 
@@ -308,7 +309,6 @@ func Benchmark_Flatt_Iterable_Impl(b *testing.B) {
 	b.StopTimer()
 }
 
-
 func Benchmark_Flatt_Slice(b *testing.B) {
 	odds := func(v int) bool { return v%2 != 0 }
 	multiDimension := [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
@@ -352,9 +352,14 @@ func Benchmark_Flatt_Slice_PlainOld(b *testing.B) {
 func Benchmark_ReduceSum_Iterable(b *testing.B) {
 	odds := func(v int) bool { return v%2 != 0 }
 	multiDimension := [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
+	expected := 1 + 3 + 5 + 7
 	b.ResetTimer()
+	result := 0
 	for i := 0; i < b.N; i++ {
-		_ = it.Reduce(it.Filter(it.Flatt(it.Flatt(it.Wrap(multiDimension), conv.To[[][]int]), conv.To[[]int]), odds), sum.Of[int])
+		result = it.Reduce(it.Filter(it.Flatt(it.Flatt(it.Wrap(multiDimension), conv.To[[][]int]), conv.To[[]int]), odds), sum.Of[int])
+	}
+	if result != expected {
+		b.Fatalf("must be %d, but %d", expected, result)
 	}
 	b.StopTimer()
 }
@@ -362,9 +367,14 @@ func Benchmark_ReduceSum_Iterable(b *testing.B) {
 func Benchmark_ReduceSum_Iterable_Impl(b *testing.B) {
 	odds := func(v int) bool { return v%2 != 0 }
 	multiDimension := [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
+	expected := 1 + 3 + 5 + 7
 	b.ResetTimer()
+	result := 0
 	for i := 0; i < b.N; i++ {
-		_ = iterimpl.Reduce(iterimpl.Filter(iterimpl.Flatt(iterimpl.Flatt(iterimpl.NewHead(multiDimension).R(), conv.To[[][]int]).R(), conv.To[[]int]).R(), odds), sum.Of[int])
+		result = iterimpl.Reduce(iterimpl.Filter(iterimpl.Flatt(iterimpl.Flatt(iterimpl.NewHead(multiDimension).R(), conv.To[[][]int]).R(), conv.To[[]int]).R(), odds), sum.Of[int])
+	}
+	if result != expected {
+		b.Fatalf("must be %d, but %d", expected, result)
 	}
 	b.StopTimer()
 }
@@ -372,9 +382,14 @@ func Benchmark_ReduceSum_Iterable_Impl(b *testing.B) {
 func Benchmark_ReduceSum_Slice(b *testing.B) {
 	odds := func(v int) bool { return v%2 != 0 }
 	multiDimension := [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
+	expected := 1 + 3 + 5 + 7
 	b.ResetTimer()
+	result := 0
 	for i := 0; i < b.N; i++ {
-		_ = it.Reduce(it.Filter(it.Flatt(sliceit.Flatt(multiDimension, conv.To[[][]int]), conv.To[[]int]), odds), sum.Of[int])
+		result = it.Reduce(it.Filter(it.Flatt(sliceit.Flatt(multiDimension, conv.To[[][]int]), conv.To[[]int]), odds), sum.Of[int])
+	}
+	if result != expected {
+		b.Fatalf("must be %d, but %d", expected, result)
 	}
 	b.StopTimer()
 }
@@ -385,9 +400,14 @@ func Benchmark_ReduceSum_Slice_Impl(b *testing.B) {
 	toTwoD := conv.To[[][]int]
 	toOneD := conv.To[[]int]
 	intSum := sum.Of[int]
+	expected := 1 + 3 + 5 + 7
 	b.ResetTimer()
+	result := 0
 	for i := 0; i < b.N; i++ {
-		_ = iterimpl.Reduce(iterimpl.Filter(iterimpl.Flatt(sliceitimpl.Flatt(multiDimension, toTwoD).R(), toOneD).R(), odds), intSum)
+		result = iterimpl.Reduce(iterimpl.Filter(iterimpl.Flatt(sliceitimpl.Flatt(multiDimension, toTwoD).R(), toOneD).R(), odds), intSum)
+	}
+	if result != expected {
+		b.Fatalf("must be %d, but %d", expected, result)
 	}
 	b.StopTimer()
 }
@@ -396,21 +416,24 @@ func Benchmark_ReduceSum_Slice_PlainOld(b *testing.B) {
 	multiDimension := [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
 	isOdd := func(val int) bool { return val%2 != 0 }
 	sum := func(a, v int) int { return a + v }
+	expected := 1 + 3 + 5 + 7
 	b.ResetTimer()
-	oddSum := 0
+	result := 0
 	for j := 0; j < b.N; j++ {
-		oddSum = 0
+		result = 0
 		for _, i := range multiDimension {
 			for _, ii := range i {
 				for _, iii := range ii {
 					if isOdd(iii % 2) {
-						oddSum = sum(oddSum, iii)
+						result = sum(result, iii)
 					}
 				}
 			}
 		}
 	}
-	_ = oddSum
+	if result != expected {
+		b.Fatalf("must be %d, but %d", expected, result)
+	}
 	b.StopTimer()
 }
 
@@ -454,9 +477,32 @@ func Benchmark_MapFlattStructure_IterableWithoutNotNilFiltering(b *testing.B) {
 
 func Benchmark_MapFlattStructure_IterableFit(b *testing.B) {
 	items := []*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil}
+	expected := []string{"first", "second"}
+	result := []string{}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_ = it.Slice(it.MapFit(it.FlattFit(it.Wrap(items), check.NotNil[Participant], (*Participant).GetAttributes), check.NotNil[Attributes], (*Attributes).GetName))
+		result = it.Slice(it.MapFit(it.FlattFit(it.Wrap(items), check.NotNil[Participant], (*Participant).GetAttributes), check.NotNil[Attributes], (*Attributes).GetName))
+	}
+	if !reflect.DeepEqual(expected, result) {
+		b.Fatalf("must be %v, but %v", expected, result)
+	}
+	b.StopTimer()
+}
+
+func Benchmark_MapFlattStructure_IterableFit_Impl(b *testing.B) {
+	items := []*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_ = iterimpl.Slice[string](iterimpl.MapFit(iterimpl.FlattFit(iterimpl.NewHead(items).R(), check.NotNil[Participant], (*Participant).GetAttributes).R(), check.NotNil[Attributes], (*Attributes).GetName))
+	}
+	b.StopTimer()
+}
+
+func Benchmark_MapFlattStructure_IterableFit_Pipe(b *testing.B) {
+	items := []*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_ = iterimpl.Slice[string](iterimpl.MapFit(iterimpl.FlattFit(iterimpl.NewHead(items).R(), check.NotNil[Participant], (*Participant).GetAttributes).R(), check.NotNil[Attributes], (*Attributes).GetName))
 	}
 	b.StopTimer()
 }
@@ -475,15 +521,6 @@ func Benchmark_MapFlattStructure_SliceFit_Impl(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_ = iterimpl.Slice[string](iterimpl.MapFit(sliceitimpl.FlattFit(items, check.NotNil[Participant], (*Participant).GetAttributes).R(), check.NotNil[Attributes], (*Attributes).GetName))
-	}
-	b.StopTimer()
-}
-
-func Benchmark_MapFlattStructure_SliceWithoutNilCheck(b *testing.B) {
-	items := []*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil}
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		_ = it.Slice(it.Map(sliceit.Flatt(items, (*Participant).GetAttributes), (*Attributes).GetName))
 	}
 	b.StopTimer()
 }

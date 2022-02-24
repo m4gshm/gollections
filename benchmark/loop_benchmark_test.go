@@ -174,12 +174,13 @@ func BenchmarkLoopImmutableVectorTailHasPrevGetPrev(b *testing.B) {
 	}
 }
 
-func BenchmarkLoopSliceWrapHasNextGetNext(b *testing.B) {
+func BenchmarkLoopSliceWrapNextNext(b *testing.B) {
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				for it := it.Wrap(values); it.HasNext(); {
-					casee.load(it.GetNext())
+				it := it.Wrap(values)
+				for v, ok := it.Next(); ok; v, ok = it.Next() {
+					casee.load(v)
 				}
 			}
 		})
@@ -210,11 +211,25 @@ func BenchmarkLoopSliceEmbeddedForByRange(b *testing.B) {
 	}
 }
 
-func BenchmarkLoopSliceEmbeddedForByIndex(b *testing.B) {
+func BenchmarkLoopSliceEmbeddedForByRangeIndex(b *testing.B) {
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				for j := 0; j < len(values); j++ {
+				for j := range values {
+					v := values[j]
+					casee.load(v)
+				}
+			}
+		})
+	}
+}
+
+func BenchmarkLoopSliceEmbeddedForByIndex(b *testing.B) {
+	l := len(values)
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for j := 0; j < l; j++ {
 					v := values[j]
 					casee.load(v)
 				}

@@ -7,7 +7,7 @@ import (
 	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/collect"
 	"github.com/m4gshm/gollections/op"
-	sunsafe "github.com/m4gshm/gollections/slice/unsafe"
+	 "github.com/m4gshm/gollections/notsafe"
 )
 
 //ErrBreak is For, Track breaker
@@ -25,12 +25,12 @@ func MapFit[From, To any, IT c.Iterator[From]](elements IT, fit c.Predicate[From
 
 //Flatt creates the Iterator that extracts slices of 'To' by a Flatter from elements of 'From' and flattens as one iterable collection of 'To' elements.
 func Flatt[From, To any, IT c.Iterator[From]](elements IT, by c.Flatter[From, To]) Flatten[From, To, IT] {
-	return Flatten[From, To, IT]{iter: elements, flatt: by, elemSizeTo: sunsafe.GetTypeSize[To]()}
+	return Flatten[From, To, IT]{iter: elements, flatt: by, elemSizeTo: notsafe.GetTypeSize[To]()}
 }
 
 //FlattFit additionally filters 'From' elements.
 func FlattFit[From, To any, IT c.Iterator[From]](elements IT, fit c.Predicate[From], flatt c.Flatter[From, To]) FlattenFit[From, To, IT] {
-	return FlattenFit[From, To, IT]{iter: elements, flatt: flatt, fit: fit}
+	return FlattenFit[From, To, IT]{iter: elements, flatt: flatt, fit: fit, elemSizeTo: notsafe.GetTypeSize[To]()}
 }
 
 //Filter creates the Iterator that checks elements by filters and returns successful ones.
