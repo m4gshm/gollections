@@ -152,8 +152,7 @@ func BenchmarkLoopMutableVectorHeadHeadNext(b *testing.B) {
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				it := c.Head()
-				for v, ok := it.Next(); ok; v, ok = it.Next() {
+				for it, v, ok := c.First(); ok; v, ok = it.Next() {
 					casee.load(v)
 				}
 			}

@@ -5,7 +5,6 @@ import (
 	"github.com/m4gshm/gollections/notsafe"
 )
 
-//go:notinheap
 type Fit[T any] struct {
 	elements []T
 	by       c.Predicate[T]

@@ -17,5 +17,5 @@ func Empty[K comparable, V any]() *mutable.Map[K, V] {
 
 //New creates the Map with a predefined capacity.
 func New[K comparable, V any](capacity int) *mutable.Map[K, V] {
-	return mutable.WrapMap(make(map[K]V, capacity))
+	return mutable.NewMap[K, V](0)
 }

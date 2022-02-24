@@ -7,6 +7,7 @@ import (
 	"github.com/m4gshm/gollections/notsafe"
 )
 
+//FlattenFit condition based Flatten
 type FlattenFit[From, To any] struct {
 	arrayFrom, arrayTo       unsafe.Pointer
 	elemSizeFrom, elemSizeTo uintptr

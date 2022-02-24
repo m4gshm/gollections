@@ -356,7 +356,7 @@ func Benchmark_MapFit_Slice_Impl_R(b *testing.B) {
 	items := slice.Of(1, 2, 3, 4, 5)
 	var s []string
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ { 
+	for i := 0; i < b.N; i++ {
 		s = it.Slice[string](sliceitimpl.MapFit(items, even, conv.And(toString, addTail)).R())
 	}
 	_ = s

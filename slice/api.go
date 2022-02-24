@@ -12,6 +12,7 @@ import (
 	"github.com/m4gshm/gollections/it/impl/it"
 )
 
+//ErrBreak is the 'break' statement of the For, Track methods
 var ErrBreak = it.ErrBreak
 
 //Of is generic sclie constructor
@@ -142,16 +143,6 @@ func ForEach[T any](elements []T, walker func(T)) {
 	for _, e := range elements {
 		walker(e)
 	}
-}
-
-//ForRefs applies walker to references with error checking
-func ForRefs[T any](references []*T, walker func(T) error) error {
-	for _, e := range references {
-		if err := walker(*e); err != nil {
-			return err
-		}
-	}
-	return nil
 }
 
 //ForEachRef applies walker to references without error checking

@@ -21,6 +21,7 @@ func GetArrayElem[T any](array unsafe.Pointer, index int, elemSize uintptr) T {
 	return *(*T)(GetArrayElemRef(array, index, elemSize))
 }
 
+//GetArrayElemRef returns an element's pointer by index from the array referenced by an unsafe pointer
 func GetArrayElemRef(array unsafe.Pointer, index int, elemSize uintptr) unsafe.Pointer {
 	return unsafe.Pointer(uintptr(array) + uintptr(index)*elemSize)
 }
@@ -35,6 +36,7 @@ func GetSliceHeader[T any](elements []T) *reflect.SliceHeader {
 	return GetSliceHeaderByRef(unsafe.Pointer(&elements))
 }
 
+//GetSliceHeaderByRef retrieves the SliceHeader of elements by an unsafe pointer
 func GetSliceHeaderByRef(elements unsafe.Pointer) *reflect.SliceHeader {
 	return (*reflect.SliceHeader)(elements)
 }
@@ -44,8 +46,9 @@ func GetSliceHeaderByRef(elements unsafe.Pointer) *reflect.SliceHeader {
 //go:nocheckptr
 func Noescape[T any](t *T) *T {
 	x := uintptr(unsafe.Pointer(t))
-	return (*T)(unsafe.Pointer(x ^ 0))
+	return (*T)(unsafe.Pointer(x ^ 0)) //nolint
 }
 
+//VerifyNotInHeapPtr is link to  reflect.verifyNotInHeapPtr
 //go:linkname VerifyNotInHeapPtr reflect.verifyNotInHeapPtr
 func VerifyNotInHeapPtr(p uintptr) bool

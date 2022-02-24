@@ -50,7 +50,6 @@ func (s *FlattenFit[From, To, IT]) Cap() int {
 	return s.iter.Cap()
 }
 
-
 //Experimental
 //must be inlined
 //DON'T USE IN PROD

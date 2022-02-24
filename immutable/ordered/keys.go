@@ -69,7 +69,7 @@ func (s *MapKeys[T]) Map(by c.Converter[T, T]) c.Pipe[T, []T] {
 }
 
 func (s *MapKeys[T]) Reduce(by op.Binary[T]) T {
-	iter:=s.Head()
+	iter := s.Head()
 	return it.Reduce(&iter, by)
 }
 

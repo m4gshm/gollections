@@ -11,6 +11,11 @@ import (
 	"github.com/m4gshm/gollections/op"
 )
 
+//NewMap creates the Map with a predefined capacity.
+func NewMap[K comparable, V any](capacity int) *Map[K, V] {
+	return WrapMap(make(map[K]V, capacity))
+}
+
 //AsMap converts a slice of key/value pairs to teh Map.
 func AsMap[K comparable, V any](elements []*c.KV[K, V]) *Map[K, V] {
 	var (

@@ -1,6 +1,6 @@
 # Gollections
 
-Golang generic container data structures and functions.
+Golang generic containers and functions.
 
 Need use Go version 1.18 beta 2 or newer.
 

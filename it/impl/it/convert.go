@@ -2,6 +2,7 @@ package it
 
 import "github.com/m4gshm/gollections/c"
 
+//ConvertFit is the Converter with elements filtering.
 type ConvertFit[From, To any, IT c.Iterator[From]] struct {
 	iter IT
 	by   c.Converter[From, To]
@@ -25,6 +26,7 @@ func (s ConvertFit[From, To, IT]) Cap() int {
 	return s.iter.Cap()
 }
 
+//Convert is the iterator wrapper implementation applying a converter to all iterable elements.
 type Convert[From, To any, IT c.Iterator[From], C c.Converter[From, To]] struct {
 	iter IT
 	by   C
