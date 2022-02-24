@@ -4,19 +4,19 @@ import (
 	"unsafe"
 
 	"github.com/m4gshm/gollections/c"
-	sunsafe "github.com/m4gshm/gollections/slice/unsafe"
+	"github.com/m4gshm/gollections/notsafe"
 )
 
 //NoStarted is the head Iterator position.
 const NoStarted = -1
 
 func NewHead[T any, TS ~[]T](elements TS) Iter[T] {
-	return NewHeadS(elements, sunsafe.GetTypeSize[T]())
+	return NewHeadS(elements, notsafe.GetTypeSize[T]())
 }
 
 func NewHeadS[T any, TS ~[]T](elements TS, elementSize uintptr) Iter[T] {
 	var (
-		header = sunsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
+		header = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
 		array  = unsafe.Pointer(header.Data)
 		size   = header.Len
 	)
@@ -30,12 +30,12 @@ func NewHeadS[T any, TS ~[]T](elements TS, elementSize uintptr) Iter[T] {
 }
 
 func NewTail[T any](elements []T) Iter[T] {
-	return NewTailS(elements, sunsafe.GetTypeSize[T]())
+	return NewTailS(elements, notsafe.GetTypeSize[T]())
 }
 
 func NewTailS[T any](elements []T, elementSize uintptr) Iter[T] {
 	var (
-		header = sunsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
+		header = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
 		array  = unsafe.Pointer(header.Data)
 		size   = header.Len
 	)
@@ -56,8 +56,8 @@ type Iter[T any] struct {
 }
 
 var (
-	_ c.Iterator[any]        = (*Iter[any])(nil)
-	_ c.PrevIterator[any]    = (*Iter[any])(nil)
+	_ c.Iterator[any]     = (*Iter[any])(nil)
+	_ c.PrevIterator[any] = (*Iter[any])(nil)
 )
 
 func (i *Iter[T]) HasNext() bool {
@@ -78,7 +78,7 @@ func (i *Iter[T]) Next() (T, bool) {
 	if CanIterateByRange(NoStarted, i.maxHasNext, current) {
 		current++
 		i.current = current
-		return *(*T)(sunsafe.GetArrayElemRef(i.array, current, i.elementSize)), true
+		return *(*T)(notsafe.GetArrayElemRef(i.array, current, i.elementSize)), true
 	}
 	var no T
 	return no, false
@@ -94,7 +94,7 @@ func (i *Iter[T]) Prev() (T, bool) {
 	if CanIterateByRange(1, i.size, current) {
 		current--
 		i.current = current
-		return *(*T)(sunsafe.GetArrayElemRef(i.array, current, i.elementSize)), true
+		return *(*T)(notsafe.GetArrayElemRef(i.array, current, i.elementSize)), true
 	}
 	var no T
 	return no, false
@@ -103,7 +103,7 @@ func (i *Iter[T]) Prev() (T, bool) {
 func (i *Iter[T]) Get() (T, bool) {
 	current := i.current
 	if IsValidIndex(i.size, current) {
-		return *(*T)(sunsafe.GetArrayElemRef(i.array, current, i.elementSize)), true
+		return *(*T)(notsafe.GetArrayElemRef(i.array, current, i.elementSize)), true
 	}
 	var no T
 	return no, false
@@ -113,18 +113,19 @@ func (i *Iter[T]) Cap() int {
 	return i.size
 }
 
+//go:nosplit
 func (i Iter[T]) R() *Iter[T] {
-	return (*Iter[T])(noescape(&i))
+	return notsafe.Noescape(&i)
 }
 
 //HasNext checks the next element in an iterator by indexs of a current element and slice length.
 func HasNext[T any](elements []T, current int) bool {
-	return HasNextBySize(sunsafe.GetLen(elements), current)
+	return HasNextBySize(notsafe.GetLen(elements), current)
 }
 
 //HasPrev checks the previos element in an iterator by indexs of a current element and slice length.
 func HasPrev[T any](elements []T, current int) bool {
-	return HasPrevBySize(sunsafe.GetLen(elements), current)
+	return HasPrevBySize(notsafe.GetLen(elements), current)
 }
 
 //HasNextBySize checks the next element in an iterator by indexs of a current element and slice length.

@@ -7,7 +7,7 @@ import (
 	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
-	sunsafe "github.com/m4gshm/gollections/slice/unsafe"
+	"github.com/m4gshm/gollections/notsafe"
 )
 
 //NewSet creates the Set and copies elements to it.
@@ -27,7 +27,7 @@ func NewSet[T comparable](elements []T) *Set[T] {
 
 //WrapSet creates a set using a map and an order slice as the internal storage.
 func WrapSet[T comparable](order []T, elements map[T]struct{}) *Set[T] {
-	return &Set[T]{order: order, elements: elements, esize: sunsafe.GetTypeSize[T]()}
+	return &Set[T]{order: order, elements: elements, esize: notsafe.GetTypeSize[T]()}
 }
 
 //Set is the Collection implementation that provides element uniqueness and access order. The elements must be comparable.

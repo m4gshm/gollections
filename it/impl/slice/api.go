@@ -5,7 +5,7 @@ import (
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/check"
-	sunsafe "github.com/m4gshm/gollections/slice/unsafe"
+	"github.com/m4gshm/gollections/notsafe"
 )
 
 //Map creates the Iterator that converts elements with a converter and returns them.
@@ -21,18 +21,25 @@ func MapFit[From, To any, FS ~[]From](elements FS, fit c.Predicate[From], by c.C
 //Flatt creates the Iterator that extracts slices of 'To' by a Flatter from elements of 'From' and flattens as one iterable collection of 'To' elements.
 func Flatt[From, To any, FS ~[]From](elements FS, by c.Flatter[From, To]) Flatten[From, To] {
 	var (
-		header       = sunsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
+		header       = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
 		array        = unsafe.Pointer(header.Data)
 		size         = header.Len
-		elemSizeFrom = sunsafe.GetTypeSize[From]()
-		elemSizeTo   = sunsafe.GetTypeSize[To]()
+		elemSizeFrom = notsafe.GetTypeSize[From]()
+		elemSizeTo   = notsafe.GetTypeSize[To]()
 	)
 	return Flatten[From, To]{arrayFrom: array, sizeFrom: size, elemSizeFrom: elemSizeFrom, elemSizeTo: elemSizeTo, flatt: by}
 }
 
 //FlattFit additionally filters –'From' elements.
 func FlattFit[From, To any, FS ~[]From](elements FS, fit c.Predicate[From], flatt c.Flatter[From, To]) FlattenFit[From, To] {
-	return FlattenFit[From, To]{elements: elements, flatt: flatt, fit: fit}
+	var (
+		header       = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
+		array        = unsafe.Pointer(header.Data)
+		size         = header.Len
+		elemSizeFrom = notsafe.GetTypeSize[From]()
+		elemSizeTo   = notsafe.GetTypeSize[To]()
+	)
+	return FlattenFit[From, To]{arrayFrom: array, sizeFrom: size, elemSizeFrom: elemSizeFrom, elemSizeTo: elemSizeTo, flatt: flatt, fit: fit}
 }
 
 //Filter creates the Iterator that checks elements by filters and returns successful ones.

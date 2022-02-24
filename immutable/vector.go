@@ -5,9 +5,9 @@ import (
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/it/impl/it"
+	"github.com/m4gshm/gollections/notsafe"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
-	sunsafe "github.com/m4gshm/gollections/slice/unsafe"
 )
 
 //NewVector creates the Vector and copies elements to it.
@@ -17,7 +17,7 @@ func NewVector[T any](elements []T) *Vector[T] {
 
 //WrapVector creates the Vector using a slise as internal storage.
 func WrapVector[T any](elements []T) *Vector[T] {
-	return &Vector[T]{elements: elements, esize: sunsafe.GetTypeSize[T]()}
+	return &Vector[T]{elements: elements, esize: notsafe.GetTypeSize[T]()}
 }
 
 //Vector is the Collection implementation that provides elements order and index access.
@@ -65,7 +65,7 @@ func (v *Vector[T]) Collect() []T {
 }
 
 func (v *Vector[T]) Len() int {
-	return sunsafe.GetLen(v.elements)
+	return notsafe.GetLen(v.elements)
 }
 
 func (v *Vector[T]) IsEmpty() bool {

@@ -1,3 +1,7 @@
+.PHONY: test
+test:
+	go test  -gcflags -m -bench=^\(Benchmark_ReduceSum_Slice_Impl\)./...
+
 .PHONY: prof
 prof:
 	# GOGC=off go test -cpuprofile cpu.prof -memprofile mem.prof -bench=^\(Benchmark_MapFlattStructure_Slice_PlainOld\|Benchmark_MapFlattStructure_SliceWithoutNilCheck\) .
