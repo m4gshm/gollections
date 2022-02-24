@@ -6,8 +6,8 @@ import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/collect"
+	"github.com/m4gshm/gollections/notsafe"
 	"github.com/m4gshm/gollections/op"
-	 "github.com/m4gshm/gollections/notsafe"
 )
 
 //ErrBreak is For, Track breaker
