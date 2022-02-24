@@ -3,16 +3,17 @@ package mutable
 import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/it/impl/it"
+	"github.com/m4gshm/gollections/notsafe"
 )
 
 //NewHead creates the Iter starting at the first element of a sclie.
-func NewHead[T any](elements *[]T, del func(int) bool) *Iter[T] {
-	return &Iter[T]{elements: elements, current: it.NoStarted, del: del}
+func NewHead[T any](elements *[]T, del func(int) bool) Iter[T] {
+	return Iter[T]{elements: elements, current: it.NoStarted, del: del}
 }
 
 //NewTail creates the Iter starting at the last element of a sclie.
-func NewTail[T any](elements *[]T, del func(int) bool) *Iter[T] {
-	return &Iter[T]{elements: elements, current: len(*elements), del: del}
+func NewTail[T any](elements *[]T, del func(int) bool) Iter[T] {
+	return Iter[T]{elements: elements, current: len(*elements), del: del}
 }
 
 //Iter is the Iterator implementation for mutable containers.
@@ -36,6 +37,16 @@ func (i *Iter[T]) HasPrev() bool {
 	return it.HasPrev(*i.elements, i.current)
 }
 
+func (i *Iter[T]) GetNext() T {
+	t, _ := i.Next()
+	return t
+}
+
+func (i *Iter[T]) GetPrev() T {
+	t, _ := i.Prev()
+	return t
+}
+
 func (i *Iter[T]) Next() (T, bool) {
 	if i.HasNext() {
 		i.current++
@@ -54,6 +65,27 @@ func (i *Iter[T]) Prev() (T, bool) {
 	}
 	var no T
 	return no, false
+}
+
+func (i *Iter[T]) Get() (T, bool) {
+	current := i.current
+	elements := *i.elements
+	if it.IsValidIndex(len(elements), current) {
+		return elements[current], true
+	}
+	var no T
+	return no, false
+}
+
+func (i *Iter[T]) Cap() int {
+	return len(*i.elements)
+}
+
+//Experimental
+//must be inlined
+//DON'T USE IN PROD
+func (i Iter[T]) R() *Iter[T] {
+	return notsafe.Noescape(&i)
 }
 
 func (i *Iter[T]) Delete() bool {
@@ -78,8 +110,4 @@ func (i *Iter[T]) DeletePrev() bool {
 		return true
 	}
 	return false
-}
-
-func (i *Iter[T]) Cap() int {
-	return len(*i.elements)
 }

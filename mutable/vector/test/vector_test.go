@@ -5,7 +5,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/m4gshm/gollections/it"
 	"github.com/m4gshm/gollections/mutable/vector"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/range_"
@@ -13,27 +12,40 @@ import (
 	"github.com/m4gshm/gollections/walk/group"
 )
 
-func Test_Vector_Iterate(t *testing.T) {
-	vec := vector.Of(1, 1, 2, 4, 3, 1)
-	values := vec.Collect()
-
-	assert.Equal(t, 6, len(values))
-
-	expected := slice.Of(1, 1, 2, 4, 3, 1)
-	assert.Equal(t, expected, values)
-
-	iterSlice := it.Slice(vec.Begin())
-	assert.Equal(t, expected, iterSlice)
-
-	out := make([]int, 0)
-	it := vec.Begin()
-	for v, ok := it.Next(); ok; v, ok = it.Next() {
-		out = append(out, v)
+func Test_VectorIterate(t *testing.T) {
+	expected := slice.Of(1, 2, 3, 4)
+	v := vector.Of(1, 2, 3, 4)
+	result := make([]int, v.Len())
+	i := 0
+	for it := v.Head(); it.HasNext(); {
+		result[i] = it.GetNext()
+		i++
 	}
-	assert.Equal(t, expected, out)
+	assert.Equal(t, expected, result)
+}
 
-	out = make([]int, 0)
-	vec.ForEach(func(v int) { out = append(out, v) })
+func Test_VectorIterate2(t *testing.T) {
+	expected := slice.Of(1, 2, 3, 4)
+	v := vector.Of(1, 2, 3, 4)
+	result := make([]int, v.Len())
+	i := 0
+	for it, v, ok := v.First(); ok; v, ok = it.Next() {
+		result[i] = v
+		i++
+	}
+	assert.Equal(t, expected, result)
+}
+
+func Test_VectorReverseIteration(t *testing.T) {
+	expected := slice.Of(4, 3, 2, 1)
+	v := vector.Of(1, 2, 3, 4)
+	result := make([]int, v.Len())
+	i := 0
+	for it := v.Tail(); it.HasPrev(); {
+		result[i] = it.GetPrev()
+		i++
+	}
+	assert.Equal(t, expected, result)
 }
 
 func Test_Vector_Sort(t *testing.T) {
@@ -97,6 +109,64 @@ func Test_Vector_Add(t *testing.T) {
 	added = vec.Add(1)
 	assert.Equal(t, added, true)
 	assert.Equal(t, slice.Of(1, 1, 2, 4, 3, 1, 1), vec.Collect())
+}
+
+func Test_Vector_Add_And_Iterate(t *testing.T) {
+	vec := vector.New[int](0)
+	it, v, ok := vec.First()
+	//no a first element
+	assert.False(t, ok)
+	//no more elements
+	assert.False(t, it.HasNext())
+	vec.Add(1)
+	//exists one more
+	assert.True(t, it.HasNext())
+	v, ok = it.Get()
+	//but the cursor points out of the range
+	assert.False(t, ok)
+	//starts itaration
+	v, ok = it.Next()
+	//success
+	assert.True(t, ok)
+	assert.Equal(t, 1, v)
+	//no more
+	assert.False(t, it.HasNext())
+	//no prev
+	assert.False(t, it.HasPrev())
+	//only the current one
+	v, ok = it.Get()
+	assert.True(t, ok)
+	assert.Equal(t, 1, v)
+}
+
+func Test_Vector_Delete_And_Iterate(t *testing.T) {
+	vec := vector.Of(2)
+	it, v, ok := vec.First()
+	//success
+	assert.True(t, ok)
+	assert.Equal(t, 2, v)
+
+	//no more
+	assert.False(t, it.HasNext())
+	//no prev
+	assert.False(t, it.HasPrev())
+	//only the current one
+	v, ok = it.Get()
+	assert.True(t, ok)
+	assert.Equal(t, 2, v)
+
+	//delete the element
+	vec.DeleteOne(0)
+
+	//no more
+	assert.False(t, it.HasNext())
+	//no prev
+	assert.False(t, it.HasPrev())
+
+	//no the current one
+	_, ok = it.Get()
+	assert.False(t, ok)
+
 }
 
 func Test_Vector_DeleteOne(t *testing.T) {
