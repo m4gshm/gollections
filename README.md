@@ -19,6 +19,7 @@ Supports write operations (append, delete, replace).
   * [Map](./mutable/map_/api.go) - built-in map wrapper that supports [container functions](#container-functions).
   * [OrderedSet](./mutable/oset/api.go) - collection of unique items, prevents duplicates, provides iteration in order of addition.
   * [OrderedMap](./mutable/omap/api.go) - same as the [Map](./mutable/map_/api.go), but supports iteration in the order in which elements are added.
+  * [sync.Map](./mutable/sync/map.go) - generic wrapper of built-in embedded sync.Map.
 
 ## [Immutable containers](./immutable/api.go) 
 
