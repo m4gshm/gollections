@@ -8,7 +8,7 @@ import (
 )
 
 //Of creates the Iterator of predefined elements.
-func Of[T any](elements ...T) *impl.Iter[T] {
+func Of[T any](elements ...T) c.Iterator[T] {
 	iter := impl.NewHead(elements)
 	return &iter
 }

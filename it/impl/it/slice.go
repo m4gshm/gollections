@@ -10,6 +10,11 @@ import (
 //NoStarted is the head Iterator position.
 const NoStarted = -1
 
+func New[T any, TS ~[]T](elements TS) *Iter[T] {
+	iter := NewHeadS(elements, notsafe.GetTypeSize[T]())
+	return &iter
+}
+
 func NewHead[T any, TS ~[]T](elements TS) Iter[T] {
 	return NewHeadS(elements, notsafe.GetTypeSize[T]())
 }
@@ -113,10 +118,11 @@ func (i *Iter[T]) Cap() int {
 	return i.size
 }
 
-//go:nosplit
+//Experimental
+//must be inlined
+//DON'T USE IN PROD
 func (i Iter[T]) R() *Iter[T] {
-	return &i
-	// return notsafe.Noescape(&i)
+	return notsafe.Noescape(&i)
 }
 
 //HasNext checks the next element in an iterator by indexs of a current element and slice length.
