@@ -2,6 +2,7 @@ package slice
 
 import (
 	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/notsafe"
 )
 
 //go:notinheap
@@ -21,7 +22,9 @@ func (s *Fit[T]) Cap() int {
 	return len(s.elements)
 }
 
+//Experimental
+//must be inlined
+//DON'T USE IN PROD
 func (s Fit[T]) R() *Fit[T] {
-	return &s
-	// return notsafe.Noescape(&s)
+	return notsafe.Noescape(&s)
 }

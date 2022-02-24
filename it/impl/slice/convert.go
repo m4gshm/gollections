@@ -2,6 +2,7 @@ package slice
 
 import (
 	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/notsafe"
 )
 
 type ConvertFit[From, To any] struct {
@@ -25,9 +26,11 @@ func (s *ConvertFit[From, To]) Cap() int {
 	return len(s.elements)
 }
 
+//Experimental
+//must be inlined
+//DON'T USE IN PROD
 func (s ConvertFit[From, To]) R() *ConvertFit[From, To] {
-	return &s
-	// return notsafe.Noescape(&s)
+	return notsafe.Noescape(&s)
 }
 
 type Convert[From, To any] struct {
@@ -56,9 +59,11 @@ func (s *Convert[From, To]) Cap() int {
 	return len(s.elements)
 }
 
+//Experimental
+//must be inlined
+//DON'T USE IN PROD
 func (s Convert[From, To]) R() *Convert[From, To] {
-	return &s
-	// return notsafe.Noescape(&s)
+	return notsafe.Noescape(&s)
 }
 
 func nextArrayElem[T any](elements []T, filter c.Predicate[T], indexHolder *int) (T, bool) {

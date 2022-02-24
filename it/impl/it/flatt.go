@@ -50,9 +50,12 @@ func (s *FlattenFit[From, To, IT]) Cap() int {
 	return s.iter.Cap()
 }
 
+
+//Experimental
+//must be inlined
+//DON'T USE IN PROD
 func (s FlattenFit[From, To, IT]) R() *FlattenFit[From, To, IT] {
-	return &s
-	// return notsafe.Noescape(&s)
+	return notsafe.Noescape(&s)
 }
 
 type Flatten[From, To any, IT c.Iterator[From]] struct {
@@ -95,7 +98,9 @@ func (s *Flatten[From, To, IT]) Cap() int {
 	return s.iter.Cap()
 }
 
+//Experimental
+//must be inlined
+//DON'T USE IN PROD
 func (s Flatten[From, To, IT]) R() *Flatten[From, To, IT] {
-	return &s
-	// return notsafe.Noescape(&s)
+	return notsafe.Noescape(&s)
 }

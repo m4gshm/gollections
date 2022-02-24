@@ -50,9 +50,11 @@ func (s *FlattenFit[From, To]) Cap() int {
 	return s.cap
 }
 
+//Experimental
+//must be inlined
+//DON'T USE IN PROD
 func (s FlattenFit[From, To]) R() *FlattenFit[From, To] {
-	return &s
-	// return notsafe.Noescape(&s)
+	return notsafe.Noescape(&s)
 }
 
 //Flatten is the Iterator impelementation that converts an element to a slice.
@@ -96,7 +98,9 @@ func (s *Flatten[From, To]) Cap() int {
 	return s.sizeFrom
 }
 
+//Experimental
+//must be inlined
+//DON'T USE IN PROD
 func (s Flatten[From, To]) R() *Flatten[From, To] {
-	return &s
-	// return notsafe.Noescape(&s)
+	return notsafe.Noescape(&s)
 }

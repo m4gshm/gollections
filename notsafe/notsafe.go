@@ -40,8 +40,8 @@ func GetSliceHeaderByRef(elements unsafe.Pointer) *reflect.SliceHeader {
 }
 
 //Noescape prevent escaping of t
-//must be inlined
 //go:nosplit
+//go:nocheckptr
 func Noescape[T any](t *T) *T {
 	x := uintptr(unsafe.Pointer(t))
 	return (*T)(unsafe.Pointer(x ^ 0))
