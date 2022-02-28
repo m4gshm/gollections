@@ -15,6 +15,7 @@ import (
 	sliceit "github.com/m4gshm/gollections/it/slice"
 	"github.com/m4gshm/gollections/mutable"
 	mvector "github.com/m4gshm/gollections/mutable/vector"
+	"github.com/m4gshm/gollections/notsafe"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/sum"
 )
@@ -160,7 +161,7 @@ func Benchmark_MapAndFilter_Iterable_Impl_R(b *testing.B) {
 	var s []string
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		s = iterimpl.Slice[string](iterimpl.Map(iterimpl.Filter(iterimpl.NewHead(items).R(), even), conv.And(toString, addTail)))
+		s = iterimpl.Slice[string](iterimpl.Map(iterimpl.Filter(R(iterimpl.NewHead(items)), even), conv.And(toString, addTail)))
 	}
 	_ = s
 
@@ -218,7 +219,7 @@ func Benchmark_MapAndFilter_Slice_Impl_R(b *testing.B) {
 	var s []string
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		s = iterimpl.Slice[string](iterimpl.Map(sliceitimpl.Filter(items, even).R(), conv.And(toString, addTail)))
+		s = iterimpl.Slice[string](iterimpl.Map(R(sliceitimpl.Filter(items, even)), conv.And(toString, addTail)))
 	}
 	_ = s
 
@@ -299,7 +300,7 @@ func Benchmark_MapFit_Iterable_Impl_R(b *testing.B) {
 	var s []string
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		s = iterimpl.Slice[string](iterimpl.MapFit(iterimpl.NewHead(items).R(), even, conv.And(toString, addTail)))
+		s = iterimpl.Slice[string](iterimpl.MapFit(R(iterimpl.NewHead(items)), even, conv.And(toString, addTail)))
 	}
 	_ = s
 
@@ -357,7 +358,7 @@ func Benchmark_MapFit_Slice_Impl_R(b *testing.B) {
 	var s []string
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		s = it.Slice[string](sliceitimpl.MapFit(items, even, conv.And(toString, addTail)).R())
+		s = it.Slice[string](R(sliceitimpl.MapFit(items, even, conv.And(toString, addTail))))
 	}
 	_ = s
 
@@ -396,7 +397,7 @@ func Benchmark_Flatt_Iterable_Impl_R(b *testing.B) {
 	multiDimension := [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		oneDimension := iterimpl.Slice[int](iterimpl.Filter(iterimpl.Flatt(iterimpl.Flatt(iterimpl.NewHead(multiDimension).R(), conv.To[[][]int]).R(), conv.To[[]int]).R(), odds))
+		oneDimension := iterimpl.Slice[int](iterimpl.Filter(R(iterimpl.Flatt(R(iterimpl.Flatt(R(iterimpl.NewHead(multiDimension)), conv.To[[][]int])), conv.To[[]int])), odds))
 		_ = oneDimension
 	}
 	b.StopTimer()
@@ -430,7 +431,7 @@ func Benchmark_Flatt_Slice_Impl_R(b *testing.B) {
 	multiDimension := [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		oneDimension := iterimpl.Slice[int](iterimpl.Filter(iterimpl.Flatt(sliceit.Flatt(multiDimension, conv.To[[][]int]), conv.To[[]int]).R(), odds))
+		oneDimension := iterimpl.Slice[int](iterimpl.Filter(R(iterimpl.Flatt(sliceit.Flatt(multiDimension, conv.To[[][]int]), conv.To[[]int])), odds))
 		_ = oneDimension
 	}
 	b.StopTimer()
@@ -494,7 +495,7 @@ func Benchmark_ReduceSum_Iterable_Impl_R(b *testing.B) {
 	b.ResetTimer()
 	result := 0
 	for i := 0; i < b.N; i++ {
-		result = iterimpl.Reduce(iterimpl.Filter(iterimpl.Flatt(iterimpl.Flatt(iterimpl.NewHead(multiDimension).R(), conv.To[[][]int]).R(), conv.To[[]int]).R(), odds), sum.Of[int])
+		result = iterimpl.Reduce(iterimpl.Filter(R(iterimpl.Flatt(R(iterimpl.Flatt(R(iterimpl.NewHead(multiDimension)), conv.To[[][]int])), conv.To[[]int])), odds), sum.Of[int])
 	}
 	if result != expected {
 		b.Fatalf("must be %d, but %d", expected, result)
@@ -547,7 +548,7 @@ func Benchmark_ReduceSum_Slice_Impl_R(b *testing.B) {
 	b.ResetTimer()
 	result := 0
 	for i := 0; i < b.N; i++ {
-		result = iterimpl.Reduce(iterimpl.Filter(iterimpl.Flatt(sliceitimpl.Flatt(multiDimension, toTwoD).R(), toOneD).R(), odds), intSum)
+		result = iterimpl.Reduce(iterimpl.Filter(R(iterimpl.Flatt(R(sliceitimpl.Flatt(multiDimension, toTwoD)), toOneD)), odds), intSum)
 	}
 	if result != expected {
 		b.Fatalf("must be %d, but %d", expected, result)
@@ -647,7 +648,7 @@ func Benchmark_MapFlattStructure_IterableFit_Impl_R(b *testing.B) {
 	items := []*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_ = iterimpl.Slice[string](iterimpl.MapFit(iterimpl.FlattFit(iterimpl.NewHead(items).R(), check.NotNil[Participant], (*Participant).GetAttributes).R(), check.NotNil[Attributes], (*Attributes).GetName))
+		_ = iterimpl.Slice[string](iterimpl.MapFit(R(iterimpl.FlattFit(R(iterimpl.NewHead(items)), check.NotNil[Participant], (*Participant).GetAttributes)), check.NotNil[Attributes], (*Attributes).GetName))
 	}
 	b.StopTimer()
 }
@@ -675,7 +676,7 @@ func Benchmark_MapFlattStructure_SliceFit_Impl_R(b *testing.B) {
 	items := []*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_ = iterimpl.Slice[string](iterimpl.MapFit(sliceitimpl.FlattFit(items, check.NotNil[Participant], (*Participant).GetAttributes).R(), check.NotNil[Attributes], (*Attributes).GetName))
+		_ = iterimpl.Slice[string](iterimpl.MapFit(R(sliceitimpl.FlattFit(items, check.NotNil[Participant], (*Participant).GetAttributes)), check.NotNil[Attributes], (*Attributes).GetName))
 	}
 	b.StopTimer()
 }
@@ -702,3 +703,9 @@ func Benchmark_MapFlattStructure_Slice_PlainOld(b *testing.B) {
 	}
 	b.StopTimer()
 }
+
+
+func R[T any](t T) *T {
+	return notsafe.Noescape(&t)
+}
+

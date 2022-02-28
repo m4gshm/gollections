@@ -4,14 +4,16 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/conv"
 	"github.com/m4gshm/gollections/it"
 	impl "github.com/m4gshm/gollections/it/impl/it"
 	sliceit "github.com/m4gshm/gollections/it/slice"
+	"github.com/m4gshm/gollections/notsafe"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/sum"
-	"github.com/stretchr/testify/assert"
 )
 
 func Test_MapAndFilter(t *testing.T) {
@@ -151,7 +153,7 @@ func Test_MapFlattFitStructure_Iterable_Impl_Unsafe(t *testing.T) {
 
 	items := []*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil, {attributes: []*Attributes{{name: "third"}, nil}}}
 
-	names := impl.Slice[string](impl.Map(impl.FlattFit(impl.NewHead(items).R(), check.NotNil[Participant], (*Participant).GetAttributes).R(), (*Attributes).GetName))
+	names := impl.Slice[string](impl.Map(R(impl.FlattFit(R(impl.NewHead(items)), check.NotNil[Participant], (*Participant).GetAttributes)), (*Attributes).GetName))
 	assert.Equal(t, expected, names)
 
 	names = it.Slice(it.Map(sliceit.FlattFit(items, check.NotNil[Participant], (*Participant).GetAttributes), (*Attributes).GetName))
@@ -180,9 +182,13 @@ func Test_Iterate(t *testing.T) {
 }
 
 func Test_Group(t *testing.T) {
-	groups := it.Group[int](it.Of(0, 1, 1, 2, 4, 3, 1, 6, 7), func(e int) bool { return e%2 == 0 }).Collect()
+	groups := it.Group(it.Of(0, 1, 1, 2, 4, 3, 1, 6, 7), func(e int) bool { return e%2 == 0 }).Collect()
 
 	assert.Equal(t, len(groups), 2)
 	assert.Equal(t, []int{1, 1, 3, 1, 7}, groups[false])
 	assert.Equal(t, []int{0, 2, 4, 6}, groups[true])
+}
+
+func R[T any](t T) *T {
+	return notsafe.Noescape(&t)
 }

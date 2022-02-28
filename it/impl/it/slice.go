@@ -123,13 +123,6 @@ func (i *Iter[T]) Cap() int {
 	return i.size
 }
 
-//Experimental
-//must be inlined
-//DON'T USE IN PROD
-func (i Iter[T]) R() *Iter[T] {
-	return notsafe.Noescape(&i)
-}
-
 //HasNext checks the next element in an iterator by indexs of a current element and slice length.
 func HasNext[T any](elements []T, current int) bool {
 	return HasNextBySize(notsafe.GetLen(elements), current)

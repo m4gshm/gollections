@@ -1,21 +1,24 @@
 package slice
 
 import (
+	"unsafe"
+
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/notsafe"
 )
 
 type ConvertFit[From, To any] struct {
-	elements []From
+	array    unsafe.Pointer
+	elemSize uintptr
+	size, i  int
 	by       c.Converter[From, To]
 	Fit      c.Predicate[From]
-	i        int
 }
 
 var _ c.Iterator[any] = (*ConvertFit[any, any])(nil)
 
 func (s *ConvertFit[From, To]) Next() (To, bool) {
-	if v, ok := nextArrayElem(s.elements, s.Fit, &s.i); ok {
+	if v, ok := nextFiltered(s.array, s.size, s.elemSize, s.Fit, &s.i); ok {
 		return s.by(v), true
 	}
 	var no To
@@ -23,32 +26,22 @@ func (s *ConvertFit[From, To]) Next() (To, bool) {
 }
 
 func (s *ConvertFit[From, To]) Cap() int {
-	return len(s.elements)
-}
-
-//Experimental
-//must be inlined
-//DON'T USE IN PROD
-func (s ConvertFit[From, To]) R() *ConvertFit[From, To] {
-	return notsafe.Noescape(&s)
+	return s.size
 }
 
 type Convert[From, To any] struct {
-	elements []From
+	array    unsafe.Pointer
+	elemSize uintptr
+	size, i  int
 	by       c.Converter[From, To]
-	i        int
-	err      error
 }
 
 var _ c.Iterator[any] = (*Convert[any, any])(nil)
 
 func (s *Convert[From, To]) Next() (To, bool) {
-	e := s.elements
-	l := len(s.elements)
-	i := s.i
-	if i < l {
-		v := e[i]
-		s.i = i + 1
+	if s.i < s.size {
+		v := *(*From)(notsafe.GetArrayElemRef(s.array, s.i, s.elemSize))
+		s.i++
 		return s.by(v), true
 	}
 	var no To
@@ -56,21 +49,13 @@ func (s *Convert[From, To]) Next() (To, bool) {
 }
 
 func (s *Convert[From, To]) Cap() int {
-	return len(s.elements)
+	return s.size
 }
 
-//Experimental
-//must be inlined
-//DON'T USE IN PROD
-func (s Convert[From, To]) R() *Convert[From, To] {
-	return notsafe.Noescape(&s)
-}
-
-func nextArrayElem[T any](elements []T, filter c.Predicate[T], indexHolder *int) (T, bool) {
-	l := len(elements)
-	for i := *indexHolder; i < l; i++ {
-		if v := elements[i]; filter(v) {
-			*indexHolder = i + 1
+func nextFiltered[T any](array unsafe.Pointer, size int, elemSize uintptr, filter c.Predicate[T], index *int) (T, bool) {
+	for i := *index; i < size; i++ {
+		if v := *(*T)(notsafe.GetArrayElemRef(array, i, elemSize)); filter(v) {
+			*index = i + 1
 			return v, true
 		}
 	}

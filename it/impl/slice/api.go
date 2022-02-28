@@ -10,12 +10,24 @@ import (
 
 //Map creates the Iterator that converts elements with a converter and returns them.
 func Map[From, To any, FS ~[]From](elements FS, by c.Converter[From, To]) Convert[From, To] {
-	return Convert[From, To]{elements: elements, by: by}
+	var (
+		header   = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
+		array    = unsafe.Pointer(header.Data)
+		size     = header.Len
+		elemSize = notsafe.GetTypeSize[From]()
+	)
+	return Convert[From, To]{array: array, size: size, elemSize: elemSize, by: by}
 }
 
 //MapFit additionally filters 'From' elements.
 func MapFit[From, To any, FS ~[]From](elements FS, fit c.Predicate[From], by c.Converter[From, To]) ConvertFit[From, To] {
-	return ConvertFit[From, To]{elements: elements, by: by, Fit: fit}
+	var (
+		header   = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
+		array    = unsafe.Pointer(header.Data)
+		size     = header.Len
+		elemSize = notsafe.GetTypeSize[From]()
+	)
+	return ConvertFit[From, To]{array: array, size: size, elemSize: elemSize, by: by, Fit: fit}
 }
 
 //Flatt creates the Iterator that extracts slices of 'To' by a Flatter from elements of 'From' and flattens as one iterable collection of 'To' elements.
@@ -44,7 +56,13 @@ func FlattFit[From, To any, FS ~[]From](elements FS, fit c.Predicate[From], flat
 
 //Filter creates the Iterator that checks elements by filters and returns successful ones.
 func Filter[T any, TS ~[]T](elements TS, filter c.Predicate[T]) Fit[T] {
-	return Fit[T]{elements: elements, by: filter}
+	var (
+		header   = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
+		array    = unsafe.Pointer(header.Data)
+		size     = header.Len
+		elemSize = notsafe.GetTypeSize[T]()
+	)
+	return Fit[T]{array: array, size: size, elemSize: elemSize, by: filter}
 }
 
 //NotNil creates the Iterator that filters nullable elements.

@@ -1,29 +1,24 @@
 package slice
 
 import (
+	"unsafe"
+
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/notsafe"
 )
 
 type Fit[T any] struct {
-	elements []T
+	array    unsafe.Pointer
+	elemSize uintptr
+	size, i  int
 	by       c.Predicate[T]
-	i        int
 }
 
 var _ c.Iterator[any] = (*Fit[any])(nil)
 
 func (s *Fit[T]) Next() (T, bool) {
-	return nextArrayElem(s.elements, s.by, &s.i)
+	return nextFiltered(s.array, s.size, s.elemSize, s.by, &s.i)
 }
 
 func (s *Fit[T]) Cap() int {
-	return len(s.elements)
-}
-
-//Experimental
-//must be inlined
-//DON'T USE IN PROD
-func (s Fit[T]) R() *Fit[T] {
-	return notsafe.Noescape(&s)
+	return s.size
 }

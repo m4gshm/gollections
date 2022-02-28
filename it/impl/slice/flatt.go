@@ -51,13 +51,6 @@ func (s *FlattenFit[From, To]) Cap() int {
 	return s.cap
 }
 
-//Experimental
-//must be inlined
-//DON'T USE IN PROD
-func (s FlattenFit[From, To]) R() *FlattenFit[From, To] {
-	return notsafe.Noescape(&s)
-}
-
 //Flatten is the Iterator impelementation that converts an element to a slice.
 //For example, Flatten can be used to convert a multi-dimensional array to a one-dimensional array ([][]int -> []int).
 type Flatten[From, To any] struct {
@@ -97,11 +90,4 @@ func (s *Flatten[From, To]) Next() (To, bool) {
 
 func (s *Flatten[From, To]) Cap() int {
 	return s.sizeFrom
-}
-
-//Experimental
-//must be inlined
-//DON'T USE IN PROD
-func (s Flatten[From, To]) R() *Flatten[From, To] {
-	return notsafe.Noescape(&s)
 }

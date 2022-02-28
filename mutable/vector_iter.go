@@ -3,7 +3,6 @@ package mutable
 import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/it/impl/it"
-	"github.com/m4gshm/gollections/notsafe"
 )
 
 //NewHead creates the Iter starting at the first element of a sclie.
@@ -79,13 +78,6 @@ func (i *Iter[T]) Get() (T, bool) {
 
 func (i *Iter[T]) Cap() int {
 	return len(*i.elements)
-}
-
-//Experimental
-//must be inlined
-//DON'T USE IN PROD
-func (i Iter[T]) R() *Iter[T] {
-	return notsafe.Noescape(&i)
 }
 
 func (i *Iter[T]) Delete() bool {

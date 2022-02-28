@@ -49,6 +49,11 @@ func Noescape[T any](t *T) *T {
 	return (*T)(unsafe.Pointer(x ^ 0)) //nolint
 }
 
-//VerifyNotInHeapPtr is link to  reflect.verifyNotInHeapPtr
-//go:linkname VerifyNotInHeapPtr reflect.verifyNotInHeapPtr
-func VerifyNotInHeapPtr(p uintptr) bool
+//InHeap is generic link to runtime.inheap
+func InHeap[T any](t *T) bool {
+	return inheap(uintptr(unsafe.Pointer(t)))
+}
+
+//go:linkname inheap runtime.inheap
+func inheap(p uintptr) bool
+
