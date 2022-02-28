@@ -3,7 +3,6 @@ package it
 import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/check"
-	"github.com/m4gshm/gollections/it/impl/it"
 	impl "github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/op"
 )
