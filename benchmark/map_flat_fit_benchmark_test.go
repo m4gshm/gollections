@@ -704,8 +704,6 @@ func Benchmark_MapFlattStructure_Slice_PlainOld(b *testing.B) {
 	b.StopTimer()
 }
 
-
 func R[T any](t T) *T {
 	return notsafe.Noescape(&t)
 }
-

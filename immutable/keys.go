@@ -24,10 +24,11 @@ var _ c.Collection[int, []int, c.Iterator[int]] = (*MapKeys[int, any])(nil)
 var _ fmt.Stringer = (*MapValues[int, any])(nil)
 
 func (s *MapKeys[K, V]) Begin() c.Iterator[K] {
-	return s.Head()
+	iter := s.Head()
+	return &iter
 }
 
-func (s *MapKeys[K, V]) Head() *it.Key[K, V] {
+func (s *MapKeys[K, V]) Head() it.Key[K, V] {
 	return it.NewKey(s.uniques)
 }
 

@@ -49,6 +49,7 @@ func (s Convert[From, To, IT, C]) Cap() int {
 	return s.iter.Cap()
 }
 
+//ConvertKV is the iterator wrapper implementation applying a converter to all iterable key/value elements.
 type ConvertKV[K, V any, IT c.KVIterator[K, V], K2, V2 any, C c.BiConverter[K, V, K2, V2]] struct {
 	iter IT
 	by   C

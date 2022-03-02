@@ -27,7 +27,7 @@ func MapFit[From, To any, FS ~[]From](elements FS, fit c.Predicate[From], by c.C
 		size     = header.Len
 		elemSize = notsafe.GetTypeSize[From]()
 	)
-	return ConvertFit[From, To]{array: array, size: size, elemSize: elemSize, by: by, Fit: fit}
+	return ConvertFit[From, To]{array: array, size: size, elemSize: elemSize, by: by, fit: fit}
 }
 
 //Flatt creates the Iterator that extracts slices of 'To' by a Flatter from elements of 'From' and flattens as one iterable collection of 'To' elements.

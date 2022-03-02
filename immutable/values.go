@@ -27,10 +27,11 @@ var (
 )
 
 func (s *MapValues[K, V]) Begin() c.Iterator[V] {
-	return s.Head()
+	iter := s.Head()
+	return &iter
 }
 
-func (s *MapValues[K, V]) Head() *it.Val[K, V] {
+func (s *MapValues[K, V]) Head() it.Val[K, V] {
 	return it.NewVal(s.elements)
 }
 
@@ -59,15 +60,18 @@ func (s *MapValues[K, V]) ForEach(walker func(V)) {
 }
 
 func (s *MapValues[K, V]) Filter(filter c.Predicate[V]) c.Pipe[V, []V] {
-	return it.NewPipe[V](it.Filter(s.Head(), filter))
+	iter := s.Head()
+	return it.NewPipe[V](it.Filter(&iter, filter))
 }
 
 func (s *MapValues[K, V]) Map(by c.Converter[V, V]) c.Pipe[V, []V] {
-	return it.NewPipe[V](it.Map(s.Head(), by))
+	iter := s.Head()
+	return it.NewPipe[V](it.Map(&iter, by))
 }
 
 func (s *MapValues[K, V]) Reduce(by op.Binary[V]) V {
-	return it.Reduce(s.Head(), by)
+	iter := s.Head()
+	return it.Reduce(&iter, by)
 }
 
 func (s *MapValues[K, V]) Sort(less func(e1, e2 V) bool) *Vector[V] {

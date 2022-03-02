@@ -153,6 +153,7 @@ func IsValidIndex(size, index int) bool {
 	return index > -1 && index < size
 }
 
+//IsValidIndex2 checks if index is out of range
 func IsValidIndex2(size, index int) bool {
 	return !((index^size == 0) || index < 0)
 }

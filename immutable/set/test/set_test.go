@@ -29,7 +29,7 @@ func Test_Set_Iterate(t *testing.T) {
 	assert.Equal(t, expected, iterSlice)
 
 	out := make(map[int]int, 0)
-	it := set.Begin()
+	it := set.Head()
 	for v, ok := it.Next(); ok; v, ok = it.Next() {
 		out[v] = v
 	}

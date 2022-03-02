@@ -5,11 +5,12 @@ import (
 	"github.com/m4gshm/gollections/op"
 )
 
-//NewPipe returns the Pipe based on iterable elements.
+//NewPipe creates the Pipe based on iterable elements.
 func NewPipe[T any, IT c.Iterator[T]](iter IT) *IterPipe[T] {
 	return &IterPipe[T]{it: iter}
 }
 
+//IterPipe is the Iterator based pipe implementation.
 type IterPipe[T any] struct {
 	it       c.Iterator[T]
 	elements []T

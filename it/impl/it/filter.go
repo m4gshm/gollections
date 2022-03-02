@@ -2,6 +2,7 @@ package it
 
 import "github.com/m4gshm/gollections/c"
 
+//Fit is the Iterator wrapper that provides filtering of elements by a Predicate.
 type Fit[T any, IT c.Iterator[T]] struct {
 	iter IT
 	by   c.Predicate[T]
@@ -20,6 +21,7 @@ func (s Fit[T, IT]) Cap() int {
 	return s.iter.Cap()
 }
 
+//FitKV is the KVIterator wrapper that provides filtering of key/value elements by a Predicate.
 type FitKV[K, V any, IT c.KVIterator[K, V]] struct {
 	iter IT
 	by   c.BiPredicate[K, V]

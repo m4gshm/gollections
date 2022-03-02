@@ -39,7 +39,7 @@ func (s *Set[T]) Begin() c.Iterator[T] {
 	return s.Head()
 }
 
-func (s *Set[T]) Head() *it.Key[T, struct{}] {
+func (s *Set[T]) Head() it.Key[T, struct{}] {
 	return it.NewKey(s.elements)
 }
 

@@ -56,4 +56,3 @@ func InHeap[T any](t *T) bool {
 
 //go:linkname inheap runtime.inheap
 func inheap(p uintptr) bool
-
