@@ -23,5 +23,5 @@ jobs:
       - name: run tests
         uses: docker://golang:rc
         with:
-          args: make test
+          args: git clone https://github.com/golang/go.git && cd go/src && ./all.bash && make test
 
