@@ -23,8 +23,5 @@ jobs:
       - name: run tests
         uses: docker://golang:1.18rc1-bullseye
         with:
-          args: ls
-      - name: ls
-        run: ls
-      - name: pwd
-        run: pwd
+          args: make test
+
