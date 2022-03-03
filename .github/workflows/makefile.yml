@@ -22,3 +22,5 @@ jobs:
       uses: docker://golang:1.18rc1-bullseye
     - name: run tests
       run: make test
+      working-directory: /github/workspace
+  
