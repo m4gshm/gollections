@@ -2,17 +2,23 @@ name: Run Tests
 
 on:
   push:
-    branches: [ main ]
+    branches: 
+      - main
+      - 'releases/**'
+      - 'feature/**'
+      - 'bugfix/**'
   pull_request:
-    branches: [ main ]
+    branches: 
+      - main
+      - 'releases/**'
+      - 'feature/**'
+      - 'bugfix/**'
 
 jobs:
   build:
-
-    runs-on: golang:1.18rc1-bullseye
+    runs-on: ubuntu-18.04
 
     steps:
-    - uses: actions/checkout@main
-
     - name: Run tests
+      uses: docker://golang:1.18rc1-bullseye
       run: make test
