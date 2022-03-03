@@ -17,8 +17,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-18.04
-
     steps:
-    - name: Run tests
+    - name: deploy container
       uses: docker://golang:1.18rc1-bullseye
+    - name: run tests
       run: make test
