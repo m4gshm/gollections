@@ -23,13 +23,12 @@ func ToVector[T any](elements []T) *Vector[T] {
 
 //WrapVector creates the Vector using a slise as internal storage.
 func WrapVector[T any](elements []T) *Vector[T] {
-	return &Vector[T]{elements: elements}
+	v := Vector[T](elements)
+	return &v
 }
 
 //Vector is the Collection implementation that provides elements order and index access.
-type Vector[T any] struct {
-	elements []T
-}
+type Vector[T any] []T
 
 var (
 	_ c.Addable[any]       = (*Vector[any])(nil)
@@ -49,36 +48,36 @@ func (v *Vector[T]) BeginEdit() c.DelIterator[T] {
 	return &iter
 }
 
-func (v *Vector[T]) Head() Iter[T] {
-	return NewHead(&v.elements, v.DeleteOne)
+func (v *Vector[T]) Head() Iter[T, Vector[T]] {
+	return NewHead(v, v.DeleteOne)
 }
 
-func (v *Vector[T]) Tail() Iter[T] {
-	return NewTail(&v.elements, v.DeleteOne)
+func (v *Vector[T]) Tail() Iter[T, Vector[T]] {
+	return NewTail(v, v.DeleteOne)
 }
 
-func (v *Vector[T]) First() (Iter[T], T, bool) {
+func (v *Vector[T]) First() (Iter[T, Vector[T]], T, bool) {
 	var (
-		iter      = NewHead(&v.elements, v.DeleteOne)
+		iter      = NewHead(v, v.DeleteOne)
 		first, ok = iter.Next()
 	)
 	return iter, first, ok
 }
 
-func (v *Vector[T]) Last() (Iter[T], T, bool) {
+func (v *Vector[T]) Last() (Iter[T, Vector[T]], T, bool) {
 	var (
-		iter      = NewTail(&v.elements, v.DeleteOne)
+		iter      = NewTail(v, v.DeleteOne)
 		first, ok = iter.Prev()
 	)
 	return iter, first, ok
 }
 
 func (v *Vector[T]) Collect() []T {
-	return slice.Copy(v.elements)
+	return slice.Copy(*v)
 }
 
 func (v *Vector[T]) Copy() *Vector[T] {
-	return WrapVector(slice.Copy(v.elements))
+	return WrapVector(slice.Copy(*v))
 }
 
 func (v *Vector[T]) IsEmpty() bool {
@@ -86,27 +85,27 @@ func (v *Vector[T]) IsEmpty() bool {
 }
 
 func (v *Vector[T]) Len() int {
-	return notsafe.GetLen(v.elements)
+	return notsafe.GetLen(*v)
 }
 
 func (v *Vector[T]) Track(tracker func(int, T) error) error {
-	return slice.Track(v.elements, tracker)
+	return slice.Track(*v, tracker)
 }
 
 func (v *Vector[T]) TrackEach(tracker func(int, T)) {
-	slice.TrackEach(v.elements, tracker)
+	slice.TrackEach(*v, tracker)
 }
 
 func (v *Vector[T]) For(walker func(T) error) error {
-	return slice.For(v.elements, walker)
+	return slice.For(*v, walker)
 }
 
 func (v *Vector[T]) ForEach(walker func(T)) {
-	slice.ForEach(v.elements, walker)
+	slice.ForEach(*v, walker)
 }
 
 func (v *Vector[T]) Get(index int) (T, bool) {
-	return slice.Get(v.elements, index)
+	return slice.Get(*v, index)
 }
 
 func (v *Vector[T]) Add(elements ...T) bool {
@@ -114,12 +113,12 @@ func (v *Vector[T]) Add(elements ...T) bool {
 }
 
 func (v *Vector[T]) AddAll(elements []T) bool {
-	v.elements = append(v.elements, elements...)
+	*v = append(*v, elements...)
 	return true
 }
 
 func (v *Vector[T]) AddOne(element T) bool {
-	v.elements = append(v.elements, element)
+	*v = append(*v, element)
 	return true
 }
 
@@ -129,9 +128,9 @@ func (v *Vector[T]) DeleteOne(index int) bool {
 }
 
 func (v *Vector[T]) Remove(index int) (T, bool) {
-	if e := v.elements; index >= 0 && index < len(e) {
+	if e := *v; index >= 0 && index < len(e) {
 		de := e[index]
-		v.elements = slice.Delete(index, e)
+		*v = slice.Delete(index, e)
 		return de, true
 	}
 	var no T
@@ -146,7 +145,7 @@ func (v *Vector[T]) Delete(indexes ...int) bool {
 		return v.DeleteOne(indexes[0])
 	}
 
-	e := v.elements
+	e := *v
 	el := len(e)
 
 	sort.Ints(indexes)
@@ -173,14 +172,14 @@ func (v *Vector[T]) Delete(indexes ...int) bool {
 		}
 	}
 	if shift > 0 {
-		v.elements = e
+		*v = e
 		return true
 	}
 	return false
 }
 
 func (v *Vector[T]) Set(index int, value T) bool {
-	e := v.elements
+	e := *v
 	if index < 0 {
 		return false
 	}
@@ -194,7 +193,7 @@ func (v *Vector[T]) Set(index int, value T) bool {
 		ne := make([]T, l, c)
 		copy(ne, e)
 		e = ne
-		v.elements = e
+		*v = e
 	}
 	e[index] = value
 	return true
@@ -217,11 +216,11 @@ func (v *Vector[T]) Reduce(by op.Binary[T]) T {
 
 //Sotr sorts the Vector in-place and returns it.
 func (v *Vector[t]) Sort(less func(e1, e2 t) bool) *Vector[t] {
-	v.elements = slice.Sort(v.elements, less)
+	*v = slice.Sort(*v, less)
 	return v
 }
 
 //String returns then string representation.
 func (v *Vector[T]) String() string {
-	return slice.ToString(v.elements)
+	return slice.ToString(*v)
 }

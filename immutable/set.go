@@ -43,6 +43,14 @@ func (s *Set[T]) Head() it.Key[T, struct{}] {
 	return it.NewKey(s.elements)
 }
 
+func (s *Set[T]) First() (it.Key[T, struct{}], T, bool) {
+	var (
+		iter      = s.Head()
+		first, ok = iter.Next()
+	)
+	return iter, first, ok
+}
+
 func (s *Set[T]) Collect() []T {
 	elements := s.elements
 	out := make([]T, 0, len(elements))

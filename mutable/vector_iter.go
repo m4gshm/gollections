@@ -6,47 +6,47 @@ import (
 )
 
 //NewHead creates the Iter starting at the first element of a sclie.
-func NewHead[T any](elements *[]T, del func(int) bool) Iter[T] {
-	return Iter[T]{elements: elements, current: it.NoStarted, del: del}
+func NewHead[T any, TS ~[]T](elements *TS, del func(int) bool) Iter[T, TS] {
+	return Iter[T, TS]{elements: elements, current: it.NoStarted, del: del}
 }
 
 //NewTail creates the Iter starting at the last element of a sclie.
-func NewTail[T any](elements *[]T, del func(int) bool) Iter[T] {
-	return Iter[T]{elements: elements, current: len(*elements), del: del}
+func NewTail[T any, TS ~[]T](elements *TS, del func(int) bool) Iter[T, TS] {
+	return Iter[T, TS]{elements: elements, current: len(*elements), del: del}
 }
 
 //Iter is the Iterator implementation for mutable containers.
-type Iter[T any] struct {
-	elements      *[]T
+type Iter[T any, TS ~[]T] struct {
+	elements      *TS
 	current, step int
 	del           func(index int) bool
 }
 
 var (
-	_ c.Iterator[any]     = (*Iter[any])(nil)
-	_ c.PrevIterator[any] = (*Iter[any])(nil)
-	_ c.DelIterator[any]  = (*Iter[any])(nil)
+	_ c.Iterator[any]     = (*Iter[any, []any])(nil)
+	_ c.PrevIterator[any] = (*Iter[any, []any])(nil)
+	_ c.DelIterator[any]  = (*Iter[any, []any])(nil)
 )
 
-func (i *Iter[T]) HasNext() bool {
+func (i *Iter[T, TS]) HasNext() bool {
 	return it.HasNext(*i.elements, i.current)
 }
 
-func (i *Iter[T]) HasPrev() bool {
+func (i *Iter[T, TS]) HasPrev() bool {
 	return it.HasPrev(*i.elements, i.current)
 }
 
-func (i *Iter[T]) GetNext() T {
+func (i *Iter[T, TS]) GetNext() T {
 	t, _ := i.Next()
 	return t
 }
 
-func (i *Iter[T]) GetPrev() T {
+func (i *Iter[T, TS]) GetPrev() T {
 	t, _ := i.Prev()
 	return t
 }
 
-func (i *Iter[T]) Next() (T, bool) {
+func (i *Iter[T, TS]) Next() (T, bool) {
 	if i.HasNext() {
 		i.current++
 		i.step = 1
@@ -56,7 +56,7 @@ func (i *Iter[T]) Next() (T, bool) {
 	return no, false
 }
 
-func (i *Iter[T]) Prev() (T, bool) {
+func (i *Iter[T, TS]) Prev() (T, bool) {
 	if i.HasPrev() {
 		i.current--
 		i.step = 0
@@ -66,7 +66,7 @@ func (i *Iter[T]) Prev() (T, bool) {
 	return no, false
 }
 
-func (i *Iter[T]) Get() (T, bool) {
+func (i *Iter[T, TS]) Get() (T, bool) {
 	current := i.current
 	elements := *i.elements
 	if it.IsValidIndex(len(elements), current) {
@@ -76,11 +76,11 @@ func (i *Iter[T]) Get() (T, bool) {
 	return no, false
 }
 
-func (i *Iter[T]) Cap() int {
+func (i *Iter[T, TS]) Cap() int {
 	return len(*i.elements)
 }
 
-func (i *Iter[T]) Delete() bool {
+func (i *Iter[T, TS]) Delete() bool {
 	if deleted := i.del(i.current); deleted {
 		i.current -= i.step
 		// i.deleted = true
@@ -89,14 +89,14 @@ func (i *Iter[T]) Delete() bool {
 	return false
 }
 
-func (i *Iter[T]) DeleteNext() bool {
+func (i *Iter[T, TS]) DeleteNext() bool {
 	if deleted := i.del(i.current + 1); deleted {
 		return true
 	}
 	return false
 }
 
-func (i *Iter[T]) DeletePrev() bool {
+func (i *Iter[T, TS]) DeletePrev() bool {
 	if deleted := i.del(i.current - 1); deleted {
 		i.current--
 		return true

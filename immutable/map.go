@@ -59,11 +59,7 @@ func (s *Map[K, V]) Head() it.KV[K, V] {
 
 //Collect exports the content as a map.
 func (s *Map[K, V]) Collect() map[K]V {
-	out := make(map[K]V, len(s.elements))
-	for key, val := range s.elements {
-		out[key] = val
-	}
-	return out
+	return map_.Copy(s.elements)
 }
 
 //Sort transforms to the ordered Map contains sorted elements.

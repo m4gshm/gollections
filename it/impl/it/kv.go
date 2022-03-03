@@ -7,8 +7,8 @@ import (
 )
 
 //NewOrderedKV is the OrderedKV constructor.
-func NewOrderedKV[K comparable, V any](uniques map[K]V, elements Iter[K]) *OrderedKV[K, V] {
-	return &OrderedKV[K, V]{elements: elements, uniques: uniques}
+func NewOrderedKV[K comparable, V any](uniques map[K]V, elements Iter[K]) OrderedKV[K, V] {
+	return OrderedKV[K, V]{elements: elements, uniques: uniques}
 }
 
 //NewKV returns the KVIterator based on map elements.
