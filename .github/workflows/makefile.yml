@@ -23,5 +23,5 @@ jobs:
       - name: run tests
         uses: docker://m4gshm/golang:1.18rc1
         with:
-          args: make test
+          args: make build lint test bench
 
