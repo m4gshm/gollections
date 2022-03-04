@@ -4,7 +4,7 @@
 			"path": "."
 		},
 		{
-			"path": "../../golang"
+			"path": "..\\..\\..\\go\\src\\github.com\\golang"
 		}
 	],
 	"settings": {
