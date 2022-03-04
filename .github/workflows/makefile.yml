@@ -21,7 +21,7 @@ jobs:
       - name: checkout
         uses: actions/checkout@v3
       - name: run tests
-        uses: docker://golang:rc
+        uses: docker://golang:1.18rc1-stretch
         with:
-          args: git clone https://github.com/golang/go.git && cd go/src && ./all.bash && make test
+          args: make test
 
