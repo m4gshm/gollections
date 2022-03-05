@@ -9,16 +9,16 @@ import (
 )
 
 //Of creates the Vector with predefined elements.
-func Of[T any](elements ...T) *immutable.Vector[T] {
+func Of[T any](elements ...T) immutable.Vector[T] {
 	return immutable.NewVector(elements)
 }
 
 //New creates the Vector and copies elements to it.
-func New[T any](elements []T) *immutable.Vector[T] {
+func New[T any](elements []T) immutable.Vector[T] {
 	return immutable.NewVector(elements)
 }
 
 //Sort creates the Vector and puts sorted elements to it.
-func Sort[t any, f constraints.Ordered](v *immutable.Vector[t], by c.Converter[t, f]) *immutable.Vector[t] {
+func Sort[t any, f constraints.Ordered](v immutable.Vector[t], by c.Converter[t, f]) immutable.Vector[t] {
 	return v.Sort(func(e1, e2 t) bool { return by(e1) < by(e2) })
 }

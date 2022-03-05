@@ -14,7 +14,7 @@ import (
 )
 
 //AsMap converts a slice of key/value pairs to teh Map.
-func AsMap[K comparable, V any](elements []*c.KV[K, V]) *Map[K, V] {
+func AsMap[K comparable, V any](elements []c.KV[K, V]) *Map[K, V] {
 	var (
 		l       = len(elements)
 		uniques = make(map[K]V, l)
@@ -88,11 +88,11 @@ func (s *Map[K, V]) IsEmpty() bool {
 	return s.Len() == 0
 }
 
-func (s *Map[K, V]) For(walker func(*c.KV[K, V]) error) error {
+func (s *Map[K, V]) For(walker func(c.KV[K, V]) error) error {
 	return map_.ForOrdered(s.order, s.elements, walker)
 }
 
-func (s *Map[K, V]) ForEach(walker func(*c.KV[K, V])) {
+func (s *Map[K, V]) ForEach(walker func(c.KV[K, V])) {
 	map_.ForEachOrdered(s.order, s.elements, walker)
 }
 
@@ -129,7 +129,7 @@ func (s *Map[K, V]) Keys() c.Collection[K, []K, c.Iterator[K]] {
 	return s.K()
 }
 
-func (s *Map[K, V]) K() *ordered.MapKeys[K] {
+func (s *Map[K, V]) K() ordered.MapKeys[K] {
 	return ordered.WrapKeys(s.order)
 }
 
@@ -137,7 +137,7 @@ func (s *Map[K, V]) Values() c.Collection[V, []V, c.Iterator[V]] {
 	return s.V()
 }
 
-func (s *Map[K, V]) V() *ordered.MapValues[K, V] {
+func (s *Map[K, V]) V() ordered.MapValues[K, V] {
 	return ordered.WrapVal(s.order, s.elements)
 }
 

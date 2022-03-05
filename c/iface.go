@@ -45,7 +45,7 @@ type Set[T any] interface {
 
 //Map - collection interface that stores key/value pairs and provide access to an element by its key.
 type Map[K comparable, V any] interface {
-	Collection[*KV[K, V], map[K]V, KVIterator[K, V]]
+	Collection[KV[K, V], map[K]V, KVIterator[K, V]]
 	Track[V, K]
 	TrackEach[V, K]
 	Checkable[K]

@@ -21,9 +21,9 @@ func _() {
 		_ c.Vector[int]        = vector.Empty[int]()
 	)
 	var (
-		_ *mutable.Set[int] = set.Of(1, 2, 3)
-		_ c.Set[int]        = set.New[int](capacity)
-		_ c.Set[int]        = set.Empty[int]()
+		_ mutable.Set[int] = set.Of(1, 2, 3)
+		_ c.Set[int]       = set.New[int](capacity)
+		_ c.Set[int]       = set.Empty[int]()
 	)
 	var (
 		_ *ordered.Set[int] = oset.Of(1, 2, 3)

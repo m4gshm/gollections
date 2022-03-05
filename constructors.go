@@ -14,23 +14,23 @@ import (
 
 func _() {
 	var (
-		_ *immutable.Vector[int] = vector.Of(1, 2, 3)
-		_ c.Vector[int]          = vector.New([]int{1, 2, 3})
+		_ immutable.Vector[int] = vector.Of(1, 2, 3)
+		_ c.Vector[int]         = vector.New([]int{1, 2, 3})
 	)
 	var (
-		_ *immutable.Set[int] = set.Of(1, 2, 3)
-		_ c.Set[int]          = set.New([]int{1, 2, 3})
+		_ immutable.Set[int] = set.Of(1, 2, 3)
+		_ c.Set[int]         = set.New([]int{1, 2, 3})
 	)
 	var (
-		_ *ordered.Set[int] = oset.Of(1, 2, 3)
-		_ c.Set[int]        = oset.New([]int{1, 2, 3})
+		_ ordered.Set[int] = oset.Of(1, 2, 3)
+		_ c.Set[int]       = oset.New([]int{1, 2, 3})
 	)
 	var (
-		_ *immutable.Map[int, string] = map_.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3"))
-		_ c.Map[int, string]          = map_.New(map[int]string{1: "2", 2: "2", 3: "3"})
+		_ immutable.Map[int, string] = map_.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3"))
+		_ c.Map[int, string]         = map_.New(map[int]string{1: "2", 2: "2", 3: "3"})
 	)
 	var (
-		_ *ordered.Map[int, string] = omap.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3"))
-		_ c.Map[int, string]        = omap.New(map[int]string{1: "2", 2: "2", 3: "3"})
+		_ ordered.Map[int, string] = omap.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3"))
+		_ c.Map[int, string]       = omap.New(map[int]string{1: "2", 2: "2", 3: "3"})
 	)
 }

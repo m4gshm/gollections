@@ -49,7 +49,7 @@ func TrackEach[M ~map[K]V, K comparable, V any](elements M, tracker func(K, V)) 
 }
 
 //For applies a walker for every key/value pairs from a map. Key/value pair is boxed to the KV. To stop walking just return the ErrBreak.
-func For[M ~map[K]V, K comparable, V any](elements M, walker func(*c.KV[K, V]) error) error {
+func For[M ~map[K]V, K comparable, V any](elements M, walker func(c.KV[K, V]) error) error {
 	for key, val := range elements {
 		if err := walker(c.NewKV(key, val)); err == ErrBreak {
 			return nil
@@ -61,7 +61,7 @@ func For[M ~map[K]V, K comparable, V any](elements M, walker func(*c.KV[K, V]) e
 }
 
 //ForEach applies a walker for every key/value pairs from a map. Key/value pair is boxed to the KV.
-func ForEach[M ~map[K]V, K comparable, V any](elements M, walker func(*c.KV[K, V])) {
+func ForEach[M ~map[K]V, K comparable, V any](elements M, walker func(c.KV[K, V])) {
 	for key, val := range elements {
 		walker(c.NewKV(key, val))
 	}
@@ -87,7 +87,7 @@ func TrackEachOrdered[M ~map[K]V, K comparable, V any](elements []K, uniques M, 
 }
 
 //ForOrdered applies a walker for every key/value pairs from a map in order. Key/value pair is boxed to the KV. To stop walking just return the ErrBreak.
-func ForOrdered[M ~map[K]V, K comparable, V any](elements []K, uniques M, walker func(*c.KV[K, V]) error) error {
+func ForOrdered[M ~map[K]V, K comparable, V any](elements []K, uniques M, walker func(c.KV[K, V]) error) error {
 	for _, key := range elements {
 		if err := walker(c.NewKV(key, uniques[key])); err == ErrBreak {
 			return nil
@@ -99,7 +99,7 @@ func ForOrdered[M ~map[K]V, K comparable, V any](elements []K, uniques M, walker
 }
 
 //ForEachOrdered applies a walker for every key/value pairs from a map in order. Key/value pair is boxed to the KV.
-func ForEachOrdered[M ~map[K]V, K comparable, V any](elements []K, uniques M, walker func(*c.KV[K, V])) {
+func ForEachOrdered[M ~map[K]V, K comparable, V any](elements []K, uniques M, walker func(c.KV[K, V])) {
 	for _, key := range elements {
 		walker(c.NewKV(key, uniques[key]))
 	}

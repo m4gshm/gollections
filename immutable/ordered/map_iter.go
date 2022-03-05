@@ -7,7 +7,7 @@ import (
 
 //NewValIter is default ValIter constructor.
 func NewValIter[K comparable, V any](elements []K, uniques map[K]V) *ValIter[K, V] {
-	return &ValIter[K, V]{elements: elements, uniques: uniques}
+	return &ValIter[K, V]{elements: elements, uniques: uniques, current: it.NoStarted}
 }
 
 //ValIter is the Iteratoc over Map values.

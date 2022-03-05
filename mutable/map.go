@@ -18,7 +18,7 @@ func NewMap[K comparable, V any](capacity int) Map[K, V] {
 }
 
 //AsMap converts a slice of key/value pairs to teh Map.
-func AsMap[K comparable, V any](elements []*c.KV[K, V]) Map[K, V] {
+func AsMap[K comparable, V any](elements []c.KV[K, V]) Map[K, V] {
 	var (
 		uniques = make(map[K]V, len(elements))
 	)
@@ -85,11 +85,11 @@ func (s Map[K, V]) IsEmpty() bool {
 	return s.Len() == 0
 }
 
-func (s Map[K, V]) For(walker func(*c.KV[K, V]) error) error {
+func (s Map[K, V]) For(walker func(c.KV[K, V]) error) error {
 	return m.For(s, walker)
 }
 
-func (s Map[K, V]) ForEach(walker func(*c.KV[K, V])) {
+func (s Map[K, V]) ForEach(walker func(c.KV[K, V])) {
 	m.ForEach(s, walker)
 }
 
@@ -124,7 +124,7 @@ func (s Map[K, V]) Keys() c.Collection[K, []K, c.Iterator[K]] {
 	return s.K()
 }
 
-func (s Map[K, V]) K() *immutable.MapKeys[K, V] {
+func (s Map[K, V]) K() immutable.MapKeys[K, V] {
 	return immutable.WrapKeys(s)
 }
 
@@ -132,7 +132,7 @@ func (s Map[K, V]) Values() c.Collection[V, []V, c.Iterator[V]] {
 	return s.V()
 }
 
-func (s Map[K, V]) V() *immutable.MapValues[K, V] {
+func (s Map[K, V]) V() immutable.MapValues[K, V] {
 	return immutable.WrapVal(s)
 }
 

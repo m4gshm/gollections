@@ -11,8 +11,8 @@ import (
 )
 
 //WrapVal creates the MapValues using elements as internal storage.
-func WrapVal[K comparable, V any](order []K, elements map[K]V) *MapValues[K, V] {
-	return &MapValues[K, V]{order, elements}
+func WrapVal[K comparable, V any](order []K, elements map[K]V) MapValues[K, V] {
+	return MapValues[K, V]{order, elements}
 }
 
 //MapValues is the wrapper for Map's values.
@@ -21,26 +21,38 @@ type MapValues[K comparable, V any] struct {
 	elements map[K]V
 }
 
-var _ c.Collection[any, []any, c.Iterator[any]] = (*MapValues[int, any])(nil)
-var _ fmt.Stringer = (*MapValues[int, any])(nil)
+var (
+	_ c.Collection[any, []any, c.Iterator[any]] = (*MapValues[int, any])(nil)
+	_ c.Collection[any, []any, c.Iterator[any]] = MapValues[int, any]{}
+	_ fmt.Stringer                              = (*MapValues[int, any])(nil)
+	_ fmt.Stringer                              = MapValues[int, any]{}
+)
 
-func (s *MapValues[K, V]) Begin() c.Iterator[V] {
+func (s MapValues[K, V]) Begin() c.Iterator[V] {
 	return s.Head()
 }
 
-func (s *MapValues[K, V]) Head() *ValIter[K, V] {
+func (s MapValues[K, V]) Head() *ValIter[K, V] {
 	return NewValIter(s.order, s.elements)
 }
 
-func (s *MapValues[K, V]) Len() int {
+func (s MapValues[K, V]) First() (*ValIter[K, V], V, bool) {
+	var (
+		iter      = s.Head()
+		first, ok = iter.Next()
+	)
+	return iter, first, ok
+}
+
+func (s MapValues[K, V]) Len() int {
 	return len(s.elements)
 }
 
-func (s *MapValues[K, V]) IsEmpty() bool {
+func (s MapValues[K, V]) IsEmpty() bool {
 	return s.Len() == 0
 }
 
-func (s *MapValues[K, V]) Collect() []V {
+func (s MapValues[K, V]) Collect() []V {
 	elements := make([]V, len(s.order))
 	for i, key := range s.order {
 		val := s.elements[key]
@@ -49,15 +61,15 @@ func (s *MapValues[K, V]) Collect() []V {
 	return elements
 }
 
-func (s *MapValues[K, V]) For(walker func(V) error) error {
+func (s MapValues[K, V]) For(walker func(V) error) error {
 	return map_.ForOrderedValues(s.order, s.elements, walker)
 }
 
-func (s *MapValues[K, V]) ForEach(walker func(V)) {
+func (s MapValues[K, V]) ForEach(walker func(V)) {
 	map_.ForEachOrderedValues(s.order, s.elements, walker)
 }
 
-func (s *MapValues[K, V]) Get(index int) (V, bool) {
+func (s MapValues[K, V]) Get(index int) (V, bool) {
 	keys := s.order
 	if index >= 0 && index < len(keys) {
 		key := keys[index]
@@ -68,18 +80,18 @@ func (s *MapValues[K, V]) Get(index int) (V, bool) {
 	return no, false
 }
 
-func (s *MapValues[K, V]) Filter(filter c.Predicate[V]) c.Pipe[V, []V] {
+func (s MapValues[K, V]) Filter(filter c.Predicate[V]) c.Pipe[V, []V] {
 	return it.NewPipe[V](it.Filter(s.Head(), filter))
 }
 
-func (s *MapValues[K, V]) Map(by c.Converter[V, V]) c.Pipe[V, []V] {
+func (s MapValues[K, V]) Map(by c.Converter[V, V]) c.Pipe[V, []V] {
 	return it.NewPipe[V](it.Map(s.Head(), by))
 }
 
-func (s *MapValues[K, V]) Reduce(by op.Binary[V]) V {
+func (s MapValues[K, V]) Reduce(by op.Binary[V]) V {
 	return it.Reduce(s.Head(), by)
 }
 
-func (s *MapValues[K, V]) String() string {
+func (s MapValues[K, V]) String() string {
 	return slice.ToString(s.Collect())
 }

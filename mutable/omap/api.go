@@ -6,7 +6,7 @@ import (
 )
 
 //Of creates the Map with predefined elements.
-func Of[K comparable, V any](elements ...*c.KV[K, V]) *ordered.Map[K, V] {
+func Of[K comparable, V any](elements ...c.KV[K, V]) *ordered.Map[K, V] {
 	return ordered.AsMap(elements)
 }
 
