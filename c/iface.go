@@ -5,9 +5,9 @@ import (
 	"github.com/m4gshm/gollections/op"
 )
 
-// Container is the base interface of implementations.
-// Where:
-// 		Collection - a collection type (may be slice, map or chain)
+//Container is the base interface of implementations.
+//Where:
+//		Collection - a collection type (may be slice, map or chain)
 // 		IT - a iterator type  (Iterator, KVIterator)
 type Container[Collection any, IT any] interface {
 	Collect() Collection
@@ -15,7 +15,7 @@ type Container[Collection any, IT any] interface {
 }
 
 //Collection is the interface of a finite-size container.
-// Where:
+//Where:
 //		T - any arbitrary type
 // 		Collection - a collection type (may be slice, map or chain)
 // 		IT - a iterator type  (Iterator, KVIterator)

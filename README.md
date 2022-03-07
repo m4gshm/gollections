@@ -2,7 +2,16 @@
 
 Golang generic containers and functions.
 
-Need use Go version 1.18rc1 or newer.
+Need use Go version ~~1.18rc1~~ or newer.
+
+1.18rc1 is unstable, please build from source. Is is easy:
+
+1. download https://github.com/golang/go/archive/refs/heads/release-branch.go1.18.zip
+2. unpack
+3. cd src
+4. run make.bash or make.bat
+
+
 
 ## Installation
 
@@ -25,7 +34,7 @@ Supports write operations (append, delete, replace).
 
 The same interfaces as in the mutable package but for read-only purposes.
 
-## Usages
+## Containers creating
 ### Immutable
 ```go
 package examples
@@ -61,7 +70,7 @@ func _() {
 	)
 	var (
 		_ ordered.Map[int, string] = omap.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3"))
-		_ c.Map[int, string]       = omap.New(map[int]string{1: "2", 2: "2", 3: "3"})
+		_ c.Map[int, string]       = omap.New(map[int]string{1: "2", 2: "2", 3: "3"})//source map order is unpredictable
 	)
 }
 ```
@@ -114,12 +123,12 @@ func _() {
 ```
 where [vector](./mutable/vector/api.go), [set](./mutable/set/api.go), [oset](./mutable/oset/api.go), [map_](./mutable/map_/api.go), [omap](./mutable/omap/api.go) are packages from [github.com/m4gshm/gollections/mutable](./mutable/) and [K.V](./K/v.go) is the method V from the package [K](./K/)
 
-## Container functions
+## Pipe functions
 
 There are three groups of operations:
- * Immediate - retrieves the result in place (Sort, Reduce (of containers), Track, For, ForEach)
- * Intermediate - only defines a computation (Wrap, Map, Flatt, Filter, Group).
- * Final - applies intermediates and retrieves a result (ForEach, Slice, Reduce (of iterators))
+ * Immediate - retrieves the result in place ([Sort](./immutable/vector.go#L112), [Reduce](./immutable/vector.go#L107) (of containers), [Track](./immutable/vector.go#L81), [TrackEach](./immutable/ordered/map.go#L136), [For](./immutable/vector.go#L89), [ForEach](./immutable/ordered/map.go#L144))
+ * Intermediate - only defines a computation ([Wrap](./it/api.go#L17), [Map](./c/op/api.go#L11), [Flatt](./c/op/api.go#L21), [Filter](./c/op/api.go#L33), [Group](./c/op/api.go#L53)).
+ * Final - applies intermediates and retrieves a result ([ForEach](./it/api.go#L75), [Slice](./it/api.go#L65), [Reduce](./it/api.go#L55) (of iterators))
 
 Intermediates should wrap one by one to make a lazy computation chain that can be applied to the latest final operation.
 

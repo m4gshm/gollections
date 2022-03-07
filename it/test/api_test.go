@@ -192,3 +192,10 @@ func Test_Group(t *testing.T) {
 func R[T any](t T) *T {
 	return notsafe.Noescape(&t)
 }
+
+
+func Test_ReduceSum(t *testing.T) {
+	s := it.Of(1, 3, 5, 7, 9, 11)
+	r := it.Reduce(s, sum.Of[int])
+	assert.Equal(t, 1+3+5+7+9+11, r)
+}

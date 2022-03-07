@@ -8,16 +8,16 @@ import (
 )
 
 //Map creates the key/value iterator that converts elements with a converter and returns them.
-func Map[k comparable, v any, IT c.KVIterator[k, v], kto comparable, vto any](elements IT, by c.BiConverter[k, v, kto, vto]) c.MapPipe[kto, vto, map[kto]vto] {
+func Map[K comparable, V any, IT c.KVIterator[K, V], kto comparable, vto any](elements IT, by c.BiConverter[K, V, kto, vto]) c.MapPipe[kto, vto, map[kto]vto] {
 	return it.NewKVPipe(it.MapKV(elements, by), collect.Map[kto, vto])
 }
 
 //Filter creates the key/value iterator that checks elements by filters and returns successful ones.
-func Filter[k comparable, v any, IT c.KVIterator[k, v]](elements IT, filter c.BiPredicate[k, v]) c.MapPipe[k, v, map[k]v] {
-	return it.NewKVPipe(it.FilterKV(elements, filter), collect.Map[k, v])
+func Filter[K comparable, V any, IT c.KVIterator[K, V]](elements IT, filter c.BiPredicate[K, V]) c.MapPipe[K, V, map[K]V] {
+	return it.NewKVPipe(it.FilterKV(elements, filter), collect.Map[K, V])
 }
 
 //Reduce reduces keys/value pairs to an one pair.
-func Reduce[k comparable, v any, IT c.KVIterator[k, v]](elements IT, by op.Quaternary[k, v]) (k, v) {
+func Reduce[K comparable, V any, IT c.KVIterator[K, V]](elements IT, by op.Quaternary[K, V]) (K, V) {
 	return it.ReduceKV(elements, by)
 }

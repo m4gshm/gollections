@@ -8,7 +8,6 @@ import (
 	"github.com/m4gshm/gollections/immutable"
 	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/map_"
-	m "github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/op"
 )
 
@@ -86,19 +85,19 @@ func (s Map[K, V]) IsEmpty() bool {
 }
 
 func (s Map[K, V]) For(walker func(c.KV[K, V]) error) error {
-	return m.For(s, walker)
+	return map_.For(s, walker)
 }
 
 func (s Map[K, V]) ForEach(walker func(c.KV[K, V])) {
-	m.ForEach(s, walker)
+	map_.ForEach(s, walker)
 }
 
 func (s Map[K, V]) Track(tracker func(K, V) error) error {
-	return m.Track(s, tracker)
+	return map_.Track(s, tracker)
 }
 
 func (s Map[K, V]) TrackEach(tracker func(K, V)) {
-	m.TrackEach(s, tracker)
+	map_.TrackEach(s, tracker)
 }
 
 func (s Map[K, V]) Contains(key K) bool {
@@ -137,7 +136,7 @@ func (s Map[K, V]) V() immutable.MapValues[K, V] {
 }
 
 func (s Map[K, V]) String() string {
-	return m.ToString(s)
+	return map_.ToString(s)
 }
 
 func (s Map[K, V]) FilterKey(fit c.Predicate[K]) c.MapPipe[K, V, map[K]V] {

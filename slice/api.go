@@ -10,6 +10,7 @@ import (
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/it/impl/it"
+	"github.com/m4gshm/gollections/op"
 )
 
 //ErrBreak is the 'break' statement of the For, Track methods
@@ -95,6 +96,19 @@ func SortCopy[T any](elements []T, less func(e1, e2 T) bool) []T {
 	var dest = make([]T, len(elements))
 	copy(dest, elements)
 	return Sort(dest, less)
+}
+
+//Reduce reduces elements to an one.
+func Reduce[T any, TS ~[]T](elements TS, by op.Binary[T]) T {
+	var result T
+	for i, v := range elements {
+		if i == 0 {
+			result = v
+		} else {
+			result = by(result, v)
+		}
+	}
+	return result
 }
 
 //Get returns the element by its index in elements, otherwise, if the provided index is ouf of the elements, returns zero T and false in the second result

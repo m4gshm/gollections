@@ -6,6 +6,7 @@ import (
 
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/range_"
+	"github.com/m4gshm/gollections/sum"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -17,6 +18,12 @@ func Test_Range(t *testing.T) {
 
 func Test_Reverse(t *testing.T) {
 	assert.Equal(t, slice.Of(-1, 0, 1, 2, 3), slice.Reverse(range_.Of(3, -1)))
+}
+
+func Test_ReduceSum(t *testing.T) {
+	s := slice.Of(1, 3, 5, 7, 9, 11)
+	r := slice.Reduce(s, sum.Of[int])
+	assert.Equal(t, 1+3+5+7+9+11, r)
 }
 
 func Test_StringRepresentation(t *testing.T) {

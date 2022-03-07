@@ -159,13 +159,13 @@ func IsValidIndex2(size, index int) bool {
 }
 
 //Get safely returns an element of a slice by an index or zero value of T if the index is out of range.
-func Get[T any](elements []T, current int) T {
+func Get[T any, TS ~[]T](elements TS, current int) T {
 	v, _ := Gett(elements, current)
 	return v
 }
 
 //Gett safely returns an element of a slice adn true by an index or zero value of T and false if the index is out of range.
-func Gett[T any](elements []T, current int) (T, bool) {
+func Gett[T any, TS ~[]T](elements TS, current int) (T, bool) {
 	if current >= len(elements) {
 		var no T
 		return no, false

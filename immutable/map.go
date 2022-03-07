@@ -8,7 +8,6 @@ import (
 	"github.com/m4gshm/gollections/immutable/ordered"
 	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/map_"
-	m "github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
 )
@@ -71,25 +70,25 @@ func (s Map[K, V]) Sort(less func(k1, k2 K) bool) ordered.Map[K, V] {
 
 //String is part of the Stringer interface for printing the string representation of this Map.
 func (s Map[K, V]) String() string {
-	return m.ToString(s.elements)
+	return map_.ToString(s.elements)
 }
 
-//Track apply a tracker to touch key, value from the inside. To stop traking just return the m.Break.
+//Track apply a tracker to touch key, value from the inside. To stop traking just return the map_.Break.
 func (s Map[K, V]) Track(tracker func(K, V) error) error {
-	return m.Track(s.elements, tracker)
+	return map_.Track(s.elements, tracker)
 }
 
 //Track apply a tracker to touch each key, value from the inside.
 func (s Map[K, V]) TrackEach(tracker func(K, V)) {
-	m.TrackEach(s.elements, tracker)
+	map_.TrackEach(s.elements, tracker)
 }
 
 func (s Map[K, V]) For(walker func(c.KV[K, V]) error) error {
-	return m.For(s.elements, walker)
+	return map_.For(s.elements, walker)
 }
 
 func (s Map[K, V]) ForEach(walker func(c.KV[K, V])) {
-	m.ForEach(s.elements, walker)
+	map_.ForEach(s.elements, walker)
 }
 
 func (s Map[K, V]) Len() int {
