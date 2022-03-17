@@ -2,16 +2,7 @@
 
 Golang generic containers and functions.
 
-Need use Go version ~~1.18rc1~~ or newer.
-
-1.18rc1 is unstable, please build from source. Is is easy:
-
-1. download https://github.com/golang/go/archive/refs/heads/release-branch.go1.18.zip
-2. unpack
-3. cd src
-4. run make.bash or make.bat
-
-
+Supports Go version 1.18 or higher.
 
 ## Installation
 

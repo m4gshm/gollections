@@ -4,12 +4,15 @@
 			"path": "."
 		},
 		{
-			"path": "..\\..\\..\\go\\src\\github.com\\golang"
+			"path": "../../golang/go"
 		}
 	],
 	"settings": {
-		"terminal.integrated.env.windows": {
-			"GOROOT": "C:\\Users\\mfour\\go\\src\\github.com\\golang\\go"
+		"terminal.integrated.env.osx": {
+			// "GOROOT": "/Users/ruaabks/go/src/github/golang/go"
 		},
-	}, 
+		"terminal.integrated.env.windows": {
+			// "GOROOT": "C:\\Users\\mfour\\go\\src\\github.com\\golang\\go"
+		},
+	}
 }

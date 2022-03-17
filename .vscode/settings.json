@@ -1,4 +1,4 @@
 {
     "go.autocompleteUnimportedPackages": true,
-    "go.goroot": "C:\\Users\\mfour\\go\\src\\github.com\\golang\\go",
+    // "go.goroot": "C:\\Users\\mfour\\go\\src\\github.com\\golang\\go",
 }
