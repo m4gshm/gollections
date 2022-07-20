@@ -10,6 +10,7 @@ import (
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/it/impl/it"
+	"github.com/m4gshm/gollections/it/slice"
 	"github.com/m4gshm/gollections/op"
 )
 
@@ -45,6 +46,13 @@ func Group[T any, K comparable](elements []T, by c.Converter[T, K]) map[K][]T {
 	}
 	return groups
 }
+
+
+//Filter creates a slice containing only the filtered elements
+func Filter[T any, TS ~[]T](elements TS, filter c.Predicate[T]) []T {
+	return it.Slice[T](slice.Filter(elements, filter))
+}
+
 
 //Range generates the sclie of integers in the range defined by from and to inclusive.
 func Range[T constraints.Integer](from T, to T) []T {

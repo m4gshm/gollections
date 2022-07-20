@@ -42,3 +42,8 @@ func Test_StringReferencesRepresentation(t *testing.T) {
 	)
 	assert.Equal(t, expected, actual)
 }
+
+func Test_Filtering(t *testing.T) {
+	r := slice.Filter([]int{1, 2, 3, 4, 5, 6}, func(i int) bool {return i %2 == 0 })
+	assert.Equal(t, []int{2,4,6}, r)
+}
