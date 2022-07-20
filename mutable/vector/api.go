@@ -7,12 +7,12 @@ import (
 	"github.com/m4gshm/gollections/mutable"
 )
 
-//Of creates the Vector with predefined elements.
+//Of instantiates Vector with predefined elements.
 func Of[T any](elements ...T) *mutable.Vector[T] {
 	return mutable.ToVector(elements)
 }
 
-//Empty creates the Vector with zero capacity.
+//Empty instantiates Vector with zero capacity.
 func Empty[T any]() *mutable.Vector[T] {
 	return New[T](0)
 }

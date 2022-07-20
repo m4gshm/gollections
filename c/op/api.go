@@ -7,7 +7,7 @@ import (
 	"github.com/m4gshm/gollections/op"
 )
 
-//Map creates the Iterator that converts elements with a converter and returns them.
+//Map instantiates Iterator that converts elements with a converter and returns them.
 func Map[From, To any, IT c.Iterable[c.Iterator[From]]](elements IT, by c.Converter[From, To]) c.Iterator[To] {
 	return it.Map(elements.Begin(), by)
 }
@@ -17,7 +17,7 @@ func MapFit[From, To any, IT c.Iterable[c.Iterator[From]]](elements IT, fit c.Pr
 	return it.MapFit(elements.Begin(), fit, by)
 }
 
-//Flatt creates the Iterator that extracts slices of 'To' by a Flatter from elements of 'From' and flattens as one iterable collection of 'To' elements.
+//Flatt instantiates Iterator that extracts slices of 'To' by a Flatter from elements of 'From' and flattens as one iterable collection of 'To' elements.
 func Flatt[From, To any, IT c.Iterable[c.Iterator[From]]](elements IT, by c.Flatter[From, To]) c.Iterator[To] {
 	iter := it.Flatt(elements.Begin(), by)
 	return &iter
@@ -29,12 +29,12 @@ func FlattFit[From, To any, IT c.Iterable[c.Iterator[From]]](elements IT, fit c.
 	return &iter
 }
 
-//Filter creates the Iterator that checks elements by filters and returns successful ones.
+//Filter instantiates Iterator that checks elements by filters and returns successful ones.
 func Filter[T any, IT c.Iterable[c.Iterator[T]]](elements IT, filter c.Predicate[T]) c.Iterator[T] {
 	return it.Filter(elements.Begin(), filter)
 }
 
-//NotNil creates the Iterator that filters nullable elements.
+//NotNil instantiates Iterator that filters nullable elements.
 func NotNil[T any, IT c.Iterable[c.Iterator[*T]]](elements IT) c.Iterator[*T] {
 	return Filter(elements, check.NotNil[T])
 }

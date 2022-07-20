@@ -7,12 +7,12 @@ import (
 	"github.com/m4gshm/gollections/op"
 )
 
-//Map creates the key/value iterator that converts elements with a converter and returns them.
+//Map instantiates key/value iterator that converts elements with a converter and returns them.
 func Map[K comparable, V any, IT c.KVIterator[K, V], kto comparable, vto any](elements IT, by c.BiConverter[K, V, kto, vto]) c.MapPipe[kto, vto, map[kto]vto] {
 	return it.NewKVPipe(it.MapKV(elements, by), collect.Map[kto, vto])
 }
 
-//Filter creates the key/value iterator that checks elements by filters and returns successful ones.
+//Filter instantiates key/value iterator that checks elements by filters and returns successful ones.
 func Filter[K comparable, V any, IT c.KVIterator[K, V]](elements IT, filter c.BiPredicate[K, V]) c.MapPipe[K, V, map[K]V] {
 	return it.NewKVPipe(it.FilterKV(elements, filter), collect.Map[K, V])
 }

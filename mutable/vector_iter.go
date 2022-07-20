@@ -5,12 +5,12 @@ import (
 	"github.com/m4gshm/gollections/it/impl/it"
 )
 
-//NewHead creates the Iter starting at the first element of a sclie.
+//NewHead instantiates Iter starting at the first element of a sclie.
 func NewHead[T any, TS ~[]T](elements *TS, del func(int) bool) Iter[T, TS] {
 	return Iter[T, TS]{elements: elements, current: it.NoStarted, del: del}
 }
 
-//NewTail creates the Iter starting at the last element of a sclie.
+//NewTail instantiates Iter starting at the last element of a sclie.
 func NewTail[T any, TS ~[]T](elements *TS, del func(int) bool) Iter[T, TS] {
 	return Iter[T, TS]{elements: elements, current: len(*elements), del: del}
 }

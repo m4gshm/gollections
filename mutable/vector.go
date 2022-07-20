@@ -11,17 +11,17 @@ import (
 	"github.com/m4gshm/gollections/slice"
 )
 
-//NewVector creates the Vector with a predefined capacity.
+//NewVector instantiates Vector with a predefined capacity.
 func NewVector[T any](capacity int) *Vector[T] {
 	return WrapVector(make([]T, 0, capacity))
 }
 
-//ToVector creates the Vector based on copy of elements slice
+//ToVector instantiates Vector based on copy of elements slice
 func ToVector[T any](elements []T) *Vector[T] {
-	return WrapVector(slice.Copy(elements))
+	return WrapVector(slice.Clone(elements))
 }
 
-//WrapVector creates the Vector using a slise as internal storage.
+//WrapVector instantiates Vector using a slise as internal storage.
 func WrapVector[T any](elements []T) *Vector[T] {
 	v := Vector[T](elements)
 	return &v
@@ -73,11 +73,11 @@ func (v *Vector[T]) Last() (Iter[T, Vector[T]], T, bool) {
 }
 
 func (v *Vector[T]) Collect() []T {
-	return slice.Copy(*v)
+	return slice.Clone(*v)
 }
 
 func (v *Vector[T]) Copy() *Vector[T] {
-	return WrapVector(slice.Copy(*v))
+	return WrapVector(slice.Clone(*v))
 }
 
 func (v *Vector[T]) IsEmpty() bool {

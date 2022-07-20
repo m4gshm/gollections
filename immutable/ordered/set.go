@@ -10,7 +10,7 @@ import (
 	"github.com/m4gshm/gollections/slice"
 )
 
-//NewSet creates the Set and copies elements to it.
+//NewSet instantiates Set and copies elements to it.
 func NewSet[T comparable](elements []T) Set[T] {
 	var (
 		uniques = map[T]struct{}{}
@@ -74,7 +74,7 @@ func (s Set[T]) Last() (it.Iter[T], T, bool) {
 }
 
 func (s Set[T]) Collect() []T {
-	return slice.Copy(s.order)
+	return slice.Clone(s.order)
 }
 
 func (s Set[T]) For(walker func(T) error) error {
@@ -114,7 +114,7 @@ func (s Set[T]) Contains(v T) bool {
 }
 
 func (s Set[T]) Sort(less func(e1, e2 T) bool) Set[T] {
-	return WrapSet(slice.SortCopy(s.order, less), s.elements)
+	return WrapSet(slice.Sort(slice.Clone(s.order), less), s.elements)
 }
 
 func (s Set[T]) String() string {

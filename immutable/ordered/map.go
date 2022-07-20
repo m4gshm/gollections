@@ -30,7 +30,7 @@ func ConvertKVsToMap[K comparable, V any](elements []c.KV[K, V]) Map[K, V] {
 	return WrapMap(order, uniques)
 }
 
-//NewMap creates the Map and copies elements to it.
+//NewMap instantiates Map and copies elements to it.
 func NewMap[K comparable, V any](elements map[K]V) Map[K, V] {
 	var (
 		uniques = make(map[K]V, len(elements))
@@ -43,7 +43,7 @@ func NewMap[K comparable, V any](elements map[K]V) Map[K, V] {
 	return WrapMap(order, uniques)
 }
 
-//WrapMap creates the ordered Map using a map and an order slice as internal storage.
+//WrapMap instantiates ordered Map using a map and an order slice as internal storage.
 func WrapMap[K comparable, V any](order []K, elements map[K]V) Map[K, V] {
 	return Map[K, V]{order: order, elements: elements, ksize: notsafe.GetTypeSize[K]()}
 }
@@ -122,7 +122,7 @@ func (s Map[K, V]) V() MapValues[K, V] {
 }
 
 func (s Map[K, V]) Sort(less func(k1, k2 K) bool) Map[K, V] {
-	return WrapMap(slice.SortCopy(s.order, less), s.elements)
+	return WrapMap(slice.Sort(slice.Clone(s.order), less), s.elements)
 }
 
 func (s Map[K, V]) String() string {

@@ -11,7 +11,7 @@ import (
 	"github.com/m4gshm/gollections/slice"
 )
 
-//NewSet creates the Set and copies elements to it.
+//NewSet instantiates Set and copies elements to it.
 func NewSet[T comparable](elements []T) Set[T] {
 	internal := map[T]struct{}{}
 	for _, T := range elements {

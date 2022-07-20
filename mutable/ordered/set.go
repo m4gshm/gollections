@@ -63,7 +63,7 @@ func (s *Set[T]) Head() *SetIter[T] {
 }
 
 func (s *Set[T]) Collect() []T {
-	return slice.Copy(s.elements)
+	return slice.Clone(s.elements)
 }
 
 func (s *Set[T]) For(walker func(T) error) error {

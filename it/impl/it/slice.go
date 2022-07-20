@@ -10,18 +10,18 @@ import (
 //NoStarted is the head Iterator position.
 const NoStarted = -1
 
-//New creates the Iter based on elements Iter and returs its reference
+//New instantiates Iter based on elements Iter and returs its reference
 func New[T any, TS ~[]T](elements TS) *Iter[T] {
 	iter := NewHeadS(elements, notsafe.GetTypeSize[T]())
 	return &iter
 }
 
-//NewHead creates the Iter based on elements slice
+//NewHead instantiates Iter based on elements slice
 func NewHead[T any, TS ~[]T](elements TS) Iter[T] {
 	return NewHeadS(elements, notsafe.GetTypeSize[T]())
 }
 
-//NewHeadS creates the Iter based on elements slice with predefined element size
+//NewHeadS instantiates Iter based on elements slice with predefined element size
 func NewHeadS[T any, TS ~[]T](elements TS, elementSize uintptr) Iter[T] {
 	var (
 		header = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
@@ -37,12 +37,12 @@ func NewHeadS[T any, TS ~[]T](elements TS, elementSize uintptr) Iter[T] {
 	}
 }
 
-//NewTail creates the Iter based on elements slice for reverse iterating
+//NewTail instantiates Iter based on elements slice for reverse iterating
 func NewTail[T any](elements []T) Iter[T] {
 	return NewTailS(elements, notsafe.GetTypeSize[T]())
 }
 
-//NewTailS creates the Iter based on elements slice with predefined element size for reverse iterating
+//NewTailS instantiates Iter based on elements slice with predefined element size for reverse iterating
 func NewTailS[T any](elements []T, elementSize uintptr) Iter[T] {
 	var (
 		header = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))

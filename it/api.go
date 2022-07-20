@@ -7,19 +7,19 @@ import (
 	"github.com/m4gshm/gollections/op"
 )
 
-//Of creates the Iterator of predefined elements.
+//Of instantiates Iterator of predefined elements.
 func Of[T any](elements ...T) c.Iterator[T] {
 	iter := it.NewHead(elements)
 	return &iter
 }
 
-//Wrap creates the Iterator using sclie as the elements source.
+//Wrap instantiates Iterator using sclie as the elements source.
 func Wrap[T any, TS ~[]T](elements TS) c.Iterator[T] {
 	iter := it.NewHead(elements)
 	return &iter
 }
 
-//Map creates the Iterator that converts elements with a converter and returns them.
+//Map instantiates Iterator that converts elements with a converter and returns them.
 func Map[From, To any, IT c.Iterator[From]](elements IT, by c.Converter[From, To]) c.Iterator[To] {
 	return it.Map(elements, by)
 }
@@ -29,7 +29,7 @@ func MapFit[From, To any, IT c.Iterator[From]](elements IT, fit c.Predicate[From
 	return it.MapFit(elements, fit, by)
 }
 
-//Flatt creates the Iterator that extracts slices of 'To' by a Flatter from elements of 'From' and flattens as one iterable collection of 'To' elements.
+//Flatt instantiates Iterator that extracts slices of 'To' by a Flatter from elements of 'From' and flattens as one iterable collection of 'To' elements.
 func Flatt[From, To any, IT c.Iterator[From]](elements IT, by c.Flatter[From, To]) c.Iterator[To] {
 	iter := it.Flatt(elements, by)
 	return &iter
@@ -41,12 +41,12 @@ func FlattFit[From, To any, IT c.Iterator[From]](elements IT, fit c.Predicate[Fr
 	return &iter
 }
 
-//Filter creates the Iterator that checks elements by a filter and returns successful ones.
+//Filter instantiates Iterator that checks elements by a filter and returns successful ones.
 func Filter[T any, IT c.Iterator[T]](elements IT, filter c.Predicate[T]) c.Iterator[T] {
 	return it.Filter(elements, filter)
 }
 
-//NotNil creates the Iterator that filters nullable elements.
+//NotNil instantiates Iterator that filters nullable elements.
 func NotNil[T any, IT c.Iterator[*T]](elements IT) c.Iterator[*T] {
 	return Filter(elements, check.NotNil[T])
 }

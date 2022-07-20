@@ -10,7 +10,7 @@ import (
 	"github.com/m4gshm/gollections/slice"
 )
 
-//WrapVal creates the MapValues using elements as internal storage.
+//WrapVal instantiates MapValues using elements as internal storage.
 func WrapVal[K comparable, V any](order []K, elements map[K]V) MapValues[K, V] {
 	return MapValues[K, V]{order, elements}
 }

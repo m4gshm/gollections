@@ -18,11 +18,6 @@ import (
 	"github.com/m4gshm/gollections/walk/group"
 )
 
-func Test_Slice_filtering(t *testing.T) {
-	f := slice.Filter([]int{1, 2, 3, 4, 5, 6}, func(i int) bool { return i%2 == 0 })
-	assert.Equal(t, []int{2, 4, 6}, f)
-}
-
 func Test_Set(t *testing.T) {
 	var (
 		s      immutable.Set[int] = set.Of(1, 1, 2, 4, 3, 1)

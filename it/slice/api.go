@@ -6,7 +6,7 @@ import (
 	"github.com/m4gshm/gollections/it/impl/slice"
 )
 
-//Map creates the Iterator that converts elements with a converter and returns them.
+//Map instantiates Iterator that converts elements with a converter and returns them.
 func Map[From, To any, FS ~[]From](elements FS, by c.Converter[From, To]) c.Iterator[To] {
 	iter := slice.Map(elements, by)
 	return &iter
@@ -18,7 +18,7 @@ func MapFit[From, To any, FS ~[]From](elements FS, fit c.Predicate[From], by c.C
 	return &iter
 }
 
-//Flatt creates the Iterator that extracts slices of 'To' by a Flatter from elements of 'From' and flattens as one iterable collection of 'To' elements.
+//Flatt instantiates Iterator that extracts slices of 'To' by a Flatter from elements of 'From' and flattens as one iterable collection of 'To' elements.
 func Flatt[From, To any, FS ~[]From](elements FS, by c.Flatter[From, To]) c.Iterator[To] {
 	iter := slice.Flatt(elements, by)
 	return &iter
@@ -30,13 +30,13 @@ func FlattFit[From, To any, FS ~[]From](elements FS, fit c.Predicate[From], flat
 	return &iter
 }
 
-//Filter creates the Iterator that checks elements by filters and returns successful ones.
+//Filter instantiates Iterator that checks elements by filters and returns successful ones.
 func Filter[T any, TS ~[]T](elements TS, filter c.Predicate[T]) c.Iterator[T] {
 	iter := slice.Filter(elements, filter)
 	return &iter
 }
 
-//NotNil creates the Iterator that filters nullable elements.
+//NotNil instantiates Iterator that filters nullable elements.
 func NotNil[T any, TRS ~[]*T](elements TRS) c.Iterator[*T] {
 	return Filter(elements, check.NotNil[T])
 }

@@ -9,7 +9,7 @@ import (
 	"github.com/m4gshm/gollections/slice"
 )
 
-//WrapKeys creates the MapKeys using elements as internal storage.
+//WrapKeys instantiates MapKeys using elements as internal storage.
 func WrapKeys[T comparable](elements []T) MapKeys[T] {
 	return MapKeys[T]{elements}
 }

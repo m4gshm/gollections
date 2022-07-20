@@ -5,7 +5,7 @@ import (
 	"github.com/m4gshm/gollections/c"
 )
 
-//Group converts elements into the map containing slices of the elements separated by keys, which are retrieved using a Converter object.
+//Group groups elements by keys into a map 
 func Group[T any, K comparable, W c.WalkEach[T]](elements W, by c.Converter[T, K]) map[K][]T {
 	groups := map[K][]T{}
 	elements.ForEach(func(e T) {

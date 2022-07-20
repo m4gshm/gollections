@@ -9,7 +9,7 @@ type Collector[t any, out any] c.Converter[c.Iterator[t], out]
 //CollectorKV is Converter of key/value Iterator that collects all values to any slice or map, mostly used to extract slice fields to flatting a result.
 type CollectorKV[k, v any, out any] func(c.KVIterator[k, v]) out
 
-//Map collects the map of key/value pairs obtained by passing over a key/value iterator.
+//Map instantiates a map with the key/values obtained by passing over a key/value iterator.
 func Map[K comparable, V any](it c.KVIterator[K, V]) map[K]V {
 	e := map[K]V{}
 	for k, v, ok := it.Next(); ok; k, v, ok = it.Next() {

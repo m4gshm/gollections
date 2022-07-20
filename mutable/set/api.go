@@ -8,17 +8,17 @@ import (
 	"github.com/m4gshm/gollections/mutable/ordered"
 )
 
-//Of creates the Set with predefined elements.
+//Of instantiates Set with predefined elements.
 func Of[T comparable](elements ...T) mutable.Set[T] {
 	return mutable.ToSet(elements)
 }
 
-//Empty creates the Set with zero capacity.
+//Empty instantiates Set with zero capacity.
 func Empty[T comparable]() mutable.Set[T] {
 	return New[T](0)
 }
 
-//New creates the Set with a predefined capacity.
+//New instantiates Set with a predefined capacity.
 func New[T comparable](capacity int) mutable.Set[T] {
 	return mutable.NewSet[T](capacity)
 }

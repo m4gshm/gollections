@@ -8,7 +8,7 @@ import (
 	"github.com/m4gshm/gollections/notsafe"
 )
 
-//Map creates the Iterator that converts elements with a converter and returns them.
+//Map instantiates Iterator that converts elements with a converter and returns them.
 func Map[From, To any, FS ~[]From](elements FS, by c.Converter[From, To]) Convert[From, To] {
 	var (
 		header   = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
@@ -30,7 +30,7 @@ func MapFit[From, To any, FS ~[]From](elements FS, fit c.Predicate[From], by c.C
 	return ConvertFit[From, To]{array: array, size: size, elemSize: elemSize, by: by, fit: fit}
 }
 
-//Flatt creates the Iterator that extracts slices of 'To' by a Flatter from elements of 'From' and flattens as one iterable collection of 'To' elements.
+//Flatt instantiates Iterator that extracts slices of 'To' by a Flatter from elements of 'From' and flattens as one iterable collection of 'To' elements.
 func Flatt[From, To any, FS ~[]From](elements FS, by c.Flatter[From, To]) Flatten[From, To] {
 	var (
 		header       = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
@@ -54,7 +54,7 @@ func FlattFit[From, To any, FS ~[]From](elements FS, fit c.Predicate[From], flat
 	return FlattenFit[From, To]{arrayFrom: array, sizeFrom: size, elemSizeFrom: elemSizeFrom, elemSizeTo: elemSizeTo, flatt: flatt, fit: fit}
 }
 
-//Filter creates the Iterator that checks elements by filters and returns successful ones.
+//Filter instantiates Iterator that checks elements by filters and returns successful ones.
 func Filter[T any, TS ~[]T](elements TS, filter c.Predicate[T]) Fit[T] {
 	var (
 		header   = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
@@ -65,7 +65,7 @@ func Filter[T any, TS ~[]T](elements TS, filter c.Predicate[T]) Fit[T] {
 	return Fit[T]{array: array, size: size, elemSize: elemSize, by: filter}
 }
 
-//NotNil creates the Iterator that filters nullable elements.
+//NotNil instantiates Iterator that filters nullable elements.
 func NotNil[T any, TRS ~[]*T](elements TRS) Fit[*T] {
 	return Filter(elements, check.NotNil[T])
 }

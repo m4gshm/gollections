@@ -9,17 +9,17 @@ import (
 	"github.com/m4gshm/gollections/immutable/ordered"
 )
 
-//Of creates the Set with predefined elements.
+//Of instantiates Set with predefined elements.
 func Of[T comparable](elements ...T) immutable.Set[T] {
 	return immutable.NewSet(elements)
 }
 
-//New creates the Set and copies elements to it.
+//New instantiates Set and copies elements to it.
 func New[T comparable](elements []T) immutable.Set[T] {
 	return immutable.NewSet(elements)
 }
 
-//Sort creates the Set and puts sorted elements to it.
+//Sort instantiates Set and puts sorted elements to it.
 func Sort[T comparable, f constraints.Ordered](s immutable.Set[T], by c.Converter[T, f]) ordered.Set[T] {
 	return s.Sort(func(e1, e2 T) bool { return by(e1) < by(e2) })
 }

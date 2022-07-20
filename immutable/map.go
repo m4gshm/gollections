@@ -21,7 +21,7 @@ func ConvertKVsToMap[K comparable, V any](elements []c.KV[K, V]) Map[K, V] {
 	return WrapMap(uniques)
 }
 
-//NewMap creates the Map with values copied from an map.
+//NewMap instantiates Map with values copied from an map.
 func NewMap[K comparable, V any](elements map[K]V) Map[K, V] {
 	uniques := make(map[K]V, len(elements))
 	for key, val := range elements {
@@ -30,7 +30,7 @@ func NewMap[K comparable, V any](elements map[K]V) Map[K, V] {
 	return WrapMap(uniques)
 }
 
-//WrapMap creates the Map using a map as internal storage.
+//WrapMap instantiates Map using a map as internal storage.
 func WrapMap[K comparable, V any](elements map[K]V) Map[K, V] {
 	return Map[K, V]{elements: elements}
 }

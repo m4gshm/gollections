@@ -5,7 +5,7 @@ import (
 	"github.com/m4gshm/gollections/op"
 )
 
-//NewPipe creates the Pipe based on iterable elements.
+//NewPipe instantiates Pipe based on iterable elements.
 func NewPipe[T any, IT c.Iterator[T]](iter IT) *IterPipe[T] {
 	return &IterPipe[T]{it: iter}
 }

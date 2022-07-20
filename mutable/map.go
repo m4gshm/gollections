@@ -11,7 +11,7 @@ import (
 	"github.com/m4gshm/gollections/op"
 )
 
-//NewMap creates the Map with a predefined capacity.
+//NewMap instantiates Map with a predefined capacity.
 func NewMap[K comparable, V any](capacity int) Map[K, V] {
 	return WrapMap(make(map[K]V, capacity))
 }
@@ -29,7 +29,7 @@ func AsMap[K comparable, V any](elements []c.KV[K, V]) Map[K, V] {
 	return WrapMap(uniques)
 }
 
-//ToMap creates the Map and copies elements to it.
+//ToMap instantiates Map and copies elements to it.
 func ToMap[K comparable, V any](elements map[K]V) Map[K, V] {
 	uniques := make(map[K]V, len(elements))
 	for key, val := range elements {
@@ -38,7 +38,7 @@ func ToMap[K comparable, V any](elements map[K]V) Map[K, V] {
 	return WrapMap(uniques)
 }
 
-//WrapMap creates the Map using a map as internal storage.
+//WrapMap instantiates Map using a map as internal storage.
 func WrapMap[K comparable, V any](elements map[K]V) Map[K, V] {
 	return Map[K, V](elements)
 }

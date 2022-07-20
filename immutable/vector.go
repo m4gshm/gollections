@@ -10,12 +10,12 @@ import (
 	"github.com/m4gshm/gollections/slice"
 )
 
-//NewVector creates the Vector and copies elements to it.
+//NewVector instantiates Vector and copies elements to it.
 func NewVector[T any](elements []T) Vector[T] {
-	return WrapVector(slice.Copy(elements))
+	return WrapVector(slice.Clone(elements))
 }
 
-//WrapVector creates the Vector using a slise as internal storage.
+//WrapVector instantiates Vector using a slise as internal storage.
 func WrapVector[T any](elements []T) Vector[T] {
 	return Vector[T]{elements: elements, esize: notsafe.GetTypeSize[T]()}
 }
@@ -63,7 +63,7 @@ func (v Vector[T]) Last() (it.Iter[T], T, bool) {
 }
 
 func (v Vector[T]) Collect() []T {
-	return slice.Copy(v.elements)
+	return slice.Clone(v.elements)
 }
 
 func (v Vector[T]) Len() int {
@@ -110,7 +110,7 @@ func (v Vector[T]) Reduce(by op.Binary[T]) T {
 }
 
 func (v Vector[T]) Sort(less func(e1, e2 T) bool) Vector[T] {
-	return WrapVector(slice.SortCopy(v.elements, less))
+	return WrapVector(slice.Sort(slice.Clone(v.elements), less))
 }
 
 func (v Vector[T]) String() string {

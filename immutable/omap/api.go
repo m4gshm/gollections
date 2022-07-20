@@ -6,12 +6,12 @@ import (
 	"github.com/m4gshm/gollections/immutable/ordered"
 )
 
-//Of creates the Map with predefined elements.
+//Of instantiates Map with predefined elements.
 func Of[K comparable, V any](elements ...c.KV[K, V]) ordered.Map[K, V] {
 	return ordered.ConvertKVsToMap(elements)
 }
 
-//New creates the Map and copies elements to it.
+//New instantiates Map and copies elements to it.
 func New[K comparable, V any](elements map[K]V) ordered.Map[K, V] {
 	return ordered.NewMap(elements)
 }

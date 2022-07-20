@@ -13,7 +13,7 @@ import (
 //ErrBreak is For, Track breaker
 var ErrBreak = errors.New("Break")
 
-//Map creates the Iterator that converts elements with a converter and returns them.
+//Map instantiates Iterator that converts elements with a converter and returns them.
 func Map[From, To any, IT c.Iterator[From]](elements IT, by c.Converter[From, To]) Convert[From, To, IT, c.Converter[From, To]] {
 	return Convert[From, To, IT, c.Converter[From, To]]{iter: elements, by: by}
 }
@@ -23,7 +23,7 @@ func MapFit[From, To any, IT c.Iterator[From]](elements IT, fit c.Predicate[From
 	return ConvertFit[From, To, IT]{iter: elements, by: by, fit: fit}
 }
 
-//Flatt creates the Iterator that extracts slices of 'To' by a Flatter from elements of 'From' and flattens as one iterable collection of 'To' elements.
+//Flatt instantiates Iterator that extracts slices of 'To' by a Flatter from elements of 'From' and flattens as one iterable collection of 'To' elements.
 func Flatt[From, To any, IT c.Iterator[From]](elements IT, by c.Flatter[From, To]) Flatten[From, To, IT] {
 	return Flatten[From, To, IT]{iter: elements, flatt: by, elemSizeTo: notsafe.GetTypeSize[To]()}
 }
@@ -33,22 +33,22 @@ func FlattFit[From, To any, IT c.Iterator[From]](elements IT, fit c.Predicate[Fr
 	return FlattenFit[From, To, IT]{iter: elements, flatt: flatt, fit: fit, elemSizeTo: notsafe.GetTypeSize[To]()}
 }
 
-//Filter creates the Iterator that checks elements by filters and returns successful ones.
+//Filter instantiates Iterator that checks elements by filters and returns successful ones.
 func Filter[T any, IT c.Iterator[T]](elements IT, filter c.Predicate[T]) Fit[T, IT] {
 	return Fit[T, IT]{iter: elements, by: filter}
 }
 
-//NotNil creates the Iterator that filters nullable elements.
+//NotNil instantiates Iterator that filters nullable elements.
 func NotNil[T any, IT c.Iterator[*T]](elements IT) Fit[*T, IT] {
 	return Filter(elements, check.NotNil[T])
 }
 
-//MapKV creates the Iterator that converts elements with a converter and returns them.
+//MapKV instantiates Iterator that converts elements with a converter and returns them.
 func MapKV[K, V any, IT c.KVIterator[K, V], k2, v2 any](elements IT, by c.BiConverter[K, V, k2, v2]) ConvertKV[K, V, IT, k2, v2, c.BiConverter[K, V, k2, v2]] {
 	return ConvertKV[K, V, IT, k2, v2, c.BiConverter[K, V, k2, v2]]{iter: elements, by: by}
 }
 
-//FilterKV creates the Iterator that checks elements by filters and returns successful ones.
+//FilterKV instantiates Iterator that checks elements by filters and returns successful ones.
 func FilterKV[K, V any, IT c.KVIterator[K, V]](elements IT, filter c.BiPredicate[K, V]) FitKV[K, V, IT] {
 	return FitKV[K, V, IT]{iter: elements, by: filter}
 }
