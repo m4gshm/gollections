@@ -29,6 +29,7 @@ import (
 	"github.com/m4gshm/gollections/slice/clone"
 	"github.com/m4gshm/gollections/slice/ordered"
 	"github.com/m4gshm/gollections/slice/range_"
+	"github.com/m4gshm/gollections/slice/reverse"
 	"github.com/m4gshm/gollections/slice/sort"
 	"github.com/m4gshm/gollections/sum"
 )
@@ -54,6 +55,7 @@ func Test_SortStructs(t *testing.T) {
 
 func Test_Reverse(t *testing.T) {
 	assert.Equal(t, []int{-1, 0, 1, 2, 3}, slice.Reverse([]int{3, 2, 1, 0, -1}))
+	assert.Equal(t, []int{-1, 0, 1, 2, 3}, reverse.Of([]int{3, 2, 1, 0, -1}))
 }
 
 var even = func(v int) bool { return v%2 == 0 }

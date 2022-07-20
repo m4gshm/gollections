@@ -2,7 +2,7 @@ package clone
 
 import "github.com/m4gshm/gollections/slice"
 
-//Of makes new slice instance with copied elements.
+//Of - synonym of the slice.Clone
 func Of[T any, TS ~[]T](elements TS) []T {
 	return slice.Clone(elements)
 }

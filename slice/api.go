@@ -78,7 +78,7 @@ func Range[T constraints.Integer](from T, to T) []T {
 	return elements
 }
 
-//Reverse inverts elements
+//Reverse inverts elements order
 func Reverse[T any, TS ~[]T](elements TS) []T {
 	l := 0
 	h := len(elements) - 1
@@ -91,13 +91,13 @@ func Reverse[T any, TS ~[]T](elements TS) []T {
 	return elements
 }
 
-//Sort returns sorted elements
+//Sort sorts elements in place by applying the less function
 func Sort[T any, TS ~[]T](elements TS, less func(e1, e2 T) bool) []T {
 	sort.Slice(elements, func(i, j int) bool { return less(elements[i], elements[j]) })
 	return elements
 }
 
-//SortByOrdered sorts elements by converting them to Ordered values and applying the operator <
+//SortByOrdered sorts elements in place by converting them to Ordered values and applying the operator <
 func SortByOrdered[T any, o constraints.Ordered, TS ~[]T](elements TS, by c.Converter[T, o]) []T {
 	return Sort(elements, func(e1, e2 T) bool { return by(e1) < by(e2) })
 }
