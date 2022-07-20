@@ -7,7 +7,7 @@ Supports Go version 1.18 or higher.
 ## Installation
 
 ```bash
-go get -u https://github.com/m4gshm/gollections
+go get -u github.com/m4gshm/gollections
 ```
 
 ## [Mutable containers](./mutable/api.go)
