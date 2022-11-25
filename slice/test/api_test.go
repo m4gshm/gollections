@@ -2,6 +2,7 @@ package test
 
 import (
 	"fmt"
+	"strconv"
 	"testing"
 
 	"github.com/m4gshm/gollections/slice"
@@ -26,6 +27,12 @@ func Test_ReduceSum(t *testing.T) {
 	assert.Equal(t, 1+3+5+7+9+11, r)
 }
 
+func Test_Convert(t *testing.T) {
+	s := slice.Of(1, 3, 5, 7, 9, 11)
+	r := slice.Map(s, strconv.Itoa)
+	assert.Equal(t, []string{"1", "3", "5", "7", "9", "11"}, r)
+}
+
 func Test_StringRepresentation(t *testing.T) {
 	var (
 		expected = fmt.Sprint(slice.Of(1, 2, 3, 4))
@@ -44,6 +51,6 @@ func Test_StringReferencesRepresentation(t *testing.T) {
 }
 
 func Test_Filtering(t *testing.T) {
-	r := slice.Filter([]int{1, 2, 3, 4, 5, 6}, func(i int) bool {return i %2 == 0 })
-	assert.Equal(t, []int{2,4,6}, r)
+	r := slice.Filter([]int{1, 2, 3, 4, 5, 6}, func(i int) bool { return i%2 == 0 })
+	assert.Equal(t, []int{2, 4, 6}, r)
 }

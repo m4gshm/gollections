@@ -39,6 +39,17 @@ func Benchmark_Map_EmbeddedSlice(b *testing.B) {
 	b.StopTimer()
 }
 
+func Benchmark_Map_Slice(b *testing.B) {
+	op := conv.And(toString, addTail)
+	var s []string
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		s = slice.Map(values, op)
+	}
+	_ = s
+	b.StopTimer()
+}
+
 func Benchmark_Map_Iterator(b *testing.B) {
 	op := conv.And(toString, addTail)
 	var s []string
