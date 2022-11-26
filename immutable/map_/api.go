@@ -1,4 +1,4 @@
-//Package map_ provides the unordered map container implementation
+// Package map_ provides the unordered map container implementation
 package map_ //nilint
 
 import (
@@ -6,12 +6,12 @@ import (
 	"github.com/m4gshm/gollections/immutable"
 )
 
-//Of instantiates Map with predefined elements.
+// Of instantiates Map with predefined elements.
 func Of[k comparable, v any](elements ...c.KV[k, v]) immutable.Map[k, v] {
 	return immutable.ConvertKVsToMap(elements)
 }
 
-//New instantiates Map and copies elements to it.
+// New instantiates Map and copies elements to it.
 func New[k comparable, v any](elements map[k]v) immutable.Map[k, v] {
 	return immutable.NewMap(elements)
 }

@@ -2,15 +2,14 @@ package it
 
 import (
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/op"
 )
 
-//NewPipe instantiates Pipe based on iterable elements.
+// NewPipe instantiates Pipe based on iterable elements.
 func NewPipe[T any, IT c.Iterator[T]](iter IT) *IterPipe[T] {
 	return &IterPipe[T]{it: iter}
 }
 
-//IterPipe is the Iterator based pipe implementation.
+// IterPipe is the Iterator based pipe implementation.
 type IterPipe[T any] struct {
 	it       c.Iterator[T]
 	elements []T
@@ -34,7 +33,7 @@ func (s *IterPipe[T]) For(walker func(T) error) error {
 	return For(s.it, walker)
 }
 
-func (s *IterPipe[T]) Reduce(by op.Binary[T]) T {
+func (s *IterPipe[T]) Reduce(by c.Binary[T]) T {
 	return Reduce(s.it, by)
 }
 

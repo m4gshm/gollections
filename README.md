@@ -26,6 +26,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/m4gshm/gollections/first"
+	"github.com/m4gshm/gollections/last"
+	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/clone"
 	"github.com/m4gshm/gollections/slice/ordered"
@@ -96,7 +99,13 @@ func Test_Slice_Group(t *testing.T) {
 
 func Test_Slice_ReduceSum(t *testing.T) {
 	s := []int{1, 2, 3, 4, 5, 6}
-	sum := slice.Reduce(s, sum.Of[int])
+	sum := slice.Reduce(s, op.Sum[int])
+	e := 1 + 2 + 3 + 4 + 5 + 6
+	assert.Equal(t, e, sum)
+}
+
+func Test_Slice_Sum(t *testing.T) {
+	sum := sum.Of(1, 2, 3, 4, 5, 6)
 	e := 1 + 2 + 3 + 4 + 5 + 6
 	assert.Equal(t, e, sum)
 }
@@ -112,6 +121,18 @@ func Test_Range(t *testing.T) {
 	assert.Equal(t, []int{-1, 0, 1, 2, 3}, range_.Of(-1, 3))
 	assert.Equal(t, []int{3, 2, 1, 0, -1}, range_.Of(3, -1))
 	assert.Equal(t, []int{1}, range_.Of(1, 1))
+}
+
+func Test_First(t *testing.T) {
+	r, ok := first.Of(1, 3, 5, 7, 9, 11).By(func(i int) bool { return i > 5 })
+	assert.True(t, ok)
+	assert.Equal(t, 7, r)
+}
+
+func Test_Last(t *testing.T) {
+	r, ok := last.Of(1, 3, 5, 7, 9, 11).By(func(i int) bool { return i < 9 })
+	assert.True(t, ok)
+	assert.Equal(t, 7, r)
 }
 ```
 

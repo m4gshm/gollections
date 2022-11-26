@@ -13,8 +13,8 @@ import (
 	"github.com/m4gshm/gollections/immutable/set"
 	"github.com/m4gshm/gollections/it"
 	slc "github.com/m4gshm/gollections/it/slice"
+	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
-	"github.com/m4gshm/gollections/sum"
 	"github.com/m4gshm/gollections/walk/group"
 )
 
@@ -82,7 +82,7 @@ func Test_compute_odds_sum(t *testing.T) {
 	)
 
 	//declarative style
-	oddSum := it.Reduce(it.Filter(it.Flatt(slc.Flatt(multiDimension, conv.To[[][]int]), conv.To[[]int]), odds), sum.Of[int])
+	oddSum := it.Reduce(it.Filter(it.Flatt(slc.Flatt(multiDimension, conv.To[[][]int]), conv.To[[]int]), odds), op.Sum[int])
 	assert.Equal(t, expected, oddSum)
 
 	//plain old style

@@ -8,15 +8,14 @@ import (
 	"github.com/m4gshm/gollections/immutable"
 	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/map_"
-	"github.com/m4gshm/gollections/op"
 )
 
-//NewMap instantiates Map with a predefined capacity.
+// NewMap instantiates Map with a predefined capacity.
 func NewMap[K comparable, V any](capacity int) Map[K, V] {
 	return WrapMap(make(map[K]V, capacity))
 }
 
-//AsMap converts a slice of key/value pairs to teh Map.
+// AsMap converts a slice of key/value pairs to teh Map.
 func AsMap[K comparable, V any](elements []c.KV[K, V]) Map[K, V] {
 	var (
 		uniques = make(map[K]V, len(elements))
@@ -29,7 +28,7 @@ func AsMap[K comparable, V any](elements []c.KV[K, V]) Map[K, V] {
 	return WrapMap(uniques)
 }
 
-//ToMap instantiates Map and copies elements to it.
+// ToMap instantiates Map and copies elements to it.
 func ToMap[K comparable, V any](elements map[K]V) Map[K, V] {
 	uniques := make(map[K]V, len(elements))
 	for key, val := range elements {
@@ -38,12 +37,12 @@ func ToMap[K comparable, V any](elements map[K]V) Map[K, V] {
 	return WrapMap(uniques)
 }
 
-//WrapMap instantiates Map using a map as internal storage.
+// WrapMap instantiates Map using a map as internal storage.
 func WrapMap[K comparable, V any](elements map[K]V) Map[K, V] {
 	return Map[K, V](elements)
 }
 
-//Map is the Collection implementation based on the embedded map.
+// Map is the Collection implementation based on the embedded map.
 type Map[K comparable, V any] map[K]V
 
 var (
@@ -169,7 +168,7 @@ func (s Map[K, V]) Map(by c.BiConverter[K, V, K, V]) c.MapPipe[K, V, map[K]V] {
 	return it.NewKVPipe(it.MapKV(&iter, by), collect.Map[K, V])
 }
 
-func (s Map[K, V]) Reduce(by op.Quaternary[K, V]) (K, V) {
+func (s Map[K, V]) Reduce(by c.Quaternary[K, V]) (K, V) {
 	iter := s.Head()
 	return it.ReduceKV(&iter, by)
 }

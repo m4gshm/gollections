@@ -5,7 +5,7 @@ import (
 	"github.com/m4gshm/gollections/it"
 )
 
-//Of - group.Of synonym of the c.Group.
+// Of - group.Of synonym of the c.Group
 func Of[T any, K comparable, IT c.Iterable[c.Iterator[T]]](elements IT, by c.Converter[T, K]) c.MapPipe[K, T, map[K][]T] {
 	return it.Group(elements.Begin(), by)
 }

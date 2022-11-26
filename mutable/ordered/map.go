@@ -9,11 +9,10 @@ import (
 	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/notsafe"
-	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
 )
 
-//AsMap converts a slice of key/value pairs to teh Map.
+// AsMap converts a slice of key/value pairs to teh Map.
 func AsMap[K comparable, V any](elements []c.KV[K, V]) *Map[K, V] {
 	var (
 		l       = len(elements)
@@ -31,12 +30,12 @@ func AsMap[K comparable, V any](elements []c.KV[K, V]) *Map[K, V] {
 	return WrapMap(order, uniques)
 }
 
-//WrapMap instantiates ordered Map using a map and an order slice as internal storage.
+// WrapMap instantiates ordered Map using a map and an order slice as internal storage.
 func WrapMap[K comparable, V any](order []K, elements map[K]V) *Map[K, V] {
 	return &Map[K, V]{order: order, elements: elements, ksize: notsafe.GetTypeSize[K]()}
 }
 
-//Map is the Collection implementation that provides element access by an unique key..
+// Map is the Collection implementation that provides element access by an unique key..
 type Map[K comparable, V any] struct {
 	order      []K
 	elements   map[K]V
@@ -175,7 +174,7 @@ func (s *Map[K, V]) Map(by c.BiConverter[K, V, K, V]) c.MapPipe[K, V, map[K]V] {
 	return it.NewKVPipe(it.MapKV(&iter, by), collect.Map[K, V])
 }
 
-func (s *Map[K, V]) Reduce(by op.Quaternary[K, V]) (K, V) {
+func (s *Map[K, V]) Reduce(by c.Quaternary[K, V]) (K, V) {
 	iter := s.Head()
 	return it.ReduceKV(&iter, by)
 }

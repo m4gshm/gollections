@@ -7,7 +7,7 @@ import (
 	"github.com/m4gshm/gollections/notsafe"
 )
 
-//FlattenFit is the Iterator wrapper that converts an element to a slice with addition filtering of the element by a Predicate and iterates over the slice.
+// FlattenFit is the Iterator wrapper that converts an element to a slice with addition filtering of the element by a Predicate and iterates over the slice.
 type FlattenFit[From, To any, IT c.Iterator[From]] struct {
 	arrayTo       unsafe.Pointer
 	elemSizeTo    uintptr
@@ -51,8 +51,8 @@ func (s *FlattenFit[From, To, IT]) Cap() int {
 	return s.iter.Cap()
 }
 
-//Flatten is the Iterator wrapper that converts an element to a slice and iterates over the elements of that slice.
-//For example, Flatten can be used to iterate over all the elements of a multi-dimensional array as if it were a one-dimensional array ([][]int -> []int).
+// Flatten is the Iterator wrapper that converts an element to a slice and iterates over the elements of that slice.
+// For example, Flatten can be used to iterate over all the elements of a multi-dimensional array as if it were a one-dimensional array ([][]int -> []int).
 type Flatten[From, To any, IT c.Iterator[From]] struct {
 	arrayTo       unsafe.Pointer
 	elemSizeTo    uintptr

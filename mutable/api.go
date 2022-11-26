@@ -1,2 +1,2 @@
-//Package mutable provides implementations of mutable containers.
+// Package mutable provides implementations of mutable containers.
 package mutable

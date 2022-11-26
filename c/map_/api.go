@@ -4,7 +4,6 @@ import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/collect"
 	"github.com/m4gshm/gollections/it/impl/it"
-	"github.com/m4gshm/gollections/op"
 )
 
 // Map instantiates key/value iterator that converts elements with a converter and returns them
@@ -18,6 +17,6 @@ func Filter[K comparable, V any, IT c.KVIterator[K, V]](elements IT, filter c.Bi
 }
 
 // Reduce reduces keys/value pairs to an one pair.
-func Reduce[K comparable, V any, IT c.KVIterator[K, V]](elements IT, by op.Quaternary[K, V]) (K, V) {
+func Reduce[K comparable, V any, IT c.KVIterator[K, V]](elements IT, by c.Quaternary[K, V]) (K, V) {
 	return it.ReduceKV(elements, by)
 }

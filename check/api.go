@@ -6,52 +6,52 @@ import (
 	"github.com/m4gshm/gollections/c"
 )
 
-//Not inverts a predicate.
+// Not inverts a predicate.
 func Not[T any](p c.Predicate[T]) c.Predicate[T] {
 	return func(v T) bool { return !p(v) }
 }
 
-//Nil checks a reference for nil value.
+// Nil checks a reference for nil value.
 func Nil[T any](val *T) bool {
 	return val == nil
 }
 
-//NotNil checks a reference for no nil value.
+// NotNil checks a reference for no nil value.
 func NotNil[T any](val *T) bool {
 	return !Nil(val)
 }
 
-//Zero checks that a value is zero.
+// Zero checks that a value is zero.
 func Zero[T any](val T) bool {
 	return reflect.ValueOf(val).IsZero()
 }
 
-//Empty checks that a slice is empty.
+// Empty checks that a slice is empty.
 func Empty[T Slice | []any](val T) bool {
 	return len(val) == 0
 }
 
-//NotEmpty checks that a slice is not empty.
+// NotEmpty checks that a slice is not empty.
 func NotEmpty[C []T, T any](val C) bool {
 	return len(val) > 0
 }
 
-//EmptyMap checks that a slice is ampty.
+// EmptyMap checks that a slice is ampty.
 func EmptyMap[K comparable, V any](val map[K]V) bool {
 	return len(val) == 0
 }
 
-//NotEmptyMap checks that a slice is not empty.
+// NotEmptyMap checks that a slice is not empty.
 func NotEmptyMap[K comparable, V any](val map[K]V) bool {
 	return len(val) > 0
 }
 
-//And makes a conjunction of two predicates
+// And makes a conjunction of two predicates
 func And[T any](p1, p2 c.Predicate[T]) c.Predicate[T] {
 	return func(v T) bool { return p1(v) && p2(v) }
 }
 
-//Union applies And to predicates
+// Union applies And to predicates
 func Union[T any](predicates []c.Predicate[T]) c.Predicate[T] {
 	l := len(predicates)
 	if l == 0 {
@@ -71,17 +71,17 @@ func Union[T any](predicates []c.Predicate[T]) c.Predicate[T] {
 	}
 }
 
-//Always returns v every time
+// Always returns v every time
 func Always[T any](v bool) c.Predicate[T] {
 	return func(_ T) bool { return v }
 }
 
-//Never returns the negative of v every time
+// Never returns the negative of v every time
 func Never[T any](v bool) c.Predicate[T] {
 	return func(_ T) bool { return !v }
 }
 
-//Slice is the constraint included all slice types
+// Slice is the constraint included all slice types
 type Slice interface {
 	~[]any | ~[]uintptr |
 		~[]int | ~[]int8 | []int16 | []int32 | []int64 |

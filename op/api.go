@@ -1,7 +1,32 @@
 package op
 
-//Binary is an operation with two arguments
-type Binary[T any] func(T, T) T
+import (
+	"github.com/m4gshm/gollections/c"
+	"golang.org/x/exp/constraints"
+)
 
-//Quaternary is an operation with four arguments
-type Quaternary[t1, t2 any] func(t1, t2, t1, t2) (t1, t2)
+// Sum returns the sum of two operands
+func Sum[T c.Summable](a T, b T) T {
+	return a + b
+}
+
+// Sub returns the substraction of the b from the a
+func Sub[T c.Number](a T, b T) T {
+	return a - b
+}
+
+// Max returns the maximum from two operands
+func Max[T constraints.Ordered](a T, b T) T {
+	if a < b {
+		return b
+	}
+	return a
+}
+
+// Min returns the minimum from two operands
+func Min[T constraints.Ordered](a T, b T) T {
+	if a > b {
+		return b
+	}
+	return a
+}

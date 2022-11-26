@@ -4,7 +4,6 @@ import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/it/impl/it"
-	"github.com/m4gshm/gollections/op"
 )
 
 // Map instantiates Iterator that converts elements with a converter and returns them
@@ -40,7 +39,7 @@ func NotNil[T any, IT c.Iterable[c.Iterator[*T]]](elements IT) c.Iterator[*T] {
 }
 
 // Reduce reduces elements to an one.
-func Reduce[T any, IT c.Iterable[c.Iterator[T]]](elements IT, by op.Binary[T]) T {
+func Reduce[T any, IT c.Iterable[c.Iterator[T]]](elements IT, by c.Binary[T]) T {
 	return it.Reduce(elements.Begin(), by)
 }
 

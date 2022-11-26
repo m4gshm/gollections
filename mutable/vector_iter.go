@@ -5,17 +5,17 @@ import (
 	"github.com/m4gshm/gollections/it/impl/it"
 )
 
-//NewHead instantiates Iter starting at the first element of a sclie.
+// NewHead instantiates Iter starting at the first element of a sclie.
 func NewHead[T any, TS ~[]T](elements *TS, del func(int) bool) Iter[T, TS] {
 	return Iter[T, TS]{elements: elements, current: it.NoStarted, del: del}
 }
 
-//NewTail instantiates Iter starting at the last element of a sclie.
+// NewTail instantiates Iter starting at the last element of a sclie.
 func NewTail[T any, TS ~[]T](elements *TS, del func(int) bool) Iter[T, TS] {
 	return Iter[T, TS]{elements: elements, current: len(*elements), del: del}
 }
 
-//Iter is the Iterator implementation for mutable containers.
+// Iter is the Iterator implementation for mutable containers.
 type Iter[T any, TS ~[]T] struct {
 	elements      *TS
 	current, step int

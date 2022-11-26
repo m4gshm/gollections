@@ -5,9 +5,11 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
+	"github.com/m4gshm/gollections/slice/first"
+	"github.com/m4gshm/gollections/slice/last"
 	"github.com/m4gshm/gollections/slice/range_"
-	"github.com/m4gshm/gollections/sum"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -23,8 +25,34 @@ func Test_Reverse(t *testing.T) {
 
 func Test_ReduceSum(t *testing.T) {
 	s := slice.Of(1, 3, 5, 7, 9, 11)
-	r := slice.Reduce(s, sum.Of[int])
+	r := slice.Reduce(s, op.Sum[int])
 	assert.Equal(t, 1+3+5+7+9+11, r)
+}
+
+func Test_Sum(t *testing.T) {
+	s := slice.Of(1, 3, 5, 7, 9, 11)
+	r := slice.Sum(s)
+	assert.Equal(t, 1+3+5+7+9+11, r)
+}
+
+func Test_First(t *testing.T) {
+	s := slice.Of(1, 3, 5, 7, 9, 11)
+	r, ok := first.Of(s, func(i int) bool { return i > 5 })
+	assert.True(t, ok)
+	assert.Equal(t, 7, r)
+
+	_, nook := slice.First(s, func(i int) bool { return i > 12 })
+	assert.False(t, nook)
+}
+
+func Test_Last(t *testing.T) {
+	s := slice.Of(1, 3, 5, 7, 9, 11)
+	r, ok := last.Of(s, func(i int) bool { return i < 9 })
+	assert.True(t, ok)
+	assert.Equal(t, 7, r)
+
+	_, nook := slice.Last(s, func(i int) bool { return i < 1 })
+	assert.False(t, nook)
 }
 
 func Test_Convert(t *testing.T) {

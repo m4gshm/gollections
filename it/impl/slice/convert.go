@@ -7,7 +7,7 @@ import (
 	"github.com/m4gshm/gollections/notsafe"
 )
 
-//ConvertFit is the array based Iterator thath provides converting of elements by a Converter with addition filtering of the elements by a Predicate.
+// ConvertFit is the array based Iterator thath provides converting of elements by a Converter with addition filtering of the elements by a Predicate.
 type ConvertFit[From, To any] struct {
 	array    unsafe.Pointer
 	elemSize uintptr
@@ -30,7 +30,7 @@ func (s *ConvertFit[From, To]) Cap() int {
 	return s.size
 }
 
-//Convert is the array based Iterator thath provides converting of elements by a Converter.
+// Convert is the array based Iterator thath provides converting of elements by a Converter.
 type Convert[From, To any] struct {
 	array    unsafe.Pointer
 	elemSize uintptr

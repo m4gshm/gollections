@@ -2,7 +2,7 @@ package it
 
 import "github.com/m4gshm/gollections/c"
 
-//ConvertFit is the Converter with elements filtering.
+// ConvertFit is the Converter with elements filtering.
 type ConvertFit[From, To any, IT c.Iterator[From]] struct {
 	iter IT
 	by   c.Converter[From, To]
@@ -26,7 +26,7 @@ func (s ConvertFit[From, To, IT]) Cap() int {
 	return s.iter.Cap()
 }
 
-//Convert is the iterator wrapper implementation applying a converter to all iterable elements.
+// Convert is the iterator wrapper implementation applying a converter to all iterable elements.
 type Convert[From, To any, IT c.Iterator[From], C c.Converter[From, To]] struct {
 	iter IT
 	by   C
@@ -49,7 +49,7 @@ func (s Convert[From, To, IT, C]) Cap() int {
 	return s.iter.Cap()
 }
 
-//ConvertKV is the iterator wrapper implementation applying a converter to all iterable key/value elements.
+// ConvertKV is the iterator wrapper implementation applying a converter to all iterable key/value elements.
 type ConvertKV[K, V any, IT c.KVIterator[K, V], K2, V2 any, C c.BiConverter[K, V, K2, V2]] struct {
 	iter IT
 	by   C

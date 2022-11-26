@@ -5,12 +5,12 @@ import (
 	"github.com/m4gshm/gollections/it/impl/it"
 )
 
-//NewSetIter creates SetIter instance.
+// NewSetIter creates SetIter instance.
 func NewSetIter[K comparable](uniques map[K]struct{}, del func(element K) bool) *SetIter[K] {
 	return &SetIter[K]{Key: it.NewKey(uniques), del: del}
 }
 
-//SetIter is the Set Iterator implementation.
+// SetIter is the Set Iterator implementation.
 type SetIter[K comparable] struct {
 	it.Key[K, struct{}]
 	del        func(element K) bool

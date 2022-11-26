@@ -5,12 +5,12 @@ import (
 	"github.com/m4gshm/gollections/it/impl/it"
 )
 
-//NewSetIter creates a set's iterator.
+// NewSetIter creates a set's iterator.
 func NewSetIter[T any](elements *[]T, del func(v T) bool) *SetIter[T] {
 	return &SetIter[T]{elements: elements, current: it.NoStarted, del: del}
 }
 
-//SetIter set iterator
+// SetIter set iterator
 type SetIter[T any] struct {
 	elements *[]T
 	current  int

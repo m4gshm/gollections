@@ -1,8 +1,11 @@
 package sum
 
-import "golang.org/x/exp/constraints"
+import (
+	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/slice/sum"
+)
 
-//Of returns the sum of two operands
-func Of[T constraints.Ordered](a T, b T) T {
-	return a + b
+// Of an alias of the slice.Sum
+func Of[T c.Summable](elements ...T) T {
+	return sum.Of(elements)
 }

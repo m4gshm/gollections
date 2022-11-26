@@ -6,12 +6,12 @@ import (
 	"github.com/m4gshm/gollections/c"
 )
 
-//NewMap sync Map constructor
+// NewMap sync Map constructor
 func NewMap[K comparable, V any]() Map[K, V] {
 	return Map[K, V]{}
 }
 
-//Map is typed wrapper of sync.Map
+// Map is typed wrapper of sync.Map
 type Map[K comparable, V any] struct {
 	m sync.Map
 }

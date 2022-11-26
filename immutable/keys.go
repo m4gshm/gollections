@@ -6,16 +6,15 @@ import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/map_"
-	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
 )
 
-//WrapKeys is non-copy constructor
+// WrapKeys is non-copy constructor
 func WrapKeys[K comparable, V any](uniques map[K]V) MapKeys[K, V] {
 	return MapKeys[K, V]{uniques}
 }
 
-//MapKeys is the container reveal keys of a map and hides values.
+// MapKeys is the container reveal keys of a map and hides values.
 type MapKeys[K comparable, V any] struct {
 	uniques map[K]V
 }
@@ -77,7 +76,7 @@ func (s MapKeys[K, V]) Map(by c.Converter[K, K]) c.Pipe[K, []K] {
 	return it.NewPipe[K](it.Map(s.Head(), by))
 }
 
-func (s MapKeys[K, V]) Reduce(by op.Binary[K]) K {
+func (s MapKeys[K, V]) Reduce(by c.Binary[K]) K {
 	return it.Reduce(s.Head(), by)
 }
 

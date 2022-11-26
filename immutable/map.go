@@ -8,11 +8,10 @@ import (
 	"github.com/m4gshm/gollections/immutable/ordered"
 	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/map_"
-	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
 )
 
-//ConvertKVsToMap converts a slice of key/value pairs to the Map.
+// ConvertKVsToMap converts a slice of key/value pairs to the Map.
 func ConvertKVsToMap[K comparable, V any](elements []c.KV[K, V]) Map[K, V] {
 	uniques := make(map[K]V, len(elements))
 	for _, kv := range elements {
@@ -21,7 +20,7 @@ func ConvertKVsToMap[K comparable, V any](elements []c.KV[K, V]) Map[K, V] {
 	return WrapMap(uniques)
 }
 
-//NewMap instantiates Map with values copied from an map.
+// NewMap instantiates Map with values copied from an map.
 func NewMap[K comparable, V any](elements map[K]V) Map[K, V] {
 	uniques := make(map[K]V, len(elements))
 	for key, val := range elements {
@@ -30,12 +29,12 @@ func NewMap[K comparable, V any](elements map[K]V) Map[K, V] {
 	return WrapMap(uniques)
 }
 
-//WrapMap instantiates Map using a map as internal storage.
+// WrapMap instantiates Map using a map as internal storage.
 func WrapMap[K comparable, V any](elements map[K]V) Map[K, V] {
 	return Map[K, V]{elements: elements}
 }
 
-//Map is the Collection implementation that provides element access by an unique key.
+// Map is the Collection implementation that provides element access by an unique key.
 type Map[K comparable, V any] struct {
 	elements map[K]V
 }
@@ -47,38 +46,38 @@ var (
 	_ fmt.Stringer    = Map[int, any]{}
 )
 
-//Begin creates a key/value iterator interface.
+// Begin creates a key/value iterator interface.
 func (s Map[K, V]) Begin() c.KVIterator[K, V] {
 	iter := s.Head()
 	return &iter
 }
 
-//Head creates a key/value iterator implementation started from the head.
+// Head creates a key/value iterator implementation started from the head.
 func (s Map[K, V]) Head() it.KV[K, V] {
 	return it.NewKV(s.elements)
 }
 
-//Collect exports the content as a map.
+// Collect exports the content as a map.
 func (s Map[K, V]) Collect() map[K]V {
 	return map_.Copy(s.elements)
 }
 
-//Sort transforms to the ordered Map contains sorted elements.
+// Sort transforms to the ordered Map contains sorted elements.
 func (s Map[K, V]) Sort(less func(k1, k2 K) bool) ordered.Map[K, V] {
 	return ordered.WrapMap(slice.Sort(map_.Keys(s.elements), less), s.elements)
 }
 
-//String is part of the Stringer interface for printing the string representation of this Map.
+// String is part of the Stringer interface for printing the string representation of this Map.
 func (s Map[K, V]) String() string {
 	return map_.ToString(s.elements)
 }
 
-//Track apply a tracker to touch key, value from the inside. To stop traking just return the map_.Break.
+// Track apply a tracker to touch key, value from the inside. To stop traking just return the map_.Break.
 func (s Map[K, V]) Track(tracker func(K, V) error) error {
 	return map_.Track(s.elements, tracker)
 }
 
-//Track apply a tracker to touch each key, value from the inside.
+// Track apply a tracker to touch each key, value from the inside.
 func (s Map[K, V]) TrackEach(tracker func(K, V)) {
 	map_.TrackEach(s.elements, tracker)
 }
@@ -157,7 +156,7 @@ func (s Map[K, V]) Map(by c.BiConverter[K, V, K, V]) c.MapPipe[K, V, map[K]V] {
 	return it.NewKVPipe(it.MapKV(&iter, by), collect.Map[K, V])
 }
 
-func (s Map[K, V]) Reduce(by op.Quaternary[K, V]) (K, V) {
+func (s Map[K, V]) Reduce(by c.Quaternary[K, V]) (K, V) {
 	iter := s.Head()
 	return it.ReduceKV(&iter, by)
 }

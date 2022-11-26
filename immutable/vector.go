@@ -6,21 +6,20 @@ import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/notsafe"
-	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
 )
 
-//NewVector instantiates Vector and copies elements to it.
+// NewVector instantiates Vector and copies elements to it.
 func NewVector[T any](elements []T) Vector[T] {
 	return WrapVector(slice.Clone(elements))
 }
 
-//WrapVector instantiates Vector using a slise as internal storage.
+// WrapVector instantiates Vector using a slise as internal storage.
 func WrapVector[T any](elements []T) Vector[T] {
 	return Vector[T]{elements: elements, esize: notsafe.GetTypeSize[T]()}
 }
 
-//Vector is the Collection implementation that provides elements order and index access.
+// Vector is the Collection implementation that provides elements order and index access.
 type Vector[T any] struct {
 	elements []T
 	esize    uintptr
@@ -104,7 +103,7 @@ func (v Vector[T]) Map(by c.Converter[T, T]) c.Pipe[T, []T] {
 	return it.NewPipe[T](it.Map(&iter, by))
 }
 
-func (v Vector[T]) Reduce(by op.Binary[T]) T {
+func (v Vector[T]) Reduce(by c.Binary[T]) T {
 	iter := v.Head()
 	return it.Reduce(&iter, by)
 }

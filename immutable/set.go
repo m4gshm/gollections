@@ -7,11 +7,10 @@ import (
 	"github.com/m4gshm/gollections/immutable/ordered"
 	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/map_"
-	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
 )
 
-//NewSet instantiates Set and copies elements to it.
+// NewSet instantiates Set and copies elements to it.
 func NewSet[T comparable](elements []T) Set[T] {
 	internal := map[T]struct{}{}
 	for _, T := range elements {
@@ -20,12 +19,12 @@ func NewSet[T comparable](elements []T) Set[T] {
 	return WrapSet(internal)
 }
 
-//WrapSet creates a set using a map as the internal storage.
+// WrapSet creates a set using a map as the internal storage.
 func WrapSet[T comparable](elements map[T]struct{}) Set[T] {
 	return Set[T]{elements: elements}
 }
 
-//Set is the Collection implementation that provides the uniqueness of its elements. Elements must be comparable.
+// Set is the Collection implementation that provides the uniqueness of its elements. Elements must be comparable.
 type Set[T comparable] struct {
 	elements map[T]struct{}
 }
@@ -86,7 +85,7 @@ func (s Set[T]) Map(by c.Converter[T, T]) c.Pipe[T, []T] {
 	return it.NewPipe[T](it.Map(s.Head(), by))
 }
 
-func (s Set[T]) Reduce(by op.Binary[T]) T {
+func (s Set[T]) Reduce(by c.Binary[T]) T {
 	return it.Reduce(s.Head(), by)
 }
 
@@ -95,7 +94,7 @@ func (s Set[T]) Contains(val T) bool {
 	return ok
 }
 
-//Sort transforms to the ordered Set.
+// Sort transforms to the ordered Set.
 func (s Set[T]) Sort(less func(e1, e2 T) bool) ordered.Set[T] {
 	return ordered.WrapSet(slice.Sort(s.Collect(), less), s.elements)
 }

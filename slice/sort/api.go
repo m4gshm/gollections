@@ -8,13 +8,12 @@ import (
 	"golang.org/x/exp/constraints"
 )
 
-//ByOrdered - synony of the slice.SortByOrdered
+// ByOrdered - synony of the slice.SortByOrdered
 func ByOrdered[T any, o constraints.Ordered, TS ~[]T](elements TS, by c.Converter[T, o]) []T {
 	return slice.SortByOrdered(elements, by)
 }
 
-
-//Of makes clone of sorted elements by the ordered.Sort
+// Of makes clone of sorted elements by the ordered.Sort
 func Of[T constraints.Ordered, TS ~[]T](elements TS) []T {
 	return ordered.Sort(clone.Of(elements))
 }

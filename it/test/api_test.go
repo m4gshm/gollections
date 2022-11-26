@@ -11,8 +11,8 @@ import (
 	"github.com/m4gshm/gollections/it"
 	impl "github.com/m4gshm/gollections/it/impl/it"
 	sliceit "github.com/m4gshm/gollections/it/slice"
+	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
-	"github.com/m4gshm/gollections/sum"
 )
 
 func Test_MapAndFilter(t *testing.T) {
@@ -82,10 +82,10 @@ func Test_ReduceSlices(t *testing.T) {
 
 	e := 1 + 3 + 5 + 7
 
-	oddSum := it.Reduce(it.Filter(it.Flatt(it.Flatt(it.Wrap(multiDimension), conv.To[[][]int]), conv.To[[]int]), odds), sum.Of[int])
+	oddSum := it.Reduce(it.Filter(it.Flatt(it.Flatt(it.Wrap(multiDimension), conv.To[[][]int]), conv.To[[]int]), odds), op.Sum[int])
 	assert.Equal(t, e, oddSum)
 
-	oddSum = it.Reduce(it.Filter(it.Flatt(sliceit.Flatt(multiDimension, conv.To[[][]int]), conv.To[[]int]), odds), sum.Of[int])
+	oddSum = it.Reduce(it.Filter(it.Flatt(sliceit.Flatt(multiDimension, conv.To[[][]int]), conv.To[[]int]), odds), op.Sum[int])
 	assert.Equal(t, e, oddSum)
 
 	//plain old style
@@ -178,6 +178,16 @@ func Test_Group(t *testing.T) {
 
 func Test_ReduceSum(t *testing.T) {
 	s := it.Of(1, 3, 5, 7, 9, 11)
-	r := it.Reduce(s, sum.Of[int])
+	r := it.Reduce(s, op.Sum[int])
 	assert.Equal(t, 1+3+5+7+9+11, r)
+}
+
+func Test_First(t *testing.T) {
+	s := it.Of(1, 3, 5, 7, 9, 11)
+	r, ok := it.First(s, func(i int) bool { return i > 5 })
+	assert.True(t, ok)
+	assert.Equal(t, 7, r)
+
+	_, nook := it.First(s, func(i int) bool { return i > 12 })
+	assert.False(t, nook)
 }

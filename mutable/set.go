@@ -7,16 +7,15 @@ import (
 	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/mutable/ordered"
-	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
 )
 
-//NewSet creates a set with a predefined capacity.
+// NewSet creates a set with a predefined capacity.
 func NewSet[T comparable](capacity int) Set[T] {
 	return WrapSet(make(map[T]struct{}, capacity))
 }
 
-//ToSet converts an elements slice to the set containing them.
+// ToSet converts an elements slice to the set containing them.
 func ToSet[T comparable](elements []T) Set[T] {
 	internal := make(map[T]struct{}, len(elements))
 	for _, v := range elements {
@@ -25,12 +24,12 @@ func ToSet[T comparable](elements []T) Set[T] {
 	return WrapSet(internal)
 }
 
-//WrapSet creates a set using a map as the internal storage.
+// WrapSet creates a set using a map as the internal storage.
 func WrapSet[K comparable](elements map[K]struct{}) Set[K] {
 	return Set[K]{elements: elements}
 }
 
-//Set is the Collection implementation that provides element uniqueness. The elements must be comparable.
+// Set is the Collection implementation that provides element uniqueness. The elements must be comparable.
 type Set[K comparable] struct {
 	elements map[K]struct{}
 }
@@ -136,11 +135,11 @@ func (s Set[K]) Map(by c.Converter[K, K]) c.Pipe[K, []K] {
 	return it.NewPipe[K](it.Map(s.Head(), by))
 }
 
-func (s Set[K]) Reduce(by op.Binary[K]) K {
+func (s Set[K]) Reduce(by c.Binary[K]) K {
 	return it.Reduce(s.Head(), by)
 }
 
-//Sort transforms to the ordered Set contains sorted elements.
+// Sort transforms to the ordered Set contains sorted elements.
 func (s Set[T]) Sort(less func(e1, e2 T) bool) *ordered.Set[T] {
 	return ordered.ToSet(slice.Sort(s.Collect(), less))
 }

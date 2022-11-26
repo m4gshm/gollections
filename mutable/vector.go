@@ -7,27 +7,26 @@ import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/notsafe"
-	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
 )
 
-//NewVector instantiates Vector with a predefined capacity.
+// NewVector instantiates Vector with a predefined capacity.
 func NewVector[T any](capacity int) *Vector[T] {
 	return WrapVector(make([]T, 0, capacity))
 }
 
-//ToVector instantiates Vector based on copy of elements slice
+// ToVector instantiates Vector based on copy of elements slice
 func ToVector[T any](elements []T) *Vector[T] {
 	return WrapVector(slice.Clone(elements))
 }
 
-//WrapVector instantiates Vector using a slise as internal storage.
+// WrapVector instantiates Vector using a slise as internal storage.
 func WrapVector[T any](elements []T) *Vector[T] {
 	v := Vector[T](elements)
 	return &v
 }
 
-//Vector is the Collection implementation that provides elements order and index access.
+// Vector is the Collection implementation that provides elements order and index access.
 type Vector[T any] []T
 
 var (
@@ -209,18 +208,18 @@ func (v *Vector[T]) Map(by c.Converter[T, T]) c.Pipe[T, []T] {
 	return it.NewPipe[T](it.Map(&iter, by))
 }
 
-func (v *Vector[T]) Reduce(by op.Binary[T]) T {
+func (v *Vector[T]) Reduce(by c.Binary[T]) T {
 	iter := v.Head()
 	return it.Reduce(&iter, by)
 }
 
-//Sotr sorts the Vector in-place and returns it.
+// Sotr sorts the Vector in-place and returns it.
 func (v *Vector[t]) Sort(less func(e1, e2 t) bool) *Vector[t] {
 	*v = slice.Sort(*v, less)
 	return v
 }
 
-//String returns then string representation.
+// String returns then string representation.
 func (v *Vector[T]) String() string {
 	return slice.ToString(*v)
 }

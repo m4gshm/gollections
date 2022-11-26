@@ -7,7 +7,6 @@ import (
 	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/collect"
 	"github.com/m4gshm/gollections/notsafe"
-	"github.com/m4gshm/gollections/op"
 )
 
 // ErrBreak is For, Track breaker
@@ -85,7 +84,7 @@ func ForEachFit[T any, IT c.Iterator[T]](elements IT, walker func(T), fit c.Pred
 }
 
 // Reduce reduces elements to an one.
-func Reduce[T any, IT c.Iterator[T]](elements IT, by op.Binary[T]) T {
+func Reduce[T any, IT c.Iterator[T]](elements IT, by c.Binary[T]) T {
 	var result T
 	if v, ok := elements.Next(); ok {
 		result = v
@@ -99,7 +98,7 @@ func Reduce[T any, IT c.Iterator[T]](elements IT, by op.Binary[T]) T {
 }
 
 // ReduceKV reduces key/values elements to an one.
-func ReduceKV[K, V any, IT c.KVIterator[K, V]](elements IT, by op.Quaternary[K, V]) (K, V) {
+func ReduceKV[K, V any, IT c.KVIterator[K, V]](elements IT, by c.Quaternary[K, V]) (K, V) {
 	var rk K
 	var rv V
 	if k, v, ok := elements.Next(); ok {
@@ -120,4 +119,15 @@ func Slice[T any, IT c.Iterator[T]](elements IT) []T {
 		s = append(s, v)
 	}
 	return s
+}
+
+// First returns the first element that satisfies requirements of the predicate 'fit'
+func First[T any, IT c.Iterator[T]](elements IT, fit c.Predicate[T]) (T, bool) {
+	for one, ok := elements.Next(); ok; one, ok = elements.Next() {
+		if fit(one) {
+			return one, true
+		}
+	}
+	var no T
+	return no, false
 }

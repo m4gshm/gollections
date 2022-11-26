@@ -52,12 +52,12 @@ func NotNil[T any, IT c.Iterator[*T]](elements IT) c.Iterator[*T] {
 }
 
 // Reduce reduces elements to an one.
-func Reduce[T any, IT c.Iterator[T]](elements IT, by op.Binary[T]) T {
+func Reduce[T any, IT c.Iterator[T]](elements IT, by c.Binary[T]) T {
 	return it.Reduce(elements, by)
 }
 
 // ReduceKV reduces key/value elements to an one.
-func ReduceKV[K, V any, IT c.KVIterator[K, V]](elements IT, by op.Quaternary[K, V]) (K, V) {
+func ReduceKV[K, V any, IT c.KVIterator[K, V]](elements IT, by c.Quaternary[K, V]) (K, V) {
 	return it.ReduceKV(elements, by)
 }
 
@@ -79,4 +79,14 @@ func ForEach[T any, IT c.Iterator[T]](elements IT, walker func(T)) {
 // ForEachFit applies a walker to elements that satisfy a predicate condition.
 func ForEachFit[T any](elements c.Iterator[T], walker func(T), fit c.Predicate[T]) {
 	it.ForEachFit(elements, walker, fit)
+}
+
+// Sum returns the sum of all elements
+func Sum[T c.Summable, IT c.Iterator[T]](elements IT) T {
+	return it.Reduce(elements, op.Sum[T])
+}
+
+// First returns the first element that satisfies requirements of the predicate 'fit'
+func First[T any, IT c.Iterator[T]](elements IT, fit c.Predicate[T]) (T, bool) {
+	return it.First(elements, fit)
 }

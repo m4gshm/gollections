@@ -2,12 +2,12 @@ package it
 
 import "github.com/m4gshm/gollections/c"
 
-//NewKeyValuer creates instance of the KeyValuer.
+// NewKeyValuer creates instance of the KeyValuer.
 func NewKeyValuer[K comparable, V any, IT c.Iterator[V]](iter IT, keyExtractor c.Converter[V, K]) *KeyValuer[K, V, IT] {
 	return &KeyValuer[K, V, IT]{iter: iter, getKey: keyExtractor}
 }
 
-//KeyValuer is the Iterator wrapper that converts a element to a key and iterates over the key/element pairs.
+// KeyValuer is the Iterator wrapper that converts a element to a key and iterates over the key/element pairs.
 type KeyValuer[K comparable, V any, IT c.Iterator[V]] struct {
 	iter   IT
 	getKey c.Converter[V, K]

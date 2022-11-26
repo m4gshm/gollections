@@ -7,16 +7,15 @@ import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/map_"
-	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
 )
 
-//WrapVal instantiates MapValues using elements as internal storage.
+// WrapVal instantiates MapValues using elements as internal storage.
 func WrapVal[K comparable, V any](elements map[K]V) MapValues[K, V] {
 	return MapValues[K, V]{elements}
 }
 
-//MapValues is the wrapper for Map's values.
+// MapValues is the wrapper for Map's values.
 type MapValues[K comparable, V any] struct {
 	elements map[K]V
 }
@@ -79,7 +78,7 @@ func (s MapValues[K, V]) Map(by c.Converter[V, V]) c.Pipe[V, []V] {
 	return it.NewPipe[V](it.Map(&iter, by))
 }
 
-func (s MapValues[K, V]) Reduce(by op.Binary[V]) V {
+func (s MapValues[K, V]) Reduce(by c.Binary[V]) V {
 	iter := s.Head()
 	return it.Reduce(&iter, by)
 }

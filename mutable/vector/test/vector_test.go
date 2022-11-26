@@ -6,9 +6,9 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/m4gshm/gollections/mutable/vector"
+	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/range_"
-	"github.com/m4gshm/gollections/sum"
 	"github.com/m4gshm/gollections/walk/group"
 )
 
@@ -263,7 +263,7 @@ func Test_Vector_DeleteByIterator_Reverse(t *testing.T) {
 }
 
 func Test_Vector_FilterMapReduce(t *testing.T) {
-	s := vector.Of(1, 1, 2, 4, 3, 4).Filter(func(i int) bool { return i%2 == 0 }).Map(func(i int) int { return i * 2 }).Reduce(sum.Of[int])
+	s := vector.Of(1, 1, 2, 4, 3, 4).Filter(func(i int) bool { return i%2 == 0 }).Map(func(i int) int { return i * 2 }).Reduce(op.Sum[int])
 	assert.Equal(t, 20, s)
 }
 

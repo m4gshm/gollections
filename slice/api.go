@@ -41,7 +41,6 @@ func Group[T any, K comparable, TS ~[]T](elements TS, by c.Converter[T, K]) map[
 			group = make([]T, 0)
 		}
 		groups[key] = append(group, e)
-
 	}
 	return groups
 }
@@ -100,17 +99,17 @@ func FlattElemFit[From, To any, FS ~[]From](elements FS, by c.Flatter[From, To],
 	return result
 }
 
-// FlattElemFit unfolds the n-dimensional slice into a n-1 dimensional slice with additinal filtering of 'From' and 'To' elements.
-func FlattFitFit[From, To any, FS ~[]From](elements FS,  fitFrom c.Predicate[From], by c.Flatter[From, To], fitTo c.Predicate[To]) []To {
+// FlattFitFit unfolds the n-dimensional slice 'elements' into a n-1 dimensional slice with additinal filtering of 'From' and 'To' elements.
+func FlattFitFit[From, To any, FS ~[]From](elements FS, fitFrom c.Predicate[From], by c.Flatter[From, To], fitTo c.Predicate[To]) []To {
 	result := make([]To, 0)
 	for _, e := range elements {
 		if fitFrom(e) {
-		for _, to := range by(e) {
-			if fitTo(to) {
-				result = append(result, to)
+			for _, to := range by(e) {
+				if fitTo(to) {
+					result = append(result, to)
+				}
 			}
 		}
-	}
 	}
 	return result
 }
@@ -172,7 +171,7 @@ func SortByOrdered[T any, o constraints.Ordered, TS ~[]T](elements TS, by c.Conv
 }
 
 // Reduce reduces elements to an one
-func Reduce[T any, TS ~[]T](elements TS, by op.Binary[T]) T {
+func Reduce[T any, TS ~[]T](elements TS, by c.Binary[T]) T {
 	var result T
 	for i, v := range elements {
 		if i == 0 {
@@ -182,6 +181,34 @@ func Reduce[T any, TS ~[]T](elements TS, by op.Binary[T]) T {
 		}
 	}
 	return result
+}
+
+// Sum returns the sum of all elements
+func Sum[T c.Summable, TS ~[]T](elements TS) T {
+	return Reduce(elements, op.Sum[T])
+}
+
+// First returns the first element that satisfies requirements of the predicate 'fit'
+func First[T any, TS ~[]T](elements TS, by c.Predicate[T]) (T, bool) {
+	for _, e := range elements {
+		if by(e) {
+			return e, true
+		}
+	}
+	var no T
+	return no, false
+}
+
+// Last returns the latest element that satisfies requirements of the predicate 'fit'
+func Last[T any, TS ~[]T](elements TS, by c.Predicate[T]) (T, bool) {
+	for i := len(elements) - 1; i >= 0; i-- {
+		e := elements[i]
+		if by(e) {
+			return e, true
+		}
+	}
+	var no T
+	return no, false
 }
 
 // Get returns an element from the elements by index, otherwise, if the provided index is ouf of the elements, returns zero T and false in the second result
@@ -194,7 +221,7 @@ func Get[T any, TS ~[]T](elements TS, index int) (T, bool) {
 	return no, false
 }
 
-// Track applies tracker to elements with error checking. To stop traking just return the ErrBreak.
+// Track applies tracker to elements with error checking. To stop traking just return the ErrBreak
 func Track[T any, TS ~[]T](elements TS, tracker func(int, T) error) error {
 	for i, e := range elements {
 		if err := tracker(i, e); err != ErrBreak {

@@ -8,15 +8,17 @@ import (
 	"github.com/m4gshm/gollections/c/op"
 	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/conv"
+	"github.com/m4gshm/gollections/first"
 	"github.com/m4gshm/gollections/immutable/vector"
 	"github.com/m4gshm/gollections/it"
 	iterimpl "github.com/m4gshm/gollections/it/impl/it"
 	sliceitimpl "github.com/m4gshm/gollections/it/impl/slice"
 	sliceit "github.com/m4gshm/gollections/it/slice"
+	"github.com/m4gshm/gollections/last"
 	"github.com/m4gshm/gollections/mutable"
 	mvector "github.com/m4gshm/gollections/mutable/vector"
+	sop "github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
-	"github.com/m4gshm/gollections/sum"
 )
 
 var (
@@ -36,6 +38,71 @@ func Benchmark_Map_EmbeddedSlice(b *testing.B) {
 		}
 	}
 	_ = s
+	b.StopTimer()
+}
+
+func Benchmark_First_Slice(b *testing.B) {
+	op := func(i int) bool { return i > 10000 }
+	var f int
+	var ok bool
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		f, ok = slice.First(values, op)
+	}
+	_ = f
+	_ = ok
+	b.StopTimer()
+}
+
+func Benchmark_First_OfBy(b *testing.B) {
+	op := func(i int) bool { return i > 10000 }
+	var f int
+	var ok bool
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		f, ok = first.Of(values...).By(op)
+	}
+	_ = f
+	_ = ok
+	b.StopTimer()
+}
+
+func Benchmark_First_Iterator(b *testing.B) {
+	op := func(i int) bool { return i > 10000 }
+	var f int
+	var ok bool
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		f, ok = it.First(it.Of(values...), op)
+	}
+	_ = f
+	_ = ok
+	b.StopTimer()
+}
+
+func Benchmark_Last_Slice(b *testing.B) {
+	op := func(i int) bool { return i < 10000 }
+	var f int
+	var ok bool
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		f, ok = slice.Last(values, op)
+	}
+	_ = f
+	_ = ok
+	b.StopTimer()
+}
+
+func Benchmark_Last_OfBy(b *testing.B) {
+	op := func(i int) bool { return i < 10000 }
+	var f int
+	var ok bool
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		f, ok = last.Of(values...).By(op)
+	}
+	_ = f
+	_ = ok
 	b.StopTimer()
 }
 
@@ -393,7 +460,7 @@ func Benchmark_ReduceSum_Iterable(b *testing.B) {
 	b.ResetTimer()
 	result := 0
 	for i := 0; i < b.N; i++ {
-		result = it.Reduce(it.Filter(it.Flatt(it.Flatt(it.Wrap(multiDimension), conv.To[[][]int]), conv.To[[]int]), odds), sum.Of[int])
+		result = it.Reduce(it.Filter(it.Flatt(it.Flatt(it.Wrap(multiDimension), conv.To[[][]int]), conv.To[[]int]), odds), sop.Sum[int])
 	}
 	if result != expected {
 		b.Fatalf("must be %d, but %d", expected, result)
@@ -411,7 +478,7 @@ func Benchmark_ReduceSum_Iterable_Impl(b *testing.B) {
 		it := iterimpl.NewHead(multiDimension)
 		twoD := iterimpl.Flatt(&it, conv.To[[][]int])
 		oneD := iterimpl.Flatt(&twoD, conv.To[[]int])
-		result = iterimpl.Reduce(iterimpl.Filter(&oneD, odds), sum.Of[int])
+		result = iterimpl.Reduce(iterimpl.Filter(&oneD, odds), sop.Sum[int])
 	}
 	if result != expected {
 		b.Fatalf("must be %d, but %d", expected, result)
@@ -426,7 +493,7 @@ func Benchmark_ReduceSum_Slice(b *testing.B) {
 	b.ResetTimer()
 	result := 0
 	for i := 0; i < b.N; i++ {
-		result = it.Reduce(it.Filter(it.Flatt(sliceit.Flatt(multiDimension, conv.To[[][]int]), conv.To[[]int]), odds), sum.Of[int])
+		result = it.Reduce(it.Filter(it.Flatt(sliceit.Flatt(multiDimension, conv.To[[][]int]), conv.To[[]int]), odds), sop.Sum[int])
 	}
 	if result != expected {
 		b.Fatalf("must be %d, but %d", expected, result)
@@ -439,7 +506,7 @@ func Benchmark_ReduceSum_Slice_Impl(b *testing.B) {
 	odds := func(v int) bool { return v%2 != 0 }
 	toTwoD := conv.To[[][]int]
 	toOneD := conv.To[[]int]
-	intSum := sum.Of[int]
+	intSum := sop.Sum[int]
 	expected := 1 + 3 + 5 + 7
 	b.ResetTimer()
 	result := 0

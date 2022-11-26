@@ -6,12 +6,12 @@ import (
 	"github.com/m4gshm/gollections/c"
 )
 
-//NewOrderedKV is the OrderedKV constructor.
+// NewOrderedKV is the OrderedKV constructor.
 func NewOrderedKV[K comparable, V any](uniques map[K]V, elements Iter[K]) OrderedKV[K, V] {
 	return OrderedKV[K, V]{elements: elements, uniques: uniques}
 }
 
-//NewKV returns the KVIterator based on map elements.
+// NewKV returns the KVIterator based on map elements.
 func NewKV[K comparable, V any](elements map[K]V) KV[K, V] {
 	m := elements
 	hmap := *(*unsafe.Pointer)(unsafe.Pointer(&m))
@@ -21,7 +21,7 @@ func NewKV[K comparable, V any](elements map[K]V) KV[K, V] {
 	return KV[K, V]{maptype: maptype, hmap: hmap, size: len(elements), iter: new(hiter)}
 }
 
-//KV is the empedded map based Iterator implementation.
+// KV is the empedded map based Iterator implementation.
 type KV[K comparable, V any] struct {
 	iter    *hiter
 	maptype unsafe.Pointer
@@ -90,7 +90,7 @@ func (h *hiter) initialized() bool {
 	return h.t != nil
 }
 
-//OrderedKV is the ordered key/value pairs Iterator implementation.
+// OrderedKV is the ordered key/value pairs Iterator implementation.
 type OrderedKV[K comparable, V any] struct {
 	elements Iter[K]
 	uniques  map[K]V
@@ -111,12 +111,12 @@ func (i *OrderedKV[K, V]) Cap() int {
 	return i.elements.Cap()
 }
 
-//NewKey it the Key constructor.
+// NewKey it the Key constructor.
 func NewKey[K comparable, V any](uniques map[K]V) Key[K, V] {
 	return Key[K, V]{KV: NewKV(uniques)}
 }
 
-//Key is the Iterator implementation that provides iterating over keys of a key/value pairs iterator.
+// Key is the Iterator implementation that provides iterating over keys of a key/value pairs iterator.
 type Key[K comparable, V any] struct {
 	KV[K, V]
 }
@@ -135,12 +135,12 @@ func (i Key[K, V]) Cap() int {
 	return i.KV.Cap()
 }
 
-//NewVal is the Val constructor.
+// NewVal is the Val constructor.
 func NewVal[K comparable, V any](uniques map[K]V) Val[K, V] {
 	return Val[K, V]{KV: NewKV(uniques)}
 }
 
-//Val is the Iterator implementation that provides iterating over values of a key/value pairs iterator.
+// Val is the Iterator implementation that provides iterating over values of a key/value pairs iterator.
 type Val[K comparable, V any] struct {
 	KV[K, V]
 }

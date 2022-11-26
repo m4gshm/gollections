@@ -5,16 +5,15 @@ import (
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/it/impl/it"
-	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
 )
 
-//WrapKeys instantiates MapKeys using elements as internal storage.
+// WrapKeys instantiates MapKeys using elements as internal storage
 func WrapKeys[T comparable](elements []T) MapKeys[T] {
 	return MapKeys[T]{elements}
 }
 
-//MapKeys is the wrapper for Map's keys.
+// MapKeys is the wrapper for Map's keys
 type MapKeys[T comparable] struct {
 	elements []T
 }
@@ -80,7 +79,7 @@ func (s MapKeys[T]) Map(by c.Converter[T, T]) c.Pipe[T, []T] {
 	return it.NewPipe[T](it.Map(&iter, by))
 }
 
-func (s MapKeys[T]) Reduce(by op.Binary[T]) T {
+func (s MapKeys[T]) Reduce(by c.Binary[T]) T {
 	iter := s.Head()
 	return it.Reduce(&iter, by)
 }

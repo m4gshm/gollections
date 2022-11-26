@@ -6,11 +6,10 @@ import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/notsafe"
-	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
 )
 
-//NewSet instantiates Set and copies elements to it.
+// NewSet instantiates Set and copies elements to it.
 func NewSet[T comparable](elements []T) Set[T] {
 	var (
 		uniques = map[T]struct{}{}
@@ -25,12 +24,12 @@ func NewSet[T comparable](elements []T) Set[T] {
 	return WrapSet(order, uniques)
 }
 
-//WrapSet creates a set using a map and an order slice as the internal storage.
+// WrapSet creates a set using a map and an order slice as the internal storage.
 func WrapSet[T comparable](order []T, elements map[T]struct{}) Set[T] {
 	return Set[T]{order: order, elements: elements, esize: notsafe.GetTypeSize[T]()}
 }
 
-//Set is the Collection implementation that provides element uniqueness and access order. The elements must be comparable.
+// Set is the Collection implementation that provides element uniqueness and access order. The elements must be comparable.
 type Set[T comparable] struct {
 	order    []T
 	elements map[T]struct{}
@@ -95,7 +94,7 @@ func (s Set[T]) Map(by c.Converter[T, T]) c.Pipe[T, []T] {
 	return it.NewPipe[T](it.Map(&iter, by))
 }
 
-func (s Set[T]) Reduce(by op.Binary[T]) T {
+func (s Set[T]) Reduce(by c.Binary[T]) T {
 	iter := s.Head()
 	return it.Reduce(&iter, by)
 }
