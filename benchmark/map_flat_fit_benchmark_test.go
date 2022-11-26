@@ -262,6 +262,25 @@ func Benchmark_MapFit_Iterable_Impl(b *testing.B) {
 	b.StopTimer()
 }
 
+func Benchmark_MapFit_Embedder_Slice(b *testing.B) {
+	var (
+		toString = func(i int) string { return fmt.Sprintf("%d", i) }
+		addTail  = func(s string) string { return s + "_tail" }
+		even     = func(v int) bool { return v%2 == 0 }
+	)
+	items := slice.Of(1, 2, 3, 4, 5)
+	var s []string
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		s = slice.MapFit(items, even, conv.And(toString, addTail))
+	}
+	_ = s
+
+	// fmt.Println(b.Name(), s)
+
+	b.StopTimer()
+}
+
 func Benchmark_MapFit_Slice(b *testing.B) {
 	var (
 		toString = func(i int) string { return fmt.Sprintf("%d", i) }

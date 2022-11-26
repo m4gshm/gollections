@@ -10,14 +10,13 @@ import (
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/it/impl/it"
-	"github.com/m4gshm/gollections/it/slice"
 	"github.com/m4gshm/gollections/op"
 )
 
 // ErrBreak is the 'break' statement of the For, Track methods
 var ErrBreak = it.ErrBreak
 
-// Of is generic sclie constructor
+// Of is generic slice constructor
 func Of[T any](elements ...T) []T { return elements }
 
 // Clone makes new slice instance with copied elements.
@@ -27,12 +26,12 @@ func Clone[T any, TS ~[]T](elements TS) []T {
 	return copied
 }
 
-// Delete removes an element by index from the slice
+// Delete removes an element by index from the slice 'elements'
 func Delete[T any, TS ~[]T](index int, elements TS) []T {
 	return append(elements[0:index], elements[index+1:]...)
 }
 
-// Group converts the slice into a map with keys computeable by a Converter.
+// Group converts the slice into a map with keys computeable by the converter 'by'
 func Group[T any, K comparable, TS ~[]T](elements TS, by c.Converter[T, K]) map[K][]T {
 	groups := map[K][]T{}
 	for _, e := range elements {
@@ -47,7 +46,7 @@ func Group[T any, K comparable, TS ~[]T](elements TS, by c.Converter[T, K]) map[
 	return groups
 }
 
-// Map creates a slice that converts elements with a converter and returns them
+// Map creates a slice consisting of the transformed elements using the converter 'by'
 func Map[From, To any, FS ~[]From](elements FS, by c.Converter[From, To]) []To {
 	result := make([]To, len(elements))
 	for i, e := range elements {
@@ -56,14 +55,75 @@ func Map[From, To any, FS ~[]From](elements FS, by c.Converter[From, To]) []To {
 	return result
 }
 
-// Filter creates a slice containing only the filtered elements
-func Filter[T any, TS ~[]T](elements TS, filter c.Predicate[T]) []T {
-	return it.Slice[T](slice.Filter(elements, filter))
+// MapFit additionally filters 'From' elements.
+func MapFit[From, To any, FS ~[]From](elements FS, fit c.Predicate[From], by c.Converter[From, To]) []To {
+	result := make([]To, 0)
+	for _, e := range elements {
+		if fit(e) {
+			result = append(result, by(e))
+		}
+	}
+	return result
 }
 
 // Flatt unfolds the n-dimensional slice into a n-1 dimensional slice
 func Flatt[From, To any, FS ~[]From](elements FS, by c.Flatter[From, To]) []To {
-	return it.Slice[To](slice.Flatt(elements, by))
+	result := make([]To, 0)
+	for _, e := range elements {
+		result = append(result, by(e)...)
+
+	}
+	return result
+}
+
+// FlattFit additionally filters 'From' elements.
+func FlattFit[From, To any, FS ~[]From](elements FS, fit c.Predicate[From], by c.Flatter[From, To]) []To {
+	result := make([]To, 0)
+	for _, e := range elements {
+		if fit(e) {
+			result = append(result, by(e)...)
+		}
+	}
+	return result
+}
+
+// FlattElemFit unfolds the n-dimensional slice into a n-1 dimensional slice with additinal filtering of 'To' elements.
+func FlattElemFit[From, To any, FS ~[]From](elements FS, by c.Flatter[From, To], fit c.Predicate[To]) []To {
+	result := make([]To, 0)
+	for _, e := range elements {
+		for _, to := range by(e) {
+			if fit(to) {
+				result = append(result, to)
+			}
+		}
+	}
+	return result
+}
+
+// FlattElemFit unfolds the n-dimensional slice into a n-1 dimensional slice with additinal filtering of 'From' and 'To' elements.
+func FlattFitFit[From, To any, FS ~[]From](elements FS,  fitFrom c.Predicate[From], by c.Flatter[From, To], fitTo c.Predicate[To]) []To {
+	result := make([]To, 0)
+	for _, e := range elements {
+		if fitFrom(e) {
+		for _, to := range by(e) {
+			if fitTo(to) {
+				result = append(result, to)
+			}
+		}
+	}
+	}
+	return result
+}
+
+// Filter creates a slice containing only the filtered elements
+func Filter[T any, TS ~[]T](elements TS, filter c.Predicate[T]) []T {
+	result := make([]T, 0)
+	for _, e := range elements {
+		if filter(e) {
+			result = append(result, e)
+		}
+	}
+	return result
 }
 
 // Range generates a sclice of integers in the range defined by from and to inclusive.
@@ -100,7 +160,7 @@ func Reverse[T any, TS ~[]T](elements TS) []T {
 	return elements
 }
 
-// Sort sorts elements in place by applying the less function
+// Sort sorts elements in place by applying the function 'less'
 func Sort[T any, TS ~[]T](elements TS, less func(e1, e2 T) bool) []T {
 	sort.Slice(elements, func(i, j int) bool { return less(elements[i], elements[j]) })
 	return elements
@@ -111,7 +171,7 @@ func SortByOrdered[T any, o constraints.Ordered, TS ~[]T](elements TS, by c.Conv
 	return Sort(elements, func(e1, e2 T) bool { return by(e1) < by(e2) })
 }
 
-// Reduce reduces elements to an one.
+// Reduce reduces elements to an one
 func Reduce[T any, TS ~[]T](elements TS, by op.Binary[T]) T {
 	var result T
 	for i, v := range elements {
@@ -124,7 +184,7 @@ func Reduce[T any, TS ~[]T](elements TS, by op.Binary[T]) T {
 	return result
 }
 
-// Get returns an element from elements by index, otherwise, if the provided index is ouf of the elements, returns zero T and false in the second result
+// Get returns an element from the elements by index, otherwise, if the provided index is ouf of the elements, returns zero T and false in the second result
 func Get[T any, TS ~[]T](elements TS, index int) (T, bool) {
 	l := len(elements)
 	if l > 0 && (index >= 0 || index < l) {
@@ -146,14 +206,14 @@ func Track[T any, TS ~[]T](elements TS, tracker func(int, T) error) error {
 	return nil
 }
 
-// TrackEach applies tracker to elements without error checking.
+// TrackEach applies tracker to elements without error checking
 func TrackEach[T any, TS ~[]T](elements TS, tracker func(int, T)) {
 	for i, e := range elements {
 		tracker(i, e)
 	}
 }
 
-// For applies walker to elements. To stop walking just return the ErrBreak.
+// For applies walker to elements. To stop walking just return the ErrBreak
 func For[T any, TS ~[]T](elements TS, walker func(T) error) error {
 	for _, e := range elements {
 		if err := walker(e); err != ErrBreak {
@@ -165,7 +225,7 @@ func For[T any, TS ~[]T](elements TS, walker func(T) error) error {
 	return nil
 }
 
-// ForEach applies walker to elements without error checking.
+// ForEach applies walker to elements without error checking
 func ForEach[T any, TS ~[]T](elements TS, walker func(T)) {
 	for _, e := range elements {
 		walker(e)

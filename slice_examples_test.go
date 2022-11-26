@@ -1,6 +1,7 @@
 package examples
 
 import (
+	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -38,12 +39,31 @@ func Test_Reverse(t *testing.T) {
 	assert.Equal(t, []int{-1, 0, 1, 2, 3}, reverse.Of([]int{3, 2, 1, 0, -1}))
 }
 
+func Test_Convert(t *testing.T) {
+	s := slice.Of(1, 3, 5, 7, 9, 11)
+	r := slice.Map(s, strconv.Itoa)
+	assert.Equal(t, []string{"1", "3", "5", "7", "9", "11"}, r)
+}
+
 var even = func(v int) bool { return v%2 == 0 }
+
+func Test_ConvertFiltered(t *testing.T) {
+	s := slice.Of(1, 3, 4, 5, 7, 8, 9, 11)
+	r := slice.MapFit(s, even, strconv.Itoa)
+	assert.Equal(t, []string{"4", "8"}, r)
+}
 
 func Test_Slice_Filter(t *testing.T) {
 	s := []int{1, 2, 3, 4, 5, 6}
 	f := slice.Filter(s, even)
 	e := []int{2, 4, 6}
+	assert.Equal(t, e, f)
+}
+
+func Test_Flatt(t *testing.T) {
+	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
+	f := slice.Flatt(md, func(i []int) []int { return i })
+	e := []int{1, 2, 3, 4, 5, 6}
 	assert.Equal(t, e, f)
 }
 

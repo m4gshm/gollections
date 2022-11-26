@@ -33,6 +33,48 @@ func Test_Convert(t *testing.T) {
 	assert.Equal(t, []string{"1", "3", "5", "7", "9", "11"}, r)
 }
 
+var even = func(v int) bool { return v%2 == 0 }
+
+func Test_ConvertFiltered(t *testing.T) {
+	s := slice.Of(1, 3, 4, 5, 7, 8, 9, 11)
+	r := slice.MapFit(s, even, strconv.Itoa)
+	assert.Equal(t, []string{"4", "8"}, r)
+}
+
+func Test_Flatt(t *testing.T) {
+	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
+	f := slice.Flatt(md, func(i []int) []int { return i })
+	e := []int{1, 2, 3, 4, 5, 6}
+	assert.Equal(t, e, f)
+}
+
+func Test_FlattFilter(t *testing.T) {
+	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
+	f := slice.FlattFit(md, func(from []int) bool { return len(from) > 1 }, func(i []int) []int { return i })
+	e := []int{1, 2, 3, 5, 6}
+	assert.Equal(t, e, f)
+}
+
+func Test_FlattElemFilter(t *testing.T) {
+	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
+	f := slice.FlattElemFit(md, func(i []int) []int { return i }, even)
+	e := []int{2, 4, 6}
+	assert.Equal(t, e, f)
+}
+
+func Test_FlattFitFit(t *testing.T) {
+	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
+	f := slice.FlattFitFit(md, func(from []int) bool { return len(from) > 1 }, func(i []int) []int { return i }, even)
+	e := []int{2, 6}
+	assert.Equal(t, e, f)
+}
+
+func Test_Filter(t *testing.T) {
+	s := slice.Of(1, 3, 4, 5, 7, 8, 9, 11)
+	r := slice.Filter(s, even)
+	assert.Equal(t, slice.Of(4, 8), r)
+}
+
 func Test_StringRepresentation(t *testing.T) {
 	var (
 		expected = fmt.Sprint(slice.Of(1, 2, 3, 4))
