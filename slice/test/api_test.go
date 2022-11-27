@@ -2,8 +2,10 @@ package test
 
 import (
 	"fmt"
+	"reflect"
 	"strconv"
 	"testing"
+	"unsafe"
 
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
@@ -124,3 +126,42 @@ func Test_Filtering(t *testing.T) {
 	r := slice.Filter([]int{1, 2, 3, 4, 5, 6}, func(i int) bool { return i%2 == 0 })
 	assert.Equal(t, []int{2, 4, 6}, r)
 }
+
+func Test_BehaveAsStrings(t *testing.T) {
+	type TypeBasedOnString string
+	type ArrayTypeBasedOnString []TypeBasedOnString
+
+	vals := ArrayTypeBasedOnString{"1", "2", "3"}
+	strs := slice.BehaveAsStrings(vals)
+
+	assert.Equal(t, []string{"1", "2", "3"}, strs)
+	pvals := unsafe.Pointer((*reflect.SliceHeader)(unsafe.Pointer(&vals)).Data)
+	pstrs := unsafe.Pointer((*reflect.SliceHeader)(unsafe.Pointer(&strs)).Data)
+	assert.Equal(t, pvals, pstrs)
+}
+
+func Test_StringsBehaveAs(t *testing.T) {
+	type TypeBasedOnString string
+	type ArrayTypeBasedOnString []TypeBasedOnString
+
+	vals := []string{"1", "2", "3"}
+	strs := slice.StringsBehaveAs[ArrayTypeBasedOnString](vals)
+
+	assert.Equal(t, ArrayTypeBasedOnString{"1", "2", "3"}, strs)
+	pvals := unsafe.Pointer((*reflect.SliceHeader)(unsafe.Pointer(&vals)).Data)
+	pstrs := unsafe.Pointer((*reflect.SliceHeader)(unsafe.Pointer(&strs)).Data)
+	assert.Equal(t, pvals, pstrs)
+}
+
+func Test_StringsBehaveAs2(t *testing.T) {
+	type TypeBasedOnString string
+
+	vals := []string{"1", "2", "3"}
+	strs := slice.StringsBehaveAs[[]TypeBasedOnString](vals)
+
+	assert.Equal(t, []TypeBasedOnString{"1", "2", "3"}, strs)
+	pvals := unsafe.Pointer((*reflect.SliceHeader)(unsafe.Pointer(&vals)).Data)
+	pstrs := unsafe.Pointer((*reflect.SliceHeader)(unsafe.Pointer(&strs)).Data)
+	assert.Equal(t, pvals, pstrs)
+}
+

@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	"sort"
+	"unsafe"
 
 	"golang.org/x/exp/constraints"
 
@@ -307,3 +308,17 @@ func ToStringRefsf[T any, TS ~[]*T](references TS, elementFormat, nilValue, deli
 	str.WriteString("]")
 	return str.String()
 }
+
+func BehaveAsStrings[T ~string, TS ~[]T](elements TS) []string {
+	ptr := unsafe.Pointer(&elements)
+	s := *(*[]string)(ptr)
+	return s
+}
+
+func StringsBehaveAs[ TS ~[]T, T ~string](elements []string) TS {
+	ptr := unsafe.Pointer(&elements)
+	s := *(*TS)(ptr)
+	return s
+}
+
+
