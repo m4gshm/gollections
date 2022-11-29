@@ -7,12 +7,13 @@ import (
 	"testing"
 	"unsafe"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/first"
 	"github.com/m4gshm/gollections/slice/last"
 	"github.com/m4gshm/gollections/slice/range_"
-	"github.com/stretchr/testify/assert"
 )
 
 func Test_Range(t *testing.T) {
@@ -165,3 +166,25 @@ func Test_StringsBehaveAs2(t *testing.T) {
 	assert.Equal(t, pvals, pstrs)
 }
 
+type rows[T any] struct {
+	in     []T
+	cursor int
+}
+
+func (r *rows[T]) hasNext() bool {
+	return r.cursor < len(r.in)
+}
+
+func (r *rows[T]) next() (T, error) {
+	e := r.in[r.cursor]
+	r.cursor++
+	return e, nil
+}
+
+func Test_Build(t *testing.T) {
+	stream := &rows[int]{slice.Of(1, 2, 3), 0}
+
+	result, _ := slice.Build(stream, (*rows[int]).hasNext, (*rows[int]).next)
+
+	assert.Equal(t, slice.Of(1, 2, 3), result)
+}

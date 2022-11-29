@@ -20,6 +20,21 @@ var ErrBreak = it.ErrBreak
 // Of is generic slice constructor
 func Of[T any](elements ...T) []T { return elements }
 
+// Build builds a slice from a source.
+// The hasElement specifies a predicate that tests existing of an element in the source.
+// The getElement extracts the element.
+func Build[S, T any](source S, hasElement func(S) bool, getElement func(S) (T, error)) ([]T, error) {
+	r := []T{}
+	for hasElement(source) {
+		o, err := getElement(source)
+		if err != nil {
+			return nil, err
+		}
+		r = append(r, o)
+	}
+	return r, nil
+}
+
 // Clone makes new slice instance with copied elements.
 func Clone[T any, TS ~[]T](elements TS) []T {
 	copied := make([]T, len(elements))
@@ -315,10 +330,8 @@ func BehaveAsStrings[T ~string, TS ~[]T](elements TS) []string {
 	return s
 }
 
-func StringsBehaveAs[ TS ~[]T, T ~string](elements []string) TS {
+func StringsBehaveAs[TS ~[]T, T ~string](elements []string) TS {
 	ptr := unsafe.Pointer(&elements)
 	s := *(*TS)(ptr)
 	return s
 }
-
-
