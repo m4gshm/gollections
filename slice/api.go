@@ -20,17 +20,31 @@ var ErrBreak = it.ErrBreak
 // Of is generic slice constructor
 func Of[T any](elements ...T) []T { return elements }
 
-// Build builds a slice from a source.
-// The hasElement specifies a predicate that tests existing of an element in the source.
-// The getElement extracts the element.
-func Build[S, T any](source S, hasElement func(S) bool, getElement func(S) (T, error)) ([]T, error) {
+// OfLoop builds a slice by iterating elements of a source.
+// The hasNext specifies a predicate that tests existing of a next element in the source.
+// The getNext extracts the element.
+func OfLoop[S, T any](source S, hasNext func(S) bool, getNext func(S) (T, error)) ([]T, error) {
 	r := []T{}
-	for hasElement(source) {
-		o, err := getElement(source)
+	for hasNext(source) {
+		o, err := getNext(source)
 		if err != nil {
-			return nil, err
+			return r, err
 		}
 		r = append(r, o)
+	}
+	return r, nil
+}
+
+// OfLoop builds a slice by an generator function.
+// The generator returns an element, or false if the generation is over, or an error.
+func Generate[T any](next func() (T, bool, error)) ([]T, error) {
+	r := []T{}
+	for  {
+		e, ok, err := next()
+		if err != nil || !ok {
+			return r, err
+		}
+		r = append(r, e)
 	}
 	return r, nil
 }

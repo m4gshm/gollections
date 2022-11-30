@@ -181,10 +181,20 @@ func (r *rows[T]) next() (T, error) {
 	return e, nil
 }
 
-func Test_Build(t *testing.T) {
+func Test_OfLoop(t *testing.T) {
 	stream := &rows[int]{slice.Of(1, 2, 3), 0}
+	result, _ := slice.OfLoop(stream, (*rows[int]).hasNext, (*rows[int]).next)
 
-	result, _ := slice.Build(stream, (*rows[int]).hasNext, (*rows[int]).next)
+	assert.Equal(t, slice.Of(1, 2, 3), result)
+}
+
+func Test_Generate(t *testing.T) {
+	counter := 0
+	result, _ := slice.Generate(func() (int, bool, error) {
+		counter++
+		return counter, counter < 4, nil
+
+	})
 
 	assert.Equal(t, slice.Of(1, 2, 3), result)
 }
