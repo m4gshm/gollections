@@ -17,10 +17,6 @@ func (s Fit[T, IT]) Next() (T, bool) {
 	return nextFiltered(s.iter, s.by)
 }
 
-func (s Fit[T, IT]) Cap() int {
-	return s.iter.Cap()
-}
-
 // FitKV is the KVIterator wrapper that provides filtering of key/value elements by a Predicate.
 type FitKV[K, V any, IT c.KVIterator[K, V]] struct {
 	iter IT
@@ -34,10 +30,6 @@ var (
 
 func (s FitKV[K, V, IT]) Next() (K, V, bool) {
 	return nextFilteredKV(s.iter, s.by)
-}
-
-func (s FitKV[K, V, IT]) Cap() int {
-	return s.iter.Cap()
 }
 
 func nextFiltered[T any, IT c.Iterator[T]](iter IT, filter c.Predicate[T]) (T, bool) {

@@ -47,10 +47,6 @@ func (s *FlattenFit[From, To, IT]) Next() (To, bool) {
 	}
 }
 
-func (s *FlattenFit[From, To, IT]) Cap() int {
-	return s.iter.Cap()
-}
-
 // Flatten is the Iterator wrapper that converts an element to a slice and iterates over the elements of that slice.
 // For example, Flatten can be used to iterate over all the elements of a multi-dimensional array as if it were a one-dimensional array ([][]int -> []int).
 type Flatten[From, To any, IT c.Iterator[From]] struct {
@@ -87,8 +83,4 @@ func (s *Flatten[From, To, IT]) Next() (To, bool) {
 			return *(*To)(notsafe.GetArrayElemRef(s.arrayTo, 0, s.elemSizeTo)), true
 		}
 	}
-}
-
-func (s *Flatten[From, To, IT]) Cap() int {
-	return s.iter.Cap()
 }

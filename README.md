@@ -10,6 +10,12 @@ Supports Go version 1.18 or higher.
 go get -u github.com/m4gshm/gollections
 ```
 
+or 
+
+```bash
+go get -u github.com/m4gshm/gollections@HEAD
+```
+
 ## [Slice API](./slice/api.go)
 
 The package provides various functions useful with slices.

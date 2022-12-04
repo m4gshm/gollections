@@ -41,10 +41,6 @@ func (s *IterPipe[T]) Begin() c.Iterator[T] {
 	return s.it
 }
 
-func (s *IterPipe[T]) Cap() int {
-	return s.it.Cap()
-}
-
 func (s *IterPipe[T]) Collect() []T {
 	e := s.elements
 	if e == nil {

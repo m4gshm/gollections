@@ -25,7 +25,3 @@ func (s *KeyValuer[K, V, IT]) Next() (K, V, bool) {
 	k := s.getKey(v)
 	return k, v, true
 }
-
-func (s *KeyValuer[K, V, IT]) Cap() int {
-	return s.iter.Cap()
-}

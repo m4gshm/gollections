@@ -13,6 +13,14 @@ func Of[T any](elements ...T) c.Iterator[T] {
 	return &iter
 }
 
+// OfLoop creates an IteratorBreakable instance that loops over elements of a source.
+// The hasNext specifies a predicate that tests existing of a next element in the source.
+// The getNext extracts the element.
+func OfLoop[S, T any](source S, hasNext func(S) bool, getNext func(S) (T, error)) c.IteratorBreakable[T] {
+	iter := it.NewLoop(source, hasNext, getNext)
+	return &iter
+}
+
 // Wrap instantiates Iterator using sclie as the elements source.
 func Wrap[T any, TS ~[]T](elements TS) c.Iterator[T] {
 	iter := it.NewHead(elements)

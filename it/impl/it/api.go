@@ -114,7 +114,16 @@ func ReduceKV[K, V any, IT c.KVIterator[K, V]](elements IT, by c.Quaternary[K, V
 
 // Slice converts an Iterator to a slice.
 func Slice[T any, IT c.Iterator[T]](elements IT) []T {
-	s := make([]T, 0, elements.Cap())
+	var s []T
+	a := any(elements)
+
+	if sized, ok := a.(c.Sized); !ok {
+		s = make([]T, 0)
+	} else if cap := sized.Cap(); cap > 0 {
+		s = make([]T, 0, cap)
+	} else {
+		s = make([]T, 0)
+	}
 	for v, ok := elements.Next(); ok; v, ok = elements.Next() {
 		s = append(s, v)
 	}

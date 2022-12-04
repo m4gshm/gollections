@@ -1,6 +1,7 @@
 package it
 
 import (
+	"errors"
 	"fmt"
 	"testing"
 
@@ -190,4 +191,39 @@ func Test_First(t *testing.T) {
 
 	_, nook := it.First(s, func(i int) bool { return i > 12 })
 	assert.False(t, nook)
+}
+
+type rows[T any] struct {
+	in     []T
+	cursor int
+}
+
+func (r *rows[T]) hasNext() bool {
+	return r.cursor < len(r.in)
+}
+
+func (r *rows[T]) next() (T, error) {
+	e := r.in[r.cursor]
+	r.cursor++
+	if r.cursor > 3 {
+		var no T
+		return no, errors.New("next error")
+	}
+	return e, nil
+}
+
+func Test_OfLoop(t *testing.T) {
+	stream := &rows[int]{slice.Of(1, 2, 3), 0}
+	iter := it.OfLoop(stream, (*rows[int]).hasNext, (*rows[int]).next)
+	s := it.Slice[int](iter)
+
+	assert.Equal(t, slice.Of(1, 2, 3), s)
+	assert.Nil(t, iter.Error())
+
+	streamWithError := &rows[int]{slice.Of(1, 2, 3, 4), 0}
+	iterWithError := it.OfLoop(streamWithError, (*rows[int]).hasNext, (*rows[int]).next)
+	s2 := it.Slice[int](iterWithError)
+
+	assert.Equal(t, slice.Of(1, 2, 3), s2)
+	assert.Equal(t, "next error", iterWithError.Error().Error())
 }

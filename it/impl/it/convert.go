@@ -22,10 +22,6 @@ func (s ConvertFit[From, To, IT]) Next() (To, bool) {
 	return no, false
 }
 
-func (s ConvertFit[From, To, IT]) Cap() int {
-	return s.iter.Cap()
-}
-
 // Convert is the iterator wrapper implementation applying a converter to all iterable elements.
 type Convert[From, To any, IT c.Iterator[From], C c.Converter[From, To]] struct {
 	iter IT
@@ -43,10 +39,6 @@ func (s Convert[From, To, IT, C]) Next() (To, bool) {
 	}
 	var no To
 	return no, false
-}
-
-func (s Convert[From, To, IT, C]) Cap() int {
-	return s.iter.Cap()
 }
 
 // ConvertKV is the iterator wrapper implementation applying a converter to all iterable key/value elements.
@@ -68,8 +60,4 @@ func (s ConvertKV[K, V, IT, K2, V2, C]) Next() (K2, V2, bool) {
 	var k2 K2
 	var v2 V2
 	return k2, v2, false
-}
-
-func (s ConvertKV[K, V, IT, K2, V2, C]) Cap() int {
-	return s.iter.Cap()
 }

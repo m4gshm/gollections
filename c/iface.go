@@ -45,7 +45,7 @@ type Set[T any] interface {
 	Checkable[T]
 }
 
-// Map - collection interface that stores key/value pairs and provide access to an element by its key.
+// Map - collection interface that stores key/value pairs and provide access to an element by its key
 type Map[K comparable, V any] interface {
 	Collection[KV[K, V], map[K]V, KVIterator[K, V]]
 	Track[V, K]
@@ -57,12 +57,23 @@ type Map[K comparable, V any] interface {
 	Values() Collection[V, []V, Iterator[V]]
 }
 
-// Iterator is the interface that provides iterate over elements of a collection.
+// Iterator is the interface that provides iterate over elements of a collection
 type Iterator[T any] interface {
-	//retrieves a next element and true or zero value of T and false if no more elements.
+	// retrieves a next element and true or zero value of T and false if no more elements
 	Next() (T, bool)
-	//returns an estimated internal storage capacity
+}
+
+// Sized - storage interface with measurable capacity
+type Sized interface {
+	// returns an estimated internal storage capacity or -1 if the capacity cannot be calculated
 	Cap() int
+}
+
+// IteratorBreakable is the interface that provides iterate over elements of a source, where an iteration can be interrupted by an error.
+type IteratorBreakable[T any] interface {
+	Iterator[T]
+	//returns an iteration abort error
+	Error() error
 }
 
 // PrevIterator is the Iterator that provides reverse iteration over elements of a collection.
@@ -82,7 +93,6 @@ type DelIterator[T any] interface {
 type KVIterator[K, V any] interface {
 	//retrieves next elements or zero values if no more elements
 	Next() (K, V, bool)
-	Cap() int
 }
 
 // Iterable is an iterator supplier interface
