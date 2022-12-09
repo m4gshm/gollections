@@ -39,7 +39,7 @@ func OfLoop[S, T any](source S, hasNext func(S) bool, getNext func(S) (T, error)
 // The generator returns an element, or false if the generation is over, or an error.
 func Generate[T any](next func() (T, bool, error)) ([]T, error) {
 	r := []T{}
-	for  {
+	for {
 		e, ok, err := next()
 		if err != nil || !ok {
 			return r, err
@@ -84,12 +84,32 @@ func Map[From, To any, FS ~[]From](elements FS, by c.Converter[From, To]) []To {
 	return result
 }
 
+// MapIndex creates a slice consisting of the transformed elements using the converter 'by'
+func MapIndex[From, To any, FS ~[]From](elements FS, by func(index int, from From) To) []To {
+	result := make([]To, len(elements))
+	for i, e := range elements {
+		result[i] = by(i, e)
+	}
+	return result
+}
+
 // MapFit additionally filters 'From' elements.
 func MapFit[From, To any, FS ~[]From](elements FS, fit c.Predicate[From], by c.Converter[From, To]) []To {
 	result := make([]To, 0)
 	for _, e := range elements {
 		if fit(e) {
 			result = append(result, by(e))
+		}
+	}
+	return result
+}
+
+// MapFitIndex additionally filters 'From' elements.
+func MapFitIndex[From, To any, FS ~[]From](elements FS, fit c.Predicate[From], by func(index int, from From) To) []To {
+	result := make([]To, 0)
+	for i, e := range elements {
+		if fit(e) {
+			result = append(result, by(i, e))
 		}
 	}
 	return result

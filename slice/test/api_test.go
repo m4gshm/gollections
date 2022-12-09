@@ -64,12 +64,24 @@ func Test_Convert(t *testing.T) {
 	assert.Equal(t, []string{"1", "3", "5", "7", "9", "11"}, r)
 }
 
+func Test_ConvertWithIndex(t *testing.T) {
+	s := slice.Of(1, 3, 5, 7, 9, 11)
+	r := slice.MapIndex(s, func(index int, elem int) int { return index + elem })
+	assert.Equal(t, slice.Of(1, 1+3, 2+5, 3+7, 4+9, 5+11), r)
+}
+
 var even = func(v int) bool { return v%2 == 0 }
 
 func Test_ConvertFiltered(t *testing.T) {
 	s := slice.Of(1, 3, 4, 5, 7, 8, 9, 11)
 	r := slice.MapFit(s, even, strconv.Itoa)
 	assert.Equal(t, []string{"4", "8"}, r)
+}
+
+func Test_ConvertFilteredWithIndex(t *testing.T) {
+	s := slice.Of(1, 3, 4, 5, 7, 8, 9, 11)
+	r := slice.MapFitIndex(s, even, func(index int, elem int) string { return strconv.Itoa(index + elem) })
+	assert.Equal(t, []string{"6", "13"}, r)
 }
 
 func Test_Flatt(t *testing.T) {
