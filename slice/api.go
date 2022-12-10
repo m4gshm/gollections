@@ -105,7 +105,7 @@ func MapFit[From, To any, FS ~[]From](elements FS, fit c.Predicate[From], by c.C
 }
 
 // MapFitIndex additionally filters 'From' elements.
-func MapFitIndex[From, To any, FS ~[]From](elements FS, fit  func(index int, from From) bool, by func(index int, from From) To) []To {
+func MapFitIndex[From, To any, FS ~[]From](elements FS, fit func(index int, from From) bool, by func(index int, from From) To) []To {
 	result := make([]To, 0)
 	for i, e := range elements {
 		if fit(i, e) {
