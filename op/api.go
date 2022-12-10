@@ -17,16 +17,24 @@ func Sub[T c.Number](a T, b T) T {
 
 // Max returns the maximum from two operands
 func Max[T constraints.Ordered](a T, b T) T {
-	if a < b {
-		return b
-	}
-	return a
+	return IfElse(a < b, b, a)
 }
 
 // Min returns the minimum from two operands
 func Min[T constraints.Ordered](a T, b T) T {
-	if a > b {
-		return b
+	return IfElse(a > b, b, a)
+}
+
+func IfElse[T any](ok bool, tru, fal T) T {
+	if ok {
+		return tru
 	}
-	return a
+	return fal
+}
+
+func IfDoElse[T any](ok bool, tru, fal func() T) T {
+	if ok {
+		return tru()
+	}
+	return fal()
 }
