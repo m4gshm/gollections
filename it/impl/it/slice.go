@@ -5,6 +5,7 @@ import (
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/notsafe"
+	"github.com/m4gshm/gollections/ptr"
 )
 
 // NoStarted is the head Iterator position.
@@ -12,8 +13,7 @@ const NoStarted = -1
 
 // New instantiates Iter based on elements Iter and returs its reference
 func New[T any, TS ~[]T](elements TS) *Iter[T] {
-	iter := NewHeadS(elements, notsafe.GetTypeSize[T]())
-	return &iter
+	return ptr.Of(NewHeadS(elements, notsafe.GetTypeSize[T]()))
 }
 
 // NewHead instantiates Iter based on elements slice

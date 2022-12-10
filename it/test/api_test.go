@@ -13,6 +13,7 @@ import (
 	impl "github.com/m4gshm/gollections/it/impl/it"
 	sliceit "github.com/m4gshm/gollections/it/slice"
 	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/ptr"
 	"github.com/m4gshm/gollections/slice"
 )
 
@@ -155,8 +156,7 @@ func Test_Iterate(t *testing.T) {
 		values[i] = i
 	}
 
-	iter := impl.NewHead(values)
-	stream := impl.NewPipe[int](&iter)
+	stream := impl.NewPipe[int](ptr.Of(impl.NewHead(values)))
 
 	result := make([]int, 0)
 

@@ -4,6 +4,7 @@ import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/it/impl/it"
+	"github.com/m4gshm/gollections/ptr"
 )
 
 // Map instantiates Iterator that converts elements with a converter and returns them
@@ -18,14 +19,12 @@ func MapFit[From, To any, IT c.Iterable[c.Iterator[From]]](elements IT, fit c.Pr
 
 // Flatt instantiates Iterator that extracts slices of 'To' by a Flatter from elements of 'From' and flattens as one iterable collection of 'To' elements.
 func Flatt[From, To any, IT c.Iterable[c.Iterator[From]]](elements IT, by c.Flatter[From, To]) c.Iterator[To] {
-	iter := it.Flatt(elements.Begin(), by)
-	return &iter
+	return ptr.Of(it.Flatt(elements.Begin(), by))
 }
 
 // FlattFit additionally filters 'From' elements.
 func FlattFit[From, To any, IT c.Iterable[c.Iterator[From]]](elements IT, fit c.Predicate[From], flatt c.Flatter[From, To]) c.Iterator[To] {
-	iter := it.FlattFit(elements.Begin(), fit, flatt)
-	return &iter
+	return ptr.Of(it.FlattFit(elements.Begin(), fit, flatt))
 }
 
 // Filter instantiates Iterator that checks elements by filters and returns successful ones.

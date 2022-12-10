@@ -6,6 +6,7 @@ import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/map_"
+	"github.com/m4gshm/gollections/ptr"
 	"github.com/m4gshm/gollections/slice"
 )
 
@@ -27,8 +28,7 @@ var (
 )
 
 func (s MapKeys[K, V]) Begin() c.Iterator[K] {
-	iter := s.Head()
-	return &iter
+	return ptr.Of(s.Head())
 }
 
 func (s MapKeys[K, V]) Head() it.Key[K, V] {

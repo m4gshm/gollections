@@ -6,6 +6,7 @@ import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/notsafe"
+	"github.com/m4gshm/gollections/ptr"
 	"github.com/m4gshm/gollections/slice"
 )
 
@@ -33,8 +34,7 @@ var (
 )
 
 func (v Vector[T]) Begin() c.Iterator[T] {
-	iter := v.Head()
-	return &iter
+	return ptr.Of(v.Head())
 }
 
 func (v Vector[T]) Head() it.Iter[T] {
@@ -94,18 +94,15 @@ func (v Vector[T]) ForEach(walker func(T)) {
 }
 
 func (v Vector[T]) Filter(filter c.Predicate[T]) c.Pipe[T, []T] {
-	iter := v.Head()
-	return it.NewPipe[T](it.Filter(&iter, filter))
+	return it.NewPipe[T](it.Filter(ptr.Of(v.Head()), filter))
 }
 
 func (v Vector[T]) Map(by c.Converter[T, T]) c.Pipe[T, []T] {
-	iter := v.Head()
-	return it.NewPipe[T](it.Map(&iter, by))
+	return it.NewPipe[T](it.Map(ptr.Of(v.Head()), by))
 }
 
 func (v Vector[T]) Reduce(by c.Binary[T]) T {
-	iter := v.Head()
-	return it.Reduce(&iter, by)
+	return it.Reduce(ptr.Of(v.Head()), by)
 }
 
 func (v Vector[T]) Sort(less func(e1, e2 T) bool) Vector[T] {

@@ -7,6 +7,7 @@ import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/notsafe"
+	"github.com/m4gshm/gollections/ptr"
 	"github.com/m4gshm/gollections/slice"
 )
 
@@ -38,13 +39,11 @@ var (
 )
 
 func (v *Vector[T]) Begin() c.Iterator[T] {
-	iter := v.Head()
-	return &iter
+	return ptr.Of(v.Head())
 }
 
 func (v *Vector[T]) BeginEdit() c.DelIterator[T] {
-	iter := v.Head()
-	return &iter
+	return ptr.Of(v.Head())
 }
 
 func (v *Vector[T]) Head() Iter[T, Vector[T]] {
@@ -199,18 +198,15 @@ func (v *Vector[T]) Set(index int, value T) bool {
 }
 
 func (v *Vector[T]) Filter(filter c.Predicate[T]) c.Pipe[T, []T] {
-	iter := v.Head()
-	return it.NewPipe[T](it.Filter(&iter, filter))
+	return it.NewPipe[T](it.Filter(ptr.Of(v.Head()), filter))
 }
 
 func (v *Vector[T]) Map(by c.Converter[T, T]) c.Pipe[T, []T] {
-	iter := v.Head()
-	return it.NewPipe[T](it.Map(&iter, by))
+	return it.NewPipe[T](it.Map(ptr.Of(v.Head()), by))
 }
 
 func (v *Vector[T]) Reduce(by c.Binary[T]) T {
-	iter := v.Head()
-	return it.Reduce(&iter, by)
+	return it.Reduce(ptr.Of(v.Head()), by)
 }
 
 // Sotr sorts the Vector in-place and returns it.

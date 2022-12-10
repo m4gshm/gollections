@@ -18,6 +18,7 @@ import (
 	"github.com/m4gshm/gollections/mutable"
 	mvector "github.com/m4gshm/gollections/mutable/vector"
 	sop "github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/ptr"
 	"github.com/m4gshm/gollections/slice"
 )
 
@@ -169,8 +170,7 @@ func Benchmark_Map_Vector_Iterator_Impl(b *testing.B) {
 	var s []string
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		iter := items.Head()
-		s = iterimpl.Slice[string](iterimpl.Map(&iter, op))
+		s = iterimpl.Slice[string](iterimpl.Map(ptr.Of(items.Head()), op))
 	}
 	_ = s
 	b.StopTimer()

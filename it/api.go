@@ -5,26 +5,24 @@ import (
 	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/ptr"
 )
 
 // Of instantiates Iterator of predefined elements.
 func Of[T any](elements ...T) c.Iterator[T] {
-	iter := it.NewHead(elements)
-	return &iter
+	return ptr.Of(it.NewHead(elements))
 }
 
 // OfLoop creates an IteratorBreakable instance that loops over elements of a source.
 // The hasNext specifies a predicate that tests existing of a next element in the source.
 // The getNext extracts the element.
 func OfLoop[S, T any](source S, hasNext func(S) bool, getNext func(S) (T, error)) c.IteratorBreakable[T] {
-	iter := it.NewLoop(source, hasNext, getNext)
-	return &iter
+	return ptr.Of(it.NewLoop(source, hasNext, getNext))
 }
 
 // Wrap instantiates Iterator using sclie as the elements source.
 func Wrap[T any, TS ~[]T](elements TS) c.Iterator[T] {
-	iter := it.NewHead(elements)
-	return &iter
+	return ptr.Of(it.NewHead(elements))
 }
 
 // Map instantiates Iterator that converts elements with a converter and returns them
@@ -39,14 +37,12 @@ func MapFit[From, To any, IT c.Iterator[From]](elements IT, fit c.Predicate[From
 
 // Flatt instantiates Iterator that extracts slices of 'To' by a Flatter from elements of 'From' and flattens as one iterable collection of 'To' elements.
 func Flatt[From, To any, IT c.Iterator[From]](elements IT, by c.Flatter[From, To]) c.Iterator[To] {
-	iter := it.Flatt(elements, by)
-	return &iter
+	return ptr.Of(it.Flatt(elements, by))
 }
 
 // FlattFit additionally filters 'From' elements.
 func FlattFit[From, To any, IT c.Iterator[From]](elements IT, fit c.Predicate[From], flatt c.Flatter[From, To]) c.Iterator[To] {
-	iter := it.FlattFit(elements, fit, flatt)
-	return &iter
+	return ptr.Of(it.FlattFit(elements, fit, flatt))
 }
 
 // Filter instantiates Iterator that checks elements by a filter and returns successful ones.

@@ -5,6 +5,7 @@ import (
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/it/impl/it"
+	"github.com/m4gshm/gollections/ptr"
 	"github.com/m4gshm/gollections/slice"
 )
 
@@ -26,8 +27,7 @@ var (
 )
 
 func (s MapKeys[T]) Begin() c.Iterator[T] {
-	iter := s.Head()
-	return &iter
+	return ptr.Of(s.Head())
 }
 
 func (s MapKeys[T]) Head() it.Iter[T] {
@@ -70,18 +70,15 @@ func (s MapKeys[T]) Get(index int) (T, bool) {
 }
 
 func (s MapKeys[T]) Filter(filter c.Predicate[T]) c.Pipe[T, []T] {
-	iter := s.Head()
-	return it.NewPipe[T](it.Filter(&iter, filter))
+	return it.NewPipe[T](it.Filter(ptr.Of(s.Head()), filter))
 }
 
 func (s MapKeys[T]) Map(by c.Converter[T, T]) c.Pipe[T, []T] {
-	iter := s.Head()
-	return it.NewPipe[T](it.Map(&iter, by))
+	return it.NewPipe[T](it.Map(ptr.Of(s.Head()), by))
 }
 
 func (s MapKeys[T]) Reduce(by c.Binary[T]) T {
-	iter := s.Head()
-	return it.Reduce(&iter, by)
+	return it.Reduce(ptr.Of(s.Head()), by)
 }
 
 func (s MapKeys[T]) String() string {

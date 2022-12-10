@@ -7,6 +7,7 @@ import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/map_"
+	"github.com/m4gshm/gollections/ptr"
 	"github.com/m4gshm/gollections/slice"
 )
 
@@ -28,8 +29,7 @@ var (
 )
 
 func (s MapValues[K, V]) Begin() c.Iterator[V] {
-	iter := s.Head()
-	return &iter
+	return ptr.Of(s.Head())
 }
 
 func (s MapValues[K, V]) Head() it.Val[K, V] {
@@ -69,18 +69,15 @@ func (s MapValues[K, V]) ForEach(walker func(V)) {
 }
 
 func (s MapValues[K, V]) Filter(filter c.Predicate[V]) c.Pipe[V, []V] {
-	iter := s.Head()
-	return it.NewPipe[V](it.Filter(&iter, filter))
+	return it.NewPipe[V](it.Filter(ptr.Of(s.Head()), filter))
 }
 
 func (s MapValues[K, V]) Map(by c.Converter[V, V]) c.Pipe[V, []V] {
-	iter := s.Head()
-	return it.NewPipe[V](it.Map(&iter, by))
+	return it.NewPipe[V](it.Map(ptr.Of(s.Head()), by))
 }
 
 func (s MapValues[K, V]) Reduce(by c.Binary[V]) V {
-	iter := s.Head()
-	return it.Reduce(&iter, by)
+	return it.Reduce(ptr.Of(s.Head()), by)
 }
 
 func (s MapValues[K, V]) Sort(less func(e1, e2 V) bool) Vector[V] {
