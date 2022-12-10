@@ -80,7 +80,7 @@ func Test_ConvertFiltered(t *testing.T) {
 
 func Test_ConvertFilteredWithIndex(t *testing.T) {
 	s := slice.Of(1, 3, 4, 5, 7, 8, 9, 11)
-	r := slice.MapFitIndex(s, even, func(index int, elem int) string { return strconv.Itoa(index + elem) })
+	r := slice.MapFitIndex(s, func(_ int, elem int) bool { return even(elem) }, func(index int, elem int) string { return strconv.Itoa(index + elem) })
 	assert.Equal(t, []string{"6", "13"}, r)
 }
 
