@@ -84,6 +84,18 @@ func Test_ConvertFilteredWithIndex(t *testing.T) {
 	assert.Equal(t, []string{"6", "13"}, r)
 }
 
+func Test_ConvertFilteredInplace(t *testing.T) {
+	s := slice.Of(1, 3, 4, 5, 7, 8, 9, 11)
+	r := slice.MapCheck(s, func(i int) (string, bool) { return strconv.Itoa(i), even(i) })
+	assert.Equal(t, []string{"4", "8"}, r)
+}
+
+func Test_ConvertFilteredWithIndexInPlace(t *testing.T) {
+	s := slice.Of(1, 3, 4, 5, 7, 8, 9, 11)
+	r := slice.MapCheckIndex(s, func(index int, elem int) (string, bool) { return strconv.Itoa(index + elem), even(elem) })
+	assert.Equal(t, []string{"6", "13"}, r)
+}
+
 func Test_Flatt(t *testing.T) {
 	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
 	f := slice.Flatt(md, func(i []int) []int { return i })

@@ -84,15 +84,6 @@ func Map[From, To any, FS ~[]From](elements FS, by c.Converter[From, To]) []To {
 	return result
 }
 
-// MapIndex creates a slice consisting of the transformed elements using the converter 'by'
-func MapIndex[From, To any, FS ~[]From](elements FS, by func(index int, from From) To) []To {
-	result := make([]To, len(elements))
-	for i, e := range elements {
-		result[i] = by(i, e)
-	}
-	return result
-}
-
 // MapFit additionally filters 'From' elements.
 func MapFit[From, To any, FS ~[]From](elements FS, fit c.Predicate[From], by c.Converter[From, To]) []To {
 	result := make([]To, 0)
@@ -104,12 +95,44 @@ func MapFit[From, To any, FS ~[]From](elements FS, fit c.Predicate[From], by c.C
 	return result
 }
 
-// MapFitIndex additionally filters 'From' elements.
+
+// MapIndex creates a slice consisting of the transformed elements using the converter 'by' which additionally applies the index of the element being converted
+func MapIndex[From, To any, FS ~[]From](elements FS, by func(index int, from From) To) []To {
+	result := make([]To, len(elements))
+	for i, e := range elements {
+		result[i] = by(i, e)
+	}
+	return result
+}
+
+// MapFitIndex additionally filters 'From' elements
 func MapFitIndex[From, To any, FS ~[]From](elements FS, fit func(index int, from From) bool, by func(index int, from From) To) []To {
 	result := make([]To, 0)
 	for i, e := range elements {
 		if fit(i, e) {
 			result = append(result, by(i, e))
+		}
+	}
+	return result
+}
+
+// MapCheck is similar to MapFit, but it checks and transforms elements in place
+func MapCheck[From, To any, FS ~[]From](elements FS, by func(from From) (To, bool)) []To {
+	result := make([]To, 0)
+	for _, e := range elements {
+		if to, ok := by(e); ok {
+			result = append(result, to)
+		}
+	}
+	return result
+}
+
+// MapCheckIndex additionally filters 'From' elements
+func MapCheckIndex[From, To any, FS ~[]From](elements FS, by func(index int, from From) (To, bool)) []To {
+	result := make([]To, 0)
+	for i, e := range elements {
+		if to, ok := by(i, e); ok {
+			result = append(result, to)
 		}
 	}
 	return result
