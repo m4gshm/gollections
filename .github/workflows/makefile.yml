@@ -23,5 +23,5 @@ jobs:
       - name: run tests
         uses: docker://golang:1.18.0-bullseye
         with:
-          args: make build lint test
+          args: make build lint bench
 
