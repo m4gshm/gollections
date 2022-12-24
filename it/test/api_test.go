@@ -7,7 +7,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/m4gshm/gollections/K"
 	"github.com/m4gshm/gollections/check"
+	"github.com/m4gshm/gollections/collect"
 	"github.com/m4gshm/gollections/conv"
 	"github.com/m4gshm/gollections/it"
 	impl "github.com/m4gshm/gollections/it/impl/it"
@@ -226,4 +228,16 @@ func Test_OfLoop(t *testing.T) {
 
 	assert.Equal(t, slice.Of(1, 2, 3), s2)
 	assert.Equal(t, "next error", iterWithError.Error().Error())
+}
+
+func Test_ToKVIterConvert(t *testing.T) {
+	var (
+		iter   = it.Of(K.V("key1", 1), K.V("key2", 2))
+		kvIter = it.ToKVIter[string, int](iter)
+		m      = collect.Map(kvIter)
+	)
+
+	assert.Equal(t, 1, m["key1"])
+	assert.Equal(t, 2, m["key2"])
+
 }

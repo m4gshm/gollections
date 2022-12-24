@@ -48,15 +48,15 @@ func (s Set[T]) Begin() c.Iterator[T] {
 	return ptr.Of(s.Head())
 }
 
-func (s Set[T]) Head() it.Iter[T] {
+func (s Set[T]) Head() it.ArrayIter[T] {
 	return it.NewHeadS(s.order, s.esize)
 }
 
-func (s Set[T]) Revert() it.Iter[T] {
+func (s Set[T]) Revert() it.ArrayIter[T] {
 	return it.NewTailS(s.order, s.esize)
 }
 
-func (s Set[T]) First() (it.Iter[T], T, bool) {
+func (s Set[T]) First() (it.ArrayIter[T], T, bool) {
 	var (
 		iter      = it.NewHeadS(s.order, s.esize)
 		first, ok = iter.Next()
@@ -64,7 +64,7 @@ func (s Set[T]) First() (it.Iter[T], T, bool) {
 	return iter, first, ok
 }
 
-func (s Set[T]) Last() (it.Iter[T], T, bool) {
+func (s Set[T]) Last() (it.ArrayIter[T], T, bool) {
 	var (
 		iter      = it.NewTailS(s.order, s.esize)
 		first, ok = iter.Prev()

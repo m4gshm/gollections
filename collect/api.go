@@ -6,8 +6,8 @@ import "github.com/m4gshm/gollections/c"
 // Collector is Converter of Iterator that collects all values to any slice or map, mostly used to extract slice fields to flatting a result.
 type Collector[t any, out any] c.Converter[c.Iterator[t], out]
 
-// CollectorKV is Converter of key/value Iterator that collects all values to any slice or map, mostly used to extract slice fields to flatting a result.
-type CollectorKV[k, v any, out any] func(c.KVIterator[k, v]) out
+// KVCollector is Converter of key/value Iterator that collects all values to any slice or map, mostly used to extract slice fields to flatting a result.
+type KVCollector[k, v any, out any] func(c.KVIterator[k, v]) out
 
 // Map instantiates a map with the key/values obtained by passing over a key/value iterator.
 func Map[K comparable, V any](it c.KVIterator[K, V]) map[K]V {
@@ -18,8 +18,8 @@ func Map[K comparable, V any](it c.KVIterator[K, V]) map[K]V {
 	return e
 }
 
-// Groups collects sets of values grouped by keys obtained by passing a key/value iterator.
-func Groups[K comparable, V any](it c.KVIterator[K, V]) map[K][]V {
+// Group collects sets of values grouped by keys obtained by passing a key/value iterator.
+func Group[K comparable, V any](it c.KVIterator[K, V]) map[K][]V {
 	e := map[K][]V{}
 	for k, v, ok := it.Next(); ok; k, v, ok = it.Next() {
 		e[k] = append(e[k], v)

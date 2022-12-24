@@ -24,7 +24,7 @@ var (
 )
 
 func (i *SetIter[K]) Next() (K, bool) {
-	key, _, ok := i.KV.Next()
+	key, _, ok := i.EmbedMapKV.Next()
 	i.currentKey = key
 	i.ok = ok
 	return key, ok

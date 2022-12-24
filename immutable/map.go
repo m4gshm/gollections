@@ -53,7 +53,7 @@ func (s Map[K, V]) Begin() c.KVIterator[K, V] {
 }
 
 // Head creates a key/value iterator implementation started from the head.
-func (s Map[K, V]) Head() it.KV[K, V] {
+func (s Map[K, V]) Head() it.EmbedMapKV[K, V] {
 	return it.NewKV(s.elements)
 }
 

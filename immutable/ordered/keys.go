@@ -30,11 +30,11 @@ func (s MapKeys[T]) Begin() c.Iterator[T] {
 	return ptr.Of(s.Head())
 }
 
-func (s MapKeys[T]) Head() it.Iter[T] {
+func (s MapKeys[T]) Head() it.ArrayIter[T] {
 	return it.NewHead(s.elements)
 }
 
-func (s MapKeys[T]) First() (it.Iter[T], T, bool) {
+func (s MapKeys[T]) First() (it.ArrayIter[T], T, bool) {
 	var (
 		iter      = s.Head()
 		first, ok = iter.Next()

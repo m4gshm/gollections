@@ -2,26 +2,28 @@ package it
 
 import "github.com/m4gshm/gollections/c"
 
-// NewKeyValuer creates instance of the KeyValuer.
-func NewKeyValuer[K comparable, V any, IT c.Iterator[V]](iter IT, keyExtractor c.Converter[V, K]) *KeyValuer[K, V, IT] {
-	return &KeyValuer[K, V, IT]{iter: iter, getKey: keyExtractor}
+// NewKeyValuer creates instance of the KeyValuer
+func NewKeyValuer[T any, K comparable, V any, IT c.Iterator[T]](iter IT, keyExtractor c.Converter[T, K], valExtractor c.Converter[T, V]) *KeyValuer[T, K, V, IT] {
+	return &KeyValuer[T, K, V, IT]{iter: iter, getKey: keyExtractor, getVal: valExtractor}
 }
 
-// KeyValuer is the Iterator wrapper that converts a element to a key and iterates over the key/element pairs.
-type KeyValuer[K comparable, V any, IT c.Iterator[V]] struct {
+// KeyValuer is the Iterator wrapper that converts a element to a key\value pair and iterates over these pairs
+type KeyValuer[T any, K comparable, V any, IT c.Iterator[T]] struct {
 	iter   IT
-	getKey c.Converter[V, K]
+	getKey c.Converter[T, K]
+	getVal c.Converter[T, V]
 }
 
-var _ c.KVIterator[int, any] = (*KeyValuer[int, any, c.Iterator[any]])(nil)
+var _ c.KVIterator[int, string] = (*KeyValuer[any, int, string, c.Iterator[any]])(nil)
 
-func (s *KeyValuer[K, V, IT]) Next() (K, V, bool) {
-	v, ok := s.iter.Next()
+func (s *KeyValuer[T, K, V, IT]) Next() (K, V, bool) {
+	elem, ok := s.iter.Next()
 	if !ok {
 		var k K
 		var v V
 		return k, v, false
 	}
-	k := s.getKey(v)
+	k := s.getKey(elem)
+	v := s.getVal(elem)
 	return k, v, true
 }

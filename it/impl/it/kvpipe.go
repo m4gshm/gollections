@@ -6,14 +6,14 @@ import (
 )
 
 // NewKVPipe instantiates Iterator wrapper that converts the elements into key/value pairs and iterates over them.
-func NewKVPipe[K comparable, V any, C any, Iter c.KVIterator[K, V]](it Iter, collector collect.CollectorKV[K, V, C]) *KVIterPipe[K, V, C] {
+func NewKVPipe[K comparable, V any, C any, Iter c.KVIterator[K, V]](it Iter, collector collect.KVCollector[K, V, C]) *KVIterPipe[K, V, C] {
 	return &KVIterPipe[K, V, C]{it: it, collector: collector}
 }
 
 // KVIterPipe is the key/value Iterator based pipe implementation.
 type KVIterPipe[K comparable, V any, C any] struct {
 	it        c.KVIterator[K, V]
-	collector collect.CollectorKV[K, V, C]
+	collector collect.KVCollector[K, V, C]
 	out       *C
 }
 

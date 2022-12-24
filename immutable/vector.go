@@ -37,15 +37,15 @@ func (v Vector[T]) Begin() c.Iterator[T] {
 	return ptr.Of(v.Head())
 }
 
-func (v Vector[T]) Head() it.Iter[T] {
+func (v Vector[T]) Head() it.ArrayIter[T] {
 	return it.NewHeadS(v.elements, v.esize)
 }
 
-func (v Vector[T]) Tail() it.Iter[T] {
+func (v Vector[T]) Tail() it.ArrayIter[T] {
 	return it.NewTailS(v.elements, v.esize)
 }
 
-func (v Vector[T]) First() (it.Iter[T], T, bool) {
+func (v Vector[T]) First() (it.ArrayIter[T], T, bool) {
 	var (
 		iter      = it.NewHeadS(v.elements, v.esize)
 		first, ok = iter.Next()
@@ -53,7 +53,7 @@ func (v Vector[T]) First() (it.Iter[T], T, bool) {
 	return iter, first, ok
 }
 
-func (v Vector[T]) Last() (it.Iter[T], T, bool) {
+func (v Vector[T]) Last() (it.ArrayIter[T], T, bool) {
 	var (
 		iter      = it.NewTailS(v.elements, v.esize)
 		first, ok = iter.Prev()

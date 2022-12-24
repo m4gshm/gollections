@@ -6,10 +6,10 @@ import (
 	"github.com/m4gshm/gollections/c"
 )
 
-// To helper for Map, Flatt.
+// To helper for Map, Flatt
 func To[T any](value T) T { return value }
 
-// AsIs helper for Map, Flatt.
+// AsIs helper for Map, Flatt
 func AsIs[T any](value T) T { return value }
 
 // And apply two converters in order.

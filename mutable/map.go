@@ -59,11 +59,11 @@ func (s Map[K, V]) Begin() c.KVIterator[K, V] {
 	return ptr.Of(s.Head())
 }
 
-func (s Map[K, V]) Head() it.KV[K, V] {
+func (s Map[K, V]) Head() it.EmbedMapKV[K, V] {
 	return it.NewKV(s)
 }
 
-func (s Map[K, V]) First() (it.KV[K, V], K, V, bool) {
+func (s Map[K, V]) First() (it.EmbedMapKV[K, V], K, V, bool) {
 	var (
 		iter               = it.NewKV(s)
 		firstK, firstV, ok = iter.Next()

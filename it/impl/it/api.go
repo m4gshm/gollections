@@ -3,6 +3,7 @@ package it
 import (
 	"errors"
 
+	"github.com/m4gshm/gollections/as"
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/collect"
@@ -13,13 +14,13 @@ import (
 var ErrBreak = errors.New("Break")
 
 // Map instantiates Iterator that converts elements with a converter and returns them
-func Map[From, To any, IT c.Iterator[From]](elements IT, by c.Converter[From, To]) Convert[From, To, IT, c.Converter[From, To]] {
-	return Convert[From, To, IT, c.Converter[From, To]]{iter: elements, by: by}
+func Map[From, To any, IT c.Iterator[From]](elements IT, by c.Converter[From, To]) ConvertIter[From, To, IT, c.Converter[From, To]] {
+	return ConvertIter[From, To, IT, c.Converter[From, To]]{iter: elements, by: by}
 }
 
 // MapFit additionally filters 'From' elements.
-func MapFit[From, To any, IT c.Iterator[From]](elements IT, fit c.Predicate[From], by c.Converter[From, To]) ConvertFit[From, To, IT] {
-	return ConvertFit[From, To, IT]{iter: elements, by: by, fit: fit}
+func MapFit[From, To any, IT c.Iterator[From]](elements IT, fit c.Predicate[From], by c.Converter[From, To]) ConvertFitIter[From, To, IT] {
+	return ConvertFitIter[From, To, IT]{iter: elements, by: by, fit: fit}
 }
 
 // Flatt instantiates Iterator that extracts slices of 'To' by a Flatter from elements of 'From' and flattens as one iterable collection of 'To' elements.
@@ -43,8 +44,8 @@ func NotNil[T any, IT c.Iterator[*T]](elements IT) Fit[*T, IT] {
 }
 
 // MapKV instantiates Iterator that converts elements with a converter and returns them
-func MapKV[K, V any, IT c.KVIterator[K, V], k2, v2 any](elements IT, by c.BiConverter[K, V, k2, v2]) ConvertKV[K, V, IT, k2, v2, c.BiConverter[K, V, k2, v2]] {
-	return ConvertKV[K, V, IT, k2, v2, c.BiConverter[K, V, k2, v2]]{iter: elements, by: by}
+func MapKV[K, V any, IT c.KVIterator[K, V], k2, v2 any](elements IT, by c.BiConverter[K, V, k2, v2]) ConvertKVIter[K, V, IT, k2, v2, c.BiConverter[K, V, k2, v2]] {
+	return ConvertKVIter[K, V, IT, k2, v2, c.BiConverter[K, V, k2, v2]]{iter: elements, by: by}
 }
 
 // FilterKV instantiates Iterator that checks elements by filters and returns successful ones.
@@ -54,7 +55,12 @@ func FilterKV[K, V any, IT c.KVIterator[K, V]](elements IT, filter c.BiPredicate
 
 // Group transforms iterable elements to the MapPipe based on applying key extractor to the elements
 func Group[T any, K comparable, IT c.Iterator[T]](elements IT, by c.Converter[T, K]) c.MapPipe[K, T, map[K][]T] {
-	return NewKVPipe(NewKeyValuer(elements, by), collect.Groups[K, T])
+	return GroupMap(elements, by, as.Is[T])
+}
+
+// GroupMap transforms iterable elements to the MapPipe based on applying key extractor to the elements
+func GroupMap[T any, K comparable, V any, IT c.Iterator[T]](elements IT, by c.Converter[T, K], val c.Converter[T, V]) c.MapPipe[K, V, map[K][]V] {
+	return NewKVPipe(NewKeyValuer(elements, by, val), collect.Group[K, V])
 }
 
 // For applies a walker to elements of an Iterator. To stop walking just return the ErrBreak.

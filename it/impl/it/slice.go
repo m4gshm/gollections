@@ -12,23 +12,23 @@ import (
 const NoStarted = -1
 
 // New instantiates Iter based on elements Iter and returs its reference
-func New[T any, TS ~[]T](elements TS) *Iter[T] {
+func New[T any, TS ~[]T](elements TS) *ArrayIter[T] {
 	return ptr.Of(NewHeadS(elements, notsafe.GetTypeSize[T]()))
 }
 
 // NewHead instantiates Iter based on elements slice
-func NewHead[T any, TS ~[]T](elements TS) Iter[T] {
+func NewHead[T any, TS ~[]T](elements TS) ArrayIter[T] {
 	return NewHeadS(elements, notsafe.GetTypeSize[T]())
 }
 
 // NewHeadS instantiates Iter based on elements slice with predefined element size
-func NewHeadS[T any, TS ~[]T](elements TS, elementSize uintptr) Iter[T] {
+func NewHeadS[T any, TS ~[]T](elements TS, elementSize uintptr) ArrayIter[T] {
 	var (
 		header = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
 		array  = unsafe.Pointer(header.Data)
 		size   = header.Len
 	)
-	return Iter[T]{
+	return ArrayIter[T]{
 		array:       array,
 		elementSize: elementSize,
 		size:        size,
@@ -38,18 +38,18 @@ func NewHeadS[T any, TS ~[]T](elements TS, elementSize uintptr) Iter[T] {
 }
 
 // NewTail instantiates Iter based on elements slice for reverse iterating
-func NewTail[T any](elements []T) Iter[T] {
+func NewTail[T any](elements []T) ArrayIter[T] {
 	return NewTailS(elements, notsafe.GetTypeSize[T]())
 }
 
 // NewTailS instantiates Iter based on elements slice with predefined element size for reverse iterating
-func NewTailS[T any](elements []T, elementSize uintptr) Iter[T] {
+func NewTailS[T any](elements []T, elementSize uintptr) ArrayIter[T] {
 	var (
 		header = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
 		array  = unsafe.Pointer(header.Data)
 		size   = header.Len
 	)
-	return Iter[T]{
+	return ArrayIter[T]{
 		array:       array,
 		elementSize: elementSize,
 		size:        size,
@@ -58,37 +58,37 @@ func NewTailS[T any](elements []T, elementSize uintptr) Iter[T] {
 	}
 }
 
-// Iter is the Iterator implementation.
-type Iter[T any] struct {
+// ArrayIter is the Iterator implementation.
+type ArrayIter[T any] struct {
 	array                     unsafe.Pointer
 	elementSize               uintptr
 	size, maxHasNext, current int
 }
 
 var (
-	_ c.Iterator[any]     = (*Iter[any])(nil)
-	_ c.PrevIterator[any] = (*Iter[any])(nil)
+	_ c.Iterator[any]     = (*ArrayIter[any])(nil)
+	_ c.PrevIterator[any] = (*ArrayIter[any])(nil)
 )
 
-func (i *Iter[T]) HasNext() bool {
+func (i *ArrayIter[T]) HasNext() bool {
 	return CanIterateByRange(NoStarted, i.maxHasNext, i.current)
 }
 
-func (i *Iter[T]) HasPrev() bool {
+func (i *ArrayIter[T]) HasPrev() bool {
 	return CanIterateByRange(1, i.size, i.current)
 }
 
-func (i *Iter[T]) GetNext() T {
+func (i *ArrayIter[T]) GetNext() T {
 	t, _ := i.Next()
 	return t
 }
 
-func (i *Iter[T]) GetPrev() T {
+func (i *ArrayIter[T]) GetPrev() T {
 	t, _ := i.Prev()
 	return t
 }
 
-func (i *Iter[T]) Next() (T, bool) {
+func (i *ArrayIter[T]) Next() (T, bool) {
 	current := i.current
 	if CanIterateByRange(NoStarted, i.maxHasNext, current) {
 		current++
@@ -99,7 +99,7 @@ func (i *Iter[T]) Next() (T, bool) {
 	return no, false
 }
 
-func (i *Iter[T]) Prev() (T, bool) {
+func (i *ArrayIter[T]) Prev() (T, bool) {
 	current := i.current
 	if CanIterateByRange(1, i.size, current) {
 		current--
@@ -110,7 +110,7 @@ func (i *Iter[T]) Prev() (T, bool) {
 	return no, false
 }
 
-func (i *Iter[T]) Get() (T, bool) {
+func (i *ArrayIter[T]) Get() (T, bool) {
 	current := i.current
 	if IsValidIndex(i.size, current) {
 		return *(*T)(notsafe.GetArrayElemRef(i.array, current, i.elementSize)), true
@@ -119,7 +119,7 @@ func (i *Iter[T]) Get() (T, bool) {
 	return no, false
 }
 
-func (i *Iter[T]) Cap() int {
+func (i *ArrayIter[T]) Cap() int {
 	return i.size
 }
 
