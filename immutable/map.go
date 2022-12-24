@@ -4,9 +4,9 @@ import (
 	"fmt"
 
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/collect"
 	"github.com/m4gshm/gollections/immutable/ordered"
 	"github.com/m4gshm/gollections/it/impl/it"
+	"github.com/m4gshm/gollections/kvit"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/ptr"
 	"github.com/m4gshm/gollections/slice"
@@ -126,28 +126,28 @@ func (s Map[K, V]) V() MapValues[K, V] {
 
 func (s Map[K, V]) FilterKey(fit c.Predicate[K]) c.MapPipe[K, V, map[K]V] {
 	var kvFit c.BiPredicate[K, V] = func(key K, val V) bool { return fit(key) }
-	return it.NewKVPipe(it.FilterKV(ptr.Of(s.Head()), kvFit), collect.Map[K, V])
+	return it.NewKVPipe(it.FilterKV(ptr.Of(s.Head()), kvFit), kvit.Map[K, V])
 }
 
 func (s Map[K, V]) MapKey(by c.Converter[K, K]) c.MapPipe[K, V, map[K]V] {
-	return it.NewKVPipe(it.MapKV(ptr.Of(s.Head()), func(key K, val V) (K, V) { return by(key), val }), collect.Map[K, V])
+	return it.NewKVPipe(it.MapKV(ptr.Of(s.Head()), func(key K, val V) (K, V) { return by(key), val }), kvit.Map[K, V])
 }
 
 func (s Map[K, V]) FilterValue(fit c.Predicate[V]) c.MapPipe[K, V, map[K]V] {
 	var kvFit c.BiPredicate[K, V] = func(key K, val V) bool { return fit(val) }
-	return it.NewKVPipe(it.FilterKV(ptr.Of(s.Head()), kvFit), collect.Map[K, V])
+	return it.NewKVPipe(it.FilterKV(ptr.Of(s.Head()), kvFit), kvit.Map[K, V])
 }
 
 func (s Map[K, V]) MapValue(by c.Converter[V, V]) c.MapPipe[K, V, map[K]V] {
-	return it.NewKVPipe(it.MapKV(ptr.Of(s.Head()), func(key K, val V) (K, V) { return key, by(val) }), collect.Map[K, V])
+	return it.NewKVPipe(it.MapKV(ptr.Of(s.Head()), func(key K, val V) (K, V) { return key, by(val) }), kvit.Map[K, V])
 }
 
 func (s Map[K, V]) Filter(filter c.BiPredicate[K, V]) c.MapPipe[K, V, map[K]V] {
-	return it.NewKVPipe(it.FilterKV(ptr.Of(s.Head()), filter), collect.Map[K, V])
+	return it.NewKVPipe(it.FilterKV(ptr.Of(s.Head()), filter), kvit.Map[K, V])
 }
 
 func (s Map[K, V]) Map(by c.BiConverter[K, V, K, V]) c.MapPipe[K, V, map[K]V] {
-	return it.NewKVPipe(it.MapKV(ptr.Of(s.Head()), by), collect.Map[K, V])
+	return it.NewKVPipe(it.MapKV(ptr.Of(s.Head()), by), kvit.Map[K, V])
 }
 
 func (s Map[K, V]) Reduce(by c.Quaternary[K, V]) (K, V) {

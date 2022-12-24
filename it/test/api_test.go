@@ -9,11 +9,11 @@ import (
 
 	"github.com/m4gshm/gollections/K"
 	"github.com/m4gshm/gollections/check"
-	"github.com/m4gshm/gollections/collect"
 	"github.com/m4gshm/gollections/conv"
 	"github.com/m4gshm/gollections/it"
 	impl "github.com/m4gshm/gollections/it/impl/it"
 	sliceit "github.com/m4gshm/gollections/it/slice"
+	"github.com/m4gshm/gollections/kvit"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/ptr"
 	"github.com/m4gshm/gollections/slice"
@@ -234,7 +234,7 @@ func Test_ToKVIterConvert(t *testing.T) {
 	var (
 		iter   = it.Of(K.V("key1", 1), K.V("key2", 2))
 		kvIter = it.ToKVIter[string, int](iter)
-		m      = collect.Map(kvIter)
+		m      = kvit.Map(kvIter)
 	)
 
 	assert.Equal(t, 1, m["key1"])
