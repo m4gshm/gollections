@@ -76,10 +76,10 @@ type IteratorBreakable[T any] interface {
 	Error() error
 }
 
-// PrevIterator is the Iterator that provides reverse iteration over elements of a collection.
+// PrevIterator is the Iterator that provides reverse iteration over elements of a collection
 type PrevIterator[T any] interface {
 	Iterator[T]
-	//retrieves a prev element and true or zero value of T and false if no more elements.
+	//retrieves a prev element and true or zero value of T and false if no more elements
 	Prev() (T, bool)
 }
 
@@ -89,10 +89,17 @@ type DelIterator[T any] interface {
 	Delete() bool
 }
 
-// KVIterator is the interface that provides iterate over all key/value pair of a map.
+// KVIterator is the interface that provides iterate over key/value pairs
 type KVIterator[K, V any] interface {
 	//retrieves next elements or zero values if no more elements
 	Next() (K, V, bool)
+}
+
+// KVIterator is the interface that provides iterate over key/value pairs, where an iteration can be interrupted by an error
+type KVIteratorBreakable[K, V any] interface {
+	KVIterator[K, V]
+	//returns an iteration abort error
+	Error() error
 }
 
 // Iterable is an iterator supplier interface
