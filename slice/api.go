@@ -35,7 +35,7 @@ func OfLoop[S, T any](source S, hasNext func(S) bool, getNext func(S) (T, error)
 	return r, nil
 }
 
-// OfLoop builds a slice by an generator function.
+// Generate builds a slice by an generator function.
 // The generator returns an element, or false if the generation is over, or an error.
 func Generate[T any](next func() (T, bool, error)) ([]T, error) {
 	r := []T{}
@@ -46,7 +46,6 @@ func Generate[T any](next func() (T, bool, error)) ([]T, error) {
 		}
 		r = append(r, e)
 	}
-	return r, nil
 }
 
 // Clone makes new slice instance with copied elements.
