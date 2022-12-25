@@ -6,19 +6,17 @@ import (
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/it/impl/it"
+	"github.com/m4gshm/gollections/kvit"
 )
 
 // ErrBreak is For, Track breaker
 var ErrBreak = it.ErrBreak
 
-func First[K, V any](key K, exist, new V) V { return exist }
-func Last[K, V any](key K, exist, new V) V  { return new }
-
 // OfLoop builds a map by iterating key\value pairs of a source.
 // The hasNext specifies a predicate that tests existing of a next pair in the source.
 // The getNext extracts the pair.
 func OfLoop[S any, K comparable, V any](source S, hasNext func(S) bool, getNext func(S) (K, V, error)) (map[K]V, error) {
-	return OfLoopResolv(source, hasNext, getNext, First[K, V])
+	return OfLoopResolv(source, hasNext, getNext, kvit.FirstVal[K, V])
 }
 
 // OfLoopResolv builds a map by iterating key\value pairs of a source.
@@ -42,7 +40,7 @@ func OfLoopResolv[S any, K comparable, V any](source S, hasNext func(S) bool, ge
 // Generate builds a map by an generator function.
 // The next returns an key\value pair, or false if the generation is over, or an error.
 func Generate[K comparable, V any](next func() (K, V, bool, error)) (map[K]V, error) {
-	return GenerateResolv(next, First[K, V])
+	return GenerateResolv(next, kvit.FirstVal[K, V])
 }
 
 // GenerateResolv builds a map by an generator function.

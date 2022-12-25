@@ -262,7 +262,7 @@ func BenchmarkLoopNewKVNextNextNext(b *testing.B) {
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				iter := impliter.NewKV(values)
+				iter := impliter.NewEmbedMapKV(values)
 				for k, _, ok := iter.Next(); ok; k, _, ok = iter.Next() {
 					casee.load(k)
 				}

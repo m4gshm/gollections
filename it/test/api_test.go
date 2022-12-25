@@ -7,13 +7,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/m4gshm/gollections/K"
 	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/conv"
 	"github.com/m4gshm/gollections/it"
 	impl "github.com/m4gshm/gollections/it/impl/it"
 	sliceit "github.com/m4gshm/gollections/it/slice"
-	"github.com/m4gshm/gollections/kvit"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/ptr"
 	"github.com/m4gshm/gollections/slice"
@@ -27,10 +25,10 @@ func Test_MapAndFilter(t *testing.T) {
 	)
 	items := []int{1, 2, 3, 4, 5}
 	converted := it.MapFit(it.Wrap(items), func(v int) bool { return v%2 == 0 }, conv.And(toString, addTail))
-	assert.Equal(t, slice.Of("2_tail", "4_tail"), it.Slice(converted))
+	assert.Equal(t, slice.Of("2_tail", "4_tail"), it.ToSlice(converted))
 
 	converted2 := sliceit.MapFit(items, func(v int) bool { return v%2 == 0 }, conv.And(toString, addTail))
-	assert.Equal(t, slice.Of("2_tail", "4_tail"), it.Slice(converted2))
+	assert.Equal(t, slice.Of("2_tail", "4_tail"), it.ToSlice(converted2))
 
 	//plain old style
 	convertedOld := make([]string, 0)
@@ -50,10 +48,10 @@ func Test_FlattSlices(t *testing.T) {
 		multiDimension = [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
 		expected       = slice.Of(1, 3, 5, 7)
 	)
-	a := it.Slice(it.Filter(it.Flatt(it.Flatt(it.Wrap(multiDimension), conv.To[[][]int]), conv.To[[]int]), odds))
+	a := it.ToSlice(it.Filter(it.Flatt(it.Flatt(it.Wrap(multiDimension), conv.To[[][]int]), conv.To[[]int]), odds))
 	assert.Equal(t, expected, a)
 
-	a = it.Slice(it.Filter(it.Flatt(sliceit.Flatt(multiDimension, conv.To[[][]int]), conv.To[[]int]), odds))
+	a = it.ToSlice(it.Filter(it.Flatt(sliceit.Flatt(multiDimension, conv.To[[][]int]), conv.To[[]int]), odds))
 	assert.Equal(t, expected, a)
 
 	//plain old style
@@ -132,10 +130,10 @@ func Test_MapFlattStructure_Iterable(t *testing.T) {
 
 	items := []*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil, {attributes: []*Attributes{{name: "third"}, nil}}}
 
-	names := it.Slice(it.Map(it.Flatt(it.Wrap(items), (*Participant).GetAttributes), (*Attributes).GetName))
+	names := it.ToSlice(it.Map(it.Flatt(it.Wrap(items), (*Participant).GetAttributes), (*Attributes).GetName))
 	assert.Equal(t, expected, names)
 
-	names = it.Slice(it.Map(sliceit.Flatt(items, (*Participant).GetAttributes), (*Attributes).GetName))
+	names = it.ToSlice(it.Map(sliceit.Flatt(items, (*Participant).GetAttributes), (*Attributes).GetName))
 	assert.Equal(t, expected, names)
 }
 
@@ -144,10 +142,10 @@ func Test_MapFlattFitStructure_Iterable(t *testing.T) {
 
 	items := []*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil, {attributes: []*Attributes{{name: "third"}, nil}}}
 
-	names := it.Slice(it.Map(it.FlattFit(it.Wrap(items), check.NotNil[Participant], (*Participant).GetAttributes), (*Attributes).GetName))
+	names := it.ToSlice(it.Map(it.FlattFit(it.Wrap(items), check.NotNil[Participant], (*Participant).GetAttributes), (*Attributes).GetName))
 	assert.Equal(t, expected, names)
 
-	names = it.Slice(it.Map(sliceit.FlattFit(items, check.NotNil[Participant], (*Participant).GetAttributes), (*Attributes).GetName))
+	names = it.ToSlice(it.Map(sliceit.FlattFit(items, check.NotNil[Participant], (*Participant).GetAttributes), (*Attributes).GetName))
 	assert.Equal(t, expected, names)
 }
 
@@ -217,27 +215,15 @@ func (r *rows[T]) next() (T, error) {
 func Test_OfLoop(t *testing.T) {
 	stream := &rows[int]{slice.Of(1, 2, 3), 0}
 	iter := it.OfLoop(stream, (*rows[int]).hasNext, (*rows[int]).next)
-	s := it.Slice[int](iter)
+	s := it.ToSlice[int](iter)
 
 	assert.Equal(t, slice.Of(1, 2, 3), s)
 	assert.Nil(t, iter.Error())
 
 	streamWithError := &rows[int]{slice.Of(1, 2, 3, 4), 0}
 	iterWithError := it.OfLoop(streamWithError, (*rows[int]).hasNext, (*rows[int]).next)
-	s2 := it.Slice[int](iterWithError)
+	s2 := it.ToSlice[int](iterWithError)
 
 	assert.Equal(t, slice.Of(1, 2, 3), s2)
 	assert.Equal(t, "next error", iterWithError.Error().Error())
-}
-
-func Test_ToKVIterConvert(t *testing.T) {
-	var (
-		iter   = it.Of(K.V("key1", 1), K.V("key2", 2))
-		kvIter = it.ToKVIter[string, int](iter)
-		m      = kvit.Map(kvIter)
-	)
-
-	assert.Equal(t, 1, m["key1"])
-	assert.Equal(t, 2, m["key2"])
-
 }

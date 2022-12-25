@@ -6,37 +6,31 @@ import (
 	"github.com/m4gshm/gollections/c"
 )
 
-// ToKVIter converts an iterator of c.KV elements
-func ToKVIter[K, V any, IT c.Iterator[c.KV[K, V]]](elements IT) KVIter[K, V] {
-	return KVIter[K, V]{elements: elements}
+// NewOrderedEmbedMapKV is the OrderedKV constructor
+func NewOrderedEmbedMapKV[K comparable, V any](uniques map[K]V, elements ArrayIter[K]) OrderedEmbedMapKVIter[K, V] {
+	return OrderedEmbedMapKVIter[K, V]{elements: elements, uniques: uniques}
 }
 
-// NewOrderedKV is the OrderedKV constructor
-func NewOrderedKV[K comparable, V any](uniques map[K]V, elements ArrayIter[K]) OrderedKV[K, V] {
-	return OrderedKV[K, V]{elements: elements, uniques: uniques}
-}
-
-// NewKV returns the KVIterator based on map elements
-func NewKV[K comparable, V any](elements map[K]V) EmbedMapKV[K, V] {
+// NewEmbedMapKV returns the KVIterator based on map elements
+func NewEmbedMapKV[K comparable, V any](elements map[K]V) EmbedMapKVIter[K, V] {
 	m := elements
 	hmap := *(*unsafe.Pointer)(unsafe.Pointer(&m))
 	i := any(m)
 	maptype := *(*unsafe.Pointer)(unsafe.Pointer(&i))
-
-	return EmbedMapKV[K, V]{maptype: maptype, hmap: hmap, size: len(elements), iter: new(hiter)}
+	return EmbedMapKVIter[K, V]{maptype: maptype, hmap: hmap, size: len(elements), iter: new(hiter)}
 }
 
-// EmbedMapKV is the embedded map based Iterator implementation
-type EmbedMapKV[K comparable, V any] struct {
+// EmbedMapKVIter is the embedded map based Iterator implementation
+type EmbedMapKVIter[K comparable, V any] struct {
 	iter    *hiter
 	maptype unsafe.Pointer
 	hmap    unsafe.Pointer
 	size    int
 }
 
-var _ c.KVIterator[int, any] = (*EmbedMapKV[int, any])(nil)
+var _ c.KVIterator[int, any] = (*EmbedMapKVIter[int, any])(nil)
 
-func (i *EmbedMapKV[K, V]) Next() (K, V, bool) {
+func (i *EmbedMapKVIter[K, V]) Next() (K, V, bool) {
 	if !i.iter.initialized() {
 		mapiterinit(i.maptype, i.hmap, i.iter)
 	} else {
@@ -54,7 +48,7 @@ func (i *EmbedMapKV[K, V]) Next() (K, V, bool) {
 	return *key, *value, true
 }
 
-func (i *EmbedMapKV[K, V]) Cap() int {
+func (i *EmbedMapKVIter[K, V]) Cap() int {
 	return i.size
 }
 
@@ -95,15 +89,15 @@ func (h *hiter) initialized() bool {
 	return h.t != nil
 }
 
-// OrderedKV is the ordered key/value pairs Iterator implementation
-type OrderedKV[K comparable, V any] struct {
+// OrderedEmbedMapKVIter is the ordered key/value pairs Iterator implementation
+type OrderedEmbedMapKVIter[K comparable, V any] struct {
 	elements ArrayIter[K]
 	uniques  map[K]V
 }
 
-var _ c.KVIterator[string, any] = (*OrderedKV[string, any])(nil)
+var _ c.KVIterator[string, any] = (*OrderedEmbedMapKVIter[string, any])(nil)
 
-func (i *OrderedKV[K, V]) Next() (K, V, bool) {
+func (i *OrderedEmbedMapKVIter[K, V]) Next() (K, V, bool) {
 	if key, ok := i.elements.Next(); ok {
 		return key, i.uniques[key], true
 	}
@@ -112,34 +106,18 @@ func (i *OrderedKV[K, V]) Next() (K, V, bool) {
 	return k, v, false
 }
 
-func (i *OrderedKV[K, V]) Cap() int {
+func (i *OrderedEmbedMapKVIter[K, V]) Cap() int {
 	return i.elements.Cap()
-}
-
-// KVIter is the wrapper of an iterator of c.KV elements
-type KVIter[K, V any] struct {
-	elements c.Iterator[c.KV[K, V]]
-}
-
-var _ c.KVIterator[string, any] = (*KVIter[string, any])(nil)
-
-func (i *KVIter[K, V]) Next() (K, V, bool) {
-	if kv, ok := i.elements.Next(); ok {
-		return kv.K, kv.V, true
-	}
-	var k K
-	var v V
-	return k, v, false
 }
 
 // NewKey it the Key constructor.
 func NewKey[K comparable, V any](uniques map[K]V) Key[K, V] {
-	return Key[K, V]{EmbedMapKV: NewKV(uniques)}
+	return Key[K, V]{EmbedMapKVIter: NewEmbedMapKV(uniques)}
 }
 
 // Key is the Iterator implementation that provides iterating over keys of a key/value pairs iterator
 type Key[K comparable, V any] struct {
-	EmbedMapKV[K, V]
+	EmbedMapKVIter[K, V]
 }
 
 var (
@@ -148,31 +126,31 @@ var (
 )
 
 func (i Key[K, V]) Next() (K, bool) {
-	key, _, ok := i.EmbedMapKV.Next()
+	key, _, ok := i.EmbedMapKVIter.Next()
 	return key, ok
 }
 
 func (i Key[K, V]) Cap() int {
-	return i.EmbedMapKV.Cap()
+	return i.EmbedMapKVIter.Cap()
 }
 
 // NewVal is the Val constructor
 func NewVal[K comparable, V any](uniques map[K]V) Val[K, V] {
-	return Val[K, V]{EmbedMapKV: NewKV(uniques)}
+	return Val[K, V]{EmbedMapKVIter: NewEmbedMapKV(uniques)}
 }
 
 // Val is the Iterator implementation that provides iterating over values of a key/value pairs iterator
 type Val[K comparable, V any] struct {
-	EmbedMapKV[K, V]
+	EmbedMapKVIter[K, V]
 }
 
 var _ c.Iterator[any] = (*Val[int, any])(nil)
 
 func (i Val[K, V]) Next() (V, bool) {
-	_, val, ok := i.EmbedMapKV.Next()
+	_, val, ok := i.EmbedMapKVIter.Next()
 	return val, ok
 }
 
 func (i *Val[K, V]) Cap() int {
-	return i.EmbedMapKV.Cap()
+	return i.EmbedMapKVIter.Cap()
 }

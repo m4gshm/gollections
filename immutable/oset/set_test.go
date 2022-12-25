@@ -20,7 +20,7 @@ func Test_Set_Iterate(t *testing.T) {
 	expected := slice.Of(1, 2, 4, 3)
 	assert.Equal(t, expected, values)
 
-	iterSlice := it.Slice(set.Begin())
+	iterSlice := it.ToSlice(set.Begin())
 	assert.Equal(t, expected, iterSlice)
 
 	out := make([]int, 0)

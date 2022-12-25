@@ -3,6 +3,7 @@ package test
 import (
 	"testing"
 
+	"github.com/m4gshm/gollections/kvit"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
@@ -49,7 +50,7 @@ func Test_OfLoopResolv(t *testing.T) {
 	result, _ := map_.OfLoopResolv(stream, (*rows[int]).hasNext, func(r *rows[int]) (bool, int, error) {
 		n, err := r.next()
 		return n%2 == 0, n, err
-	}, map_.Last[bool, int])
+	}, kvit.LastVal[bool, int])
 
 	assert.Equal(t, 4, result[true])
 	assert.Equal(t, 3, result[false])

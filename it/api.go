@@ -65,9 +65,9 @@ func ReduceKV[K, V any, IT c.KVIterator[K, V]](elements IT, by c.Quaternary[K, V
 	return it.ReduceKV(elements, by)
 }
 
-// Slice converts an Iterator to a slice
-func Slice[T any](elements c.Iterator[T]) []T {
-	return it.Slice[T](elements)
+// ToSlice converts an Iterator to a slice
+func ToSlice[T any](elements c.Iterator[T]) []T {
+	return it.ToSlice[T](elements)
 }
 
 // Group transforms iterable elements to the MapPipe based on applying key extractor to the elements
@@ -95,7 +95,6 @@ func First[T any, IT c.Iterator[T]](elements IT, fit c.Predicate[T]) (T, bool) {
 	return it.First(elements, fit)
 }
 
-// ToKVIter converts an iterator of c.KV elements
-func ToKVIter[K any, V any, IT c.Iterator[c.KV[K, V]]](elements IT) c.KVIterator[K, V] {
-	return ptr.Of(it.ToKVIter[K, V](elements))
+func ToPairs[T, K, V any](elements c.Iterator[T], keyExtractor c.Converter[T, K], valExtractor c.Converter[T, V]) c.KVIterator[K, V] {
+	return ptr.Of(it.NewKeyValuer(elements, keyExtractor, valExtractor))
 }

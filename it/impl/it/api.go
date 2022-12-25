@@ -6,7 +6,7 @@ import (
 	"github.com/m4gshm/gollections/as"
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/check"
-	"github.com/m4gshm/gollections/collect"
+	"github.com/m4gshm/gollections/kvit/group"
 	"github.com/m4gshm/gollections/notsafe"
 )
 
@@ -60,7 +60,7 @@ func Group[T any, K comparable, IT c.Iterator[T]](elements IT, by c.Converter[T,
 
 // GroupMap transforms iterable elements to the MapPipe based on applying key extractor to the elements
 func GroupMap[T any, K comparable, V any, IT c.Iterator[T]](elements IT, by c.Converter[T, K], val c.Converter[T, V]) c.MapPipe[K, V, map[K][]V] {
-	return NewKVPipe(NewKeyValuer(elements, by, val), collect.Group[K, V])
+	return NewKVPipe(NewKeyValuer(elements, by, val), group.Of[K, V])
 }
 
 // For applies a walker to elements of an Iterator. To stop walking just return the ErrBreak.
@@ -118,8 +118,8 @@ func ReduceKV[K, V any, IT c.KVIterator[K, V]](elements IT, by c.Quaternary[K, V
 	return rk, rv
 }
 
-// Slice converts an Iterator to a slice.
-func Slice[T any, IT c.Iterator[T]](elements IT) []T {
+// ToSlice converts an Iterator to a slice.
+func ToSlice[T any, IT c.Iterator[T]](elements IT) []T {
 	var s []T
 	a := any(elements)
 

@@ -5,6 +5,6 @@ import (
 )
 
 // V is K.V shortening for map_.NewKV
-func V[k comparable, v any](key k, value v) c.KV[k, v] {
+func V[k, v any](key k, value v) c.KV[k, v] {
 	return c.NewKV(key, value)
 }

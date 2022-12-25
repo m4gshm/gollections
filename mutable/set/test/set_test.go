@@ -24,7 +24,7 @@ func Test_Set_Iterate(t *testing.T) {
 	sort.Ints(values)
 	assert.Equal(t, expected, values)
 
-	iterSlice := it.Slice(set.Begin())
+	iterSlice := it.ToSlice(set.Begin())
 	sort.Ints(iterSlice)
 	assert.Equal(t, expected, iterSlice)
 
