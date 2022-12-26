@@ -6,6 +6,7 @@ import (
 	implit "github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/kvit/group"
 	"github.com/m4gshm/gollections/kvit/impl/kvit"
+	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/ptr"
 )
 
@@ -28,10 +29,10 @@ func FromIter[T, K, V any](elements c.Iterator[T], keyExtractor c.Converter[T, K
 }
 
 // FirstVal - ToMap value resolver
-func FirstVal[K, V any](key K, exist, new V) V { return exist }
+func FirstVal[K, V any](exists bool, key K, old, new V) V { return op.IfElse(exists, old, new) }
 
 // LastVal - ToMap value resolver
-func LastVal[K, V any](key K, exist, new V) V { return new }
+func LastVal[K, V any](exists bool, key K, old, new V) V { return new }
 
 // ToMap collects key\value elements to a map by iterating over the elements
 func ToMap[K comparable, V any](it c.KVIterator[K, V]) map[K]V {
@@ -39,14 +40,11 @@ func ToMap[K comparable, V any](it c.KVIterator[K, V]) map[K]V {
 }
 
 // ToMapResolv collects key\value elements to a map by iterating over the elements with resolving of duplicated key values
-func ToMapResolv[K comparable, V any](it c.KVIterator[K, V], valResolv func(K, V, V) V) map[K]V {
+func ToMapResolv[K comparable, E, V any](it c.KVIterator[K, E], valResolv func(bool, K, V, E) V) map[K]V {
 	e := map[K]V{}
-	for k, v, ok := it.Next(); ok; k, v, ok = it.Next() {
-		if exists, ok := e[k]; ok {
-			e[k] = valResolv(k, exists, v)
-		} else {
-			e[k] = v
-		}
+	for k, elem, ok := it.Next(); ok; k, elem, ok = it.Next() {
+		exists, ok := e[k]
+		e[k] = valResolv(ok, k, exists, elem)
 	}
 	return e
 }

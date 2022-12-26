@@ -5,6 +5,7 @@ import (
 
 	"github.com/m4gshm/gollections/kvit"
 	"github.com/m4gshm/gollections/map_"
+	"github.com/m4gshm/gollections/map_/group"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/stretchr/testify/assert"
@@ -72,10 +73,21 @@ func Test_GenerateResolv(t *testing.T) {
 	result, _ := map_.GenerateResolv(func() (bool, int, bool, error) {
 		counter++
 		return counter%2 == 0, counter, counter < 5, nil
-	}, func(k bool, exists, new int) int {
-		return op.IfElse(k, new, exists)
+	}, func(exists bool, k bool, old, new int) int {
+		return op.IfElse(exists, op.IfElse(k, new, old), new)
 	})
 
 	assert.Equal(t, 4, result[true])
 	assert.Equal(t, 1, result[false])
+}
+
+func Test_GroupOfLoop(t *testing.T) {
+	stream := &rows[int]{slice.Of(1, 2, 3), 0}
+	result, _ := group.OfLoop(stream, (*rows[int]).hasNext, func(r *rows[int]) (bool, int, error) {
+		n, err := r.next()
+		return n%2 == 0, n, err
+	})
+
+	assert.Equal(t, slice.Of(2), result[true])
+	assert.Equal(t, slice.Of(1, 3), result[false])
 }

@@ -19,22 +19,30 @@ func OfLoop[S any, K comparable, V any](source S, hasNext func(S) bool, getNext 
 	return OfLoopResolv(source, hasNext, getNext, kvit.FirstVal[K, V])
 }
 
-// OfLoopResolv builds a map by iterating key\value pairs of a source.
+// OfLoopResolv builds a map by iterating elements of a source.
 // The hasNext specifies a predicate that tests existing of a next pair in the source.
-// The getNext extracts the pair.
-// The resolv selects value for duplicated keys.
-func OfLoopResolv[S any, K comparable, V any](source S, hasNext func(S) bool, getNext func(S) (K, V, error), resolv func(K, V, V) V) (map[K]V, error) {
+// The getNext extracts the element.
+// The resolv values for duplicated keys.
+func OfLoopResolv[S any, K comparable, E, V any](source S, hasNext func(S) bool, getNext func(S) (K, E, error), resolv func(bool, K, V, E) V) (map[K]V, error) {
 	r := map[K]V{}
 	for hasNext(source) {
-		if k, v, err := getNext(source); err != nil {
+		k, elem, err := getNext(source)
+		if err != nil {
 			return r, err
-		} else if ov, ok := r[k]; ok {
-			r[k] = resolv(k, ov, v)
-		} else {
-			r[k] = v
 		}
+		existVal, ok := r[k]
+		r[k] = resolv(ok, k, existVal, elem)
 	}
 	return r, nil
+}
+
+// GroupOfLoop builds a map of slices by iterating over elements, extracting key\value pairs and grouping the values for each key in the slices.
+// The hasNext specifies a predicate that tests existing of a next pair in the source.
+// The getNext extracts the pair.
+func GroupOfLoop[S any, K comparable, V any](source S, hasNext func(S) bool, getNext func(S) (K, V, error)) (map[K][]V, error) {
+	return OfLoopResolv(source, hasNext, getNext, func(exists bool, key K, elements []V, val V) []V {
+		return append(elements, val)
+	})
 }
 
 // Generate builds a map by an generator function.
@@ -46,17 +54,15 @@ func Generate[K comparable, V any](next func() (K, V, bool, error)) (map[K]V, er
 // GenerateResolv builds a map by an generator function.
 // The next returns an key\value pair, or false if the generation is over, or an error.
 // The resolv selects value for duplicated keys.
-func GenerateResolv[K comparable, V any](next func() (K, V, bool, error), resolv func(K, V, V) V) (map[K]V, error) {
+func GenerateResolv[K comparable, V any](next func() (K, V, bool, error), resolv func(bool, K, V, V) V) (map[K]V, error) {
 	r := map[K]V{}
 	for {
 		k, v, ok, err := next()
 		if err != nil || !ok {
 			return r, err
-		} else if ov, ok := r[k]; ok {
-			r[k] = resolv(k, ov, v)
-		} else {
-			r[k] = v
 		}
+		ov, ok := r[k]
+		r[k] = resolv(ok, k, ov, v)
 	}
 }
 
