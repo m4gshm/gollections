@@ -43,11 +43,12 @@ func (i *EmbedMapKVIter[K, V]) Next() (K, V, bool) {
 		return key, value, false
 	}
 	iterelem := mapiterelem(i.iter)
-	var key *K = (*K)(iterkey)
-	var value *V = (*V)(iterelem)
+	key := (*K)(iterkey)
+	value := (*V)(iterelem)
 	return *key, *value, true
 }
 
+// Cap returns the size of the map
 func (i *EmbedMapKVIter[K, V]) Cap() int {
 	return i.size
 }
@@ -151,6 +152,7 @@ func (i Val[K, V]) Next() (V, bool) {
 	return val, ok
 }
 
+// Cap returns the size of the map
 func (i *Val[K, V]) Cap() int {
 	return i.EmbedMapKVIter.Cap()
 }

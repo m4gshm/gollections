@@ -20,10 +20,12 @@ func WrapPairs[K, V any, P ~[]c.KV[K, V]](pairs P) c.KVIterator[K, V] {
 	return FromPairs(it.Wrap(pairs))
 }
 
+// FromPairs converts a iterator of key\value pair elements to a KVIterator
 func FromPairs[K, V any](elements c.Iterator[c.KV[K, V]]) c.KVIterator[K, V] {
 	return FromIter(elements, (c.KV[K, V]).Key, (c.KV[K, V]).Value)
 }
 
+// FromIter converts a c.Iterator to a c.KVIterator using key and value extractors
 func FromIter[T, K, V any](elements c.Iterator[T], keyExtractor c.Converter[T, K], valExtractor c.Converter[T, V]) c.KVIterator[K, V] {
 	return it.ToPairs(elements, keyExtractor, valExtractor)
 }

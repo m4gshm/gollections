@@ -9,6 +9,7 @@ func NewLoop[S, K, V any](source S, hasNext func(S) bool, getNext func(S) (K, V,
 	return LoopKVIter[S, K, V]{source: source, hasNext: hasNext, getNext: getNext}
 }
 
+// LoopKVIter - universal key\value iterator implementation
 type LoopKVIter[S, K, V any] struct {
 	source  S
 	hasNext func(S) bool
@@ -24,11 +25,11 @@ var (
 // Next implements c.KVIterator
 func (i *LoopKVIter[S, K, V]) Next() (K, V, bool) {
 	if i.abort == nil && i.hasNext(i.source) {
-		if k, v, err := i.getNext(i.source); err == nil {
+		k, v, err := i.getNext(i.source)
+		if err == nil {
 			return k, v, true
-		} else {
-			i.abort = err
 		}
+		i.abort = err
 	}
 	var k K
 	var v V

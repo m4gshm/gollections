@@ -1,4 +1,4 @@
-// common operations of c.Iterable based collections
+// Package op consists of common operations of c.Iterable based collections
 package op
 
 import (

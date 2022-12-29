@@ -9,7 +9,7 @@ import (
 )
 
 // Map instantiates Iterator that converts elements with a converter and returns them
-func Map[From, To any, FS ~[]From](elements FS, by c.Converter[From, To]) Convert[From, To] {
+func Map[FS ~[]From, From, To any](elements FS, by c.Converter[From, To]) Convert[From, To] {
 	var (
 		header   = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
 		array    = unsafe.Pointer(header.Data)
@@ -20,7 +20,7 @@ func Map[From, To any, FS ~[]From](elements FS, by c.Converter[From, To]) Conver
 }
 
 // MapFit additionally filters 'From' elements.
-func MapFit[From, To any, FS ~[]From](elements FS, fit c.Predicate[From], by c.Converter[From, To]) ConvertFit[From, To] {
+func MapFit[FS ~[]From, From, To any](elements FS, fit c.Predicate[From], by c.Converter[From, To]) ConvertFit[From, To] {
 	var (
 		header   = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
 		array    = unsafe.Pointer(header.Data)
@@ -31,7 +31,7 @@ func MapFit[From, To any, FS ~[]From](elements FS, fit c.Predicate[From], by c.C
 }
 
 // Flatt instantiates Iterator that extracts slices of 'To' by a Flatter from elements of 'From' and flattens as one iterable collection of 'To' elements.
-func Flatt[From, To any, FS ~[]From](elements FS, by c.Flatter[From, To]) Flatten[From, To] {
+func Flatt[FS ~[]From, From, To any](elements FS, by c.Flatter[From, To]) Flatten[From, To] {
 	var (
 		header       = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
 		array        = unsafe.Pointer(header.Data)
@@ -43,7 +43,7 @@ func Flatt[From, To any, FS ~[]From](elements FS, by c.Flatter[From, To]) Flatte
 }
 
 // FlattFit additionally filters –'From' elements.
-func FlattFit[From, To any, FS ~[]From](elements FS, fit c.Predicate[From], flatt c.Flatter[From, To]) FlattenFit[From, To] {
+func FlattFit[FS ~[]From, From, To any](elements FS, fit c.Predicate[From], flatt c.Flatter[From, To]) FlattenFit[From, To] {
 	var (
 		header       = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
 		array        = unsafe.Pointer(header.Data)
@@ -55,7 +55,7 @@ func FlattFit[From, To any, FS ~[]From](elements FS, fit c.Predicate[From], flat
 }
 
 // Filter instantiates Iterator that checks elements by filters and returns successful ones.
-func Filter[T any, TS ~[]T](elements TS, filter c.Predicate[T]) Fit[T] {
+func Filter[TS ~[]T, T any](elements TS, filter c.Predicate[T]) Fit[T] {
 	var (
 		header   = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
 		array    = unsafe.Pointer(header.Data)

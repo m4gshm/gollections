@@ -25,6 +25,7 @@ func Min[T constraints.Ordered](a T, b T) T {
 	return IfElse(a > b, b, a)
 }
 
+// IfElse returns the tru value if ok, otherwise return the fal value
 func IfElse[T any](ok bool, tru, fal T) T {
 	if ok {
 		return tru
@@ -32,6 +33,7 @@ func IfElse[T any](ok bool, tru, fal T) T {
 	return fal
 }
 
+// IfDoElse exececutes the tru func if ok, otherwise exec the fal function and returns it result
 func IfDoElse[T any](ok bool, tru, fal func() T) T {
 	if ok {
 		return tru()

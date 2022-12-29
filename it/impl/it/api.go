@@ -1,3 +1,4 @@
+// Package it provides implementations of untility methods for the c.Iterator
 package it
 
 import (
@@ -13,7 +14,7 @@ import (
 // ErrBreak is For, Track breaker
 var ErrBreak = errors.New("Break")
 
-// Map instantiates Iterator that converts elements with a converter and returns them
+// Map instantiates Iterator that converts elements with a converter and returns them.
 func Map[From, To any, IT c.Iterator[From]](elements IT, by c.Converter[From, To]) ConvertIter[From, To, IT, c.Converter[From, To]] {
 	return ConvertIter[From, To, IT, c.Converter[From, To]]{iter: elements, by: by}
 }
@@ -33,22 +34,22 @@ func FlattFit[From, To any, IT c.Iterator[From]](elements IT, fit c.Predicate[Fr
 	return FlattenFit[From, To, IT]{iter: elements, flatt: flatt, fit: fit, elemSizeTo: notsafe.GetTypeSize[To]()}
 }
 
-// Filter instantiates Iterator that checks elements by filters and returns successful ones.
+// Filter creates an Iterator that checks elements by filters and returns successful ones.
 func Filter[T any, IT c.Iterator[T]](elements IT, filter c.Predicate[T]) Fit[T, IT] {
 	return Fit[T, IT]{iter: elements, by: filter}
 }
 
-// NotNil instantiates Iterator that filters nullable elements.
+// NotNil creates an Iterator that filters nullable elements.
 func NotNil[T any, IT c.Iterator[*T]](elements IT) Fit[*T, IT] {
 	return Filter(elements, check.NotNil[T])
 }
 
-// MapKV instantiates Iterator that converts elements with a converter and returns them
+// MapKV creates an Iterator that applies a transformer to iterable key\values.
 func MapKV[K, V any, IT c.KVIterator[K, V], k2, v2 any](elements IT, by c.BiConverter[K, V, k2, v2]) ConvertKVIter[K, V, IT, k2, v2, c.BiConverter[K, V, k2, v2]] {
 	return ConvertKVIter[K, V, IT, k2, v2, c.BiConverter[K, V, k2, v2]]{iter: elements, by: by}
 }
 
-// FilterKV instantiates Iterator that checks elements by filters and returns successful ones.
+// FilterKV creates an Iterator that checks elements by a filter and returns successful ones
 func FilterKV[K, V any, IT c.KVIterator[K, V]](elements IT, filter c.BiPredicate[K, V]) FitKV[K, V, IT] {
 	return FitKV[K, V, IT]{iter: elements, by: filter}
 }
@@ -63,7 +64,7 @@ func GroupMap[T any, K comparable, V any, IT c.Iterator[T]](elements IT, by c.Co
 	return NewKVPipe(NewKeyValuer(elements, by, val), group.Of[K, V])
 }
 
-// For applies a walker to elements of an Iterator. To stop walking just return the ErrBreak.
+// For applies a walker to elements of an Iterator. To stop walking just return the ErrBreak
 func For[T any, IT c.Iterator[T]](elements IT, walker func(T) error) error {
 	for v, ok := elements.Next(); ok; v, ok = elements.Next() {
 		if err := walker(v); err == ErrBreak {
@@ -75,21 +76,21 @@ func For[T any, IT c.Iterator[T]](elements IT, walker func(T) error) error {
 	return nil
 }
 
-// ForEach applies a walker to elements of an Iterator.
+// ForEach applies a walker to elements of an Iterator
 func ForEach[T any, IT c.Iterator[T]](elements IT, walker func(T)) {
 	for v, ok := elements.Next(); ok; v, ok = elements.Next() {
 		walker(v)
 	}
 }
 
-// ForEachFit applies a walker to elements that satisfy a predicate condition.
+// ForEachFit applies a walker to elements that satisfy a predicate condition
 func ForEachFit[T any, IT c.Iterator[T]](elements IT, walker func(T), fit c.Predicate[T]) {
 	for v, ok := elements.Next(); ok && fit(v); v, ok = elements.Next() {
 		walker(v)
 	}
 }
 
-// Reduce reduces elements to an one.
+// Reduce reduces elements to an one
 func Reduce[T any, IT c.Iterator[T]](elements IT, by c.Binary[T]) T {
 	var result T
 	if v, ok := elements.Next(); ok {
@@ -103,7 +104,7 @@ func Reduce[T any, IT c.Iterator[T]](elements IT, by c.Binary[T]) T {
 	return result
 }
 
-// ReduceKV reduces key/values elements to an one.
+// ReduceKV reduces key/values elements to an one
 func ReduceKV[K, V any, IT c.KVIterator[K, V]](elements IT, by c.Quaternary[K, V]) (K, V) {
 	var rk K
 	var rv V
@@ -118,7 +119,7 @@ func ReduceKV[K, V any, IT c.KVIterator[K, V]](elements IT, by c.Quaternary[K, V
 	return rk, rv
 }
 
-// ToSlice converts an Iterator to a slice.
+// ToSlice converts an Iterator to a slice
 func ToSlice[T any, IT c.Iterator[T]](elements IT) []T {
 	var s []T
 	a := any(elements)

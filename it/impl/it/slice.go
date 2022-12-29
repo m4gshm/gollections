@@ -12,17 +12,17 @@ import (
 const NoStarted = -1
 
 // New instantiates Iter based on elements Iter and returs its reference
-func New[T any, TS ~[]T](elements TS) *ArrayIter[T] {
+func New[TS ~[]T, T any](elements TS) *ArrayIter[T] {
 	return ptr.Of(NewHeadS(elements, notsafe.GetTypeSize[T]()))
 }
 
 // NewHead instantiates Iter based on elements slice
-func NewHead[T any, TS ~[]T](elements TS) ArrayIter[T] {
+func NewHead[TS ~[]T, T any](elements TS) ArrayIter[T] {
 	return NewHeadS(elements, notsafe.GetTypeSize[T]())
 }
 
 // NewHeadS instantiates Iter based on elements slice with predefined element size
-func NewHeadS[T any, TS ~[]T](elements TS, elementSize uintptr) ArrayIter[T] {
+func NewHeadS[TS ~[]T, T any](elements TS, elementSize uintptr) ArrayIter[T] {
 	var (
 		header = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
 		array  = unsafe.Pointer(header.Data)
@@ -159,13 +159,13 @@ func IsValidIndex2(size, index int) bool {
 }
 
 // Get safely returns an element of a slice by an index or zero value of T if the index is out of range.
-func Get[T any, TS ~[]T](elements TS, current int) T {
+func Get[TS ~[]T, T any](elements TS, current int) T {
 	v, _ := Gett(elements, current)
 	return v
 }
 
 // Gett safely returns an element of a slice adn true by an index or zero value of T and false if the index is out of range.
-func Gett[T any, TS ~[]T](elements TS, current int) (T, bool) {
+func Gett[TS ~[]T, T any](elements TS, current int) (T, bool) {
 	if current >= len(elements) {
 		var no T
 		return no, false

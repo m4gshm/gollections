@@ -2,6 +2,7 @@ package ordered
 
 import (
 	"fmt"
+	"sort"
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/it/impl/it"
@@ -168,8 +169,17 @@ func (s *Set[T]) Reduce(by c.Binary[T]) T {
 	return it.Reduce(s.Head(), by)
 }
 
-func (s *Set[t]) Sort(less func(e1, e2 t) bool) *Set[t] {
-	s.elements = slice.Sort(s.elements, less)
+// Sort transforms to the ordered Set.
+func (s *Set[T]) Sort(less slice.Less[T]) *Set[T] {
+	return s.sortBy(sort.Slice, less)
+}
+
+func (s *Set[T]) StableSort(less slice.Less[T]) *Set[T] {
+	return s.sortBy(sort.SliceStable, less)
+}
+
+func (s *Set[T]) sortBy(sorter slice.Sorter, less slice.Less[T]) *Set[T] {
+	slice.Sort(s.elements, sorter, less)
 	return s
 }
 

@@ -2,6 +2,7 @@ package mutable
 
 import (
 	"fmt"
+	"sort"
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/it/impl/it"
@@ -62,7 +63,7 @@ func (s Set[K]) Collect() []K {
 }
 
 func (s Set[T]) Copy() Set[T] {
-	return WrapSet(map_.Copy(s.elements))
+	return WrapSet(map_.Clone(s.elements))
 }
 
 func (s Set[T]) IsEmpty() bool {
@@ -140,8 +141,18 @@ func (s Set[K]) Reduce(by c.Binary[K]) K {
 }
 
 // Sort transforms to the ordered Set contains sorted elements.
-func (s Set[T]) Sort(less func(e1, e2 T) bool) *ordered.Set[T] {
-	return ordered.ToSet(slice.Sort(s.Collect(), less))
+func (s *Set[T]) Sort(less slice.Less[T]) *ordered.Set[T] {
+	return s.sortBy(sort.Slice, less)
+}
+
+func (s *Set[T]) StableSort(less slice.Less[T]) *ordered.Set[T] {
+	return s.sortBy(sort.SliceStable, less)
+}
+
+func (s *Set[T]) sortBy(sorter slice.Sorter, less slice.Less[T]) *ordered.Set[T] {
+	c := slice.Clone(s.Collect())
+	slice.Sort(c, sorter, less)
+	return ordered.ToSet(c)
 }
 
 func (s Set[K]) String() string {

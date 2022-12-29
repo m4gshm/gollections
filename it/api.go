@@ -21,7 +21,7 @@ func OfLoop[S, T any](source S, hasNext func(S) bool, getNext func(S) (T, error)
 }
 
 // Wrap instantiates Iterator using slice as the elements source
-func Wrap[T any, TS ~[]T](elements TS) c.Iterator[T] {
+func Wrap[TS ~[]T, T any](elements TS) c.Iterator[T] {
 	return ptr.Of(it.NewHead(elements))
 }
 
@@ -95,6 +95,7 @@ func First[T any, IT c.Iterator[T]](elements IT, fit c.Predicate[T]) (T, bool) {
 	return it.First(elements, fit)
 }
 
+// ToPairs converts a c.Iterator to a c.KVIterator using key and value extractors
 func ToPairs[T, K, V any](elements c.Iterator[T], keyExtractor c.Converter[T, K], valExtractor c.Converter[T, V]) c.KVIterator[K, V] {
 	return ptr.Of(it.NewKeyValuer(elements, keyExtractor, valExtractor))
 }

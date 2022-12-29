@@ -2,6 +2,7 @@ package immutable
 
 import (
 	"fmt"
+	"sort"
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/it/impl/it"
@@ -105,8 +106,18 @@ func (v Vector[T]) Reduce(by c.Binary[T]) T {
 	return it.Reduce(ptr.Of(v.Head()), by)
 }
 
-func (v Vector[T]) Sort(less func(e1, e2 T) bool) Vector[T] {
-	return WrapVector(slice.Sort(slice.Clone(v.elements), less))
+func (v Vector[T]) Sort(less slice.Less[T]) Vector[T] {
+	return v.sortBy(sort.Slice, less)
+}
+
+func (v Vector[T]) StableSort(less slice.Less[T]) Vector[T] {
+	return v.sortBy(sort.SliceStable, less)
+}
+
+func (v Vector[T]) sortBy(sorter slice.Sorter, less slice.Less[T]) Vector[T] {
+	c := slice.Clone(v.elements)
+	slice.Sort(c, sorter, less)
+	return WrapVector(c)
 }
 
 func (v Vector[T]) String() string {

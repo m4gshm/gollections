@@ -1,3 +1,4 @@
+// Package examples of collection constructors
 package examples
 
 import (

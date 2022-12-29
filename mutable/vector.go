@@ -38,23 +38,29 @@ var (
 	_ fmt.Stringer         = (*Vector[any])(nil)
 )
 
+// Begin creates an iterator of the vector
 func (v *Vector[T]) Begin() c.Iterator[T] {
 	return ptr.Of(v.Head())
 }
 
+// BeginEdit creates an iterator with deleting elements
 func (v *Vector[T]) BeginEdit() c.DelIterator[T] {
 	return ptr.Of(v.Head())
 }
 
-func (v *Vector[T]) Head() Iter[T, Vector[T]] {
+// Head creates an iterator impl instace of the vector
+func (v *Vector[T]) Head() Iter[Vector[T], T] {
 	return NewHead(v, v.DeleteOne)
 }
 
-func (v *Vector[T]) Tail() Iter[T, Vector[T]] {
+// Tail creates an iterator pointing to the end of the vector
+func (v *Vector[T]) Tail() Iter[Vector[T], T] {
 	return NewTail(v, v.DeleteOne)
 }
 
-func (v *Vector[T]) First() (Iter[T, Vector[T]], T, bool) {
+// First returns the first element of the vector, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
+// If no more elements then returns false in the last value.
+func (v *Vector[T]) First() (Iter[Vector[T], T], T, bool) {
 	var (
 		iter      = NewHead(v, v.DeleteOne)
 		first, ok = iter.Next()
@@ -62,7 +68,9 @@ func (v *Vector[T]) First() (Iter[T, Vector[T]], T, bool) {
 	return iter, first, ok
 }
 
-func (v *Vector[T]) Last() (Iter[T, Vector[T]], T, bool) {
+// Last returns the last element of the vector, an iterator to iterate over the remaining elements, and true\false marker of availability prev elements.
+// If no more elements then returns false in the last value.
+func (v *Vector[T]) Last() (Iter[Vector[T], T], T, bool) {
 	var (
 		iter      = NewTail(v, v.DeleteOne)
 		first, ok = iter.Prev()
@@ -70,61 +78,75 @@ func (v *Vector[T]) Last() (Iter[T, Vector[T]], T, bool) {
 	return iter, first, ok
 }
 
+// Collect transforms the vector to a slice
 func (v *Vector[T]) Collect() []T {
 	return slice.Clone(*v)
 }
 
+// Copy just makes a copy of the vector instance
 func (v *Vector[T]) Copy() *Vector[T] {
 	return WrapVector(slice.Clone(*v))
 }
 
+// IsEmpty checks if there are elements in the vector
 func (v *Vector[T]) IsEmpty() bool {
 	return v.Len() == 0
 }
 
+// Len returns amount of elements
 func (v *Vector[T]) Len() int {
 	return notsafe.GetLen(*v)
 }
 
+// Track applies tracker to elements with error checking. To stop traking just return the ErrBreak
 func (v *Vector[T]) Track(tracker func(int, T) error) error {
 	return slice.Track(*v, tracker)
 }
 
+// TrackEach applies tracker to elements without error checking
 func (v *Vector[T]) TrackEach(tracker func(int, T)) {
 	slice.TrackEach(*v, tracker)
 }
 
+// For applies walker to elements. To stop walking just return the ErrBreak
 func (v *Vector[T]) For(walker func(T) error) error {
 	return slice.For(*v, walker)
 }
 
+// ForEach applies walker to elements without error checking
 func (v *Vector[T]) ForEach(walker func(T)) {
 	slice.ForEach(*v, walker)
 }
 
+// Get returns an element by the index, otherwise, if the provided index is ouf of the vector len, returns zero T and false in the second result
 func (v *Vector[T]) Get(index int) (T, bool) {
 	return slice.Get(*v, index)
 }
 
+// Add adds elements to the end of the vector
 func (v *Vector[T]) Add(elements ...T) bool {
 	return v.AddAll(elements)
 }
 
+// AddAll adds elements to the end of the vector
 func (v *Vector[T]) AddAll(elements []T) bool {
 	*v = append(*v, elements...)
 	return true
 }
 
+// AddOne adds a element to the end of the vector
 func (v *Vector[T]) AddOne(element T) bool {
 	*v = append(*v, element)
 	return true
 }
 
+// DeleteOne removes a element by the index
 func (v *Vector[T]) DeleteOne(index int) bool {
 	_, ok := v.Remove(index)
 	return ok
 }
 
+// Remove removes and returns a element by the index
 func (v *Vector[T]) Remove(index int) (T, bool) {
 	if e := *v; index >= 0 && index < len(e) {
 		de := e[index]
@@ -135,6 +157,7 @@ func (v *Vector[T]) Remove(index int) (T, bool) {
 	return no, false
 }
 
+// Delete drops elements by indexes
 func (v *Vector[T]) Delete(indexes ...int) bool {
 	l := len(indexes)
 	if l == 0 {
@@ -176,6 +199,7 @@ func (v *Vector[T]) Delete(indexes ...int) bool {
 	return false
 }
 
+// Set puts a element into the vector at the index
 func (v *Vector[T]) Set(index int, value T) bool {
 	e := *v
 	if index < 0 {
@@ -197,25 +221,36 @@ func (v *Vector[T]) Set(index int, value T) bool {
 	return true
 }
 
+// Filter returns a pipe consisting of vector elements matching the filter
 func (v *Vector[T]) Filter(filter c.Predicate[T]) c.Pipe[T, []T] {
 	return it.NewPipe[T](it.Filter(ptr.Of(v.Head()), filter))
 }
 
+// Map returns a pipe of converted vector elements by the converter 'by'
 func (v *Vector[T]) Map(by c.Converter[T, T]) c.Pipe[T, []T] {
 	return it.NewPipe[T](it.Map(ptr.Of(v.Head()), by))
 }
 
+// Reduce reduces elements to an one
 func (v *Vector[T]) Reduce(by c.Binary[T]) T {
 	return it.Reduce(ptr.Of(v.Head()), by)
 }
 
-// Sotr sorts the Vector in-place and returns it.
-func (v *Vector[t]) Sort(less func(e1, e2 t) bool) *Vector[t] {
-	*v = slice.Sort(*v, less)
+// Sort sorts the Vector in-place and returns it
+func (v *Vector[T]) Sort(less slice.Less[T]) *Vector[T] {
+	return v.sortBy(sort.Slice, less)
+}
+
+func (v *Vector[T]) StableSort(less slice.Less[T]) *Vector[T] {
+	return v.sortBy(sort.SliceStable, less)
+}
+
+func (v *Vector[T]) sortBy(sorter slice.Sorter, less slice.Less[T]) *Vector[T] {
+	slice.Sort(*v, sorter, less)
 	return v
 }
 
-// String returns then string representation.
+// String returns then string representation
 func (v *Vector[T]) String() string {
 	return slice.ToString(*v)
 }

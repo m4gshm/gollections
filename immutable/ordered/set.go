@@ -2,6 +2,7 @@ package ordered
 
 import (
 	"fmt"
+	"sort"
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/it/impl/it"
@@ -109,8 +110,18 @@ func (s Set[T]) Contains(v T) bool {
 	return ok
 }
 
-func (s Set[T]) Sort(less func(e1, e2 T) bool) Set[T] {
-	return WrapSet(slice.Sort(slice.Clone(s.order), less), s.elements)
+func (s Set[T]) Sort(less slice.Less[T]) Set[T] {
+	return s.sortBy(sort.Slice, less)
+}
+
+func (s Set[T]) StableSort(less slice.Less[T]) Set[T] {
+	return s.sortBy(sort.SliceStable, less)
+}
+
+func (s Set[T]) sortBy(sorter slice.Sorter, less slice.Less[T]) Set[T] {
+	c := slice.Clone(s.order)
+	slice.Sort(c, sorter, less)
+	return WrapSet(c, s.elements)
 }
 
 func (s Set[T]) String() string {

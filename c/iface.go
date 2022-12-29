@@ -95,7 +95,7 @@ type KVIterator[K, V any] interface {
 	Next() (K, V, bool)
 }
 
-// KVIterator is the interface that provides iterate over key/value pairs, where an iteration can be interrupted by an error
+// KVIteratorBreakable is the interface that provides iterate over key/value pairs, where an iteration can be interrupted by an error
 type KVIteratorBreakable[K, V any] interface {
 	KVIterator[K, V]
 	//returns an iteration abort error

@@ -72,7 +72,7 @@ func (s Map[K, V]) First() (it.EmbedMapKVIter[K, V], K, V, bool) {
 }
 
 func (s Map[K, V]) Collect() map[K]V {
-	return map_.Copy(s)
+	return map_.Clone(s)
 }
 
 func (s Map[K, V]) Len() int {

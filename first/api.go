@@ -5,28 +5,32 @@ import (
 	"github.com/m4gshm/gollections/slice/first"
 )
 
-// Of an alias of the slice.First
-func Of[T any](elements ...T) ofElements[T] {
-	return ofElements[T]{elements: elements}
+// Of the first part of an expression first.Of(elements...).By(tester)
+func Of[T any](elements ...T) OfElements[T] {
+	return OfElements[T]{elements: elements}
 }
 
-// By an alias of the slice.First
-func By[T any](by c.Predicate[T]) byPredicate[T] {
-	return byPredicate[T]{by: by}
+// By the first part of an expression first.By(tester).Of(elements...)
+func By[T any](by c.Predicate[T]) ByPredicate[T] {
+	return ByPredicate[T]{by: by}
 }
 
-type byPredicate[T any] struct {
+// ByPredicate is tail prducer of the first.By
+type ByPredicate[T any] struct {
 	by c.Predicate[T]
 }
 
-func (l byPredicate[T]) Of(elements ...T) (T, bool) {
+// Of the finish part of an expression first.By(tester).Of(elements...)
+func (l ByPredicate[T]) Of(elements ...T) (T, bool) {
 	return first.Of(elements, l.by)
 }
 
-type ofElements[T any] struct {
+// OfElements is tail prducer of the first.Of
+type OfElements[T any] struct {
 	elements []T
 }
 
-func (l ofElements[T]) By(by c.Predicate[T]) (T, bool) {
+// By the finish part of an expression first.Of(elements...).By(tester)
+func (l OfElements[T]) By(by c.Predicate[T]) (T, bool) {
 	return first.Of(l.elements, by)
 }

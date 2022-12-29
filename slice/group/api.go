@@ -6,6 +6,6 @@ import (
 )
 
 // Of - group.Of synonym of the slice.Group
-func Of[T any, K comparable, TS ~[]T](elements TS, by c.Converter[T, K]) map[K][]T {
+func Of[T any, K comparable, TS ~[]T](elements TS, by c.Converter[T, K]) map[K]TS {
 	return slice.Group(elements, by)
 }

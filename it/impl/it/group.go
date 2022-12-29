@@ -15,7 +15,7 @@ type KeyValuer[T, K, V any, IT c.Iterator[T]] struct {
 }
 
 var _ c.KVIterator[int, string] = (*KeyValuer[any, int, string, c.Iterator[any]])(nil)
-var _ c.KVIterator[int, string] = KeyValuer[any, int, string, c.Iterator[any]] {}
+var _ c.KVIterator[int, string] = KeyValuer[any, int, string, c.Iterator[any]]{}
 
 func (s KeyValuer[T, K, V, IT]) Next() (K, V, bool) {
 	elem, ok := s.iter.Next()

@@ -4,7 +4,6 @@ package slice
 import (
 	"bytes"
 	"fmt"
-	"sort"
 	"unsafe"
 
 	"golang.org/x/exp/constraints"
@@ -48,21 +47,26 @@ func Generate[T any](next func() (T, bool, error)) ([]T, error) {
 	}
 }
 
-// Clone makes new slice instance with copied elements.
-func Clone[T any, TS ~[]T](elements TS) []T {
-	copied := make([]T, len(elements))
+// Clone makes new slice instance with copied elements
+func Clone[TS ~[]T, T any](elements TS) TS {
+	copied := make(TS, len(elements))
 	copy(copied, elements)
 	return copied
 }
 
+// DeepClone copies slice elements using a copier function and returns them as a new slice
+func DeepClone[TS ~[]T, T any](elements TS, copier func(T) T) TS {
+	return Convert(elements, copier)
+}
+
 // Delete removes an element by index from the slice 'elements'
-func Delete[T any, TS ~[]T](index int, elements TS) []T {
+func Delete[TS ~[]T, T any](index int, elements TS) TS {
 	return append(elements[0:index], elements[index+1:]...)
 }
 
 // Group converts the slice into a map with keys computeable by the converter 'by'
-func Group[T any, K comparable, TS ~[]T](elements TS, by c.Converter[T, K]) map[K][]T {
-	groups := map[K][]T{}
+func Group[T any, K comparable, TS ~[]T](elements TS, by c.Converter[T, K]) map[K]TS {
+	groups := map[K]TS{}
 	for _, e := range elements {
 		key := by(e)
 		group := groups[key]
@@ -74,8 +78,8 @@ func Group[T any, K comparable, TS ~[]T](elements TS, by c.Converter[T, K]) map[
 	return groups
 }
 
-// Map creates a slice consisting of the transformed elements using the converter 'by'
-func Map[From, To any, FS ~[]From](elements FS, by c.Converter[From, To]) []To {
+// Convert creates a slice consisting of the transformed elements using the converter 'by'
+func Convert[FS ~[]From, From, To any](elements FS, by c.Converter[From, To]) []To {
 	result := make([]To, len(elements))
 	for i, e := range elements {
 		result[i] = by(e)
@@ -83,8 +87,8 @@ func Map[From, To any, FS ~[]From](elements FS, by c.Converter[From, To]) []To {
 	return result
 }
 
-// MapFit additionally filters 'From' elements.
-func MapFit[From, To any, FS ~[]From](elements FS, fit c.Predicate[From], by c.Converter[From, To]) []To {
+// ConvertFit additionally filters 'From' elements
+func ConvertFit[FS ~[]From, From, To any](elements FS, fit c.Predicate[From], by c.Converter[From, To]) []To {
 	result := make([]To, 0)
 	for _, e := range elements {
 		if fit(e) {
@@ -94,9 +98,8 @@ func MapFit[From, To any, FS ~[]From](elements FS, fit c.Predicate[From], by c.C
 	return result
 }
 
-
-// MapIndex creates a slice consisting of the transformed elements using the converter 'by' which additionally applies the index of the element being converted
-func MapIndex[From, To any, FS ~[]From](elements FS, by func(index int, from From) To) []To {
+// ConvertIndexed creates a slice consisting of the transformed elements using the converter 'by' which additionally applies the index of the element being converted
+func ConvertIndexed[FS ~[]From, From, To any](elements FS, by func(index int, from From) To) []To {
 	result := make([]To, len(elements))
 	for i, e := range elements {
 		result[i] = by(i, e)
@@ -104,8 +107,8 @@ func MapIndex[From, To any, FS ~[]From](elements FS, by func(index int, from Fro
 	return result
 }
 
-// MapFitIndex additionally filters 'From' elements
-func MapFitIndex[From, To any, FS ~[]From](elements FS, fit func(index int, from From) bool, by func(index int, from From) To) []To {
+// ConvertFitIndexed additionally filters 'From' elements
+func ConvertFitIndexed[FS ~[]From, From, To any](elements FS, fit func(index int, from From) bool, by func(index int, from From) To) []To {
 	result := make([]To, 0)
 	for i, e := range elements {
 		if fit(i, e) {
@@ -115,8 +118,8 @@ func MapFitIndex[From, To any, FS ~[]From](elements FS, fit func(index int, from
 	return result
 }
 
-// MapCheck is similar to MapFit, but it checks and transforms elements in place
-func MapCheck[From, To any, FS ~[]From](elements FS, by func(from From) (To, bool)) []To {
+// ConvertCheck is similar to ConvertFit, but it checks and transforms elements together
+func ConvertCheck[FS ~[]From, From, To any](elements FS, by func(from From) (To, bool)) []To {
 	result := make([]To, 0)
 	for _, e := range elements {
 		if to, ok := by(e); ok {
@@ -126,8 +129,8 @@ func MapCheck[From, To any, FS ~[]From](elements FS, by func(from From) (To, boo
 	return result
 }
 
-// MapCheckIndex additionally filters 'From' elements
-func MapCheckIndex[From, To any, FS ~[]From](elements FS, by func(index int, from From) (To, bool)) []To {
+// ConvertCheckIndexed additionally filters 'From' elements
+func ConvertCheckIndexed[FS ~[]From, From, To any](elements FS, by func(index int, from From) (To, bool)) []To {
 	result := make([]To, 0)
 	for i, e := range elements {
 		if to, ok := by(i, e); ok {
@@ -138,7 +141,7 @@ func MapCheckIndex[From, To any, FS ~[]From](elements FS, by func(index int, fro
 }
 
 // Flatt unfolds the n-dimensional slice into a n-1 dimensional slice
-func Flatt[From, To any, FS ~[]From](elements FS, by c.Flatter[From, To]) []To {
+func Flatt[FS ~[]From, From, To any](elements FS, by c.Flatter[From, To]) []To {
 	result := make([]To, 0)
 	for _, e := range elements {
 		result = append(result, by(e)...)
@@ -148,7 +151,7 @@ func Flatt[From, To any, FS ~[]From](elements FS, by c.Flatter[From, To]) []To {
 }
 
 // FlattFit additionally filters 'From' elements.
-func FlattFit[From, To any, FS ~[]From](elements FS, fit c.Predicate[From], by c.Flatter[From, To]) []To {
+func FlattFit[FS ~[]From, From, To any](elements FS, fit c.Predicate[From], by c.Flatter[From, To]) []To {
 	result := make([]To, 0)
 	for _, e := range elements {
 		if fit(e) {
@@ -159,7 +162,7 @@ func FlattFit[From, To any, FS ~[]From](elements FS, fit c.Predicate[From], by c
 }
 
 // FlattElemFit unfolds the n-dimensional slice into a n-1 dimensional slice with additinal filtering of 'To' elements.
-func FlattElemFit[From, To any, FS ~[]From](elements FS, by c.Flatter[From, To], fit c.Predicate[To]) []To {
+func FlattElemFit[FS ~[]From, From, To any](elements FS, by c.Flatter[From, To], fit c.Predicate[To]) []To {
 	result := make([]To, 0)
 	for _, e := range elements {
 		for _, to := range by(e) {
@@ -172,7 +175,7 @@ func FlattElemFit[From, To any, FS ~[]From](elements FS, by c.Flatter[From, To],
 }
 
 // FlattFitFit unfolds the n-dimensional slice 'elements' into a n-1 dimensional slice with additinal filtering of 'From' and 'To' elements.
-func FlattFitFit[From, To any, FS ~[]From](elements FS, fitFrom c.Predicate[From], by c.Flatter[From, To], fitTo c.Predicate[To]) []To {
+func FlattFitFit[FS ~[]From, From, To any](elements FS, fitFrom c.Predicate[From], by c.Flatter[From, To], fitTo c.Predicate[To]) []To {
 	result := make([]To, 0)
 	for _, e := range elements {
 		if fitFrom(e) {
@@ -187,7 +190,7 @@ func FlattFitFit[From, To any, FS ~[]From](elements FS, fitFrom c.Predicate[From
 }
 
 // Filter creates a slice containing only the filtered elements
-func Filter[T any, TS ~[]T](elements TS, filter c.Predicate[T]) []T {
+func Filter[TS ~[]T, T any](elements TS, filter c.Predicate[T]) []T {
 	result := make([]T, 0)
 	for _, e := range elements {
 		if filter(e) {
@@ -219,7 +222,7 @@ func Range[T constraints.Integer](from T, to T) []T {
 }
 
 // Reverse inverts elements order
-func Reverse[T any, TS ~[]T](elements TS) []T {
+func Reverse[TS ~[]T, T any](elements TS) []T {
 	l := 0
 	h := len(elements) - 1
 	for l < h {
@@ -231,19 +234,21 @@ func Reverse[T any, TS ~[]T](elements TS) []T {
 	return elements
 }
 
+type Less[T any] func(e1, e2 T) bool
+type Sorter func(x any, less func(i, j int) bool)
+
 // Sort sorts elements in place by applying the function 'less'
-func Sort[T any, TS ~[]T](elements TS, less func(e1, e2 T) bool) []T {
-	sort.Slice(elements, func(i, j int) bool { return less(elements[i], elements[j]) })
-	return elements
+func Sort[TS ~[]T, T any](elements TS, sorter Sorter, less Less[T]) {
+	sorter(elements, func(i, j int) bool { return less(elements[i], elements[j]) })
 }
 
 // SortByOrdered sorts elements in place by converting them to Ordered values and applying the operator <
-func SortByOrdered[T any, o constraints.Ordered, TS ~[]T](elements TS, by c.Converter[T, o]) []T {
-	return Sort(elements, func(e1, e2 T) bool { return by(e1) < by(e2) })
+func SortByOrdered[T any, o constraints.Ordered, TS ~[]T](elements TS, sorter Sorter, by c.Converter[T, o]) {
+	Sort(elements, sorter, func(e1, e2 T) bool { return by(e1) < by(e2) })
 }
 
 // Reduce reduces elements to an one
-func Reduce[T any, TS ~[]T](elements TS, by c.Binary[T]) T {
+func Reduce[TS ~[]T, T any](elements TS, by c.Binary[T]) T {
 	var result T
 	for i, v := range elements {
 		if i == 0 {
@@ -261,7 +266,7 @@ func Sum[T c.Summable, TS ~[]T](elements TS) T {
 }
 
 // First returns the first element that satisfies requirements of the predicate 'fit'
-func First[T any, TS ~[]T](elements TS, by c.Predicate[T]) (T, bool) {
+func First[TS ~[]T, T any](elements TS, by c.Predicate[T]) (T, bool) {
 	for _, e := range elements {
 		if by(e) {
 			return e, true
@@ -272,7 +277,7 @@ func First[T any, TS ~[]T](elements TS, by c.Predicate[T]) (T, bool) {
 }
 
 // Last returns the latest element that satisfies requirements of the predicate 'fit'
-func Last[T any, TS ~[]T](elements TS, by c.Predicate[T]) (T, bool) {
+func Last[TS ~[]T, T any](elements TS, by c.Predicate[T]) (T, bool) {
 	for i := len(elements) - 1; i >= 0; i-- {
 		e := elements[i]
 		if by(e) {
@@ -284,7 +289,7 @@ func Last[T any, TS ~[]T](elements TS, by c.Predicate[T]) (T, bool) {
 }
 
 // Get returns an element from the elements by index, otherwise, if the provided index is ouf of the elements, returns zero T and false in the second result
-func Get[T any, TS ~[]T](elements TS, index int) (T, bool) {
+func Get[TS ~[]T, T any](elements TS, index int) (T, bool) {
 	l := len(elements)
 	if l > 0 && (index >= 0 || index < l) {
 		return elements[index], true
@@ -294,7 +299,7 @@ func Get[T any, TS ~[]T](elements TS, index int) (T, bool) {
 }
 
 // Track applies tracker to elements with error checking. To stop traking just return the ErrBreak
-func Track[T any, TS ~[]T](elements TS, tracker func(int, T) error) error {
+func Track[TS ~[]T, T any](elements TS, tracker func(int, T) error) error {
 	for i, e := range elements {
 		if err := tracker(i, e); err != ErrBreak {
 			return nil
@@ -306,14 +311,14 @@ func Track[T any, TS ~[]T](elements TS, tracker func(int, T) error) error {
 }
 
 // TrackEach applies tracker to elements without error checking
-func TrackEach[T any, TS ~[]T](elements TS, tracker func(int, T)) {
+func TrackEach[TS ~[]T, T any](elements TS, tracker func(int, T)) {
 	for i, e := range elements {
 		tracker(i, e)
 	}
 }
 
 // For applies walker to elements. To stop walking just return the ErrBreak
-func For[T any, TS ~[]T](elements TS, walker func(T) error) error {
+func For[TS ~[]T, T any](elements TS, walker func(T) error) error {
 	for _, e := range elements {
 		if err := walker(e); err != ErrBreak {
 			return nil
@@ -325,7 +330,7 @@ func For[T any, TS ~[]T](elements TS, walker func(T) error) error {
 }
 
 // ForEach applies walker to elements without error checking
-func ForEach[T any, TS ~[]T](elements TS, walker func(T)) {
+func ForEach[TS ~[]T, T any](elements TS, walker func(T)) {
 	for _, e := range elements {
 		walker(e)
 	}
@@ -339,12 +344,12 @@ func ForEachRef[T any, TS ~[]*T](references TS, walker func(T)) {
 }
 
 // ToString converts elements to their default string representation
-func ToString[T any, TS ~[]T](elements TS) string {
+func ToString[TS ~[]T, T any](elements TS) string {
 	return ToStringf(elements, "%+v", " ")
 }
 
 // ToStringf converts elements to a string representation defined by a custom element format and a delimiter
-func ToStringf[T any, TS ~[]T](elements TS, elementFormat, delimeter string) string {
+func ToStringf[TS ~[]T, T any](elements TS, elementFormat, delimeter string) string {
 	str := bytes.Buffer{}
 	str.WriteString("[")
 	for i, v := range elements {
@@ -380,12 +385,14 @@ func ToStringRefsf[T any, TS ~[]*T](references TS, elementFormat, nilValue, deli
 	return str.String()
 }
 
+// BehaveAsStrings draws a string inherited type slice as the slice of strings
 func BehaveAsStrings[T ~string, TS ~[]T](elements TS) []string {
 	ptr := unsafe.Pointer(&elements)
 	s := *(*[]string)(ptr)
 	return s
 }
 
+// StringsBehaveAs draws a string slice as the slice of a string inherited type
 func StringsBehaveAs[TS ~[]T, T ~string](elements []string) TS {
 	ptr := unsafe.Pointer(&elements)
 	s := *(*TS)(ptr)

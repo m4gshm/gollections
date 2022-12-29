@@ -6,6 +6,6 @@ import (
 )
 
 // Of an alias of the slice.Last
-func Of[T any, TS ~[]T](elements TS, by c.Predicate[T]) (T, bool) {
+func Of[TS ~[]T, T any](elements TS, by c.Predicate[T]) (T, bool) {
 	return slice.Last(elements, by)
 }

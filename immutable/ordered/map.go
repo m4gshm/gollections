@@ -2,6 +2,7 @@ package ordered
 
 import (
 	"fmt"
+	"sort"
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/it/impl/it"
@@ -83,7 +84,7 @@ func (s Map[K, V]) First() (it.OrderedEmbedMapKVIter[K, V], K, V, bool) {
 }
 
 func (s Map[K, V]) Collect() map[K]V {
-	return map_.Copy(s.elements)
+	return map_.Clone(s.elements)
 }
 
 func (s Map[K, V]) Len() int {
@@ -120,8 +121,18 @@ func (s Map[K, V]) V() MapValues[K, V] {
 	return WrapVal(s.order, s.elements)
 }
 
-func (s Map[K, V]) Sort(less func(k1, k2 K) bool) Map[K, V] {
-	return WrapMap(slice.Sort(slice.Clone(s.order), less), s.elements)
+func (s Map[K, V]) Sort(less slice.Less[K]) Map[K, V] {
+	return s.sortBy(sort.Slice, less)
+}
+
+func (s Map[K, V]) StableSort(less slice.Less[K]) Map[K, V] {
+	return s.sortBy(sort.SliceStable, less)
+}
+
+func (s Map[K, V]) sortBy(sorter slice.Sorter, less slice.Less[K]) Map[K, V] {
+	c := slice.Clone(s.order)
+	slice.Sort(c, sorter, less)
+	return WrapMap(c, s.elements)
 }
 
 func (s Map[K, V]) String() string {

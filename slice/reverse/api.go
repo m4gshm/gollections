@@ -6,6 +6,6 @@ import (
 )
 
 // Of makes clone of elements in reverse order
-func Of[T any, TS ~[]T](elements TS) []T {
+func Of[TS ~[]T, T any](elements TS) TS {
 	return slice.Reverse(clone.Of(elements))
 }

@@ -112,7 +112,7 @@ func Benchmark_Map_Slice(b *testing.B) {
 	var s []string
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		s = slice.Map(values, op)
+		s = slice.Convert(values, op)
 	}
 	_ = s
 	b.StopTimer()
@@ -339,7 +339,7 @@ func Benchmark_MapFit_Embedder_Slice(b *testing.B) {
 	var s []string
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		s = slice.MapFit(items, even, conv.And(toString, addTail))
+		s = slice.ConvertFit(items, even, conv.And(toString, addTail))
 	}
 	_ = s
 

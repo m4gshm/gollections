@@ -2,6 +2,7 @@ package immutable
 
 import (
 	"fmt"
+	"sort"
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/immutable/ordered"
@@ -48,106 +49,119 @@ var (
 )
 
 // Begin creates a key/value iterator interface.
-func (s Map[K, V]) Begin() c.KVIterator[K, V] {
-	return ptr.Of(s.Head())
+func (m Map[K, V]) Begin() c.KVIterator[K, V] {
+	return ptr.Of(m.Head())
 }
 
 // Head creates a key/value iterator implementation started from the head.
-func (s Map[K, V]) Head() it.EmbedMapKVIter[K, V] {
-	return it.NewEmbedMapKV(s.elements)
+func (m Map[K, V]) Head() it.EmbedMapKVIter[K, V] {
+	return it.NewEmbedMapKV(m.elements)
 }
 
 // Collect exports the content as a map.
-func (s Map[K, V]) Collect() map[K]V {
-	return map_.Copy(s.elements)
+func (m Map[K, V]) Collect() map[K]V {
+	return map_.Clone(m.elements)
 }
 
 // Sort transforms to the ordered Map contains sorted elements.
-func (s Map[K, V]) Sort(less func(k1, k2 K) bool) ordered.Map[K, V] {
-	return ordered.WrapMap(slice.Sort(map_.Keys(s.elements), less), s.elements)
+func (m Map[K, V]) Sort(less slice.Less[K]) ordered.Map[K, V] {
+	return m.sortBy(sort.Slice, less)
+}
+
+func (m Map[K, V]) StableSort(less slice.Less[K]) ordered.Map[K, V] {
+	return m.sortBy(sort.SliceStable, less)
+}
+
+func (m Map[K, V]) sortBy(sorter slice.Sorter, less slice.Less[K]) ordered.Map[K, V] {
+	c := map_.Keys(m.elements)
+	slice.Sort(map_.Keys(m.elements), sorter, less)
+	return ordered.WrapMap(c, m.elements)
 }
 
 // String is part of the Stringer interface for printing the string representation of this Map.
-func (s Map[K, V]) String() string {
-	return map_.ToString(s.elements)
+func (m Map[K, V]) String() string {
+	return map_.ToString(m.elements)
 }
 
 // Track apply a tracker to touch key, value from the inside. To stop traking just return the map_.Break.
-func (s Map[K, V]) Track(tracker func(K, V) error) error {
-	return map_.Track(s.elements, tracker)
+func (m Map[K, V]) Track(tracker func(K, V) error) error {
+	return map_.Track(m.elements, tracker)
 }
 
-// Track apply a tracker to touch each key, value from the inside.
-func (s Map[K, V]) TrackEach(tracker func(K, V)) {
-	map_.TrackEach(s.elements, tracker)
+// TrackEach apply a tracker to touch each key, value from the inside.
+func (m Map[K, V]) TrackEach(tracker func(K, V)) {
+	map_.TrackEach(m.elements, tracker)
 }
 
-func (s Map[K, V]) For(walker func(c.KV[K, V]) error) error {
-	return map_.For(s.elements, walker)
+func (m Map[K, V]) For(walker func(c.KV[K, V]) error) error {
+	return map_.For(m.elements, walker)
 }
 
-func (s Map[K, V]) ForEach(walker func(c.KV[K, V])) {
-	map_.ForEach(s.elements, walker)
+func (m Map[K, V]) ForEach(walker func(c.KV[K, V])) {
+	map_.ForEach(m.elements, walker)
 }
 
-func (s Map[K, V]) Len() int {
-	return len(s.elements)
+func (m Map[K, V]) Len() int {
+	return len(m.elements)
 }
 
-func (s Map[K, V]) IsEmpty() bool {
-	return s.Len() == 0
+func (m Map[K, V]) IsEmpty() bool {
+	return m.Len() == 0
 }
 
-func (s Map[K, V]) Contains(key K) bool {
-	_, ok := s.elements[key]
+func (m Map[K, V]) Contains(key K) bool {
+	_, ok := m.elements[key]
 	return ok
 }
 
-func (s Map[K, V]) Get(key K) (V, bool) {
-	val, ok := s.elements[key]
+func (m Map[K, V]) Get(key K) (V, bool) {
+	val, ok := m.elements[key]
 	return val, ok
 }
 
-func (s Map[K, V]) Keys() c.Collection[K, []K, c.Iterator[K]] {
-	return s.K()
+func (m Map[K, V]) Keys() c.Collection[K, []K, c.Iterator[K]] {
+	return m.K()
 }
 
-func (s Map[K, V]) K() MapKeys[K, V] {
-	return WrapKeys(s.elements)
+func (m Map[K, V]) K() MapKeys[K, V] {
+	return WrapKeys(m.elements)
 }
 
-func (s Map[K, V]) Values() c.Collection[V, []V, c.Iterator[V]] {
-	return s.V()
+func (m Map[K, V]) Values() c.Collection[V, []V, c.Iterator[V]] {
+	return m.V()
 }
 
-func (s Map[K, V]) V() MapValues[K, V] {
-	return WrapVal(s.elements)
+func (m Map[K, V]) V() MapValues[K, V] {
+	return WrapVal(m.elements)
 }
 
-func (s Map[K, V]) FilterKey(fit c.Predicate[K]) c.MapPipe[K, V, map[K]V] {
-	return it.NewKVPipe(it.FilterKV(ptr.Of(s.Head()), c.FitKey[K, V](fit)), kvit.ToMap[K, V])
+func (m Map[K, V]) FilterKey(fit c.Predicate[K]) c.MapPipe[K, V, map[K]V] {
+	return it.NewKVPipe(it.FilterKV(ptr.Of(m.Head()), c.FitKey[K, V](fit)), kvit.ToMap[K, V])
 }
 
-func (s Map[K, V]) MapKey(by c.Converter[K, K]) c.MapPipe[K, V, map[K]V] {
-	return it.NewKVPipe(it.MapKV(ptr.Of(s.Head()), func(key K, val V) (K, V) { return by(key), val }), kvit.ToMap[K, V])
+func (m Map[K, V]) MapKey(by c.Converter[K, K]) c.MapPipe[K, V, map[K]V] {
+	return it.NewKVPipe(it.MapKV(ptr.Of(m.Head()), func(key K, val V) (K, V) { return by(key), val }), kvit.ToMap[K, V])
 }
 
-func (s Map[K, V]) FilterValue(fit c.Predicate[V]) c.MapPipe[K, V, map[K]V] {
-	return it.NewKVPipe(it.FilterKV(ptr.Of(s.Head()), c.FitValue[K](fit)), kvit.ToMap[K, V])
+func (m Map[K, V]) FilterValue(fit c.Predicate[V]) c.MapPipe[K, V, map[K]V] {
+	return it.NewKVPipe(it.FilterKV(ptr.Of(m.Head()), c.FitValue[K](fit)), kvit.ToMap[K, V])
 }
 
-func (s Map[K, V]) MapValue(by c.Converter[V, V]) c.MapPipe[K, V, map[K]V] {
-	return it.NewKVPipe(it.MapKV(ptr.Of(s.Head()), func(key K, val V) (K, V) { return key, by(val) }), kvit.ToMap[K, V])
+func (m Map[K, V]) MapValue(by c.Converter[V, V]) c.MapPipe[K, V, map[K]V] {
+	return it.NewKVPipe(it.MapKV(ptr.Of(m.Head()), func(key K, val V) (K, V) { return key, by(val) }), kvit.ToMap[K, V])
 }
 
-func (s Map[K, V]) Filter(filter c.BiPredicate[K, V]) c.MapPipe[K, V, map[K]V] {
-	return it.NewKVPipe(it.FilterKV(ptr.Of(s.Head()), filter), kvit.ToMap[K, V])
+func (m Map[K, V]) Filter(filter c.BiPredicate[K, V]) c.MapPipe[K, V, map[K]V] {
+	return it.NewKVPipe(it.FilterKV(ptr.Of(m.Head()), filter), kvit.ToMap[K, V])
 }
 
-func (s Map[K, V]) Map(by c.BiConverter[K, V, K, V]) c.MapPipe[K, V, map[K]V] {
-	return it.NewKVPipe(it.MapKV(ptr.Of(s.Head()), by), kvit.ToMap[K, V])
+// Map creates an Iterator that applies a converter to iterable elements.
+// The 'by' converter is applied only when the 'Next' method of returned Iterator is called and does not change the elements of the map.
+func (m Map[K, V]) Map(by c.BiConverter[K, V, K, V]) c.MapPipe[K, V, map[K]V] {
+	return it.NewKVPipe(it.MapKV(ptr.Of(m.Head()), by), kvit.ToMap[K, V])
 }
 
-func (s Map[K, V]) Reduce(by c.Quaternary[K, V]) (K, V) {
-	return it.ReduceKV(ptr.Of(s.Head()), by)
+// Reduce reduces key\value pairs to an one.
+func (m Map[K, V]) Reduce(by c.Quaternary[K, V]) (K, V) {
+	return it.ReduceKV(ptr.Of(m.Head()), by)
 }

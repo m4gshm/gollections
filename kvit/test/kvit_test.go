@@ -54,9 +54,8 @@ func Test_OfLoop(t *testing.T) {
 		next, err := r.next()
 		if err != nil {
 			return false, 0, err
-		} else {
-			return next%2 == 0, next, nil
 		}
+		return next%2 == 0, next, nil
 	}
 
 	iter := kvit.OfLoop(stream, (*rows[int]).hasNext, evens)

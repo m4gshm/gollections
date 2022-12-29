@@ -9,6 +9,7 @@ func NewLoop[S, T any](source S, hasNext func(S) bool, getNext func(S) (T, error
 	return LoopIter[S, T]{source: source, hasNext: hasNext, getNext: getNext}
 }
 
+// LoopIter - universal c.Iterator implementation
 type LoopIter[S, T any] struct {
 	source  S
 	hasNext func(S) bool
@@ -24,11 +25,11 @@ var (
 // Next implements c.Iterator
 func (i *LoopIter[S, T]) Next() (T, bool) {
 	if i.abort == nil && i.hasNext(i.source) {
-		if next, err := i.getNext(i.source); err == nil {
+		next, err := i.getNext(i.source)
+		if err == nil {
 			return next, true
-		} else {
-			i.abort = err
 		}
+		i.abort = err
 	}
 	var no T
 	return no, false
