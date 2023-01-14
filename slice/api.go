@@ -237,7 +237,7 @@ func Reverse[TS ~[]T, T any](elements TS) []T {
 type Less[T any] func(e1, e2 T) bool
 type Sorter func(x any, less func(i, j int) bool)
 
-// Sort sorts elements in place by applying the function 'less'
+// Sort sorts elements in place using a function that checks if an element is smaller than the others
 func Sort[TS ~[]T, T any](elements TS, sorter Sorter, less Less[T]) {
 	sorter(elements, func(i, j int) bool { return less(elements[i], elements[j]) })
 }

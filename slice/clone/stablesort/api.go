@@ -16,6 +16,13 @@ func By[T any, o constraints.Ordered, TS ~[]T](elements TS, by c.Converter[T, o]
 	return c
 }
 
+// ByLess makes clone and atanle sorts elements using a function that checks if an element is smaller than the others
+func ByLess[T any, TS ~[]T](elements TS, less slice.Less[T]) TS {
+	c := clone.Of(elements)
+	slice.Sort(c, sort.SliceStable, less)
+	return c
+}
+
 // Of makes clone of stable sorted orderable elements
 func Of[T constraints.Ordered, TS ~[]T](elements TS) TS {
 	return By(elements, func(o T) T { return o })

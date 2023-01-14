@@ -38,6 +38,20 @@ func Test_SortStructs(t *testing.T) {
 	assert.Equal(t, []User{{"Tom", 18}, {"Bob", 26}, {"Alice", 35}}, byAge)
 }
 
+func Test_SortStructsByLess(t *testing.T) {
+	type User struct {
+		name string
+		age  int
+	}
+	var (
+		users        = []User{{"Bob", 26}, {"Alice", 35}, {"Tom", 18}}
+		byName       = sort.ByLess(users, func(u1, u2 User) bool { return u1.name < u2.name })
+		byAgeReverse = sort.ByLess(users, func(u1, u2 User) bool { return u1.age > u2.age })
+	)
+	assert.Equal(t, []User{{"Alice", 35}, {"Bob", 26}, {"Tom", 18}}, byName)
+	assert.Equal(t, []User{{"Alice", 35}, {"Bob", 26}, {"Tom", 18}}, byAgeReverse)
+}
+
 func Test_Reverse(t *testing.T) {
 	assert.Equal(t, []int{-1, 0, 1, 2, 3}, slice.Reverse([]int{3, 2, 1, 0, -1}))
 	assert.Equal(t, []int{-1, 0, 1, 2, 3}, reverse.Of([]int{3, 2, 1, 0, -1}))
