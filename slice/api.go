@@ -238,13 +238,14 @@ type Less[T any] func(e1, e2 T) bool
 type Sorter func(x any, less func(i, j int) bool)
 
 // Sort sorts elements in place using a function that checks if an element is smaller than the others
-func Sort[TS ~[]T, T any](elements TS, sorter Sorter, less Less[T]) {
+func Sort[TS ~[]T, T any](elements TS, sorter Sorter, less Less[T]) TS {
 	sorter(elements, func(i, j int) bool { return less(elements[i], elements[j]) })
+	return elements
 }
 
-// SortByOrdered sorts elements in place by converting them to Ordered values and applying the operator <
-func SortByOrdered[T any, o constraints.Ordered, TS ~[]T](elements TS, sorter Sorter, by c.Converter[T, o]) {
-	Sort(elements, sorter, func(e1, e2 T) bool { return by(e1) < by(e2) })
+// SortByOrdered sorts elements in place by converting them to constraints.Ordered values and applying the operator <
+func SortByOrdered[T any, o constraints.Ordered, TS ~[]T](elements TS, sorter Sorter, by c.Converter[T, o]) TS {
+	return Sort(elements, sorter, func(e1, e2 T) bool { return by(e1) < by(e2) })
 }
 
 // Reduce reduces elements to an one

@@ -13,9 +13,14 @@ import (
 	"github.com/m4gshm/gollections/ptr"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/clone"
+	"github.com/m4gshm/gollections/slice/clone/reverse"
+	csort "github.com/m4gshm/gollections/slice/clone/sort"
+	cstablesort "github.com/m4gshm/gollections/slice/clone/stablesort"
 	"github.com/m4gshm/gollections/slice/first"
 	"github.com/m4gshm/gollections/slice/last"
 	"github.com/m4gshm/gollections/slice/range_"
+	"github.com/m4gshm/gollections/slice/sort"
+	"github.com/m4gshm/gollections/slice/stablesort"
 )
 
 func Test_Range(t *testing.T) {
@@ -25,7 +30,17 @@ func Test_Range(t *testing.T) {
 }
 
 func Test_Reverse(t *testing.T) {
-	assert.Equal(t, slice.Of(-1, 0, 1, 2, 3), slice.Reverse(range_.Of(3, -1)))
+	src := range_.Of(3, -1)
+	reversed := slice.Reverse(src)
+	assert.Equal(t, slice.Of(-1, 0, 1, 2, 3), reversed)
+	assert.Equal(t, (*reflect.SliceHeader)(unsafe.Pointer(&src)).Data, (*reflect.SliceHeader)(unsafe.Pointer(&reversed)).Data)
+}
+
+func Test_ReverseCloned(t *testing.T) {
+	src := range_.Of(3, -1)
+	reversed := reverse.Of(src)
+	assert.Equal(t, slice.Of(-1, 0, 1, 2, 3), reversed)
+	assert.NotEqual(t, (*reflect.SliceHeader)(unsafe.Pointer(&src)).Data, (*reflect.SliceHeader)(unsafe.Pointer(&reversed)).Data)
 }
 
 func Test_Clone(t *testing.T) {
@@ -251,4 +266,32 @@ func Test_Generate(t *testing.T) {
 	result, _ := slice.Generate(func() (int, bool, error) { counter++; return counter, counter < 4, nil })
 
 	assert.Equal(t, slice.Of(1, 2, 3), result)
+}
+
+func Test_Sort(t *testing.T) {
+	src := range_.Of(3, -1)
+	sorted := sort.Of(src)
+	assert.Equal(t, slice.Of(-1, 0, 1, 2, 3), sorted)
+	assert.Equal(t, (*reflect.SliceHeader)(unsafe.Pointer(&src)).Data, (*reflect.SliceHeader)(unsafe.Pointer(&sorted)).Data)
+}
+
+func Test_SortCloned(t *testing.T) {
+	src := range_.Of(3, -1)
+	sorted := csort.Of(src)
+	assert.Equal(t, slice.Of(-1, 0, 1, 2, 3), sorted)
+	assert.NotEqual(t, (*reflect.SliceHeader)(unsafe.Pointer(&src)).Data, (*reflect.SliceHeader)(unsafe.Pointer(&sorted)).Data)
+}
+
+func Test_StableSort(t *testing.T) {
+	src := range_.Of(3, -1)
+	sorted := stablesort.Of(src)
+	assert.Equal(t, slice.Of(-1, 0, 1, 2, 3), sorted)
+	assert.Equal(t, (*reflect.SliceHeader)(unsafe.Pointer(&src)).Data, (*reflect.SliceHeader)(unsafe.Pointer(&sorted)).Data)
+}
+
+func Test_StableSortCloned(t *testing.T) {
+	src := range_.Of(3, -1)
+	sorted := cstablesort.Of(src)
+	assert.Equal(t, slice.Of(-1, 0, 1, 2, 3), sorted)
+	assert.NotEqual(t, (*reflect.SliceHeader)(unsafe.Pointer(&src)).Data, (*reflect.SliceHeader)(unsafe.Pointer(&sorted)).Data)
 }
