@@ -74,7 +74,7 @@ func (m Map[K, V]) StableSort(less slice.Less[K]) ordered.Map[K, V] {
 
 func (m Map[K, V]) sortBy(sorter slice.Sorter, less slice.Less[K]) ordered.Map[K, V] {
 	c := map_.Keys(m.elements)
-	slice.Sort(map_.Keys(m.elements), sorter, less)
+	slice.Sort(c, sorter, less)
 	return ordered.WrapMap(c, m.elements)
 }
 

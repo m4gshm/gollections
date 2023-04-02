@@ -1,6 +1,6 @@
 
 .PHONY: all
-all: build test bench
+all: build test bench readme
 
 .PHONY: test
 test:
@@ -47,3 +47,9 @@ lint:
 	golint ./...
 	go install github.com/mgechev/revive@latest
 	revive ./...
+
+.PHONY: readme
+readme:
+	$(info #README.md...)
+	asciidoctor -b docbook docs/readme.adoc 
+	pandoc -f docbook -t gfm docs/readme.xml -o README.md	

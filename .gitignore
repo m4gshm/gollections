@@ -1,2 +1,4 @@
 .vscode/*.log
 docker/go/
+docs/readme.xml
+.DS_Store

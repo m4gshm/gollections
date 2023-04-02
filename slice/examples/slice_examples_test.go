@@ -29,8 +29,9 @@ func Test_SortStructs(t *testing.T) {
 		name string
 		age  int
 	}
+	var users = []User{{"Bob", 26}, {"Alice", 35}, {"Tom", 18}}
 	var (
-		users  = []User{{"Bob", 26}, {"Alice", 35}, {"Tom", 18}}
+		//sorted
 		byName = sort.By(users, func(u User) string { return u.name })
 		byAge  = sort.By(users, func(u User) int { return u.age })
 	)
@@ -43,8 +44,9 @@ func Test_SortStructsByLess(t *testing.T) {
 		name string
 		age  int
 	}
+	var users = []User{{"Bob", 26}, {"Alice", 35}, {"Tom", 18}}
 	var (
-		users        = []User{{"Bob", 26}, {"Alice", 35}, {"Tom", 18}}
+		//sorted
 		byName       = sort.ByLess(users, func(u1, u2 User) bool { return u1.name < u2.name })
 		byAgeReverse = sort.ByLess(users, func(u1, u2 User) bool { return u1.age > u2.age })
 	)
