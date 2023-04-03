@@ -6,14 +6,14 @@ import (
 )
 
 // NewSetIter creates SetIter instance.
-func NewSetIter[K comparable](uniques map[K]struct{}, del func(element K) bool) *SetIter[K] {
+func NewSetIter[K comparable](uniques map[K]struct{}, del func(element K)) *SetIter[K] {
 	return &SetIter[K]{Key: it.NewKey(uniques), del: del}
 }
 
 // SetIter is the Set Iterator implementation.
 type SetIter[K comparable] struct {
 	it.Key[K, struct{}]
-	del        func(element K) bool
+	del        func(element K)
 	currentKey K
 	ok         bool
 }
@@ -30,9 +30,8 @@ func (i *SetIter[K]) Next() (K, bool) {
 	return key, ok
 }
 
-func (i *SetIter[K]) Delete() bool {
+func (i *SetIter[K]) Delete() {
 	if i.ok {
-		return i.del(i.currentKey)
+		i.del(i.currentKey)
 	}
-	return false
 }

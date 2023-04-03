@@ -48,11 +48,11 @@ func Test_Set_Iterate(t *testing.T) {
 	}
 }
 
-func Test_Set_Add(t *testing.T) {
+func Test_Set_AddVerify(t *testing.T) {
 	set := set.New[int](0)
-	added := set.Add(1, 2, 4, 3)
+	added := set.AddVerify(1, 2, 4, 3)
 	assert.Equal(t, added, true)
-	added = set.Add(1)
+	added = set.AddVerify(1)
 	assert.Equal(t, added, false)
 
 	values := set.Collect()
@@ -66,7 +66,7 @@ func Test_Set_Delete(t *testing.T) {
 	values := set.Collect()
 
 	for _, v := range values {
-		_ = set.Delete(v)
+		set.Delete(v)
 	}
 
 	assert.Equal(t, 0, len(set.Collect()))
@@ -79,7 +79,7 @@ func Test_Set_DeleteByIterator(t *testing.T) {
 	i := 0
 	for _, ok := iter.Next(); ok; _, ok = iter.Next() {
 		i++
-		_ = iter.Delete()
+		iter.Delete()
 	}
 
 	assert.Equal(t, 4, i)

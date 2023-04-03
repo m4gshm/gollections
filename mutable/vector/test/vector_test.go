@@ -94,31 +94,27 @@ func (u *user) Age() int     { return u.age }
 
 func Test_Vector_AddAndDelete(t *testing.T) {
 	vec := vector.New[int](0)
-	added := vec.AddAll(range_.Of(0, 1000))
-	assert.Equal(t, added, true)
+	vec.Add(range_.Of(0, 1000)...)
 	deleted := false
 	for i := vec.Head(); i.HasNext(); {
 		deleted = i.DeleteNext()
 	}
-	assert.Equal(t, added, true)
 	assert.Equal(t, deleted, true)
 	assert.True(t, vec.IsEmpty())
 
-	added = vec.AddAll(range_.Of(0, 10000))
+	vec.Add(range_.Of(0, 10000)...)
 	for i := vec.Tail(); i.HasPrev(); {
 		deleted = i.DeletePrev()
 	}
-	assert.Equal(t, added, true)
 	assert.Equal(t, deleted, true)
 	assert.True(t, vec.IsEmpty())
 }
 
 func Test_Vector_Add(t *testing.T) {
 	vec := vector.New[int](0)
-	added := vec.Add(1, 1, 2, 4, 3, 1)
-	assert.Equal(t, added, true)
-	added = vec.Add(1)
-	assert.Equal(t, added, true)
+	vec.Add(1, 1, 2, 4, 3, 1)
+	assert.Equal(t, slice.Of(1, 1, 2, 4, 3, 1), vec.Collect())
+	vec.Add(1)
 	assert.Equal(t, slice.Of(1, 1, 2, 4, 3, 1, 1), vec.Collect())
 }
 
@@ -182,47 +178,41 @@ func Test_Vector_Delete_And_Iterate(t *testing.T) {
 
 func Test_Vector_DeleteOne(t *testing.T) {
 	vec := vector.Of("1", "1", "2", "4", "3", "1")
-	r := vec.Delete(3)
-	assert.Equal(t, r, true)
+	vec.DeleteOne(3)
 	assert.Equal(t, slice.Of("1", "1", "2", "3", "1"), vec.Collect())
-	r = vec.Delete(5)
+	r := vec.DeleteOneVerify(5)
 	assert.Equal(t, r, false)
 }
 
 func Test_Vector_DeleteMany(t *testing.T) {
 	vec := vector.Of("0", "1", "2", "3", "4", "5", "6")
-	r := vec.Delete(3, 0, 5)
-	assert.Equal(t, r, true)
+	vec.Delete(3, 0, 5)
 	assert.Equal(t, slice.Of("1", "2", "4", "6"), vec.Collect())
-	r = vec.Delete(5, 4)
+	r := vec.DeleteVerify(5, 4)
 	assert.Equal(t, r, false)
 }
 
 func Test_Vector_DeleteManyFromTail(t *testing.T) {
 	vec := vector.Of("0", "1", "2", "3", "4", "5", "6")
-	r := vec.Delete(4, 5, 6)
-	assert.Equal(t, r, true)
+	vec.Delete(4, 5, 6)
 	assert.Equal(t, slice.Of("0", "1", "2", "3"), vec.Collect())
 }
 
 func Test_Vector_DeleteManyFromHead(t *testing.T) {
 	vec := vector.Of("0", "1", "2", "3", "4", "5", "6")
-	r := vec.Delete(0, 1, 2)
-	assert.Equal(t, r, true)
+	vec.Delete(0, 1, 2)
 	assert.Equal(t, slice.Of("3", "4", "5", "6"), vec.Collect())
 }
 
 func Test_Vector_DeleteManyFromMiddle(t *testing.T) {
 	vec := vector.Of("0", "1", "2", "3", "4", "5", "6")
-	r := vec.Delete(4, 3)
-	assert.Equal(t, r, true)
+	vec.Delete(4, 3)
 	assert.Equal(t, slice.Of("0", "1", "2", "5", "6"), vec.Collect())
 }
 
 func Test_Vector_Set(t *testing.T) {
 	vec := vector.Of("1", "1", "2", "4", "3", "1")
-	added := vec.Set(10, "11")
-	assert.Equal(t, added, true)
+	vec.Set(10, "11")
 	assert.Equal(t, slice.Of("1", "1", "2", "4", "3", "1", "", "", "", "", "11"), vec.Collect())
 }
 
@@ -232,13 +222,13 @@ func Test_Vector_DeleteByIterator(t *testing.T) {
 
 	i := 0
 	var v int
-	var ok, deleted bool
+	var ok bool
 	for v, ok = iter.Next(); ok; v, ok = iter.Next() {
 		i++
-		deleted = iter.Delete()
+		iter.Delete()
 	}
 
-	_, _, _ = v, ok, deleted
+	_, _ = v, ok
 
 	assert.Equal(t, 6, i)
 	assert.Equal(t, 0, len(vec.Collect()))
@@ -250,13 +240,13 @@ func Test_Vector_DeleteByIterator_Reverse(t *testing.T) {
 
 	i := 0
 	var v int
-	var ok, deleted bool
+	var ok bool
 	for v, ok = iter.Prev(); ok; v, ok = iter.Prev() {
 		i++
-		deleted = iter.Delete()
+		iter.Delete()
 	}
 
-	_, _, _ = v, ok, deleted
+	_, _ = v, ok
 
 	assert.Equal(t, 6, i)
 	assert.Equal(t, 0, len(vec.Collect()))

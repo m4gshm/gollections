@@ -36,14 +36,18 @@ type Set[K comparable] struct {
 }
 
 var (
-	_ c.Addable[int]    = (*Set[int])(nil)
-	_ c.Deleteable[int] = (*Set[int])(nil)
-	_ c.Set[int]        = (*Set[int])(nil)
-	_ fmt.Stringer      = (*Set[int])(nil)
-	_ c.Addable[int]    = Set[int]{}
-	_ c.Deleteable[int] = Set[int]{}
-	_ c.Set[int]        = Set[int]{}
-	_ fmt.Stringer      = Set[int]{}
+	_ c.Addable[int]          = (*Set[int])(nil)
+	_ c.AddableVerify[int]    = (*Set[int])(nil)
+	_ c.Deleteable[int]       = (*Set[int])(nil)
+	_ c.DeleteableVerify[int] = (*Set[int])(nil)
+	_ c.Set[int]              = (*Set[int])(nil)
+	_ fmt.Stringer            = (*Set[int])(nil)
+	_ c.Addable[int]          = Set[int]{}
+	_ c.AddableVerify[int]    = Set[int]{}
+	_ c.Deleteable[int]       = Set[int]{}
+	_ c.DeleteableVerify[int] = Set[int]{}
+	_ c.Set[int]              = Set[int]{}
+	_ fmt.Stringer            = Set[int]{}
 )
 
 func (s Set[K]) Begin() c.Iterator[K] {
@@ -79,45 +83,56 @@ func (s Set[K]) Contains(val K) bool {
 	return ok
 }
 
-func (s Set[K]) Add(elements ...K) bool {
-	return s.AddAll(elements)
-}
-
-func (s Set[K]) AddAll(elements []K) bool {
-	added := false
+func (s Set[K]) Add(elements ...K) {
 	for _, element := range elements {
-		if _, ok := s.elements[element]; !ok {
-			s.elements[element] = struct{}{}
-			added = true
-		}
+		s.AddOne(element)
 	}
-	return added
 }
 
-func (s Set[K]) AddOne(element K) bool {
-	if _, ok := s.elements[element]; ok {
-		return false
-	}
+func (s Set[K]) AddOne(element K) {
 	s.elements[element] = struct{}{}
-	return true
 }
 
-func (s Set[K]) Delete(elements ...K) bool {
+func (s Set[K]) AddVerify(elements ...K) bool {
+	ok := false
 	for _, element := range elements {
-		if _, ok := s.elements[element]; !ok {
-			return false
-		}
+		ok = s.AddOneVerify(element) || ok
+	}
+	return ok
+}
+
+func (s Set[K]) AddOneVerify(element K) bool {
+	ok := !s.Contains(element)
+	if ok {
+		s.elements[element] = struct{}{}
+	}
+	return ok
+}
+
+func (s Set[K]) Delete(elements ...K) {
+	for _, element := range elements {
+		s.DeleteOne(element)
+	}
+}
+
+func (s Set[K]) DeleteOne(element K) {
+	delete(s.elements, element)
+}
+
+func (s Set[T]) DeleteVerify(elements ...T) bool {
+	ok := false
+	for i := range elements {
+		ok = s.DeleteOneVerify(elements[i]) || ok
+	}
+	return ok
+}
+
+func (s Set[K]) DeleteOneVerify(element K) bool {
+	_, ok := s.elements[element]
+	if ok {
 		delete(s.elements, element)
 	}
-	return true
-}
-
-func (s Set[K]) DeleteOne(element K) bool {
-	if _, ok := s.elements[element]; !ok {
-		return false
-	}
-	delete(s.elements, element)
-	return true
+	return ok
 }
 
 func (s Set[K]) For(walker func(K) error) error {

@@ -46,9 +46,10 @@ type Map[K comparable, V any] struct {
 }
 
 var (
-	// _ mutable.Settable[int, any] = (*Map[int, any])(nil)
-	_ c.Map[int, any] = (*Map[int, any])(nil)
-	_ fmt.Stringer    = (*Map[int, any])(nil)
+	_ c.Settable[int, any]       = (*Map[int, any])(nil)
+	_ c.SettableVerify[int, any] = (*Map[int, any])(nil)
+	_ c.Map[int, any]            = (*Map[int, any])(nil)
+	_ fmt.Stringer               = (*Map[int, any])(nil)
 )
 
 func (m *Map[K, V]) Begin() c.KVIterator[K, V] {
@@ -123,15 +124,20 @@ func (m *Map[K, V]) Get(key K) (V, bool) {
 	return val, ok
 }
 
-func (m *Map[K, V]) Set(key K, value V) bool {
-	u := m.elements
-	if _, ok := u[key]; !ok {
-		e := m.order
+func (m *Map[K, V]) Set(key K, value V) {
+	m.SetVerify(key, value)
+}
+
+func (m *Map[K, V]) SetVerify(key K, value V) bool {
+	var (
+		u     = m.elements
+		_, ok = u[key]
+	)
+	if !ok {
 		u[key] = value
-		m.order = append(e, key)
-		return true
+		m.order = append(m.order, key)
 	}
-	return false
+	return !ok
 }
 
 func (m *Map[K, V]) Keys() c.Collection[K, []K, c.Iterator[K]] {

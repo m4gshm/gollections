@@ -6,7 +6,7 @@ import (
 )
 
 // NewSetIter creates a set's iterator.
-func NewSetIter[T any](elements *[]T, del func(v T) bool) *SetIter[T] {
+func NewSetIter[T any](elements *[]T, del func(v T)) *SetIter[T] {
 	return &SetIter[T]{elements: elements, current: it.NoStarted, del: del}
 }
 
@@ -14,7 +14,7 @@ func NewSetIter[T any](elements *[]T, del func(v T) bool) *SetIter[T] {
 type SetIter[T any] struct {
 	elements *[]T
 	current  int
-	del      func(v T) bool
+	del      func(v T)
 }
 
 var (
@@ -35,10 +35,9 @@ func (i *SetIter[T]) Cap() int {
 	return len(*i.elements)
 }
 
-func (i *SetIter[T]) Delete() bool {
+func (i *SetIter[T]) Delete() {
 	if v, ok := it.Gett(*i.elements, i.current); ok {
 		i.current--
-		return i.del(v)
+		i.del(v)
 	}
-	return false
 }

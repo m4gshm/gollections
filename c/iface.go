@@ -86,7 +86,7 @@ type PrevIterator[T any] interface {
 // DelIterator is the Iterator provides deleting of current element.
 type DelIterator[T any] interface {
 	Iterator[T]
-	Delete() bool
+	Delete()
 }
 
 // KVIterator is the interface that provides iterate over key/value pairs
@@ -178,17 +178,36 @@ type Access[P any, V any] interface {
 
 // Addable is the interface that provides appending the collection by elements.
 type Addable[T any] interface {
-	Add(...T) bool
+	Add(...T)
+	AddOne(T)
+}
+
+// AddableVerify is the interface that provides appending the collection by elements.
+type AddableVerify[T any] interface {
+	AddVerify(...T) bool
+	AddOneVerify(T) bool
 }
 
 // Settable is the interface that provides replacing an element by its pointer (index or key).
 type Settable[P any, V any] interface {
-	Set(key P, value V) bool
+	Set(key P, value V)
+}
+
+// SettableVerify is the interface that provides replacing an element by its pointer (index or key).
+type SettableVerify[P any, V any] interface {
+	SetVerify(key P, value V) bool
 }
 
 // Deleteable is the interface that provides removing any elements from the collection.
 type Deleteable[k any] interface {
-	Delete(...k) bool
+	Delete(...k)
+	DeleteOne(k)
+}
+
+// DeleteableVerify is the interface that provides removing any elements from the collection by.
+type DeleteableVerify[k any] interface {
+	DeleteVerify(...k) bool
+	DeleteOneVerify(k) bool
 }
 
 // Removable is the interface that provides removing an element by its pointer (index or key).

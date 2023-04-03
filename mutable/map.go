@@ -47,12 +47,18 @@ func WrapMap[K comparable, V any](elements map[K]V) Map[K, V] {
 type Map[K comparable, V any] map[K]V
 
 var (
-	_ c.Settable[int, any] = (*Map[int, any])(nil)
-	_ c.Settable[int, any] = (Map[int, any])(nil)
-	_ c.Map[int, any]      = (*Map[int, any])(nil)
-	_ c.Map[int, any]      = (Map[int, any])(nil)
-	_ fmt.Stringer         = (*Map[int, any])(nil)
-	_ fmt.Stringer         = (Map[int, any])(nil)
+	_ c.Deleteable[int]          = (*Map[int, any])(nil)
+	_ c.Deleteable[int]          = (Map[int, any])(nil)
+	_ c.DeleteableVerify[int]    = (*Map[int, any])(nil)
+	_ c.DeleteableVerify[int]    = (Map[int, any])(nil)
+	_ c.Settable[int, any]       = (*Map[int, any])(nil)
+	_ c.Settable[int, any]       = (Map[int, any])(nil)
+	_ c.SettableVerify[int, any] = (*Map[int, any])(nil)
+	_ c.SettableVerify[int, any] = (Map[int, any])(nil)
+	_ c.Map[int, any]            = (*Map[int, any])(nil)
+	_ c.Map[int, any]            = (Map[int, any])(nil)
+	_ fmt.Stringer               = (*Map[int, any])(nil)
+	_ fmt.Stringer               = (Map[int, any])(nil)
 )
 
 func (s Map[K, V]) Begin() c.KVIterator[K, V] {
@@ -109,13 +115,42 @@ func (s Map[K, V]) Get(key K) (V, bool) {
 	return val, ok
 }
 
-func (s Map[K, V]) Set(key K, value V) bool {
-	u := s
-	if _, ok := u[key]; !ok {
-		u[key] = value
-		return true
+func (s Map[K, V]) Set(key K, value V) {
+	s[key] = value
+}
+
+func (s Map[K, V]) SetVerify(key K, value V) bool {
+	ok := !s.Contains(key)
+	if ok {
+		s.Set(key, value)
 	}
-	return false
+	return ok
+}
+
+func (s Map[K, V]) Delete(keys ...K) {
+	for _, key := range keys {
+		s.DeleteOne(key)
+	}
+}
+
+func (s Map[K, V]) DeleteOne(key K) {
+	delete(s, key)
+}
+
+func (s Map[K, V]) DeleteVerify(keys ...K) bool {
+	ok := false
+	for _, key := range keys {
+		ok = s.DeleteOneVerify(key) || ok
+	}
+	return ok
+}
+
+func (s Map[K, V]) DeleteOneVerify(key K) bool {
+	ok := !s.Contains(key)
+	if ok {
+		s.Delete(key)
+	}
+	return ok
 }
 
 func (s Map[K, V]) Keys() c.Collection[K, []K, c.Iterator[K]] {

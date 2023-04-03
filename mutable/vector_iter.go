@@ -80,13 +80,10 @@ func (i *Iter[TS, T]) Cap() int {
 	return len(*i.elements)
 }
 
-func (i *Iter[TS, T]) Delete() bool {
+func (i *Iter[TS, T]) Delete() {
 	if deleted := i.del(i.current); deleted {
 		i.current -= i.step
-		// i.deleted = true
-		return true
 	}
-	return false
 }
 
 func (i *Iter[TS, T]) DeleteNext() bool {

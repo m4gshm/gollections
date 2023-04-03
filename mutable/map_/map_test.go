@@ -65,15 +65,14 @@ func Test_Map_IterateOverRange(t *testing.T) {
 
 func Test_Map_Add(t *testing.T) {
 	d := New[int, string](4)
-	s := d.Set(1, "1")
+	s := d.SetVerify(1, "1")
 	assert.Equal(t, s, true)
-	s = d.Set(2, "2")
-	assert.Equal(t, s, true)
-	s = d.Set(4, "4")
-	assert.Equal(t, s, true)
-	s = d.Set(3, "3")
-	assert.Equal(t, s, true)
-	s = d.Set(1, "11")
+
+	d.Set(2, "2")
+	d.Set(4, "4")
+	d.Set(3, "3")
+
+	s = d.SetVerify(1, "11")
 	assert.Equal(t, s, false)
 
 	keys := d.Keys().Collect()
