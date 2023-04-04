@@ -20,8 +20,9 @@ import (
 )
 
 func Test_SortInt(t *testing.T) {
-	c := sort.Of([]int{1, 3, -1, 2, 0})
-	assert.Equal(t, []int{-1, 0, 1, 2, 3}, c)
+	ints := []int{1, 3, -1, 2, 0}
+	sorted := sort.Of(ints)
+	assert.Equal(t, []int{-1, 0, 1, 2, 3}, sorted)
 }
 
 func Test_SortStructs(t *testing.T) {

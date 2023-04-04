@@ -20,26 +20,32 @@ or
 go get -u github.com/m4gshm/gollections@HEAD
 ----
 
-=== link:./slice/api.go[Slice API]
+=== Main packages
 
-The package provides various functions useful with slices. +
-Additionally contains subpackages as shortcuts of some functions from the base package.
+==== Slices - link:./slice/api.go[github.com/m4gshm/gollections/slice]
 
-Just looks some examples:
+The package provides helper subpackages and functions for using with slices. +
+Most helpers organized as pair of a main function and short aliases in a subpackage. For example the function link:./slice/api.go#L247[slice.SortByOrdered] has aliases link:./slice/sort/api.go#L12[sort.By] and link:./slice/sort/api.go#L23[sort.Of].
+
+Usage examples:
 
 [source,go]
 ----
 include::../slice/examples/slice_examples_test.go[]
 ----
 
-=== link:./map_/api.go[Map API]
+==== Maps - link:./map_/api.go[github.com/m4gshm/gollections/map_]
+
+The package provides helper subpackages and functions for using with maps. +
+
+Usage examples:
 
 [source,go]
 ----
 include::../map_/examples/map_examples_test.go[]
 ----
 
-=== link:./mutable/api.go[Mutable containers]
+==== Mutable containers
 
 Supports write operations (append, delete, replace).
 
@@ -50,13 +56,13 @@ Supports write operations (append, delete, replace).
   * link:./mutable/omap/api.go[OrderedMap] - same as the link:./mutable/map_/api.go[Map], but supports iteration in the order in which elements are added.
   * link:./mutable/sync/map.go[sync.Map] - generic wrapper of built-in embedded sync.Map.
 
-=== link:./immutable/api.go[Immutable containers]
+==== Immutable containers
 
 The same interfaces as in the mutable package but for read-only purposes.
 
-=== Containers creating
+==== Containers creating
 
-==== Immutable
+===== Immutable
 
 [source,go]
 ----
@@ -65,7 +71,7 @@ include::../constructors.go[]
 
 where link:./immutable/vector/api.go[vector], link:./immutable/set/api.go[set], link:./immutable/oset/api.go[oset], link:./immutable/map_/api.go[map_], link:./immutable/omap/api.go[omap] are packages from link:./immutable/[github.com/m4gshm/gollections/immutable] and link:./K/v.go[K.V] is the method V from the package link:./K/[K]
 
-==== Mutable
+===== Mutable
 
 [source,go]
 ----
@@ -91,7 +97,7 @@ Intermediates should wrap one by one to make a lazy computation chain that can b
 var items immutable.Vector[Item]
 
 var (
-    condition c.Predicate[Item]  = func(item Item) ...
+    condition c.Predicate[Item]    = func(item Item) ...
     max       op.Binary[Attribute] = func(attribute1 Attribute, attribute2 Attribute) ...
 ) 
 
@@ -100,7 +106,7 @@ maxItemAttribute := it.Reduce(it.Map(c.Filer(items, condition), Item.GetAttribut
 
 Functions grouped into packages by applicable type (link:./c/api.go[container], link:./c/map_/api.go[map], link:./it/api.go[iterator], link:slice/api.go[slice])
 
-=== Packages
+=== Additional packages
 
 ==== link:./c/iface.go[Common interfaces]
 

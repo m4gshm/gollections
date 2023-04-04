@@ -16,13 +16,19 @@ or
 go get -u github.com/m4gshm/gollections@HEAD
 ```
 
-## [Slice API](./slice/api.go)
+## Main packages
 
-The package provides various functions useful with slices.  
-Additionally contains subpackages as shortcuts of some functions from
-the base package.
+### Slices - [github.com/m4gshm/gollections/slice](./slice/api.go)
 
-Just looks some examples:
+The package provides helper subpackages and functions for using with
+slices.  
+Most helpers organized as pair of a main function and short aliases in a
+subpackage. For example the function
+[slice.SortByOrdered](./slice/api.go#L247) has aliases
+[sort.By](./slice/sort/api.go#L12) and
+[sort.Of](./slice/sort/api.go#L23).
+
+Usage examples:
 
 ``` go
 package examples
@@ -47,8 +53,9 @@ import (
 )
 
 func Test_SortInt(t *testing.T) {
-    c := sort.Of([]int{1, 3, -1, 2, 0})
-    assert.Equal(t, []int{-1, 0, 1, 2, 3}, c)
+    ints := []int{1, 3, -1, 2, 0}
+    sorted := sort.Of(ints)
+    assert.Equal(t, []int{-1, 0, 1, 2, 3}, sorted)
 }
 
 func Test_SortStructs(t *testing.T) {
@@ -237,7 +244,12 @@ func Test_Generate(t *testing.T) {
 }
 ```
 
-## [Map API](./map_/api.go)
+### Maps - [github.com/m4gshm/gollections/map\_](./map_/api.go)
+
+The package provides helper subpackages and functions for using with
+maps.  
+
+Usage examples:
 
 ``` go
 package examples
@@ -349,7 +361,7 @@ func Test_GroupOfLoop(t *testing.T) {
 }
 ```
 
-## [Mutable containers](./mutable/api.go)
+### Mutable containers
 
 Supports write operations (append, delete, replace).
 
@@ -372,14 +384,14 @@ Supports write operations (append, delete, replace).
 - [sync.Map](./mutable/sync/map.go) - generic wrapper of built-in
   embedded sync.Map.
 
-## [Immutable containers](./immutable/api.go)
+### Immutable containers
 
 The same interfaces as in the mutable package but for read-only
 purposes.
 
-## Containers creating
+### Containers creating
 
-### Immutable
+#### Immutable
 
 ``` go
 // Package examples of collection constructors
@@ -427,7 +439,7 @@ where [vector](./immutable/vector/api.go),
 packages from [github.com/m4gshm/gollections/immutable](./immutable/)
 and [K.V](./K/v.go) is the method V from the package [K](./K/)
 
-### Mutable
+#### Mutable
 
 ``` go
 package examples
@@ -510,7 +522,7 @@ that can be applied to the latest final operation.
 var items immutable.Vector[Item]
 
 var (
-    condition c.Predicate[Item]  = func(item Item) ...
+    condition c.Predicate[Item]    = func(item Item) ...
     max       op.Binary[Attribute] = func(attribute1 Attribute, attribute2 Attribute) ...
 )
 
@@ -521,7 +533,7 @@ Functions grouped into packages by applicable type
 ([container](./c/api.go), [map](./c/map_/api.go),
 [iterator](./it/api.go), [slice](slice/api.go))
 
-## Packages
+## Additional packages
 
 ### [Common interfaces](./c/iface.go)
 
