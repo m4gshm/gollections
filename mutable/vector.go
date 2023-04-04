@@ -31,13 +31,13 @@ func WrapVector[T any](elements []T) *Vector[T] {
 type Vector[T any] []T
 
 var (
-	_ c.Addable[any]             = (*Vector[any])(nil)
-	_ c.Deleteable[int]          = (*Vector[any])(nil)
-	_ c.DeleteableVerify[int]    = (*Vector[any])(nil)
-	_ c.Settable[int, any]       = (*Vector[any])(nil)
-	_ c.SettableVerify[int, any] = (*Vector[any])(nil)
-	_ c.Vector[any]              = (*Vector[any])(nil)
-	_ fmt.Stringer               = (*Vector[any])(nil)
+	_ c.Addable[any]          = (*Vector[any])(nil)
+	_ c.Deleteable[int]       = (*Vector[any])(nil)
+	_ c.DeleteableVerify[int] = (*Vector[any])(nil)
+	_ c.Settable[int, any]    = (*Vector[any])(nil)
+	_ c.SettableNew[int, any] = (*Vector[any])(nil)
+	_ c.Vector[any]           = (*Vector[any])(nil)
+	_ fmt.Stringer            = (*Vector[any])(nil)
 )
 
 // Begin creates an iterator of the vector
@@ -52,19 +52,19 @@ func (v *Vector[T]) BeginEdit() c.DelIterator[T] {
 
 // Head creates an iterator impl instace of the vector
 func (v *Vector[T]) Head() Iter[Vector[T], T] {
-	return NewHead(v, v.DeleteOneVerify)
+	return NewHead(v, v.DeleteActualOne)
 }
 
 // Tail creates an iterator pointing to the end of the vector
 func (v *Vector[T]) Tail() Iter[Vector[T], T] {
-	return NewTail(v, v.DeleteOneVerify)
+	return NewTail(v, v.DeleteActualOne)
 }
 
 // First returns the first element of the vector, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then returns false in the last value.
 func (v *Vector[T]) First() (Iter[Vector[T], T], T, bool) {
 	var (
-		iter      = NewHead(v, v.DeleteOneVerify)
+		iter      = NewHead(v, v.DeleteActualOne)
 		first, ok = iter.Next()
 	)
 	return iter, first, ok
@@ -74,7 +74,7 @@ func (v *Vector[T]) First() (Iter[Vector[T], T], T, bool) {
 // If no more elements then returns false in the last value.
 func (v *Vector[T]) Last() (Iter[Vector[T], T], T, bool) {
 	var (
-		iter      = NewTail(v, v.DeleteOneVerify)
+		iter      = NewTail(v, v.DeleteActualOne)
 		first, ok = iter.Prev()
 	)
 	return iter, first, ok
@@ -137,11 +137,11 @@ func (v *Vector[T]) AddOne(element T) {
 
 // Delete removes a element by the index
 func (v *Vector[T]) DeleteOne(index int) {
-	_ = v.DeleteOneVerify(index)
+	_ = v.DeleteActualOne(index)
 }
 
-// DeleteOneVerify removes a element by the index
-func (v *Vector[T]) DeleteOneVerify(index int) bool {
+// DeleteActualOne removes a element by the index
+func (v *Vector[T]) DeleteActualOne(index int) bool {
 	_, ok := v.Remove(index)
 	return ok
 }
@@ -159,16 +159,16 @@ func (v *Vector[T]) Remove(index int) (T, bool) {
 
 // Delete drops elements by indexes
 func (v *Vector[T]) Delete(indexes ...int) {
-	v.DeleteVerify(indexes...)
+	v.DeleteActual(indexes...)
 }
 
-// DeleteVerify drops elements by indexes with verification of no-op
-func (v *Vector[T]) DeleteVerify(indexes ...int) bool {
+// DeleteActual drops elements by indexes with verification of no-op
+func (v *Vector[T]) DeleteActual(indexes ...int) bool {
 	l := len(indexes)
 	if l == 0 {
 		return false
 	} else if l == 1 {
-		return v.DeleteOneVerify(indexes[0])
+		return v.DeleteActualOne(indexes[0])
 	}
 
 	e := *v
@@ -206,11 +206,11 @@ func (v *Vector[T]) DeleteVerify(indexes ...int) bool {
 
 // Set puts a element into the vector at the index
 func (v *Vector[T]) Set(index int, value T) {
-	v.SetVerify(index, value)
+	v.SetNew(index, value)
 }
 
-// SetVerify puts a element into the vector at the index
-func (v *Vector[T]) SetVerify(index int, value T) bool {
+// SetNew puts a element into the vector at the index
+func (v *Vector[T]) SetNew(index int, value T) bool {
 	e := *v
 	if index < 0 {
 		return false

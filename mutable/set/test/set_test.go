@@ -50,9 +50,9 @@ func Test_Set_Iterate(t *testing.T) {
 
 func Test_Set_AddVerify(t *testing.T) {
 	set := set.New[int](0)
-	added := set.AddVerify(1, 2, 4, 3)
+	added := set.AddNew(1, 2, 4, 3)
 	assert.Equal(t, added, true)
-	added = set.AddVerify(1)
+	added = set.AddNewOne(1)
 	assert.Equal(t, added, false)
 
 	values := set.Collect()

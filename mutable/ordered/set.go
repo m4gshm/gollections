@@ -45,7 +45,7 @@ type Set[T comparable] struct {
 
 var (
 	_ c.Addable[int]          = (*Set[int])(nil)
-	_ c.AddableVerify[int]    = (*Set[int])(nil)
+	_ c.AddableNew[int]       = (*Set[int])(nil)
 	_ c.Deleteable[int]       = (*Set[int])(nil)
 	_ c.DeleteableVerify[int] = (*Set[int])(nil)
 	_ c.Set[int]              = (*Set[int])(nil)
@@ -89,15 +89,15 @@ func (s *Set[T]) Contains(v T) bool {
 	return ok
 }
 
-func (s *Set[T]) AddVerify(elements ...T) bool {
+func (s *Set[T]) AddNew(elements ...T) bool {
 	ok := false
 	for i := range elements {
-		ok = s.AddOneVerify(elements[i]) || ok
+		ok = s.AddNewOne(elements[i]) || ok
 	}
 	return ok
 }
 
-func (s *Set[T]) AddOneVerify(v T) bool {
+func (s *Set[T]) AddNewOne(v T) bool {
 	u := s.uniques
 	if _, ok := u[v]; !ok {
 		e := s.elements
@@ -109,30 +109,30 @@ func (s *Set[T]) AddOneVerify(v T) bool {
 }
 
 func (s *Set[T]) Add(elements ...T) {
-	s.AddVerify(elements...)
+	s.AddNew(elements...)
 }
 
 func (s *Set[T]) AddOne(v T) {
-	s.AddOneVerify(v)
+	s.AddNewOne(v)
 }
 
 func (s *Set[T]) Delete(elements ...T) {
-	s.DeleteVerify(elements...)
+	s.DeleteActual(elements...)
 }
 
 func (s *Set[T]) DeleteOne(v T) {
-	s.DeleteOneVerify(v)
+	s.DeleteActualOne(v)
 }
 
-func (s *Set[T]) DeleteVerify(elements ...T) bool {
+func (s *Set[T]) DeleteActual(elements ...T) bool {
 	ok := false
 	for i := range elements {
-		ok = s.DeleteOneVerify(elements[i]) || ok
+		ok = s.DeleteActualOne(elements[i]) || ok
 	}
 	return ok
 }
 
-func (s *Set[T]) DeleteOneVerify(v T) bool {
+func (s *Set[T]) DeleteActualOne(v T) bool {
 	u := s.uniques
 	if pos, ok := u[v]; ok {
 		delete(u, v)

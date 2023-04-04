@@ -182,10 +182,10 @@ type Addable[T any] interface {
 	AddOne(T)
 }
 
-// AddableVerify is the interface that provides appending the collection by elements.
-type AddableVerify[T any] interface {
-	AddVerify(...T) bool
-	AddOneVerify(T) bool
+// AddableNew is the interface that provides appending the collection by elements.
+type AddableNew[T any] interface {
+	AddNew(...T) bool
+	AddNewOne(T) bool
 }
 
 // Settable is the interface that provides replacing an element by its pointer (index or key).
@@ -193,9 +193,9 @@ type Settable[P any, V any] interface {
 	Set(key P, value V)
 }
 
-// SettableVerify is the interface that provides replacing an element by its pointer (index or key).
-type SettableVerify[P any, V any] interface {
-	SetVerify(key P, value V) bool
+// SettableNew is the interface that provides replacing an element by its pointer (index or key).
+type SettableNew[P any, V any] interface {
+	SetNew(key P, value V) bool
 }
 
 // Deleteable is the interface that provides removing any elements from the collection.
@@ -204,10 +204,10 @@ type Deleteable[k any] interface {
 	DeleteOne(k)
 }
 
-// DeleteableVerify is the interface that provides removing any elements from the collection by.
+// DeleteableVerify is the interface that provides removing any elements from the collection.
 type DeleteableVerify[k any] interface {
-	DeleteVerify(...k) bool
-	DeleteOneVerify(k) bool
+	DeleteActual(...k) bool
+	DeleteActualOne(k) bool
 }
 
 // Removable is the interface that provides removing an element by its pointer (index or key).

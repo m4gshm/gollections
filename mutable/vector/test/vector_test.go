@@ -180,7 +180,7 @@ func Test_Vector_DeleteOne(t *testing.T) {
 	vec := vector.Of("1", "1", "2", "4", "3", "1")
 	vec.DeleteOne(3)
 	assert.Equal(t, slice.Of("1", "1", "2", "3", "1"), vec.Collect())
-	r := vec.DeleteOneVerify(5)
+	r := vec.DeleteActualOne(5)
 	assert.Equal(t, r, false)
 }
 
@@ -188,7 +188,7 @@ func Test_Vector_DeleteMany(t *testing.T) {
 	vec := vector.Of("0", "1", "2", "3", "4", "5", "6")
 	vec.Delete(3, 0, 5)
 	assert.Equal(t, slice.Of("1", "2", "4", "6"), vec.Collect())
-	r := vec.DeleteVerify(5, 4)
+	r := vec.DeleteActual(5, 4)
 	assert.Equal(t, r, false)
 }
 

@@ -31,12 +31,12 @@ func Test_Map_Iterate(t *testing.T) {
 
 func Test_Map_Add(t *testing.T) {
 	d := New[int, string](4)
-	s := d.SetVerify(1, "1")
+	s := d.SetNew(1, "1")
 	assert.Equal(t, s, true)
 	d.Set(2, "2")
 	d.Set(4, "4")
 	d.Set(3, "3")
-	s = d.SetVerify(1, "11")
+	s = d.SetNew(1, "11")
 	assert.Equal(t, s, false)
 
 	assert.Equal(t, slice.Of(1, 2, 4, 3), d.Keys().Collect())
