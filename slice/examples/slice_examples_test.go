@@ -6,10 +6,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/m4gshm/gollections/conv"
 	"github.com/m4gshm/gollections/first"
 	"github.com/m4gshm/gollections/last"
 	"github.com/m4gshm/gollections/op"
-	"github.com/m4gshm/gollections/ptr"
+	"github.com/m4gshm/gollections/predicate/less"
+	"github.com/m4gshm/gollections/predicate/more"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/clone"
 	"github.com/m4gshm/gollections/slice/clone/sort"
@@ -63,11 +65,7 @@ func Test_Reverse(t *testing.T) {
 func Test_Clone(t *testing.T) {
 	type entity struct{ val string }
 	var (
-		first  = entity{"first"}
-		second = entity{"second"}
-		third  = entity{"third"}
-
-		entities = []*entity{&first, &second, &third}
+		entities = []*entity{{"first"}, {"second"}, {"third"}}
 		copy     = clone.Of(entities)
 	)
 
@@ -82,12 +80,8 @@ func Test_Clone(t *testing.T) {
 func Test_DeepClone(t *testing.T) {
 	type entity struct{ val string }
 	var (
-		first  = entity{"first"}
-		second = entity{"second"}
-		third  = entity{"third"}
-
-		entities = []*entity{&first, &second, &third}
-		copy     = clone.Deep(entities, func(e *entity) *entity { return ptr.Of(*e) })
+		entities = []*entity{{"first"}, {"second"}, {"third"}}
+		copy     = clone.Deep(entities, clone.Ptr[entity])
 	)
 
 	assert.Equal(t, entities, copy)
@@ -128,7 +122,7 @@ func Test_Slice_Filter(t *testing.T) {
 
 func Test_Flatt(t *testing.T) {
 	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
-	f := slice.Flatt(md, func(i []int) []int { return i })
+	f := slice.Flatt(md, conv.AsIs[[]int])
 	e := []int{1, 2, 3, 4, 5, 6}
 	assert.Equal(t, e, f)
 }
@@ -155,7 +149,7 @@ func Test_Slice_Sum(t *testing.T) {
 
 func Test_Slice_Flatt(t *testing.T) {
 	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
-	f := slice.Flatt(md, func(i []int) []int { return i })
+	f := slice.Flatt(md, conv.AsIs[[]int])
 	e := []int{1, 2, 3, 4, 5, 6}
 	assert.Equal(t, e, f)
 }
@@ -167,13 +161,13 @@ func Test_Range(t *testing.T) {
 }
 
 func Test_First(t *testing.T) {
-	r, ok := first.Of(1, 3, 5, 7, 9, 11).By(func(i int) bool { return i > 5 })
+	r, ok := first.Of(1, 3, 5, 7, 9, 11).By(more.Than(5))
 	assert.True(t, ok)
 	assert.Equal(t, 7, r)
 }
 
 func Test_Last(t *testing.T) {
-	r, ok := last.Of(1, 3, 5, 7, 9, 11).By(func(i int) bool { return i < 9 })
+	r, ok := last.Of(1, 3, 5, 7, 9, 11).By(less.Than(9))
 	assert.True(t, ok)
 	assert.Equal(t, 7, r)
 }

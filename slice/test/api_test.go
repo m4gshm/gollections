@@ -10,7 +10,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/m4gshm/gollections/op"
-	"github.com/m4gshm/gollections/ptr"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/clone"
 	"github.com/m4gshm/gollections/slice/clone/reverse"
@@ -70,7 +69,7 @@ func Test_DeepClone(t *testing.T) {
 		third  = entity{"third"}
 
 		entities = []*entity{&first, &second, &third}
-		copy     = clone.Deep(entities, func(e *entity) *entity { return ptr.Of(*e) })
+		copy     = clone.Deep(entities, clone.Ptr[entity])
 	)
 
 	assert.Equal(t, entities, copy)
@@ -80,6 +79,17 @@ func Test_DeepClone(t *testing.T) {
 		assert.Equal(t, entities[i], copy[i])
 		assert.NotSame(t, entities[i], copy[i])
 	}
+}
+
+func Test_PointerClone(t *testing.T) {
+
+	s1 := "test"
+	p1 := &s1
+
+	p2 := clone.Ptr(p1)
+
+	assert.Equal(t, s1, *p2)
+	assert.NotSame(t, p1, p2)
 }
 
 func Test_ReduceSum(t *testing.T) {
