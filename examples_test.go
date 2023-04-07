@@ -14,6 +14,7 @@ import (
 	"github.com/m4gshm/gollections/it"
 	slc "github.com/m4gshm/gollections/it/slice"
 	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/predicate/more"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/walk/group"
 )
@@ -60,7 +61,7 @@ func Test_group_orderset_with_filtering_by_stirng_len(t *testing.T) {
 		"second", //duplicate
 	), func(v string) int { return len(v) },
 	).FilterKey(
-		func(k int) bool { return k > 3 },
+		more.Than(3),
 	).MapValue(
 		func(v string) string { return v + "_" },
 	).Collect()

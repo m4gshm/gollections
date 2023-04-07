@@ -55,8 +55,8 @@ import (
 )
 
 func Test_SortInt(t *testing.T) {
-    ints := []int{1, 3, -1, 2, 0}
-    sorted := sort.Of(ints)
+    source := []int{1, 3, -1, 2, 0}
+    sorted := sort.Of(source)
     assert.Equal(t, []int{-1, 0, 1, 2, 3}, sorted)
 }
 
@@ -127,64 +127,85 @@ func Test_DeepClone(t *testing.T) {
 }
 
 func Test_Convert(t *testing.T) {
-    s := slice.Of(1, 3, 5, 7, 9, 11)
-    r := slice.Convert(s, strconv.Itoa)
-    assert.Equal(t, slice.Of("1", "3", "5", "7", "9", "11"), r)
+    var (
+        source   = slice.Of(1, 3, 5, 7, 9, 11)
+        result   = slice.Convert(source, strconv.Itoa)
+        expected = slice.Of("1", "3", "5", "7", "9", "11")
+    )
+    assert.Equal(t, expected, result)
 }
 
 var even = func(v int) bool { return v%2 == 0 }
 
 func Test_ConvertFiltered(t *testing.T) {
-    s := []int{1, 3, 4, 5, 7, 8, 9, 11}
-    r := slice.ConvertFit(s, even, strconv.Itoa)
-    assert.Equal(t, []string{"4", "8"}, r)
+    var (
+        source   = []int{1, 3, 4, 5, 7, 8, 9, 11}
+        result   = slice.ConvertFit(source, even, strconv.Itoa)
+        expected = []string{"4", "8"}
+    )
+    assert.Equal(t, expected, result)
 }
 
 func Test_ConvertFilteredWithIndexInPlace(t *testing.T) {
-    s := slice.Of(1, 3, 4, 5, 7, 8, 9, 11)
-    r := slice.ConvertCheckIndexed(s, func(index int, elem int) (string, bool) { return strconv.Itoa(index + elem), even(elem) })
-    assert.Equal(t, []string{"6", "13"}, r)
+    var (
+        source   = slice.Of(1, 3, 4, 5, 7, 8, 9, 11)
+        result   = slice.ConvertCheckIndexed(source, func(index int, elem int) (string, bool) { return strconv.Itoa(index + elem), even(elem) })
+        expected = []string{"6", "13"}
+    )
+    assert.Equal(t, expected, result)
 }
 
 func Test_Slice_Filter(t *testing.T) {
-    s := []int{1, 2, 3, 4, 5, 6}
-    f := slice.Filter(s, even)
-    e := []int{2, 4, 6}
-    assert.Equal(t, e, f)
+    var (
+        source   = []int{1, 2, 3, 4, 5, 6}
+        result   = slice.Filter(source, even)
+        expected = []int{2, 4, 6}
+    )
+    assert.Equal(t, expected, result)
 }
 
 func Test_Flatt(t *testing.T) {
-    md := [][]int{{1, 2, 3}, {4}, {5, 6}}
-    f := slice.Flatt(md, conv.AsIs[[]int])
-    e := []int{1, 2, 3, 4, 5, 6}
-    assert.Equal(t, e, f)
+    var (
+        source   = [][]int{{1, 2, 3}, {4}, {5, 6}}
+        result   = slice.Flatt(source, conv.AsIs[[]int])
+        expected = []int{1, 2, 3, 4, 5, 6}
+    )
+    assert.Equal(t, expected, result)
 }
 
 func Test_Slice_Group(t *testing.T) {
-    s := []int{1, 2, 3, 4, 5, 6}
-    g := group.Of(s, even)
-    e := map[bool][]int{false: {1, 3, 5}, true: {2, 4, 6}}
-    assert.Equal(t, e, g)
+    var (
+        source   = []int{1, 2, 3, 4, 5, 6}
+        result   = group.Of(source, even)
+        expected = map[bool][]int{false: {1, 3, 5}, true: {2, 4, 6}}
+    )
+    assert.Equal(t, expected, result)
 }
 
 func Test_Slice_ReduceSum(t *testing.T) {
-    s := []int{1, 2, 3, 4, 5, 6}
-    sum := slice.Reduce(s, op.Sum[int])
-    e := 1 + 2 + 3 + 4 + 5 + 6
-    assert.Equal(t, e, sum)
+    var (
+        source   = []int{1, 2, 3, 4, 5, 6}
+        sum      = slice.Reduce(source, op.Sum[int])
+        expected = 1 + 2 + 3 + 4 + 5 + 6
+    )
+    assert.Equal(t, expected, sum)
 }
 
 func Test_Slice_Sum(t *testing.T) {
-    sum := sum.Of(1, 2, 3, 4, 5, 6)
-    e := 1 + 2 + 3 + 4 + 5 + 6
-    assert.Equal(t, e, sum)
+    var (
+        sum      = sum.Of(1, 2, 3, 4, 5, 6)
+        expected = 1 + 2 + 3 + 4 + 5 + 6
+    )
+    assert.Equal(t, expected, sum)
 }
 
 func Test_Slice_Flatt(t *testing.T) {
-    md := [][]int{{1, 2, 3}, {4}, {5, 6}}
-    f := slice.Flatt(md, conv.AsIs[[]int])
-    e := []int{1, 2, 3, 4, 5, 6}
-    assert.Equal(t, e, f)
+    var (
+        source   = [][]int{{1, 2, 3}, {4}, {5, 6}}
+        result   = slice.Flatt(source, conv.AsIs[[]int])
+        expected = []int{1, 2, 3, 4, 5, 6}
+    )
+    assert.Equal(t, expected, result)
 }
 
 func Test_Range(t *testing.T) {
@@ -194,25 +215,30 @@ func Test_Range(t *testing.T) {
 }
 
 func Test_First(t *testing.T) {
-    r, ok := first.Of(1, 3, 5, 7, 9, 11).By(more.Than(5))
+    result, ok := first.Of(1, 3, 5, 7, 9, 11).By(more.Than(5))
     assert.True(t, ok)
-    assert.Equal(t, 7, r)
+    assert.Equal(t, 7, result)
 }
 
 func Test_Last(t *testing.T) {
-    r, ok := last.Of(1, 3, 5, 7, 9, 11).By(less.Than(9))
+    result, ok := last.Of(1, 3, 5, 7, 9, 11).By(less.Than(9))
     assert.True(t, ok)
-    assert.Equal(t, 7, r)
+    assert.Equal(t, 7, result)
 }
 
 func Test_BehaveAsStrings(t *testing.T) {
-    type TypeBasedOnString string
-    type ArrayTypeBasedOnString []TypeBasedOnString
+    type (
+        TypeBasedOnString      string
+        ArrayTypeBasedOnString []TypeBasedOnString
+    )
 
-    vals := ArrayTypeBasedOnString{"1", "2", "3"}
-    strs := slice.BehaveAsStrings(vals)
+    var (
+        source   = ArrayTypeBasedOnString{"1", "2", "3"}
+        result   = slice.BehaveAsStrings(source)
+        expected = []string{"1", "2", "3"}
+    )
 
-    assert.Equal(t, []string{"1", "2", "3"}, strs)
+    assert.Equal(t, expected, result)
 }
 
 type rows[T any] struct {
@@ -224,17 +250,21 @@ func (r *rows[T]) hasNext() bool    { return r.cursor < len(r.row) }
 func (r *rows[T]) next() (T, error) { e := r.row[r.cursor]; r.cursor++; return e, nil }
 
 func Test_OfLoop(t *testing.T) {
-    stream := &rows[int]{slice.Of(1, 2, 3), 0}
-    result, _ := slice.OfLoop(stream, (*rows[int]).hasNext, (*rows[int]).next)
-
-    assert.Equal(t, slice.Of(1, 2, 3), result)
+    var (
+        stream    = &rows[int]{slice.Of(1, 2, 3), 0}
+        result, _ = slice.OfLoop(stream, (*rows[int]).hasNext, (*rows[int]).next)
+        expected  = slice.Of(1, 2, 3)
+    )
+    assert.Equal(t, expected, result)
 }
 
 func Test_Generate(t *testing.T) {
-    counter := 0
-    result, _ := slice.Generate(func() (int, bool, error) { counter++; return counter, counter < 4, nil })
-
-    assert.Equal(t, slice.Of(1, 2, 3), result)
+    var (
+        counter   = 0
+        result, _ = slice.Generate(func() (int, bool, error) { counter++; return counter, counter < 4, nil })
+        expected  = slice.Of(1, 2, 3)
+    )
+    assert.Equal(t, expected, result)
 }
 ```
 
@@ -561,6 +591,7 @@ import (
     "github.com/m4gshm/gollections/it"
     slc "github.com/m4gshm/gollections/it/slice"
     "github.com/m4gshm/gollections/op"
+    "github.com/m4gshm/gollections/predicate/more"
     "github.com/m4gshm/gollections/slice"
     "github.com/m4gshm/gollections/walk/group"
 )
@@ -607,7 +638,7 @@ func Test_group_orderset_with_filtering_by_stirng_len(t *testing.T) {
         "second", //duplicate
     ), func(v string) int { return len(v) },
     ).FilterKey(
-        func(k int) bool { return k > 3 },
+        more.Than(3),
     ).MapValue(
         func(v string) string { return v + "_" },
     ).Collect()
