@@ -5,6 +5,7 @@ import (
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/notsafe"
+	"github.com/m4gshm/gollections/predicate"
 )
 
 // FlattenFit is the Iterator wrapper that converts an element to a slice with addition filtering of the element by a Predicate and iterates over the slice.
@@ -14,7 +15,7 @@ type FlattenFit[From, To any, IT c.Iterator[From]] struct {
 	indTo, sizeTo int
 	iter          IT
 	flatt         c.Flatter[From, To]
-	fit           c.Predicate[From]
+	fit           predicate.Predicate[From]
 }
 
 var _ c.Iterator[any] = (*FlattenFit[any, any, c.Iterator[any]])(nil)

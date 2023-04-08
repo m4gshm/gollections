@@ -5,6 +5,7 @@ import (
 	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/predicate"
 	"github.com/m4gshm/gollections/ptr"
 )
 
@@ -31,7 +32,7 @@ func Map[From, To any, IT c.Iterator[From]](elements IT, by c.Converter[From, To
 }
 
 // MapFit additionally filters 'From' elements.
-func MapFit[From, To any, IT c.Iterator[From]](elements IT, fit c.Predicate[From], by c.Converter[From, To]) c.Iterator[To] {
+func MapFit[From, To any, IT c.Iterator[From]](elements IT, fit predicate.Predicate[From], by c.Converter[From, To]) c.Iterator[To] {
 	return it.MapFit(elements, fit, by)
 }
 
@@ -41,12 +42,12 @@ func Flatt[From, To any, IT c.Iterator[From]](elements IT, by c.Flatter[From, To
 }
 
 // FlattFit additionally filters 'From' elements
-func FlattFit[From, To any, IT c.Iterator[From]](elements IT, fit c.Predicate[From], flatt c.Flatter[From, To]) c.Iterator[To] {
+func FlattFit[From, To any, IT c.Iterator[From]](elements IT, fit predicate.Predicate[From], flatt c.Flatter[From, To]) c.Iterator[To] {
 	return ptr.Of(it.FlattFit(elements, fit, flatt))
 }
 
 // Filter instantiates Iterator that checks elements by a filter and returns successful ones
-func Filter[T any, IT c.Iterator[T]](elements IT, filter c.Predicate[T]) c.Iterator[T] {
+func Filter[T any, IT c.Iterator[T]](elements IT, filter predicate.Predicate[T]) c.Iterator[T] {
 	return it.Filter(elements, filter)
 }
 
@@ -81,7 +82,7 @@ func ForEach[T any, IT c.Iterator[T]](elements IT, walker func(T)) {
 }
 
 // ForEachFit applies a walker to elements that satisfy a predicate condition
-func ForEachFit[T any](elements c.Iterator[T], walker func(T), fit c.Predicate[T]) {
+func ForEachFit[T any](elements c.Iterator[T], walker func(T), fit predicate.Predicate[T]) {
 	it.ForEachFit(elements, walker, fit)
 }
 
@@ -91,7 +92,7 @@ func Sum[T c.Summable, IT c.Iterator[T]](elements IT) T {
 }
 
 // First returns the first element that satisfies requirements of the predicate 'fit'
-func First[T any, IT c.Iterator[T]](elements IT, fit c.Predicate[T]) (T, bool) {
+func First[T any, IT c.Iterator[T]](elements IT, fit predicate.Predicate[T]) (T, bool) {
 	return it.First(elements, fit)
 }
 

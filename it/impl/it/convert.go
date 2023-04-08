@@ -1,12 +1,15 @@
 package it
 
-import "github.com/m4gshm/gollections/c"
+import (
+	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/predicate"
+)
 
 // ConvertFitIter is the Converter with elements filtering.
 type ConvertFitIter[From, To any, IT c.Iterator[From]] struct {
 	iter IT
 	by   c.Converter[From, To]
-	fit  c.Predicate[From]
+	fit  predicate.Predicate[From]
 }
 
 var (

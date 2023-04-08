@@ -9,6 +9,7 @@ import (
 	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/kvit"
 	"github.com/m4gshm/gollections/map_"
+	"github.com/m4gshm/gollections/predicate"
 	"github.com/m4gshm/gollections/ptr"
 	"github.com/m4gshm/gollections/slice"
 )
@@ -135,7 +136,7 @@ func (m Map[K, V]) V() MapValues[K, V] {
 	return WrapVal(m.elements)
 }
 
-func (m Map[K, V]) FilterKey(fit c.Predicate[K]) c.MapPipe[K, V, map[K]V] {
+func (m Map[K, V]) FilterKey(fit predicate.Predicate[K]) c.MapPipe[K, V, map[K]V] {
 	return it.NewKVPipe(it.FilterKV(ptr.Of(m.Head()), c.FitKey[K, V](fit)), kvit.ToMap[K, V])
 }
 
@@ -143,7 +144,7 @@ func (m Map[K, V]) MapKey(by c.Converter[K, K]) c.MapPipe[K, V, map[K]V] {
 	return it.NewKVPipe(it.MapKV(ptr.Of(m.Head()), func(key K, val V) (K, V) { return by(key), val }), kvit.ToMap[K, V])
 }
 
-func (m Map[K, V]) FilterValue(fit c.Predicate[V]) c.MapPipe[K, V, map[K]V] {
+func (m Map[K, V]) FilterValue(fit predicate.Predicate[V]) c.MapPipe[K, V, map[K]V] {
 	return it.NewKVPipe(it.FilterKV(ptr.Of(m.Head()), c.FitValue[K](fit)), kvit.ToMap[K, V])
 }
 
@@ -151,7 +152,7 @@ func (m Map[K, V]) MapValue(by c.Converter[V, V]) c.MapPipe[K, V, map[K]V] {
 	return it.NewKVPipe(it.MapKV(ptr.Of(m.Head()), func(key K, val V) (K, V) { return key, by(val) }), kvit.ToMap[K, V])
 }
 
-func (m Map[K, V]) Filter(filter c.BiPredicate[K, V]) c.MapPipe[K, V, map[K]V] {
+func (m Map[K, V]) Filter(filter predicate.BiPredicate[K, V]) c.MapPipe[K, V, map[K]V] {
 	return it.NewKVPipe(it.FilterKV(ptr.Of(m.Head()), filter), kvit.ToMap[K, V])
 }
 

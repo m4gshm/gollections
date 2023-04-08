@@ -10,8 +10,10 @@ import (
 	"github.com/m4gshm/gollections/first"
 	"github.com/m4gshm/gollections/last"
 	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/predicate/exclude"
 	"github.com/m4gshm/gollections/predicate/less"
 	"github.com/m4gshm/gollections/predicate/more"
+	"github.com/m4gshm/gollections/predicate/one"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/clone"
 	"github.com/m4gshm/gollections/slice/clone/sort"
@@ -191,6 +193,21 @@ func Test_Last(t *testing.T) {
 	result, ok := last.Of(1, 3, 5, 7, 9, 11).By(less.Than(9))
 	assert.True(t, ok)
 	assert.Equal(t, 7, result)
+}
+
+func Test_OneOf(t *testing.T) {
+	result := slice.Filter(slice.Of(1, 3, 5, 7, 9, 11), one.Of(1, 7).Or(one.Of(11)))
+	assert.Equal(t, slice.Of(1, 7, 11), result)
+}
+
+func Test_ExcludeAll(t *testing.T) {
+	result := slice.Filter(slice.Of(1, 3, 5, 7, 9, 11), exclude.All(1, 7, 11))
+	assert.Equal(t, slice.Of(3, 5, 9), result)
+}
+
+func Test_Xor(t *testing.T) {
+	result := slice.Filter(slice.Of(1, 3, 5, 7, 9, 11), one.Of(1, 3, 5, 7).Xor(one.Of(7, 9, 11)))
+	assert.Equal(t, slice.Of(1, 3, 5, 9, 11), result)
 }
 
 func Test_BehaveAsStrings(t *testing.T) {

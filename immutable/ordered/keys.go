@@ -5,6 +5,7 @@ import (
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/it/impl/it"
+	"github.com/m4gshm/gollections/predicate"
 	"github.com/m4gshm/gollections/ptr"
 	"github.com/m4gshm/gollections/slice"
 )
@@ -69,7 +70,7 @@ func (s MapKeys[T]) Get(index int) (T, bool) {
 	return slice.Get(s.elements, index)
 }
 
-func (s MapKeys[T]) Filter(filter c.Predicate[T]) c.Pipe[T, []T] {
+func (s MapKeys[T]) Filter(filter predicate.Predicate[T]) c.Pipe[T, []T] {
 	return it.NewPipe[T](it.Filter(ptr.Of(s.Head()), filter))
 }
 

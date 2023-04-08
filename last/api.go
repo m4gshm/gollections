@@ -1,7 +1,7 @@
 package last
 
 import (
-	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/predicate"
 	"github.com/m4gshm/gollections/slice/last"
 )
 
@@ -11,13 +11,13 @@ func Of[T any](elements ...T) OfElements[T] {
 }
 
 // By an alias of the slice.Last
-func By[T any](by c.Predicate[T]) ByPredicate[T] {
+func By[T any](by predicate.Predicate[T]) ByPredicate[T] {
 	return ByPredicate[T]{by: by}
 }
 
 // ByPredicate tail of the By method
 type ByPredicate[T any] struct {
-	by c.Predicate[T]
+	by predicate.Predicate[T]
 }
 
 func (l ByPredicate[T]) Of(elements ...T) (T, bool) {
@@ -29,6 +29,6 @@ type OfElements[T any] struct {
 	elements []T
 }
 
-func (l OfElements[T]) By(by c.Predicate[T]) (T, bool) {
+func (l OfElements[T]) By(by predicate.Predicate[T]) (T, bool) {
 	return last.Of(l.elements, by)
 }

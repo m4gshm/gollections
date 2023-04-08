@@ -9,6 +9,7 @@ import (
 	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/kvit/group"
 	"github.com/m4gshm/gollections/notsafe"
+	"github.com/m4gshm/gollections/predicate"
 )
 
 // ErrBreak is For, Track breaker
@@ -20,7 +21,7 @@ func Map[From, To any, IT c.Iterator[From]](elements IT, by c.Converter[From, To
 }
 
 // MapFit additionally filters 'From' elements.
-func MapFit[From, To any, IT c.Iterator[From]](elements IT, fit c.Predicate[From], by c.Converter[From, To]) ConvertFitIter[From, To, IT] {
+func MapFit[From, To any, IT c.Iterator[From]](elements IT, fit predicate.Predicate[From], by c.Converter[From, To]) ConvertFitIter[From, To, IT] {
 	return ConvertFitIter[From, To, IT]{iter: elements, by: by, fit: fit}
 }
 
@@ -30,12 +31,12 @@ func Flatt[From, To any, IT c.Iterator[From]](elements IT, by c.Flatter[From, To
 }
 
 // FlattFit additionally filters 'From' elements.
-func FlattFit[From, To any, IT c.Iterator[From]](elements IT, fit c.Predicate[From], flatt c.Flatter[From, To]) FlattenFit[From, To, IT] {
+func FlattFit[From, To any, IT c.Iterator[From]](elements IT, fit predicate.Predicate[From], flatt c.Flatter[From, To]) FlattenFit[From, To, IT] {
 	return FlattenFit[From, To, IT]{iter: elements, flatt: flatt, fit: fit, elemSizeTo: notsafe.GetTypeSize[To]()}
 }
 
 // Filter creates an Iterator that checks elements by filters and returns successful ones.
-func Filter[T any, IT c.Iterator[T]](elements IT, filter c.Predicate[T]) Fit[T, IT] {
+func Filter[T any, IT c.Iterator[T]](elements IT, filter predicate.Predicate[T]) Fit[T, IT] {
 	return Fit[T, IT]{iter: elements, by: filter}
 }
 
@@ -50,7 +51,7 @@ func MapKV[K, V any, IT c.KVIterator[K, V], k2, v2 any](elements IT, by c.BiConv
 }
 
 // FilterKV creates an Iterator that checks elements by a filter and returns successful ones
-func FilterKV[K, V any, IT c.KVIterator[K, V]](elements IT, filter c.BiPredicate[K, V]) FitKV[K, V, IT] {
+func FilterKV[K, V any, IT c.KVIterator[K, V]](elements IT, filter predicate.BiPredicate[K, V]) FitKV[K, V, IT] {
 	return FitKV[K, V, IT]{iter: elements, by: filter}
 }
 
@@ -84,7 +85,7 @@ func ForEach[T any, IT c.Iterator[T]](elements IT, walker func(T)) {
 }
 
 // ForEachFit applies a walker to elements that satisfy a predicate condition
-func ForEachFit[T any, IT c.Iterator[T]](elements IT, walker func(T), fit c.Predicate[T]) {
+func ForEachFit[T any, IT c.Iterator[T]](elements IT, walker func(T), fit predicate.Predicate[T]) {
 	for v, ok := elements.Next(); ok && fit(v); v, ok = elements.Next() {
 		walker(v)
 	}
@@ -138,7 +139,7 @@ func ToSlice[T any, IT c.Iterator[T]](elements IT) []T {
 }
 
 // First returns the first element that satisfies requirements of the predicate 'fit'
-func First[T any, IT c.Iterator[T]](elements IT, fit c.Predicate[T]) (T, bool) {
+func First[T any, IT c.Iterator[T]](elements IT, fit predicate.Predicate[T]) (T, bool) {
 	for one, ok := elements.Next(); ok; one, ok = elements.Next() {
 		if fit(one) {
 			return one, true

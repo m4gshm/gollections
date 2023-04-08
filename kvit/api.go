@@ -7,6 +7,7 @@ import (
 	"github.com/m4gshm/gollections/kvit/group"
 	"github.com/m4gshm/gollections/kvit/impl/kvit"
 	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/predicate"
 	"github.com/m4gshm/gollections/ptr"
 )
 
@@ -69,17 +70,17 @@ func Map[K comparable, V any, Kto comparable, Vto any](elements c.KVIterator[K, 
 }
 
 // Filter instantiates key/value iterator that iterates only over filtered elements
-func Filter[K comparable, V any, IT c.KVIterator[K, V]](elements IT, filter c.BiPredicate[K, V]) c.MapPipe[K, V, map[K]V] {
+func Filter[K comparable, V any, IT c.KVIterator[K, V]](elements IT, filter predicate.BiPredicate[K, V]) c.MapPipe[K, V, map[K]V] {
 	return implit.NewKVPipe(implit.FilterKV(elements, filter), ToMap[K, V])
 }
 
 // FilterKey instantiates key/value iterator that iterates only over elements that filtered by the key
-func FilterKey[K comparable, V any](elements c.KVIterator[K, V], filter c.Predicate[K]) c.MapPipe[K, V, map[K]V] {
+func FilterKey[K comparable, V any](elements c.KVIterator[K, V], filter predicate.Predicate[K]) c.MapPipe[K, V, map[K]V] {
 	return Filter(elements, c.FitKey[K, V](filter))
 }
 
 // FilterValue instantiates key/value iterator that iterates only over elements that filtered by the value
-func FilterValue[K comparable, V any](elements c.KVIterator[K, V], filter c.Predicate[V]) c.MapPipe[K, V, map[K]V] {
+func FilterValue[K comparable, V any](elements c.KVIterator[K, V], filter predicate.Predicate[V]) c.MapPipe[K, V, map[K]V] {
 	return Filter(elements, c.FitValue[K](filter))
 }
 

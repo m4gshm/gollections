@@ -6,6 +6,7 @@ import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/notsafe"
+	"github.com/m4gshm/gollections/predicate"
 )
 
 // Map instantiates Iterator that converts elements with a converter and returns them
@@ -20,7 +21,7 @@ func Map[FS ~[]From, From, To any](elements FS, by c.Converter[From, To]) Conver
 }
 
 // MapFit additionally filters 'From' elements.
-func MapFit[FS ~[]From, From, To any](elements FS, fit c.Predicate[From], by c.Converter[From, To]) ConvertFit[From, To] {
+func MapFit[FS ~[]From, From, To any](elements FS, fit predicate.Predicate[From], by c.Converter[From, To]) ConvertFit[From, To] {
 	var (
 		header   = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
 		array    = unsafe.Pointer(header.Data)
@@ -43,7 +44,7 @@ func Flatt[FS ~[]From, From, To any](elements FS, by c.Flatter[From, To]) Flatte
 }
 
 // FlattFit additionally filters –'From' elements.
-func FlattFit[FS ~[]From, From, To any](elements FS, fit c.Predicate[From], flatt c.Flatter[From, To]) FlattenFit[From, To] {
+func FlattFit[FS ~[]From, From, To any](elements FS, fit predicate.Predicate[From], flatt c.Flatter[From, To]) FlattenFit[From, To] {
 	var (
 		header       = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
 		array        = unsafe.Pointer(header.Data)
@@ -55,7 +56,7 @@ func FlattFit[FS ~[]From, From, To any](elements FS, fit c.Predicate[From], flat
 }
 
 // Filter instantiates Iterator that checks elements by filters and returns successful ones.
-func Filter[TS ~[]T, T any](elements TS, filter c.Predicate[T]) Fit[T] {
+func Filter[TS ~[]T, T any](elements TS, filter predicate.Predicate[T]) Fit[T] {
 	var (
 		header   = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
 		array    = unsafe.Pointer(header.Data)

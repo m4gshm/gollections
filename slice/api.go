@@ -11,6 +11,7 @@ import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/predicate"
 )
 
 // ErrBreak is the 'break' statement of the For, Track methods
@@ -88,7 +89,7 @@ func Convert[FS ~[]From, From, To any](elements FS, by c.Converter[From, To]) []
 }
 
 // ConvertFit additionally filters 'From' elements
-func ConvertFit[FS ~[]From, From, To any](elements FS, fit c.Predicate[From], by c.Converter[From, To]) []To {
+func ConvertFit[FS ~[]From, From, To any](elements FS, fit predicate.Predicate[From], by c.Converter[From, To]) []To {
 	result := make([]To, 0)
 	for _, e := range elements {
 		if fit(e) {
@@ -151,7 +152,7 @@ func Flatt[FS ~[]From, From, To any](elements FS, by c.Flatter[From, To]) []To {
 }
 
 // FlattFit additionally filters 'From' elements.
-func FlattFit[FS ~[]From, From, To any](elements FS, fit c.Predicate[From], by c.Flatter[From, To]) []To {
+func FlattFit[FS ~[]From, From, To any](elements FS, fit predicate.Predicate[From], by c.Flatter[From, To]) []To {
 	result := make([]To, 0)
 	for _, e := range elements {
 		if fit(e) {
@@ -162,7 +163,7 @@ func FlattFit[FS ~[]From, From, To any](elements FS, fit c.Predicate[From], by c
 }
 
 // FlattElemFit unfolds the n-dimensional slice into a n-1 dimensional slice with additinal filtering of 'To' elements.
-func FlattElemFit[FS ~[]From, From, To any](elements FS, by c.Flatter[From, To], fit c.Predicate[To]) []To {
+func FlattElemFit[FS ~[]From, From, To any](elements FS, by c.Flatter[From, To], fit predicate.Predicate[To]) []To {
 	result := make([]To, 0)
 	for _, e := range elements {
 		for _, to := range by(e) {
@@ -175,7 +176,7 @@ func FlattElemFit[FS ~[]From, From, To any](elements FS, by c.Flatter[From, To],
 }
 
 // FlattFitFit unfolds the n-dimensional slice 'elements' into a n-1 dimensional slice with additinal filtering of 'From' and 'To' elements.
-func FlattFitFit[FS ~[]From, From, To any](elements FS, fitFrom c.Predicate[From], by c.Flatter[From, To], fitTo c.Predicate[To]) []To {
+func FlattFitFit[FS ~[]From, From, To any](elements FS, fitFrom predicate.Predicate[From], by c.Flatter[From, To], fitTo predicate.Predicate[To]) []To {
 	result := make([]To, 0)
 	for _, e := range elements {
 		if fitFrom(e) {
@@ -190,7 +191,7 @@ func FlattFitFit[FS ~[]From, From, To any](elements FS, fitFrom c.Predicate[From
 }
 
 // Filter creates a slice containing only the filtered elements
-func Filter[TS ~[]T, T any](elements TS, filter c.Predicate[T]) []T {
+func Filter[TS ~[]T, T any](elements TS, filter predicate.Predicate[T]) []T {
 	result := make([]T, 0)
 	for _, e := range elements {
 		if filter(e) {
@@ -267,7 +268,7 @@ func Sum[T c.Summable, TS ~[]T](elements TS) T {
 }
 
 // First returns the first element that satisfies requirements of the predicate 'fit'
-func First[TS ~[]T, T any](elements TS, by c.Predicate[T]) (T, bool) {
+func First[TS ~[]T, T any](elements TS, by predicate.Predicate[T]) (T, bool) {
 	for _, e := range elements {
 		if by(e) {
 			return e, true
@@ -278,7 +279,7 @@ func First[TS ~[]T, T any](elements TS, by c.Predicate[T]) (T, bool) {
 }
 
 // Last returns the latest element that satisfies requirements of the predicate 'fit'
-func Last[TS ~[]T, T any](elements TS, by c.Predicate[T]) (T, bool) {
+func Last[TS ~[]T, T any](elements TS, by predicate.Predicate[T]) (T, bool) {
 	for i := len(elements) - 1; i >= 0; i-- {
 		e := elements[i]
 		if by(e) {

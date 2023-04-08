@@ -2,6 +2,7 @@
 package c
 
 import (
+	"github.com/m4gshm/gollections/predicate"
 	"golang.org/x/exp/constraints"
 )
 
@@ -135,7 +136,7 @@ type Checkable[T any] interface {
 // Transformable is the interface that provides limited kit of container transformation methods.
 // The full kit of transformer functions are in the package 'c'
 type Transformable[T any, Collection any] interface {
-	Filter(Predicate[T]) Pipe[T, Collection]
+	Filter(predicate.Predicate[T]) Pipe[T, Collection]
 	Map(Converter[T, T]) Pipe[T, Collection]
 }
 
@@ -151,13 +152,13 @@ type Pipe[T any, Collection any] interface {
 // MapTransformable is the interface that provides limited kit of map transformation methods.
 // The full kit of transformer functions are in the package 'c/map_'
 type MapTransformable[K comparable, V any, Map any] interface {
-	Filter(BiPredicate[K, V]) MapPipe[K, V, Map]
+	Filter(predicate.BiPredicate[K, V]) MapPipe[K, V, Map]
 	Map(BiConverter[K, V, K, V]) MapPipe[K, V, Map]
 
-	FilterKey(Predicate[K]) MapPipe[K, V, Map]
+	FilterKey(predicate.Predicate[K]) MapPipe[K, V, Map]
 	MapKey(Converter[K, K]) MapPipe[K, V, Map]
 
-	FilterValue(Predicate[V]) MapPipe[K, V, Map]
+	FilterValue(predicate.Predicate[V]) MapPipe[K, V, Map]
 	MapValue(Converter[V, V]) MapPipe[K, V, Map]
 }
 

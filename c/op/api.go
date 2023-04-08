@@ -5,6 +5,7 @@ import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/it/impl/it"
+	"github.com/m4gshm/gollections/predicate"
 	"github.com/m4gshm/gollections/ptr"
 )
 
@@ -14,7 +15,7 @@ func Map[From, To any, IT c.Iterable[c.Iterator[From]]](elements IT, by c.Conver
 }
 
 // MapFit additionally filters 'From' elements
-func MapFit[From, To any, IT c.Iterable[c.Iterator[From]]](elements IT, fit c.Predicate[From], by c.Converter[From, To]) c.Iterator[To] {
+func MapFit[From, To any, IT c.Iterable[c.Iterator[From]]](elements IT, fit predicate.Predicate[From], by c.Converter[From, To]) c.Iterator[To] {
 	return it.MapFit(elements.Begin(), fit, by)
 }
 
@@ -24,12 +25,12 @@ func Flatt[From, To any, IT c.Iterable[c.Iterator[From]]](elements IT, by c.Flat
 }
 
 // FlattFit additionally filters 'From' elements
-func FlattFit[From, To any, IT c.Iterable[c.Iterator[From]]](elements IT, fit c.Predicate[From], flatt c.Flatter[From, To]) c.Iterator[To] {
+func FlattFit[From, To any, IT c.Iterable[c.Iterator[From]]](elements IT, fit predicate.Predicate[From], flatt c.Flatter[From, To]) c.Iterator[To] {
 	return ptr.Of(it.FlattFit(elements.Begin(), fit, flatt))
 }
 
 // Filter instantiates Iterator that checks elements by filters and returns successful ones
-func Filter[T any, IT c.Iterable[c.Iterator[T]]](elements IT, filter c.Predicate[T]) c.Iterator[T] {
+func Filter[T any, IT c.Iterable[c.Iterator[T]]](elements IT, filter predicate.Predicate[T]) c.Iterator[T] {
 	return it.Filter(elements.Begin(), filter)
 }
 

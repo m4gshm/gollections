@@ -2,6 +2,7 @@ package it
 
 import (
 	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/predicate"
 )
 
 // NewKVPipe instantiates Iterator wrapper that converts the elements into key/value pairs and iterates over them.
@@ -18,8 +19,8 @@ type KVIterPipe[K comparable, V any, C any] struct {
 
 var _ c.MapPipe[string, any, any] = (*KVIterPipe[string, any, any])(nil)
 
-func (s *KVIterPipe[K, V, C]) FilterKey(fit c.Predicate[K]) c.MapPipe[K, V, C] {
-	var kvFit c.BiPredicate[K, V] = func(key K, val V) bool { return fit(key) }
+func (s *KVIterPipe[K, V, C]) FilterKey(fit predicate.Predicate[K]) c.MapPipe[K, V, C] {
+	var kvFit predicate.BiPredicate[K, V] = func(key K, val V) bool { return fit(key) }
 	return NewKVPipe(FilterKV(s.it, kvFit), s.collector)
 }
 
@@ -27,8 +28,8 @@ func (s *KVIterPipe[K, V, C]) MapKey(by c.Converter[K, K]) c.MapPipe[K, V, C] {
 	return NewKVPipe(MapKV(s.it, func(key K, val V) (K, V) { return by(key), val }), s.collector)
 }
 
-func (s *KVIterPipe[K, V, C]) FilterValue(fit c.Predicate[V]) c.MapPipe[K, V, C] {
-	var kvFit c.BiPredicate[K, V] = func(key K, val V) bool { return fit(val) }
+func (s *KVIterPipe[K, V, C]) FilterValue(fit predicate.Predicate[V]) c.MapPipe[K, V, C] {
+	var kvFit predicate.BiPredicate[K, V] = func(key K, val V) bool { return fit(val) }
 	return NewKVPipe(FilterKV(s.it, kvFit), s.collector)
 }
 
@@ -36,7 +37,7 @@ func (s *KVIterPipe[K, V, C]) MapValue(by c.Converter[V, V]) c.MapPipe[K, V, C] 
 	return NewKVPipe(MapKV(s.it, func(key K, val V) (K, V) { return key, by(val) }), s.collector)
 }
 
-func (s *KVIterPipe[K, V, C]) Filter(fit c.BiPredicate[K, V]) c.MapPipe[K, V, C] {
+func (s *KVIterPipe[K, V, C]) Filter(fit predicate.BiPredicate[K, V]) c.MapPipe[K, V, C] {
 	return NewKVPipe(FilterKV(s.it, fit), s.collector)
 }
 

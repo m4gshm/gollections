@@ -2,6 +2,7 @@ package it
 
 import (
 	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/predicate"
 )
 
 // NewPipe instantiates Pipe based on iterable elements.
@@ -17,7 +18,7 @@ type IterPipe[T any] struct {
 
 var _ c.Pipe[any, []any] = (*IterPipe[any])(nil)
 
-func (s *IterPipe[T]) Filter(fit c.Predicate[T]) c.Pipe[T, []T] {
+func (s *IterPipe[T]) Filter(fit predicate.Predicate[T]) c.Pipe[T, []T] {
 	return NewPipe[T](Filter(s.it, fit))
 }
 

@@ -4,6 +4,7 @@ import (
 	"unsafe"
 
 	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/predicate"
 )
 
 // Fit is the array based Iterator implementation that provides filtering of elements by a Predicate.
@@ -11,7 +12,7 @@ type Fit[T any] struct {
 	array    unsafe.Pointer
 	elemSize uintptr
 	size, i  int
-	by       c.Predicate[T]
+	by       predicate.Predicate[T]
 }
 
 var _ c.Iterator[any] = (*Fit[any])(nil)
