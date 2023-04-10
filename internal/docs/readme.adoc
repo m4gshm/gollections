@@ -31,7 +31,7 @@ Usage examples:
 
 [source,go]
 ----
-include::../slice/examples/slice_examples_test.go[]
+include::../examples/slice/slice_examples_test.go[]
 ----
 
 ==== Maps - link:./map_/api.go[github.com/m4gshm/gollections/map_]
@@ -42,7 +42,7 @@ Usage examples:
 
 [source,go]
 ----
-include::../map_/examples/map_examples_test.go[]
+include::../examples/map_/map_examples_test.go[]
 ----
 
 ==== Mutable containers
@@ -66,7 +66,7 @@ The same interfaces as in the mutable package but for read-only purposes.
 
 [source,go]
 ----
-include::../constructors.go[]
+include::../examples/constructors.go[]
 ----
 
 where link:./immutable/vector/api.go[vector], link:./immutable/set/api.go[set], link:./immutable/oset/api.go[oset], link:./immutable/map_/api.go[map_], link:./immutable/omap/api.go[omap] are packages from link:./immutable/[github.com/m4gshm/gollections/immutable] and link:./K/v.go[K.V] is the method V from the package link:./K/[K]
@@ -75,7 +75,7 @@ where link:./immutable/vector/api.go[vector], link:./immutable/set/api.go[set], 
 
 [source,go]
 ----
-include::../constructors_mutable.go[]
+include::../examples/constructors_mutable.go[]
 ----
 
 where link:./mutable/vector/api.go[vector], link:./mutable/set/api.go[set], link:./mutable/oset/api.go[oset], link:./mutable/map_/api.go[map_], link:./mutable/omap/api.go[omap] are packages from link:./mutable/[github.com/m4gshm/gollections/mutable] and link:./K/v.go[K.V] is the method V from the package link:./K/[K]
@@ -122,5 +122,5 @@ Declarative style API over 'Iterator' interface.
 
 [source,go]
 ----
-include::../examples_test.go[]
+include::../examples/examples_test.go[]
 ----

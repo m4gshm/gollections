@@ -17,11 +17,19 @@ import (
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/clone"
 	"github.com/m4gshm/gollections/slice/clone/sort"
+	"github.com/m4gshm/gollections/slice/convert"
 	"github.com/m4gshm/gollections/slice/group"
 	"github.com/m4gshm/gollections/slice/range_"
 	"github.com/m4gshm/gollections/slice/reverse"
 	"github.com/m4gshm/gollections/sum"
 )
+
+//go:generate fieldr -debug -type User get-set
+
+type User struct {
+	name string
+	age  int
+}
 
 func Test_SortInt(t *testing.T) {
 	source := []int{1, 3, -1, 2, 0}
@@ -30,10 +38,6 @@ func Test_SortInt(t *testing.T) {
 }
 
 func Test_SortStructs(t *testing.T) {
-	type User struct {
-		name string
-		age  int
-	}
 	var users = []User{{"Bob", 26}, {"Alice", 35}, {"Tom", 18}}
 	var (
 		//sorted
@@ -45,10 +49,6 @@ func Test_SortStructs(t *testing.T) {
 }
 
 func Test_SortStructsByLess(t *testing.T) {
-	type User struct {
-		name string
-		age  int
-	}
 	var users = []User{{"Bob", 26}, {"Alice", 35}, {"Tom", 18}}
 	var (
 		//sorted
@@ -109,8 +109,18 @@ var even = func(v int) bool { return v%2 == 0 }
 func Test_ConvertFiltered(t *testing.T) {
 	var (
 		source   = []int{1, 3, 4, 5, 7, 8, 9, 11}
-		result   = slice.ConvertFit(source, even, strconv.Itoa)
+		result   = convert.Fit(source, strconv.Itoa, even)
 		expected = []string{"4", "8"}
+	)
+	assert.Equal(t, expected, result)
+}
+
+func Test_ConvertNotNil(t *testing.T) {
+	type entity struct{ val string }
+	var (
+		source   = []*entity{{"first"}, nil, {"third"}, nil, {"fifth"}}
+		result   = convert.NotNil(source, func(e *entity) string { return e.val })
+		expected = []string{"first", "third", "fifth"}
 	)
 	assert.Equal(t, expected, result)
 }
@@ -118,7 +128,7 @@ func Test_ConvertFiltered(t *testing.T) {
 func Test_ConvertFilteredWithIndexInPlace(t *testing.T) {
 	var (
 		source   = slice.Of(1, 3, 4, 5, 7, 8, 9, 11)
-		result   = slice.ConvertCheckIndexed(source, func(index int, elem int) (string, bool) { return strconv.Itoa(index + elem), even(elem) })
+		result   = convert.CheckIndexed(source, func(index int, elem int) (string, bool) { return strconv.Itoa(index + elem), even(elem) })
 		expected = []string{"6", "13"}
 	)
 	assert.Equal(t, expected, result)
@@ -129,6 +139,16 @@ func Test_Slice_Filter(t *testing.T) {
 		source   = []int{1, 2, 3, 4, 5, 6}
 		result   = slice.Filter(source, even)
 		expected = []int{2, 4, 6}
+	)
+	assert.Equal(t, expected, result)
+}
+
+func Test_FilterNotNil(t *testing.T) {
+	type entity struct{ val string }
+	var (
+		source   = []*entity{{"first"}, nil, {"third"}, nil, {"fifth"}}
+		result   = slice.NotNil(source)
+		expected = []*entity{{"first"}, {"third"}, {"fifth"}}
 	)
 	assert.Equal(t, expected, result)
 }

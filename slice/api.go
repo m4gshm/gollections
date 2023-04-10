@@ -9,6 +9,7 @@ import (
 	"golang.org/x/exp/constraints"
 
 	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/predicate"
@@ -188,6 +189,10 @@ func FlattFitFit[FS ~[]From, From, To any](elements FS, fitFrom predicate.Predic
 		}
 	}
 	return result
+}
+
+func NotNil[TS ~[]*T, T any](elements TS) TS {
+	return Filter(elements, check.NotNil[T])
 }
 
 // Filter creates a slice containing only the filtered elements

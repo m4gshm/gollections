@@ -51,5 +51,5 @@ lint:
 .PHONY: readme
 readme:
 	$(info #README.md...)
-	asciidoctor -b docbook docs/readme.adoc 
-	pandoc -f docbook -t gfm docs/readme.xml -o README.md	
+	asciidoctor -b docbook internal/docs/readme.adoc 
+	pandoc -f docbook -t gfm internal/docs/readme.xml -o README.md	
