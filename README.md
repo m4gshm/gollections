@@ -57,12 +57,14 @@ import (
     "github.com/m4gshm/gollections/sum"
 )
 
-//go:generate fieldr -debug -type User get-set
-
 type User struct {
     name string
     age  int
 }
+
+func (u User) Name() string { return u.name }
+
+func (u User) Age() int { return u.age }
 
 func Test_SortInt(t *testing.T) {
     source := []int{1, 3, -1, 2, 0}
@@ -74,8 +76,8 @@ func Test_SortStructs(t *testing.T) {
     var users = []User{{"Bob", 26}, {"Alice", 35}, {"Tom", 18}}
     var (
         //sorted
-        byName = sort.By(users, func(u User) string { return u.name })
-        byAge  = sort.By(users, func(u User) int { return u.age })
+        byName = sort.By(users, User.Name)
+        byAge  = sort.By(users, User.Age)
     )
     assert.Equal(t, []User{{"Alice", 35}, {"Bob", 26}, {"Tom", 18}}, byName)
     assert.Equal(t, []User{{"Tom", 18}, {"Bob", 26}, {"Alice", 35}}, byAge)
@@ -151,9 +153,9 @@ func Test_ConvertFiltered(t *testing.T) {
 func Test_ConvertNilSafe(t *testing.T) {
     type entity struct{ val *string }
     var (
-        first = "first"
-        third = "third"
-        fifth= "fifth"
+        first    = "first"
+        third    = "third"
+        fifth    = "fifth"
         source   = []*entity{{&first}, {}, {&third}, nil, {&fifth}}
         result   = convert.NilSafe(source, func(e *entity) *string { return e.val })
         expected = []*string{&first, &third, &fifth}
@@ -321,13 +323,14 @@ package examples
 import (
     "testing"
 
+    "github.com/stretchr/testify/assert"
+
     "github.com/m4gshm/gollections/map_"
     "github.com/m4gshm/gollections/map_/clone"
     "github.com/m4gshm/gollections/map_/group"
     "github.com/m4gshm/gollections/ptr"
     "github.com/m4gshm/gollections/slice"
     "github.com/m4gshm/gollections/slice/clone/sort"
-    "github.com/stretchr/testify/assert"
 )
 
 type entity struct{ val string }

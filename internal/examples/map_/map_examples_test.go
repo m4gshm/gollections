@@ -3,13 +3,14 @@ package examples
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/map_/clone"
 	"github.com/m4gshm/gollections/map_/group"
 	"github.com/m4gshm/gollections/ptr"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/clone/sort"
-	"github.com/stretchr/testify/assert"
 )
 
 type entity struct{ val string }
