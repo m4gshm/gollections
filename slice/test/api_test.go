@@ -15,6 +15,7 @@ import (
 	"github.com/m4gshm/gollections/slice/clone/reverse"
 	csort "github.com/m4gshm/gollections/slice/clone/sort"
 	cstablesort "github.com/m4gshm/gollections/slice/clone/stablesort"
+	"github.com/m4gshm/gollections/slice/convert"
 	"github.com/m4gshm/gollections/slice/first"
 	"github.com/m4gshm/gollections/slice/last"
 	"github.com/m4gshm/gollections/slice/range_"
@@ -134,6 +135,43 @@ func Test_ConvertWithIndex(t *testing.T) {
 	s := slice.Of(1, 3, 5, 7, 9, 11)
 	r := slice.ConvertIndexed(s, func(index int, elem int) int { return index + elem })
 	assert.Equal(t, slice.Of(1, 1+3, 2+5, 3+7, 4+9, 5+11), r)
+}
+
+
+func Test_ConvertNotNil(t *testing.T) {
+	type entity struct{ val string }
+	var (
+		source   = []*entity{{"first"}, nil, {"third"}, nil, {"fifth"}}
+		result   = convert.NotNil(source, func(e *entity) string { return e.val })
+		expected = []string{"first", "third", "fifth"}
+	)
+	assert.Equal(t, expected, result)
+}
+
+func Test_ConvertToNotNil(t *testing.T) {
+	type entity struct{ val *string }
+	var (
+		first = "first"
+		third = "third"
+		fifth= "fifth"
+		source   = []entity{{&first}, {}, {&third}, {}, {&fifth}}
+		result   = convert.ToNotNil(source, func(e entity) *string { return e.val })
+		expected = []*string{&first, &third, &fifth}
+	)
+	assert.Equal(t, expected, result)
+}
+
+func Test_ConvertNilSafe(t *testing.T) {
+	type entity struct{ val *string }
+	var (
+		first = "first"
+		third = "third"
+		fifth= "fifth"
+		source   = []*entity{{&first}, {}, {&third}, nil, {&fifth}}
+		result   = convert.NilSafe(source, func(e *entity) *string { return e.val })
+		expected = []*string{&first, &third, &fifth}
+	)
+	assert.Equal(t, expected, result)
 }
 
 var even = func(v int) bool { return v%2 == 0 }

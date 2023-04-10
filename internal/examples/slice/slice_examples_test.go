@@ -115,12 +115,15 @@ func Test_ConvertFiltered(t *testing.T) {
 	assert.Equal(t, expected, result)
 }
 
-func Test_ConvertNotNil(t *testing.T) {
-	type entity struct{ val string }
+func Test_ConvertNilSafe(t *testing.T) {
+	type entity struct{ val *string }
 	var (
-		source   = []*entity{{"first"}, nil, {"third"}, nil, {"fifth"}}
-		result   = convert.NotNil(source, func(e *entity) string { return e.val })
-		expected = []string{"first", "third", "fifth"}
+		first = "first"
+		third = "third"
+		fifth= "fifth"
+		source   = []*entity{{&first}, {}, {&third}, nil, {&fifth}}
+		result   = convert.NilSafe(source, func(e *entity) *string { return e.val })
+		expected = []*string{&first, &third, &fifth}
 	)
 	assert.Equal(t, expected, result)
 }

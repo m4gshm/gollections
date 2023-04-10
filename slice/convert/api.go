@@ -15,6 +15,26 @@ func NotNil[FS ~[]*From, From, To any](elements FS, by c.Converter[*From, To]) [
 	return Fit(elements, by, not.Nil[From])
 }
 
+func ToNotNil[FS ~[]From, From, To any](elements FS, by c.Converter[From, *To]) []*To {
+	return slice.ConvertCheck(elements, func(f From) (*To, bool) {
+		if t := by(f); t != nil {
+			return t, true
+		}
+		return nil, false
+	})
+}
+
+func NilSafe[FS ~[]*From, From, To any](elements FS, by c.Converter[*From, *To]) []*To {
+	return slice.ConvertCheck(elements, func(f *From) (*To, bool) {
+		if f != nil {
+			if t := by(f); t != nil {
+				return t, true
+			}
+		}
+		return nil, false
+	})
+}
+
 func Check[FS ~[]From, From, To any](elements FS, by func(from From) (To, bool)) []To {
 	return slice.ConvertCheck(elements, by)
 }
