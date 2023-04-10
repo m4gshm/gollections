@@ -308,7 +308,7 @@ func Get[TS ~[]T, T any](elements TS, index int) (T, bool) {
 // Track applies tracker to elements with error checking. To stop traking just return the ErrBreak
 func Track[TS ~[]T, T any](elements TS, tracker func(int, T) error) error {
 	for i, e := range elements {
-		if err := tracker(i, e); err != ErrBreak {
+		if err := tracker(i, e); err == ErrBreak {
 			return nil
 		} else if err != nil {
 			return err
@@ -327,7 +327,7 @@ func TrackEach[TS ~[]T, T any](elements TS, tracker func(int, T)) {
 // For applies walker to elements. To stop walking just return the ErrBreak
 func For[TS ~[]T, T any](elements TS, walker func(T) error) error {
 	for _, e := range elements {
-		if err := walker(e); err != ErrBreak {
+		if err := walker(e); err == ErrBreak {
 			return nil
 		} else if err != nil {
 			return err
