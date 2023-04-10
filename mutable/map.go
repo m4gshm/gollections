@@ -183,3 +183,11 @@ func (s Map[K, V]) Map(by c.BiConverter[K, V, K, V]) c.MapPipe[K, V, map[K]V] {
 func (s Map[K, V]) Reduce(by c.Quaternary[K, V]) (K, V) {
 	return it.ReduceKV(ptr.Of(s.Head()), by)
 }
+
+func (m *Map[K, V]) Immutable() immutable.Map[K, V] {
+	return immutable.WrapMap(m.Collect())
+}
+
+func (m *Map[K, V]) SetAll(kvs c.Map[K, V]) {
+	kvs.TrackEach(func(key K, value V) { m.Set(key, value) })
+}

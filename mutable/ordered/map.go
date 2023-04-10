@@ -190,5 +190,9 @@ func (m *Map[K, V]) Reduce(by c.Quaternary[K, V]) (K, V) {
 }
 
 func (m *Map[K, V]) Immutable() ordered.Map[K, V] {
-	return ordered.WrapMap(m.order, m.elements)
+	return ordered.WrapMap(slice.Clone(m.order), map_.Clone(m.elements))
+}
+
+func (m *Map[K, V]) SetAll(kvs c.Map[K, V]) {
+	kvs.TrackEach(func(key K, value V) { m.Set(key, value) })
 }
