@@ -188,3 +188,7 @@ func (m *Map[K, V]) Map(by c.BiConverter[K, V, K, V]) c.MapPipe[K, V, map[K]V] {
 func (m *Map[K, V]) Reduce(by c.Quaternary[K, V]) (K, V) {
 	return it.ReduceKV(ptr.Of(m.Head()), by)
 }
+
+func (m *Map[K, V]) Immutable() ordered.Map[K, V] {
+	return ordered.WrapMap(m.order, m.elements)
+}
