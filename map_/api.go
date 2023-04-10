@@ -13,6 +13,19 @@ import (
 // ErrBreak is For, Track breaker
 var ErrBreak = it.ErrBreak
 
+// Of creates a map from a slice of key/value pairs.
+func Of[K comparable, V any](elements ...c.KV[K, V]) map[K]V {
+	var (
+		uniques = make(map[K]V, len(elements))
+	)
+	for _, kv := range elements {
+		key := kv.Key()
+		val := kv.Value()
+		uniques[key] = val
+	}
+	return uniques
+}
+
 // OfLoop builds a map by iterating key\value pairs of a source.
 // The hasNext specifies a predicate that tests existing of a next pair in the source.
 // The getNext extracts the pair.

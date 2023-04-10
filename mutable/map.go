@@ -17,17 +17,9 @@ func NewMap[K comparable, V any](capacity int) Map[K, V] {
 	return WrapMap(make(map[K]V, capacity))
 }
 
-// AsMap converts a slice of key/value pairs to teh Map.
+// AsMap converts a slice of key/value pairs into a Map instance.
 func AsMap[K comparable, V any](elements []c.KV[K, V]) Map[K, V] {
-	var (
-		uniques = make(map[K]V, len(elements))
-	)
-	for _, kv := range elements {
-		key := kv.Key()
-		val := kv.Value()
-		uniques[key] = val
-	}
-	return WrapMap(uniques)
+	return WrapMap(map_.Of(elements...))
 }
 
 // ToMap instantiates Map and copies elements to it.
