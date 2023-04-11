@@ -40,18 +40,22 @@ func WrapMap[K comparable, V any](elements map[K]V) Map[K, V] {
 type Map[K comparable, V any] map[K]V
 
 var (
-	_ c.Deleteable[int]       = (*Map[int, any])(nil)
-	_ c.Deleteable[int]       = (Map[int, any])(nil)
-	_ c.Removable[int, any]   = (*Map[int, any])(nil)
-	_ c.Removable[int, any]   = (Map[int, any])(nil)
-	_ c.Settable[int, any]    = (*Map[int, any])(nil)
-	_ c.Settable[int, any]    = (Map[int, any])(nil)
-	_ c.SettableNew[int, any] = (*Map[int, any])(nil)
-	_ c.SettableNew[int, any] = (Map[int, any])(nil)
-	_ c.Map[int, any]         = (*Map[int, any])(nil)
-	_ c.Map[int, any]         = (Map[int, any])(nil)
-	_ fmt.Stringer            = (*Map[int, any])(nil)
-	_ fmt.Stringer            = (Map[int, any])(nil)
+	_ c.Deleteable[int]                                        = (*Map[int, any])(nil)
+	_ c.Deleteable[int]                                        = (Map[int, any])(nil)
+	_ c.Removable[int, any]                                    = (*Map[int, any])(nil)
+	_ c.Removable[int, any]                                    = (Map[int, any])(nil)
+	_ c.Settable[int, any]                                     = (*Map[int, any])(nil)
+	_ c.Settable[int, any]                                     = (Map[int, any])(nil)
+	_ c.SettableNew[int, any]                                  = (*Map[int, any])(nil)
+	_ c.SettableNew[int, any]                                  = (Map[int, any])(nil)
+	_ c.SettableMap[int, any]                                  = (*Map[int, any])(nil)
+	_ c.SettableMap[int, any]                                  = (Map[int, any])(nil)
+	_ c.ImmutableMapConvert[int, any, immutable.Map[int, any]] = (*Map[int, any])(nil)
+	_ c.ImmutableMapConvert[int, any, immutable.Map[int, any]] = (Map[int, any])(nil)
+	_ c.Map[int, any]                                          = (*Map[int, any])(nil)
+	_ c.Map[int, any]                                          = (Map[int, any])(nil)
+	_ fmt.Stringer                                             = (*Map[int, any])(nil)
+	_ fmt.Stringer                                             = (Map[int, any])(nil)
 )
 
 func (s Map[K, V]) Begin() c.KVIterator[K, V] {
@@ -184,10 +188,10 @@ func (s Map[K, V]) Reduce(by c.Quaternary[K, V]) (K, V) {
 	return it.ReduceKV(ptr.Of(s.Head()), by)
 }
 
-func (m *Map[K, V]) Immutable() immutable.Map[K, V] {
+func (m Map[K, V]) Immutable() immutable.Map[K, V] {
 	return immutable.WrapMap(m.Collect())
 }
 
-func (m *Map[K, V]) SetAll(kvs c.Map[K, V]) {
+func (m Map[K, V]) SetMap(kvs c.Map[K, V]) {
 	kvs.TrackEach(func(key K, value V) { m.Set(key, value) })
 }

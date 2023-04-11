@@ -47,10 +47,12 @@ type Map[K comparable, V any] struct {
 }
 
 var (
-	_ c.Settable[int, any]    = (*Map[int, any])(nil)
-	_ c.SettableNew[int, any] = (*Map[int, any])(nil)
-	_ c.Map[int, any]         = (*Map[int, any])(nil)
-	_ fmt.Stringer            = (*Map[int, any])(nil)
+	_ c.Settable[int, any]                                   = (*Map[int, any])(nil)
+	_ c.SettableNew[int, any]                                = (*Map[int, any])(nil)
+	_ c.SettableMap[int, any]                                = (*Map[int, any])(nil)
+	_ c.ImmutableMapConvert[int, any, ordered.Map[int, any]] = (*Map[int, any])(nil)
+	_ c.Map[int, any]                                        = (*Map[int, any])(nil)
+	_ fmt.Stringer                                           = (*Map[int, any])(nil)
 )
 
 func (m *Map[K, V]) Begin() c.KVIterator[K, V] {
@@ -193,6 +195,6 @@ func (m *Map[K, V]) Immutable() ordered.Map[K, V] {
 	return ordered.WrapMap(slice.Clone(m.order), map_.Clone(m.elements))
 }
 
-func (m *Map[K, V]) SetAll(kvs c.Map[K, V]) {
+func (m *Map[K, V]) SetMap(kvs c.Map[K, V]) {
 	kvs.TrackEach(func(key K, value V) { m.Set(key, value) })
 }

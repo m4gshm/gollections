@@ -58,7 +58,7 @@ type Map[K comparable, V any] interface {
 	Values() Collection[V, []V, Iterator[V]]
 }
 
-// Iterator is the interface that provides iterate over elements of a collection
+// Iterator provides iterate over elements of a collection
 type Iterator[T any] interface {
 	// retrieves a next element and true or zero value of T and false if no more elements
 	Next() (T, bool)
@@ -70,7 +70,7 @@ type Sized interface {
 	Cap() int
 }
 
-// IteratorBreakable is the interface that provides iterate over elements of a source, where an iteration can be interrupted by an error.
+// IteratorBreakable provides iterate over elements of a source, where an iteration can be interrupted by an error.
 type IteratorBreakable[T any] interface {
 	Iterator[T]
 	//returns an iteration abort error
@@ -90,13 +90,13 @@ type DelIterator[T any] interface {
 	Delete()
 }
 
-// KVIterator is the interface that provides iterate over key/value pairs
+// KVIterator provides iterate over key/value pairs
 type KVIterator[K, V any] interface {
 	//retrieves next elements or zero values if no more elements
 	Next() (K, V, bool)
 }
 
-// KVIteratorBreakable is the interface that provides iterate over key/value pairs, where an iteration can be interrupted by an error
+// KVIteratorBreakable provides iterate over key/value pairs, where an iteration can be interrupted by an error
 type KVIteratorBreakable[K, V any] interface {
 	KVIterator[K, V]
 	//returns an iteration abort error
@@ -133,7 +133,7 @@ type Checkable[T any] interface {
 	Contains(T) bool
 }
 
-// Transformable is the interface that provides limited kit of container transformation methods.
+// Transformable provides limited kit of container transformation methods.
 // The full kit of transformer functions are in the package 'c'
 type Transformable[T any, Collection any] interface {
 	Filter(predicate.Predicate[T]) Pipe[T, Collection]
@@ -149,7 +149,7 @@ type Pipe[T any, Collection any] interface {
 	Reduce(Binary[T]) T
 }
 
-// MapTransformable is the interface that provides limited kit of map transformation methods.
+// MapTransformable provides limited kit of map transformation methods.
 // The full kit of transformer functions are in the package 'c/map_'
 type MapTransformable[K comparable, V any, Map any] interface {
 	Filter(predicate.BiPredicate[K, V]) MapPipe[K, V, Map]
@@ -168,7 +168,7 @@ type MapPipe[K comparable, V any, Map any] interface {
 	Container[Map, KVIterator[K, V]]
 }
 
-// Access is the interface that provides access to an element by its pointer (index, key, coordinate, etc.)
+// Access provides access to an element by its pointer (index, key, coordinate, etc.)
 // Where:
 //
 //	P - a type of pointer to a value (index, map key, coordinates)
@@ -177,41 +177,51 @@ type Access[P any, V any] interface {
 	Get(P) (V, bool)
 }
 
-// Addable is the interface that provides appending the collection by elements.
+// Addable provides appending the collection by elements.
 type Addable[T any] interface {
 	Add(...T)
 	AddOne(T)
 }
 
-// AddableNew is the interface that provides appending the collection by elements.
+// AddableNew provides appending the collection by elements.
 type AddableNew[T any] interface {
 	AddNew(...T) bool
 	AddNewOne(T) bool
 }
 
-// Settable is the interface that provides replacing an element by its pointer (index or key).
+// Settable provides element insertion or replacement by its pointer (index or key).
 type Settable[P any, V any] interface {
 	Set(key P, value V)
 }
 
-// SettableNew is the interface that provides replacing an element by its pointer (index or key).
+// SettableNew provides element insertion by its pointer (index or key) only if the specified place is not occupied.
 type SettableNew[P any, V any] interface {
 	SetNew(key P, value V) bool
 }
 
-// Deleteable is the interface that provides removing any elements from the collection.
+// SettableMap provides element insertion or replacement with an equal key element of a map.
+type SettableMap[K comparable, V any] interface {
+	SetMap(m Map[K, V])
+}
+
+// Deleteable provides removing any elements from the collection.
 type Deleteable[k any] interface {
 	Delete(...k)
 	DeleteOne(k)
 }
 
-// DeleteableVerify is the interface that provides removing any elements from the collection.
+// DeleteableVerify provides removing any elements from the collection.
 type DeleteableVerify[k any] interface {
 	DeleteActual(...k) bool
 	DeleteActualOne(k) bool
 }
 
-// Removable is the interface that provides removing an element by its pointer (index or key).
+// ImmutableMapConvert provides converting to an immutable map instance.
+type ImmutableMapConvert[K comparable, V any, M Map[K, V]] interface {
+	Immutable() M
+}
+
+// Removable provides removing an element by its pointer (index or key).
 type Removable[P any, V any] interface {
 	Remove(P) (V, bool)
 }
