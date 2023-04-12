@@ -62,7 +62,7 @@ func Test_group_orderset_with_filtering_by_stirng_len(t *testing.T) {
 	), func(v string) int { return len(v) },
 	).FilterKey(
 		more.Than(3),
-	).MapValue(
+	).ConvertValue(
 		func(v string) string { return v + "_" },
 	).Collect()
 

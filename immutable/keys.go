@@ -73,8 +73,8 @@ func (s MapKeys[K, V]) Filter(filter predicate.Predicate[K]) c.Pipe[K, []K] {
 	return it.NewPipe[K](it.Filter(s.Head(), filter))
 }
 
-func (s MapKeys[K, V]) Map(by c.Converter[K, K]) c.Pipe[K, []K] {
-	return it.NewPipe[K](it.Map(s.Head(), by))
+func (s MapKeys[K, V]) Convert(by c.Converter[K, K]) c.Pipe[K, []K] {
+	return it.NewPipe[K](it.Convert(s.Head(), by))
 }
 
 func (s MapKeys[K, V]) Reduce(by c.Binary[K]) K {

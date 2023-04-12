@@ -66,18 +66,37 @@ func Delete[TS ~[]T, T any](index int, elements TS) TS {
 	return append(elements[0:index], elements[index+1:]...)
 }
 
-// Group converts the slice into a map with keys computeable by the converter 'by'
-func Group[T any, K comparable, TS ~[]T](elements TS, by c.Converter[T, K]) map[K]TS {
+// Group converts a slice into a map, extracting a key for each element of the slice applying the converter 'keyProducer'
+func Group[T any, K comparable, TS ~[]T](elements TS, keyProducer c.Converter[T, K]) map[K]TS {
 	groups := map[K]TS{}
 	for _, e := range elements {
-		key := by(e)
-		group := groups[key]
-		if group == nil {
-			group = make([]T, 0)
-		}
-		groups[key] = append(group, e)
+		initGroup(keyProducer(e), e, groups)
 	}
 	return groups
+}
+
+// GroupInMultiple converts a slice into a map, extracting multiple keys per each element of the slice applying the converter 'keyProducer'
+func GroupInMultiple[T any, K comparable, TS ~[]T](elements TS, keysProducer c.Converter[T, []K]) map[K]TS {
+	groups := map[K]TS{}
+	for _, e := range elements {
+		if keys := keysProducer(e); len(keys) == 0 {
+			var key K
+			initGroup(key, e, groups)
+		} else {
+			for _, key := range keys {
+				initGroup(key, e, groups)
+			}
+		}
+	}
+	return groups
+}
+
+func initGroup[T any, K comparable, TS ~[]T](key K, e T, groups map[K]TS) {
+	group := groups[key]
+	if group == nil {
+		group = make([]T, 0)
+	}
+	groups[key] = append(group, e)
 }
 
 // Convert creates a slice consisting of the transformed elements using the converter 'by'
@@ -89,12 +108,36 @@ func Convert[FS ~[]From, From, To any](elements FS, by c.Converter[From, To]) []
 	return result
 }
 
-// ConvertFit additionally filters 'From' elements
-func ConvertFit[FS ~[]From, From, To any](elements FS, fit predicate.Predicate[From], by c.Converter[From, To]) []To {
+// FilterAndConvert additionally filters 'From' elements
+func FilterAndConvert[FS ~[]From, From, To any](elements FS, filter predicate.Predicate[From], by c.Converter[From, To]) []To {
 	result := make([]To, 0)
 	for _, e := range elements {
-		if fit(e) {
+		if filter(e) {
 			result = append(result, by(e))
+		}
+	}
+	return result
+}
+
+// FilterAndConvert additionally filters 'To' elements
+func ConvertAndFilter[FS ~[]From, From, To any](elements FS, by c.Converter[From, To], filter predicate.Predicate[To]) []To {
+	result := make([]To, 0)
+	for _, e := range elements {
+		if r := by(e); filter(r) {
+			result = append(result, r)
+		}
+	}
+	return result
+}
+
+// FilterConvertFilter filters source, converts, and filters converted elements
+func FilterConvertFilter[FS ~[]From, From, To any](elements FS, filter predicate.Predicate[From], by c.Converter[From, To], filterConverted predicate.Predicate[To]) []To {
+	result := make([]To, 0)
+	for _, e := range elements {
+		if filter(e) {
+			if r := by(e); filterConverted(r) {
+				result = append(result, r)
+			}
 		}
 	}
 	return result
@@ -109,12 +152,12 @@ func ConvertIndexed[FS ~[]From, From, To any](elements FS, by func(index int, fr
 	return result
 }
 
-// ConvertFitIndexed additionally filters 'From' elements
-func ConvertFitIndexed[FS ~[]From, From, To any](elements FS, fit func(index int, from From) bool, by func(index int, from From) To) []To {
+// FilterAndConvertIndexed additionally filters 'From' elements
+func FilterAndConvertIndexed[FS ~[]From, From, To any](elements FS, filter func(index int, from From) bool, converter func(index int, from From) To) []To {
 	result := make([]To, 0)
 	for i, e := range elements {
-		if fit(i, e) {
-			result = append(result, by(i, e))
+		if filter(i, e) {
+			result = append(result, converter(i, e))
 		}
 	}
 	return result
@@ -152,23 +195,23 @@ func Flatt[FS ~[]From, From, To any](elements FS, by c.Flatter[From, To]) []To {
 	return result
 }
 
-// FlattFit additionally filters 'From' elements.
-func FlattFit[FS ~[]From, From, To any](elements FS, fit predicate.Predicate[From], by c.Flatter[From, To]) []To {
+// FilerAndFlatt additionally filters 'From' elements.
+func FilerAndFlatt[FS ~[]From, From, To any](elements FS, filter predicate.Predicate[From], by c.Flatter[From, To]) []To {
 	result := make([]To, 0)
 	for _, e := range elements {
-		if fit(e) {
+		if filter(e) {
 			result = append(result, by(e)...)
 		}
 	}
 	return result
 }
 
-// FlattElemFit unfolds the n-dimensional slice into a n-1 dimensional slice with additinal filtering of 'To' elements.
-func FlattElemFit[FS ~[]From, From, To any](elements FS, by c.Flatter[From, To], fit predicate.Predicate[To]) []To {
+// FlattAndFiler unfolds the n-dimensional slice into a n-1 dimensional slice with additinal filtering of 'To' elements.
+func FlattAndFiler[FS ~[]From, From, To any](elements FS, by c.Flatter[From, To], filter predicate.Predicate[To]) []To {
 	result := make([]To, 0)
 	for _, e := range elements {
 		for _, to := range by(e) {
-			if fit(to) {
+			if filter(to) {
 				result = append(result, to)
 			}
 		}
@@ -176,13 +219,13 @@ func FlattElemFit[FS ~[]From, From, To any](elements FS, by c.Flatter[From, To],
 	return result
 }
 
-// FlattFitFit unfolds the n-dimensional slice 'elements' into a n-1 dimensional slice with additinal filtering of 'From' and 'To' elements.
-func FlattFitFit[FS ~[]From, From, To any](elements FS, fitFrom predicate.Predicate[From], by c.Flatter[From, To], fitTo predicate.Predicate[To]) []To {
+// FilterFlattFilter unfolds the n-dimensional slice 'elements' into a n-1 dimensional slice with additinal filtering of 'From' and 'To' elements.
+func FilterFlattFilter[FS ~[]From, From, To any](elements FS, filterFrom predicate.Predicate[From], by c.Flatter[From, To], filterTo predicate.Predicate[To]) []To {
 	result := make([]To, 0)
 	for _, e := range elements {
-		if fitFrom(e) {
+		if filterFrom(e) {
 			for _, to := range by(e) {
-				if fitTo(to) {
+				if filterTo(to) {
 					result = append(result, to)
 				}
 			}
@@ -272,7 +315,7 @@ func Sum[T c.Summable, TS ~[]T](elements TS) T {
 	return Reduce(elements, op.Sum[T])
 }
 
-// First returns the first element that satisfies requirements of the predicate 'fit'
+// First returns the first element that satisfies requirements of the predicate 'filter'
 func First[TS ~[]T, T any](elements TS, by predicate.Predicate[T]) (T, bool) {
 	for _, e := range elements {
 		if by(e) {
@@ -283,7 +326,7 @@ func First[TS ~[]T, T any](elements TS, by predicate.Predicate[T]) (T, bool) {
 	return no, false
 }
 
-// Last returns the latest element that satisfies requirements of the predicate 'fit'
+// Last returns the latest element that satisfies requirements of the predicate 'filter'
 func Last[TS ~[]T, T any](elements TS, by predicate.Predicate[T]) (T, bool) {
 	for i := len(elements) - 1; i >= 0; i-- {
 		e := elements[i]
@@ -404,4 +447,15 @@ func StringsBehaveAs[TS ~[]T, T ~string](elements []string) TS {
 	ptr := unsafe.Pointer(&elements)
 	s := *(*TS)(ptr)
 	return s
+}
+
+func NoEmpty[TS ~[]T, T any](elements TS, def []T) TS {
+	if len(elements) > 0 {
+		return elements
+	}
+	return def
+}
+
+func GetNoEmpty[TS ~[]T, T any](elementsProducer func() TS, def []T) TS {
+	return NoEmpty(elementsProducer(), def)
 }

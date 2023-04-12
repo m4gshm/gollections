@@ -12,11 +12,11 @@ type BiConverter[From1, From2, To1, To2 any] func(From1, From2) (To1, To2)
 type Flatter[From, To any] Converter[From, []To]
 
 // FitKey adapts a key appliable predicate to a key\value one
-func FitKey[K, V any](fit predicate.Predicate[K]) predicate.BiPredicate[K, V] {
-	return func(key K, val V) bool { return fit(key) }
+func FitKey[K, V any](filter predicate.Predicate[K]) predicate.BiPredicate[K, V] {
+	return func(key K, val V) bool { return filter(key) }
 }
 
 // FitValue adapts a value appliable predicate to a key\value one
-func FitValue[K, V any](fit predicate.Predicate[V]) predicate.BiPredicate[K, V] {
-	return func(key K, val V) bool { return fit(val) }
+func FitValue[K, V any](filter predicate.Predicate[V]) predicate.BiPredicate[K, V] {
+	return func(key K, val V) bool { return filter(val) }
 }

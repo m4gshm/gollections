@@ -238,8 +238,8 @@ func (v *Vector[T]) Filter(filter predicate.Predicate[T]) c.Pipe[T, []T] {
 }
 
 // Map returns a pipe of converted vector elements by the converter 'by'
-func (v *Vector[T]) Map(by c.Converter[T, T]) c.Pipe[T, []T] {
-	return it.NewPipe[T](it.Map(ptr.Of(v.Head()), by))
+func (v *Vector[T]) Convert(by c.Converter[T, T]) c.Pipe[T, []T] {
+	return it.NewPipe[T](it.Convert(ptr.Of(v.Head()), by))
 }
 
 // Reduce reduces elements to an one

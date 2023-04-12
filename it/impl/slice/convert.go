@@ -14,13 +14,13 @@ type ConvertFit[From, To any] struct {
 	elemSize uintptr
 	size, i  int
 	by       c.Converter[From, To]
-	fit      predicate.Predicate[From]
+	filter   predicate.Predicate[From]
 }
 
 var _ c.Iterator[any] = (*ConvertFit[any, any])(nil)
 
 func (s *ConvertFit[From, To]) Next() (To, bool) {
-	if v, ok := nextFiltered(s.array, s.size, s.elemSize, s.fit, &s.i); ok {
+	if v, ok := nextFiltered(s.array, s.size, s.elemSize, s.filter, &s.i); ok {
 		return s.by(v), true
 	}
 	var no To
@@ -31,17 +31,17 @@ func (s *ConvertFit[From, To]) Cap() int {
 	return s.size
 }
 
-// Convert is the array based Iterator thath provides converting of elements by a Converter.
-type Convert[From, To any] struct {
+// Converter is the array based Iterator thath provides converting of elements by a Converter.
+type Converter[From, To any] struct {
 	array    unsafe.Pointer
 	elemSize uintptr
 	size, i  int
 	by       c.Converter[From, To]
 }
 
-var _ c.Iterator[any] = (*Convert[any, any])(nil)
+var _ c.Iterator[any] = (*Converter[any, any])(nil)
 
-func (s *Convert[From, To]) Next() (To, bool) {
+func (s *Converter[From, To]) Next() (To, bool) {
 	if s.i < s.size {
 		v := *(*From)(notsafe.GetArrayElemRef(s.array, s.i, s.elemSize))
 		s.i++
@@ -51,7 +51,7 @@ func (s *Convert[From, To]) Next() (To, bool) {
 	return no, false
 }
 
-func (s *Convert[From, To]) Cap() int {
+func (s *Converter[From, To]) Cap() int {
 	return s.size
 }
 

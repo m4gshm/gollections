@@ -31,7 +31,7 @@ Usage examples:
 
 [source,go]
 ----
-include::../examples/slice/slice_examples_test.go[]
+include::../examples/slice_examples/slice_examples_test.go[]
 ----
 
 ==== Maps - link:./map_/api.go[github.com/m4gshm/gollections/map_]
@@ -42,7 +42,7 @@ Usage examples:
 
 [source,go]
 ----
-include::../examples/map_/map_examples_test.go[]
+include::../examples/map_examples/map_examples_test.go[]
 ----
 
 ==== Mutable containers
@@ -101,7 +101,7 @@ var (
     max       op.Binary[Attribute] = func(attribute1 Attribute, attribute2 Attribute) ...
 ) 
 
-maxItemAttribute := it.Reduce(it.Map(c.Filer(items, condition), Item.GetAttribute), max)
+maxItemAttribute := it.Reduce(it.Convert(c.Filer(items, condition), Item.GetAttribute), max)
 ----
 
 Functions grouped into packages by applicable type (link:./c/api.go[container], link:./c/map_/api.go[map], link:./it/api.go[iterator], link:slice/api.go[slice])

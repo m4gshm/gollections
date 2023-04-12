@@ -18,12 +18,12 @@ type IterPipe[T any] struct {
 
 var _ c.Pipe[any, []any] = (*IterPipe[any])(nil)
 
-func (s *IterPipe[T]) Filter(fit predicate.Predicate[T]) c.Pipe[T, []T] {
-	return NewPipe[T](Filter(s.it, fit))
+func (s *IterPipe[T]) Filter(filter predicate.Predicate[T]) c.Pipe[T, []T] {
+	return NewPipe[T](Filter(s.it, filter))
 }
 
-func (s *IterPipe[T]) Map(by c.Converter[T, T]) c.Pipe[T, []T] {
-	return NewPipe[T](Map(s.it, by))
+func (s *IterPipe[T]) Convert(by c.Converter[T, T]) c.Pipe[T, []T] {
+	return NewPipe[T](Convert(s.it, by))
 }
 
 func (s *IterPipe[T]) ForEach(walker func(T)) {

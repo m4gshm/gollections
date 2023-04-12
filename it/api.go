@@ -26,24 +26,24 @@ func Wrap[TS ~[]T, T any](elements TS) c.Iterator[T] {
 	return ptr.Of(it.NewHead(elements))
 }
 
-// Map instantiates Iterator that converts elements with a converter and returns them
-func Map[From, To any, IT c.Iterator[From]](elements IT, by c.Converter[From, To]) c.Iterator[To] {
-	return it.Map(elements, by)
+// Convert instantiates Iterator that converts elements with a converter and returns them
+func Convert[From, To any, IT c.Iterator[From]](elements IT, converter c.Converter[From, To]) c.Iterator[To] {
+	return it.Convert(elements, converter)
 }
 
-// MapFit additionally filters 'From' elements.
-func MapFit[From, To any, IT c.Iterator[From]](elements IT, fit predicate.Predicate[From], by c.Converter[From, To]) c.Iterator[To] {
-	return it.MapFit(elements, fit, by)
+// FilterAndConvert additionally filters 'From' elements.
+func FilterAndConvert[From, To any, IT c.Iterator[From]](elements IT, filter predicate.Predicate[From], converter c.Converter[From, To]) c.Iterator[To] {
+	return it.FilterAndConvert(elements, filter, converter)
 }
 
 // Flatt instantiates Iterator that extracts slices of 'To' by a Flatter from elements of 'From' and flattens as one iterable collection of 'To' elements
-func Flatt[From, To any, IT c.Iterator[From]](elements IT, by c.Flatter[From, To]) c.Iterator[To] {
-	return ptr.Of(it.Flatt(elements, by))
+func Flatt[From, To any, IT c.Iterator[From]](elements IT, flatt c.Flatter[From, To]) c.Iterator[To] {
+	return ptr.Of(it.Flatt(elements, flatt))
 }
 
-// FlattFit additionally filters 'From' elements
-func FlattFit[From, To any, IT c.Iterator[From]](elements IT, fit predicate.Predicate[From], flatt c.Flatter[From, To]) c.Iterator[To] {
-	return ptr.Of(it.FlattFit(elements, fit, flatt))
+// FilterAndFlatt additionally filters 'From' elements
+func FilterAndFlatt[From, To any, IT c.Iterator[From]](elements IT, filter predicate.Predicate[From], flatt c.Flatter[From, To]) c.Iterator[To] {
+	return ptr.Of(it.FilterAndFlatt(elements, filter, flatt))
 }
 
 // Filter instantiates Iterator that checks elements by a filter and returns successful ones
@@ -81,9 +81,9 @@ func ForEach[T any, IT c.Iterator[T]](elements IT, walker func(T)) {
 	it.ForEach(elements, walker)
 }
 
-// ForEachFit applies a walker to elements that satisfy a predicate condition
-func ForEachFit[T any](elements c.Iterator[T], walker func(T), fit predicate.Predicate[T]) {
-	it.ForEachFit(elements, walker, fit)
+// ForEachFiltered applies a walker to elements that satisfy a predicate condition
+func ForEachFiltered[T any](elements c.Iterator[T], walker func(T), filter predicate.Predicate[T]) {
+	it.ForEachFiltered(elements, walker, filter)
 }
 
 // Sum returns the sum of all elements
@@ -91,9 +91,9 @@ func Sum[T c.Summable, IT c.Iterator[T]](elements IT) T {
 	return it.Reduce(elements, op.Sum[T])
 }
 
-// First returns the first element that satisfies requirements of the predicate 'fit'
-func First[T any, IT c.Iterator[T]](elements IT, fit predicate.Predicate[T]) (T, bool) {
-	return it.First(elements, fit)
+// First returns the first element that satisfies requirements of the predicate 'filter'
+func First[T any, IT c.Iterator[T]](elements IT, filter predicate.Predicate[T]) (T, bool) {
+	return it.First(elements, filter)
 }
 
 // ToPairs converts a c.Iterator to a c.KVIterator using key and value extractors

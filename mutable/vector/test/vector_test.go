@@ -253,7 +253,7 @@ func Test_Vector_DeleteByIterator_Reverse(t *testing.T) {
 }
 
 func Test_Vector_FilterMapReduce(t *testing.T) {
-	s := vector.Of(1, 1, 2, 4, 3, 4).Filter(func(i int) bool { return i%2 == 0 }).Map(func(i int) int { return i * 2 }).Reduce(op.Sum[int])
+	s := vector.Of(1, 1, 2, 4, 3, 4).Filter(func(i int) bool { return i%2 == 0 }).Convert(func(i int) int { return i * 2 }).Reduce(op.Sum[int])
 	assert.Equal(t, 20, s)
 }
 

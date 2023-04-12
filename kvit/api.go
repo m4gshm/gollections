@@ -66,7 +66,7 @@ func OfLoop[S, k, V any](source S, hasNext func(S) bool, getNext func(S) (k, V, 
 
 // Map instantiates key/value iterator that converts elements with a converter and returns them
 func Map[K comparable, V any, Kto comparable, Vto any](elements c.KVIterator[K, V], by c.BiConverter[K, V, Kto, Vto]) c.MapPipe[Kto, Vto, map[Kto]Vto] {
-	return implit.NewKVPipe(implit.MapKV(elements, by), ToMap[Kto, Vto])
+	return implit.NewKVPipe(implit.ConvertKV(elements, by), ToMap[Kto, Vto])
 }
 
 // Filter instantiates key/value iterator that iterates only over filtered elements

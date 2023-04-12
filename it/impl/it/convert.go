@@ -7,9 +7,9 @@ import (
 
 // ConvertFitIter is the Converter with elements filtering.
 type ConvertFitIter[From, To any, IT c.Iterator[From]] struct {
-	iter IT
-	by   c.Converter[From, To]
-	fit  predicate.Predicate[From]
+	iter   IT
+	by     c.Converter[From, To]
+	filter predicate.Predicate[From]
 }
 
 var (
@@ -18,7 +18,7 @@ var (
 )
 
 func (s ConvertFitIter[From, To, IT]) Next() (To, bool) {
-	if V, ok := nextFiltered(s.iter, s.fit); ok {
+	if V, ok := nextFiltered(s.iter, s.filter); ok {
 		return s.by(V), true
 	}
 	var no To

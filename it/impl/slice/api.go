@@ -9,26 +9,26 @@ import (
 	"github.com/m4gshm/gollections/predicate"
 )
 
-// Map instantiates Iterator that converts elements with a converter and returns them
-func Map[FS ~[]From, From, To any](elements FS, by c.Converter[From, To]) Convert[From, To] {
+// Convert instantiates Iterator that converts elements with a converter and returns them
+func Convert[FS ~[]From, From, To any](elements FS, by c.Converter[From, To]) Converter[From, To] {
 	var (
 		header   = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
 		array    = unsafe.Pointer(header.Data)
 		size     = header.Len
 		elemSize = notsafe.GetTypeSize[From]()
 	)
-	return Convert[From, To]{array: array, size: size, elemSize: elemSize, by: by}
+	return Converter[From, To]{array: array, size: size, elemSize: elemSize, by: by}
 }
 
-// MapFit additionally filters 'From' elements.
-func MapFit[FS ~[]From, From, To any](elements FS, fit predicate.Predicate[From], by c.Converter[From, To]) ConvertFit[From, To] {
+// FilterAndConvert additionally filters 'From' elements.
+func FilterAndConvert[FS ~[]From, From, To any](elements FS, filter predicate.Predicate[From], converter c.Converter[From, To]) ConvertFit[From, To] {
 	var (
 		header   = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
 		array    = unsafe.Pointer(header.Data)
 		size     = header.Len
 		elemSize = notsafe.GetTypeSize[From]()
 	)
-	return ConvertFit[From, To]{array: array, size: size, elemSize: elemSize, by: by, fit: fit}
+	return ConvertFit[From, To]{array: array, size: size, elemSize: elemSize, by: converter, filter: filter}
 }
 
 // Flatt instantiates Iterator that extracts slices of 'To' by a Flatter from elements of 'From' and flattens as one iterable collection of 'To' elements.
@@ -43,8 +43,8 @@ func Flatt[FS ~[]From, From, To any](elements FS, by c.Flatter[From, To]) Flatte
 	return Flatten[From, To]{arrayFrom: array, sizeFrom: size, elemSizeFrom: elemSizeFrom, elemSizeTo: elemSizeTo, flatt: by}
 }
 
-// FlattFit additionally filters –'From' elements.
-func FlattFit[FS ~[]From, From, To any](elements FS, fit predicate.Predicate[From], flatt c.Flatter[From, To]) FlattenFit[From, To] {
+// FilterAndFlatt additionally filters –'From' elements.
+func FilterAndFlatt[FS ~[]From, From, To any](elements FS, filter predicate.Predicate[From], flatt c.Flatter[From, To]) FlattenFit[From, To] {
 	var (
 		header       = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
 		array        = unsafe.Pointer(header.Data)
@@ -52,7 +52,7 @@ func FlattFit[FS ~[]From, From, To any](elements FS, fit predicate.Predicate[Fro
 		elemSizeFrom = notsafe.GetTypeSize[From]()
 		elemSizeTo   = notsafe.GetTypeSize[To]()
 	)
-	return FlattenFit[From, To]{arrayFrom: array, sizeFrom: size, elemSizeFrom: elemSizeFrom, elemSizeTo: elemSizeTo, flatt: flatt, fit: fit}
+	return FlattenFit[From, To]{arrayFrom: array, sizeFrom: size, elemSizeFrom: elemSizeFrom, elemSizeTo: elemSizeTo, flatt: flatt, filter: filter}
 }
 
 // Filter instantiates Iterator that checks elements by filters and returns successful ones.

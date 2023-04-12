@@ -156,28 +156,28 @@ func (s Map[K, V]) ForEach(walker func(c.KV[K, V])) {
 	map_.ForEachOrdered(s.order, s.elements, walker)
 }
 
-func (s Map[K, V]) FilterKey(fit predicate.Predicate[K]) c.MapPipe[K, V, map[K]V] {
-	return it.NewKVPipe(it.FilterKV(ptr.Of(s.Head()), func(key K, val V) bool { return fit(key) }), kvit.ToMap[K, V])
+func (s Map[K, V]) FilterKey(filter predicate.Predicate[K]) c.MapPipe[K, V, map[K]V] {
+	return it.NewKVPipe(it.FilterKV(ptr.Of(s.Head()), func(key K, val V) bool { return filter(key) }), kvit.ToMap[K, V])
 }
 
-func (s Map[K, V]) MapKey(by c.Converter[K, K]) c.MapPipe[K, V, map[K]V] {
-	return it.NewKVPipe(it.MapKV(ptr.Of(s.Head()), func(key K, val V) (K, V) { return by(key), val }), kvit.ToMap[K, V])
+func (s Map[K, V]) ConvertKey(by c.Converter[K, K]) c.MapPipe[K, V, map[K]V] {
+	return it.NewKVPipe(it.ConvertKV(ptr.Of(s.Head()), func(key K, val V) (K, V) { return by(key), val }), kvit.ToMap[K, V])
 }
 
-func (s Map[K, V]) FilterValue(fit predicate.Predicate[V]) c.MapPipe[K, V, map[K]V] {
-	return it.NewKVPipe(it.FilterKV(ptr.Of(s.Head()), func(key K, val V) bool { return fit(val) }), kvit.ToMap[K, V])
+func (s Map[K, V]) FilterValue(filter predicate.Predicate[V]) c.MapPipe[K, V, map[K]V] {
+	return it.NewKVPipe(it.FilterKV(ptr.Of(s.Head()), func(key K, val V) bool { return filter(val) }), kvit.ToMap[K, V])
 }
 
-func (s Map[K, V]) MapValue(by c.Converter[V, V]) c.MapPipe[K, V, map[K]V] {
-	return it.NewKVPipe(it.MapKV(ptr.Of(s.Head()), func(key K, val V) (K, V) { return key, by(val) }), kvit.ToMap[K, V])
+func (s Map[K, V]) ConvertValue(by c.Converter[V, V]) c.MapPipe[K, V, map[K]V] {
+	return it.NewKVPipe(it.ConvertKV(ptr.Of(s.Head()), func(key K, val V) (K, V) { return key, by(val) }), kvit.ToMap[K, V])
 }
 
 func (s Map[K, V]) Filter(filter predicate.BiPredicate[K, V]) c.MapPipe[K, V, map[K]V] {
 	return it.NewKVPipe(it.FilterKV(ptr.Of(s.Head()), filter), kvit.ToMap[K, V])
 }
 
-func (s Map[K, V]) Map(by c.BiConverter[K, V, K, V]) c.MapPipe[K, V, map[K]V] {
-	return it.NewKVPipe(it.MapKV(ptr.Of(s.Head()), by), kvit.ToMap[K, V])
+func (s Map[K, V]) Convert(by c.BiConverter[K, V, K, V]) c.MapPipe[K, V, map[K]V] {
+	return it.NewKVPipe(it.ConvertKV(ptr.Of(s.Head()), by), kvit.ToMap[K, V])
 }
 
 func (s Map[K, V]) Reduce(by c.Quaternary[K, V]) (K, V) {

@@ -46,7 +46,7 @@ func Test_Set_Contains(t *testing.T) {
 }
 
 func Test_Set_FilterMapReduce(t *testing.T) {
-	s := Of(1, 1, 2, 4, 3, 1).Filter(func(i int) bool { return i%2 == 0 }).Map(func(i int) int { return i * 2 }).Reduce(op.Sum[int])
+	s := Of(1, 1, 2, 4, 3, 1).Filter(func(i int) bool { return i%2 == 0 }).Convert(func(i int) int { return i * 2 }).Reduce(op.Sum[int])
 	assert.Equal(t, 12, s)
 }
 

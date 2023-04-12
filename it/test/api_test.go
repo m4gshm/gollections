@@ -17,17 +17,17 @@ import (
 	"github.com/m4gshm/gollections/slice"
 )
 
-func Test_MapAndFilter(t *testing.T) {
+func Test_FilterAndConvert(t *testing.T) {
 
 	var (
 		toString = func(i int) string { return fmt.Sprintf("%d", i) }
 		addTail  = func(s string) string { return s + "_tail" }
 	)
 	items := []int{1, 2, 3, 4, 5}
-	converted := it.MapFit(it.Wrap(items), func(v int) bool { return v%2 == 0 }, conv.And(toString, addTail))
+	converted := it.FilterAndConvert(it.Wrap(items), func(v int) bool { return v%2 == 0 }, conv.And(toString, addTail))
 	assert.Equal(t, slice.Of("2_tail", "4_tail"), it.ToSlice(converted))
 
-	converted2 := sliceit.MapFit(items, func(v int) bool { return v%2 == 0 }, conv.And(toString, addTail))
+	converted2 := sliceit.FilterAndConvert(items, func(v int) bool { return v%2 == 0 }, conv.And(toString, addTail))
 	assert.Equal(t, slice.Of("2_tail", "4_tail"), it.ToSlice(converted2))
 
 	//plain old style
@@ -125,27 +125,27 @@ func (p *Participant) GetAttributes() []*Attributes {
 	return p.attributes
 }
 
-func Test_MapFlattStructure_Iterable(t *testing.T) {
+func Test_ConvertFlattStructure_Iterable(t *testing.T) {
 	expected := slice.Of("first", "second", "", "third", "")
 
 	items := []*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil, {attributes: []*Attributes{{name: "third"}, nil}}}
 
-	names := it.ToSlice(it.Map(it.Flatt(it.Wrap(items), (*Participant).GetAttributes), (*Attributes).GetName))
+	names := it.ToSlice(it.Convert(it.Flatt(it.Wrap(items), (*Participant).GetAttributes), (*Attributes).GetName))
 	assert.Equal(t, expected, names)
 
-	names = it.ToSlice(it.Map(sliceit.Flatt(items, (*Participant).GetAttributes), (*Attributes).GetName))
+	names = it.ToSlice(it.Convert(sliceit.Flatt(items, (*Participant).GetAttributes), (*Attributes).GetName))
 	assert.Equal(t, expected, names)
 }
 
-func Test_MapFlattFitStructure_Iterable(t *testing.T) {
+func Test_ConvertFilterAndFlattStructure_Iterable(t *testing.T) {
 	expected := slice.Of("first", "second", "", "third", "")
 
 	items := []*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil, {attributes: []*Attributes{{name: "third"}, nil}}}
 
-	names := it.ToSlice(it.Map(it.FlattFit(it.Wrap(items), check.NotNil[Participant], (*Participant).GetAttributes), (*Attributes).GetName))
+	names := it.ToSlice(it.Convert(it.FilterAndFlatt(it.Wrap(items), check.NotNil[Participant], (*Participant).GetAttributes), (*Attributes).GetName))
 	assert.Equal(t, expected, names)
 
-	names = it.ToSlice(it.Map(sliceit.FlattFit(items, check.NotNil[Participant], (*Participant).GetAttributes), (*Attributes).GetName))
+	names = it.ToSlice(it.Convert(sliceit.FilterAndFlatt(items, check.NotNil[Participant], (*Participant).GetAttributes), (*Attributes).GetName))
 	assert.Equal(t, expected, names)
 }
 

@@ -15,7 +15,7 @@ type FlattenFit[From, To any] struct {
 	sizeFrom, sizeTo         int
 	indFrom, indTo, cap      int
 	flatt                    c.Flatter[From, To]
-	fit                      predicate.Predicate[From]
+	filter                   predicate.Predicate[From]
 }
 
 var _ c.Iterator[any] = (*FlattenFit[any, any])(nil)
@@ -33,7 +33,7 @@ func (s *FlattenFit[From, To]) Next() (To, bool) {
 	}
 
 	for indFrom := s.indFrom; indFrom < s.sizeFrom; indFrom++ {
-		if v := *(*From)(notsafe.GetArrayElemRef(s.arrayFrom, indFrom, s.elemSizeFrom)); s.fit(v) {
+		if v := *(*From)(notsafe.GetArrayElemRef(s.arrayFrom, indFrom, s.elemSizeFrom)); s.filter(v) {
 			if elementsTo := s.flatt(v); len(elementsTo) > 0 {
 				s.indFrom = indFrom + 1
 				s.indTo = 1

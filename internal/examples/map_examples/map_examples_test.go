@@ -1,4 +1,4 @@
-package examples
+package map_examples
 
 import (
 	"testing"

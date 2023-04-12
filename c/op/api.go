@@ -9,14 +9,14 @@ import (
 	"github.com/m4gshm/gollections/ptr"
 )
 
-// Map instantiates Iterator that converts elements with a converter and returns them
-func Map[From, To any, IT c.Iterable[c.Iterator[From]]](elements IT, by c.Converter[From, To]) c.Iterator[To] {
-	return it.Map(elements.Begin(), by)
+// Convert instantiates Iterator that converts elements with a converter and returns them
+func Convert[From, To any, IT c.Iterable[c.Iterator[From]]](elements IT, by c.Converter[From, To]) c.Iterator[To] {
+	return it.Convert(elements.Begin(), by)
 }
 
-// MapFit additionally filters 'From' elements
-func MapFit[From, To any, IT c.Iterable[c.Iterator[From]]](elements IT, fit predicate.Predicate[From], by c.Converter[From, To]) c.Iterator[To] {
-	return it.MapFit(elements.Begin(), fit, by)
+// FilterAndConvert additionally filters 'From' elements
+func FilterAndConvert[From, To any, IT c.Iterable[c.Iterator[From]]](elements IT, filter predicate.Predicate[From], converter c.Converter[From, To]) c.Iterator[To] {
+	return it.FilterAndConvert(elements.Begin(), filter, converter)
 }
 
 // Flatt instantiates Iterator that extracts slices of 'To' by a Flatter from elements of 'From' and flattens as one iterable collection of 'To' elements
@@ -24,9 +24,9 @@ func Flatt[From, To any, IT c.Iterable[c.Iterator[From]]](elements IT, by c.Flat
 	return ptr.Of(it.Flatt(elements.Begin(), by))
 }
 
-// FlattFit additionally filters 'From' elements
-func FlattFit[From, To any, IT c.Iterable[c.Iterator[From]]](elements IT, fit predicate.Predicate[From], flatt c.Flatter[From, To]) c.Iterator[To] {
-	return ptr.Of(it.FlattFit(elements.Begin(), fit, flatt))
+// FilterAndFlatt additionally filters 'From' elements
+func FilterAndFlatt[From, To any, IT c.Iterable[c.Iterator[From]]](elements IT, filter predicate.Predicate[From], flatt c.Flatter[From, To]) c.Iterator[To] {
+	return ptr.Of(it.FilterAndFlatt(elements.Begin(), filter, flatt))
 }
 
 // Filter instantiates Iterator that checks elements by filters and returns successful ones

@@ -136,20 +136,20 @@ func (m Map[K, V]) V() MapValues[K, V] {
 	return WrapVal(m.elements)
 }
 
-func (m Map[K, V]) FilterKey(fit predicate.Predicate[K]) c.MapPipe[K, V, map[K]V] {
-	return it.NewKVPipe(it.FilterKV(ptr.Of(m.Head()), c.FitKey[K, V](fit)), kvit.ToMap[K, V])
+func (m Map[K, V]) FilterKey(filter predicate.Predicate[K]) c.MapPipe[K, V, map[K]V] {
+	return it.NewKVPipe(it.FilterKV(ptr.Of(m.Head()), c.FitKey[K, V](filter)), kvit.ToMap[K, V])
 }
 
-func (m Map[K, V]) MapKey(by c.Converter[K, K]) c.MapPipe[K, V, map[K]V] {
-	return it.NewKVPipe(it.MapKV(ptr.Of(m.Head()), func(key K, val V) (K, V) { return by(key), val }), kvit.ToMap[K, V])
+func (m Map[K, V]) ConvertKey(by c.Converter[K, K]) c.MapPipe[K, V, map[K]V] {
+	return it.NewKVPipe(it.ConvertKV(ptr.Of(m.Head()), func(key K, val V) (K, V) { return by(key), val }), kvit.ToMap[K, V])
 }
 
-func (m Map[K, V]) FilterValue(fit predicate.Predicate[V]) c.MapPipe[K, V, map[K]V] {
-	return it.NewKVPipe(it.FilterKV(ptr.Of(m.Head()), c.FitValue[K](fit)), kvit.ToMap[K, V])
+func (m Map[K, V]) FilterValue(filter predicate.Predicate[V]) c.MapPipe[K, V, map[K]V] {
+	return it.NewKVPipe(it.FilterKV(ptr.Of(m.Head()), c.FitValue[K](filter)), kvit.ToMap[K, V])
 }
 
-func (m Map[K, V]) MapValue(by c.Converter[V, V]) c.MapPipe[K, V, map[K]V] {
-	return it.NewKVPipe(it.MapKV(ptr.Of(m.Head()), func(key K, val V) (K, V) { return key, by(val) }), kvit.ToMap[K, V])
+func (m Map[K, V]) ConvertValue(by c.Converter[V, V]) c.MapPipe[K, V, map[K]V] {
+	return it.NewKVPipe(it.ConvertKV(ptr.Of(m.Head()), func(key K, val V) (K, V) { return key, by(val) }), kvit.ToMap[K, V])
 }
 
 func (m Map[K, V]) Filter(filter predicate.BiPredicate[K, V]) c.MapPipe[K, V, map[K]V] {
@@ -158,8 +158,8 @@ func (m Map[K, V]) Filter(filter predicate.BiPredicate[K, V]) c.MapPipe[K, V, ma
 
 // Map creates an Iterator that applies a converter to iterable elements.
 // The 'by' converter is applied only when the 'Next' method of returned Iterator is called and does not change the elements of the map.
-func (m Map[K, V]) Map(by c.BiConverter[K, V, K, V]) c.MapPipe[K, V, map[K]V] {
-	return it.NewKVPipe(it.MapKV(ptr.Of(m.Head()), by), kvit.ToMap[K, V])
+func (m Map[K, V]) Convert(by c.BiConverter[K, V, K, V]) c.MapPipe[K, V, map[K]V] {
+	return it.NewKVPipe(it.ConvertKV(ptr.Of(m.Head()), by), kvit.ToMap[K, V])
 }
 
 // Reduce reduces key\value pairs to an one.

@@ -148,8 +148,8 @@ func (s Set[K]) Filter(filter predicate.Predicate[K]) c.Pipe[K, []K] {
 	return it.NewPipe[K](it.Filter(s.Head(), filter))
 }
 
-func (s Set[K]) Map(by c.Converter[K, K]) c.Pipe[K, []K] {
-	return it.NewPipe[K](it.Map(s.Head(), by))
+func (s Set[K]) Convert(by c.Converter[K, K]) c.Pipe[K, []K] {
+	return it.NewPipe[K](it.Convert(s.Head(), by))
 }
 
 func (s Set[K]) Reduce(by c.Binary[K]) K {

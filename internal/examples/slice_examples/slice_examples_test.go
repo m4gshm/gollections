@@ -1,23 +1,28 @@
-package examples
+package slice_examples
 
 import (
 	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/m4gshm/gollections/conv"
 	"github.com/m4gshm/gollections/first"
+	"github.com/m4gshm/gollections/immutable/set"
 	"github.com/m4gshm/gollections/last"
+	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/predicate/exclude"
 	"github.com/m4gshm/gollections/predicate/less"
 	"github.com/m4gshm/gollections/predicate/more"
+	"github.com/m4gshm/gollections/predicate/not"
 	"github.com/m4gshm/gollections/predicate/one"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/clone"
 	"github.com/m4gshm/gollections/slice/clone/sort"
 	"github.com/m4gshm/gollections/slice/convert"
+	"github.com/m4gshm/gollections/slice/filter"
 	"github.com/m4gshm/gollections/slice/group"
 	"github.com/m4gshm/gollections/slice/range_"
 	"github.com/m4gshm/gollections/slice/reverse"
@@ -25,40 +30,86 @@ import (
 )
 
 type User struct {
+	name  string
+	age   int
+	roles []Role
+}
+
+type Role struct {
 	name string
-	age  int
 }
 
-func (u User) Name() string { return u.name }
-
-func (u User) Age() int { return u.age }
-
-func Test_SortInt(t *testing.T) {
-	source := []int{1, 3, -1, 2, 0}
-	sorted := sort.Of(source)
-	assert.Equal(t, []int{-1, 0, 1, 2, 3}, sorted)
+func (u Role) Name() string {
+	return u.name
 }
+
+func (u User) Name() string {
+	return u.name
+}
+
+func (u User) Age() int {
+	return u.age
+}
+
+func (u User) Roles() []Role {
+	return u.roles
+}
+
+var users = []User{
+	{name: "Bob", age: 26, roles: []Role{{"Admin"}, {"manager"}}},
+	{name: "Alice", age: 35, roles: []Role{{"Manager"}}},
+	{name: "Tom", age: 18},
+}
+
+func Test_GroupBySeveralKeysAndConvertMapValues(t *testing.T) {
+	usersByRole := group.InMultiple(users, func(u User) []string { return convert.AndConvert(u.Roles(), Role.Name, strings.ToLower) })
+	namesByRole := map_.ConvertValues(usersByRole, func(u []User) []string { return slice.Convert(u, User.Name) })
+
+	assert.Equal(t, namesByRole[""], []string{"Tom"})
+	assert.Equal(t, namesByRole["manager"], []string{"Bob", "Alice"})
+	assert.Equal(t, namesByRole["admin"], []string{"Bob"})
+}
+
+func Test_FindFirsManager(t *testing.T) {
+	alice, _ := first.Of(users...).By(func(u User) bool { return set.New(slice.Convert(u.Roles(), Role.Name)).Contains("Manager") })
+
+	assert.Equal(t, "Alice", alice.Name())
+}
+
+func Test_AggregateFilteredRoles(t *testing.T) {
+	roles := slice.Flatt(users, User.Roles)
+	roleNamesExceptManager := convert.AndFilter(roles, Role.Name, not.Eq("Manager"))
+
+	assert.Equal(t, slice.Of("Admin", "manager"), roleNamesExceptManager)
+}
+
 
 func Test_SortStructs(t *testing.T) {
-	var users = []User{{"Bob", 26}, {"Alice", 35}, {"Tom", 18}}
+	var users = []User{{name: "Bob", age: 26}, {name: "Alice", age: 35}, {name: "Tom", age: 18}}
 	var (
 		//sorted
 		byName = sort.By(users, User.Name)
 		byAge  = sort.By(users, User.Age)
 	)
-	assert.Equal(t, []User{{"Alice", 35}, {"Bob", 26}, {"Tom", 18}}, byName)
-	assert.Equal(t, []User{{"Tom", 18}, {"Bob", 26}, {"Alice", 35}}, byAge)
+	assert.Equal(t, []User{{name: "Alice", age: 35}, {name: "Bob", age: 26}, {name: "Tom", age: 18}}, byName)
+	assert.Equal(t, []User{{name: "Tom", age: 18}, {name: "Bob", age: 26}, {name: "Alice", age: 35}}, byAge)
 }
 
 func Test_SortStructsByLess(t *testing.T) {
-	var users = []User{{"Bob", 26}, {"Alice", 35}, {"Tom", 18}}
+	var users = []User{{name: "Bob", age: 26}, {name: "Alice", age: 35}, {name: "Tom", age: 18}}
 	var (
 		//sorted
 		byName       = sort.ByLess(users, func(u1, u2 User) bool { return u1.name < u2.name })
 		byAgeReverse = sort.ByLess(users, func(u1, u2 User) bool { return u1.age > u2.age })
 	)
-	assert.Equal(t, []User{{"Alice", 35}, {"Bob", 26}, {"Tom", 18}}, byName)
-	assert.Equal(t, []User{{"Alice", 35}, {"Bob", 26}, {"Tom", 18}}, byAgeReverse)
+	assert.Equal(t, []User{{name: "Alice", age: 35}, {name: "Bob", age: 26}, {name: "Tom", age: 18}}, byName)
+	assert.Equal(t, []User{{name: "Alice", age: 35}, {name: "Bob", age: 26}, {name: "Tom", age: 18}}, byAgeReverse)
+}
+
+func Test_SortInt(t *testing.T) {
+	source := []int{1, 3, -1, 2, 0}
+	sorted := sort.Of(source)
+	assert.Equal(t, []int{-1, 0, 1, 2, 3}, sorted)
 }
 
 func Test_Reverse(t *testing.T) {
@@ -111,8 +162,17 @@ var even = func(v int) bool { return v%2 == 0 }
 func Test_ConvertFiltered(t *testing.T) {
 	var (
 		source   = []int{1, 3, 4, 5, 7, 8, 9, 11}
-		result   = convert.Fit(source, strconv.Itoa, even)
+		result   = filter.AndConvert(source, even, strconv.Itoa)
 		expected = []string{"4", "8"}
+	)
+	assert.Equal(t, expected, result)
+}
+
+func Test_FilterConverted(t *testing.T) {
+	var (
+		source   = []int{1, 3, 4, 5, 7, 8, 9, 11}
+		result   = convert.AndFilter(source, strconv.Itoa, func(s string) bool { return len(s) == 2 })
+		expected = []string{"11"}
 	)
 	assert.Equal(t, expected, result)
 }
