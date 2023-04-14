@@ -11,22 +11,20 @@ import (
 // ErrBreak is Convert, Filter loops breaker
 var ErrBreak = it.ErrBreak
 
-// ErrNoFit is Convert, Filter element exclude from loop marker
-var ErrNoFit = errors.New("noFit")
+// ErrIgnore is Convert, Filter element exclude from loop marker
+var ErrIgnore = errors.New("noFit")
 
 // OfLoop builds a slice by iterating elements of a source.
-// The hasNext specifies a predicate that tests existing of a next element in the source.
-// The getNext extracts the element.
-func OfLoop[S, T any](source S, hasNext func(S) bool, getNext func(S) (T, error)) ([]T, error) {
+// The getNext extracts next element or returns loop break marker or an error.
+func OfLoop[S, T any](source S, getNext func(S) (T, error)) ([]T, error) {
 	r := []T{}
-	for hasNext(source) {
-		o, err := getNext(source)
-		if err != nil {
-			return r, err
+	for {
+		if o, err := getNext(source); err != nil {
+			return r, checkBreak(err)
+		} else {
+			r = append(r, o)
 		}
-		r = append(r, o)
 	}
-	return r, nil
 }
 
 // Generate builds a slice by an generator function.
@@ -60,7 +58,7 @@ func Group[T any, K comparable, TS ~[]T](elements TS, keyProducer func(T) (K, er
 			initGroup(k, e, groups)
 		} else if errors.Is(err, ErrBreak) {
 			return groups, nil
-		} else if !errors.Is(err, ErrNoFit) {
+		} else if !errors.Is(err, ErrIgnore) {
 			return groups, err
 		}
 	}
@@ -82,7 +80,7 @@ func GroupInMultiple[T any, K comparable, TS ~[]T](elements TS, keysProducer fun
 			}
 		} else if errors.Is(err, ErrBreak) {
 			return groups, nil
-		} else if !errors.Is(err, ErrNoFit) {
+		} else if !errors.Is(err, ErrIgnore) {
 			return groups, err
 		}
 	}
@@ -105,7 +103,7 @@ func Convert[FS ~[]From, From, To any](elements FS, by func(From) (To, error)) (
 			result[i] = c
 		} else if errors.Is(err, ErrBreak) {
 			return result, nil
-		} else if !errors.Is(err, ErrNoFit) {
+		} else if !errors.Is(err, ErrIgnore) {
 			return result, err
 		}
 	}
@@ -120,7 +118,7 @@ func ConvertIndexed[FS ~[]From, From, To any](elements FS, by func(index int, fr
 			result[i] = c
 		} else if errors.Is(err, ErrBreak) {
 			return result, nil
-		} else if !errors.Is(err, ErrNoFit) {
+		} else if !errors.Is(err, ErrIgnore) {
 			return result, err
 		}
 	}
@@ -135,7 +133,7 @@ func Flatt[FS ~[]From, From, To any](elements FS, by func(From) ([]To, error)) (
 			result = append(result, f...)
 		} else if errors.Is(err, ErrBreak) {
 			return result, nil
-		} else if !errors.Is(err, ErrNoFit) {
+		} else if !errors.Is(err, ErrIgnore) {
 			return result, err
 		}
 	}
@@ -151,7 +149,7 @@ func Filter[TS ~[]T, T any](elements TS, filter func(T) error) ([]T, error) {
 		} else if err != nil {
 			if errors.Is(err, ErrBreak) {
 				return result, nil
-			} else if !errors.Is(err, ErrNoFit) {
+			} else if !errors.Is(err, ErrIgnore) {
 				return result, err
 			}
 		}
@@ -169,7 +167,7 @@ func Reduce[TS ~[]T, T any](elements TS, by func(T, T) (T, error)) (T, error) {
 			result = r
 		} else if errors.Is(err, ErrBreak) {
 			return result, nil
-		} else if !errors.Is(err, ErrNoFit) {
+		} else if !errors.Is(err, ErrIgnore) {
 			return result, err
 		}
 	}
