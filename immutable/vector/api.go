@@ -4,7 +4,6 @@ package vector
 import (
 	"golang.org/x/exp/constraints"
 
-	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/immutable"
 )
 
@@ -19,6 +18,6 @@ func New[T any](elements []T) immutable.Vector[T] {
 }
 
 // Sort instantiates Vector and puts sorted elements to it.
-func Sort[t any, f constraints.Ordered](v immutable.Vector[t], by c.Converter[t, f]) immutable.Vector[t] {
+func Sort[t any, f constraints.Ordered](v immutable.Vector[t], by func(t) f) immutable.Vector[t] {
 	return v.Sort(func(e1, e2 t) bool { return by(e1) < by(e2) })
 }

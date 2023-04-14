@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/m4gshm/gollections/conv"
+	convert1 "github.com/m4gshm/gollections/convert"
 	"github.com/m4gshm/gollections/first"
 	"github.com/m4gshm/gollections/immutable/set"
 	"github.com/m4gshm/gollections/last"
@@ -82,7 +82,6 @@ func Test_AggregateFilteredRoles(t *testing.T) {
 
 	assert.Equal(t, slice.Of("Admin", "manager"), roleNamesExceptManager)
 }
-
 
 func Test_SortStructs(t *testing.T) {
 	var users = []User{{name: "Bob", age: 26}, {name: "Alice", age: 35}, {name: "Tom", age: 18}}
@@ -221,7 +220,7 @@ func Test_FilterNotNil(t *testing.T) {
 func Test_Flatt(t *testing.T) {
 	var (
 		source   = [][]int{{1, 2, 3}, {4}, {5, 6}}
-		result   = slice.Flatt(source, conv.AsIs[[]int])
+		result   = slice.Flatt(source, convert1.AsIs[[]int])
 		expected = []int{1, 2, 3, 4, 5, 6}
 	)
 	assert.Equal(t, expected, result)
@@ -256,7 +255,7 @@ func Test_Slice_Sum(t *testing.T) {
 func Test_Slice_Flatt(t *testing.T) {
 	var (
 		source   = [][]int{{1, 2, 3}, {4}, {5, 6}}
-		result   = slice.Flatt(source, conv.AsIs[[]int])
+		result   = slice.Flatt(source, convert1.AsIs[[]int])
 		expected = []int{1, 2, 3, 4, 5, 6}
 	)
 	assert.Equal(t, expected, result)

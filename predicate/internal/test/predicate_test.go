@@ -1,4 +1,4 @@
-package predicate_test
+package test
 
 import (
 	"testing"

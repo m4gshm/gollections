@@ -91,7 +91,7 @@ func DeepClone[M ~map[K]V, K comparable, V any](elements M, valCopier func(V) V)
 }
 
 // ConvertValues creates a map with converted values
-func ConvertValues[V, Vto any, K comparable, M ~map[K]V](elements M, by c.Converter[V, Vto]) map[K]Vto {
+func ConvertValues[V, Vto any, K comparable, M ~map[K]V](elements M, by func(V) Vto) map[K]Vto {
 	converted := make(map[K]Vto, len(elements))
 	for key, val := range elements {
 		converted[key] = by(val)
@@ -114,7 +114,7 @@ func Values[V any, K comparable, M ~map[K]V](elements M) []V {
 }
 
 // ValuesConverted makes a slice of converted map values
-func ValuesConverted[M ~map[K]V, K comparable, V, Vto any](elements M, by c.Converter[V, Vto]) []Vto {
+func ValuesConverted[M ~map[K]V, K comparable, V, Vto any](elements M, by func(V) Vto) []Vto {
 	values := make([]Vto, 0, len(elements))
 	for _, val := range elements {
 		values = append(values, by(val))

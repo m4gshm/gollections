@@ -7,7 +7,6 @@ import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/notsafe"
-	"github.com/m4gshm/gollections/predicate"
 	"github.com/m4gshm/gollections/ptr"
 	"github.com/m4gshm/gollections/slice"
 )
@@ -95,15 +94,15 @@ func (v Vector[T]) ForEach(walker func(T)) {
 	slice.ForEach(v.elements, walker)
 }
 
-func (v Vector[T]) Filter(filter predicate.Predicate[T]) c.Pipe[T, []T] {
+func (v Vector[T]) Filter(filter func(T) bool) c.Pipe[T, []T] {
 	return it.NewPipe[T](it.Filter(ptr.Of(v.Head()), filter))
 }
 
-func (v Vector[T]) Convert(by c.Converter[T, T]) c.Pipe[T, []T] {
+func (v Vector[T]) Convert(by func(T) T) c.Pipe[T, []T] {
 	return it.NewPipe[T](it.Convert(ptr.Of(v.Head()), by))
 }
 
-func (v Vector[T]) Reduce(by c.Binary[T]) T {
+func (v Vector[T]) Reduce(by func(T, T) T) T {
 	return it.Reduce(ptr.Of(v.Head()), by)
 }
 

@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	cgroup "github.com/m4gshm/gollections/c/group"
-	"github.com/m4gshm/gollections/conv"
+	convert "github.com/m4gshm/gollections/convert"
 	"github.com/m4gshm/gollections/immutable"
 	"github.com/m4gshm/gollections/immutable/oset"
 	"github.com/m4gshm/gollections/immutable/set"
@@ -83,7 +83,7 @@ func Test_compute_odds_sum(t *testing.T) {
 	)
 
 	//declarative style
-	oddSum := it.Reduce(it.Filter(it.Flatt(slc.Flatt(multiDimension, conv.To[[][]int]), conv.To[[]int]), odds), op.Sum[int])
+	oddSum := it.Reduce(it.Filter(it.Flatt(slc.Flatt(multiDimension, convert.To[[][]int]), convert.To[[]int]), odds), op.Sum[int])
 	assert.Equal(t, expected, oddSum)
 
 	//plain old style

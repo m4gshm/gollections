@@ -5,32 +5,31 @@ import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/it/impl/it"
-	"github.com/m4gshm/gollections/predicate"
 	"github.com/m4gshm/gollections/ptr"
 )
 
 // Convert instantiates Iterator that converts elements with a converter and returns them
-func Convert[From, To any, IT c.Iterable[c.Iterator[From]]](elements IT, by c.Converter[From, To]) c.Iterator[To] {
+func Convert[From, To any, IT c.Iterable[c.Iterator[From]]](elements IT, by func(From) To) c.Iterator[To] {
 	return it.Convert(elements.Begin(), by)
 }
 
 // FilterAndConvert additionally filters 'From' elements
-func FilterAndConvert[From, To any, IT c.Iterable[c.Iterator[From]]](elements IT, filter predicate.Predicate[From], converter c.Converter[From, To]) c.Iterator[To] {
+func FilterAndConvert[From, To any, IT c.Iterable[c.Iterator[From]]](elements IT, filter func(From) bool, converter func(From) To) c.Iterator[To] {
 	return it.FilterAndConvert(elements.Begin(), filter, converter)
 }
 
 // Flatt instantiates Iterator that extracts slices of 'To' by a Flatter from elements of 'From' and flattens as one iterable collection of 'To' elements
-func Flatt[From, To any, IT c.Iterable[c.Iterator[From]]](elements IT, by c.Flatter[From, To]) c.Iterator[To] {
+func Flatt[From, To any, IT c.Iterable[c.Iterator[From]]](elements IT, by func(From) []To) c.Iterator[To] {
 	return ptr.Of(it.Flatt(elements.Begin(), by))
 }
 
 // FilterAndFlatt additionally filters 'From' elements
-func FilterAndFlatt[From, To any, IT c.Iterable[c.Iterator[From]]](elements IT, filter predicate.Predicate[From], flatt c.Flatter[From, To]) c.Iterator[To] {
+func FilterAndFlatt[From, To any, IT c.Iterable[c.Iterator[From]]](elements IT, filter func(From) bool, flatt func(From) []To) c.Iterator[To] {
 	return ptr.Of(it.FilterAndFlatt(elements.Begin(), filter, flatt))
 }
 
 // Filter instantiates Iterator that checks elements by filters and returns successful ones
-func Filter[T any, IT c.Iterable[c.Iterator[T]]](elements IT, filter predicate.Predicate[T]) c.Iterator[T] {
+func Filter[T any, IT c.Iterable[c.Iterator[T]]](elements IT, filter func(T) bool) c.Iterator[T] {
 	return it.Filter(elements.Begin(), filter)
 }
 
@@ -40,7 +39,7 @@ func NotNil[T any, IT c.Iterable[c.Iterator[*T]]](elements IT) c.Iterator[*T] {
 }
 
 // Reduce reduces elements to an one
-func Reduce[T any, IT c.Iterable[c.Iterator[T]]](elements IT, by c.Binary[T]) T {
+func Reduce[T any, IT c.Iterable[c.Iterator[T]]](elements IT, by func(T, T) T) T {
 	return it.Reduce(elements.Begin(), by)
 }
 
@@ -50,6 +49,6 @@ func ToSlice[T any, IT c.Iterable[c.Iterator[T]]](elements IT) []T {
 }
 
 // Group groups elements to slices by a converter and returns a map
-func Group[T any, K comparable, C c.Iterable[IT], IT c.Iterator[T]](elements C, by c.Converter[T, K]) c.MapPipe[K, T, map[K][]T] {
+func Group[T any, K comparable, C c.Iterable[IT], IT c.Iterator[T]](elements C, by func(T) K) c.MapPipe[K, T, map[K][]T] {
 	return it.Group(elements.Begin(), by)
 }

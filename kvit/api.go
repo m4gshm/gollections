@@ -6,8 +6,8 @@ import (
 	implit "github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/kvit/group"
 	"github.com/m4gshm/gollections/kvit/impl/kvit"
+	"github.com/m4gshm/gollections/map_/filter"
 	"github.com/m4gshm/gollections/op"
-	"github.com/m4gshm/gollections/predicate"
 	"github.com/m4gshm/gollections/ptr"
 )
 
@@ -27,7 +27,7 @@ func FromPairs[K, V any](elements c.Iterator[c.KV[K, V]]) c.KVIterator[K, V] {
 }
 
 // FromIter converts a c.Iterator to a c.KVIterator using key and value extractors
-func FromIter[T, K, V any](elements c.Iterator[T], keyExtractor c.Converter[T, K], valExtractor c.Converter[T, V]) c.KVIterator[K, V] {
+func FromIter[T, K, V any](elements c.Iterator[T], keyExtractor func(T) K, valExtractor func(T) V) c.KVIterator[K, V] {
 	return it.ToPairs(elements, keyExtractor, valExtractor)
 }
 
@@ -65,23 +65,23 @@ func OfLoop[S, k, V any](source S, hasNext func(S) bool, getNext func(S) (k, V, 
 }
 
 // Map instantiates key/value iterator that converts elements with a converter and returns them
-func Map[K comparable, V any, Kto comparable, Vto any](elements c.KVIterator[K, V], by c.BiConverter[K, V, Kto, Vto]) c.MapPipe[Kto, Vto, map[Kto]Vto] {
+func Map[K comparable, V any, Kto comparable, Vto any](elements c.KVIterator[K, V], by func(K, V) (Kto, Vto)) c.MapPipe[Kto, Vto, map[Kto]Vto] {
 	return implit.NewKVPipe(implit.ConvertKV(elements, by), ToMap[Kto, Vto])
 }
 
 // Filter instantiates key/value iterator that iterates only over filtered elements
-func Filter[K comparable, V any, IT c.KVIterator[K, V]](elements IT, filter predicate.BiPredicate[K, V]) c.MapPipe[K, V, map[K]V] {
+func Filter[K comparable, V any, IT c.KVIterator[K, V]](elements IT, filter func(K, V) bool) c.MapPipe[K, V, map[K]V] {
 	return implit.NewKVPipe(implit.FilterKV(elements, filter), ToMap[K, V])
 }
 
 // FilterKey instantiates key/value iterator that iterates only over elements that filtered by the key
-func FilterKey[K comparable, V any](elements c.KVIterator[K, V], filter predicate.Predicate[K]) c.MapPipe[K, V, map[K]V] {
-	return Filter(elements, c.FitKey[K, V](filter))
+func FilterKey[K comparable, V any](elements c.KVIterator[K, V], fit func(K) bool) c.MapPipe[K, V, map[K]V] {
+	return Filter(elements, filter.Key[K, V](fit))
 }
 
 // FilterValue instantiates key/value iterator that iterates only over elements that filtered by the value
-func FilterValue[K comparable, V any](elements c.KVIterator[K, V], filter predicate.Predicate[V]) c.MapPipe[K, V, map[K]V] {
-	return Filter(elements, c.FitValue[K](filter))
+func FilterValue[K comparable, V any](elements c.KVIterator[K, V], fit func(V) bool) c.MapPipe[K, V, map[K]V] {
+	return Filter(elements, filter.Value[K](fit))
 }
 
 // Reduce reduces keys/value pairs to an one pair

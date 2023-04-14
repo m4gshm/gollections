@@ -97,8 +97,8 @@ Intermediates should wrap one by one to make a lazy computation chain that can b
 var items immutable.Vector[Item]
 
 var (
-    condition predicate.Predicate[Item]    = func(item Item) ...
-    max       op.Binary[Attribute] = func(attribute1 Attribute, attribute2 Attribute) ...
+    condition = func(item Item) bool { ... }
+    max       = func(attribute1 Attribute, attribute2 Attribute) Attribute { ... }
 ) 
 
 maxItemAttribute := it.Reduce(it.Convert(c.Filer(items, condition), Item.GetAttribute), max)

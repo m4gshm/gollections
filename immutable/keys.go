@@ -6,7 +6,6 @@ import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/map_"
-	"github.com/m4gshm/gollections/predicate"
 	"github.com/m4gshm/gollections/ptr"
 	"github.com/m4gshm/gollections/slice"
 )
@@ -69,15 +68,15 @@ func (s MapKeys[K, V]) ForEach(walker func(K)) {
 	map_.ForEachKey(s.uniques, walker)
 }
 
-func (s MapKeys[K, V]) Filter(filter predicate.Predicate[K]) c.Pipe[K, []K] {
+func (s MapKeys[K, V]) Filter(filter func(K) bool) c.Pipe[K, []K] {
 	return it.NewPipe[K](it.Filter(s.Head(), filter))
 }
 
-func (s MapKeys[K, V]) Convert(by c.Converter[K, K]) c.Pipe[K, []K] {
+func (s MapKeys[K, V]) Convert(by func(K) K) c.Pipe[K, []K] {
 	return it.NewPipe[K](it.Convert(s.Head(), by))
 }
 
-func (s MapKeys[K, V]) Reduce(by c.Binary[K]) K {
+func (s MapKeys[K, V]) Reduce(by func(K, K) K) K {
 	return it.Reduce(s.Head(), by)
 }
 

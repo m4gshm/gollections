@@ -2,7 +2,6 @@
 package c
 
 import (
-	"github.com/m4gshm/gollections/predicate"
 	"golang.org/x/exp/constraints"
 )
 
@@ -136,8 +135,8 @@ type Checkable[T any] interface {
 // Transformable provides limited kit of container transformation methods.
 // The full kit of transformer functions are in the package 'c'
 type Transformable[T any, Collection any] interface {
-	Filter(predicate.Predicate[T]) Pipe[T, Collection]
-	Convert(Converter[T, T]) Pipe[T, Collection]
+	Filter(func(T) bool) Pipe[T, Collection]
+	Convert(func(T) T) Pipe[T, Collection]
 }
 
 // Pipe extends Transformable by finalize methods like ForEach, Collect or Reduce.
@@ -146,20 +145,20 @@ type Pipe[T any, Collection any] interface {
 	Container[Collection, Iterator[T]]
 	Walk[T]
 	WalkEach[T]
-	Reduce(Binary[T]) T
+	Reduce(func(T, T) T) T
 }
 
 // MapTransformable provides limited kit of map transformation methods.
 // The full kit of transformer functions are in the package 'c/map_'
 type MapTransformable[K comparable, V any, Map any] interface {
-	Filter(predicate.BiPredicate[K, V]) MapPipe[K, V, Map]
-	Convert(BiConverter[K, V, K, V]) MapPipe[K, V, Map]
+	Filter(func(K, V) bool) MapPipe[K, V, Map]
+	Convert(func(K, V) (K, V)) MapPipe[K, V, Map]
 
-	FilterKey(predicate.Predicate[K]) MapPipe[K, V, Map]
-	ConvertKey(Converter[K, K]) MapPipe[K, V, Map]
+	FilterKey(func(K) bool) MapPipe[K, V, Map]
+	ConvertKey(func(K) K) MapPipe[K, V, Map]
 
-	FilterValue(predicate.Predicate[V]) MapPipe[K, V, Map]
-	ConvertValue(Converter[V, V]) MapPipe[K, V, Map]
+	FilterValue(func(V) bool) MapPipe[K, V, Map]
+	ConvertValue(func(V) V) MapPipe[K, V, Map]
 }
 
 // MapPipe extends MapTransformable by finalize methods like ForEach, Collect or Reduce.
@@ -235,9 +234,6 @@ type Summable interface {
 type Number interface {
 	constraints.Integer | constraints.Float | constraints.Complex
 }
-
-// Binary is an operation with two arguments
-type Binary[T any] func(T, T) T
 
 // Quaternary is an operation with four arguments
 type Quaternary[t1, t2 any] func(t1, t2, t1, t2) (t1, t2)

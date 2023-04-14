@@ -12,7 +12,6 @@ import (
 	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/op"
-	"github.com/m4gshm/gollections/predicate"
 )
 
 // ErrBreak is the 'break' statement of the For, Track methods
@@ -67,7 +66,7 @@ func Delete[TS ~[]T, T any](index int, elements TS) TS {
 }
 
 // Group converts a slice into a map, extracting a key for each element of the slice applying the converter 'keyProducer'
-func Group[T any, K comparable, TS ~[]T](elements TS, keyProducer c.Converter[T, K]) map[K]TS {
+func Group[T any, K comparable, TS ~[]T](elements TS, keyProducer func(T) K) map[K]TS {
 	groups := map[K]TS{}
 	for _, e := range elements {
 		initGroup(keyProducer(e), e, groups)
@@ -76,7 +75,7 @@ func Group[T any, K comparable, TS ~[]T](elements TS, keyProducer c.Converter[T,
 }
 
 // GroupInMultiple converts a slice into a map, extracting multiple keys per each element of the slice applying the converter 'keyProducer'
-func GroupInMultiple[T any, K comparable, TS ~[]T](elements TS, keysProducer c.Converter[T, []K]) map[K]TS {
+func GroupInMultiple[T any, K comparable, TS ~[]T](elements TS, keysProducer func(T) []K) map[K]TS {
 	groups := map[K]TS{}
 	for _, e := range elements {
 		if keys := keysProducer(e); len(keys) == 0 {
@@ -100,7 +99,7 @@ func initGroup[T any, K comparable, TS ~[]T](key K, e T, groups map[K]TS) {
 }
 
 // Convert creates a slice consisting of the transformed elements using the converter 'by'
-func Convert[FS ~[]From, From, To any](elements FS, by c.Converter[From, To]) []To {
+func Convert[FS ~[]From, From, To any](elements FS, by func(From) To) []To {
 	result := make([]To, len(elements))
 	for i, e := range elements {
 		result[i] = by(e)
@@ -109,7 +108,7 @@ func Convert[FS ~[]From, From, To any](elements FS, by c.Converter[From, To]) []
 }
 
 // FilterAndConvert additionally filters 'From' elements
-func FilterAndConvert[FS ~[]From, From, To any](elements FS, filter predicate.Predicate[From], by c.Converter[From, To]) []To {
+func FilterAndConvert[FS ~[]From, From, To any](elements FS, filter func(From) bool, by func(From) To) []To {
 	result := make([]To, 0)
 	for _, e := range elements {
 		if filter(e) {
@@ -120,7 +119,7 @@ func FilterAndConvert[FS ~[]From, From, To any](elements FS, filter predicate.Pr
 }
 
 // FilterAndConvert additionally filters 'To' elements
-func ConvertAndFilter[FS ~[]From, From, To any](elements FS, by c.Converter[From, To], filter predicate.Predicate[To]) []To {
+func ConvertAndFilter[FS ~[]From, From, To any](elements FS, by func(From) To, filter func(To) bool) []To {
 	result := make([]To, 0)
 	for _, e := range elements {
 		if r := by(e); filter(r) {
@@ -131,7 +130,7 @@ func ConvertAndFilter[FS ~[]From, From, To any](elements FS, by c.Converter[From
 }
 
 // FilterConvertFilter filters source, converts, and filters converted elements
-func FilterConvertFilter[FS ~[]From, From, To any](elements FS, filter predicate.Predicate[From], by c.Converter[From, To], filterConverted predicate.Predicate[To]) []To {
+func FilterConvertFilter[FS ~[]From, From, To any](elements FS, filter func(From) bool, by func(From) To, filterConverted func(To) bool) []To {
 	result := make([]To, 0)
 	for _, e := range elements {
 		if filter(e) {
@@ -186,7 +185,7 @@ func ConvertCheckIndexed[FS ~[]From, From, To any](elements FS, by func(index in
 }
 
 // Flatt unfolds the n-dimensional slice into a n-1 dimensional slice
-func Flatt[FS ~[]From, From, To any](elements FS, by c.Flatter[From, To]) []To {
+func Flatt[FS ~[]From, From, To any](elements FS, by func(From) []To) []To {
 	result := make([]To, 0)
 	for _, e := range elements {
 		result = append(result, by(e)...)
@@ -196,7 +195,7 @@ func Flatt[FS ~[]From, From, To any](elements FS, by c.Flatter[From, To]) []To {
 }
 
 // FilerAndFlatt additionally filters 'From' elements.
-func FilerAndFlatt[FS ~[]From, From, To any](elements FS, filter predicate.Predicate[From], by c.Flatter[From, To]) []To {
+func FilerAndFlatt[FS ~[]From, From, To any](elements FS, filter func(From) bool, by func(From) []To) []To {
 	result := make([]To, 0)
 	for _, e := range elements {
 		if filter(e) {
@@ -207,7 +206,7 @@ func FilerAndFlatt[FS ~[]From, From, To any](elements FS, filter predicate.Predi
 }
 
 // FlattAndFiler unfolds the n-dimensional slice into a n-1 dimensional slice with additinal filtering of 'To' elements.
-func FlattAndFiler[FS ~[]From, From, To any](elements FS, by c.Flatter[From, To], filter predicate.Predicate[To]) []To {
+func FlattAndFiler[FS ~[]From, From, To any](elements FS, by func(From) []To, filter func(To) bool) []To {
 	result := make([]To, 0)
 	for _, e := range elements {
 		for _, to := range by(e) {
@@ -220,7 +219,7 @@ func FlattAndFiler[FS ~[]From, From, To any](elements FS, by c.Flatter[From, To]
 }
 
 // FilterFlattFilter unfolds the n-dimensional slice 'elements' into a n-1 dimensional slice with additinal filtering of 'From' and 'To' elements.
-func FilterFlattFilter[FS ~[]From, From, To any](elements FS, filterFrom predicate.Predicate[From], by c.Flatter[From, To], filterTo predicate.Predicate[To]) []To {
+func FilterFlattFilter[FS ~[]From, From, To any](elements FS, filterFrom func(From) bool, by func(From) []To, filterTo func(To) bool) []To {
 	result := make([]To, 0)
 	for _, e := range elements {
 		if filterFrom(e) {
@@ -239,7 +238,7 @@ func NotNil[TS ~[]*T, T any](elements TS) TS {
 }
 
 // Filter creates a slice containing only the filtered elements
-func Filter[TS ~[]T, T any](elements TS, filter predicate.Predicate[T]) []T {
+func Filter[TS ~[]T, T any](elements TS, filter func(T) bool) []T {
 	result := make([]T, 0)
 	for _, e := range elements {
 		if filter(e) {
@@ -249,7 +248,7 @@ func Filter[TS ~[]T, T any](elements TS, filter predicate.Predicate[T]) []T {
 	return result
 }
 
-// Range generates a sclice of integers in the range defined by from and to inclusive.
+// Range generates a slice of integers in the range defined by from and to inclusive.
 func Range[T constraints.Integer](from T, to T) []T {
 	if to == from {
 		return []T{to}
@@ -293,12 +292,12 @@ func Sort[TS ~[]T, T any](elements TS, sorter Sorter, less Less[T]) TS {
 }
 
 // SortByOrdered sorts elements in place by converting them to constraints.Ordered values and applying the operator <
-func SortByOrdered[T any, o constraints.Ordered, TS ~[]T](elements TS, sorter Sorter, by c.Converter[T, o]) TS {
+func SortByOrdered[T any, o constraints.Ordered, TS ~[]T](elements TS, sorter Sorter, by func(T) o) TS {
 	return Sort(elements, sorter, func(e1, e2 T) bool { return by(e1) < by(e2) })
 }
 
 // Reduce reduces elements to an one
-func Reduce[TS ~[]T, T any](elements TS, by c.Binary[T]) T {
+func Reduce[TS ~[]T, T any](elements TS, by func(T, T) T) T {
 	var result T
 	for i, v := range elements {
 		if i == 0 {
@@ -316,7 +315,7 @@ func Sum[T c.Summable, TS ~[]T](elements TS) T {
 }
 
 // First returns the first element that satisfies requirements of the predicate 'filter'
-func First[TS ~[]T, T any](elements TS, by predicate.Predicate[T]) (T, bool) {
+func First[TS ~[]T, T any](elements TS, by func(T) bool) (T, bool) {
 	for _, e := range elements {
 		if by(e) {
 			return e, true
@@ -327,7 +326,7 @@ func First[TS ~[]T, T any](elements TS, by predicate.Predicate[T]) (T, bool) {
 }
 
 // Last returns the latest element that satisfies requirements of the predicate 'filter'
-func Last[TS ~[]T, T any](elements TS, by predicate.Predicate[T]) (T, bool) {
+func Last[TS ~[]T, T any](elements TS, by func(T) bool) (T, bool) {
 	for i := len(elements) - 1; i >= 0; i-- {
 		e := elements[i]
 		if by(e) {

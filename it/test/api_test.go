@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/m4gshm/gollections/check"
-	"github.com/m4gshm/gollections/conv"
+	"github.com/m4gshm/gollections/convert"
 	"github.com/m4gshm/gollections/it"
 	impl "github.com/m4gshm/gollections/it/impl/it"
 	sliceit "github.com/m4gshm/gollections/it/slice"
@@ -24,17 +24,17 @@ func Test_FilterAndConvert(t *testing.T) {
 		addTail  = func(s string) string { return s + "_tail" }
 	)
 	items := []int{1, 2, 3, 4, 5}
-	converted := it.FilterAndConvert(it.Wrap(items), func(v int) bool { return v%2 == 0 }, conv.And(toString, addTail))
+	converted := it.FilterAndConvert(it.Wrap(items), func(v int) bool { return v%2 == 0 }, convert.And(toString, addTail))
 	assert.Equal(t, slice.Of("2_tail", "4_tail"), it.ToSlice(converted))
 
-	converted2 := sliceit.FilterAndConvert(items, func(v int) bool { return v%2 == 0 }, conv.And(toString, addTail))
+	converted2 := sliceit.FilterAndConvert(items, func(v int) bool { return v%2 == 0 }, convert.And(toString, addTail))
 	assert.Equal(t, slice.Of("2_tail", "4_tail"), it.ToSlice(converted2))
 
 	//plain old style
 	convertedOld := make([]string, 0)
 	for _, i := range items {
 		if i%2 == 0 {
-			convertedOld = append(convertedOld, conv.And(toString, addTail)(i))
+			convertedOld = append(convertedOld, convert.And(toString, addTail)(i))
 		}
 	}
 
@@ -48,10 +48,10 @@ func Test_FlattSlices(t *testing.T) {
 		multiDimension = [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
 		expected       = slice.Of(1, 3, 5, 7)
 	)
-	a := it.ToSlice(it.Filter(it.Flatt(it.Flatt(it.Wrap(multiDimension), conv.To[[][]int]), conv.To[[]int]), odds))
+	a := it.ToSlice(it.Filter(it.Flatt(it.Flatt(it.Wrap(multiDimension), convert.To[[][]int]), convert.To[[]int]), odds))
 	assert.Equal(t, expected, a)
 
-	a = it.ToSlice(it.Filter(it.Flatt(sliceit.Flatt(multiDimension, conv.To[[][]int]), conv.To[[]int]), odds))
+	a = it.ToSlice(it.Filter(it.Flatt(sliceit.Flatt(multiDimension, convert.To[[][]int]), convert.To[[]int]), odds))
 	assert.Equal(t, expected, a)
 
 	//plain old style
@@ -84,10 +84,10 @@ func Test_ReduceSlices(t *testing.T) {
 
 	e := 1 + 3 + 5 + 7
 
-	oddSum := it.Reduce(it.Filter(it.Flatt(it.Flatt(it.Wrap(multiDimension), conv.To[[][]int]), conv.To[[]int]), odds), op.Sum[int])
+	oddSum := it.Reduce(it.Filter(it.Flatt(it.Flatt(it.Wrap(multiDimension), convert.To[[][]int]), convert.To[[]int]), odds), op.Sum[int])
 	assert.Equal(t, e, oddSum)
 
-	oddSum = it.Reduce(it.Filter(it.Flatt(sliceit.Flatt(multiDimension, conv.To[[][]int]), conv.To[[]int]), odds), op.Sum[int])
+	oddSum = it.Reduce(it.Filter(it.Flatt(sliceit.Flatt(multiDimension, convert.To[[][]int]), convert.To[[]int]), odds), op.Sum[int])
 	assert.Equal(t, e, oddSum)
 
 	//plain old style

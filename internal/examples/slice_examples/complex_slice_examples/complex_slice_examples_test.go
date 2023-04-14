@@ -1,11 +1,6 @@
 package slice_examples
 
 import (
-	"strings"
-	"testing"
-
-	"github.com/stretchr/testify/assert"
-
 	"github.com/m4gshm/gollections/first"
 	"github.com/m4gshm/gollections/immutable/set"
 	"github.com/m4gshm/gollections/map_"
@@ -13,6 +8,9 @@ import (
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/convert"
 	"github.com/m4gshm/gollections/slice/group"
+	"github.com/stretchr/testify/assert"
+	"strings"
+	"testing"
 )
 
 type User struct {
@@ -25,8 +23,8 @@ type Role struct {
 	name string
 }
 
-func (u Role) Name() string {
-	return u.name
+func (r Role) Name() string {
+	return r.name
 }
 
 func (u User) Name() string {

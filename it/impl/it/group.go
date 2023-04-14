@@ -1,17 +1,19 @@
 package it
 
-import "github.com/m4gshm/gollections/c"
+import (
+	"github.com/m4gshm/gollections/c"
+)
 
 // NewKeyValuer creates instance of the KeyValuer
-func NewKeyValuer[T any, K, V any, IT c.Iterator[T]](iter IT, keyExtractor c.Converter[T, K], valExtractor c.Converter[T, V]) KeyValuer[T, K, V, IT] {
+func NewKeyValuer[T any, K, V any, IT c.Iterator[T]](iter IT, keyExtractor func(T) K, valExtractor func(T) V) KeyValuer[T, K, V, IT] {
 	return KeyValuer[T, K, V, IT]{iter: iter, getKey: keyExtractor, getVal: valExtractor}
 }
 
 // KeyValuer is the Iterator wrapper that converts a element to a key\value pair and iterates over these pairs
 type KeyValuer[T, K, V any, IT c.Iterator[T]] struct {
 	iter   IT
-	getKey c.Converter[T, K]
-	getVal c.Converter[T, V]
+	getKey func(T) K
+	getVal func(T) V
 }
 
 var _ c.KVIterator[int, string] = (*KeyValuer[any, int, string, c.Iterator[any]])(nil)

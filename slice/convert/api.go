@@ -1,25 +1,23 @@
 package convert
 
 import (
-	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/not"
-	"github.com/m4gshm/gollections/predicate"
 	"github.com/m4gshm/gollections/slice"
 )
 
-func AndConvert[FS ~[]From, From, To, Too any](elements FS, firsConverter c.Converter[From, To], secondConverter c.Converter[To, Too]) []Too {
+func AndConvert[FS ~[]From, From, To, Too any](elements FS, firsConverter func(From) To, secondConverter func(To) Too) []Too {
 	return slice.Convert(slice.Convert(elements, firsConverter), secondConverter)
 }
 
-func AndFilter[FS ~[]From, From, To any](elements FS, converter c.Converter[From, To], filter predicate.Predicate[To]) []To {
+func AndFilter[FS ~[]From, From, To any](elements FS, converter func(From) To, filter func(To) bool) []To {
 	return slice.ConvertAndFilter(elements, converter, filter)
 }
 
-func NotNil[FS ~[]*From, From, To any](elements FS, converter c.Converter[*From, To]) []To {
+func NotNil[FS ~[]*From, From, To any](elements FS, converter func(*From) To) []To {
 	return slice.FilterAndConvert(elements, not.Nil[From], converter)
 }
 
-func ToNotNil[FS ~[]From, From, To any](elements FS, converter c.Converter[From, *To]) []*To {
+func ToNotNil[FS ~[]From, From, To any](elements FS, converter func(From) *To) []*To {
 	return slice.ConvertCheck(elements, func(f From) (*To, bool) {
 		if t := converter(f); t != nil {
 			return t, true
@@ -28,7 +26,7 @@ func ToNotNil[FS ~[]From, From, To any](elements FS, converter c.Converter[From,
 	})
 }
 
-func NilSafe[FS ~[]*From, From, To any](elements FS, converter c.Converter[*From, *To]) []*To {
+func NilSafe[FS ~[]*From, From, To any](elements FS, converter func(*From) *To) []*To {
 	return slice.ConvertCheck(elements, func(f *From) (*To, bool) {
 		if f != nil {
 			if t := converter(f); t != nil {

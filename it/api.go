@@ -5,7 +5,6 @@ import (
 	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/op"
-	"github.com/m4gshm/gollections/predicate"
 	"github.com/m4gshm/gollections/ptr"
 )
 
@@ -27,27 +26,27 @@ func Wrap[TS ~[]T, T any](elements TS) c.Iterator[T] {
 }
 
 // Convert instantiates Iterator that converts elements with a converter and returns them
-func Convert[From, To any, IT c.Iterator[From]](elements IT, converter c.Converter[From, To]) c.Iterator[To] {
+func Convert[From, To any, IT c.Iterator[From]](elements IT, converter func(From) To) c.Iterator[To] {
 	return it.Convert(elements, converter)
 }
 
 // FilterAndConvert additionally filters 'From' elements.
-func FilterAndConvert[From, To any, IT c.Iterator[From]](elements IT, filter predicate.Predicate[From], converter c.Converter[From, To]) c.Iterator[To] {
+func FilterAndConvert[From, To any, IT c.Iterator[From]](elements IT, filter func(From) bool, converter func(From) To) c.Iterator[To] {
 	return it.FilterAndConvert(elements, filter, converter)
 }
 
 // Flatt instantiates Iterator that extracts slices of 'To' by a Flatter from elements of 'From' and flattens as one iterable collection of 'To' elements
-func Flatt[From, To any, IT c.Iterator[From]](elements IT, flatt c.Flatter[From, To]) c.Iterator[To] {
+func Flatt[From, To any, IT c.Iterator[From]](elements IT, flatt func(From) []To) c.Iterator[To] {
 	return ptr.Of(it.Flatt(elements, flatt))
 }
 
 // FilterAndFlatt additionally filters 'From' elements
-func FilterAndFlatt[From, To any, IT c.Iterator[From]](elements IT, filter predicate.Predicate[From], flatt c.Flatter[From, To]) c.Iterator[To] {
+func FilterAndFlatt[From, To any, IT c.Iterator[From]](elements IT, filter func(From) bool, flatt func(From) []To) c.Iterator[To] {
 	return ptr.Of(it.FilterAndFlatt(elements, filter, flatt))
 }
 
 // Filter instantiates Iterator that checks elements by a filter and returns successful ones
-func Filter[T any, IT c.Iterator[T]](elements IT, filter predicate.Predicate[T]) c.Iterator[T] {
+func Filter[T any, IT c.Iterator[T]](elements IT, filter func(T) bool) c.Iterator[T] {
 	return it.Filter(elements, filter)
 }
 
@@ -57,7 +56,7 @@ func NotNil[T any, IT c.Iterator[*T]](elements IT) c.Iterator[*T] {
 }
 
 // Reduce reduces elements to an one
-func Reduce[T any, IT c.Iterator[T]](elements IT, by c.Binary[T]) T {
+func Reduce[T any, IT c.Iterator[T]](elements IT, by func(T, T) T) T {
 	return it.Reduce(elements, by)
 }
 
@@ -72,7 +71,7 @@ func ToSlice[T any](elements c.Iterator[T]) []T {
 }
 
 // Group transforms iterable elements to the MapPipe based on applying key extractor to the elements
-func Group[T any, K comparable](elements c.Iterator[T], by c.Converter[T, K]) c.MapPipe[K, T, map[K][]T] {
+func Group[T any, K comparable](elements c.Iterator[T], by func(T) K) c.MapPipe[K, T, map[K][]T] {
 	return it.Group(elements, by)
 }
 
@@ -82,7 +81,7 @@ func ForEach[T any, IT c.Iterator[T]](elements IT, walker func(T)) {
 }
 
 // ForEachFiltered applies a walker to elements that satisfy a predicate condition
-func ForEachFiltered[T any](elements c.Iterator[T], walker func(T), filter predicate.Predicate[T]) {
+func ForEachFiltered[T any](elements c.Iterator[T], walker func(T), filter func(T) bool) {
 	it.ForEachFiltered(elements, walker, filter)
 }
 
@@ -92,11 +91,11 @@ func Sum[T c.Summable, IT c.Iterator[T]](elements IT) T {
 }
 
 // First returns the first element that satisfies requirements of the predicate 'filter'
-func First[T any, IT c.Iterator[T]](elements IT, filter predicate.Predicate[T]) (T, bool) {
+func First[T any, IT c.Iterator[T]](elements IT, filter func(T) bool) (T, bool) {
 	return it.First(elements, filter)
 }
 
 // ToPairs converts a c.Iterator to a c.KVIterator using key and value extractors
-func ToPairs[T, K, V any](elements c.Iterator[T], keyExtractor c.Converter[T, K], valExtractor c.Converter[T, V]) c.KVIterator[K, V] {
+func ToPairs[T, K, V any](elements c.Iterator[T], keyExtractor func(T) K, valExtractor func(T) V) c.KVIterator[K, V] {
 	return ptr.Of(it.NewKeyValuer(elements, keyExtractor, valExtractor))
 }

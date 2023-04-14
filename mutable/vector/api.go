@@ -3,7 +3,6 @@ package vector
 import (
 	"golang.org/x/exp/constraints"
 
-	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/mutable"
 )
 
@@ -23,6 +22,6 @@ func New[T any](capacity int) *mutable.Vector[T] {
 }
 
 // Sort sorts a Vector in-place by a converter that thransforms a element to an Ordered (int, string and so on).
-func Sort[T any, F constraints.Ordered](v *mutable.Vector[T], by c.Converter[T, F]) *mutable.Vector[T] {
+func Sort[T any, F constraints.Ordered](v *mutable.Vector[T], by func(T) F) *mutable.Vector[T] {
 	return v.Sort(func(e1, e2 T) bool { return by(e1) < by(e2) })
 }
