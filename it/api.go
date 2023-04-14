@@ -8,6 +8,9 @@ import (
 	"github.com/m4gshm/gollections/ptr"
 )
 
+// ErrBreak is For, Track breaker
+var ErrBreak = it.ErrBreak
+
 // Of instantiates Iterator of predefined elements
 func Of[T any](elements ...T) c.Iterator[T] {
 	return ptr.Of(it.NewHead(elements))

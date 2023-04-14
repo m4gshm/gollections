@@ -3,7 +3,7 @@ package test
 import (
 	"testing"
 
-	"github.com/m4gshm/gollections/predicate/brk/predicate"
+	"github.com/m4gshm/gollections/predicate/break/predicate"
 	"github.com/stretchr/testify/assert"
 )
 

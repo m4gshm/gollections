@@ -118,7 +118,7 @@ func FilterAndConvert[FS ~[]From, From, To any](elements FS, filter func(From) b
 	return result
 }
 
-// FilterAndConvert additionally filters 'To' elements
+// ConvertAndFilter additionally filters 'To' elements
 func ConvertAndFilter[FS ~[]From, From, To any](elements FS, by func(From) To, filter func(To) bool) []To {
 	result := make([]To, 0)
 	for _, e := range elements {
