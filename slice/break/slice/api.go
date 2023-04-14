@@ -8,8 +8,11 @@ import (
 	"github.com/m4gshm/gollections/op"
 )
 
-// ErrBreak is Filter, Check breaker
+// ErrBreak is Convert, Filter loops breaker
 var ErrBreak = it.ErrBreak
+
+// ErrNoFit is Convert, Filter element exclude from loop marker
+var ErrNoFit = errors.New("noFit")
 
 // OfLoop builds a slice by iterating elements of a source.
 // The hasNext specifies a predicate that tests existing of a next element in the source.
@@ -53,10 +56,12 @@ func Delete[TS ~[]T, T any](index int, elements TS) (TS, error) {
 func Group[T any, K comparable, TS ~[]T](elements TS, keyProducer func(T) (K, error)) (map[K]TS, error) {
 	groups := map[K]TS{}
 	for _, e := range elements {
-		if k, err := keyProducer(e); err != nil {
-			return groups, checkBreak(err)
-		} else {
+		if k, err := keyProducer(e); err == nil {
 			initGroup(k, e, groups)
+		} else if errors.Is(err, ErrBreak) {
+			return groups, nil
+		} else if !errors.Is(err, ErrNoFit) {
+			return groups, err
 		}
 	}
 	return groups, nil
@@ -66,15 +71,19 @@ func Group[T any, K comparable, TS ~[]T](elements TS, keyProducer func(T) (K, er
 func GroupInMultiple[T any, K comparable, TS ~[]T](elements TS, keysProducer func(T) ([]K, error)) (map[K]TS, error) {
 	groups := map[K]TS{}
 	for _, e := range elements {
-		if keys, err := keysProducer(e); err != nil {
-			return groups, checkBreak(err)
-		} else if len(keys) == 0 {
-			var key K
-			initGroup(key, e, groups)
-		} else {
-			for _, key := range keys {
+		if keys, err := keysProducer(e); err == nil {
+			if len(keys) == 0 {
+				var key K
 				initGroup(key, e, groups)
+			} else {
+				for _, key := range keys {
+					initGroup(key, e, groups)
+				}
 			}
+		} else if errors.Is(err, ErrBreak) {
+			return groups, nil
+		} else if !errors.Is(err, ErrNoFit) {
+			return groups, err
 		}
 	}
 	return groups, nil
@@ -92,10 +101,12 @@ func initGroup[T any, K comparable, TS ~[]T](key K, e T, groups map[K]TS) {
 func Convert[FS ~[]From, From, To any](elements FS, by func(From) (To, error)) ([]To, error) {
 	result := make([]To, len(elements))
 	for i, e := range elements {
-		if c, err := by(e); err != nil {
-			return result, checkBreak(err)
-		} else {
+		if c, err := by(e); err == nil {
 			result[i] = c
+		} else if errors.Is(err, ErrBreak) {
+			return result, nil
+		} else if !errors.Is(err, ErrNoFit) {
+			return result, err
 		}
 	}
 	return result, nil
@@ -105,10 +116,12 @@ func Convert[FS ~[]From, From, To any](elements FS, by func(From) (To, error)) (
 func ConvertIndexed[FS ~[]From, From, To any](elements FS, by func(index int, from From) (To, error)) ([]To, error) {
 	result := make([]To, len(elements))
 	for i, e := range elements {
-		if c, err := by(i, e); err != nil {
-			return result, checkBreak(err)
-		} else {
+		if c, err := by(i, e); err == nil {
 			result[i] = c
+		} else if errors.Is(err, ErrBreak) {
+			return result, nil
+		} else if !errors.Is(err, ErrNoFit) {
+			return result, err
 		}
 	}
 	return result, nil
@@ -118,35 +131,46 @@ func ConvertIndexed[FS ~[]From, From, To any](elements FS, by func(index int, fr
 func Flatt[FS ~[]From, From, To any](elements FS, by func(From) ([]To, error)) ([]To, error) {
 	result := make([]To, 0)
 	for _, e := range elements {
-		if f, err := by(e); err != nil {
-			return result, checkBreak(err)
-		} else {
+		if f, err := by(e); err == nil {
 			result = append(result, f...)
+		} else if errors.Is(err, ErrBreak) {
+			return result, nil
+		} else if !errors.Is(err, ErrNoFit) {
+			return result, err
 		}
 	}
 	return result, nil
 }
 
 // Filter creates a slice containing only the filtered elements
-func Filter[TS ~[]T, T any](elements TS, filter func(T) (bool, error)) ([]T, error) {
+func Filter[TS ~[]T, T any](elements TS, filter func(T) error) ([]T, error) {
 	result := make([]T, 0)
 	for _, e := range elements {
-		if ok, err := filter(e); err != nil {
-			return result, checkBreak(err)
-		} else if ok {
+		if err := filter(e); err == nil {
 			result = append(result, e)
+		} else if err != nil {
+			if errors.Is(err, ErrBreak) {
+				return result, nil
+			} else if !errors.Is(err, ErrNoFit) {
+				return result, err
+			}
 		}
 	}
 	return result, nil
 }
 
 // Reduce reduces elements to an one
-func Reduce[TS ~[]T, T any](elements TS, by func(T, T) (T, error)) (result T, err error) {
+func Reduce[TS ~[]T, T any](elements TS, by func(T, T) (T, error)) (T, error) {
+	var result T
 	for i, v := range elements {
 		if i == 0 {
 			result = v
-		} else if result, err = by(result, v); err != nil {
-			return result, checkBreak(err)
+		} else if r, err := by(result, v); err == nil {
+			result = r
+		} else if errors.Is(err, ErrBreak) {
+			return result, nil
+		} else if !errors.Is(err, ErrNoFit) {
+			return result, err
 		}
 	}
 	return result, nil
