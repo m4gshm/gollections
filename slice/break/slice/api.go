@@ -12,12 +12,15 @@ import (
 var ErrBreak = it.ErrBreak
 
 // ErrIgnore is Convert, Filter element exclude from loop marker
-var ErrIgnore = errors.New("noFit")
+var ErrIgnore = errors.New("Ignore")
+
+// ErrIgnoreAndBreak is loop stopper without the latest element including in the result
+var ErrIgnoreAndBreak = errors.New("IgnoreBreak")
 
 // OfLoop builds a slice by iterating elements of a source.
 // The getNext extracts next element or returns loop break marker or an error.
 func OfLoop[S, T any](source S, getNext func(S) (T, error)) ([]T, error) {
-	r := []T{}
+	var r []T
 	for {
 		if o, err := getNext(source); err != nil {
 			return r, checkBreak(err)
@@ -30,7 +33,7 @@ func OfLoop[S, T any](source S, getNext func(S) (T, error)) ([]T, error) {
 // Generate builds a slice by an generator function.
 // The generator returns an element, or false if the generation is over, or an error.
 func Generate[T any](next func() (T, bool, error)) ([]T, error) {
-	r := []T{}
+	var r []T
 	for {
 		e, ok, err := next()
 		if err != nil || !ok {
@@ -57,6 +60,9 @@ func Group[T any, K comparable, TS ~[]T](elements TS, keyProducer func(T) (K, er
 		if k, err := keyProducer(e); err == nil {
 			initGroup(k, e, groups)
 		} else if errors.Is(err, ErrBreak) {
+			initGroup(k, e, groups)
+			return groups, nil
+		} else if errors.Is(err, ErrIgnoreAndBreak) {
 			return groups, nil
 		} else if !errors.Is(err, ErrIgnore) {
 			return groups, err
@@ -70,15 +76,11 @@ func GroupInMultiple[T any, K comparable, TS ~[]T](elements TS, keysProducer fun
 	groups := map[K]TS{}
 	for _, e := range elements {
 		if keys, err := keysProducer(e); err == nil {
-			if len(keys) == 0 {
-				var key K
-				initGroup(key, e, groups)
-			} else {
-				for _, key := range keys {
-					initGroup(key, e, groups)
-				}
-			}
+			initGroups(keys, e, groups)
 		} else if errors.Is(err, ErrBreak) {
+			initGroups(keys, e, groups)
+			return groups, nil
+		} else if errors.Is(err, ErrIgnoreAndBreak) {
 			return groups, nil
 		} else if !errors.Is(err, ErrIgnore) {
 			return groups, err
@@ -87,21 +89,31 @@ func GroupInMultiple[T any, K comparable, TS ~[]T](elements TS, keysProducer fun
 	return groups, nil
 }
 
-func initGroup[T any, K comparable, TS ~[]T](key K, e T, groups map[K]TS) {
-	group := groups[key]
-	if group == nil {
-		group = make([]T, 0)
+func initGroups[T any, K comparable, TS ~[]T](keys []K, e T, groups map[K]TS) {
+	if len(keys) == 0 {
+		var key K
+		initGroup(key, e, groups)
+	} else {
+		for _, key := range keys {
+			initGroup(key, e, groups)
+		}
 	}
-	groups[key] = append(group, e)
+}
+
+func initGroup[T any, K comparable, TS ~[]T](key K, e T, groups map[K]TS) {
+	groups[key] = append(groups[key], e)
 }
 
 // Convert creates a slice consisting of the transformed elements using the converter 'by'
 func Convert[FS ~[]From, From, To any](elements FS, by func(From) (To, error)) ([]To, error) {
-	result := make([]To, len(elements))
-	for i, e := range elements {
+	var result []To
+	for _, e := range elements {
 		if c, err := by(e); err == nil {
-			result[i] = c
+			result = append(result, c)
 		} else if errors.Is(err, ErrBreak) {
+			result = append(result, c)
+			return result, nil
+		} else if errors.Is(err, ErrIgnoreAndBreak) {
 			return result, nil
 		} else if !errors.Is(err, ErrIgnore) {
 			return result, err
@@ -112,11 +124,14 @@ func Convert[FS ~[]From, From, To any](elements FS, by func(From) (To, error)) (
 
 // ConvertIndexed creates a slice consisting of the transformed elements using the converter 'by' which additionally applies the index of the element being converted
 func ConvertIndexed[FS ~[]From, From, To any](elements FS, by func(index int, from From) (To, error)) ([]To, error) {
-	result := make([]To, len(elements))
+	var result []To
 	for i, e := range elements {
 		if c, err := by(i, e); err == nil {
-			result[i] = c
+			result = append(result, c)
 		} else if errors.Is(err, ErrBreak) {
+			result = append(result, c)
+			return result, nil
+		} else if errors.Is(err, ErrIgnoreAndBreak) {
 			return result, nil
 		} else if !errors.Is(err, ErrIgnore) {
 			return result, err
@@ -127,11 +142,14 @@ func ConvertIndexed[FS ~[]From, From, To any](elements FS, by func(index int, fr
 
 // Flatt unfolds the n-dimensional slice into a n-1 dimensional slice
 func Flatt[FS ~[]From, From, To any](elements FS, by func(From) ([]To, error)) ([]To, error) {
-	result := make([]To, 0)
+	var result []To
 	for _, e := range elements {
 		if f, err := by(e); err == nil {
 			result = append(result, f...)
 		} else if errors.Is(err, ErrBreak) {
+			result = append(result, f...)
+			return result, nil
+		} else if errors.Is(err, ErrIgnoreAndBreak) {
 			return result, nil
 		} else if !errors.Is(err, ErrIgnore) {
 			return result, err
@@ -142,12 +160,15 @@ func Flatt[FS ~[]From, From, To any](elements FS, by func(From) ([]To, error)) (
 
 // Filter creates a slice containing only the filtered elements
 func Filter[TS ~[]T, T any](elements TS, filter func(T) error) ([]T, error) {
-	result := make([]T, 0)
+	var result []T
 	for _, e := range elements {
 		if err := filter(e); err == nil {
 			result = append(result, e)
 		} else if err != nil {
 			if errors.Is(err, ErrBreak) {
+				result = append(result, e)
+				return result, nil
+			} else if errors.Is(err, ErrIgnoreAndBreak) {
 				return result, nil
 			} else if !errors.Is(err, ErrIgnore) {
 				return result, err
@@ -166,6 +187,9 @@ func Reduce[TS ~[]T, T any](elements TS, by func(T, T) (T, error)) (T, error) {
 		} else if r, err := by(result, v); err == nil {
 			result = r
 		} else if errors.Is(err, ErrBreak) {
+			result = r
+			return result, nil
+		} else if errors.Is(err, ErrIgnoreAndBreak) {
 			return result, nil
 		} else if !errors.Is(err, ErrIgnore) {
 			return result, err

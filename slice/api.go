@@ -24,7 +24,7 @@ func Of[T any](elements ...T) []T { return elements }
 // The hasNext specifies a predicate that tests existing of a next element in the source.
 // The getNext extracts the element.
 func OfLoop[S, T any](source S, hasNext func(S) bool, getNext func(S) (T, error)) ([]T, error) {
-	r := []T{}
+	var r []T
 	for hasNext(source) {
 		o, err := getNext(source)
 		if err != nil {
@@ -38,7 +38,7 @@ func OfLoop[S, T any](source S, hasNext func(S) bool, getNext func(S) (T, error)
 // Generate builds a slice by an generator function.
 // The generator returns an element, or false if the generation is over, or an error.
 func Generate[T any](next func() (T, bool, error)) ([]T, error) {
-	r := []T{}
+	var r []T
 	for {
 		e, ok, err := next()
 		if err != nil || !ok {
@@ -50,6 +50,9 @@ func Generate[T any](next func() (T, bool, error)) ([]T, error) {
 
 // Clone makes new slice instance with copied elements
 func Clone[TS ~[]T, T any](elements TS) TS {
+	if elements == nil {
+		return nil
+	}
 	copied := make(TS, len(elements))
 	copy(copied, elements)
 	return copied
@@ -91,15 +94,14 @@ func GroupInMultiple[T any, K comparable, TS ~[]T](elements TS, keysProducer fun
 }
 
 func initGroup[T any, K comparable, TS ~[]T](key K, e T, groups map[K]TS) {
-	group := groups[key]
-	if group == nil {
-		group = make([]T, 0)
-	}
-	groups[key] = append(group, e)
+	groups[key] = append(groups[key], e)
 }
 
 // Convert creates a slice consisting of the transformed elements using the converter 'by'
 func Convert[FS ~[]From, From, To any](elements FS, by func(From) To) []To {
+	if elements == nil {
+		return nil
+	}
 	result := make([]To, len(elements))
 	for i, e := range elements {
 		result[i] = by(e)
@@ -109,7 +111,7 @@ func Convert[FS ~[]From, From, To any](elements FS, by func(From) To) []To {
 
 // FilterAndConvert additionally filters 'From' elements
 func FilterAndConvert[FS ~[]From, From, To any](elements FS, filter func(From) bool, by func(From) To) []To {
-	result := make([]To, 0)
+	var result []To
 	for _, e := range elements {
 		if filter(e) {
 			result = append(result, by(e))
@@ -120,7 +122,7 @@ func FilterAndConvert[FS ~[]From, From, To any](elements FS, filter func(From) b
 
 // ConvertAndFilter additionally filters 'To' elements
 func ConvertAndFilter[FS ~[]From, From, To any](elements FS, by func(From) To, filter func(To) bool) []To {
-	result := make([]To, 0)
+	var result []To
 	for _, e := range elements {
 		if r := by(e); filter(r) {
 			result = append(result, r)
@@ -131,7 +133,7 @@ func ConvertAndFilter[FS ~[]From, From, To any](elements FS, by func(From) To, f
 
 // FilterConvertFilter filters source, converts, and filters converted elements
 func FilterConvertFilter[FS ~[]From, From, To any](elements FS, filter func(From) bool, by func(From) To, filterConverted func(To) bool) []To {
-	result := make([]To, 0)
+	var result []To
 	for _, e := range elements {
 		if filter(e) {
 			if r := by(e); filterConverted(r) {
@@ -144,6 +146,9 @@ func FilterConvertFilter[FS ~[]From, From, To any](elements FS, filter func(From
 
 // ConvertIndexed creates a slice consisting of the transformed elements using the converter 'by' which additionally applies the index of the element being converted
 func ConvertIndexed[FS ~[]From, From, To any](elements FS, by func(index int, from From) To) []To {
+	if elements == nil {
+		return nil
+	}
 	result := make([]To, len(elements))
 	for i, e := range elements {
 		result[i] = by(i, e)
@@ -153,7 +158,7 @@ func ConvertIndexed[FS ~[]From, From, To any](elements FS, by func(index int, fr
 
 // FilterAndConvertIndexed additionally filters 'From' elements
 func FilterAndConvertIndexed[FS ~[]From, From, To any](elements FS, filter func(index int, from From) bool, converter func(index int, from From) To) []To {
-	result := make([]To, 0)
+	var result []To
 	for i, e := range elements {
 		if filter(i, e) {
 			result = append(result, converter(i, e))
@@ -164,7 +169,7 @@ func FilterAndConvertIndexed[FS ~[]From, From, To any](elements FS, filter func(
 
 // ConvertCheck is similar to ConvertFit, but it checks and transforms elements together
 func ConvertCheck[FS ~[]From, From, To any](elements FS, by func(from From) (To, bool)) []To {
-	result := make([]To, 0)
+	var result []To
 	for _, e := range elements {
 		if to, ok := by(e); ok {
 			result = append(result, to)
@@ -175,7 +180,7 @@ func ConvertCheck[FS ~[]From, From, To any](elements FS, by func(from From) (To,
 
 // ConvertCheckIndexed additionally filters 'From' elements
 func ConvertCheckIndexed[FS ~[]From, From, To any](elements FS, by func(index int, from From) (To, bool)) []To {
-	result := make([]To, 0)
+	var result []To
 	for i, e := range elements {
 		if to, ok := by(i, e); ok {
 			result = append(result, to)
@@ -186,7 +191,7 @@ func ConvertCheckIndexed[FS ~[]From, From, To any](elements FS, by func(index in
 
 // Flatt unfolds the n-dimensional slice into a n-1 dimensional slice
 func Flatt[FS ~[]From, From, To any](elements FS, by func(From) []To) []To {
-	result := make([]To, 0)
+	var result []To
 	for _, e := range elements {
 		result = append(result, by(e)...)
 
@@ -196,7 +201,7 @@ func Flatt[FS ~[]From, From, To any](elements FS, by func(From) []To) []To {
 
 // FilerAndFlatt additionally filters 'From' elements.
 func FilerAndFlatt[FS ~[]From, From, To any](elements FS, filter func(From) bool, by func(From) []To) []To {
-	result := make([]To, 0)
+	var result []To
 	for _, e := range elements {
 		if filter(e) {
 			result = append(result, by(e)...)
@@ -207,7 +212,7 @@ func FilerAndFlatt[FS ~[]From, From, To any](elements FS, filter func(From) bool
 
 // FlattAndFiler unfolds the n-dimensional slice into a n-1 dimensional slice with additinal filtering of 'To' elements.
 func FlattAndFiler[FS ~[]From, From, To any](elements FS, by func(From) []To, filter func(To) bool) []To {
-	result := make([]To, 0)
+	var result []To
 	for _, e := range elements {
 		for _, to := range by(e) {
 			if filter(to) {
@@ -220,7 +225,7 @@ func FlattAndFiler[FS ~[]From, From, To any](elements FS, by func(From) []To, fi
 
 // FilterFlattFilter unfolds the n-dimensional slice 'elements' into a n-1 dimensional slice with additinal filtering of 'From' and 'To' elements.
 func FilterFlattFilter[FS ~[]From, From, To any](elements FS, filterFrom func(From) bool, by func(From) []To, filterTo func(To) bool) []To {
-	result := make([]To, 0)
+	var result []To
 	for _, e := range elements {
 		if filterFrom(e) {
 			for _, to := range by(e) {
@@ -239,7 +244,7 @@ func NotNil[TS ~[]*T, T any](elements TS) TS {
 
 // Filter creates a slice containing only the filtered elements
 func Filter[TS ~[]T, T any](elements TS, filter func(T) bool) []T {
-	result := make([]T, 0)
+	var result []T
 	for _, e := range elements {
 		if filter(e) {
 			result = append(result, e)
