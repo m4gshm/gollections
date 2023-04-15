@@ -14,8 +14,8 @@ import (
 // NewSet instantiates Set and copies elements to it.
 func NewSet[T comparable](elements []T) Set[T] {
 	internal := map[T]struct{}{}
-	for _, T := range elements {
-		internal[T] = struct{}{}
+	for _, e := range elements {
+		internal[e] = struct{}{}
 	}
 	return WrapSet(internal)
 }
@@ -23,6 +23,19 @@ func NewSet[T comparable](elements []T) Set[T] {
 // WrapSet creates a set using a map as the internal storage.
 func WrapSet[T comparable](elements map[T]struct{}) Set[T] {
 	return Set[T]{elements: elements}
+}
+
+// ToSet creates a Set instance with elements obtained by passing an iterator.
+func ToSet[T comparable](elements c.Iterator[T]) Set[T] {
+	internal := map[T]struct{}{}
+	for {
+		if e, ok := elements.Next(); !ok {
+			break
+		} else {
+			internal[e] = struct{}{}
+		}
+	}
+	return WrapSet(internal)
 }
 
 // Set is the Collection implementation that provides the uniqueness of its elements. Elements must be comparable.

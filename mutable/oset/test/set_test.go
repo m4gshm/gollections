@@ -36,7 +36,7 @@ func Test_Set_Iterate(t *testing.T) {
 }
 
 func Test_Set_AddVerify(t *testing.T) {
-	set := oset.New[int](0)
+	set := oset.NewCap[int](0)
 	added := set.AddNew(1, 2, 4, 3)
 	assert.Equal(t, added, true)
 	added = set.AddNewOne(1)

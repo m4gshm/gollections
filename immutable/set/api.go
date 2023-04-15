@@ -4,6 +4,7 @@ package set
 import (
 	"golang.org/x/exp/constraints"
 
+	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/immutable"
 	"github.com/m4gshm/gollections/immutable/ordered"
 )
@@ -16,6 +17,11 @@ func Of[T comparable](elements ...T) immutable.Set[T] {
 // New instantiates Set and copies elements to it.
 func New[T comparable](elements []T) immutable.Set[T] {
 	return immutable.NewSet(elements)
+}
+
+// From creates a Set instance with elements obtained by passing an iterator.
+func From[T comparable](elements c.Iterator[T]) immutable.Set[T] {
+	return immutable.ToSet(elements)
 }
 
 // Sort instantiates Set and puts sorted elements to it.

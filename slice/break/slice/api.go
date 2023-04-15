@@ -6,6 +6,7 @@ import (
 
 	"github.com/m4gshm/gollections/it"
 	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/slice"
 )
 
 // ErrBreak is Convert, Filter loops breaker
@@ -16,6 +17,9 @@ var ErrIgnore = errors.New("Ignore")
 
 // ErrIgnoreAndBreak is loop stopper without the latest element including in the result
 var ErrIgnoreAndBreak = errors.New("IgnoreBreak")
+
+// Of is generic slice constructor
+func Of[T any](elements ...T) []T { return slice.Of(elements...) }
 
 // OfLoop builds a slice by iterating elements of a source.
 // The getNext extracts next element or returns loop break marker or an error.

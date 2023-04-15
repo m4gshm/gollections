@@ -4,7 +4,9 @@ package vector
 import (
 	"golang.org/x/exp/constraints"
 
+	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/immutable"
+	"github.com/m4gshm/gollections/it"
 )
 
 // Of instantiates Vector with predefined elements.
@@ -15,6 +17,11 @@ func Of[T any](elements ...T) immutable.Vector[T] {
 // New instantiates Vector and copies elements to it.
 func New[T any](elements []T) immutable.Vector[T] {
 	return immutable.NewVector(elements)
+}
+
+// From creates a Vector instance with elements obtained by passing an iterator.
+func From[T any](elements c.Iterator[T]) immutable.Vector[T] {
+	return immutable.WrapVector(it.ToSlice(elements))
 }
 
 // Sort instantiates Vector and puts sorted elements to it.

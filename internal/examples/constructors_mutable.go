@@ -17,17 +17,17 @@ func _() {
 
 	var (
 		_ *mutable.Vector[int] = vector.Of(1, 2, 3)
-		_ c.Vector[int]        = vector.New[int](capacity)
+		_ c.Vector[int]        = vector.NewCap[int](capacity)
 		_ c.Vector[int]        = vector.Empty[int]()
 	)
 	var (
 		_ mutable.Set[int] = set.Of(1, 2, 3)
-		_ c.Set[int]       = set.New[int](capacity)
+		_ c.Set[int]       = set.NewCap[int](capacity)
 		_ c.Set[int]       = set.Empty[int]()
 	)
 	var (
 		_ *ordered.Set[int] = oset.Of(1, 2, 3)
-		_ c.Set[int]        = oset.New[int](capacity)
+		_ c.Set[int]        = oset.NewCap[int](capacity)
 		_ c.Set[int]        = oset.Empty[int]()
 	)
 	var (

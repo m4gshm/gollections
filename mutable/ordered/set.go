@@ -9,26 +9,44 @@ import (
 	"github.com/m4gshm/gollections/slice"
 )
 
-// ToSet converts an elements slice to the set containing them.
-func ToSet[T comparable](elements []T) *Set[T] {
+// NewSet instantiates Set and copies elements to it.
+func NewSet[T comparable](elements []T) *Set[T] {
 	var (
 		l       = len(elements)
 		uniques = make(map[T]int, l)
 		order   = make([]T, 0, l)
 	)
 	pos := 0
-	for _, v := range elements {
-		if _, ok := uniques[v]; !ok {
-			order = append(order, v)
-			uniques[v] = pos
+	for _, e := range elements {
+		if _, ok := uniques[e]; !ok {
+			order = append(order, e)
+			uniques[e] = pos
 			pos++
 		}
 	}
 	return WrapSet(order, uniques)
 }
 
-// NewSet creates a set with a predefined capacity.
-func NewSet[T comparable](capacity int) *Set[T] {
+// ToSet creates a Set instance with elements obtained by passing an iterator.
+func ToSet[T comparable](elements c.Iterator[T]) *Set[T] {
+	var (
+		uniques = map[T]int{}
+		order   []T
+		pos     = 0
+	)
+
+	for {
+		if e, ok := elements.Next(); !ok {
+			break
+		} else {
+			order, pos = add(e, uniques, order, pos)
+		}
+	}
+	return WrapSet(order, uniques)
+}
+
+// NewSetCap creates a set with a predefined capacity.
+func NewSetCap[T comparable](capacity int) *Set[T] {
 	return WrapSet(make([]T, 0, capacity), make(map[T]int, capacity))
 }
 
@@ -176,4 +194,13 @@ func (s *Set[T]) sortBy(sorter slice.Sorter, less slice.Less[T]) *Set[T] {
 
 func (s *Set[T]) String() string {
 	return slice.ToString(s.elements)
+}
+
+func add[T comparable](e T, uniques map[T]int, order []T, pos int) ([]T, int) {
+	if _, ok := uniques[e]; !ok {
+		order = append(order, e)
+		uniques[e] = pos
+		pos++
+	}
+	return order, pos
 }

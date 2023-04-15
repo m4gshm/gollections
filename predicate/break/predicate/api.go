@@ -7,6 +7,11 @@ func (p Predicate[T]) Or(or Predicate[T]) Predicate[T]   { return Or(p, or) }
 func (p Predicate[T]) And(and Predicate[T]) Predicate[T] { return And(p, and) }
 func (p Predicate[T]) Xor(xor Predicate[T]) Predicate[T] { return Xor(p, xor) }
 
+// Of breakable Predicate constructor
+func Of[T comparable](predicate func(T) bool) Predicate[T] {
+	return func(c T) (bool, error) { return predicate(c), nil }
+}
+
 // Eq makes a predicate to test for equality
 func Eq[T comparable](v T) Predicate[T] {
 	return func(c T) (bool, error) { return v == c, nil }

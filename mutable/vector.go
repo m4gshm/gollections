@@ -11,23 +11,23 @@ import (
 	"github.com/m4gshm/gollections/slice"
 )
 
-// NewVector instantiates Vector with a predefined capacity.
-func NewVector[T any](capacity int) *Vector[T] {
+// NewVectorCap instantiates Vector with a predefined capacity
+func NewVectorCap[T any](capacity int) *Vector[T] {
 	return WrapVector(make([]T, 0, capacity))
 }
 
-// ToVector instantiates Vector based on copy of elements slice
-func ToVector[T any](elements []T) *Vector[T] {
+// NewVector instantiates Vector based on copy of elements slice
+func NewVector[T any](elements []T) *Vector[T] {
 	return WrapVector(slice.Clone(elements))
 }
 
-// WrapVector instantiates Vector using a slise as internal storage.
+// WrapVector instantiates Vector using a slise as internal storage
 func WrapVector[T any](elements []T) *Vector[T] {
 	v := Vector[T](elements)
 	return &v
 }
 
-// Vector is the Collection implementation that provides elements order and index access.
+// Vector is the Collection implementation that provides elements order and index access
 type Vector[T any] []T
 
 var (

@@ -11,16 +11,29 @@ import (
 	"github.com/m4gshm/gollections/slice"
 )
 
-// NewSet creates a set with a predefined capacity.
-func NewSet[T comparable](capacity int) Set[T] {
+// NewSetCap creates a set with a predefined capacity.
+func NewSetCap[T comparable](capacity int) Set[T] {
 	return WrapSet(make(map[T]struct{}, capacity))
 }
 
-// ToSet converts an elements slice to the set containing them.
-func ToSet[T comparable](elements []T) Set[T] {
+// NewSet instantiates Set and copies elements to it.
+func NewSet[T comparable](elements []T) Set[T] {
 	internal := make(map[T]struct{}, len(elements))
 	for _, v := range elements {
 		internal[v] = struct{}{}
+	}
+	return WrapSet(internal)
+}
+
+// ToSet creates a Set instance with elements obtained by passing an iterator.
+func ToSet[T comparable](elements c.Iterator[T]) Set[T] {
+	internal := map[T]struct{}{}
+	for {
+		if e, ok := elements.Next(); !ok {
+			break
+		} else {
+			internal[e] = struct{}{}
+		}
 	}
 	return WrapSet(internal)
 }
@@ -165,9 +178,9 @@ func (s *Set[T]) StableSort(less slice.Less[T]) *ordered.Set[T] {
 }
 
 func (s *Set[T]) sortBy(sorter slice.Sorter, less slice.Less[T]) *ordered.Set[T] {
-	c := slice.Clone(s.Collect())
-	slice.Sort(c, sorter, less)
-	return ordered.ToSet(c)
+	cl := slice.Clone(s.Collect())
+	slice.Sort(cl, sorter, less)
+	return ordered.NewSet(cl)
 }
 
 func (s Set[K]) String() string {

@@ -15,13 +15,10 @@ import (
 func NewSet[T comparable](elements []T) Set[T] {
 	var (
 		uniques = map[T]struct{}{}
-		order   = []T{}
+		order   []T
 	)
-	for _, v := range elements {
-		if _, ok := uniques[v]; !ok {
-			order = append(order, v)
-			uniques[v] = struct{}{}
-		}
+	for _, e := range elements {
+		order = add(e, uniques, order)
 	}
 	return WrapSet(order, uniques)
 }
@@ -29,6 +26,22 @@ func NewSet[T comparable](elements []T) Set[T] {
 // WrapSet creates a set using a map and an order slice as the internal storage.
 func WrapSet[T comparable](order []T, elements map[T]struct{}) Set[T] {
 	return Set[T]{order: order, elements: elements, esize: notsafe.GetTypeSize[T]()}
+}
+
+// ToSet creates a Set instance with elements obtained by passing an iterator.
+func ToSet[T comparable](elements c.Iterator[T]) Set[T] {
+	var (
+		uniques = map[T]struct{}{}
+		order   []T
+	)
+	for {
+		if e, ok := elements.Next(); !ok {
+			break
+		} else {
+			order = add(e, uniques, order)
+		}
+	}
+	return WrapSet(order, uniques)
 }
 
 // Set is the Collection implementation that provides element uniqueness and access order. The elements must be comparable.
@@ -126,4 +139,12 @@ func (s Set[T]) sortBy(sorter slice.Sorter, less slice.Less[T]) Set[T] {
 
 func (s Set[T]) String() string {
 	return slice.ToString(s.order)
+}
+
+func add[T comparable](e T, uniques map[T]struct{}, order []T) []T {
+	if _, ok := uniques[e]; !ok {
+		order = append(order, e)
+		uniques[e] = struct{}{}
+	}
+	return order
 }

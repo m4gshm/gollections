@@ -93,7 +93,7 @@ func (u *user) Name() string { return u.name }
 func (u *user) Age() int     { return u.age }
 
 func Test_Vector_AddAndDelete(t *testing.T) {
-	vec := vector.New[int](0)
+	vec := vector.NewCap[int](0)
 	vec.Add(range_.Of(0, 1000)...)
 	deleted := false
 	for i := vec.Head(); i.HasNext(); {
@@ -111,7 +111,7 @@ func Test_Vector_AddAndDelete(t *testing.T) {
 }
 
 func Test_Vector_Add(t *testing.T) {
-	vec := vector.New[int](0)
+	vec := vector.NewCap[int](0)
 	vec.Add(1, 1, 2, 4, 3, 1)
 	assert.Equal(t, slice.Of(1, 1, 2, 4, 3, 1), vec.Collect())
 	vec.Add(1)
@@ -119,7 +119,7 @@ func Test_Vector_Add(t *testing.T) {
 }
 
 func Test_Vector_Add_And_Iterate(t *testing.T) {
-	vec := vector.New[int](0)
+	vec := vector.NewCap[int](0)
 	it, v, ok := vec.First()
 	//no a first element
 	assert.False(t, ok)

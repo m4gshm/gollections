@@ -183,7 +183,7 @@ func Benchmark_Map_Vector_ForEach_(b *testing.B) {
 	var s *mutable.Vector[string]
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		s = mvector.New[string](c)
+		s = mvector.NewCap[string](c)
 		items.ForEach(func(element int) { s.Add(op(element)) })
 	}
 	_ = s

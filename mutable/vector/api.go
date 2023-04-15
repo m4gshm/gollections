@@ -3,22 +3,29 @@ package vector
 import (
 	"golang.org/x/exp/constraints"
 
+	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/it"
 	"github.com/m4gshm/gollections/mutable"
 )
 
 // Of instantiates Vector with predefined elements.
 func Of[T any](elements ...T) *mutable.Vector[T] {
-	return mutable.ToVector(elements)
+	return mutable.NewVector(elements)
 }
 
 // Empty instantiates Vector with zero capacity.
 func Empty[T any]() *mutable.Vector[T] {
-	return New[T](0)
+	return NewCap[T](0)
 }
 
-// New creates a vector with a predefined capacity.
-func New[T any](capacity int) *mutable.Vector[T] {
-	return mutable.NewVector[T](capacity)
+// NewCap creates a vector with a predefined capacity.
+func NewCap[T any](capacity int) *mutable.Vector[T] {
+	return mutable.NewVectorCap[T](capacity)
+}
+
+// From creates a Vector instance with elements obtained by passing an iterator.
+func From[T any](elements c.Iterator[T]) *mutable.Vector[T] {
+	return mutable.WrapVector(it.ToSlice(elements))
 }
 
 // Sort sorts a Vector in-place by a converter that thransforms a element to an Ordered (int, string and so on).
