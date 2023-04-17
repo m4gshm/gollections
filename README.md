@@ -40,7 +40,8 @@ import (
 
     "github.com/stretchr/testify/assert"
 
-    convert1 "github.com/m4gshm/gollections/convert"
+    "github.com/m4gshm/gollections/as"
+    "github.com/m4gshm/gollections/convert"
     "github.com/m4gshm/gollections/first"
     "github.com/m4gshm/gollections/immutable/set"
     "github.com/m4gshm/gollections/last"
@@ -54,7 +55,7 @@ import (
     "github.com/m4gshm/gollections/slice"
     "github.com/m4gshm/gollections/slice/clone"
     "github.com/m4gshm/gollections/slice/clone/sort"
-    "github.com/m4gshm/gollections/slice/convert"
+    sliceconv "github.com/m4gshm/gollections/slice/convert"
     "github.com/m4gshm/gollections/slice/filter"
     "github.com/m4gshm/gollections/slice/group"
     "github.com/m4gshm/gollections/slice/range_"
@@ -95,7 +96,7 @@ var users = []User{
 }
 
 func Test_GroupBySeveralKeysAndConvertMapValues(t *testing.T) {
-    usersByRole := group.InMultiple(users, func(u User) []string { return convert.AndConvert(u.Roles(), Role.Name, strings.ToLower) })
+    usersByRole := group.InMultiple(users, func(u User) []string { return sliceconv.AndConvert(u.Roles(), Role.Name, strings.ToLower) })
     namesByRole := map_.ConvertValues(usersByRole, func(u []User) []string { return slice.Convert(u, User.Name) })
 
     assert.Equal(t, namesByRole[""], []string{"Tom"})
@@ -111,7 +112,7 @@ func Test_FindFirsManager(t *testing.T) {
 
 func Test_AggregateFilteredRoles(t *testing.T) {
     roles := slice.Flatt(users, User.Roles)
-    roleNamesExceptManager := convert.AndFilter(roles, Role.Name, not.Eq("Manager"))
+    roleNamesExceptManager := sliceconv.AndFilter(roles, Role.Name, not.Eq("Manager"))
 
     assert.Equal(t, slice.Of("Admin", "manager"), roleNamesExceptManager)
 }
@@ -203,7 +204,7 @@ func Test_ConvertFiltered(t *testing.T) {
 func Test_FilterConverted(t *testing.T) {
     var (
         source   = []int{1, 3, 4, 5, 7, 8, 9, 11}
-        result   = convert.AndFilter(source, strconv.Itoa, func(s string) bool { return len(s) == 2 })
+        result   = sliceconv.AndFilter(source, strconv.Itoa, func(s string) bool { return len(s) == 2 })
         expected = []string{"11"}
     )
     assert.Equal(t, expected, result)
@@ -216,7 +217,7 @@ func Test_ConvertNilSafe(t *testing.T) {
         third    = "third"
         fifth    = "fifth"
         source   = []*entity{{&first}, {}, {&third}, nil, {&fifth}}
-        result   = convert.NilSafe(source, func(e *entity) *string { return e.val })
+        result   = sliceconv.NilSafe(source, func(e *entity) *string { return e.val })
         expected = []*string{&first, &third, &fifth}
     )
     assert.Equal(t, expected, result)
@@ -225,7 +226,7 @@ func Test_ConvertNilSafe(t *testing.T) {
 func Test_ConvertFilteredWithIndexInPlace(t *testing.T) {
     var (
         source   = slice.Of(1, 3, 4, 5, 7, 8, 9, 11)
-        result   = convert.CheckIndexed(source, func(index int, elem int) (string, bool) { return strconv.Itoa(index + elem), even(elem) })
+        result   = sliceconv.CheckIndexed(source, func(index int, elem int) (string, bool) { return strconv.Itoa(index + elem), even(elem) })
         expected = []string{"6", "13"}
     )
     assert.Equal(t, expected, result)
@@ -253,7 +254,7 @@ func Test_FilterNotNil(t *testing.T) {
 func Test_Flatt(t *testing.T) {
     var (
         source   = [][]int{{1, 2, 3}, {4}, {5, 6}}
-        result   = slice.Flatt(source, convert1.AsIs[[]int])
+        result   = slice.Flatt(source, as.Is[[]int])
         expected = []int{1, 2, 3, 4, 5, 6}
     )
     assert.Equal(t, expected, result)
@@ -288,7 +289,7 @@ func Test_Slice_Sum(t *testing.T) {
 func Test_Slice_Flatt(t *testing.T) {
     var (
         source   = [][]int{{1, 2, 3}, {4}, {5, 6}}
-        result   = slice.Flatt(source, convert1.AsIs[[]int])
+        result   = slice.Flatt(source, as.Is[[]int])
         expected = []int{1, 2, 3, 4, 5, 6}
     )
     assert.Equal(t, expected, result)
@@ -685,8 +686,8 @@ import (
 
     "github.com/stretchr/testify/assert"
 
+    "github.com/m4gshm/gollections/as"
     cgroup "github.com/m4gshm/gollections/c/group"
-    convert "github.com/m4gshm/gollections/convert"
     "github.com/m4gshm/gollections/immutable"
     "github.com/m4gshm/gollections/immutable/oset"
     "github.com/m4gshm/gollections/immutable/set"
@@ -762,7 +763,7 @@ func Test_compute_odds_sum(t *testing.T) {
     )
 
     //declarative style
-    oddSum := iter.Reduce(iter.Filter(iter.Flatt(slc.Flatt(multiDimension, convert.To[[][]int]), convert.To[[]int]), odds), op.Sum[int])
+    oddSum := iter.Reduce(iter.Filter(iter.Flatt(slc.Flatt(multiDimension, as.Is[[][]int]), as.Is[[]int]), odds), op.Sum[int])
     assert.Equal(t, expected, oddSum)
 
     //plain old style
