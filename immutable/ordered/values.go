@@ -80,15 +80,17 @@ func (s MapValues[K, V]) Get(index int) (V, bool) {
 }
 
 func (s MapValues[K, V]) Filter(filter func(V) bool) c.Pipe[V, []V] {
-	return it.NewPipe[V](it.Filter(s.Head(), filter))
+	h := s.Head()
+	return it.NewPipe[V](it.Filter(h, h.Next, filter))
 }
 
 func (s MapValues[K, V]) Convert(by func(V) V) c.Pipe[V, []V] {
-	return it.NewPipe[V](it.Convert(s.Head(), by))
+	h := s.Head()
+	return it.NewPipe[V](it.Convert(h, h.Next, by))
 }
 
 func (s MapValues[K, V]) Reduce(by func(V, V) V) V {
-	return it.Reduce(s.Head(), by)
+	return it.Reduce(s.Head().Next, by)
 }
 
 func (s MapValues[K, V]) String() string {

@@ -233,17 +233,19 @@ func (v *Vector[T]) SetNew(index int, value T) bool {
 
 // Filter returns a pipe consisting of vector elements matching the filter
 func (v *Vector[T]) Filter(filter func(T) bool) c.Pipe[T, []T] {
-	return it.NewPipe[T](it.Filter(ptr.Of(v.Head()), filter))
+	h := ptr.Of(v.Head())
+	return it.NewPipe[T](it.Filter(h, h.Next, filter))
 }
 
 // Map returns a pipe of converted vector elements by the converter 'by'
 func (v *Vector[T]) Convert(by func(T) T) c.Pipe[T, []T] {
-	return it.NewPipe[T](it.Convert(ptr.Of(v.Head()), by))
+	h := ptr.Of(v.Head())
+	return it.NewPipe[T](it.Convert(h, h.Next, by))
 }
 
 // Reduce reduces elements to an one
 func (v *Vector[T]) Reduce(by func(T, T) T) T {
-	return it.Reduce(ptr.Of(v.Head()), by)
+	return it.Reduce(ptr.Of(v.Head()).Next, by)
 }
 
 // Sort sorts the Vector in-place and returns it

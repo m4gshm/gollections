@@ -10,12 +10,12 @@ import (
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/check"
-	"github.com/m4gshm/gollections/it/impl/it"
+	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
 )
 
 // ErrBreak is the 'break' statement of the For, Track methods
-var ErrBreak = it.ErrBreak
+var ErrBreak = loop.ErrBreak
 
 // Of is generic slice constructor
 func Of[T any](elements ...T) []T { return elements }

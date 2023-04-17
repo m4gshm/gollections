@@ -69,15 +69,17 @@ func (s MapValues[K, V]) ForEach(walker func(V)) {
 }
 
 func (s MapValues[K, V]) Filter(filter func(V) bool) c.Pipe[V, []V] {
-	return it.NewPipe[V](it.Filter(ptr.Of(s.Head()), filter))
+	h := ptr.Of(s.Head())
+	return it.NewPipe[V](it.Filter(h, h.Next, filter))
 }
 
 func (s MapValues[K, V]) Convert(by func(V) V) c.Pipe[V, []V] {
-	return it.NewPipe[V](it.Convert(ptr.Of(s.Head()), by))
+	h := ptr.Of(s.Head())
+	return it.NewPipe[V](it.Convert(h, h.Next, by))
 }
 
 func (s MapValues[K, V]) Reduce(by func(V, V) V) V {
-	return it.Reduce(ptr.Of(s.Head()), by)
+	return it.Reduce(ptr.Of(s.Head()).Next, by)
 }
 
 func (s MapValues[K, V]) Sort(less func(e1, e2 V) bool) Vector[V] {

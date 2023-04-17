@@ -180,5 +180,5 @@ func (s Map[K, V]) Convert(by func(K, V) (K, V)) c.MapPipe[K, V, map[K]V] {
 }
 
 func (s Map[K, V]) Reduce(by c.Quaternary[K, V]) (K, V) {
-	return it.ReduceKV(ptr.Of(s.Head()), by)
+	return it.ReduceKV(ptr.Of(s.Head()).Next, by)
 }

@@ -31,5 +31,10 @@ type OfElements[T any] struct {
 
 // By the finish part of an expression first.Of(elements...).By(tester)
 func (l OfElements[T]) By(by func(T) bool) (T, bool) {
-	return first.Of(l.elements, by)
+	return l.Where(by)
+}
+
+// By the finish part of an expression first.Of(elements...).Where(condition)
+func (l OfElements[T]) Where(condition func(T) bool) (T, bool) {
+	return first.Of(l.elements, condition)
 }

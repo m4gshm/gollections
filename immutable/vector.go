@@ -95,15 +95,17 @@ func (v Vector[T]) ForEach(walker func(T)) {
 }
 
 func (v Vector[T]) Filter(filter func(T) bool) c.Pipe[T, []T] {
-	return it.NewPipe[T](it.Filter(ptr.Of(v.Head()), filter))
+	h := ptr.Of(v.Head())
+	return it.NewPipe[T](it.Filter(h, h.Next, filter))
 }
 
 func (v Vector[T]) Convert(by func(T) T) c.Pipe[T, []T] {
-	return it.NewPipe[T](it.Convert(ptr.Of(v.Head()), by))
+	h := ptr.Of(v.Head())
+	return it.NewPipe[T](it.Convert(h, h.Next, by))
 }
 
 func (v Vector[T]) Reduce(by func(T, T) T) T {
-	return it.Reduce(ptr.Of(v.Head()), by)
+	return it.Reduce(ptr.Of(v.Head()).Next, by)
 }
 
 func (v Vector[T]) Sort(less slice.Less[T]) Vector[T] {

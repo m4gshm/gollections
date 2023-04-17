@@ -8,16 +8,17 @@ import (
 )
 
 // FlattenFit is the Iterator wrapper that converts an element to a slice with addition filtering of the element by a Predicate and iterates over the slice.
-type FlattenFit[From, To any, IT c.Iterator[From]] struct {
+type FlattenFit[From, To any, IT any] struct {
 	arrayTo       unsafe.Pointer
 	elemSizeTo    uintptr
 	indTo, sizeTo int
 	iter          IT
+	next          func() (From, bool)
 	flatt         func(From) []To
 	filter        func(From) bool
 }
 
-var _ c.Iterator[any] = (*FlattenFit[any, any, c.Iterator[any]])(nil)
+var _ c.Iterator[any] = (*FlattenFit[any, any, any])(nil)
 
 func (s *FlattenFit[From, To, IT]) Next() (To, bool) {
 	sizeTo := s.sizeTo
@@ -32,7 +33,7 @@ func (s *FlattenFit[From, To, IT]) Next() (To, bool) {
 	}
 
 	for {
-		if v, ok := s.iter.Next(); !ok {
+		if v, ok := s.next(); !ok {
 			var no To
 			return no, false
 		} else if s.filter(v) {
@@ -49,15 +50,16 @@ func (s *FlattenFit[From, To, IT]) Next() (To, bool) {
 
 // Flatten is the Iterator wrapper that converts an element to a slice and iterates over the elements of that slice.
 // For example, Flatten can be used to iterate over all the elements of a multi-dimensional array as if it were a one-dimensional array ([][]int -> []int).
-type Flatten[From, To any, IT c.Iterator[From]] struct {
+type Flatten[From, To, IT any] struct {
 	arrayTo       unsafe.Pointer
 	elemSizeTo    uintptr
 	indTo, sizeTo int
 	iter          IT
+	next          func() (From, bool)
 	flatt         func(From) []To
 }
 
-var _ c.Iterator[any] = (*Flatten[any, any, c.Iterator[any]])(nil)
+var _ c.Iterator[any] = (*Flatten[any, any, any])(nil)
 
 func (s *Flatten[From, To, IT]) Next() (To, bool) {
 	sizeTo := s.sizeTo
@@ -72,7 +74,7 @@ func (s *Flatten[From, To, IT]) Next() (To, bool) {
 	}
 
 	for {
-		if v, ok := s.iter.Next(); !ok {
+		if v, ok := s.next(); !ok {
 			var no To
 			return no, false
 		} else if elementsTo := s.flatt(v); len(elementsTo) > 0 {

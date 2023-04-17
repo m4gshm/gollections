@@ -2,6 +2,7 @@ package it
 
 import (
 	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/loop"
 )
 
 // NewPipe instantiates Pipe based on iterable elements.
@@ -18,23 +19,24 @@ type IterPipe[T any] struct {
 var _ c.Pipe[any, []any] = (*IterPipe[any])(nil)
 
 func (s *IterPipe[T]) Filter(filter func(T) bool) c.Pipe[T, []T] {
-	return NewPipe[T](Filter(s.it, filter))
+	it := s.it
+	return NewPipe[T](Filter(it, it.Next, filter))
 }
 
 func (s *IterPipe[T]) Convert(by func(T) T) c.Pipe[T, []T] {
-	return NewPipe[T](Convert(s.it, by))
+	return NewPipe[T](Convert(s.it, s.it.Next, by))
 }
 
 func (s *IterPipe[T]) ForEach(walker func(T)) {
-	ForEach(s.it, walker)
+	loop.ForEach(s.it.Next, walker)
 }
 
 func (s *IterPipe[T]) For(walker func(T) error) error {
-	return For(s.it, walker)
+	return loop.For(s.it.Next, walker)
 }
 
 func (s *IterPipe[T]) Reduce(by func(T, T) T) T {
-	return Reduce(s.it, by)
+	return Reduce(s.it.Next, by)
 }
 
 func (s *IterPipe[T]) Begin() c.Iterator[T] {

@@ -6,12 +6,12 @@ import (
 
 	"github.com/m4gshm/gollections/as"
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/kvit"
+	"github.com/m4gshm/gollections/loop"
 )
 
 // ErrBreak is For, Track breaker
-var ErrBreak = it.ErrBreak
+var ErrBreak = loop.ErrBreak
 
 // Of creates a map from a slice of key/value pairs.
 func Of[K comparable, V any](elements ...c.KV[K, V]) map[K]V {

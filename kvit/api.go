@@ -18,7 +18,7 @@ func OfPairs[K, V any](pairs ...c.KV[K, V]) c.KVIterator[K, V] {
 
 // WrapPairs instantiates KVIterator using slice as the key\value pairs source
 func WrapPairs[K, V any, P ~[]c.KV[K, V]](pairs P) c.KVIterator[K, V] {
-	return FromPairs(it.Wrap(pairs))
+	return FromPairs[K, V](it.Wrap(pairs))
 }
 
 // FromPairs converts a iterator of key\value pair elements to a KVIterator
@@ -86,5 +86,5 @@ func FilterValue[K comparable, V any](elements c.KVIterator[K, V], fit func(V) b
 
 // Reduce reduces keys/value pairs to an one pair
 func Reduce[K comparable, V any](elements c.KVIterator[K, V], by c.Quaternary[K, V]) (K, V) {
-	return implit.ReduceKV(elements, by)
+	return implit.ReduceKV(elements.Next, by)
 }

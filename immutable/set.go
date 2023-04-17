@@ -92,15 +92,17 @@ func (s Set[T]) ForEach(walker func(T)) {
 }
 
 func (s Set[T]) Filter(filter func(T) bool) c.Pipe[T, []T] {
-	return it.NewPipe[T](it.Filter(s.Head(), filter))
+	h := s.Head()
+	return it.NewPipe[T](it.Filter(h, h.Next, filter))
 }
 
 func (s Set[T]) Convert(by func(T) T) c.Pipe[T, []T] {
-	return it.NewPipe[T](it.Convert(s.Head(), by))
+	h := s.Head()
+	return it.NewPipe[T](it.Convert(h, h.Next, by))
 }
 
 func (s Set[T]) Reduce(by func(T, T) T) T {
-	return it.Reduce(s.Head(), by)
+	return it.Reduce(s.Head().Next, by)
 }
 
 func (s Set[T]) Contains(val T) bool {

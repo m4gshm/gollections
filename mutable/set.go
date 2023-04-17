@@ -157,15 +157,17 @@ func (s Set[K]) ForEach(walker func(K)) {
 }
 
 func (s Set[K]) Filter(filter func(K) bool) c.Pipe[K, []K] {
-	return it.NewPipe[K](it.Filter(s.Head(), filter))
+	h := s.Head()
+	return it.NewPipe[K](it.Filter(h, h.Next, filter))
 }
 
 func (s Set[K]) Convert(by func(K) K) c.Pipe[K, []K] {
-	return it.NewPipe[K](it.Convert(s.Head(), by))
+	h := s.Head()
+	return it.NewPipe[K](it.Convert(h, h.Next, by))
 }
 
 func (s Set[K]) Reduce(by func(K, K) K) K {
-	return it.Reduce(s.Head(), by)
+	return it.Reduce(s.Head().Next, by)
 }
 
 // Sort transforms to the ordered Set contains sorted elements.

@@ -12,6 +12,7 @@ import (
 	"github.com/m4gshm/gollections/it"
 	impl "github.com/m4gshm/gollections/it/impl/it"
 	sliceit "github.com/m4gshm/gollections/it/slice"
+	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/ptr"
 	"github.com/m4gshm/gollections/slice"
@@ -25,10 +26,10 @@ func Test_FilterAndConvert(t *testing.T) {
 	)
 	items := []int{1, 2, 3, 4, 5}
 	converted := it.FilterAndConvert(it.Wrap(items), func(v int) bool { return v%2 == 0 }, convert.And(toString, addTail))
-	assert.Equal(t, slice.Of("2_tail", "4_tail"), it.ToSlice(converted))
+	assert.Equal(t, slice.Of("2_tail", "4_tail"), loop.ToSlice(converted.Next))
 
 	converted2 := sliceit.FilterAndConvert(items, func(v int) bool { return v%2 == 0 }, convert.And(toString, addTail))
-	assert.Equal(t, slice.Of("2_tail", "4_tail"), it.ToSlice(converted2))
+	assert.Equal(t, slice.Of("2_tail", "4_tail"), loop.ToSlice(converted2.Next))
 
 	//plain old style
 	convertedOld := make([]string, 0)
@@ -130,10 +131,10 @@ func Test_ConvertFlattStructure_Iterable(t *testing.T) {
 
 	items := []*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil, {attributes: []*Attributes{{name: "third"}, nil}}}
 
-	names := it.ToSlice(it.Convert(it.Flatt(it.Wrap(items), (*Participant).GetAttributes), (*Attributes).GetName))
+	names := loop.ToSlice(it.Convert(it.Flatt(it.Wrap(items), (*Participant).GetAttributes), (*Attributes).GetName).Next)
 	assert.Equal(t, expected, names)
 
-	names = it.ToSlice(it.Convert(sliceit.Flatt(items, (*Participant).GetAttributes), (*Attributes).GetName))
+	names = loop.ToSlice(it.Convert(sliceit.Flatt(items, (*Participant).GetAttributes), (*Attributes).GetName).Next)
 	assert.Equal(t, expected, names)
 }
 
@@ -142,10 +143,10 @@ func Test_ConvertFilterAndFlattStructure_Iterable(t *testing.T) {
 
 	items := []*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil, {attributes: []*Attributes{{name: "third"}, nil}}}
 
-	names := it.ToSlice(it.Convert(it.FilterAndFlatt(it.Wrap(items), check.NotNil[Participant], (*Participant).GetAttributes), (*Attributes).GetName))
+	names := loop.ToSlice(it.Convert(it.FilterAndFlatt(it.Wrap(items), check.NotNil[Participant], (*Participant).GetAttributes), (*Attributes).GetName).Next)
 	assert.Equal(t, expected, names)
 
-	names = it.ToSlice(it.Convert(sliceit.FilterAndFlatt(items, check.NotNil[Participant], (*Participant).GetAttributes), (*Attributes).GetName))
+	names = loop.ToSlice(it.Convert(sliceit.FilterAndFlatt(items, check.NotNil[Participant], (*Participant).GetAttributes), (*Attributes).GetName).Next)
 	assert.Equal(t, expected, names)
 }
 

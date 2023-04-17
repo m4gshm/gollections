@@ -5,18 +5,19 @@ import (
 )
 
 // Fit is the Iterator wrapper that provides filtering of elements by a Predicate.
-type Fit[T any, IT c.Iterator[T]] struct {
+type Fit[T, IT any] struct {
 	iter IT
+	next func() (T, bool)
 	by   func(T) bool
 }
 
 var (
-	_ c.Iterator[any] = (*Fit[any, c.Iterator[any]])(nil)
-	_ c.Iterator[any] = Fit[any, c.Iterator[any]]{}
+	_ c.Iterator[any] = (*Fit[any, any])(nil)
+	_ c.Iterator[any] = Fit[any, any]{}
 )
 
 func (s Fit[T, IT]) Next() (T, bool) {
-	return nextFiltered(s.iter, s.by)
+	return nextFiltered(s.next, s.by)
 }
 
 // FitKV is the KVIterator wrapper that provides filtering of key/value elements by a Predicate.
@@ -34,8 +35,8 @@ func (s FitKV[K, V, IT]) Next() (K, V, bool) {
 	return nextFilteredKV(s.iter, s.by)
 }
 
-func nextFiltered[T any, IT c.Iterator[T]](iter IT, filter func(T) bool) (T, bool) {
-	for v, ok := iter.Next(); ok; v, ok = iter.Next() {
+func nextFiltered[T any](next func() (T, bool), filter func(T) bool) (T, bool) {
+	for v, ok := next(); ok; v, ok = next() {
 		if filter(v) {
 			return v, true
 		}

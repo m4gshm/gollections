@@ -5,19 +5,20 @@ import (
 )
 
 // ConvertFitIter is the Converter with elements filtering.
-type ConvertFitIter[From, To any, IT c.Iterator[From]] struct {
+type ConvertFitIter[From, To, IT any] struct {
 	iter   IT
+	next   func() (From, bool)
 	by     func(From) To
 	filter func(From) bool
 }
 
 var (
-	_ c.Iterator[any] = ConvertFitIter[any, any, c.Iterator[any]]{}
-	_ c.Iterator[any] = (*ConvertFitIter[any, any, c.Iterator[any]])(nil)
+	_ c.Iterator[any] = ConvertFitIter[any, any, any]{}
+	_ c.Iterator[any] = (*ConvertFitIter[any, any, any])(nil)
 )
 
 func (s ConvertFitIter[From, To, IT]) Next() (To, bool) {
-	if V, ok := nextFiltered(s.iter, s.filter); ok {
+	if V, ok := nextFiltered(s.next, s.filter); ok {
 		return s.by(V), true
 	}
 	var no To
@@ -25,18 +26,19 @@ func (s ConvertFitIter[From, To, IT]) Next() (To, bool) {
 }
 
 // ConvertIter is the iterator wrapper implementation applying a converter to all iterable elements.
-type ConvertIter[From, To any, IT c.Iterator[From], C func(From) To] struct {
+type ConvertIter[From, To any, IT any] struct {
 	iter IT
-	by   C
+	next func() (From, bool)
+	by   func(From) To
 }
 
 var (
-	_ c.Iterator[any] = ConvertIter[any, any, c.Iterator[any], func(any) any]{}
-	_ c.Iterator[any] = (*ConvertIter[any, any, c.Iterator[any], func(any) any])(nil)
+	_ c.Iterator[any] = ConvertIter[any, any, any]{}
+	_ c.Iterator[any] = (*ConvertIter[any, any, any])(nil)
 )
 
-func (s ConvertIter[From, To, IT, C]) Next() (To, bool) {
-	if v, ok := s.iter.Next(); ok {
+func (s ConvertIter[From, To, IT]) Next() (To, bool) {
+	if v, ok := s.next(); ok {
 		return s.by(v), true
 	}
 	var no To

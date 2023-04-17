@@ -4,15 +4,17 @@ import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/it/impl/it"
+	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/ptr"
 )
 
-// ErrBreak is For, Track breaker
-var ErrBreak = it.ErrBreak
-
 // Of instantiates Iterator of predefined elements
 func Of[T any](elements ...T) c.Iterator[T] {
+	return ptr.Of(it.NewHead(elements))
+}
+
+func New[T any](elements []T) c.Iterator[T] {
 	return ptr.Of(it.NewHead(elements))
 }
 
@@ -24,33 +26,33 @@ func OfLoop[S, T any](source S, hasNext func(S) bool, getNext func(S) (T, error)
 }
 
 // Wrap instantiates Iterator using slice as the elements source
-func Wrap[TS ~[]T, T any](elements TS) c.Iterator[T] {
+func Wrap[TS ~[]T, T any](elements TS) *it.ArrayIter[T] {
 	return ptr.Of(it.NewHead(elements))
 }
 
 // Convert instantiates Iterator that converts elements with a converter and returns them
-func Convert[From, To any, IT c.Iterator[From]](elements IT, converter func(From) To) c.Iterator[To] {
-	return it.Convert(elements, converter)
+func Convert[From, To any, IT c.Iterator[From]](elements IT, converter func(From) To) it.ConvertIter[From, To, IT] {
+	return it.Convert(elements, elements.Next, converter)
 }
 
 // FilterAndConvert additionally filters 'From' elements.
-func FilterAndConvert[From, To any, IT c.Iterator[From]](elements IT, filter func(From) bool, converter func(From) To) c.Iterator[To] {
-	return it.FilterAndConvert(elements, filter, converter)
+func FilterAndConvert[From, To any, IT c.Iterator[From]](elements IT, filter func(From) bool, converter func(From) To) it.ConvertFitIter[From, To, IT] {
+	return it.FilterAndConvert(elements, elements.Next, filter, converter)
 }
 
 // Flatt instantiates Iterator that extracts slices of 'To' by a Flatter from elements of 'From' and flattens as one iterable collection of 'To' elements
-func Flatt[From, To any, IT c.Iterator[From]](elements IT, flatt func(From) []To) c.Iterator[To] {
-	return ptr.Of(it.Flatt(elements, flatt))
+func Flatt[From, To any, IT c.Iterator[From]](elements IT, flatt func(From) []To) *it.Flatten[From, To, IT] {
+	return ptr.Of(it.Flatt(elements, elements.Next, flatt))
 }
 
 // FilterAndFlatt additionally filters 'From' elements
 func FilterAndFlatt[From, To any, IT c.Iterator[From]](elements IT, filter func(From) bool, flatt func(From) []To) c.Iterator[To] {
-	return ptr.Of(it.FilterAndFlatt(elements, filter, flatt))
+	return ptr.Of(it.FilterAndFlatt(elements, elements.Next, filter, flatt))
 }
 
 // Filter instantiates Iterator that checks elements by a filter and returns successful ones
 func Filter[T any, IT c.Iterator[T]](elements IT, filter func(T) bool) c.Iterator[T] {
-	return it.Filter(elements, filter)
+	return it.Filter(elements, elements.Next, filter)
 }
 
 // NotNil instantiates Iterator that filters nullable elements
@@ -60,12 +62,12 @@ func NotNil[T any, IT c.Iterator[*T]](elements IT) c.Iterator[*T] {
 
 // Reduce reduces elements to an one
 func Reduce[T any, IT c.Iterator[T]](elements IT, by func(T, T) T) T {
-	return it.Reduce(elements, by)
+	return it.Reduce(elements.Next, by)
 }
 
 // ReduceKV reduces key/value elements to an one
 func ReduceKV[K, V any, IT c.KVIterator[K, V]](elements IT, by c.Quaternary[K, V]) (K, V) {
-	return it.ReduceKV(elements, by)
+	return it.ReduceKV(elements.Next, by)
 }
 
 // ToSlice converts an Iterator to a slice
@@ -80,25 +82,25 @@ func Group[T any, K comparable](elements c.Iterator[T], by func(T) K) c.MapPipe[
 
 // ForEach applies a walker to elements of an Iterator
 func ForEach[T any, IT c.Iterator[T]](elements IT, walker func(T)) {
-	it.ForEach(elements, walker)
+	loop.ForEach(elements.Next, walker)
 }
 
 // ForEachFiltered applies a walker to elements that satisfy a predicate condition
 func ForEachFiltered[T any](elements c.Iterator[T], walker func(T), filter func(T) bool) {
-	it.ForEachFiltered(elements, walker, filter)
+	loop.ForEachFiltered(elements.Next, walker, filter)
 }
 
 // Sum returns the sum of all elements
 func Sum[T c.Summable, IT c.Iterator[T]](elements IT) T {
-	return it.Reduce(elements, op.Sum[T])
+	return it.Reduce(elements.Next, op.Sum[T])
 }
 
 // First returns the first element that satisfies requirements of the predicate 'filter'
 func First[T any, IT c.Iterator[T]](elements IT, filter func(T) bool) (T, bool) {
-	return it.First(elements, filter)
+	return loop.First(elements.Next, filter)
 }
 
 // ToPairs converts a c.Iterator to a c.KVIterator using key and value extractors
 func ToPairs[T, K, V any](elements c.Iterator[T], keyExtractor func(T) K, valExtractor func(T) V) c.KVIterator[K, V] {
-	return ptr.Of(it.NewKeyValuer(elements, keyExtractor, valExtractor))
+	return ptr.Of(it.NewKeyValuer(elements, elements.Next, keyExtractor, valExtractor))
 }

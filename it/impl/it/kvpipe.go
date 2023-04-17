@@ -54,7 +54,7 @@ func (s *KVIterPipe[K, V, C]) Track(tracker func(K, V) error) error {
 }
 
 func (s *KVIterPipe[K, V, C]) Reduce(by c.Quaternary[K, V]) (K, V) {
-	return ReduceKV(s.it, by)
+	return ReduceKV(s.it.Next, by)
 }
 
 func (s *KVIterPipe[K, V, C]) Begin() c.KVIterator[K, V] {

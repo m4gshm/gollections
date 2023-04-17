@@ -4,13 +4,13 @@ package slice
 import (
 	"errors"
 
-	"github.com/m4gshm/gollections/it"
+	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
 )
 
 // ErrBreak is Convert, Filter loops breaker
-var ErrBreak = it.ErrBreak
+var ErrBreak = loop.ErrBreak
 
 // ErrIgnore is Convert, Filter element exclude from loop marker
 var ErrIgnore = errors.New("Ignore")

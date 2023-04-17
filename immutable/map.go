@@ -164,5 +164,5 @@ func (m Map[K, V]) Convert(by func(K, V) (K, V)) c.MapPipe[K, V, map[K]V] {
 
 // Reduce reduces key\value pairs to an one.
 func (m Map[K, V]) Reduce(by c.Quaternary[K, V]) (K, V) {
-	return it.ReduceKV(ptr.Of(m.Head()), by)
+	return it.ReduceKV(ptr.Of(m.Head()).Next, by)
 }

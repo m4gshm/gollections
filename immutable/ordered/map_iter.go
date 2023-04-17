@@ -17,7 +17,10 @@ type ValIter[K comparable, V any] struct {
 	current  int
 }
 
-var _ c.Iterator[any] = (*ValIter[int, any])(nil)
+var (
+	_ c.Iterator[any] = (*ValIter[int, any])(nil)
+	_ c.Sized         = (*ValIter[int, any])(nil)
+)
 
 func (s *ValIter[K, V]) Next() (V, bool) {
 	if it.HasNext(s.elements, s.current) {
