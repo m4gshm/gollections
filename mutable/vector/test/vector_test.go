@@ -5,6 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/m4gshm/gollections/it"
 	"github.com/m4gshm/gollections/mutable/vector"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
@@ -115,6 +116,14 @@ func Test_Vector_Add(t *testing.T) {
 	vec.Add(1, 1, 2, 4, 3, 1)
 	assert.Equal(t, slice.Of(1, 1, 2, 4, 3, 1), vec.Slice())
 	vec.Add(1)
+	assert.Equal(t, slice.Of(1, 1, 2, 4, 3, 1, 1), vec.Slice())
+}
+
+func Test_Vector_AddAll(t *testing.T) {
+	vec := vector.NewCap[int](0)
+	vec.AddAll(it.Of(1, 1, 2, 4, 3, 1))
+	assert.Equal(t, slice.Of(1, 1, 2, 4, 3, 1), vec.Slice())
+	vec.AddAll(vector.Of(1).Begin())
 	assert.Equal(t, slice.Of(1, 1, 2, 4, 3, 1, 1), vec.Slice())
 }
 

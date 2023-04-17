@@ -209,6 +209,10 @@ type AddableNew[T any] interface {
 	AddNewOne(T) bool
 }
 
+type AddableAll[T any] interface {
+	AddAll(Iterator[T])
+}
+
 // Settable provides element insertion or replacement by its pointer (index or key).
 type Settable[P any, V any] interface {
 	Set(key P, value V)

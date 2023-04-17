@@ -60,6 +60,16 @@ func Test_Set_AddVerify(t *testing.T) {
 	assert.Equal(t, slice.Of(1, 2, 3, 4), values)
 }
 
+func Test_Set_AddAll(t *testing.T) {
+	set := set.NewCap[int](0)
+	set.AddAll(it.Wrap(slice.Of(1, 2, 4, 3)))
+	set.AddAll(it.Of(4, 3))
+
+	values := sort.Of(set.Slice())
+
+	assert.Equal(t, slice.Of(1, 2, 3, 4), values)
+}
+
 func Test_Set_Delete(t *testing.T) {
 	set := set.Of(1, 1, 2, 4, 3, 1)
 	values := set.Collect()

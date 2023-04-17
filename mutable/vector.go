@@ -32,6 +32,7 @@ type Vector[T any] []T
 
 var (
 	_ c.Addable[any]          = (*Vector[any])(nil)
+	_ c.AddableAll[any]       = (*Vector[any])(nil)
 	_ c.Deleteable[int]       = (*Vector[any])(nil)
 	_ c.DeleteableVerify[int] = (*Vector[any])(nil)
 	_ c.Settable[int, any]    = (*Vector[any])(nil)
@@ -139,6 +140,10 @@ func (v *Vector[T]) Add(elements ...T) {
 // AddOne adds a element to the end of the vector
 func (v *Vector[T]) AddOne(element T) {
 	*v = append(*v, element)
+}
+
+func (v *Vector[T]) AddAll(elements c.Iterator[T]) {
+	*v = append(*v, loop.ToSlice(elements.Next)...)
 }
 
 // Delete removes a element by the index

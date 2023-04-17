@@ -52,12 +52,14 @@ type Set[K comparable] struct {
 var (
 	_ c.Addable[int]          = (*Set[int])(nil)
 	_ c.AddableNew[int]       = (*Set[int])(nil)
+	_ c.AddableAll[int]       = (*Set[int])(nil)
 	_ c.Deleteable[int]       = (*Set[int])(nil)
 	_ c.DeleteableVerify[int] = (*Set[int])(nil)
 	_ c.Set[int]              = (*Set[int])(nil)
 	_ fmt.Stringer            = (*Set[int])(nil)
 	_ c.Addable[int]          = Set[int]{}
 	_ c.AddableNew[int]       = Set[int]{}
+	_ c.AddableAll[int]       = Set[int]{}
 	_ c.Deleteable[int]       = Set[int]{}
 	_ c.DeleteableVerify[int] = Set[int]{}
 	_ c.Set[int]              = Set[int]{}
@@ -125,6 +127,10 @@ func (s Set[K]) AddNewOne(element K) bool {
 		s.elements[element] = struct{}{}
 	}
 	return ok
+}
+
+func (s Set[T]) AddAll(elements c.Iterator[T]) {
+	loop.ForEach(elements.Next, s.AddOne)
 }
 
 func (s Set[K]) Delete(elements ...K) {
