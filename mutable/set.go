@@ -53,6 +53,7 @@ var (
 	_ c.Addable[int]          = (*Set[int])(nil)
 	_ c.AddableNew[int]       = (*Set[int])(nil)
 	_ c.AddableAll[int]       = (*Set[int])(nil)
+	_ c.AddableAllNew[int]    = (*Set[int])(nil)
 	_ c.Deleteable[int]       = (*Set[int])(nil)
 	_ c.DeleteableVerify[int] = (*Set[int])(nil)
 	_ c.Set[int]              = (*Set[int])(nil)
@@ -60,6 +61,7 @@ var (
 	_ c.Addable[int]          = Set[int]{}
 	_ c.AddableNew[int]       = Set[int]{}
 	_ c.AddableAll[int]       = Set[int]{}
+	_ c.AddableAllNew[int]    = Set[int]{}
 	_ c.Deleteable[int]       = Set[int]{}
 	_ c.DeleteableVerify[int] = Set[int]{}
 	_ c.Set[int]              = Set[int]{}
@@ -116,12 +118,12 @@ func (s Set[K]) AddOne(element K) {
 func (s Set[K]) AddNew(elements ...K) bool {
 	ok := false
 	for _, element := range elements {
-		ok = s.AddNewOne(element) || ok
+		ok = s.AddOneNew(element) || ok
 	}
 	return ok
 }
 
-func (s Set[K]) AddNewOne(element K) bool {
+func (s Set[K]) AddOneNew(element K) bool {
 	ok := !s.Contains(element)
 	if ok {
 		s.elements[element] = struct{}{}
@@ -129,8 +131,14 @@ func (s Set[K]) AddNewOne(element K) bool {
 	return ok
 }
 
-func (s Set[T]) AddAll(elements c.Iterator[T]) {
-	loop.ForEach(elements.Next, s.AddOne)
+func (s Set[T]) AddAll(elements c.Iterable[c.Iterator[T]]) {
+	loop.ForEach(elements.Begin().Next, s.AddOne)
+}
+
+func (s Set[T]) AddAllNew(elements c.Iterable[c.Iterator[T]]) bool {
+	var ok bool
+	loop.ForEach(elements.Begin().Next, func(v T) { ok = s.AddOneNew(v) || ok })
+	return ok
 }
 
 func (s Set[K]) Delete(elements ...K) {

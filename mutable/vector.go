@@ -142,7 +142,11 @@ func (v *Vector[T]) AddOne(element T) {
 	*v = append(*v, element)
 }
 
-func (v *Vector[T]) AddAll(elements c.Iterator[T]) {
+func (v *Vector[T]) AddAll(elements c.Iterable[c.Iterator[T]]) {
+	*v = append(*v, loop.ToSlice(elements.Begin().Next)...)
+}
+
+func (v *Vector[T]) AddAllNew(elements c.Iterator[T]) {
 	*v = append(*v, loop.ToSlice(elements.Next)...)
 }
 

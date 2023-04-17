@@ -66,6 +66,7 @@ var (
 	_ c.Addable[int]          = (*Set[int])(nil)
 	_ c.AddableNew[int]       = (*Set[int])(nil)
 	_ c.AddableAll[int]       = (*Set[int])(nil)
+	_ c.AddableAllNew[int]    = (*Set[int])(nil)
 	_ c.Deleteable[int]       = (*Set[int])(nil)
 	_ c.DeleteableVerify[int] = (*Set[int])(nil)
 	_ c.Set[int]              = (*Set[int])(nil)
@@ -116,12 +117,12 @@ func (s *Set[T]) Contains(v T) bool {
 func (s *Set[T]) AddNew(elements ...T) bool {
 	ok := false
 	for i := range elements {
-		ok = s.AddNewOne(elements[i]) || ok
+		ok = s.AddOneNew(elements[i]) || ok
 	}
 	return ok
 }
 
-func (s *Set[T]) AddNewOne(v T) bool {
+func (s *Set[T]) AddOneNew(v T) bool {
 	u := s.uniques
 	if _, ok := u[v]; !ok {
 		e := s.elements
@@ -137,11 +138,17 @@ func (s *Set[T]) Add(elements ...T) {
 }
 
 func (s *Set[T]) AddOne(v T) {
-	s.AddNewOne(v)
+	s.AddOneNew(v)
 }
 
-func (s *Set[T]) AddAll(elements c.Iterator[T]) {
-	loop.ForEach(elements.Next, s.AddOne)
+func (s *Set[T]) AddAll(elements c.Iterable[c.Iterator[T]]) {
+	loop.ForEach(elements.Begin().Next, s.AddOne)
+}
+
+func (s *Set[T]) AddAllNew(elements c.Iterable[c.Iterator[T]]) bool {
+	var ok bool
+	loop.ForEach(elements.Begin().Next, func(v T) { ok = s.AddOneNew(v) || ok })
+	return ok
 }
 
 func (s *Set[T]) Delete(elements ...T) {

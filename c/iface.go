@@ -206,11 +206,15 @@ type Addable[T any] interface {
 // AddableNew provides appending the collection by elements.
 type AddableNew[T any] interface {
 	AddNew(...T) bool
-	AddNewOne(T) bool
+	AddOneNew(T) bool
 }
 
 type AddableAll[T any] interface {
-	AddAll(Iterator[T])
+	AddAll(Iterable[Iterator[T]])
+}
+
+type AddableAllNew[T any] interface {
+	AddAllNew(Iterable[Iterator[T]]) bool
 }
 
 // Settable provides element insertion or replacement by its pointer (index or key).

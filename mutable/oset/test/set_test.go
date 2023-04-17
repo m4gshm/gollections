@@ -10,6 +10,7 @@ import (
 	"github.com/m4gshm/gollections/it"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/mutable/oset"
+	"github.com/m4gshm/gollections/mutable/vector"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/walk/group"
@@ -45,11 +46,35 @@ func Test_Set_AddVerify(t *testing.T) {
 	set := oset.NewCap[int](0)
 	added := set.AddNew(1, 2, 4, 3)
 	assert.Equal(t, added, true)
-	added = set.AddNewOne(1)
+	added = set.AddOneNew(1)
 	assert.Equal(t, added, false)
 
 	values := set.Slice()
 
+	assert.Equal(t, slice.Of(1, 2, 4, 3), values)
+}
+
+func Test_Set_AddAll(t *testing.T) {
+	set := oset.NewCap[int](0)
+	set.AddAll(vector.Of(1, 2))
+	set.AddAll(vector.Of(4, 3))
+
+	values := set.Slice()
+
+	assert.Equal(t, slice.Of(1, 2, 4, 3), values)
+}
+
+func Test_Set_AddAllNew(t *testing.T) {
+	set := oset.NewCap[int](0)
+	added := set.AddAllNew(vector.Of(1, 2))
+	assert.True(t, added)
+	//4, 3 are new
+	added = set.AddAllNew(vector.Of(1, 4, 3))
+	assert.True(t, added)
+	added = set.AddAllNew(vector.Of(2, 4, 3))
+	assert.False(t, added)
+
+	values := set.Slice()
 	assert.Equal(t, slice.Of(1, 2, 4, 3), values)
 }
 
