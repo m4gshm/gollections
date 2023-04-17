@@ -17,11 +17,11 @@ type Map[K comparable, V any] struct {
 }
 
 var (
-	_ c.Settable[int, any]  = (*Map[int, any])(nil)
-	_ c.Deleteable[int]     = (*Map[int, any])(nil)
-	_ c.Removable[int, any] = (*Map[int, any])(nil)
-	_ c.TrackEach[any, int] = (*Map[int, any])(nil)
-	_ c.Access[int, any]    = (*Map[int, any])(nil)
+	_ c.Settable[int, any]      = (*Map[int, any])(nil)
+	_ c.Deleteable[int]         = (*Map[int, any])(nil)
+	_ c.Removable[int, any]     = (*Map[int, any])(nil)
+	_ c.TrackEachLoop[any, int] = (*Map[int, any])(nil)
+	_ c.Access[int, any]        = (*Map[int, any])(nil)
 )
 
 func (m *Map[K, V]) TrackEach(traker func(key K, value V)) {

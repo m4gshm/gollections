@@ -27,8 +27,8 @@ type Container[Collection any, IT any] interface {
 //	IT - a iterator type  (Iterator, KVIterator)
 type Collection[T any, Collection any, IT any] interface {
 	Container[Collection, IT]
-	Walk[T]
-	WalkEach[T]
+	ForLoop[T]
+	ForEachLoop[T]
 	Len() int
 	IsEmpty() bool
 }
@@ -36,8 +36,8 @@ type Collection[T any, Collection any, IT any] interface {
 // Vector - collection interface that provides elements order and access by index to the elements.
 type Vector[T any] interface {
 	Collection[T, []T, Iterator[T]]
-	Track[T, int]
-	TrackEach[T, int]
+	TrackLoop[T, int]
+	TrackEachLoop[T, int]
 	Access[int, T]
 	Transformable[T, []T]
 }
@@ -52,8 +52,8 @@ type Set[T any] interface {
 // Map - collection interface that stores key/value pairs and provide access to an element by its key
 type Map[K comparable, V any] interface {
 	Collection[KV[K, V], map[K]V, KVIterator[K, V]]
-	Track[V, K]
-	TrackEach[V, K]
+	TrackLoop[V, K]
+	TrackEachLoop[V, K]
 	Checkable[K]
 	Access[K, V]
 	MapTransformable[K, V, map[K]V]
@@ -111,25 +111,25 @@ type Iterable[IT any] interface {
 	Begin() IT
 }
 
-// Walk is the interface of a collection that provides traversing of the elements.
-type Walk[IT any] interface {
+// ForLoop is the interface of a collection that provides traversing of the elements.
+type ForLoop[IT any] interface {
 	// return ErrBreak for loop breaking
 	For(func(element IT) error) error
 }
 
-// WalkEach is the interface of a collection that provides traversing of the elements without error checking.
-type WalkEach[T any] interface {
+// ForEachLoop is the interface of a collection that provides traversing of the elements without error checking.
+type ForEachLoop[T any] interface {
 	ForEach(func(element T))
 }
 
-// Track is the interface of a collection that provides traversing of the elements with position tracking (index, key, coordinates, etc.).
-type Track[T any, P any] interface {
+// TrackLoop is the interface of a collection that provides traversing of the elements with position tracking (index, key, coordinates, etc.).
+type TrackLoop[T any, P any] interface {
 	// return ErrBreak for loop breaking
 	Track(func(position P, element T) error) error
 }
 
-// TrackEach is the interface of a collection that provides traversing of the elements with position tracking (index, key, coordinates, etc.) without error checking
-type TrackEach[T any, P any] interface {
+// TrackEachLoop is the interface of a collection that provides traversing of the elements with position tracking (index, key, coordinates, etc.) without error checking
+type TrackEachLoop[T any, P any] interface {
 	TrackEach(func(position P, element T))
 }
 
@@ -149,8 +149,8 @@ type Transformable[T any, Collection any] interface {
 type Pipe[T any, Collection any] interface {
 	Transformable[T, Collection]
 	Container[Collection, Iterator[T]]
-	Walk[T]
-	WalkEach[T]
+	ForLoop[T]
+	ForEachLoop[T]
 	Reduce(func(T, T) T) T
 }
 
