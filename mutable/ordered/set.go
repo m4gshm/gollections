@@ -85,6 +85,14 @@ func (s *Set[T]) Head() *SetIter[T] {
 	return NewSetIter(&s.elements, s.DeleteOne)
 }
 
+func (s *Set[T]) First() (*SetIter[T], T, bool) {
+	var (
+		iterator  = s.Head()
+		first, ok = iterator.Next()
+	)
+	return iterator, first, ok
+}
+
 func (s *Set[T]) Slice() []T {
 	return slice.Clone(s.elements)
 }

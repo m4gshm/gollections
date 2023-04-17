@@ -80,6 +80,14 @@ func (s Set[K]) Head() *SetIter[K] {
 	return NewSetIter(s.elements, s.DeleteOne)
 }
 
+func (s Set[K]) First() (*SetIter[K], K, bool) {
+	var (
+		iterator  = s.Head()
+		first, ok = iterator.Next()
+	)
+	return iterator, first, ok
+}
+
 func (s Set[K]) Slice() []K {
 	return map_.Keys(s.elements)
 }

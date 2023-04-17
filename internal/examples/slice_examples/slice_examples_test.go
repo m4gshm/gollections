@@ -8,7 +8,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/m4gshm/gollections/as"
-	"github.com/m4gshm/gollections/convert"
 	"github.com/m4gshm/gollections/first"
 	"github.com/m4gshm/gollections/immutable/set"
 	"github.com/m4gshm/gollections/last"
