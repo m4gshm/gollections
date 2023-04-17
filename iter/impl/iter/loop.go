@@ -1,4 +1,4 @@
-package it
+package iter
 
 import "github.com/m4gshm/gollections/c"
 

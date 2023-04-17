@@ -5,7 +5,7 @@ import (
 	"sort"
 
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/it/impl/it"
+	"github.com/m4gshm/gollections/iter/impl/iter"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/notsafe"
 	"github.com/m4gshm/gollections/slice"
@@ -67,20 +67,20 @@ func (v *Vector[T]) Tail() Iter[Vector[T], T] {
 // If no more elements then returns false in the last value.
 func (v *Vector[T]) First() (Iter[Vector[T], T], T, bool) {
 	var (
-		iter      = NewHead(v, v.DeleteActualOne)
-		first, ok = iter.Next()
+		iterator  = NewHead(v, v.DeleteActualOne)
+		first, ok = iterator.Next()
 	)
-	return iter, first, ok
+	return iterator, first, ok
 }
 
 // Last returns the last element of the vector, an iterator to iterate over the remaining elements, and true\false marker of availability prev elements.
 // If no more elements then returns false in the last value.
 func (v *Vector[T]) Last() (Iter[Vector[T], T], T, bool) {
 	var (
-		iter      = NewTail(v, v.DeleteActualOne)
-		first, ok = iter.Prev()
+		iterator  = NewTail(v, v.DeleteActualOne)
+		first, ok = iterator.Prev()
 	)
-	return iter, first, ok
+	return iterator, first, ok
 }
 
 // Collect transforms the vector to a slice
@@ -249,13 +249,13 @@ func (v *Vector[T]) SetNew(index int, value T) bool {
 // Filter returns a pipe consisting of vector elements matching the filter
 func (v *Vector[T]) Filter(filter func(T) bool) c.Pipe[T, []T] {
 	h := v.Head()
-	return it.NewPipe[T](it.Filter(h, h.Next, filter))
+	return iter.NewPipe[T](iter.Filter(h, h.Next, filter))
 }
 
 // Map returns a pipe of converted vector elements by the converter 'by'
 func (v *Vector[T]) Convert(by func(T) T) c.Pipe[T, []T] {
 	h := v.Head()
-	return it.NewPipe[T](it.Convert(h, h.Next, by))
+	return iter.NewPipe[T](iter.Convert(h, h.Next, by))
 }
 
 // Reduce reduces elements to an one

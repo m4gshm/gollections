@@ -4,7 +4,7 @@ import (
 	"golang.org/x/exp/constraints"
 
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/it/impl/it"
+	"github.com/m4gshm/gollections/iter/impl/iter"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/mutable"
 )
@@ -36,11 +36,11 @@ func Sort[T any, F constraints.Ordered](v *mutable.Vector[T], by func(T) F) *mut
 
 func Convert[From, To any](s *mutable.Vector[From], by func(From) To) c.Pipe[To, []To] {
 	h := s.Head()
-	return it.NewPipe[To](it.Convert(h, h.Next, by))
+	return iter.NewPipe[To](iter.Convert(h, h.Next, by))
 }
 
 func Flatt[From, To any](v *mutable.Vector[From], by func(From) []To) c.Pipe[To, []To] {
 	h := v.Head()
-	f := it.Flatt(h, h.Next, by)
-	return it.NewPipe[To](&f)
+	f := iter.Flatt(h, h.Next, by)
+	return iter.NewPipe[To](&f)
 }

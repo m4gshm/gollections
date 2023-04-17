@@ -9,10 +9,10 @@ import (
 	"github.com/m4gshm/gollections/convert"
 	"github.com/m4gshm/gollections/first"
 	"github.com/m4gshm/gollections/immutable/vector"
-	"github.com/m4gshm/gollections/it"
-	iterimpl "github.com/m4gshm/gollections/it/impl/it"
-	sliceitimpl "github.com/m4gshm/gollections/it/impl/slice"
-	sliceit "github.com/m4gshm/gollections/it/slice"
+	"github.com/m4gshm/gollections/iter"
+	iterimpl "github.com/m4gshm/gollections/iter/impl/iter"
+	sliceitimpl "github.com/m4gshm/gollections/iter/impl/slice"
+	sliceit "github.com/m4gshm/gollections/iter/slice"
 	"github.com/m4gshm/gollections/iterable"
 	"github.com/m4gshm/gollections/last"
 	"github.com/m4gshm/gollections/loop"
@@ -72,7 +72,7 @@ func Benchmark_First_Iterator(b *testing.B) {
 	var f int
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		f, _ = it.First(it.Of(values...), op)
+		f, _ = iter.First(iter.Of(values...), op)
 	}
 	b.StopTimer()
 	assert.Equal(b, threshhold+1, f)
@@ -116,7 +116,7 @@ func Benchmark_Map_Iterator(b *testing.B) {
 	var s []string
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		s = it.ToSlice(it.Convert(it.Of(values...), op))
+		s = iter.ToSlice(iter.Convert(iter.Of(values...), op))
 	}
 	_ = s
 	b.StopTimer()
@@ -195,7 +195,7 @@ func Benchmark_MapAndFilter_Iterable(b *testing.B) {
 	var s []string
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		s = it.ToSlice(it.Convert(it.Filter(it.Wrap(items), even), convert.And(toString, addTail)))
+		s = iter.ToSlice(iter.Convert(iter.Filter(iter.Wrap(items), even), convert.And(toString, addTail)))
 	}
 	_ = s
 
@@ -235,7 +235,7 @@ func Benchmark_MapAndFilter_Slice(b *testing.B) {
 	var s []string
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		s = it.ToSlice(it.Convert(sliceit.Filter(items, even), convert.And(toString, addTail)))
+		s = iter.ToSlice(iter.Convert(sliceit.Filter(items, even), convert.And(toString, addTail)))
 	}
 	_ = s
 
@@ -296,7 +296,7 @@ func Benchmark_FilterAndConvert_Iterable(b *testing.B) {
 	var s []string
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		s = it.ToSlice(it.FilterAndConvert(it.Wrap(items), even, convert.And(toString, addTail)))
+		s = iter.ToSlice(iter.FilterAndConvert(iter.Wrap(items), even, convert.And(toString, addTail)))
 
 	}
 	_ = s
@@ -355,7 +355,7 @@ func Benchmark_FilterAndConvert_Slice(b *testing.B) {
 	var s []string
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		s = it.ToSlice(sliceit.FilterAndConvert(items, even, convert.And(toString, addTail)))
+		s = iter.ToSlice(sliceit.FilterAndConvert(items, even, convert.And(toString, addTail)))
 	}
 	_ = s
 
@@ -389,7 +389,7 @@ func Benchmark_Flatt_Iterable(b *testing.B) {
 	multiDimension := [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		oneDimension := it.ToSlice(it.Filter(it.Flatt(it.Flatt(it.Wrap(multiDimension), convert.To[[][]int]), convert.To[[]int]), odds))
+		oneDimension := iter.ToSlice(iter.Filter(iter.Flatt(iter.Flatt(iter.Wrap(multiDimension), convert.To[[][]int]), convert.To[[]int]), odds))
 		_ = oneDimension
 	}
 	b.StopTimer()
@@ -414,7 +414,7 @@ func Benchmark_Flatt_Slice(b *testing.B) {
 	multiDimension := [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		oneDimension := it.ToSlice(it.Filter(it.Flatt(sliceit.Flatt(multiDimension, convert.To[[][]int]), convert.To[[]int]), odds))
+		oneDimension := iter.ToSlice(iter.Filter(iter.Flatt(sliceit.Flatt(multiDimension, convert.To[[][]int]), convert.To[[]int]), odds))
 		_ = oneDimension
 	}
 	b.StopTimer()
@@ -458,7 +458,7 @@ func Benchmark_ReduceSum_Iterable(b *testing.B) {
 	b.ResetTimer()
 	result := 0
 	for i := 0; i < b.N; i++ {
-		result = it.Reduce(it.Filter(it.Flatt(it.Flatt(it.Wrap(multiDimension), convert.To[[][]int]), convert.To[[]int]), odds), sop.Sum[int])
+		result = iter.Reduce(iter.Filter(iter.Flatt(iter.Flatt(iter.Wrap(multiDimension), convert.To[[][]int]), convert.To[[]int]), odds), sop.Sum[int])
 	}
 	if result != expected {
 		b.Fatalf("must be %d, but %d", expected, result)
@@ -491,7 +491,7 @@ func Benchmark_ReduceSum_Slice(b *testing.B) {
 	b.ResetTimer()
 	result := 0
 	for i := 0; i < b.N; i++ {
-		result = it.Reduce(it.Filter(it.Flatt(sliceit.Flatt(multiDimension, convert.To[[][]int]), convert.To[[]int]), odds), sop.Sum[int])
+		result = iter.Reduce(iter.Filter(iter.Flatt(sliceit.Flatt(multiDimension, convert.To[[][]int]), convert.To[[]int]), odds), sop.Sum[int])
 	}
 	if result != expected {
 		b.Fatalf("must be %d, but %d", expected, result)
@@ -565,7 +565,7 @@ func Benchmark_MapFlattStructure_IterableNotNil(b *testing.B) {
 	items := []*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_ = it.ToSlice(it.Convert(it.NotNil[Attributes](it.Flatt(it.NotNil[Participant](it.Wrap(items)), (*Participant).GetAttributes)), (*Attributes).GetName))
+		_ = iter.ToSlice(iter.Convert(iter.NotNil[Attributes](iter.Flatt(iter.NotNil[Participant](iter.Wrap(items)), (*Participant).GetAttributes)), (*Attributes).GetName))
 	}
 	b.StopTimer()
 }
@@ -574,7 +574,7 @@ func Benchmark_MapFlattStructure_IterableWithoutNotNilFiltering(b *testing.B) {
 	items := []*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_ = it.ToSlice(it.Convert(it.Flatt(it.Wrap(items), (*Participant).GetAttributes), (*Attributes).GetName))
+		_ = iter.ToSlice(iter.Convert(iter.Flatt(iter.Wrap(items), (*Participant).GetAttributes), (*Attributes).GetName))
 	}
 	b.StopTimer()
 }
@@ -585,7 +585,7 @@ func Benchmark_MapFlattStructure_IterableFit(b *testing.B) {
 	result := []string{}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		result = it.ToSlice(it.FilterAndConvert(it.FilterAndFlatt(it.Wrap(items), check.NotNil[Participant], (*Participant).GetAttributes), check.NotNil[Attributes], (*Attributes).GetName))
+		result = iter.ToSlice(iter.FilterAndConvert(iter.FilterAndFlatt(iter.Wrap(items), check.NotNil[Participant], (*Participant).GetAttributes), check.NotNil[Attributes], (*Attributes).GetName))
 	}
 	if !reflect.DeepEqual(expected, result) {
 		b.Fatalf("must be %v, but %v", expected, result)
@@ -609,7 +609,7 @@ func Benchmark_MapFlattStructure_SliceFit(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		att := sliceit.FilterAndFlatt(items, check.NotNil[Participant], (*Participant).GetAttributes)
-		_ = it.ToSlice(it.FilterAndConvert(att, check.NotNil[Attributes], (*Attributes).GetName))
+		_ = iter.ToSlice(iter.FilterAndConvert(att, check.NotNil[Attributes], (*Attributes).GetName))
 	}
 	b.StopTimer()
 }

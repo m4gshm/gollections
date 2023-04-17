@@ -6,7 +6,7 @@ import (
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/immutable/ordered"
-	"github.com/m4gshm/gollections/it/impl/it"
+	"github.com/m4gshm/gollections/iter/impl/iter"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/slice"
@@ -55,16 +55,16 @@ func (s Set[T]) Begin() c.Iterator[T] {
 	return s.Head()
 }
 
-func (s Set[T]) Head() it.Key[T, struct{}] {
-	return it.NewKey(s.elements)
+func (s Set[T]) Head() iter.Key[T, struct{}] {
+	return iter.NewKey(s.elements)
 }
 
-func (s Set[T]) First() (it.Key[T, struct{}], T, bool) {
+func (s Set[T]) First() (iter.Key[T, struct{}], T, bool) {
 	var (
-		iter      = s.Head()
-		first, ok = iter.Next()
+		iterator  = s.Head()
+		first, ok = iterator.Next()
 	)
-	return iter, first, ok
+	return iterator, first, ok
 }
 
 func (s Set[T]) Collect() []T {
@@ -98,12 +98,12 @@ func (s Set[T]) ForEach(walker func(T)) {
 
 func (s Set[T]) Filter(filter func(T) bool) c.Pipe[T, []T] {
 	h := s.Head()
-	return it.NewPipe[T](it.Filter(h, h.Next, filter))
+	return iter.NewPipe[T](iter.Filter(h, h.Next, filter))
 }
 
 func (s Set[T]) Convert(by func(T) T) c.Pipe[T, []T] {
 	h := s.Head()
-	return it.NewPipe[T](it.Convert(h, h.Next, by))
+	return iter.NewPipe[T](iter.Convert(h, h.Next, by))
 }
 
 func (s Set[T]) Reduce(by func(T, T) T) T {

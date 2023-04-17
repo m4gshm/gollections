@@ -226,14 +226,14 @@ func Test_Vector_Set(t *testing.T) {
 
 func Test_Vector_DeleteByIterator(t *testing.T) {
 	vec := vector.Of(1, 1, 2, 4, 3, 1)
-	iter := vec.BeginEdit()
+	iterator := vec.BeginEdit()
 
 	i := 0
 	var v int
 	var ok bool
-	for v, ok = iter.Next(); ok; v, ok = iter.Next() {
+	for v, ok = iterator.Next(); ok; v, ok = iterator.Next() {
 		i++
-		iter.Delete()
+		iterator.Delete()
 	}
 
 	_, _ = v, ok
@@ -244,14 +244,14 @@ func Test_Vector_DeleteByIterator(t *testing.T) {
 
 func Test_Vector_DeleteByIterator_Reverse(t *testing.T) {
 	vec := vector.Of(1, 1, 2, 4, 3, 1)
-	iter := vec.Tail()
+	iterator := vec.Tail()
 
 	i := 0
 	var v int
 	var ok bool
-	for v, ok = iter.Prev(); ok; v, ok = iter.Prev() {
+	for v, ok = iterator.Prev(); ok; v, ok = iterator.Prev() {
 		i++
-		iter.Delete()
+		iterator.Delete()
 	}
 
 	_, _ = v, ok

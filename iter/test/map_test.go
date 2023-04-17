@@ -3,7 +3,7 @@ package it
 import (
 	"testing"
 
-	"github.com/m4gshm/gollections/it/impl/it"
+	"github.com/m4gshm/gollections/iter/impl/iter"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -14,7 +14,7 @@ func Test_NewEmbedMapKV_Iterate(t *testing.T) {
 
 	values := map[string]*s{"first": {"first_name"}, "second": {"first_second"}}
 	result := map[string]*s{}
-	it := it.NewEmbedMapKV(values)
+	it := iter.NewEmbedMapKV(values)
 	for k, v, ok := it.Next(); ok; k, v, ok = it.Next() {
 		result[k] = v
 	}

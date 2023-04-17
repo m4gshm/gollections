@@ -1,4 +1,4 @@
-package it
+package iter
 
 import (
 	"unsafe"
@@ -17,32 +17,32 @@ func NewEmbedMapKV[K comparable, V any](elements map[K]V) EmbedMapKVIter[K, V] {
 	hmap := *(*unsafe.Pointer)(unsafe.Pointer(&m))
 	i := any(m)
 	maptype := *(*unsafe.Pointer)(unsafe.Pointer(&i))
-	return EmbedMapKVIter[K, V]{maptype: maptype, hmap: hmap, size: len(elements), iter: new(hiter)}
+	return EmbedMapKVIter[K, V]{maptype: maptype, hmap: hmap, size: len(elements), iterator: new(hiter)}
 }
 
 // EmbedMapKVIter is the embedded map based Iterator implementation
 type EmbedMapKVIter[K comparable, V any] struct {
-	iter    *hiter
-	maptype unsafe.Pointer
-	hmap    unsafe.Pointer
-	size    int
+	iterator *hiter
+	maptype  unsafe.Pointer
+	hmap     unsafe.Pointer
+	size     int
 }
 
 var _ c.KVIterator[int, any] = (*EmbedMapKVIter[int, any])(nil)
 
 func (i *EmbedMapKVIter[K, V]) Next() (K, V, bool) {
-	if !i.iter.initialized() {
-		mapiterinit(i.maptype, i.hmap, i.iter)
+	if !i.iterator.initialized() {
+		mapiterinit(i.maptype, i.hmap, i.iterator)
 	} else {
-		mapiternext(i.iter)
+		mapiternext(i.iterator)
 	}
-	iterkey := mapiterkey(i.iter)
+	iterkey := mapiterkey(i.iterator)
 	if iterkey == nil {
 		var key K
 		var value V
 		return key, value, false
 	}
-	iterelem := mapiterelem(i.iter)
+	iterelem := mapiterelem(i.iterator)
 	key := (*K)(iterkey)
 	value := (*V)(iterelem)
 	return *key, *value, true

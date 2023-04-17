@@ -1,9 +1,9 @@
-package it
+package iter
 
 import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/check"
-	"github.com/m4gshm/gollections/it/impl/it"
+	"github.com/m4gshm/gollections/iter/impl/iter"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
 )
@@ -21,41 +21,41 @@ func New[T any](elements []T) c.Iterator[T] {
 // The hasNext specifies a predicate that tests existing of a next element in the source.
 // The getNext extracts the element.
 func OfLoop[S, T any](source S, hasNext func(S) bool, getNext func(S) (T, error)) c.IteratorBreakable[T] {
-	l := it.NewLoop(source, hasNext, getNext)
+	l := iter.NewLoop(source, hasNext, getNext)
 	return &l
 }
 
 // Wrap instantiates Iterator using slice as the elements source
-func Wrap[TS ~[]T, T any](elements TS) *it.ArrayIter[T] {
-	h := it.NewHead(elements)
+func Wrap[TS ~[]T, T any](elements TS) *iter.ArrayIter[T] {
+	h := iter.NewHead(elements)
 	return &h
 }
 
 // Convert instantiates Iterator that converts elements with a converter and returns them
 func Convert[From, To any, IT c.Iterator[From]](elements IT, converter func(From) To) c.Iterator[To] {
-	return it.Convert(elements, elements.Next, converter)
+	return iter.Convert(elements, elements.Next, converter)
 }
 
 // FilterAndConvert additionally filters 'From' elements.
 func FilterAndConvert[From, To any, IT c.Iterator[From]](elements IT, filter func(From) bool, converter func(From) To) c.Iterator[To] {
-	return it.FilterAndConvert(elements, elements.Next, filter, converter)
+	return iter.FilterAndConvert(elements, elements.Next, filter, converter)
 }
 
 // Flatt instantiates Iterator that extracts slices of 'To' by a Flatter from elements of 'From' and flattens as one iterable collection of 'To' elements
 func Flatt[From, To any, IT c.Iterator[From]](elements IT, flatt func(From) []To) c.Iterator[To] {
-	f := it.Flatt(elements, elements.Next, flatt)
+	f := iter.Flatt(elements, elements.Next, flatt)
 	return &f
 }
 
 // FilterAndFlatt additionally filters 'From' elements
 func FilterAndFlatt[From, To any, IT c.Iterator[From]](elements IT, filter func(From) bool, flatt func(From) []To) c.Iterator[To] {
-	f := it.FilterAndFlatt(elements, elements.Next, filter, flatt)
+	f := iter.FilterAndFlatt(elements, elements.Next, filter, flatt)
 	return &f
 }
 
 // Filter instantiates Iterator that checks elements by a filter and returns successful ones
 func Filter[T any, IT c.Iterator[T]](elements IT, filter func(T) bool) c.Iterator[T] {
-	return it.Filter(elements, elements.Next, filter)
+	return iter.Filter(elements, elements.Next, filter)
 }
 
 // NotNil instantiates Iterator that filters nullable elements
@@ -80,7 +80,7 @@ func ToSlice[T any](elements c.Iterator[T]) []T {
 
 // Group transforms iterable elements to the MapPipe based on applying key extractor to the elements
 func Group[T any, K comparable](elements c.Iterator[T], by func(T) K) c.MapPipe[K, T, map[K][]T] {
-	return it.Group(elements, by)
+	return iter.Group(elements, by)
 }
 
 // ForEach applies a walker to elements of an Iterator
@@ -105,6 +105,6 @@ func First[T any, IT c.Iterator[T]](elements IT, filter func(T) bool) (T, bool) 
 
 // ToPairs converts a c.Iterator to a c.KVIterator using key and value extractors
 func ToPairs[T, K, V any](elements c.Iterator[T], keyExtractor func(T) K, valExtractor func(T) V) c.KVIterator[K, V] {
-	kv := it.NewKeyValuer(elements, elements.Next, keyExtractor, valExtractor)
+	kv := iter.NewKeyValuer(elements, elements.Next, keyExtractor, valExtractor)
 	return &kv
 }

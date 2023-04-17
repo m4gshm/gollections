@@ -1,4 +1,4 @@
-package it
+package iter
 
 import (
 	"github.com/m4gshm/gollections/c"
@@ -6,10 +6,10 @@ import (
 
 // ConvertFitIter is the Converter with elements filtering.
 type ConvertFitIter[From, To, IT any] struct {
-	iter   IT
-	next   func() (From, bool)
-	by     func(From) To
-	filter func(From) bool
+	iterator IT
+	next     func() (From, bool)
+	by       func(From) To
+	filter   func(From) bool
 }
 
 var (
@@ -27,9 +27,9 @@ func (s ConvertFitIter[From, To, IT]) Next() (To, bool) {
 
 // ConvertIter is the iterator wrapper implementation applying a converter to all iterable elements.
 type ConvertIter[From, To any, IT any] struct {
-	iter IT
-	next func() (From, bool)
-	by   func(From) To
+	iterator IT
+	next     func() (From, bool)
+	by       func(From) To
 }
 
 var (
@@ -47,8 +47,8 @@ func (s ConvertIter[From, To, IT]) Next() (To, bool) {
 
 // ConvertKVIter is the iterator wrapper implementation applying a converter to all iterable key/value elements.
 type ConvertKVIter[K, V any, IT c.KVIterator[K, V], K2, V2 any, C func(K, V) (K2, V2)] struct {
-	iter IT
-	by   C
+	iterator IT
+	by       C
 }
 
 var (
@@ -57,7 +57,7 @@ var (
 )
 
 func (s ConvertKVIter[K, V, IT, K2, V2, C]) Next() (K2, V2, bool) {
-	if K, V, ok := s.iter.Next(); ok {
+	if K, V, ok := s.iterator.Next(); ok {
 		k2, v2 := s.by(K, V)
 		return k2, v2, true
 	}

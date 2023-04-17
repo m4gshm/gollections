@@ -1,4 +1,4 @@
-package it
+package iter
 
 import (
 	"unsafe"
@@ -12,7 +12,7 @@ type FlattenFit[From, To any, IT any] struct {
 	arrayTo       unsafe.Pointer
 	elemSizeTo    uintptr
 	indTo, sizeTo int
-	iter          IT
+	iterator      IT
 	next          func() (From, bool)
 	flatt         func(From) []To
 	filter        func(From) bool
@@ -54,7 +54,7 @@ type Flatten[From, To, IT any] struct {
 	arrayTo       unsafe.Pointer
 	elemSizeTo    uintptr
 	indTo, sizeTo int
-	iter          IT
+	iterator      IT
 	next          func() (From, bool)
 	flatt         func(From) []To
 }

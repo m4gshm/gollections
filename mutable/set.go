@@ -5,7 +5,7 @@ import (
 	"sort"
 
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/it/impl/it"
+	"github.com/m4gshm/gollections/iter/impl/iter"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/mutable/ordered"
@@ -177,12 +177,12 @@ func (s Set[K]) ForEach(walker func(K)) {
 
 func (s Set[K]) Filter(filter func(K) bool) c.Pipe[K, []K] {
 	h := s.Head()
-	return it.NewPipe[K](it.Filter(h, h.Next, filter))
+	return iter.NewPipe[K](iter.Filter(h, h.Next, filter))
 }
 
 func (s Set[K]) Convert(by func(K) K) c.Pipe[K, []K] {
 	h := s.Head()
-	return it.NewPipe[K](it.Convert(h, h.Next, by))
+	return iter.NewPipe[K](iter.Convert(h, h.Next, by))
 }
 
 func (s Set[K]) Reduce(by func(K, K) K) K {

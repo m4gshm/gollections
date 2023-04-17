@@ -6,7 +6,7 @@ import (
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/immutable"
-	"github.com/m4gshm/gollections/it/impl/it"
+	"github.com/m4gshm/gollections/iter/impl/iter"
 	"github.com/m4gshm/gollections/loop"
 )
 
@@ -32,11 +32,11 @@ func Sort[t any, f constraints.Ordered](v immutable.Vector[t], by func(t) f) imm
 
 func Convert[From, To any](v immutable.Vector[From], by func(From) To) c.Pipe[To, []To] {
 	h := v.Head()
-	return it.NewPipe[To](it.Convert(h, h.Next, by))
+	return iter.NewPipe[To](iter.Convert(h, h.Next, by))
 }
 
 func Flatt[From, To any](v immutable.Vector[From], by func(From) []To) c.Pipe[To, []To] {
 	h := v.Head()
-	f := it.Flatt(h, h.Next, by)
-	return it.NewPipe[To](&f)
+	f := iter.Flatt(h, h.Next, by)
+	return iter.NewPipe[To](&f)
 }

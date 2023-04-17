@@ -6,8 +6,8 @@ import (
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/immutable/ordered"
-	"github.com/m4gshm/gollections/it/impl/it"
-	"github.com/m4gshm/gollections/kvit"
+	"github.com/m4gshm/gollections/iter/impl/iter"
+	"github.com/m4gshm/gollections/kviter"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/notsafe"
@@ -59,20 +59,20 @@ func (m *Map[K, V]) Begin() c.KVIterator[K, V] {
 	return &h
 }
 
-func (m *Map[K, V]) Head() it.OrderedEmbedMapKVIter[K, V] {
-	return it.NewOrderedEmbedMapKV(m.elements, it.NewHeadS(m.order, m.ksize))
+func (m *Map[K, V]) Head() iter.OrderedEmbedMapKVIter[K, V] {
+	return iter.NewOrderedEmbedMapKV(m.elements, iter.NewHeadS(m.order, m.ksize))
 }
 
-func (m *Map[K, V]) Tail() it.OrderedEmbedMapKVIter[K, V] {
-	return it.NewOrderedEmbedMapKV(m.elements, it.NewTailS(m.order, m.ksize))
+func (m *Map[K, V]) Tail() iter.OrderedEmbedMapKVIter[K, V] {
+	return iter.NewOrderedEmbedMapKV(m.elements, iter.NewTailS(m.order, m.ksize))
 }
 
-func (m *Map[K, V]) First() (it.OrderedEmbedMapKVIter[K, V], K, V, bool) {
+func (m *Map[K, V]) First() (iter.OrderedEmbedMapKVIter[K, V], K, V, bool) {
 	var (
-		iter               = m.Head()
-		firstK, firstV, ok = iter.Next()
+		iterator           = m.Head()
+		firstK, firstV, ok = iterator.Next()
 	)
-	return iter, firstK, firstV, ok
+	return iterator, firstK, firstV, ok
 }
 
 func (m *Map[K, V]) Collect() map[K]V {
@@ -169,32 +169,32 @@ func (m *Map[K, V]) String() string {
 
 func (m *Map[K, V]) FilterKey(filter func(K) bool) c.MapPipe[K, V, map[K]V] {
 	h := m.Head()
-	return it.NewKVPipe(it.FilterKV(&h, func(key K, val V) bool { return filter(key) }), kvit.ToMap[K, V])
+	return iter.NewKVPipe(iter.FilterKV(&h, func(key K, val V) bool { return filter(key) }), kviter.ToMap[K, V])
 }
 
 func (m *Map[K, V]) ConvertKey(by func(K) K) c.MapPipe[K, V, map[K]V] {
 	h := m.Head()
-	return it.NewKVPipe(it.ConvertKV(&h, func(key K, val V) (K, V) { return by(key), val }), kvit.ToMap[K, V])
+	return iter.NewKVPipe(iter.ConvertKV(&h, func(key K, val V) (K, V) { return by(key), val }), kviter.ToMap[K, V])
 }
 
 func (m *Map[K, V]) FilterValue(filter func(V) bool) c.MapPipe[K, V, map[K]V] {
 	h := m.Head()
-	return it.NewKVPipe(it.FilterKV(&h, func(key K, val V) bool { return filter(val) }), kvit.ToMap[K, V])
+	return iter.NewKVPipe(iter.FilterKV(&h, func(key K, val V) bool { return filter(val) }), kviter.ToMap[K, V])
 }
 
 func (m *Map[K, V]) ConvertValue(by func(V) V) c.MapPipe[K, V, map[K]V] {
 	h := m.Head()
-	return it.NewKVPipe(it.ConvertKV(&h, func(key K, val V) (K, V) { return key, by(val) }), kvit.ToMap[K, V])
+	return iter.NewKVPipe(iter.ConvertKV(&h, func(key K, val V) (K, V) { return key, by(val) }), kviter.ToMap[K, V])
 }
 
 func (m *Map[K, V]) Filter(filter func(K, V) bool) c.MapPipe[K, V, map[K]V] {
 	h := m.Head()
-	return it.NewKVPipe(it.FilterKV(&h, filter), kvit.ToMap[K, V])
+	return iter.NewKVPipe(iter.FilterKV(&h, filter), kviter.ToMap[K, V])
 }
 
 func (m *Map[K, V]) Convert(by func(K, V) (K, V)) c.MapPipe[K, V, map[K]V] {
 	h := m.Head()
-	return it.NewKVPipe(it.ConvertKV(&h, by), kvit.ToMap[K, V])
+	return iter.NewKVPipe(iter.ConvertKV(&h, by), kviter.ToMap[K, V])
 }
 
 func (m *Map[K, V]) Reduce(by c.Quaternary[K, V]) (K, V) {

@@ -1,11 +1,11 @@
-package kvit
+package kviter
 
 import (
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/it"
-	implit "github.com/m4gshm/gollections/it/impl/it"
-	"github.com/m4gshm/gollections/kvit/group"
-	"github.com/m4gshm/gollections/kvit/impl/kvit"
+	"github.com/m4gshm/gollections/iter"
+	implit "github.com/m4gshm/gollections/iter/impl/iter"
+	"github.com/m4gshm/gollections/kviter/group"
+	"github.com/m4gshm/gollections/kviter/impl/kvit"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_/filter"
 	"github.com/m4gshm/gollections/op"
@@ -18,7 +18,7 @@ func OfPairs[K, V any](pairs ...c.KV[K, V]) c.KVIterator[K, V] {
 
 // WrapPairs instantiates KVIterator using slice as the key\value pairs source
 func WrapPairs[K, V any, P ~[]c.KV[K, V]](pairs P) c.KVIterator[K, V] {
-	return FromPairs[K, V](it.Wrap(pairs))
+	return FromPairs[K, V](iter.Wrap(pairs))
 }
 
 // FromPairs converts a iterator of key\value pair elements to a KVIterator
@@ -28,7 +28,7 @@ func FromPairs[K, V any](elements c.Iterator[c.KV[K, V]]) c.KVIterator[K, V] {
 
 // FromIter converts a c.Iterator to a c.KVIterator using key and value extractors
 func FromIter[T, K, V any](elements c.Iterator[T], keyExtractor func(T) K, valExtractor func(T) V) c.KVIterator[K, V] {
-	return it.ToPairs(elements, keyExtractor, valExtractor)
+	return iter.ToPairs(elements, keyExtractor, valExtractor)
 }
 
 // FirstVal - ToMap value resolver

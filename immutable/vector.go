@@ -5,7 +5,7 @@ import (
 	"sort"
 
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/it/impl/it"
+	"github.com/m4gshm/gollections/iter/impl/iter"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/notsafe"
 	"github.com/m4gshm/gollections/slice"
@@ -39,28 +39,28 @@ func (v Vector[T]) Begin() c.Iterator[T] {
 	return &h
 }
 
-func (v Vector[T]) Head() it.ArrayIter[T] {
-	return it.NewHeadS(v.elements, v.esize)
+func (v Vector[T]) Head() iter.ArrayIter[T] {
+	return iter.NewHeadS(v.elements, v.esize)
 }
 
-func (v Vector[T]) Tail() it.ArrayIter[T] {
-	return it.NewTailS(v.elements, v.esize)
+func (v Vector[T]) Tail() iter.ArrayIter[T] {
+	return iter.NewTailS(v.elements, v.esize)
 }
 
-func (v Vector[T]) First() (it.ArrayIter[T], T, bool) {
+func (v Vector[T]) First() (iter.ArrayIter[T], T, bool) {
 	var (
-		iter      = it.NewHeadS(v.elements, v.esize)
-		first, ok = iter.Next()
+		iterator  = iter.NewHeadS(v.elements, v.esize)
+		first, ok = iterator.Next()
 	)
-	return iter, first, ok
+	return iterator, first, ok
 }
 
-func (v Vector[T]) Last() (it.ArrayIter[T], T, bool) {
+func (v Vector[T]) Last() (iter.ArrayIter[T], T, bool) {
 	var (
-		iter      = it.NewTailS(v.elements, v.esize)
-		first, ok = iter.Prev()
+		iterator  = iter.NewTailS(v.elements, v.esize)
+		first, ok = iterator.Prev()
 	)
-	return iter, first, ok
+	return iterator, first, ok
 }
 
 func (v Vector[T]) Collect() []T {
@@ -101,12 +101,12 @@ func (v Vector[T]) ForEach(walker func(T)) {
 
 func (v Vector[T]) Filter(filter func(T) bool) c.Pipe[T, []T] {
 	h := v.Head()
-	return it.NewPipe[T](it.Filter(h, h.Next, filter))
+	return iter.NewPipe[T](iter.Filter(h, h.Next, filter))
 }
 
 func (v Vector[T]) Convert(by func(T) T) c.Pipe[T, []T] {
 	h := v.Head()
-	return it.NewPipe[T](it.Convert(h, h.Next, by))
+	return iter.NewPipe[T](iter.Convert(h, h.Next, by))
 }
 
 func (v Vector[T]) Reduce(by func(T, T) T) T {

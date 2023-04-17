@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/it/impl/it"
+	"github.com/m4gshm/gollections/iter/impl/iter"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/slice"
@@ -38,10 +38,10 @@ func (s MapValues[K, V]) Head() *ValIter[K, V] {
 
 func (s MapValues[K, V]) First() (*ValIter[K, V], V, bool) {
 	var (
-		iter      = s.Head()
-		first, ok = iter.Next()
+		iterator  = s.Head()
+		first, ok = iterator.Next()
 	)
-	return iter, first, ok
+	return iterator, first, ok
 }
 
 func (s MapValues[K, V]) Len() int {
@@ -82,12 +82,12 @@ func (s MapValues[K, V]) Get(index int) (V, bool) {
 
 func (s MapValues[K, V]) Filter(filter func(V) bool) c.Pipe[V, []V] {
 	h := s.Head()
-	return it.NewPipe[V](it.Filter(h, h.Next, filter))
+	return iter.NewPipe[V](iter.Filter(h, h.Next, filter))
 }
 
 func (s MapValues[K, V]) Convert(by func(V) V) c.Pipe[V, []V] {
 	h := s.Head()
-	return it.NewPipe[V](it.Convert(h, h.Next, by))
+	return iter.NewPipe[V](iter.Convert(h, h.Next, by))
 }
 
 func (s MapValues[K, V]) Reduce(by func(V, V) V) V {

@@ -5,7 +5,7 @@ import (
 	"sort"
 
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/it/impl/it"
+	"github.com/m4gshm/gollections/iter/impl/iter"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/slice"
 )
@@ -185,12 +185,12 @@ func (s *Set[T]) DeleteActualOne(v T) bool {
 
 func (s *Set[T]) Filter(filter func(T) bool) c.Pipe[T, []T] {
 	h := s.Head()
-	return it.NewPipe[T](it.Filter(h, h.Next, filter))
+	return iter.NewPipe[T](iter.Filter(h, h.Next, filter))
 }
 
 func (s *Set[T]) Convert(by func(T) T) c.Pipe[T, []T] {
 	h := s.Head()
-	return it.NewPipe[T](it.Convert(h, h.Next, by))
+	return iter.NewPipe[T](iter.Convert(h, h.Next, by))
 }
 
 func (s *Set[T]) Reduce(by func(T, T) T) T {

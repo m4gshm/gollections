@@ -1,4 +1,4 @@
-package it
+package iter
 
 import (
 	"github.com/m4gshm/gollections/c"
@@ -6,8 +6,8 @@ import (
 )
 
 // NewPipe instantiates Pipe based on iterator elements.
-func NewPipe[T any, IT c.Iterator[T]](iter IT) *IterPipe[T] {
-	return &IterPipe[T]{Iterator: iter}
+func NewPipe[T any, IT c.Iterator[T]](iterator IT) *IterPipe[T] {
+	return &IterPipe[T]{Iterator: iterator}
 }
 
 // IterPipe is the Iterator based pipe implementation.

@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/m4gshm/gollections/immutable/oset"
-	"github.com/m4gshm/gollections/it"
+	"github.com/m4gshm/gollections/iter"
 	"github.com/m4gshm/gollections/iterable"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
@@ -25,7 +25,7 @@ func Test_Set_Iterate(t *testing.T) {
 	expected := slice.Of(1, 2, 4, 3)
 	assert.Equal(t, expected, values)
 
-	iterSlice := it.ToSlice(set.Begin())
+	iterSlice := iter.ToSlice(set.Begin())
 	assert.Equal(t, expected, iterSlice)
 
 	loopService := loop.ToSlice(ptr.Of(set.Head()).Next)
@@ -72,7 +72,7 @@ func Test_Set_Group_By_Walker(t *testing.T) {
 }
 
 func Test_Set_Group_By_Iterator(t *testing.T) {
-	groups := it.Group(oset.Of(0, 1, 1, 2, 4, 3, 1, 6, 7).Begin(), func(e int) bool { return e%2 == 0 }).Collect()
+	groups := iter.Group(oset.Of(0, 1, 1, 2, 4, 3, 1, 6, 7).Begin(), func(e int) bool { return e%2 == 0 }).Collect()
 
 	assert.Equal(t, len(groups), 2)
 	assert.Equal(t, []int{1, 3, 7}, groups[false])
@@ -104,7 +104,7 @@ func Test_Set_SortStructByField(t *testing.T) {
 func Test_Set_Convert(t *testing.T) {
 	var (
 		ints     = oset.Of(3, 3, 1, 1, 1, 5, 6, 8, 8, 0, -2, -2)
-		strings  = it.ToSlice(it.Filter(oset.Convert(ints, strconv.Itoa), func(s string) bool { return len(s) == 1 }))
+		strings  = iter.ToSlice(iter.Filter(oset.Convert(ints, strconv.Itoa), func(s string) bool { return len(s) == 1 }))
 		strings2 = oset.Convert(ints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 }).Slice()
 	)
 	assert.Equal(t, slice.Of("3", "1", "5", "6", "8", "0"), strings)

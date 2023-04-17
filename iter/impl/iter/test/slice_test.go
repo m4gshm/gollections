@@ -1,8 +1,9 @@
-package it
+package test
 
 import (
 	"testing"
 
+	"github.com/m4gshm/gollections/iter/impl/iter"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -14,10 +15,10 @@ func Test_PointerBasedIter(t *testing.T) {
 	}
 
 	expected := []someType{{"123", 123}, {"2", 2}, {"3", 3}, {"4", 4}}
-	iter := NewHead(expected)
+	iterator := iter.NewHead(expected)
 	result := make([]someType, 0)
-	for iter.HasNext() {
-		n := iter.GetNext()
+	for iterator.HasNext() {
+		n := iterator.GetNext()
 		result = append(result, n)
 	}
 
@@ -32,9 +33,9 @@ func Test_PointerBasedIter2(t *testing.T) {
 	}
 
 	expected := []someType{{"123", 123}, {"2", 2}, {"3", 3}, {"4", 4}}
-	iter := NewHead(expected)
+	iterator := iter.NewHead(expected)
 	result := make([]someType, 0)
-	for v, ok := iter.Next(); ok; v, ok = iter.Next() {
+	for v, ok := iterator.Next(); ok; v, ok = iterator.Next() {
 		result = append(result, v)
 	}
 
@@ -50,9 +51,9 @@ func Test_PointerBasedIter2Reverse(t *testing.T) {
 
 	values := []someType{{"123", 123}, {"2", 2}, {"3", 3}, {"4", 4}}
 	expected := []someType{{"4", 4}, {"3", 3}, {"2", 2}, {"123", 123}}
-	iter := NewTail(values)
+	iterator := iter.NewTail(values)
 	result := make([]someType, 0)
-	for v, ok := iter.Prev(); ok; v, ok = iter.Prev() {
+	for v, ok := iterator.Prev(); ok; v, ok = iterator.Prev() {
 		result = append(result, v)
 	}
 
@@ -67,41 +68,41 @@ func Test_PointerBasedIterTailGetNext(t *testing.T) {
 	}
 
 	values := []someType{{"123", 123}, {"2", 2}, {"3", 3}, {"4", 4}}
-	iter := NewTail(values)
+	iterator := iter.NewTail(values)
 
-	v, ok := iter.Get() //out of range
+	v, ok := iterator.Get() //out of range
 	_ = v
 	assert.False(t, ok)
 
-	v, ok = iter.Next() //no more elements, because the iterator has not been started
+	v, ok = iterator.Next() //no more elements, because the iterator has not been started
 	_ = v
 	assert.False(t, ok)
 
-	v, ok = iter.Prev() //start from the latest element
+	v, ok = iterator.Prev() //start from the latest element
 	assert.True(t, ok)
 	assert.Equal(t, someType{"4", 4}, v)
 
-	v, ok = iter.Get() //gets the current element
+	v, ok = iterator.Get() //gets the current element
 	assert.True(t, ok)
 	assert.Equal(t, someType{"4", 4}, v)
 
-	v, ok = iter.Next()
+	v, ok = iterator.Next()
 	_ = v
 	assert.False(t, ok) //no more elements after the latest
 
-	v, ok = iter.Prev() //gets prev
+	v, ok = iterator.Prev() //gets prev
 	assert.Equal(t, someType{"3", 3}, v)
 	assert.True(t, ok)
 
-	v, ok = iter.Get() //gets the current element
+	v, ok = iterator.Get() //gets the current element
 	assert.True(t, ok)
 	assert.Equal(t, someType{"3", 3}, v)
 
-	v, ok = iter.Next()
+	v, ok = iterator.Next()
 	assert.True(t, ok) //returns to the latest
 	assert.Equal(t, someType{"4", 4}, v)
 
-	v, ok = iter.Get() //gets the current element
+	v, ok = iterator.Get() //gets the current element
 	assert.True(t, ok)
 	assert.Equal(t, someType{"4", 4}, v)
 }
@@ -114,37 +115,37 @@ func Test_PointerBasedIterHeadGetPrev(t *testing.T) {
 	}
 
 	values := []someType{{"123", 123}, {"2", 2}, {"3", 3}, {"4", 4}}
-	iter := NewHead(values)
+	iterator := iter.NewHead(values)
 
-	v, ok := iter.Prev()
+	v, ok := iterator.Prev()
 	_ = v
 	assert.False(t, ok)
 
-	v, ok = iter.Next()
+	v, ok = iterator.Next()
 	assert.True(t, ok)
 	assert.Equal(t, someType{"123", 123}, v)
 
-	v, ok = iter.Get()
+	v, ok = iterator.Get()
 	assert.True(t, ok)
 	assert.Equal(t, someType{"123", 123}, v)
 
-	v, ok = iter.Prev()
+	v, ok = iterator.Prev()
 	_ = v
 	assert.False(t, ok)
 
-	v, ok = iter.Next()
+	v, ok = iterator.Next()
 	assert.True(t, ok)
 	assert.Equal(t, someType{"2", 2}, v)
 
-	v, ok = iter.Get()
+	v, ok = iterator.Get()
 	assert.True(t, ok)
 	assert.Equal(t, someType{"2", 2}, v)
 
-	v, ok = iter.Prev()
+	v, ok = iterator.Prev()
 	assert.True(t, ok)
 	assert.Equal(t, someType{"123", 123}, v)
 
-	v, ok = iter.Get()
+	v, ok = iterator.Get()
 	assert.True(t, ok)
 	assert.Equal(t, someType{"123", 123}, v)
 }
@@ -158,30 +159,30 @@ func Test_PointerBasedEmptyIter(t *testing.T) {
 
 	values := []someType{}
 
-	iter := NewHead(values)
+	iterator := iter.NewHead(values)
 
-	v, ok := iter.Prev()
+	v, ok := iterator.Prev()
 	_ = v
 	assert.False(t, ok)
 
-	v, ok = iter.Next()
+	v, ok = iterator.Next()
 	assert.False(t, ok)
 
-	v, ok = iter.Get()
+	v, ok = iterator.Get()
 	assert.False(t, ok)
 
 	//tail
 
-	iter = NewTail(values)
+	iterator = iter.NewTail(values)
 
-	v, ok = iter.Prev()
+	v, ok = iterator.Prev()
 	_ = v
 	assert.False(t, ok)
 
-	v, ok = iter.Next()
+	v, ok = iterator.Next()
 	assert.False(t, ok)
 
-	v, ok = iter.Get()
+	v, ok = iterator.Get()
 	assert.False(t, ok)
 }
 
@@ -193,61 +194,61 @@ func Test_PointerBasedOneElementIter(t *testing.T) {
 	}
 
 	values := []someType{{"only one", 1}}
-	iter := NewHead(values)
+	iterator := iter.NewHead(values)
 
-	v, ok := iter.Prev()
+	v, ok := iterator.Prev()
 	_ = v
 	assert.False(t, ok)
 
-	v, ok = iter.Next()
+	v, ok = iterator.Next()
 	assert.True(t, ok)
 
-	v, ok = iter.Get()
+	v, ok = iterator.Get()
 	assert.True(t, ok)
 
-	iter = NewTail(values)
+	iterator = iter.NewTail(values)
 
-	v, ok = iter.Next()
+	v, ok = iterator.Next()
 	_ = v
 	assert.False(t, ok)
 
-	v, ok = iter.Prev()
+	v, ok = iterator.Prev()
 	assert.True(t, ok)
 
-	v, ok = iter.Get()
+	v, ok = iterator.Get()
 	assert.True(t, ok)
 }
 
 func Test_CanIterateByRange(t *testing.T) {
-	r := CanIterateByRange(NoStarted, 5, 4)
+	r := iter.CanIterateByRange(iter.NoStarted, 5, 4)
 	assert.True(t, r)
 
-	r = CanIterateByRange(NoStarted, 5, 6)
+	r = iter.CanIterateByRange(iter.NoStarted, 5, 6)
 	assert.False(t, r)
 
-	r = CanIterateByRange(NoStarted, 5, NoStarted)
+	r = iter.CanIterateByRange(iter.NoStarted, 5, iter.NoStarted)
 	assert.True(t, r)
 }
 
 func Test_IsValidIndex(t *testing.T) {
-	r := IsValidIndex(5, 0)
+	r := iter.IsValidIndex(5, 0)
 	assert.True(t, r)
 
-	r = IsValidIndex(5, 5)
+	r = iter.IsValidIndex(5, 5)
 	assert.False(t, r)
 
-	r = IsValidIndex(5, -1)
+	r = iter.IsValidIndex(5, -1)
 	assert.False(t, r)
 
 }
 
 func Test_IsValidIndex2(t *testing.T) {
-	r := IsValidIndex2(5, 0)
+	r := iter.IsValidIndex2(5, 0)
 	assert.True(t, r)
 
-	r = IsValidIndex2(5, 5)
+	r = iter.IsValidIndex2(5, 5)
 	assert.False(t, r)
 
-	r = IsValidIndex2(5, -1)
+	r = iter.IsValidIndex2(5, -1)
 	assert.False(t, r)
 }

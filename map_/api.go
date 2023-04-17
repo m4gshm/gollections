@@ -6,7 +6,7 @@ import (
 
 	"github.com/m4gshm/gollections/as"
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/kvit"
+	"github.com/m4gshm/gollections/kviter"
 	"github.com/m4gshm/gollections/loop"
 )
 
@@ -30,7 +30,7 @@ func Of[K comparable, V any](elements ...c.KV[K, V]) map[K]V {
 // The hasNext specifies a predicate that tests existing of a next pair in the source.
 // The getNext extracts the pair.
 func OfLoop[S any, K comparable, V any](source S, hasNext func(S) bool, getNext func(S) (K, V, error)) (map[K]V, error) {
-	return OfLoopResolv(source, hasNext, getNext, kvit.FirstVal[K, V])
+	return OfLoopResolv(source, hasNext, getNext, kviter.FirstVal[K, V])
 }
 
 // OfLoopResolv builds a map by iterating elements of a source.
@@ -62,7 +62,7 @@ func GroupOfLoop[S any, K comparable, V any](source S, hasNext func(S) bool, get
 // Generate builds a map by an generator function.
 // The next returns an key\value pair, or false if the generation is over, or an error.
 func Generate[K comparable, V any](next func() (K, V, bool, error)) (map[K]V, error) {
-	return GenerateResolv(next, kvit.FirstVal[K, V])
+	return GenerateResolv(next, kviter.FirstVal[K, V])
 }
 
 // GenerateResolv builds a map by an generator function.

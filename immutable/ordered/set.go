@@ -5,7 +5,7 @@ import (
 	"sort"
 
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/it/impl/it"
+	"github.com/m4gshm/gollections/iter/impl/iter"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/notsafe"
 	"github.com/m4gshm/gollections/slice"
@@ -63,28 +63,28 @@ func (s Set[T]) Begin() c.Iterator[T] {
 	return &h
 }
 
-func (s Set[T]) Head() it.ArrayIter[T] {
-	return it.NewHeadS(s.order, s.esize)
+func (s Set[T]) Head() iter.ArrayIter[T] {
+	return iter.NewHeadS(s.order, s.esize)
 }
 
-func (s Set[T]) Revert() it.ArrayIter[T] {
-	return it.NewTailS(s.order, s.esize)
+func (s Set[T]) Revert() iter.ArrayIter[T] {
+	return iter.NewTailS(s.order, s.esize)
 }
 
-func (s Set[T]) First() (it.ArrayIter[T], T, bool) {
+func (s Set[T]) First() (iter.ArrayIter[T], T, bool) {
 	var (
-		iter      = it.NewHeadS(s.order, s.esize)
-		first, ok = iter.Next()
+		iterator  = iter.NewHeadS(s.order, s.esize)
+		first, ok = iterator.Next()
 	)
-	return iter, first, ok
+	return iterator, first, ok
 }
 
-func (s Set[T]) Last() (it.ArrayIter[T], T, bool) {
+func (s Set[T]) Last() (iter.ArrayIter[T], T, bool) {
 	var (
-		iter      = it.NewTailS(s.order, s.esize)
-		first, ok = iter.Prev()
+		iterator  = iter.NewTailS(s.order, s.esize)
+		first, ok = iterator.Prev()
 	)
-	return iter, first, ok
+	return iterator, first, ok
 }
 
 func (s Set[T]) Collect() []T {
@@ -105,12 +105,12 @@ func (s Set[T]) ForEach(walker func(T)) {
 
 func (s Set[T]) Filter(filter func(T) bool) c.Pipe[T, []T] {
 	h := s.Head()
-	return it.NewPipe[T](it.Filter(h, h.Next, filter))
+	return iter.NewPipe[T](iter.Filter(h, h.Next, filter))
 }
 
 func (s Set[T]) Convert(by func(T) T) c.Pipe[T, []T] {
 	h := s.Head()
-	return it.NewPipe[T](it.Convert(h, h.Next, by))
+	return iter.NewPipe[T](iter.Convert(h, h.Next, by))
 }
 
 func (s Set[T]) Reduce(by func(T, T) T) T {

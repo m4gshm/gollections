@@ -2,12 +2,12 @@ package mutable
 
 import (
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/it/impl/it"
+	"github.com/m4gshm/gollections/iter/impl/iter"
 )
 
 // NewHead instantiates Iter starting at the first element of a slice.
 func NewHead[TS ~[]T, T any](elements *TS, del func(int) bool) Iter[TS, T] {
-	return Iter[TS, T]{elements: elements, current: it.NoStarted, del: del}
+	return Iter[TS, T]{elements: elements, current: iter.NoStarted, del: del}
 }
 
 // NewTail instantiates Iter starting at the last element of a slice.
@@ -29,11 +29,11 @@ var (
 )
 
 func (i *Iter[TS, T]) HasNext() bool {
-	return it.HasNext(*i.elements, i.current)
+	return iter.HasNext(*i.elements, i.current)
 }
 
 func (i *Iter[TS, T]) HasPrev() bool {
-	return it.HasPrev(*i.elements, i.current)
+	return iter.HasPrev(*i.elements, i.current)
 }
 
 func (i *Iter[TS, T]) GetNext() T {
@@ -50,7 +50,7 @@ func (i *Iter[TS, T]) Next() (T, bool) {
 	if i.HasNext() {
 		i.current++
 		i.step = 1
-		return it.Get(*i.elements, i.current), true
+		return iter.Get(*i.elements, i.current), true
 	}
 	var no T
 	return no, false
@@ -60,7 +60,7 @@ func (i *Iter[TS, T]) Prev() (T, bool) {
 	if i.HasPrev() {
 		i.current--
 		i.step = 0
-		return it.Get(*i.elements, i.current), true
+		return iter.Get(*i.elements, i.current), true
 	}
 	var no T
 	return no, false
@@ -69,7 +69,7 @@ func (i *Iter[TS, T]) Prev() (T, bool) {
 func (i *Iter[TS, T]) Get() (T, bool) {
 	current := i.current
 	elements := *i.elements
-	if it.IsValidIndex(len(elements), current) {
+	if iter.IsValidIndex(len(elements), current) {
 		return elements[current], true
 	}
 	var no T

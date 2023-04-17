@@ -9,9 +9,9 @@ import (
 
 	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/convert"
-	"github.com/m4gshm/gollections/it"
-	impl "github.com/m4gshm/gollections/it/impl/it"
-	sliceit "github.com/m4gshm/gollections/it/slice"
+	"github.com/m4gshm/gollections/iter"
+	impl "github.com/m4gshm/gollections/iter/impl/iter"
+	sliceit "github.com/m4gshm/gollections/iter/slice"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
@@ -24,7 +24,7 @@ func Test_FilterAndConvert(t *testing.T) {
 		addTail  = func(s string) string { return s + "_tail" }
 	)
 	items := []int{1, 2, 3, 4, 5}
-	converted := it.FilterAndConvert(it.Wrap(items), func(v int) bool { return v%2 == 0 }, convert.And(toString, addTail))
+	converted := iter.FilterAndConvert(iter.Wrap(items), func(v int) bool { return v%2 == 0 }, convert.And(toString, addTail))
 	assert.Equal(t, slice.Of("2_tail", "4_tail"), loop.ToSlice(converted.Next))
 
 	converted2 := sliceit.FilterAndConvert(items, func(v int) bool { return v%2 == 0 }, convert.And(toString, addTail))
@@ -48,10 +48,10 @@ func Test_FlattSlices(t *testing.T) {
 		multiDimension = [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
 		expected       = slice.Of(1, 3, 5, 7)
 	)
-	a := it.ToSlice(it.Filter(it.Flatt(it.Flatt(it.Wrap(multiDimension), convert.To[[][]int]), convert.To[[]int]), odds))
+	a := iter.ToSlice(iter.Filter(iter.Flatt(iter.Flatt(iter.Wrap(multiDimension), convert.To[[][]int]), convert.To[[]int]), odds))
 	assert.Equal(t, expected, a)
 
-	a = it.ToSlice(it.Filter(it.Flatt(sliceit.Flatt(multiDimension, convert.To[[][]int]), convert.To[[]int]), odds))
+	a = iter.ToSlice(iter.Filter(iter.Flatt(sliceit.Flatt(multiDimension, convert.To[[][]int]), convert.To[[]int]), odds))
 	assert.Equal(t, expected, a)
 
 	//plain old style
@@ -84,10 +84,10 @@ func Test_ReduceSlices(t *testing.T) {
 
 	e := 1 + 3 + 5 + 7
 
-	oddSum := it.Reduce(it.Filter(it.Flatt(it.Flatt(it.Wrap(multiDimension), convert.To[[][]int]), convert.To[[]int]), odds), op.Sum[int])
+	oddSum := iter.Reduce(iter.Filter(iter.Flatt(iter.Flatt(iter.Wrap(multiDimension), convert.To[[][]int]), convert.To[[]int]), odds), op.Sum[int])
 	assert.Equal(t, e, oddSum)
 
-	oddSum = it.Reduce(it.Filter(it.Flatt(sliceit.Flatt(multiDimension, convert.To[[][]int]), convert.To[[]int]), odds), op.Sum[int])
+	oddSum = iter.Reduce(iter.Filter(iter.Flatt(sliceit.Flatt(multiDimension, convert.To[[][]int]), convert.To[[]int]), odds), op.Sum[int])
 	assert.Equal(t, e, oddSum)
 
 	//plain old style
@@ -130,10 +130,10 @@ func Test_ConvertFlattStructure_Iterable(t *testing.T) {
 
 	items := []*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil, {attributes: []*Attributes{{name: "third"}, nil}}}
 
-	names := loop.ToSlice(it.Convert(it.Flatt(it.Wrap(items), (*Participant).GetAttributes), (*Attributes).GetName).Next)
+	names := loop.ToSlice(iter.Convert(iter.Flatt(iter.Wrap(items), (*Participant).GetAttributes), (*Attributes).GetName).Next)
 	assert.Equal(t, expected, names)
 
-	names = loop.ToSlice(it.Convert(sliceit.Flatt(items, (*Participant).GetAttributes), (*Attributes).GetName).Next)
+	names = loop.ToSlice(iter.Convert(sliceit.Flatt(items, (*Participant).GetAttributes), (*Attributes).GetName).Next)
 	assert.Equal(t, expected, names)
 }
 
@@ -142,10 +142,10 @@ func Test_ConvertFilterAndFlattStructure_Iterable(t *testing.T) {
 
 	items := []*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil, {attributes: []*Attributes{{name: "third"}, nil}}}
 
-	names := loop.ToSlice(it.Convert(it.FilterAndFlatt(it.Wrap(items), check.NotNil[Participant], (*Participant).GetAttributes), (*Attributes).GetName).Next)
+	names := loop.ToSlice(iter.Convert(iter.FilterAndFlatt(iter.Wrap(items), check.NotNil[Participant], (*Participant).GetAttributes), (*Attributes).GetName).Next)
 	assert.Equal(t, expected, names)
 
-	names = loop.ToSlice(it.Convert(sliceit.FilterAndFlatt(items, check.NotNil[Participant], (*Participant).GetAttributes), (*Attributes).GetName).Next)
+	names = loop.ToSlice(iter.Convert(sliceit.FilterAndFlatt(items, check.NotNil[Participant], (*Participant).GetAttributes), (*Attributes).GetName).Next)
 	assert.Equal(t, expected, names)
 }
 
@@ -163,14 +163,14 @@ func Test_Iterate(t *testing.T) {
 	stream.ForEach(func(i int) { result = append(result, i) })
 
 	result = make([]int, 0)
-	it.ForEach(it.New(values), func(i int) { result = append(result, i) })
+	iter.ForEach(iter.New(values), func(i int) { result = append(result, i) })
 
 	assert.Equal(t, values, result)
 
 }
 
 func Test_Group(t *testing.T) {
-	groups := it.Group(it.Of(0, 1, 1, 2, 4, 3, 1, 6, 7), func(e int) bool { return e%2 == 0 }).Collect()
+	groups := iter.Group(iter.Of(0, 1, 1, 2, 4, 3, 1, 6, 7), func(e int) bool { return e%2 == 0 }).Collect()
 
 	assert.Equal(t, len(groups), 2)
 	assert.Equal(t, []int{1, 1, 3, 1, 7}, groups[false])
@@ -178,18 +178,18 @@ func Test_Group(t *testing.T) {
 }
 
 func Test_ReduceSum(t *testing.T) {
-	s := it.Of(1, 3, 5, 7, 9, 11)
+	s := iter.Of(1, 3, 5, 7, 9, 11)
 	r := loop.Reduce(s.Next, op.Sum[int])
 	assert.Equal(t, 1+3+5+7+9+11, r)
 }
 
 func Test_First(t *testing.T) {
-	s := it.Of(1, 3, 5, 7, 9, 11)
-	r, ok := it.First(s, func(i int) bool { return i > 5 })
+	s := iter.Of(1, 3, 5, 7, 9, 11)
+	r, ok := iter.First(s, func(i int) bool { return i > 5 })
 	assert.True(t, ok)
 	assert.Equal(t, 7, r)
 
-	_, nook := it.First(s, func(i int) bool { return i > 12 })
+	_, nook := iter.First(s, func(i int) bool { return i > 12 })
 	assert.False(t, nook)
 }
 
@@ -214,15 +214,15 @@ func (r *rows[T]) next() (T, error) {
 
 func Test_OfLoop(t *testing.T) {
 	stream := &rows[int]{slice.Of(1, 2, 3), 0}
-	iter := it.OfLoop(stream, (*rows[int]).hasNext, (*rows[int]).next)
-	s := it.ToSlice[int](iter)
+	iterator := iter.OfLoop(stream, (*rows[int]).hasNext, (*rows[int]).next)
+	s := iter.ToSlice[int](iterator)
 
 	assert.Equal(t, slice.Of(1, 2, 3), s)
-	assert.Nil(t, iter.Error())
+	assert.Nil(t, iterator.Error())
 
 	streamWithError := &rows[int]{slice.Of(1, 2, 3, 4), 0}
-	iterWithError := it.OfLoop(streamWithError, (*rows[int]).hasNext, (*rows[int]).next)
-	s2 := it.ToSlice[int](iterWithError)
+	iterWithError := iter.OfLoop(streamWithError, (*rows[int]).hasNext, (*rows[int]).next)
+	s2 := iter.ToSlice[int](iterWithError)
 
 	assert.Equal(t, slice.Of(1, 2, 3), s2)
 	assert.Equal(t, "next error", iterWithError.Error().Error())

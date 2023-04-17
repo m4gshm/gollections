@@ -6,8 +6,8 @@ import (
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/immutable/ordered"
-	"github.com/m4gshm/gollections/it/impl/it"
-	"github.com/m4gshm/gollections/kvit"
+	"github.com/m4gshm/gollections/iter/impl/iter"
+	"github.com/m4gshm/gollections/kviter"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/map_/filter"
@@ -56,8 +56,8 @@ func (m Map[K, V]) Begin() c.KVIterator[K, V] {
 }
 
 // Head creates a key/value iterator implementation started from the head.
-func (m Map[K, V]) Head() it.EmbedMapKVIter[K, V] {
-	return it.NewEmbedMapKV(m.elements)
+func (m Map[K, V]) Head() iter.EmbedMapKVIter[K, V] {
+	return iter.NewEmbedMapKV(m.elements)
 }
 
 // Collect exports the content as a map.
@@ -143,34 +143,34 @@ func (m Map[K, V]) V() MapValues[K, V] {
 
 func (m Map[K, V]) FilterKey(predicate func(K) bool) c.MapPipe[K, V, map[K]V] {
 	h := m.Head()
-	return it.NewKVPipe(it.FilterKV(&h, filter.Key[K, V](predicate)), kvit.ToMap[K, V])
+	return iter.NewKVPipe(iter.FilterKV(&h, filter.Key[K, V](predicate)), kviter.ToMap[K, V])
 }
 
 func (m Map[K, V]) ConvertKey(by func(K) K) c.MapPipe[K, V, map[K]V] {
 	h := m.Head()
-	return it.NewKVPipe(it.ConvertKV(&h, func(key K, val V) (K, V) { return by(key), val }), kvit.ToMap[K, V])
+	return iter.NewKVPipe(iter.ConvertKV(&h, func(key K, val V) (K, V) { return by(key), val }), kviter.ToMap[K, V])
 }
 
 func (m Map[K, V]) FilterValue(predicate func(V) bool) c.MapPipe[K, V, map[K]V] {
 	h := m.Head()
-	return it.NewKVPipe(it.FilterKV(&h, filter.Value[K](predicate)), kvit.ToMap[K, V])
+	return iter.NewKVPipe(iter.FilterKV(&h, filter.Value[K](predicate)), kviter.ToMap[K, V])
 }
 
 func (m Map[K, V]) ConvertValue(by func(V) V) c.MapPipe[K, V, map[K]V] {
 	h := m.Head()
-	return it.NewKVPipe(it.ConvertKV(&h, func(key K, val V) (K, V) { return key, by(val) }), kvit.ToMap[K, V])
+	return iter.NewKVPipe(iter.ConvertKV(&h, func(key K, val V) (K, V) { return key, by(val) }), kviter.ToMap[K, V])
 }
 
 func (m Map[K, V]) Filter(filter func(K, V) bool) c.MapPipe[K, V, map[K]V] {
 	h := m.Head()
-	return it.NewKVPipe(it.FilterKV(&h, filter), kvit.ToMap[K, V])
+	return iter.NewKVPipe(iter.FilterKV(&h, filter), kviter.ToMap[K, V])
 }
 
 // Map creates an Iterator that applies a converter to iterable elements.
 // The 'by' converter is applied only when the 'Next' method of returned Iterator is called and does not change the elements of the map.
 func (m Map[K, V]) Convert(by func(K, V) (K, V)) c.MapPipe[K, V, map[K]V] {
 	h := m.Head()
-	return it.NewKVPipe(it.ConvertKV(&h, by), kvit.ToMap[K, V])
+	return iter.NewKVPipe(iter.ConvertKV(&h, by), kviter.ToMap[K, V])
 }
 
 // Reduce reduces key\value pairs to an one.

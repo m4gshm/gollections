@@ -2,17 +2,17 @@ package mutable
 
 import (
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/it/impl/it"
+	"github.com/m4gshm/gollections/iter/impl/iter"
 )
 
 // NewSetIter creates SetIter instance.
 func NewSetIter[K comparable](uniques map[K]struct{}, del func(element K)) *SetIter[K] {
-	return &SetIter[K]{Key: it.NewKey(uniques), del: del}
+	return &SetIter[K]{Key: iter.NewKey(uniques), del: del}
 }
 
 // SetIter is the Set Iterator implementation.
 type SetIter[K comparable] struct {
-	it.Key[K, struct{}]
+	iter.Key[K, struct{}]
 	del        func(element K)
 	currentKey K
 	ok         bool

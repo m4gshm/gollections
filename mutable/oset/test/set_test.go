@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/m4gshm/gollections/it"
+	"github.com/m4gshm/gollections/iter"
 	"github.com/m4gshm/gollections/iterable"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/mutable/oset"
@@ -25,7 +25,7 @@ func Test_Set_Iterate(t *testing.T) {
 	expected := slice.Of(1, 2, 4, 3)
 	assert.Equal(t, expected, values)
 
-	iterSlice := it.ToSlice(set.Begin())
+	iterSlice := iter.ToSlice(set.Begin())
 	assert.Equal(t, expected, iterSlice)
 
 	loopSlice := loop.ToSlice(set.Head().Next)
@@ -91,12 +91,12 @@ func Test_Set_Delete(t *testing.T) {
 
 func Test_Set_DeleteByIterator(t *testing.T) {
 	set := oset.Of(1, 1, 2, 4, 3, 1)
-	iter := set.BeginEdit()
+	iterator := set.BeginEdit()
 
 	i := 0
-	for _, ok := iter.Next(); ok; _, ok = iter.Next() {
+	for _, ok := iterator.Next(); ok; _, ok = iterator.Next() {
 		i++
-		iter.Delete()
+		iterator.Delete()
 	}
 
 	assert.Equal(t, 4, i)
@@ -119,7 +119,7 @@ func Test_Set_Group(t *testing.T) {
 func Test_Set_Convert(t *testing.T) {
 	var (
 		ints     = oset.Of(3, 3, 1, 1, 1, 5, 6, 8, 8, 0, -2, -2)
-		strings  = it.ToSlice(it.Filter(oset.Convert(ints, strconv.Itoa), func(s string) bool { return len(s) == 1 }))
+		strings  = iter.ToSlice(iter.Filter(oset.Convert(ints, strconv.Itoa), func(s string) bool { return len(s) == 1 }))
 		strings2 = oset.Convert(ints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 }).Slice()
 	)
 	assert.Equal(t, slice.Of("3", "1", "5", "6", "8", "0"), strings)

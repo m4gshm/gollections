@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/it/impl/it"
+	"github.com/m4gshm/gollections/iter/impl/iter"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/slice"
 )
@@ -31,16 +31,16 @@ func (s MapKeys[T]) Begin() c.Iterator[T] {
 	return &h
 }
 
-func (s MapKeys[T]) Head() it.ArrayIter[T] {
-	return it.NewHead(s.elements)
+func (s MapKeys[T]) Head() iter.ArrayIter[T] {
+	return iter.NewHead(s.elements)
 }
 
-func (s MapKeys[T]) First() (it.ArrayIter[T], T, bool) {
+func (s MapKeys[T]) First() (iter.ArrayIter[T], T, bool) {
 	var (
-		iter      = s.Head()
-		first, ok = iter.Next()
+		iterator  = s.Head()
+		first, ok = iterator.Next()
 	)
-	return iter, first, ok
+	return iterator, first, ok
 }
 
 func (s MapKeys[T]) Len() int {
@@ -72,12 +72,12 @@ func (s MapKeys[T]) Get(index int) (T, bool) {
 
 func (s MapKeys[T]) Filter(filter func(T) bool) c.Pipe[T, []T] {
 	h := s.Head()
-	return it.NewPipe[T](it.Filter(h, h.Next, filter))
+	return iter.NewPipe[T](iter.Filter(h, h.Next, filter))
 }
 
 func (s MapKeys[T]) Convert(by func(T) T) c.Pipe[T, []T] {
 	h := s.Head()
-	return it.NewPipe[T](it.Convert(h, h.Next, by))
+	return iter.NewPipe[T](iter.Convert(h, h.Next, by))
 }
 
 func (s MapKeys[T]) Reduce(by func(T, T) T) T {
