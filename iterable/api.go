@@ -1,5 +1,5 @@
-// Package op consists of common operations of c.Iterable based collections
-package collection
+// Package iterable consists of common operations of c.Iterable based collections
+package iterable
 
 import (
 	"github.com/m4gshm/gollections/c"

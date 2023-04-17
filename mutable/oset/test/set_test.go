@@ -6,8 +6,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/it"
+	"github.com/m4gshm/gollections/iterable"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/mutable/oset"
 	"github.com/m4gshm/gollections/mutable/vector"
@@ -130,7 +130,7 @@ func Test_Set_Flatt(t *testing.T) {
 	var (
 		ints        = oset.Of(3, 3, 1, 1, 1, 5, 6, 8, 8, 0, -2, -2)
 		fints       = oset.Flatt(ints, func(i int) []int { return slice.Of(i) })
-		stringsPipe = collection.Filter(collection.Convert(fints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 }), func(s string) bool { return len(s) == 1 })
+		stringsPipe = iterable.Filter(iterable.Convert(fints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 }), func(s string) bool { return len(s) == 1 })
 	)
 	assert.Equal(t, slice.Of("3", "1", "5", "6", "8", "0"), stringsPipe.Slice())
 }
@@ -139,7 +139,7 @@ func Test_Set_DoubleConvert(t *testing.T) {
 	var (
 		ints               = oset.Of(3, 1, 5, 6, 8, 0, -2)
 		stringsPipe        = oset.Convert(ints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 })
-		prefixedStrinsPipe = collection.Convert(stringsPipe, func(s string) string { return "_" + s })
+		prefixedStrinsPipe = iterable.Convert(stringsPipe, func(s string) string { return "_" + s })
 	)
 	assert.Equal(t, slice.Of("_3", "_1", "_5", "_6", "_8", "_0"), prefixedStrinsPipe.Slice())
 
