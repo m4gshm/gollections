@@ -6,45 +6,48 @@ import (
 )
 
 // NewKVPipe instantiates Iterator wrapper that converts the elements into key/value pairs and iterates over them.
-func NewKVPipe[K comparable, V any, C any, IT c.KVIterator[K, V]](it IT, collector KVCollector[K, V, C]) *KVIterPipe[K, V, C] {
-	return &KVIterPipe[K, V, C]{KVIterator: it, collector: collector}
+func NewKVPipe[K comparable, V any, M map[K]V | map[K][]V, IT c.KVIterator[K, V]](it IT, collector MapCollector[K, V, M]) *KVIterPipe[K, V, M] {
+	return &KVIterPipe[K, V, M]{KVIterator: it, collector: collector}
 }
 
 // KVIterPipe is the key/value Iterator based pipe implementation.
-type KVIterPipe[K comparable, V any, C any] struct {
+type KVIterPipe[K comparable, V any, M map[K]V | map[K][]V] struct {
 	c.KVIterator[K, V]
-	collector KVCollector[K, V, C]
+	collector MapCollector[K, V, M]
 }
 
-var _ c.MapPipe[string, any, any] = (*KVIterPipe[string, any, any])(nil)
+var (
+	_ c.MapPipe[string, any, map[string]any]   = (*KVIterPipe[string, any, map[string]any])(nil)
+	_ c.MapPipe[string, any, map[string][]any] = (*KVIterPipe[string, any, map[string][]any])(nil)
+)
 
-func (s *KVIterPipe[K, V, C]) FilterKey(filter func(K) bool) c.MapPipe[K, V, C] {
+func (s *KVIterPipe[K, V, M]) FilterKey(filter func(K) bool) c.MapPipe[K, V, M] {
 	kvFit := func(key K, val V) bool { return filter(key) }
 	return NewKVPipe(FilterKV(s, kvFit), s.collector)
 }
 
-func (s *KVIterPipe[K, V, C]) ConvertKey(by func(K) K) c.MapPipe[K, V, C] {
+func (s *KVIterPipe[K, V, M]) ConvertKey(by func(K) K) c.MapPipe[K, V, M] {
 	return NewKVPipe(ConvertKV(s, func(key K, val V) (K, V) { return by(key), val }), s.collector)
 }
 
-func (s *KVIterPipe[K, V, C]) FilterValue(filter func(V) bool) c.MapPipe[K, V, C] {
+func (s *KVIterPipe[K, V, M]) FilterValue(filter func(V) bool) c.MapPipe[K, V, M] {
 	kvFit := func(key K, val V) bool { return filter(val) }
 	return NewKVPipe(FilterKV(s, kvFit), s.collector)
 }
 
-func (s *KVIterPipe[K, V, C]) ConvertValue(by func(V) V) c.MapPipe[K, V, C] {
+func (s *KVIterPipe[K, V, M]) ConvertValue(by func(V) V) c.MapPipe[K, V, M] {
 	return NewKVPipe(ConvertKV(s, func(key K, val V) (K, V) { return key, by(val) }), s.collector)
 }
 
-func (s *KVIterPipe[K, V, C]) Filter(filter func(K, V) bool) c.MapPipe[K, V, C] {
+func (s *KVIterPipe[K, V, M]) Filter(filter func(K, V) bool) c.MapPipe[K, V, M] {
 	return NewKVPipe(FilterKV(s, filter), s.collector)
 }
 
-func (s *KVIterPipe[K, V, C]) Convert(by func(K, V) (K, V)) c.MapPipe[K, V, C] {
+func (s *KVIterPipe[K, V, M]) Convert(by func(K, V) (K, V)) c.MapPipe[K, V, M] {
 	return NewKVPipe(ConvertKV(s, by), s.collector)
 }
 
-func (s *KVIterPipe[K, V, C]) Track(tracker func(K, V) error) error {
+func (s *KVIterPipe[K, V, M]) Track(tracker func(K, V) error) error {
 	for key, val, ok := s.Next(); ok; key, val, ok = s.Next() {
 		if err := tracker(key, val); err != nil {
 			return err
@@ -53,17 +56,21 @@ func (s *KVIterPipe[K, V, C]) Track(tracker func(K, V) error) error {
 	return nil
 }
 
-func (s *KVIterPipe[K, V, C]) Reduce(by c.Quaternary[K, V]) (K, V) {
+func (s *KVIterPipe[K, V, M]) TrackEach(tracker func(K, V)) {
+
+}
+
+func (s *KVIterPipe[K, V, M]) Reduce(by c.Quaternary[K, V]) (K, V) {
 	return loop.ReduceKV(s.Next, by)
 }
 
-func (s *KVIterPipe[K, V, C]) Begin() c.KVIterator[K, V] {
+func (s *KVIterPipe[K, V, M]) Begin() c.KVIterator[K, V] {
 	return s
 }
 
-func (s *KVIterPipe[K, V, C]) Collect() C {
+func (s *KVIterPipe[K, V, M]) Map() M {
 	return s.collector(s)
 }
 
-// KVCollector is Converter of key/value Iterator that collects all values to any slice or map, mostly used to extract slice fields to flatting a result
-type KVCollector[k, v any, out any] func(c.KVIterator[k, v]) out
+// MapCollector is Converter of key/value Iterator that collects all values to any slice or map, mostly used to extract slice fields to flatting a result
+type MapCollector[K comparable, V any, M map[K]V | map[K][]V] func(c.KVIterator[K, V]) M

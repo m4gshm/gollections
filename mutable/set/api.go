@@ -34,12 +34,12 @@ func Sort[T comparable, F constraints.Ordered](s mutable.Set[T], by func(T) F) *
 	return s.Sort(func(e1, e2 T) bool { return by(e1) < by(e2) })
 }
 
-func Convert[From, To comparable](s mutable.Set[From], by func(From) To) c.Pipe[To, []To] {
+func Convert[From, To comparable](s mutable.Set[From], by func(From) To) c.Pipe[To] {
 	h := *(s.Head())
 	return iter.NewPipe[To](iter.Convert(h, h.Next, by))
 }
 
-func Flatt[From, To comparable](s mutable.Set[From], by func(From) []To) c.Pipe[To, []To] {
+func Flatt[From, To comparable](s mutable.Set[From], by func(From) []To) c.Pipe[To] {
 	h := *(s.Head())
 	f := iter.Flatt(h, h.Next, by)
 	return iter.NewPipe[To](&f)

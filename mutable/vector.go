@@ -83,13 +83,9 @@ func (v *Vector[T]) Last() (Iter[Vector[T], T], T, bool) {
 	return iterator, first, ok
 }
 
-// Collect transforms the vector to a slice
-func (v *Vector[T]) Collect() []T {
-	return slice.Clone(*v)
-}
-
+// Slice transforms the vector to a slice
 func (v *Vector[T]) Slice() []T {
-	return v.Collect()
+	return slice.Clone(*v)
 }
 
 // Copy just makes a copy of the vector instance
@@ -142,7 +138,7 @@ func (v *Vector[T]) AddOne(element T) {
 	*v = append(*v, element)
 }
 
-func (v *Vector[T]) AddAll(elements c.Iterable[c.Iterator[T]]) {
+func (v *Vector[T]) AddAll(elements c.Iterable[T]) {
 	*v = append(*v, loop.ToSlice(elements.Begin().Next)...)
 }
 
@@ -247,13 +243,13 @@ func (v *Vector[T]) SetNew(index int, value T) bool {
 }
 
 // Filter returns a pipe consisting of vector elements matching the filter
-func (v *Vector[T]) Filter(filter func(T) bool) c.Pipe[T, []T] {
+func (v *Vector[T]) Filter(filter func(T) bool) c.Pipe[T] {
 	h := v.Head()
 	return iter.NewPipe[T](iter.Filter(h, h.Next, filter))
 }
 
 // Map returns a pipe of converted vector elements by the converter 'by'
-func (v *Vector[T]) Convert(by func(T) T) c.Pipe[T, []T] {
+func (v *Vector[T]) Convert(by func(T) T) c.Pipe[T] {
 	h := v.Head()
 	return iter.NewPipe[T](iter.Convert(h, h.Next, by))
 }

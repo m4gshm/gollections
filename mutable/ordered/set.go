@@ -85,12 +85,8 @@ func (s *Set[T]) Head() *SetIter[T] {
 	return NewSetIter(&s.elements, s.DeleteOne)
 }
 
-func (s *Set[T]) Collect() []T {
-	return slice.Clone(s.elements)
-}
-
 func (s *Set[T]) Slice() []T {
-	return s.Collect()
+	return slice.Clone(s.elements)
 }
 
 func (s *Set[T]) For(walker func(T) error) error {
@@ -141,11 +137,11 @@ func (s *Set[T]) AddOne(v T) {
 	s.AddOneNew(v)
 }
 
-func (s *Set[T]) AddAll(elements c.Iterable[c.Iterator[T]]) {
+func (s *Set[T]) AddAll(elements c.Iterable[T]) {
 	loop.ForEach(elements.Begin().Next, s.AddOne)
 }
 
-func (s *Set[T]) AddAllNew(elements c.Iterable[c.Iterator[T]]) bool {
+func (s *Set[T]) AddAllNew(elements c.Iterable[T]) bool {
 	var ok bool
 	loop.ForEach(elements.Begin().Next, func(v T) { ok = s.AddOneNew(v) || ok })
 	return ok
@@ -183,12 +179,12 @@ func (s *Set[T]) DeleteActualOne(v T) bool {
 	return false
 }
 
-func (s *Set[T]) Filter(filter func(T) bool) c.Pipe[T, []T] {
+func (s *Set[T]) Filter(filter func(T) bool) c.Pipe[T] {
 	h := s.Head()
 	return iter.NewPipe[T](iter.Filter(h, h.Next, filter))
 }
 
-func (s *Set[T]) Convert(by func(T) T) c.Pipe[T, []T] {
+func (s *Set[T]) Convert(by func(T) T) c.Pipe[T] {
 	h := s.Head()
 	return iter.NewPipe[T](iter.Convert(h, h.Next, by))
 }

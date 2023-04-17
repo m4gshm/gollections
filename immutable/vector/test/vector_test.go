@@ -110,7 +110,7 @@ func Test_Vector_Convert(t *testing.T) {
 func Test_Vector_Flatt(t *testing.T) {
 	var (
 		deepInts    = vector.Of(vector.Of(3, 1), vector.Of(5, 6, 8, 0, -2))
-		ints        = vector.Flatt(deepInts, immutable.Vector[int].Collect)
+		ints        = vector.Flatt(deepInts, immutable.Vector[int].Slice)
 		stringsPipe = iterable.Filter(iterable.Convert(ints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 }), func(s string) bool { return len(s) == 1 })
 	)
 	assert.Equal(t, slice.Of("3", "1", "5", "6", "8", "0"), stringsPipe.Slice())

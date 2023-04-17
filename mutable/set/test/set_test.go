@@ -19,7 +19,7 @@ import (
 
 func Test_Set_Iterate(t *testing.T) {
 	set := set.Of(1, 1, 2, 4, 3, 1)
-	values := sort.Of(set.Collect())
+	values := sort.Of(set.Slice())
 
 	assert.Equal(t, 4, len(values))
 
@@ -87,13 +87,13 @@ func Test_Set_AddAllNew(t *testing.T) {
 
 func Test_Set_Delete(t *testing.T) {
 	set := set.Of(1, 1, 2, 4, 3, 1)
-	values := set.Collect()
+	values := set.Slice()
 
 	for _, v := range values {
 		set.Delete(v)
 	}
 
-	assert.Equal(t, 0, len(set.Collect()))
+	assert.Equal(t, 0, len(set.Slice()))
 }
 
 func Test_Set_DeleteByIterator(t *testing.T) {
@@ -107,7 +107,7 @@ func Test_Set_DeleteByIterator(t *testing.T) {
 	}
 
 	assert.Equal(t, 4, i)
-	assert.Equal(t, 0, len(set.Collect()))
+	assert.Equal(t, 0, len(set.Slice()))
 }
 
 func Test_Set_Contains(t *testing.T) {
@@ -136,7 +136,7 @@ func Test_Set_Group_By_Walker(t *testing.T) {
 }
 
 func Test_Set_Group_By_Iterator(t *testing.T) {
-	groups := cgroup.Of(set.Of(0, 1, 1, 2, 4, 3, 1, 6, 7), func(e int) bool { return e%2 == 0 }).Collect()
+	groups := cgroup.Of(set.Of(0, 1, 1, 2, 4, 3, 1, 6, 7), func(e int) bool { return e%2 == 0 }).Map()
 
 	assert.Equal(t, len(groups), 2)
 	fg := sort.Of(groups[false])

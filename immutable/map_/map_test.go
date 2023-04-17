@@ -13,7 +13,7 @@ func Test_Map_Iterate(t *testing.T) {
 	dict := Of(K.V(1, "1"), K.V(1, "1"), K.V(2, "2"), K.V(4, "4"), K.V(3, "3"), K.V(1, "1"))
 
 	assert.Equal(t, 4, dict.Len())
-	assert.Equal(t, 4, len(dict.Collect()))
+	assert.Equal(t, 4, len(dict.Map()))
 
 	expectedK := slice.Of(1, 2, 3, 4)
 	expectedV := slice.Of("1", "2", "3", "4")
@@ -32,8 +32,8 @@ func Test_Map_Iterate(t *testing.T) {
 	assert.Equal(t, expectedK, keys)
 	assert.Equal(t, expectedV, values)
 
-	keys = dict.Keys().Collect()
-	values = dict.Values().Collect()
+	keys = dict.Keys().Slice()
+	values = dict.Values().Slice()
 	sort.Ints(keys)
 	sort.Strings(values)
 	assert.Equal(t, slice.Of(1, 2, 3, 4), keys)
@@ -42,7 +42,7 @@ func Test_Map_Iterate(t *testing.T) {
 
 func Test_Map_Iterate_Keys(t *testing.T) {
 	dict := Of(K.V(1, "1"), K.V(1, "1"), K.V(2, "2"), K.V(4, "4"), K.V(3, "3"), K.V(1, "1"))
-	assert.Equal(t, 4, len(dict.Collect()))
+	assert.Equal(t, 4, len(dict.Map()))
 
 	expectedK := slice.Of(1, 2, 3, 4)
 
@@ -58,7 +58,7 @@ func Test_Map_Iterate_Keys(t *testing.T) {
 
 func Test_Map_Iterate_Values(t *testing.T) {
 	ordered := Of(K.V(1, "1"), K.V(1, "1"), K.V(2, "2"), K.V(4, "4"), K.V(3, "3"), K.V(1, "1"))
-	assert.Equal(t, 4, len(ordered.Collect()))
+	assert.Equal(t, 4, len(ordered.Map()))
 
 	expectedV := slice.Of("1", "2", "3", "4")
 

@@ -743,7 +743,7 @@ func Test_group_orderset_with_filtering_by_stirng_len(t *testing.T) {
         more.Than(3),
     ).ConvertValue(
         func(v string) string { return v + "_" },
-    ).Collect()
+    ).Map()
 
     fmt.Println(groups) //map[int][]string{5:[]string{"first_", "third_", "fifth_", "sixth_", "ninth_", "tenth_", "three_"}, 6:[]string{"second_", "fourth_", "eighth_"}, 7:[]string{"seventh_"}}
 

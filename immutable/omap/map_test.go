@@ -10,7 +10,7 @@ import (
 
 func Test_Map_Iterate(t *testing.T) {
 	ordered := Of(K.V(1, "1"), K.V(1, "1"), K.V(2, "2"), K.V(4, "4"), K.V(3, "3"), K.V(1, "1"))
-	assert.Equal(t, 4, len(ordered.Collect()))
+	assert.Equal(t, 4, len(ordered.Map()))
 
 	expectedK := slice.Of(1, 2, 4, 3)
 	expectedV := slice.Of("1", "2", "4", "3")
@@ -24,13 +24,13 @@ func Test_Map_Iterate(t *testing.T) {
 	assert.Equal(t, expectedK, keys)
 	assert.Equal(t, expectedV, values)
 
-	assert.Equal(t, slice.Of(1, 2, 4, 3), ordered.Keys().Collect())
-	assert.Equal(t, slice.Of("1", "2", "4", "3"), ordered.Values().Collect())
+	assert.Equal(t, slice.Of(1, 2, 4, 3), ordered.Keys().Slice())
+	assert.Equal(t, slice.Of("1", "2", "4", "3"), ordered.Values().Slice())
 }
 
 func Test_Map_Iterate_Keys(t *testing.T) {
 	ordered := Of(K.V(1, "1"), K.V(1, "1"), K.V(2, "2"), K.V(4, "4"), K.V(3, "3"), K.V(1, "1"))
-	assert.Equal(t, 4, len(ordered.Collect()))
+	assert.Equal(t, 4, len(ordered.Map()))
 
 	expectedK := slice.Of(1, 2, 4, 3)
 
@@ -44,7 +44,7 @@ func Test_Map_Iterate_Keys(t *testing.T) {
 
 func Test_Map_Iterate_Values(t *testing.T) {
 	ordered := Of(K.V(1, "1"), K.V(1, "1"), K.V(2, "2"), K.V(4, "4"), K.V(3, "3"), K.V(1, "1"))
-	assert.Equal(t, 4, len(ordered.Collect()))
+	assert.Equal(t, 4, len(ordered.Map()))
 
 	expectedV := slice.Of("1", "2", "4", "3")
 

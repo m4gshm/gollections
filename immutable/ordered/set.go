@@ -87,12 +87,8 @@ func (s Set[T]) Last() (iter.ArrayIter[T], T, bool) {
 	return iterator, first, ok
 }
 
-func (s Set[T]) Collect() []T {
-	return slice.Clone(s.order)
-}
-
 func (s Set[T]) Slice() []T {
-	return s.Collect()
+	return slice.Clone(s.order)
 }
 
 func (s Set[T]) For(walker func(T) error) error {
@@ -103,12 +99,12 @@ func (s Set[T]) ForEach(walker func(T)) {
 	slice.ForEach(s.order, walker)
 }
 
-func (s Set[T]) Filter(filter func(T) bool) c.Pipe[T, []T] {
+func (s Set[T]) Filter(filter func(T) bool) c.Pipe[T] {
 	h := s.Head()
 	return iter.NewPipe[T](iter.Filter(h, h.Next, filter))
 }
 
-func (s Set[T]) Convert(by func(T) T) c.Pipe[T, []T] {
+func (s Set[T]) Convert(by func(T) T) c.Pipe[T] {
 	h := s.Head()
 	return iter.NewPipe[T](iter.Convert(h, h.Next, by))
 }

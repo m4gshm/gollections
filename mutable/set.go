@@ -80,12 +80,8 @@ func (s Set[K]) Head() *SetIter[K] {
 	return NewSetIter(s.elements, s.DeleteOne)
 }
 
-func (s Set[K]) Collect() []K {
-	return map_.Keys(s.elements)
-}
-
 func (s Set[K]) Slice() []K {
-	return s.Collect()
+	return map_.Keys(s.elements)
 }
 
 func (s Set[T]) Copy() Set[T] {
@@ -131,11 +127,11 @@ func (s Set[K]) AddOneNew(element K) bool {
 	return ok
 }
 
-func (s Set[T]) AddAll(elements c.Iterable[c.Iterator[T]]) {
+func (s Set[T]) AddAll(elements c.Iterable[T]) {
 	loop.ForEach(elements.Begin().Next, s.AddOne)
 }
 
-func (s Set[T]) AddAllNew(elements c.Iterable[c.Iterator[T]]) bool {
+func (s Set[T]) AddAllNew(elements c.Iterable[T]) bool {
 	var ok bool
 	loop.ForEach(elements.Begin().Next, func(v T) { ok = s.AddOneNew(v) || ok })
 	return ok
@@ -175,12 +171,12 @@ func (s Set[K]) ForEach(walker func(K)) {
 	map_.ForEachKey(s.elements, walker)
 }
 
-func (s Set[K]) Filter(filter func(K) bool) c.Pipe[K, []K] {
+func (s Set[K]) Filter(filter func(K) bool) c.Pipe[K] {
 	h := s.Head()
 	return iter.NewPipe[K](iter.Filter(h, h.Next, filter))
 }
 
-func (s Set[K]) Convert(by func(K) K) c.Pipe[K, []K] {
+func (s Set[K]) Convert(by func(K) K) c.Pipe[K] {
 	h := s.Head()
 	return iter.NewPipe[K](iter.Convert(h, h.Next, by))
 }

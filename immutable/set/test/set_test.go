@@ -19,7 +19,7 @@ import (
 
 func Test_Set_Iterate(t *testing.T) {
 	set := set.Of(1, 1, 2, 4, 3, 1)
-	values := sort.Of(set.Collect())
+	values := sort.Of(set.Slice())
 
 	assert.Equal(t, 4, len(values))
 
@@ -77,7 +77,7 @@ func Test_Set_Group_By_Walker(t *testing.T) {
 }
 
 func Test_Set_Group_By_Iterator(t *testing.T) {
-	groups := iter.Group(set.Of(0, 1, 1, 2, 4, 3, 1, 6, 7).Begin(), func(e int) bool { return e%2 == 0 }).Collect()
+	groups := iter.Group(set.Of(0, 1, 1, 2, 4, 3, 1, 6, 7).Begin(), func(e int) bool { return e%2 == 0 }).Map()
 
 	assert.Equal(t, len(groups), 2)
 	fg := sort.Of(groups[false])

@@ -11,7 +11,7 @@ import (
 
 func Test_Map_Iterate(t *testing.T) {
 	unordered := Of(K.V(1, "1"), K.V(1, "1"), K.V(2, "2"), K.V(4, "4"), K.V(3, "3"), K.V(1, "1"))
-	assert.Equal(t, 4, len(unordered.Collect()))
+	assert.Equal(t, 4, len(unordered.Map()))
 
 	expectedK := slice.Of(1, 2, 3, 4)
 	expectedV := slice.Of("1", "2", "3", "4")
@@ -28,9 +28,9 @@ func Test_Map_Iterate(t *testing.T) {
 	assert.Equal(t, expectedK, keys)
 	assert.Equal(t, expectedV, values)
 
-	keys = unordered.Keys().Collect()
+	keys = unordered.Keys().Slice()
 	sort.Ints(keys)
-	values = unordered.Values().Collect()
+	values = unordered.Values().Slice()
 	sort.Strings(values)
 	assert.Equal(t, slice.Of(1, 2, 3, 4), keys)
 	assert.Equal(t, slice.Of("1", "2", "3", "4"), values)
@@ -38,7 +38,7 @@ func Test_Map_Iterate(t *testing.T) {
 
 func Test_Map_IterateOverRange(t *testing.T) {
 	unordered := Of(K.V(1, "1"), K.V(1, "1"), K.V(2, "2"), K.V(4, "4"), K.V(3, "3"), K.V(1, "1"))
-	assert.Equal(t, 4, len(unordered.Collect()))
+	assert.Equal(t, 4, len(unordered.Map()))
 
 	expectedK := slice.Of(1, 2, 3, 4)
 	expectedV := slice.Of("1", "2", "3", "4")
@@ -55,9 +55,9 @@ func Test_Map_IterateOverRange(t *testing.T) {
 	assert.Equal(t, expectedK, keys)
 	assert.Equal(t, expectedV, values)
 
-	keys = unordered.Keys().Collect()
+	keys = unordered.Keys().Slice()
 	sort.Ints(keys)
-	values = unordered.Values().Collect()
+	values = unordered.Values().Slice()
 	sort.Strings(values)
 	assert.Equal(t, slice.Of(1, 2, 3, 4), keys)
 	assert.Equal(t, slice.Of("1", "2", "3", "4"), values)
@@ -75,9 +75,9 @@ func Test_Map_Add(t *testing.T) {
 	s = d.SetNew(1, "11")
 	assert.Equal(t, s, false)
 
-	keys := d.Keys().Collect()
+	keys := d.Keys().Slice()
 	sort.Ints(keys)
-	values := d.Values().Collect()
+	values := d.Values().Slice()
 	sort.Strings(values)
 	assert.Equal(t, slice.Of(1, 2, 3, 4), keys)
 	assert.Equal(t, slice.Of("1", "2", "3", "4"), values)

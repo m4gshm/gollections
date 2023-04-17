@@ -67,7 +67,7 @@ func (s Set[T]) First() (iter.Key[T, struct{}], T, bool) {
 	return iterator, first, ok
 }
 
-func (s Set[T]) Collect() []T {
+func (s Set[T]) Slice() []T {
 	elements := s.elements
 	out := make([]T, 0, len(elements))
 	for e := range elements {
@@ -76,16 +76,12 @@ func (s Set[T]) Collect() []T {
 	return out
 }
 
-func (s Set[T]) Slice() []T {
-	return s.Collect()
-}
-
 func (s Set[T]) Len() int {
 	return len(s.elements)
 }
 
 func (s Set[T]) IsEmpty() bool {
-	return s.IsEmpty()
+	return s.Len() == 0
 }
 
 func (s Set[T]) For(walker func(T) error) error {
@@ -96,12 +92,12 @@ func (s Set[T]) ForEach(walker func(T)) {
 	map_.ForEachKey(s.elements, walker)
 }
 
-func (s Set[T]) Filter(filter func(T) bool) c.Pipe[T, []T] {
+func (s Set[T]) Filter(filter func(T) bool) c.Pipe[T] {
 	h := s.Head()
 	return iter.NewPipe[T](iter.Filter(h, h.Next, filter))
 }
 
-func (s Set[T]) Convert(by func(T) T) c.Pipe[T, []T] {
+func (s Set[T]) Convert(by func(T) T) c.Pipe[T] {
 	h := s.Head()
 	return iter.NewPipe[T](iter.Convert(h, h.Next, by))
 }

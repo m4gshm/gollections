@@ -144,7 +144,7 @@ func (s Map[K, V]) Remove(key K) (V, bool) {
 	return v, ok
 }
 
-func (s Map[K, V]) Keys() c.Collection[K, []K, c.Iterator[K]] {
+func (s Map[K, V]) Keys() c.Collection[K] {
 	return s.K()
 }
 
@@ -152,7 +152,7 @@ func (s Map[K, V]) K() immutable.MapKeys[K, V] {
 	return immutable.WrapKeys(s)
 }
 
-func (s Map[K, V]) Values() c.Collection[V, []V, c.Iterator[V]] {
+func (s Map[K, V]) Values() c.Collection[V] {
 	return s.V()
 }
 

@@ -170,7 +170,7 @@ func Test_Iterate(t *testing.T) {
 }
 
 func Test_Group(t *testing.T) {
-	groups := iter.Group(iter.Of(0, 1, 1, 2, 4, 3, 1, 6, 7), func(e int) bool { return e%2 == 0 }).Collect()
+	groups := iter.Group(iter.Of(0, 1, 1, 2, 4, 3, 1, 6, 7), func(e int) bool { return e%2 == 0 }).Map()
 
 	assert.Equal(t, len(groups), 2)
 	assert.Equal(t, []int{1, 1, 3, 1, 7}, groups[false])

@@ -12,5 +12,5 @@ func Test_group_odd_even(t *testing.T) {
 		even   = func(v int) bool { return v%2 == 0 }
 		groups = Of(iter.Of(1, 1, 2, 4, 3, 1), even)
 	)
-	assert.Equal(t, map[bool][]int{false: {1, 1, 3, 1}, true: {2, 4}}, groups.Collect())
+	assert.Equal(t, map[bool][]int{false: {1, 1, 3, 1}, true: {2, 4}}, groups.Map())
 }

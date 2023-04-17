@@ -84,12 +84,8 @@ func (s Map[K, V]) First() (iter.OrderedEmbedMapKVIter[K, V], K, V, bool) {
 	return iterator, firstK, firstV, ok
 }
 
-func (s Map[K, V]) Collect() map[K]V {
-	return map_.Clone(s.elements)
-}
-
 func (s Map[K, V]) Map() map[K]V {
-	return s.Collect()
+	return map_.Clone(s.elements)
 }
 
 func (s Map[K, V]) Len() int {
@@ -110,7 +106,7 @@ func (s Map[K, V]) Get(key K) (V, bool) {
 	return val, ok
 }
 
-func (s Map[K, V]) Keys() c.Collection[K, []K, c.Iterator[K]] {
+func (s Map[K, V]) Keys() c.Collection[K] {
 	return s.K()
 }
 
@@ -118,7 +114,7 @@ func (s Map[K, V]) K() MapKeys[K] {
 	return WrapKeys(s.order)
 }
 
-func (s Map[K, V]) Values() c.Collection[V, []V, c.Iterator[V]] {
+func (s Map[K, V]) Values() c.Collection[V] {
 	return s.V()
 }
 

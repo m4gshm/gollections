@@ -75,12 +75,8 @@ func (m *Map[K, V]) First() (iter.OrderedEmbedMapKVIter[K, V], K, V, bool) {
 	return iterator, firstK, firstV, ok
 }
 
-func (m *Map[K, V]) Collect() map[K]V {
-	return map_.Clone(m.elements)
-}
-
 func (m *Map[K, V]) Map() map[K]V {
-	return m.Collect()
+	return map_.Clone(m.elements)
 }
 
 // Sort transforms to the ordered Map contains sorted elements.
@@ -147,7 +143,7 @@ func (m *Map[K, V]) SetNew(key K, value V) bool {
 	return !ok
 }
 
-func (m *Map[K, V]) Keys() c.Collection[K, []K, c.Iterator[K]] {
+func (m *Map[K, V]) Keys() c.Collection[K] {
 	return m.K()
 }
 
@@ -155,7 +151,7 @@ func (m *Map[K, V]) K() ordered.MapKeys[K] {
 	return ordered.WrapKeys(m.order)
 }
 
-func (m *Map[K, V]) Values() c.Collection[V, []V, c.Iterator[V]] {
+func (m *Map[K, V]) Values() c.Collection[V] {
 	return m.V()
 }
 

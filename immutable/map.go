@@ -60,13 +60,9 @@ func (m Map[K, V]) Head() iter.EmbedMapKVIter[K, V] {
 	return iter.NewEmbedMapKV(m.elements)
 }
 
-// Collect exports the content as a map.
-func (m Map[K, V]) Collect() map[K]V {
-	return map_.Clone(m.elements)
-}
-
+// Map exports the content as a map.
 func (m Map[K, V]) Map() map[K]V {
-	return m.Collect()
+	return map_.Clone(m.elements)
 }
 
 // Sort transforms to the ordered Map contains sorted elements.
@@ -125,7 +121,7 @@ func (m Map[K, V]) Get(key K) (V, bool) {
 	return val, ok
 }
 
-func (m Map[K, V]) Keys() c.Collection[K, []K, c.Iterator[K]] {
+func (m Map[K, V]) Keys() c.Collection[K] {
 	return m.K()
 }
 
@@ -133,7 +129,7 @@ func (m Map[K, V]) K() MapKeys[K, V] {
 	return WrapKeys(m.elements)
 }
 
-func (m Map[K, V]) Values() c.Collection[V, []V, c.Iterator[V]] {
+func (m Map[K, V]) Values() c.Collection[V] {
 	return m.V()
 }
 

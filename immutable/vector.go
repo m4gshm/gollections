@@ -63,12 +63,8 @@ func (v Vector[T]) Last() (iter.ArrayIter[T], T, bool) {
 	return iterator, first, ok
 }
 
-func (v Vector[T]) Collect() []T {
-	return slice.Clone(v.elements)
-}
-
 func (v Vector[T]) Slice() []T {
-	return v.Collect()
+	return slice.Clone(v.elements)
 }
 
 func (v Vector[T]) Len() int {
@@ -99,12 +95,12 @@ func (v Vector[T]) ForEach(walker func(T)) {
 	slice.ForEach(v.elements, walker)
 }
 
-func (v Vector[T]) Filter(filter func(T) bool) c.Pipe[T, []T] {
+func (v Vector[T]) Filter(filter func(T) bool) c.Pipe[T] {
 	h := v.Head()
 	return iter.NewPipe[T](iter.Filter(h, h.Next, filter))
 }
 
-func (v Vector[T]) Convert(by func(T) T) c.Pipe[T, []T] {
+func (v Vector[T]) Convert(by func(T) T) c.Pipe[T] {
 	h := v.Head()
 	return iter.NewPipe[T](iter.Convert(h, h.Next, by))
 }

@@ -21,10 +21,10 @@ type MapKeys[K comparable, V any] struct {
 }
 
 var (
-	_ c.Collection[int, []int, c.Iterator[int]] = (*MapKeys[int, any])(nil)
-	_ c.Collection[int, []int, c.Iterator[int]] = MapKeys[int, any]{}
-	_ fmt.Stringer                              = (*MapValues[int, any])(nil)
-	_ fmt.Stringer                              = MapValues[int, any]{}
+	_ c.Collection[int] = (*MapKeys[int, any])(nil)
+	_ c.Collection[int] = MapKeys[int, any]{}
+	_ fmt.Stringer      = (*MapValues[int, any])(nil)
+	_ fmt.Stringer      = MapValues[int, any]{}
 )
 
 func (s MapKeys[K, V]) Begin() c.Iterator[K] {
@@ -52,7 +52,7 @@ func (s MapKeys[K, V]) IsEmpty() bool {
 	return s.Len() == 0
 }
 
-func (s MapKeys[K, V]) Collect() []K {
+func (s MapKeys[K, V]) Slice() []K {
 	uniques := s.uniques
 	elements := make([]K, 0, len(s.uniques))
 	for key := range uniques {
@@ -69,12 +69,12 @@ func (s MapKeys[K, V]) ForEach(walker func(K)) {
 	map_.ForEachKey(s.uniques, walker)
 }
 
-func (s MapKeys[K, V]) Filter(filter func(K) bool) c.Pipe[K, []K] {
+func (s MapKeys[K, V]) Filter(filter func(K) bool) c.Pipe[K] {
 	h := s.Head()
 	return iter.NewPipe[K](iter.Filter(h, h.Next, filter))
 }
 
-func (s MapKeys[K, V]) Convert(by func(K) K) c.Pipe[K, []K] {
+func (s MapKeys[K, V]) Convert(by func(K) K) c.Pipe[K] {
 	h := s.Head()
 	return iter.NewPipe[K](iter.Convert(h, h.Next, by))
 }
@@ -84,5 +84,5 @@ func (s MapKeys[K, V]) Reduce(by func(K, K) K) K {
 }
 
 func (s MapKeys[K, V]) String() string {
-	return slice.ToString(s.Collect())
+	return slice.ToString(s.Slice())
 }

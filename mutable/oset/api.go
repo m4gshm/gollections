@@ -26,12 +26,12 @@ func NewCap[T comparable](capacity int) *ordered.Set[T] {
 	return ordered.NewSetCap[T](capacity)
 }
 
-func Convert[From, To comparable](s *ordered.Set[From], by func(From) To) c.Pipe[To, []To] {
+func Convert[From, To comparable](s *ordered.Set[From], by func(From) To) c.Pipe[To] {
 	h := *(s.Head())
 	return iter.NewPipe[To](iter.Convert(h, h.Next, by))
 }
 
-func Flatt[From, To comparable](s *ordered.Set[From], by func(From) []To) c.Pipe[To, []To] {
+func Flatt[From, To comparable](s *ordered.Set[From], by func(From) []To) c.Pipe[To] {
 	h := *(s.Head())
 	f := iter.Flatt(h, h.Next, by)
 	return iter.NewPipe[To](&f)

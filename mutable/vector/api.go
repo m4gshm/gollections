@@ -34,12 +34,12 @@ func Sort[T any, F constraints.Ordered](v *mutable.Vector[T], by func(T) F) *mut
 	return v.Sort(func(e1, e2 T) bool { return by(e1) < by(e2) })
 }
 
-func Convert[From, To any](s *mutable.Vector[From], by func(From) To) c.Pipe[To, []To] {
+func Convert[From, To any](s *mutable.Vector[From], by func(From) To) c.Pipe[To] {
 	h := s.Head()
 	return iter.NewPipe[To](iter.Convert(h, h.Next, by))
 }
 
-func Flatt[From, To any](v *mutable.Vector[From], by func(From) []To) c.Pipe[To, []To] {
+func Flatt[From, To any](v *mutable.Vector[From], by func(From) []To) c.Pipe[To] {
 	h := v.Head()
 	f := iter.Flatt(h, h.Next, by)
 	return iter.NewPipe[To](&f)
