@@ -76,6 +76,10 @@ func (s Set[T]) Collect() []T {
 	return out
 }
 
+func (s Set[T]) Slice() []T {
+	return s.Collect()
+}
+
 func (s Set[T]) Len() int {
 	return len(s.elements)
 }
@@ -121,11 +125,11 @@ func (s Set[T]) StableSort(less slice.Less[T]) ordered.Set[T] {
 }
 
 func (s Set[T]) sortBy(sorter slice.Sorter, less slice.Less[T]) ordered.Set[T] {
-	c := slice.Clone(s.Collect())
+	c := slice.Clone(s.Slice())
 	slice.Sort(c, sorter, less)
 	return ordered.WrapSet(c, s.elements)
 }
 
 func (s Set[T]) String() string {
-	return slice.ToString(s.Collect())
+	return slice.ToString(s.Slice())
 }

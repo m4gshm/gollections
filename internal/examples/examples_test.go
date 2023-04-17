@@ -22,7 +22,7 @@ import (
 func Test_Set(t *testing.T) {
 	var (
 		s      immutable.Set[int] = set.Of(1, 1, 2, 4, 3, 1)
-		values []int              = s.Collect()
+		values []int              = s.Slice()
 	)
 
 	assert.Equal(t, 4, s.Len())
@@ -37,7 +37,7 @@ func Test_Set(t *testing.T) {
 
 func Test_OrderedSet(t *testing.T) {
 	s := oset.Of(1, 1, 2, 4, 3, 1)
-	values := s.Collect()
+	values := s.Slice()
 	fmt.Println(s) //[1, 2, 4, 3]
 
 	assert.Equal(t, slice.Of(1, 2, 4, 3), values)

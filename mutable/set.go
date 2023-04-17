@@ -80,6 +80,10 @@ func (s Set[K]) Collect() []K {
 	return map_.Keys(s.elements)
 }
 
+func (s Set[K]) Slice() []K {
+	return s.Collect()
+}
+
 func (s Set[T]) Copy() Set[T] {
 	return WrapSet(map_.Clone(s.elements))
 }
@@ -181,11 +185,11 @@ func (s *Set[T]) StableSort(less slice.Less[T]) *ordered.Set[T] {
 }
 
 func (s *Set[T]) sortBy(sorter slice.Sorter, less slice.Less[T]) *ordered.Set[T] {
-	cl := slice.Clone(s.Collect())
+	cl := slice.Clone(s.Slice())
 	slice.Sort(cl, sorter, less)
 	return ordered.NewSet(cl)
 }
 
 func (s Set[K]) String() string {
-	return slice.ToString(s.Collect())
+	return slice.ToString(s.Slice())
 }

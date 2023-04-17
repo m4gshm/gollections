@@ -9,6 +9,7 @@ import (
 	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/immutable"
 	"github.com/m4gshm/gollections/immutable/vector"
+	"github.com/m4gshm/gollections/it"
 	"github.com/m4gshm/gollections/slice"
 )
 
@@ -98,23 +99,21 @@ func Test_Vector_SortStructByField(t *testing.T) {
 
 func Test_Vector_Convert(t *testing.T) {
 	var (
-		ints        = vector.Of(3, 1, 5, 6, 8, 0, -2)
-		stringsPipe = vector.Convert(ints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 })
+		ints     = vector.Of(3, 1, 5, 6, 8, 0, -2)
+		strings  = it.ToSlice(it.Filter(vector.Convert(ints, strconv.Itoa), func(s string) bool { return len(s) == 1 }))
+		strings2 = vector.Convert(ints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 }).Slice()
 	)
-	assert.Equal(t, slice.Of("3", "1", "5", "6", "8", "0"), stringsPipe.Collect())
-
-	//second call do nothing
-	var no []string
-	assert.Equal(t, no, stringsPipe.Collect())
+	assert.Equal(t, slice.Of("3", "1", "5", "6", "8", "0"), strings)
+	assert.Equal(t, strings, strings2)
 }
 
 func Test_Vector_Flatt(t *testing.T) {
 	var (
 		deepInts    = vector.Of(vector.Of(3, 1), vector.Of(5, 6, 8, 0, -2))
-		ints        = collection.Flatt(deepInts, immutable.Vector[int].Collect)
-		stringsPipe = collection.Convert(ints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 })
+		ints        = vector.Flatt(deepInts, immutable.Vector[int].Collect)
+		stringsPipe = collection.Filter(collection.Convert(ints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 }), func(s string) bool { return len(s) == 1 })
 	)
-	assert.Equal(t, slice.Of("3", "1", "5", "6", "8", "0"), stringsPipe.Collect())
+	assert.Equal(t, slice.Of("3", "1", "5", "6", "8", "0"), stringsPipe.Slice())
 }
 
 func Test_Vector_DoubleConvert(t *testing.T) {
@@ -123,11 +122,11 @@ func Test_Vector_DoubleConvert(t *testing.T) {
 		stringsPipe        = vector.Convert(ints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 })
 		prefixedStrinsPipe = collection.Convert(stringsPipe, func(s string) string { return "_" + s })
 	)
-	assert.Equal(t, slice.Of("_3", "_1", "_5", "_6", "_8", "_0"), prefixedStrinsPipe.Collect())
+	assert.Equal(t, slice.Of("_3", "_1", "_5", "_6", "_8", "_0"), prefixedStrinsPipe.Slice())
 
 	//second call do nothing
 	var no []string
-	assert.Equal(t, no, stringsPipe.Collect())
+	assert.Equal(t, no, stringsPipe.Slice())
 }
 
 type user struct {

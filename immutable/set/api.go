@@ -36,7 +36,7 @@ func Convert[From, To comparable](s immutable.Set[From], by func(From) To) c.Pip
 }
 
 func Flatt[From, To comparable](s immutable.Set[From], by func(From) []To) c.Pipe[To, []To] {
-	b := s.Head()
-	f := it.Flatt(b, b.Next, by)
+	h := s.Head()
+	f := it.Flatt(h, h.Next, by)
 	return it.NewPipe[To](&f)
 }

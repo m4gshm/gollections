@@ -91,6 +91,10 @@ func (s Set[T]) Collect() []T {
 	return slice.Clone(s.order)
 }
 
+func (s Set[T]) Slice() []T {
+	return s.Collect()
+}
+
 func (s Set[T]) For(walker func(T) error) error {
 	return slice.For(s.order, walker)
 }

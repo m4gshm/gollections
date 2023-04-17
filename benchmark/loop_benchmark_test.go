@@ -303,7 +303,7 @@ func BenchmarkImmutableVectorCollecAndLoop(b *testing.B) {
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				for _, v := range c.Collect() {
+				for _, v := range c.Slice() {
 					casee.load(v)
 				}
 			}
@@ -338,7 +338,7 @@ func BenchmarkImmutableOrderedSetCollectAndLoop(b *testing.B) {
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				for _, v := range c.Collect() {
+				for _, v := range c.Slice() {
 					casee.load(v)
 				}
 			}

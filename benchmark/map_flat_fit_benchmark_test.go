@@ -140,7 +140,7 @@ func Benchmark_Map_Vector_Iterator(b *testing.B) {
 	var s []string
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		s = collection.Convert(items, concat).Collect()
+		s = collection.Convert(items, concat).Slice()
 	}
 	_ = s
 
@@ -152,7 +152,7 @@ func Benchmark_Map_Vector_Iterator_No_Cache_Operation(b *testing.B) {
 	var s []string
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		s = collection.Convert(items, convert.And(toString, addTail)).Collect()
+		s = collection.Convert(items, convert.And(toString, addTail)).Slice()
 	}
 	_ = s
 	b.StopTimer()

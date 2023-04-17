@@ -65,6 +65,10 @@ func (m Map[K, V]) Collect() map[K]V {
 	return map_.Clone(m.elements)
 }
 
+func (m Map[K, V]) Map() map[K]V {
+	return m.Collect()
+}
+
 // Sort transforms to the ordered Map contains sorted elements.
 func (m Map[K, V]) Sort(less slice.Less[K]) ordered.Map[K, V] {
 	return m.sortBy(sort.Slice, less)

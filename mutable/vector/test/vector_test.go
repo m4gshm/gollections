@@ -113,9 +113,9 @@ func Test_Vector_AddAndDelete(t *testing.T) {
 func Test_Vector_Add(t *testing.T) {
 	vec := vector.NewCap[int](0)
 	vec.Add(1, 1, 2, 4, 3, 1)
-	assert.Equal(t, slice.Of(1, 1, 2, 4, 3, 1), vec.Collect())
+	assert.Equal(t, slice.Of(1, 1, 2, 4, 3, 1), vec.Slice())
 	vec.Add(1)
-	assert.Equal(t, slice.Of(1, 1, 2, 4, 3, 1, 1), vec.Collect())
+	assert.Equal(t, slice.Of(1, 1, 2, 4, 3, 1, 1), vec.Slice())
 }
 
 func Test_Vector_Add_And_Iterate(t *testing.T) {
@@ -179,7 +179,7 @@ func Test_Vector_Delete_And_Iterate(t *testing.T) {
 func Test_Vector_DeleteOne(t *testing.T) {
 	vec := vector.Of("1", "1", "2", "4", "3", "1")
 	vec.DeleteOne(3)
-	assert.Equal(t, slice.Of("1", "1", "2", "3", "1"), vec.Collect())
+	assert.Equal(t, slice.Of("1", "1", "2", "3", "1"), vec.Slice())
 	r := vec.DeleteActualOne(5)
 	assert.Equal(t, r, false)
 }
@@ -187,7 +187,7 @@ func Test_Vector_DeleteOne(t *testing.T) {
 func Test_Vector_DeleteMany(t *testing.T) {
 	vec := vector.Of("0", "1", "2", "3", "4", "5", "6")
 	vec.Delete(3, 0, 5)
-	assert.Equal(t, slice.Of("1", "2", "4", "6"), vec.Collect())
+	assert.Equal(t, slice.Of("1", "2", "4", "6"), vec.Slice())
 	r := vec.DeleteActual(5, 4)
 	assert.Equal(t, r, false)
 }
@@ -195,25 +195,25 @@ func Test_Vector_DeleteMany(t *testing.T) {
 func Test_Vector_DeleteManyFromTail(t *testing.T) {
 	vec := vector.Of("0", "1", "2", "3", "4", "5", "6")
 	vec.Delete(4, 5, 6)
-	assert.Equal(t, slice.Of("0", "1", "2", "3"), vec.Collect())
+	assert.Equal(t, slice.Of("0", "1", "2", "3"), vec.Slice())
 }
 
 func Test_Vector_DeleteManyFromHead(t *testing.T) {
 	vec := vector.Of("0", "1", "2", "3", "4", "5", "6")
 	vec.Delete(0, 1, 2)
-	assert.Equal(t, slice.Of("3", "4", "5", "6"), vec.Collect())
+	assert.Equal(t, slice.Of("3", "4", "5", "6"), vec.Slice())
 }
 
 func Test_Vector_DeleteManyFromMiddle(t *testing.T) {
 	vec := vector.Of("0", "1", "2", "3", "4", "5", "6")
 	vec.Delete(4, 3)
-	assert.Equal(t, slice.Of("0", "1", "2", "5", "6"), vec.Collect())
+	assert.Equal(t, slice.Of("0", "1", "2", "5", "6"), vec.Slice())
 }
 
 func Test_Vector_Set(t *testing.T) {
 	vec := vector.Of("1", "1", "2", "4", "3", "1")
 	vec.Set(10, "11")
-	assert.Equal(t, slice.Of("1", "1", "2", "4", "3", "1", "", "", "", "", "11"), vec.Collect())
+	assert.Equal(t, slice.Of("1", "1", "2", "4", "3", "1", "", "", "", "", "11"), vec.Slice())
 }
 
 func Test_Vector_DeleteByIterator(t *testing.T) {
@@ -231,7 +231,7 @@ func Test_Vector_DeleteByIterator(t *testing.T) {
 	_, _ = v, ok
 
 	assert.Equal(t, 6, i)
-	assert.Equal(t, 0, len(vec.Collect()))
+	assert.Equal(t, 0, len(vec.Slice()))
 }
 
 func Test_Vector_DeleteByIterator_Reverse(t *testing.T) {
@@ -249,7 +249,7 @@ func Test_Vector_DeleteByIterator_Reverse(t *testing.T) {
 	_, _ = v, ok
 
 	assert.Equal(t, 6, i)
-	assert.Equal(t, 0, len(vec.Collect()))
+	assert.Equal(t, 0, len(vec.Slice()))
 }
 
 func Test_Vector_FilterMapReduce(t *testing.T) {

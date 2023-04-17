@@ -67,6 +67,10 @@ func (v Vector[T]) Collect() []T {
 	return slice.Clone(v.elements)
 }
 
+func (v Vector[T]) Slice() []T {
+	return v.Collect()
+}
+
 func (v Vector[T]) Len() int {
 	return notsafe.GetLen(v.elements)
 }

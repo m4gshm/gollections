@@ -19,6 +19,14 @@ type Container[Collection any, IT any] interface {
 	Iterable[IT]
 }
 
+type SliceFactory[T any] interface {
+	Slice() []T
+}
+
+type MapFactory[K comparable, V any] interface {
+	Map() map[K]V
+}
+
 // Collection is the interface of a finite-size container.
 // Where:
 //
@@ -36,6 +44,7 @@ type Collection[T any, Collection any, IT any] interface {
 // Vector - collection interface that provides elements order and access by index to the elements.
 type Vector[T any] interface {
 	Collection[T, []T, Iterator[T]]
+	SliceFactory[T]
 	TrackLoop[T, int]
 	TrackEachLoop[T, int]
 	Access[int, T]
@@ -45,6 +54,7 @@ type Vector[T any] interface {
 // Set - collection interface that ensures the uniqueness of elements (does not insert duplicate values).
 type Set[T any] interface {
 	Collection[T, []T, Iterator[T]]
+	SliceFactory[T]
 	Transformable[T, []T]
 	Checkable[T]
 }
@@ -52,6 +62,7 @@ type Set[T any] interface {
 // Map - collection interface that stores key/value pairs and provide access to an element by its key
 type Map[K comparable, V any] interface {
 	Collection[KV[K, V], map[K]V, KVIterator[K, V]]
+	MapFactory[K, V]
 	TrackLoop[V, K]
 	TrackEachLoop[V, K]
 	Checkable[K]
@@ -150,6 +161,7 @@ type Pipe[T any, Collection any] interface {
 	Iterator[T]
 	Transformable[T, Collection]
 	Container[Collection, Iterator[T]]
+	SliceFactory[T]
 	ForLoop[T]
 	ForEachLoop[T]
 	Reduce(func(T, T) T) T
@@ -173,6 +185,7 @@ type MapPipe[K comparable, V any, Map any] interface {
 	KVIterator[K, V]
 	MapTransformable[K, V, Map]
 	Container[Map, KVIterator[K, V]]
+	// MapFactory[K, V]
 }
 
 // Access provides access to an element by its pointer (index, key, coordinate, etc.)

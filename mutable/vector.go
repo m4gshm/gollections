@@ -87,6 +87,10 @@ func (v *Vector[T]) Collect() []T {
 	return slice.Clone(*v)
 }
 
+func (v *Vector[T]) Slice() []T {
+	return v.Collect()
+}
+
 // Copy just makes a copy of the vector instance
 func (v *Vector[T]) Copy() *Vector[T] {
 	return WrapVector(slice.Clone(*v))

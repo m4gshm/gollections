@@ -1,14 +1,16 @@
 package test
 
 import (
-	"sort"
+	"strconv"
 	"testing"
 
 	cgroup "github.com/m4gshm/gollections/c/group"
+	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/it"
 	"github.com/m4gshm/gollections/mutable/set"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
+	"github.com/m4gshm/gollections/slice/sort"
 
 	"github.com/m4gshm/gollections/walk/group"
 	"github.com/stretchr/testify/assert"
@@ -16,16 +18,14 @@ import (
 
 func Test_Set_Iterate(t *testing.T) {
 	set := set.Of(1, 1, 2, 4, 3, 1)
-	values := set.Collect()
+	values := sort.Of(set.Collect())
 
 	assert.Equal(t, 4, len(values))
 
 	expected := slice.Of(1, 2, 3, 4)
-	sort.Ints(values)
 	assert.Equal(t, expected, values)
 
-	iterSlice := it.ToSlice(set.Begin())
-	sort.Ints(iterSlice)
+	iterSlice := sort.Of(it.ToSlice(set.Begin()))
 	assert.Equal(t, expected, iterSlice)
 
 	out := make(map[int]int, 0)
@@ -55,8 +55,7 @@ func Test_Set_AddVerify(t *testing.T) {
 	added = set.AddNewOne(1)
 	assert.Equal(t, added, false)
 
-	values := set.Collect()
-	sort.Ints(values)
+	values := sort.Of(set.Slice())
 
 	assert.Equal(t, slice.Of(1, 2, 3, 4), values)
 }
@@ -104,10 +103,8 @@ func Test_Set_FilterMapReduce(t *testing.T) {
 func Test_Set_Group_By_Walker(t *testing.T) {
 	groups := group.Of(set.Of(0, 1, 1, 2, 4, 3, 1, 6, 7), func(e int) bool { return e%2 == 0 })
 
-	fg := groups[false]
-	sort.Ints(fg)
-	tg := groups[true]
-	sort.Ints(tg)
+	fg := sort.Of(groups[false])
+	tg := sort.Of(groups[true])
 	assert.Equal(t, len(groups), 2)
 	assert.Equal(t, []int{1, 3, 7}, fg)
 	assert.Equal(t, []int{0, 2, 4, 6}, tg)
@@ -117,12 +114,41 @@ func Test_Set_Group_By_Iterator(t *testing.T) {
 	groups := cgroup.Of(set.Of(0, 1, 1, 2, 4, 3, 1, 6, 7), func(e int) bool { return e%2 == 0 }).Collect()
 
 	assert.Equal(t, len(groups), 2)
-	fg := groups[false]
-
-	sort.Ints(fg)
-	tg := groups[true]
-	sort.Ints(tg)
+	fg := sort.Of(groups[false])
+	tg := sort.Of(groups[true])
 
 	assert.Equal(t, []int{1, 3, 7}, fg)
 	assert.Equal(t, []int{0, 2, 4, 6}, tg)
+}
+
+func Test_Set_Convert(t *testing.T) {
+	var (
+		ints     = set.Of(3, 3, 1, 1, 1, 5, 6, 8, 8, 0, -2, -2)
+		strings  = sort.Of(it.ToSlice(it.Filter(set.Convert(ints, strconv.Itoa), func(s string) bool { return len(s) == 1 })))
+		strings2 = sort.Of(set.Convert(ints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 }).Slice())
+	)
+	assert.Equal(t, slice.Of("0", "1", "3", "5", "6", "8"), strings)
+	assert.Equal(t, strings, strings2)
+}
+
+func Test_Set_Flatt(t *testing.T) {
+	var (
+		ints        = set.Of(3, 3, 1, 1, 1, 5, 6, 8, 8, 0, -2, -2)
+		fints       = set.Flatt(ints, func(i int) []int { return slice.Of(i) })
+		stringsPipe = collection.Filter(collection.Convert(fints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 }), func(s string) bool { return len(s) == 1 })
+	)
+	assert.Equal(t, slice.Of("0", "1", "3", "5", "6", "8"), sort.Of(stringsPipe.Slice()))
+}
+
+func Test_Set_DoubleConvert(t *testing.T) {
+	var (
+		ints               = set.Of(3, 1, 5, 6, 8, 0, -2)
+		stringsPipe        = set.Convert(ints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 })
+		prefixedStrinsPipe = collection.Convert(stringsPipe, func(s string) string { return "_" + s })
+	)
+	assert.Equal(t, slice.Of("_0", "_1", "_3", "_5", "_6", "_8"), sort.Of(prefixedStrinsPipe.Slice()))
+
+	//second call do nothing
+	var no []string
+	assert.Equal(t, no, stringsPipe.Slice())
 }

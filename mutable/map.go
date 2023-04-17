@@ -78,6 +78,10 @@ func (s Map[K, V]) Collect() map[K]V {
 	return map_.Clone(s)
 }
 
+func (s Map[K, V]) Map() map[K]V {
+	return s.Collect()
+}
+
 func (s Map[K, V]) Len() int {
 	return len(s)
 }

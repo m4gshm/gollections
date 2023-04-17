@@ -40,7 +40,7 @@ func Convert[From, To any](s *mutable.Vector[From], by func(From) To) c.Pipe[To,
 }
 
 func Flatt[From, To any](v *mutable.Vector[From], by func(From) []To) c.Pipe[To, []To] {
-	b := v.Head()
-	f := it.Flatt(b, b.Next, by)
+	h := v.Head()
+	f := it.Flatt(h, h.Next, by)
 	return it.NewPipe[To](&f)
 }

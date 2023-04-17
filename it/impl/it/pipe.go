@@ -49,3 +49,7 @@ func (s *IterPipe[T]) Collect() []T {
 	}
 	return e
 }
+
+func (s *IterPipe[T]) Slice() []T {
+	return s.Collect()
+}
