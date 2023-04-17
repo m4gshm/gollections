@@ -2,7 +2,7 @@ package loop
 
 import "errors"
 
-// ErrBreak is For, Track breaker
+// ErrBreak is the 'break' statement of the For, Track methods
 var ErrBreak = errors.New("Break")
 
 // For applies a walker to elements retrieved by the 'next' function. To stop walking just return the ErrBreak

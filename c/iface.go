@@ -2,8 +2,12 @@
 package c
 
 import (
+	"github.com/m4gshm/gollections/loop"
 	"golang.org/x/exp/constraints"
 )
+
+// ErrBreak is the 'break' statement of the For, Track methods
+var ErrBreak = loop.ErrBreak
 
 // Container is the base interface of implementations.
 // Where:
@@ -109,6 +113,7 @@ type Iterable[IT any] interface {
 
 // Walk is the interface of a collection that provides traversing of the elements.
 type Walk[IT any] interface {
+	// return ErrBreak for loop breaking
 	For(func(element IT) error) error
 }
 
@@ -119,6 +124,7 @@ type WalkEach[T any] interface {
 
 // Track is the interface of a collection that provides traversing of the elements with position tracking (index, key, coordinates, etc.).
 type Track[T any, P any] interface {
+	// return ErrBreak for loop breaking
 	Track(func(position P, element T) error) error
 }
 
