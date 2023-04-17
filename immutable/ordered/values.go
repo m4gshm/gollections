@@ -5,6 +5,7 @@ import (
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/it/impl/it"
+	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/slice"
 )
@@ -90,7 +91,7 @@ func (s MapValues[K, V]) Convert(by func(V) V) c.Pipe[V, []V] {
 }
 
 func (s MapValues[K, V]) Reduce(by func(V, V) V) V {
-	return it.Reduce(s.Head().Next, by)
+	return loop.Reduce(s.Head().Next, by)
 }
 
 func (s MapValues[K, V]) String() string {

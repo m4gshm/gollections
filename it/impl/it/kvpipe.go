@@ -2,6 +2,7 @@ package it
 
 import (
 	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/loop"
 )
 
 // NewKVPipe instantiates Iterator wrapper that converts the elements into key/value pairs and iterates over them.
@@ -54,7 +55,7 @@ func (s *KVIterPipe[K, V, C]) Track(tracker func(K, V) error) error {
 }
 
 func (s *KVIterPipe[K, V, C]) Reduce(by c.Quaternary[K, V]) (K, V) {
-	return ReduceKV(s.it.Next, by)
+	return loop.ReduceKV(s.it.Next, by)
 }
 
 func (s *KVIterPipe[K, V, C]) Begin() c.KVIterator[K, V] {

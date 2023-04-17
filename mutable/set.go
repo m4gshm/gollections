@@ -6,6 +6,7 @@ import (
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/it/impl/it"
+	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/mutable/ordered"
 	"github.com/m4gshm/gollections/slice"
@@ -167,7 +168,7 @@ func (s Set[K]) Convert(by func(K) K) c.Pipe[K, []K] {
 }
 
 func (s Set[K]) Reduce(by func(K, K) K) K {
-	return it.Reduce(s.Head().Next, by)
+	return loop.Reduce(s.Head().Next, by)
 }
 
 // Sort transforms to the ordered Set contains sorted elements.

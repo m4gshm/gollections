@@ -32,6 +32,19 @@ func Test_VectorIterate2(t *testing.T) {
 	assert.Equal(t, expected, result)
 }
 
+func Test_VectorIterate3(t *testing.T) {
+	expected := slice.Of(1, 2, 3, 4)
+	v := Of(1, 2, 3, 4)
+	result := make([]int, v.Len())
+	i := 0
+	it := v.Head()
+	for v, ok := it.Next(); ok; v, ok = it.Next() {
+		result[i] = v
+		i++
+	}
+	assert.Equal(t, expected, result)
+}
+
 func Test_VectorReverseIteration(t *testing.T) {
 	expected := slice.Of(4, 3, 2, 1)
 	v := Of(1, 2, 3, 4)

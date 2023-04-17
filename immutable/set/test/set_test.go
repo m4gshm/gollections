@@ -9,6 +9,7 @@ import (
 	"github.com/m4gshm/gollections/immutable/oset"
 	"github.com/m4gshm/gollections/immutable/set"
 	"github.com/m4gshm/gollections/it"
+	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/walk/group"
@@ -27,6 +28,10 @@ func Test_Set_Iterate(t *testing.T) {
 	iterSlice := it.ToSlice(set.Begin())
 	sort.Ints(iterSlice)
 	assert.Equal(t, expected, iterSlice)
+
+	loopSlice := loop.ToSlice(set.Head().Next)
+	sort.Ints(loopSlice)
+	assert.Equal(t, expected, loopSlice)
 
 	out := make(map[int]int, 0)
 	for it, v, ok := set.First(); ok; v, ok = it.Next() {

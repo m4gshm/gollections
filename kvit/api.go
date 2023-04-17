@@ -6,9 +6,9 @@ import (
 	implit "github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/kvit/group"
 	"github.com/m4gshm/gollections/kvit/impl/kvit"
+	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_/filter"
 	"github.com/m4gshm/gollections/op"
-	"github.com/m4gshm/gollections/ptr"
 )
 
 // OfPairs instantiates KVIterator of predefined key\value pairs
@@ -61,7 +61,8 @@ func Group[K comparable, V any](it c.KVIterator[K, V]) map[K][]V {
 // The hasNext specifies a predicate that tests existing of a next element in the source.
 // The getNext extracts the element.
 func OfLoop[S, k, V any](source S, hasNext func(S) bool, getNext func(S) (k, V, error)) c.KVIteratorBreakable[k, V] {
-	return ptr.Of(kvit.NewLoop(source, hasNext, getNext))
+	l := kvit.NewLoop(source, hasNext, getNext)
+	return &l
 }
 
 // Map instantiates key/value iterator that converts elements with a converter and returns them
@@ -86,5 +87,5 @@ func FilterValue[K comparable, V any](elements c.KVIterator[K, V], fit func(V) b
 
 // Reduce reduces keys/value pairs to an one pair
 func Reduce[K comparable, V any](elements c.KVIterator[K, V], by c.Quaternary[K, V]) (K, V) {
-	return implit.ReduceKV(elements.Next, by)
+	return loop.ReduceKV(elements.Next, by)
 }

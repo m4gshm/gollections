@@ -6,8 +6,8 @@ import (
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/it/impl/it"
+	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/notsafe"
-	"github.com/m4gshm/gollections/ptr"
 	"github.com/m4gshm/gollections/slice"
 )
 
@@ -59,7 +59,8 @@ var (
 )
 
 func (s Set[T]) Begin() c.Iterator[T] {
-	return ptr.Of(s.Head())
+	h := s.Head()
+	return &h
 }
 
 func (s Set[T]) Head() it.ArrayIter[T] {
@@ -99,17 +100,18 @@ func (s Set[T]) ForEach(walker func(T)) {
 }
 
 func (s Set[T]) Filter(filter func(T) bool) c.Pipe[T, []T] {
-	h := ptr.Of(s.Head())
+	h := s.Head()
 	return it.NewPipe[T](it.Filter(h, h.Next, filter))
 }
 
 func (s Set[T]) Convert(by func(T) T) c.Pipe[T, []T] {
-	h := ptr.Of(s.Head())
+	h := s.Head()
 	return it.NewPipe[T](it.Convert(h, h.Next, by))
 }
 
 func (s Set[T]) Reduce(by func(T, T) T) T {
-	return it.Reduce(ptr.Of(s.Head()).Next, by)
+	h := s.Head()
+	return loop.Reduce(h.Next, by)
 }
 
 func (s Set[T]) Len() int {

@@ -4,7 +4,7 @@ import (
 	"golang.org/x/exp/constraints"
 
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/it"
+	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/mutable"
 )
 
@@ -25,7 +25,7 @@ func NewCap[T any](capacity int) *mutable.Vector[T] {
 
 // From creates a Vector instance with elements obtained by passing an iterator.
 func From[T any](elements c.Iterator[T]) *mutable.Vector[T] {
-	return mutable.WrapVector(it.ToSlice(elements))
+	return mutable.WrapVector(loop.ToSlice(elements.Next))
 }
 
 // Sort sorts a Vector in-place by a converter that thransforms a element to an Ordered (int, string and so on).

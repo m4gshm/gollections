@@ -6,6 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/m4gshm/gollections/it"
+	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/mutable/oset"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
@@ -24,12 +25,16 @@ func Test_Set_Iterate(t *testing.T) {
 	iterSlice := it.ToSlice(set.Begin())
 	assert.Equal(t, expected, iterSlice)
 
+	loopSlice := loop.ToSlice(set.Head().Next)
+	assert.Equal(t, expected, loopSlice)
+
 	out := make([]int, 0)
 	it := set.Begin()
 	for v, ok := it.Next(); ok; v, ok = it.Next() {
 		out = append(out, v)
 	}
 	assert.Equal(t, expected, out)
+
 
 	out = make([]int, 0)
 	set.ForEach(func(v int) { out = append(out, v) })

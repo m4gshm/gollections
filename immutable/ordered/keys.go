@@ -5,7 +5,7 @@ import (
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/it/impl/it"
-	"github.com/m4gshm/gollections/ptr"
+	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/slice"
 )
 
@@ -27,7 +27,8 @@ var (
 )
 
 func (s MapKeys[T]) Begin() c.Iterator[T] {
-	return ptr.Of(s.Head())
+	h := s.Head()
+	return &h
 }
 
 func (s MapKeys[T]) Head() it.ArrayIter[T] {
@@ -70,17 +71,18 @@ func (s MapKeys[T]) Get(index int) (T, bool) {
 }
 
 func (s MapKeys[T]) Filter(filter func(T) bool) c.Pipe[T, []T] {
-	h := ptr.Of(s.Head())
+	h := s.Head()
 	return it.NewPipe[T](it.Filter(h, h.Next, filter))
 }
 
 func (s MapKeys[T]) Convert(by func(T) T) c.Pipe[T, []T] {
-	h := ptr.Of(s.Head())
+	h := s.Head()
 	return it.NewPipe[T](it.Convert(h, h.Next, by))
 }
 
 func (s MapKeys[T]) Reduce(by func(T, T) T) T {
-	return it.Reduce(ptr.Of(s.Head()).Next, by)
+	h := s.Head()
+	return loop.Reduce(h.Next, by)
 }
 
 func (s MapKeys[T]) String() string {

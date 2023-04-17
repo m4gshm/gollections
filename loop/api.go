@@ -50,3 +50,32 @@ func ToSlice[T any](next func() (T, bool)) []T {
 	}
 	return s
 }
+
+// Reduce reduces elements to an one
+func Reduce[T any](next func() (T, bool), by func(T, T) T) T {
+	var result T
+	if v, ok := next(); ok {
+		result = v
+	} else {
+		return result
+	}
+	for v, ok := next(); ok; v, ok = next() {
+		result = by(result, v)
+	}
+	return result
+}
+
+// ReduceKV reduces key/values elements to an one
+func ReduceKV[K, V any](next func() (K, V, bool), by func(K, V, K, V) (K, V)) (K, V) {
+	var rk K
+	var rv V
+	if k, v, ok := next(); ok {
+		rk, rv = k, v
+	} else {
+		return rk, rv
+	}
+	for k, v, ok := next(); ok; k, v, ok = next() {
+		rk, rv = by(rk, rv, k, v)
+	}
+	return rk, rv
+}

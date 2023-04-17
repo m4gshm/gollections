@@ -36,7 +36,7 @@ func (s *IterPipe[T]) For(walker func(T) error) error {
 }
 
 func (s *IterPipe[T]) Reduce(by func(T, T) T) T {
-	return Reduce(s.it.Next, by)
+	return loop.Reduce(s.it.Next, by)
 }
 
 func (s *IterPipe[T]) Begin() c.Iterator[T] {

@@ -4,7 +4,9 @@ import (
 	"testing"
 
 	"github.com/m4gshm/gollections/it"
+	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/ptr"
 	"github.com/m4gshm/gollections/slice"
 
 	"github.com/m4gshm/gollections/walk/group"
@@ -22,6 +24,9 @@ func Test_Set_Iterate(t *testing.T) {
 
 	iterSlice := it.ToSlice(set.Begin())
 	assert.Equal(t, expected, iterSlice)
+
+	loopService := loop.ToSlice(ptr.Of(set.Head()).Next)
+	assert.Equal(t, expected, loopService)
 
 	out := make([]int, 0)
 	for it, v, ok := set.First(); ok; v, ok = it.Next() {
@@ -43,6 +48,11 @@ func Test_Set_Contains(t *testing.T) {
 	assert.True(t, set.Contains(3))
 	assert.False(t, set.Contains(0))
 	assert.False(t, set.Contains(-1))
+}
+
+func Test_Set_FilterReduce(t *testing.T) {
+	s := Of(1, 1, 2, 4, 3, 1).Reduce(op.Sum[int])
+	assert.Equal(t, 1+2+3+4, s)
 }
 
 func Test_Set_FilterMapReduce(t *testing.T) {

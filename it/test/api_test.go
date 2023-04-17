@@ -14,7 +14,6 @@ import (
 	sliceit "github.com/m4gshm/gollections/it/slice"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
-	"github.com/m4gshm/gollections/ptr"
 	"github.com/m4gshm/gollections/slice"
 )
 
@@ -157,14 +156,14 @@ func Test_Iterate(t *testing.T) {
 		values[i] = i
 	}
 
-	stream := impl.NewPipe[int](ptr.Of(impl.NewHead(values)))
+	stream := impl.NewPipe[int](impl.New(values))
 
 	result := make([]int, 0)
 
 	stream.ForEach(func(i int) { result = append(result, i) })
 
 	result = make([]int, 0)
-	it.ForEach(it.Wrap(values), func(i int) { result = append(result, i) })
+	it.ForEach(it.New(values), func(i int) { result = append(result, i) })
 
 	assert.Equal(t, values, result)
 
@@ -180,7 +179,7 @@ func Test_Group(t *testing.T) {
 
 func Test_ReduceSum(t *testing.T) {
 	s := it.Of(1, 3, 5, 7, 9, 11)
-	r := it.Reduce(s, op.Sum[int])
+	r := loop.Reduce(s.Next, op.Sum[int])
 	assert.Equal(t, 1+3+5+7+9+11, r)
 }
 
