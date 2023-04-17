@@ -4,6 +4,7 @@ import (
 	"golang.org/x/exp/constraints"
 
 	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/mutable"
 	"github.com/m4gshm/gollections/mutable/ordered"
 )
@@ -31,4 +32,15 @@ func NewCap[T comparable](capacity int) mutable.Set[T] {
 // Sort sorts a Set in-place by a converter that thransforms a element to an Ordered (int, string and so on).
 func Sort[T comparable, F constraints.Ordered](s mutable.Set[T], by func(T) F) *ordered.Set[T] {
 	return s.Sort(func(e1, e2 T) bool { return by(e1) < by(e2) })
+}
+
+func Convert[From, To comparable](s mutable.Set[From], by func(From) To) c.Pipe[To, []To] {
+	h := s.Head()
+	return it.NewPipe[To](it.Convert(h, h.Next, by))
+}
+
+func Flatt[From, To comparable](s mutable.Set[From], by func(From) []To) c.Pipe[To, []To] {
+	b := s.Head()
+	f := it.Flatt(b, b.Next, by)
+	return it.NewPipe[To](&f)
 }

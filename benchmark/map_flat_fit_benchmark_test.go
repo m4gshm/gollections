@@ -5,8 +5,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/m4gshm/gollections/c/op"
 	"github.com/m4gshm/gollections/check"
+	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/convert"
 	"github.com/m4gshm/gollections/first"
 	"github.com/m4gshm/gollections/immutable/vector"
@@ -140,7 +140,7 @@ func Benchmark_Map_Vector_Iterator(b *testing.B) {
 	var s []string
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		s = it.ToSlice(op.Convert(items, concat))
+		s = collection.Convert(items, concat).Collect()
 	}
 	_ = s
 
@@ -152,7 +152,7 @@ func Benchmark_Map_Vector_Iterator_No_Cache_Operation(b *testing.B) {
 	var s []string
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		s = it.ToSlice(op.Convert(items, convert.And(toString, addTail)))
+		s = collection.Convert(items, convert.And(toString, addTail)).Collect()
 	}
 	_ = s
 	b.StopTimer()

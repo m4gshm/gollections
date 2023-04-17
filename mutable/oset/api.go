@@ -2,6 +2,7 @@ package oset
 
 import (
 	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/mutable/ordered"
 )
 
@@ -23,4 +24,15 @@ func Empty[T comparable]() *ordered.Set[T] {
 // NewCap instantiates Set with a predefined capacity.
 func NewCap[T comparable](capacity int) *ordered.Set[T] {
 	return ordered.NewSetCap[T](capacity)
+}
+
+func Convert[From, To comparable](s *ordered.Set[From], by func(From) To) c.Pipe[To, []To] {
+	h := s.Head()
+	return it.NewPipe[To](it.Convert(h, h.Next, by))
+}
+
+func Flatt[From, To comparable](s *ordered.Set[From], by func(From) []To) c.Pipe[To, []To] {
+	b := s.Head()
+	f := it.Flatt(b, b.Next, by)
+	return it.NewPipe[To](&f)
 }

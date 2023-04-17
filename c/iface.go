@@ -147,6 +147,7 @@ type Transformable[T any, Collection any] interface {
 
 // Pipe extends Transformable by finalize methods like ForEach, Collect or Reduce.
 type Pipe[T any, Collection any] interface {
+	Iterator[T]
 	Transformable[T, Collection]
 	Container[Collection, Iterator[T]]
 	ForLoop[T]
@@ -169,6 +170,7 @@ type MapTransformable[K comparable, V any, Map any] interface {
 
 // MapPipe extends MapTransformable by finalize methods like ForEach, Collect or Reduce.
 type MapPipe[K comparable, V any, Map any] interface {
+	KVIterator[K, V]
 	MapTransformable[K, V, Map]
 	Container[Map, KVIterator[K, V]]
 }

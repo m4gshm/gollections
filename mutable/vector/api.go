@@ -4,6 +4,7 @@ import (
 	"golang.org/x/exp/constraints"
 
 	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/it/impl/it"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/mutable"
 )
@@ -31,4 +32,15 @@ func From[T any](elements c.Iterator[T]) *mutable.Vector[T] {
 // Sort sorts a Vector in-place by a converter that thransforms a element to an Ordered (int, string and so on).
 func Sort[T any, F constraints.Ordered](v *mutable.Vector[T], by func(T) F) *mutable.Vector[T] {
 	return v.Sort(func(e1, e2 T) bool { return by(e1) < by(e2) })
+}
+
+func Convert[From, To any](s *mutable.Vector[From], by func(From) To) c.Pipe[To, []To] {
+	h := s.Head()
+	return it.NewPipe[To](it.Convert(h, h.Next, by))
+}
+
+func Flatt[From, To any](v *mutable.Vector[From], by func(From) []To) c.Pipe[To, []To] {
+	b := v.Head()
+	f := it.Flatt(b, b.Next, by)
+	return it.NewPipe[To](&f)
 }
