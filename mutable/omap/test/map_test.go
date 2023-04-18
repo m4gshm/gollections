@@ -145,4 +145,3 @@ func Test_Map_Zero(t *testing.T) {
 	m.Values().Convert(nil).For(nil)
 	m.Values().Filter(nil).ForEach(nil)
 }
-

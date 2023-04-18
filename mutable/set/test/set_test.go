@@ -18,6 +18,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func Test_Set_From(t *testing.T) {
+	set := set.From(iter.Of(1, 1, 2, 2, 3, 4, 3, 2, 1))
+	assert.Equal(t, slice.Of(1, 2, 3, 4), sort.Of(set.Slice()))
+}
+
 func Test_Set_Iterate(t *testing.T) {
 	set := set.Of(1, 1, 2, 4, 3, 1)
 	values := sort.Of(set.Slice())

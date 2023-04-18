@@ -13,6 +13,11 @@ import (
 	"github.com/m4gshm/gollections/slice"
 )
 
+func Test_Vector_From(t *testing.T) {
+	set := vector.From(iter.Of(1, 1, 2, 2, 3, 4, 3, 2, 1))
+	assert.Equal(t, slice.Of(1, 1, 2, 2, 3, 4, 3, 2, 1), set.Slice())
+}
+
 func Test_VectorIterate(t *testing.T) {
 	expected := slice.Of(1, 2, 3, 4)
 	v := vector.Of(1, 2, 3, 4)

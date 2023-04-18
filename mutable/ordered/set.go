@@ -37,12 +37,8 @@ func ToSet[T comparable](elements c.Iterator[T]) *Set[T] {
 	)
 
 	if elements != nil {
-		for {
-			if e, ok := elements.Next(); !ok {
-				break
-			} else {
-				order, pos = add(e, uniques, order, pos)
-			}
+		for e, ok := elements.Next(); ok; e, ok = elements.Next() {
+			order, pos = add(e, uniques, order, pos)
 		}
 	}
 	return WrapSet(order, uniques)

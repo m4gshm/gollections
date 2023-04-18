@@ -34,12 +34,8 @@ func ToSet[T comparable](elements c.Iterator[T]) *Set[T] {
 		uniques = map[T]struct{}{}
 		order   []T
 	)
-	for {
-		if e, ok := elements.Next(); !ok {
-			break
-		} else {
-			order = add(e, uniques, order)
-		}
+	for e, ok := elements.Next(); ok; e, ok = elements.Next() {
+		order = add(e, uniques, order)
 	}
 	return WrapSet(order, uniques)
 }

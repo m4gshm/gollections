@@ -30,12 +30,8 @@ func NewSet[T comparable](elements []T) *Set[T] {
 func ToSet[T comparable](elements c.Iterator[T]) *Set[T] {
 	internal := map[T]struct{}{}
 	if elements != nil {
-		for {
-			if e, ok := elements.Next(); !ok {
-				break
-			} else {
-				internal[e] = struct{}{}
-			}
+		for e, ok := elements.Next(); ok; e, ok = elements.Next() {
+			internal[e] = struct{}{}
 		}
 	}
 	return WrapSet(internal)
@@ -148,7 +144,7 @@ func (s *Set[T]) AddOne(element T) {
 }
 
 func (s *Set[T]) AddNew(elements ...T) bool {
-	if s == nil  {
+	if s == nil {
 		return false
 	}
 	ok := false
@@ -159,7 +155,7 @@ func (s *Set[T]) AddNew(elements ...T) bool {
 }
 
 func (s *Set[T]) AddOneNew(element T) bool {
-	if s == nil  {
+	if s == nil {
 		return false
 	}
 	ok := !s.Contains(element)
@@ -170,14 +166,14 @@ func (s *Set[T]) AddOneNew(element T) bool {
 }
 
 func (s *Set[T]) AddAll(elements c.Iterable[T]) {
-	if s == nil  {
+	if s == nil {
 		return
 	}
 	loop.ForEach(elements.Begin().Next, s.AddOne)
 }
 
 func (s *Set[T]) AddAllNew(elements c.Iterable[T]) bool {
-	if s == nil  {
+	if s == nil {
 		return false
 	}
 	var ok bool
@@ -186,7 +182,7 @@ func (s *Set[T]) AddAllNew(elements c.Iterable[T]) bool {
 }
 
 func (s *Set[T]) Delete(elements ...T) {
-	if s == nil  {
+	if s == nil {
 		return
 	}
 	for _, element := range elements {
@@ -195,14 +191,14 @@ func (s *Set[T]) Delete(elements ...T) {
 }
 
 func (s *Set[T]) DeleteOne(element T) {
-	if s == nil  {
+	if s == nil {
 		return
 	}
 	delete(s.elements, element)
 }
 
 func (s *Set[T]) DeleteActual(elements ...T) bool {
-	if s == nil  {
+	if s == nil {
 		return false
 	}
 	ok := false

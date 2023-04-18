@@ -1,6 +1,9 @@
 package slice_examples
 
 import (
+	"strings"
+	"testing"
+
 	"github.com/m4gshm/gollections/first"
 	"github.com/m4gshm/gollections/immutable/set"
 	"github.com/m4gshm/gollections/map_"
@@ -9,8 +12,6 @@ import (
 	"github.com/m4gshm/gollections/slice/convert"
 	"github.com/m4gshm/gollections/slice/group"
 	"github.com/stretchr/testify/assert"
-	"strings"
-	"testing"
 )
 
 type User struct {
