@@ -3,6 +3,7 @@ package test
 import (
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 
 	"github.com/m4gshm/gollections/op"
@@ -11,10 +12,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var absPath = "/home/user"
-var absPath2 = "/usr/bin"
+var absPath = op.IfElse(runtime.GOOS == "windows", "c:\\home\\user", "/home/user")
+var absPath2 = op.IfElse(runtime.GOOS == "windows", "c:\\usr\\bin", "/usr/bin")
 
 func TestConvert(t *testing.T) {
+
 	if homeDir, err := os.UserHomeDir(); err != nil {
 		t.Error(err)
 	} else if err := os.Chdir(homeDir); err != nil {
