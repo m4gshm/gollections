@@ -13,7 +13,7 @@ import (
 )
 
 // NewSet instantiates Set and copies elements to it.
-func NewSet[T comparable](elements []T) Set[T] {
+func NewSet[T comparable](elements []T) *Set[T] {
 	internal := map[T]struct{}{}
 	for _, e := range elements {
 		internal[e] = struct{}{}
@@ -22,17 +22,15 @@ func NewSet[T comparable](elements []T) Set[T] {
 }
 
 // WrapSet creates a set using a map as the internal storage.
-func WrapSet[T comparable](elements map[T]struct{}) Set[T] {
-	return Set[T]{elements: elements}
+func WrapSet[T comparable](elements map[T]struct{}) *Set[T] {
+	return &Set[T]{elements: elements}
 }
 
 // ToSet creates a Set instance with elements obtained by passing an iterator.
-func ToSet[T comparable](elements c.Iterator[T]) Set[T] {
+func ToSet[T comparable](elements c.Iterator[T]) *Set[T] {
 	internal := map[T]struct{}{}
-	for {
-		if e, ok := elements.Next(); !ok {
-			break
-		} else {
+	if elements != nil {
+		for e, ok := elements.Next(); !ok; e, ok = elements.Next() {
 			internal[e] = struct{}{}
 		}
 	}
@@ -46,20 +44,23 @@ type Set[T comparable] struct {
 
 var (
 	_ c.Set[int]   = (*Set[int])(nil)
-	_ c.Set[int]   = Set[int]{}
 	_ fmt.Stringer = (*Set[int])(nil)
-	_ fmt.Stringer = Set[int]{}
 )
 
-func (s Set[T]) Begin() c.Iterator[T] {
-	return s.Head()
+func (s *Set[T]) Begin() c.Iterator[T] {
+	h := s.Head()
+	return &h
 }
 
-func (s Set[T]) Head() iter.Key[T, struct{}] {
-	return iter.NewKey(s.elements)
+func (s *Set[T]) Head() iter.Key[T, struct{}] {
+	var elements map[T]struct{}
+	if s != nil {
+		elements = s.elements
+	}
+	return *iter.NewKey(elements)
 }
 
-func (s Set[T]) First() (iter.Key[T, struct{}], T, bool) {
+func (s *Set[T]) First() (iter.Key[T, struct{}], T, bool) {
 	var (
 		iterator  = s.Head()
 		first, ok = iterator.Next()
@@ -67,65 +68,82 @@ func (s Set[T]) First() (iter.Key[T, struct{}], T, bool) {
 	return iterator, first, ok
 }
 
-func (s Set[T]) Slice() []T {
+func (s *Set[T]) Slice() (out []T) {
+	if s == nil {
+		return
+	}
 	elements := s.elements
-	out := make([]T, 0, len(elements))
+	out = make([]T, 0, len(elements))
 	for e := range elements {
 		out = append(out, e)
 	}
 	return out
 }
 
-func (s Set[T]) Len() int {
+func (s *Set[T]) Len() int {
+	if s == nil {
+		return 0
+	}
 	return len(s.elements)
 }
 
-func (s Set[T]) IsEmpty() bool {
+func (s *Set[T]) IsEmpty() bool {
 	return s.Len() == 0
 }
 
-func (s Set[T]) For(walker func(T) error) error {
+func (s *Set[T]) For(walker func(T) error) error {
+	if s == nil {
+		return nil
+	}
 	return map_.ForKeys(s.elements, walker)
 }
 
-func (s Set[T]) ForEach(walker func(T)) {
-	map_.ForEachKey(s.elements, walker)
+func (s *Set[T]) ForEach(walker func(T)) {
+	if s != nil {
+		map_.ForEachKey(s.elements, walker)
+	}
 }
 
-func (s Set[T]) Filter(filter func(T) bool) c.Pipe[T] {
+func (s *Set[T]) Filter(filter func(T) bool) c.Pipe[T] {
 	h := s.Head()
 	return iter.NewPipe[T](iter.Filter(h, h.Next, filter))
 }
 
-func (s Set[T]) Convert(by func(T) T) c.Pipe[T] {
+func (s *Set[T]) Convert(by func(T) T) c.Pipe[T] {
 	h := s.Head()
 	return iter.NewPipe[T](iter.Convert(h, h.Next, by))
 }
 
-func (s Set[T]) Reduce(by func(T, T) T) T {
-	return loop.Reduce(s.Head().Next, by)
+func (s *Set[T]) Reduce(by func(T, T) T) T {
+	h := s.Head()
+	return loop.Reduce((&h).Next, by)
 }
 
-func (s Set[T]) Contains(val T) bool {
+func (s *Set[T]) Contains(val T) bool {
+	if s == nil {
+		return false
+	}
 	_, ok := s.elements[val]
 	return ok
 }
 
 // Sort transforms to the ordered Set.
-func (s Set[T]) Sort(less slice.Less[T]) ordered.Set[T] {
+func (s *Set[T]) Sort(less slice.Less[T]) *ordered.Set[T] {
 	return s.sortBy(sort.Slice, less)
 }
 
-func (s Set[T]) StableSort(less slice.Less[T]) ordered.Set[T] {
+func (s *Set[T]) StableSort(less slice.Less[T]) *ordered.Set[T] {
 	return s.sortBy(sort.SliceStable, less)
 }
 
-func (s Set[T]) sortBy(sorter slice.Sorter, less slice.Less[T]) ordered.Set[T] {
-	c := slice.Clone(s.Slice())
-	slice.Sort(c, sorter, less)
-	return ordered.WrapSet(c, s.elements)
+func (s *Set[T]) sortBy(sorter slice.Sorter, less slice.Less[T]) *ordered.Set[T] {
+	var elements map[T]struct{}
+	if s != nil {
+		elements = s.elements
+	}
+	return ordered.WrapSet(slice.Sort(slice.Clone(s.Slice()), sorter, less), elements)
 }
 
-func (s Set[T]) String() string {
+func (s *Set[T]) String() string {
 	return slice.ToString(s.Slice())
 }

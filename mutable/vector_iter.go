@@ -12,6 +12,9 @@ func NewHead[TS ~[]T, T any](elements *TS, del func(int) bool) Iter[TS, T] {
 
 // NewTail instantiates Iter starting at the last element of a slice.
 func NewTail[TS ~[]T, T any](elements *TS, del func(int) bool) Iter[TS, T] {
+	if elements == nil {
+		return Iter[TS, T]{}
+	}
 	return Iter[TS, T]{elements: elements, current: len(*elements), del: del}
 }
 
@@ -29,21 +32,31 @@ var (
 )
 
 func (i *Iter[TS, T]) HasNext() bool {
+	if i == nil || i.elements == nil {
+		return false
+	}
 	return iter.HasNext(*i.elements, i.current)
 }
 
 func (i *Iter[TS, T]) HasPrev() bool {
+	if i == nil || i.elements == nil {
+		return false
+	}
 	return iter.HasPrev(*i.elements, i.current)
 }
 
-func (i *Iter[TS, T]) GetNext() T {
-	t, _ := i.Next()
-	return t
+func (i *Iter[TS, T]) GetNext() (t T) {
+	if i != nil {
+		t, _ = i.Next()
+	}
+	return
 }
 
-func (i *Iter[TS, T]) GetPrev() T {
-	t, _ := i.Prev()
-	return t
+func (i *Iter[TS, T]) GetPrev() (t T) {
+	if i != nil {
+		t, _ = i.Prev()
+	}
+	return
 }
 
 func (i *Iter[TS, T]) Next() (T, bool) {
@@ -66,35 +79,44 @@ func (i *Iter[TS, T]) Prev() (T, bool) {
 	return no, false
 }
 
-func (i *Iter[TS, T]) Get() (T, bool) {
+func (i *Iter[TS, T]) Get() (t T, ok bool) {
+	if i == nil || i.elements == nil {
+		return
+	}
 	current := i.current
 	elements := *i.elements
 	if iter.IsValidIndex(len(elements), current) {
 		return elements[current], true
 	}
-	var no T
-	return no, false
+	return
 }
 
 func (i *Iter[TS, T]) Cap() int {
+	if i == nil || i.elements == nil {
+		return 0
+	}
 	return len(*i.elements)
 }
 
 func (i *Iter[TS, T]) Delete() {
-	if deleted := i.del(i.current); deleted {
+	if i == nil {
+		return
+	} else if deleted := i.del(i.current); deleted {
 		i.current -= i.step
 	}
 }
 
 func (i *Iter[TS, T]) DeleteNext() bool {
-	if deleted := i.del(i.current + 1); deleted {
-		return true
+	if i == nil {
+		return false
 	}
-	return false
+	return i.del(i.current + 1)
 }
 
 func (i *Iter[TS, T]) DeletePrev() bool {
-	if deleted := i.del(i.current - 1); deleted {
+	if i == nil {
+		return false
+	} else if deleted := i.del(i.current - 1); deleted {
 		i.current--
 		return true
 	}

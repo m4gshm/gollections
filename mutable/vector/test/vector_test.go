@@ -5,6 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/m4gshm/gollections/mutable"
 	"github.com/m4gshm/gollections/mutable/vector"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
@@ -82,6 +83,107 @@ func Test_Vector_SortStructByField(t *testing.T) {
 	)
 	assert.Equal(t, vector.Of(alise, anonymous, bob, cherlie), sortedByName)
 	assert.Equal(t, vector.Of(anonymous, bob, alise, cherlie), sortedByAge)
+}
+
+func Test_Vector_Nil(t *testing.T) {
+	var vec *mutable.Vector[int]
+	var nils []int
+	vec.Add(1, 2, 3)
+	vec.Add(nils...)
+	vec.AddOne(4)
+	vec.AddAll(vec)
+
+	vec.Delete(1, 2, 3)
+	vec.Delete(nils...)
+	vec.DeleteOne(4)
+
+	vec.IsEmpty()
+	vec.Len()
+
+	vec.For(nil)
+	vec.ForEach(nil)
+	vec.Track(nil)
+	vec.TrackEach(nil)
+
+	assert.Equal(t, nils, vec.Slice())
+
+	head := vec.Head()
+	assert.False(t, head.HasNext())
+	assert.False(t, head.HasPrev())
+
+	_, ok := head.Get()
+	assert.False(t, ok)
+	_, ok = head.Next()
+	assert.False(t, ok)
+	head.Cap()
+
+	tail := vec.Tail()
+	assert.False(t, tail.HasNext())
+	assert.False(t, tail.HasPrev())
+
+	_, ok = tail.Get()
+	assert.False(t, ok)
+	_, ok = tail.Next()
+	assert.False(t, ok)
+	tail.Cap()
+}
+
+func Test_Vector_Zero(t *testing.T) {
+	var vec mutable.Vector[string]
+
+	var nilValues []string
+	vec.Add("a", "b", "c")
+	vec.Add(nilValues...)
+	vec.AddOne("d")
+	vec.AddAll(&vec)
+
+	vec.Delete(0, 1, 2)
+	var nilIndexes []int
+	vec.Delete(nilIndexes...)
+	vec.DeleteOne(0)
+
+	e := vec.IsEmpty()
+	assert.False(t, e)
+
+	l := vec.Len()
+	assert.Equal(t, 4, l)
+
+	vec.For(nil)
+	vec.ForEach(nil)
+	vec.Track(nil)
+	vec.TrackEach(nil)
+
+	assert.Equal(t, slice.Of("a", "b", "c", "d"), vec.Slice())
+
+	head := vec.Head()
+	assert.True(t, head.HasNext())
+	assert.False(t, head.HasPrev())
+
+	_, ok := head.Get()
+	assert.False(t, ok)
+	fv, ok := head.Next()
+	assert.True(t, ok)
+	assert.Equal(t, "a", fv)
+	c := head.Cap()
+	assert.Equal(t, 4, c)
+
+	tail := vec.Tail()
+	assert.False(t, tail.HasNext())
+	assert.True(t, tail.HasPrev())
+
+	_, ok = tail.Get()
+	assert.False(t, ok)
+	tv, ok := tail.Prev()
+	assert.True(t, ok)
+	assert.Equal(t, "d", tv)
+	c = tail.Cap()
+	assert.Equal(t, 4, c)
+}
+
+func Test_Vector_AddAllOfSelf(t *testing.T) {
+	vec := vector.Of(1, 2, 3)
+	vec.AddAll(vec)
+	assert.Equal(t, vector.Of(1, 2, 3, 1, 2, 3), vec)
 }
 
 type user struct {
@@ -165,23 +267,66 @@ func Test_Vector_Delete_And_Iterate(t *testing.T) {
 	assert.False(t, it.HasNext())
 	//no prev
 	assert.False(t, it.HasPrev())
+
 	//only the current one
 	v, ok = it.Get()
 	assert.True(t, ok)
 	assert.Equal(t, 2, v)
 
-	//delete the element
-	vec.DeleteOne(0)
+	it.Delete()
+
+	//no the current one
+	_, ok = it.Get()
+	assert.False(t, ok)
 
 	//no more
 	assert.False(t, it.HasNext())
 	//no prev
 	assert.False(t, it.HasPrev())
 
-	//no the current one
+	assert.True(t, vec.IsEmpty())
+
+	// add values to vector
+	vec.Add(1, 3)
+
+	//it must to point before the first
 	_, ok = it.Get()
 	assert.False(t, ok)
+	assert.True(t, it.HasNext())
+	assert.False(t, it.HasPrev())
 
+	v, ok = it.Next()
+	assert.True(t, ok)
+	assert.Equal(t, 1, v)
+
+	assert.True(t, it.HasNext())
+	assert.False(t, it.HasPrev())
+
+	v, ok = it.Next()
+	assert.True(t, ok)
+	assert.Equal(t, 3, v)
+
+	assert.False(t, it.HasNext())
+	assert.True(t, it.HasPrev())
+
+	v, ok = it.Prev()
+	assert.True(t, ok)
+	assert.Equal(t, 1, v)
+
+	assert.True(t, it.HasNext())
+	assert.False(t, it.HasPrev())
+
+	//delete the first one
+	it.Delete()
+
+	//second must remains
+	assert.False(t, it.HasNext())
+	assert.False(t, it.HasPrev())
+	v, ok = it.Get()
+	assert.True(t, ok)
+	assert.Equal(t, 3, v)
+
+	assert.Equal(t, []int{3}, vec.Slice())
 }
 
 func Test_Vector_DeleteOne(t *testing.T) {

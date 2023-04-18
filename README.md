@@ -41,7 +41,6 @@ import (
     "github.com/stretchr/testify/assert"
 
     "github.com/m4gshm/gollections/as"
-    "github.com/m4gshm/gollections/convert"
     "github.com/m4gshm/gollections/first"
     "github.com/m4gshm/gollections/immutable/set"
     "github.com/m4gshm/gollections/last"
@@ -538,24 +537,24 @@ import (
 
 func _() {
     var (
-        _ immutable.Vector[int] = vector.Of(1, 2, 3)
-        _ c.Vector[int]         = vector.New([]int{1, 2, 3})
+        _ *immutable.Vector[int] = vector.Of(1, 2, 3)
+        _ c.Vector[int]          = vector.New([]int{1, 2, 3})
     )
     var (
-        _ immutable.Set[int] = set.Of(1, 2, 3)
-        _ c.Set[int]         = set.New([]int{1, 2, 3})
+        _ *immutable.Set[int] = set.Of(1, 2, 3)
+        _ c.Set[int]          = set.New([]int{1, 2, 3})
     )
     var (
-        _ ordered.Set[int] = oset.Of(1, 2, 3)
-        _ c.Set[int]       = oset.New([]int{1, 2, 3})
+        _ *ordered.Set[int] = oset.Of(1, 2, 3)
+        _ c.Set[int]        = oset.New([]int{1, 2, 3})
     )
     var (
-        _ immutable.Map[int, string] = map_.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3"))
-        _ c.Map[int, string]         = map_.New(map[int]string{1: "2", 2: "2", 3: "3"})
+        _ *immutable.Map[int, string] = map_.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3"))
+        _ c.Map[int, string]          = map_.New(map[int]string{1: "2", 2: "2", 3: "3"})
     )
     var (
-        _ ordered.Map[int, string] = omap.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3"))
-        _ c.Map[int, string]       = omap.New(map[int]string{1: "2", 2: "2", 3: "3"}) //source map order is unpredictable
+        _ *ordered.Map[int, string] = omap.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3"))
+        _ c.Map[int, string]        = omap.New(map[int]string{1: "2", 2: "2", 3: "3"}) //source map order is unpredictable
     )
 }
 ```
@@ -592,9 +591,9 @@ func _() {
         _ c.Vector[int]        = vector.Empty[int]()
     )
     var (
-        _ mutable.Set[int] = set.Of(1, 2, 3)
-        _ c.Set[int]       = set.NewCap[int](capacity)
-        _ c.Set[int]       = set.Empty[int]()
+        _ *mutable.Set[int] = set.Of(1, 2, 3)
+        _ c.Set[int]        = set.NewCap[int](capacity)
+        _ c.Set[int]        = set.Empty[int]()
     )
     var (
         _ *ordered.Set[int] = oset.Of(1, 2, 3)
@@ -602,9 +601,9 @@ func _() {
         _ c.Set[int]        = oset.Empty[int]()
     )
     var (
-        _ mutable.Map[int, string] = map_.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3"))
-        _ c.Map[int, string]       = map_.New[int, string](capacity)
-        _ c.Map[int, string]       = map_.Empty[int, string]()
+        _ *mutable.Map[int, string] = map_.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3"))
+        _ c.Map[int, string]        = map_.New[int, string](capacity)
+        _ c.Map[int, string]        = map_.Empty[int, string]()
     )
     var (
         _ *ordered.Map[int, string] = omap.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3"))
@@ -701,8 +700,8 @@ import (
 
 func Test_Set(t *testing.T) {
     var (
-        s      immutable.Set[int] = set.Of(1, 1, 2, 4, 3, 1)
-        values []int              = s.Slice()
+        s      *immutable.Set[int] = set.Of(1, 1, 2, 4, 3, 1)
+        values []int               = s.Slice()
     )
 
     assert.Equal(t, 4, s.Len())

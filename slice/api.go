@@ -354,6 +354,9 @@ func Get[TS ~[]T, T any](elements TS, index int) (T, bool) {
 
 // Track applies tracker to elements with error checking. To stop traking just return the ErrBreak
 func Track[TS ~[]T, T any](elements TS, tracker func(int, T) error) error {
+	if tracker == nil {
+		return nil
+	}
 	for i, e := range elements {
 		if err := tracker(i, e); err == ErrBreak {
 			return nil
@@ -366,6 +369,9 @@ func Track[TS ~[]T, T any](elements TS, tracker func(int, T) error) error {
 
 // TrackEach applies tracker to elements without error checking
 func TrackEach[TS ~[]T, T any](elements TS, tracker func(int, T)) {
+	if tracker == nil {
+		return
+	}
 	for i, e := range elements {
 		tracker(i, e)
 	}
@@ -373,6 +379,9 @@ func TrackEach[TS ~[]T, T any](elements TS, tracker func(int, T)) {
 
 // For applies walker to elements. To stop walking just return the ErrBreak
 func For[TS ~[]T, T any](elements TS, walker func(T) error) error {
+	if walker == nil {
+		return nil
+	}
 	for _, e := range elements {
 		if err := walker(e); err == ErrBreak {
 			return nil
@@ -385,6 +394,9 @@ func For[TS ~[]T, T any](elements TS, walker func(T) error) error {
 
 // ForEach applies walker to elements without error checking
 func ForEach[TS ~[]T, T any](elements TS, walker func(T)) {
+	if walker == nil {
+		return
+	}
 	for _, e := range elements {
 		walker(e)
 	}
@@ -392,6 +404,9 @@ func ForEach[TS ~[]T, T any](elements TS, walker func(T)) {
 
 // ForEachRef applies walker to references without error checking
 func ForEachRef[T any, TS ~[]*T](references TS, walker func(T)) {
+	if walker == nil {
+		return
+	}
 	for _, e := range references {
 		walker(*e)
 	}

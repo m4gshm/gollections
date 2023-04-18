@@ -252,3 +252,33 @@ func Test_IsValidIndex2(t *testing.T) {
 	r = iter.IsValidIndex2(5, -1)
 	assert.False(t, r)
 }
+
+func Test_Head_Tail_Nil_Safety(t *testing.T) {
+	var values []int
+
+	head := iter.NewHead(values)
+
+	assert.False(t, head.HasNext())
+	assert.False(t, head.HasPrev())
+
+	_, ok := head.Get()
+	assert.False(t, ok)
+
+	_, ok = head.Next()
+	assert.False(t, ok)
+	_, ok = head.Prev()
+	assert.False(t, ok)
+	head.Cap()
+
+	tail := iter.NewTail(values)
+
+	assert.False(t, tail.HasNext())
+	assert.False(t, tail.HasPrev())
+	_, ok = tail.Get()
+	assert.False(t, ok)
+	_, ok = tail.Next()
+	assert.False(t, ok)
+	_, ok = tail.Prev()
+	assert.False(t, ok)
+	tail.Cap()
+}

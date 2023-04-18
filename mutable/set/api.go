@@ -10,22 +10,22 @@ import (
 )
 
 // Of instantiates Set with predefined elements.
-func Of[T comparable](elements ...T) mutable.Set[T] {
+func Of[T comparable](elements ...T) *mutable.Set[T] {
 	return mutable.NewSet(elements)
 }
 
 // From creates a Set instance with elements obtained by passing an iterator.
-func From[T comparable](elements c.Iterator[T]) mutable.Set[T] {
+func From[T comparable](elements c.Iterator[T]) *mutable.Set[T] {
 	return mutable.ToSet(elements)
 }
 
 // Empty instantiates Set with zero capacity.
-func Empty[T comparable]() mutable.Set[T] {
+func Empty[T comparable]() *mutable.Set[T] {
 	return NewCap[T](0)
 }
 
 // NewCap instantiates Set with a predefined capacity.
-func NewCap[T comparable](capacity int) mutable.Set[T] {
+func NewCap[T comparable](capacity int) *mutable.Set[T] {
 	return mutable.NewSetCap[T](capacity)
 }
 
@@ -34,13 +34,13 @@ func Sort[T comparable, F constraints.Ordered](s mutable.Set[T], by func(T) F) *
 	return s.Sort(func(e1, e2 T) bool { return by(e1) < by(e2) })
 }
 
-func Convert[From, To comparable](s mutable.Set[From], by func(From) To) c.Pipe[To] {
-	h := *(s.Head())
+func Convert[From, To comparable](s *mutable.Set[From], by func(From) To) c.Pipe[To] {
+	h := s.Head()
 	return iter.NewPipe[To](iter.Convert(h, h.Next, by))
 }
 
-func Flatt[From, To comparable](s mutable.Set[From], by func(From) []To) c.Pipe[To] {
-	h := *(s.Head())
+func Flatt[From, To comparable](s *mutable.Set[From], by func(From) []To) c.Pipe[To] {
+	h := s.Head()
 	f := iter.Flatt(h, h.Next, by)
 	return iter.NewPipe[To](&f)
 }

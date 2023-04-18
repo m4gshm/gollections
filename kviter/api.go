@@ -77,7 +77,7 @@ func Filter[K comparable, V any, IT c.KVIterator[K, V]](elements IT, filter func
 
 // FilterKey instantiates key/value iterator that iterates only over elements that filtered by the key
 func FilterKey[K comparable, V any](elements c.KVIterator[K, V], fit func(K) bool) c.MapPipe[K, V, map[K]V] {
-	return Filter(elements, filter.Key[K, V](fit))
+	return Filter(elements, filter.Key[V](fit))
 }
 
 // FilterValue instantiates key/value iterator that iterates only over elements that filtered by the value

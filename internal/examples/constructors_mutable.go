@@ -21,9 +21,9 @@ func _() {
 		_ c.Vector[int]        = vector.Empty[int]()
 	)
 	var (
-		_ mutable.Set[int] = set.Of(1, 2, 3)
-		_ c.Set[int]       = set.NewCap[int](capacity)
-		_ c.Set[int]       = set.Empty[int]()
+		_ *mutable.Set[int] = set.Of(1, 2, 3)
+		_ c.Set[int]        = set.NewCap[int](capacity)
+		_ c.Set[int]        = set.Empty[int]()
 	)
 	var (
 		_ *ordered.Set[int] = oset.Of(1, 2, 3)
@@ -31,9 +31,9 @@ func _() {
 		_ c.Set[int]        = oset.Empty[int]()
 	)
 	var (
-		_ mutable.Map[int, string] = map_.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3"))
-		_ c.Map[int, string]       = map_.New[int, string](capacity)
-		_ c.Map[int, string]       = map_.Empty[int, string]()
+		_ *mutable.Map[int, string] = map_.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3"))
+		_ c.Map[int, string]        = map_.New[int, string](capacity)
+		_ c.Map[int, string]        = map_.Empty[int, string]()
 	)
 	var (
 		_ *ordered.Map[int, string] = omap.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3"))

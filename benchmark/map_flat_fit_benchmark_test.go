@@ -19,7 +19,6 @@ import (
 	"github.com/m4gshm/gollections/mutable"
 	mvector "github.com/m4gshm/gollections/mutable/vector"
 	sop "github.com/m4gshm/gollections/op"
-	"github.com/m4gshm/gollections/ptr"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/stretchr/testify/assert"
 )
@@ -42,6 +41,22 @@ func Benchmark_Map_EmbeddedSlice(b *testing.B) {
 	}
 	_ = s
 	b.StopTimer()
+}
+
+func Benchmark_First_PlainOld(b *testing.B) {
+	op := func(i int) bool { return i > threshhold }
+	var f int
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		for _, v := range values {
+			if op(v) {
+				f = v
+				break
+			}
+		}
+	}
+	b.StopTimer()
+	assert.Equal(b, threshhold+1, f)
 }
 
 func Benchmark_First_Slice(b *testing.B) {
@@ -164,7 +179,7 @@ func Benchmark_Map_Vector_Iterator_Impl(b *testing.B) {
 	var s []string
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		h := ptr.Of(items.Head())
+		h := (items.Head())
 		s = loop.ToSlice(iterimpl.Convert(h, h.Next, op).Next)
 	}
 	_ = s
@@ -316,7 +331,7 @@ func Benchmark_FilterAndConvert_Iterable_Impl(b *testing.B) {
 	var s []string
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		it := ptr.Of(iterimpl.NewHead(items))
+		it := (iterimpl.NewHead(items))
 		s = loop.ToSlice(iterimpl.FilterAndConvert(it, it.Next, even, convert.And(toString, addTail)).Next)
 	}
 	_ = s
@@ -598,7 +613,7 @@ func Benchmark_MapFlattStructure_IterableFit_Impl(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		it := iterimpl.NewHead(items)
-		attr := iterimpl.FilterAndFlatt(&it, (&it).Next, check.NotNil[Participant], (*Participant).GetAttributes)
+		attr := iterimpl.FilterAndFlatt(it, it.Next, check.NotNil[Participant], (*Participant).GetAttributes)
 		_ = loop.ToSlice(iterimpl.FilterAndConvert(&attr, (&attr).Next, check.NotNil[Attributes], (*Attributes).GetName).Next)
 	}
 	b.StopTimer()

@@ -10,13 +10,13 @@ import (
 )
 
 // Convert instantiates Iterator that converts elements with a converter and returns them.
-func Convert[From, To any, IT any](elements IT, next func() (From, bool), by func(From) To) ConvertIter[From, To, IT] {
-	return ConvertIter[From, To, IT]{iterator: elements, next: next, by: by}
+func Convert[From, To any, IT any](elements IT, next func() (From, bool), by func(From) To) *ConvertIter[From, To, IT] {
+	return &ConvertIter[From, To, IT]{iterator: elements, next: next, by: by}
 }
 
 // FilterAndConvert additionally filters 'From' elements.
-func FilterAndConvert[From, To, IT any](iterator IT, next func() (From, bool), filter func(From) bool, by func(From) To) ConvertFitIter[From, To, IT] {
-	return ConvertFitIter[From, To, IT]{iterator: iterator, next: next, by: by, filter: filter}
+func FilterAndConvert[From, To, IT any](iterator IT, next func() (From, bool), filter func(From) bool, by func(From) To) *ConvertFitIter[From, To, IT] {
+	return &ConvertFitIter[From, To, IT]{iterator: iterator, next: next, by: by, filter: filter}
 }
 
 // Flatt instantiates Iterator that extracts slices of 'To' by a Flatter from elements of 'From' and flattens as one iterable collection of 'To' elements.
@@ -40,8 +40,8 @@ func NotNil[T any, IT c.Iterator[*T]](elements IT) Fit[*T, IT] {
 }
 
 // ConvertKV creates an Iterator that applies a transformer to iterable key\values.
-func ConvertKV[K, V any, IT c.KVIterator[K, V], k2, v2 any](elements IT, by func(K, V) (k2, v2)) ConvertKVIter[K, V, IT, k2, v2, func(K, V) (k2, v2)] {
-	return ConvertKVIter[K, V, IT, k2, v2, func(K, V) (k2, v2)]{iterator: elements, by: by}
+func ConvertKV[K, V any, IT c.KVIterator[K, V], k2, v2 any](elements IT, by func(K, V) (k2, v2)) *ConvertKVIter[K, V, IT, k2, v2, func(K, V) (k2, v2)] {
+	return &ConvertKVIter[K, V, IT, k2, v2, func(K, V) (k2, v2)]{iterator: elements, by: by}
 }
 
 // FilterKV creates an Iterator that checks elements by a filter and returns successful ones

@@ -3,6 +3,8 @@ package iter
 import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/loop"
+	"github.com/m4gshm/gollections/map_/convert"
+	"github.com/m4gshm/gollections/map_/filter"
 )
 
 // NewKVPipe instantiates Iterator wrapper that converts the elements into key/value pairs and iterates over them.
@@ -21,22 +23,20 @@ var (
 	_ c.MapPipe[string, any, map[string][]any] = (*KVIterPipe[string, any, map[string][]any])(nil)
 )
 
-func (s *KVIterPipe[K, V, M]) FilterKey(filter func(K) bool) c.MapPipe[K, V, M] {
-	kvFit := func(key K, val V) bool { return filter(key) }
-	return NewKVPipe(FilterKV(s, kvFit), s.collector)
+func (s *KVIterPipe[K, V, M]) FilterKey(predicate func(K) bool) c.MapPipe[K, V, M] {
+	return NewKVPipe(FilterKV(s, filter.Key[V](predicate)), s.collector)
 }
 
 func (s *KVIterPipe[K, V, M]) ConvertKey(by func(K) K) c.MapPipe[K, V, M] {
-	return NewKVPipe(ConvertKV(s, func(key K, val V) (K, V) { return by(key), val }), s.collector)
+	return NewKVPipe(ConvertKV(s, convert.Key[V](by)), s.collector)
 }
 
-func (s *KVIterPipe[K, V, M]) FilterValue(filter func(V) bool) c.MapPipe[K, V, M] {
-	kvFit := func(key K, val V) bool { return filter(val) }
-	return NewKVPipe(FilterKV(s, kvFit), s.collector)
+func (s *KVIterPipe[K, V, M]) FilterValue(predicate func(V) bool) c.MapPipe[K, V, M] {
+	return NewKVPipe(FilterKV(s, filter.Value[K](predicate)), s.collector)
 }
 
 func (s *KVIterPipe[K, V, M]) ConvertValue(by func(V) V) c.MapPipe[K, V, M] {
-	return NewKVPipe(ConvertKV(s, func(key K, val V) (K, V) { return key, by(val) }), s.collector)
+	return NewKVPipe(ConvertKV(s, convert.Value[K](by)), s.collector)
 }
 
 func (s *KVIterPipe[K, V, M]) Filter(filter func(K, V) bool) c.MapPipe[K, V, M] {

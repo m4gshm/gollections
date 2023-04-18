@@ -84,7 +84,10 @@ func (v *Vector[T]) Last() (Iter[Vector[T], T], T, bool) {
 }
 
 // Slice transforms the vector to a slice
-func (v *Vector[T]) Slice() []T {
+func (v *Vector[T]) Slice() (t []T) {
+	if v == nil {
+		return
+	}
 	return slice.Clone(*v)
 }
 
@@ -100,50 +103,68 @@ func (v *Vector[T]) IsEmpty() bool {
 
 // Len returns amount of elements
 func (v *Vector[T]) Len() int {
+	if v == nil {
+		return 0
+	}
 	return notsafe.GetLen(*v)
 }
 
 // Track applies tracker to elements with error checking. To stop traking just return the ErrBreak
 func (v *Vector[T]) Track(tracker func(int, T) error) error {
+	if v == nil {
+		return nil
+	}
 	return slice.Track(*v, tracker)
 }
 
 // TrackEach applies tracker to elements without error checking
 func (v *Vector[T]) TrackEach(tracker func(int, T)) {
-	slice.TrackEach(*v, tracker)
+	if v != nil {
+		slice.TrackEach(*v, tracker)
+	}
 }
 
 // For applies walker to elements. To stop walking just return the ErrBreak
 func (v *Vector[T]) For(walker func(T) error) error {
+	if v == nil {
+		return nil
+	}
 	return slice.For(*v, walker)
 }
 
 // ForEach applies walker to elements without error checking
 func (v *Vector[T]) ForEach(walker func(T)) {
-	slice.ForEach(*v, walker)
+	if !(v == nil) {
+		slice.ForEach(*v, walker)
+	}
 }
 
 // Get returns an element by the index, otherwise, if the provided index is ouf of the vector len, returns zero T and false in the second result
-func (v *Vector[T]) Get(index int) (T, bool) {
+func (v *Vector[T]) Get(index int) (t T, ok bool) {
+	if v == nil {
+		return
+	}
 	return slice.Get(*v, index)
 }
 
 // Add adds elements to the end of the vector
 func (v *Vector[T]) Add(elements ...T) {
-	*v = append(*v, elements...)
+	if v != nil {
+		*v = append(*v, elements...)
+	}
 }
 
 // AddOne adds a element to the end of the vector
 func (v *Vector[T]) AddOne(element T) {
-	*v = append(*v, element)
+	if v != nil {
+		*v = append(*v, element)
+	}
 }
 
 func (v *Vector[T]) AddAll(elements c.Iterable[T]) {
-	*v = append(*v, loop.ToSlice(elements.Begin().Next)...)
-}
-
-func (v *Vector[T]) AddAllNew(elements c.Iterator[T]) {
-	*v = append(*v, loop.ToSlice(elements.Next)...)
+	if v != nil {
+		*v = append(*v, loop.ToSlice(elements.Begin().Next)...)
+	}
 }
 
 // Delete removes a element by the index
@@ -158,14 +179,16 @@ func (v *Vector[T]) DeleteActualOne(index int) bool {
 }
 
 // Remove removes and returns a element by the index
-func (v *Vector[T]) Remove(index int) (T, bool) {
+func (v *Vector[T]) Remove(index int) (t T, ok bool) {
+	if v == nil {
+		return
+	}
 	if e := *v; index >= 0 && index < len(e) {
 		de := e[index]
 		*v = slice.Delete(index, e)
 		return de, true
 	}
-	var no T
-	return no, false
+	return
 }
 
 // Delete drops elements by indexes
@@ -175,6 +198,9 @@ func (v *Vector[T]) Delete(indexes ...int) {
 
 // DeleteActual drops elements by indexes with verification of no-op
 func (v *Vector[T]) DeleteActual(indexes ...int) bool {
+	if v == nil {
+		return false
+	}
 	l := len(indexes)
 	if l == 0 {
 		return false
@@ -222,6 +248,9 @@ func (v *Vector[T]) Set(index int, value T) {
 
 // SetNew puts a element into the vector at the index
 func (v *Vector[T]) SetNew(index int, value T) bool {
+	if v == nil {
+		return false
+	}
 	e := *v
 	if index < 0 {
 		return false
@@ -245,13 +274,15 @@ func (v *Vector[T]) SetNew(index int, value T) bool {
 // Filter returns a pipe consisting of vector elements matching the filter
 func (v *Vector[T]) Filter(filter func(T) bool) c.Pipe[T] {
 	h := v.Head()
-	return iter.NewPipe[T](iter.Filter(h, h.Next, filter))
+	f := iter.Filter(h, h.Next, filter)
+	return iter.NewPipe[T](f)
 }
 
 // Map returns a pipe of converted vector elements by the converter 'by'
 func (v *Vector[T]) Convert(by func(T) T) c.Pipe[T] {
 	h := v.Head()
-	return iter.NewPipe[T](iter.Convert(h, h.Next, by))
+	c := iter.Convert(h, h.Next, by)
+	return iter.NewPipe[T](c)
 }
 
 // Reduce reduces elements to an one
@@ -270,11 +301,16 @@ func (v *Vector[T]) StableSort(less slice.Less[T]) *Vector[T] {
 }
 
 func (v *Vector[T]) sortBy(sorter slice.Sorter, less slice.Less[T]) *Vector[T] {
-	slice.Sort(*v, sorter, less)
+	if v != nil {
+		slice.Sort(*v, sorter, less)
+	}
 	return v
 }
 
 // String returns then string representation
 func (v *Vector[T]) String() string {
+	if v == nil {
+		return ""
+	}
 	return slice.ToString(*v)
 }

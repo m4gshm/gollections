@@ -6,12 +6,14 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/m4gshm/gollections/immutable"
 	"github.com/m4gshm/gollections/immutable/oset"
 	"github.com/m4gshm/gollections/immutable/set"
 	"github.com/m4gshm/gollections/iter"
 	"github.com/m4gshm/gollections/iterable"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/ptr"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/sort"
 	"github.com/m4gshm/gollections/walk/group"
@@ -29,7 +31,7 @@ func Test_Set_Iterate(t *testing.T) {
 	iterSlice := sort.Of(iter.ToSlice(set.Begin()))
 	assert.Equal(t, expected, iterSlice)
 
-	loopSlice := sort.Of(loop.ToSlice(set.Head().Next))
+	loopSlice := sort.Of(loop.ToSlice(ptr.Of(set.Head()).Next))
 	assert.Equal(t, expected, loopSlice)
 
 	out := make(map[int]int, 0)
@@ -142,6 +144,55 @@ func Test_Set_DoubleConvert(t *testing.T) {
 	var no []string
 	assert.Equal(t, no, stringsPipe.Slice())
 }
+
+func Test_Set_Nil(t *testing.T) {
+	var set *immutable.Set[int]
+
+	assert.False(t, set.Contains(1))
+
+	set.IsEmpty()
+	set.Len()
+
+	set.For(nil)
+	set.ForEach(nil)
+
+	set.Slice()
+
+	set.Convert(nil)
+	set.Filter(nil)
+
+	head := set.Head()
+	_, ok := head.Next()
+	assert.False(t, ok)
+
+	_, _, ok = set.First()
+	assert.False(t, ok)
+}
+
+func Test_Set_Zero(t *testing.T) {
+	var set immutable.Set[int]
+
+	assert.False(t, set.Contains(1))
+
+	set.IsEmpty()
+	set.Len()
+
+	set.For(nil)
+	set.ForEach(nil)
+
+	set.Slice()
+
+	set.Convert(nil)
+	set.Filter(nil)
+
+	head := set.Head()
+	_, ok := head.Next()
+	assert.False(t, ok)
+
+	_, _, ok = set.First()
+	assert.False(t, ok)
+}
+
 
 type user struct {
 	name string

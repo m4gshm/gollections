@@ -7,11 +7,11 @@ import (
 )
 
 // Of instantiates Map with predefined elements.
-func Of[k comparable, v any](elements ...c.KV[k, v]) immutable.Map[k, v] {
+func Of[k comparable, v any](elements ...c.KV[k, v]) *immutable.Map[k, v] {
 	return immutable.ConvertKVsToMap(elements)
 }
 
 // New instantiates Map and copies elements to it.
-func New[k comparable, v any](elements map[k]v) immutable.Map[k, v] {
+func New[k comparable, v any](elements map[k]v) *immutable.Map[k, v] {
 	return immutable.NewMap(elements)
 }

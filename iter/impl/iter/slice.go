@@ -11,9 +11,8 @@ import (
 const NoStarted = -1
 
 // New instantiates Iter based on elements Iter and returs its reference
-func New[TS ~[]T, T any](elements TS) *ArrayIter[T] {
-	h := NewHeadS(elements, notsafe.GetTypeSize[T]())
-	return &h
+func New[TS ~[]T, T any](elements TS) ArrayIter[T] {
+	return NewHeadS(elements, notsafe.GetTypeSize[T]())
 }
 
 // NewHead instantiates Iter based on elements slice
@@ -71,10 +70,16 @@ var (
 )
 
 func (i *ArrayIter[T]) HasNext() bool {
+	if i == nil {
+		return false
+	}
 	return CanIterateByRange(NoStarted, i.maxHasNext, i.current)
 }
 
 func (i *ArrayIter[T]) HasPrev() bool {
+	if i == nil {
+		return false
+	}
 	return CanIterateByRange(1, i.size, i.current)
 }
 
@@ -88,38 +93,46 @@ func (i *ArrayIter[T]) GetPrev() T {
 	return t
 }
 
-func (i *ArrayIter[T]) Next() (T, bool) {
-	current := i.current
-	if CanIterateByRange(NoStarted, i.maxHasNext, current) {
+func (i *ArrayIter[T]) Next() (v T, ok bool) {
+	if i == nil || i.array == nil {
+		return
+	}
+	if current := i.current; CanIterateByRange(NoStarted, i.maxHasNext, current) {
 		current++
 		i.current = current
 		return *(*T)(notsafe.GetArrayElemRef(i.array, current, i.elementSize)), true
 	}
-	var no T
-	return no, false
+	return
 }
 
-func (i *ArrayIter[T]) Prev() (T, bool) {
+func (i *ArrayIter[T]) Prev() (v T, ok bool) {
+	if i == nil || i.array == nil {
+		return
+	}
 	current := i.current
 	if CanIterateByRange(1, i.size, current) {
 		current--
 		i.current = current
 		return *(*T)(notsafe.GetArrayElemRef(i.array, current, i.elementSize)), true
 	}
-	var no T
-	return no, false
+	return
 }
 
-func (i *ArrayIter[T]) Get() (T, bool) {
+func (i *ArrayIter[T]) Get() (v T, ok bool) {
+	if i == nil || i.array == nil {
+		return
+	}
 	current := i.current
 	if IsValidIndex(i.size, current) {
 		return *(*T)(notsafe.GetArrayElemRef(i.array, current, i.elementSize)), true
 	}
-	var no T
-	return no, false
+	return
 }
 
 func (i *ArrayIter[T]) Cap() int {
+	if i == nil {
+		return 0
+	}
 	return i.size
 }
 

@@ -35,23 +35,26 @@ func (s FitKV[K, V, IT]) Next() (K, V, bool) {
 	return nextFilteredKV(s.iterator, s.by)
 }
 
-func nextFiltered[T any](next func() (T, bool), filter func(T) bool) (T, bool) {
+func nextFiltered[T any](next func() (T, bool), filter func(T) bool) (v T, ok bool) {
+	if next == nil || filter == nil {
+		return
+	}
 	for v, ok := next(); ok; v, ok = next() {
 		if filter(v) {
 			return v, true
 		}
 	}
-	var v T
-	return v, false
+	return
 }
 
-func nextFilteredKV[K any, V any, IT c.KVIterator[K, V]](iterator IT, filter func(K, V) bool) (K, V, bool) {
+func nextFilteredKV[K any, V any, IT c.KVIterator[K, V]](iterator IT, filter func(K, V) bool) (key K, val V, filtered bool) {
+	if filter == nil {
+		return
+	}
 	for key, val, ok := iterator.Next(); ok; key, val, ok = iterator.Next() {
 		if filter(key, val) {
 			return key, val, true
 		}
 	}
-	var key K
-	var val V
-	return key, val, false
+	return
 }

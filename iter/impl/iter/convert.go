@@ -13,16 +13,17 @@ type ConvertFitIter[From, To, IT any] struct {
 }
 
 var (
-	_ c.Iterator[any] = ConvertFitIter[any, any, any]{}
 	_ c.Iterator[any] = (*ConvertFitIter[any, any, any])(nil)
 )
 
-func (s ConvertFitIter[From, To, IT]) Next() (To, bool) {
-	if V, ok := nextFiltered(s.next, s.filter); ok {
-		return s.by(V), true
+func (c *ConvertFitIter[From, To, IT]) Next() (t To, ok bool) {
+	if c == nil || c.by == nil {
+		return
 	}
-	var no To
-	return no, false
+	if V, ok := nextFiltered(c.next, c.filter); ok {
+		return c.by(V), true
+	}
+	return
 }
 
 // ConvertIter is the iterator wrapper implementation applying a converter to all iterable elements.
@@ -33,16 +34,17 @@ type ConvertIter[From, To any, IT any] struct {
 }
 
 var (
-	_ c.Iterator[any] = ConvertIter[any, any, any]{}
 	_ c.Iterator[any] = (*ConvertIter[any, any, any])(nil)
 )
 
-func (s ConvertIter[From, To, IT]) Next() (To, bool) {
-	if v, ok := s.next(); ok {
-		return s.by(v), true
+func (c *ConvertIter[From, To, IT]) Next() (t To, ok bool) {
+	if c == nil || c.by == nil {
+		return
 	}
-	var no To
-	return no, false
+	if v, ok := c.next(); ok {
+		return c.by(v), true
+	}
+	return
 }
 
 // ConvertKVIter is the iterator wrapper implementation applying a converter to all iterable key/value elements.
@@ -52,16 +54,16 @@ type ConvertKVIter[K, V any, IT c.KVIterator[K, V], K2, V2 any, C func(K, V) (K2
 }
 
 var (
-	_ c.KVIterator[any, any] = ConvertKVIter[any, any, c.KVIterator[any, any], any, any, func(any, any) (any, any)]{}
 	_ c.KVIterator[any, any] = (*ConvertKVIter[any, any, c.KVIterator[any, any], any, any, func(any, any) (any, any)])(nil)
 )
 
-func (s ConvertKVIter[K, V, IT, K2, V2, C]) Next() (K2, V2, bool) {
-	if K, V, ok := s.iterator.Next(); ok {
-		k2, v2 := s.by(K, V)
+func (c *ConvertKVIter[K, V, IT, K2, V2, C]) Next() (k K2, v V2, ok bool) {
+	if c == nil || c.by == nil {
+		return
+	}
+	if K, V, ok := c.iterator.Next(); ok {
+		k2, v2 := c.by(K, V)
 		return k2, v2, true
 	}
-	var k2 K2
-	var v2 V2
-	return k2, v2, false
+	return
 }

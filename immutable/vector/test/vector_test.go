@@ -110,7 +110,7 @@ func Test_Vector_Convert(t *testing.T) {
 func Test_Vector_Flatt(t *testing.T) {
 	var (
 		deepInts    = vector.Of(vector.Of(3, 1), vector.Of(5, 6, 8, 0, -2))
-		ints        = vector.Flatt(deepInts, immutable.Vector[int].Slice)
+		ints        = vector.Flatt(deepInts, (*immutable.Vector[int]).Slice)
 		stringsPipe = iterable.Filter(iterable.Convert(ints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 }), func(s string) bool { return len(s) == 1 })
 	)
 	assert.Equal(t, slice.Of("3", "1", "5", "6", "8", "0"), stringsPipe.Slice())
@@ -127,6 +127,74 @@ func Test_Vector_DoubleConvert(t *testing.T) {
 	//second call do nothing
 	var no []string
 	assert.Equal(t, no, stringsPipe.Slice())
+}
+
+func Test_Vector_Nil(t *testing.T) {
+	var vec *immutable.Vector[int]
+
+	vec.IsEmpty()
+	vec.Len()
+
+	vec.For(nil)
+	vec.ForEach(nil)
+	vec.Track(nil)
+	vec.TrackEach(nil)
+
+	vec.Slice()
+
+	head := vec.Head()
+	assert.False(t, head.HasNext())
+	assert.False(t, head.HasPrev())
+
+	_, ok := head.Get()
+	assert.False(t, ok)
+	_, ok = head.Next()
+	assert.False(t, ok)
+	head.Cap()
+
+	tail := vec.Tail()
+	assert.False(t, tail.HasNext())
+	assert.False(t, tail.HasPrev())
+
+	_, ok = tail.Get()
+	assert.False(t, ok)
+	_, ok = tail.Next()
+	assert.False(t, ok)
+	tail.Cap()
+}
+
+func Test_Vector_Zero(t *testing.T) {
+	var vec immutable.Vector[int]
+
+	vec.IsEmpty()
+	vec.Len()
+
+	vec.For(nil)
+	vec.ForEach(nil)
+	vec.Track(nil)
+	vec.TrackEach(nil)
+
+	vec.Slice()
+
+	head := vec.Head()
+	assert.False(t, head.HasNext())
+	assert.False(t, head.HasPrev())
+
+	_, ok := head.Get()
+	assert.False(t, ok)
+	_, ok = head.Next()
+	assert.False(t, ok)
+	head.Cap()
+
+	tail := vec.Tail()
+	assert.False(t, tail.HasNext())
+	assert.False(t, tail.HasPrev())
+
+	_, ok = tail.Get()
+	assert.False(t, ok)
+	_, ok = tail.Next()
+	assert.False(t, ok)
+	tail.Cap()
 }
 
 type user struct {

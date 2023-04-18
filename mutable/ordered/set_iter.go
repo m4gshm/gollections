@@ -22,20 +22,28 @@ var (
 	_ c.DelIterator[any] = (*SetIter[any])(nil)
 )
 
-func (i *SetIter[T]) Next() (T, bool) {
+func (i *SetIter[T]) Next() (t T, ok bool) {
+	if i == nil {
+		return
+	}
 	if iter.HasNext(*i.elements, i.current) {
 		i.current++
 		return iter.Gett(*i.elements, i.current)
 	}
-	var no T
-	return no, false
+	return
 }
 
 func (i *SetIter[T]) Cap() int {
+	if i == nil {
+		return 0
+	}
 	return len(*i.elements)
 }
 
 func (i *SetIter[T]) Delete() {
+	if i == nil {
+		return
+	}
 	if v, ok := iter.Gett(*i.elements, i.current); ok {
 		i.current--
 		i.del(v)

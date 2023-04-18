@@ -36,11 +36,13 @@ func ToSet[T comparable](elements c.Iterator[T]) *Set[T] {
 		pos     = 0
 	)
 
-	for {
-		if e, ok := elements.Next(); !ok {
-			break
-		} else {
-			order, pos = add(e, uniques, order, pos)
+	if elements != nil {
+		for {
+			if e, ok := elements.Next(); !ok {
+				break
+			} else {
+				order, pos = add(e, uniques, order, pos)
+			}
 		}
 	}
 	return WrapSet(order, uniques)
@@ -82,10 +84,17 @@ func (s *Set[T]) BeginEdit() c.DelIterator[T] {
 }
 
 func (s *Set[T]) Head() *SetIter[T] {
+	if s == nil {
+		return nil
+	}
 	return NewSetIter(&s.elements, s.DeleteOne)
 }
 
 func (s *Set[T]) First() (*SetIter[T], T, bool) {
+	if s == nil {
+		var z T
+		return nil, z, false
+	}
 	var (
 		iterator  = s.Head()
 		first, ok = iterator.Next()
@@ -94,18 +103,30 @@ func (s *Set[T]) First() (*SetIter[T], T, bool) {
 }
 
 func (s *Set[T]) Slice() []T {
+	if s == nil {
+		return nil
+	}
 	return slice.Clone(s.elements)
 }
 
 func (s *Set[T]) For(walker func(T) error) error {
+	if s == nil {
+		return nil
+	}
 	return slice.For(s.elements, walker)
 }
 
 func (s *Set[T]) ForEach(walker func(T)) {
+	if s == nil {
+		return
+	}
 	slice.ForEach(s.elements, walker)
 }
 
 func (s *Set[T]) Len() int {
+	if s == nil {
+		return 0
+	}
 	return len(s.elements)
 }
 
@@ -114,11 +135,17 @@ func (s *Set[T]) IsEmpty() bool {
 }
 
 func (s *Set[T]) Contains(v T) bool {
+	if s == nil {
+		return false
+	}
 	_, ok := s.uniques[v]
 	return ok
 }
 
 func (s *Set[T]) AddNew(elements ...T) bool {
+	if s == nil {
+		return false
+	}
 	ok := false
 	for i := range elements {
 		ok = s.AddOneNew(elements[i]) || ok
@@ -127,7 +154,14 @@ func (s *Set[T]) AddNew(elements ...T) bool {
 }
 
 func (s *Set[T]) AddOneNew(v T) bool {
+	if s == nil {
+		return false
+	}
 	u := s.uniques
+	if u == nil {
+		u = map[T]int{}
+		s.uniques = u
+	}
 	if _, ok := u[v]; !ok {
 		e := s.elements
 		u[v] = len(e)
@@ -138,6 +172,9 @@ func (s *Set[T]) AddOneNew(v T) bool {
 }
 
 func (s *Set[T]) Add(elements ...T) {
+	if s == nil || elements == nil {
+		return
+	}
 	s.AddNew(elements...)
 }
 
@@ -146,10 +183,16 @@ func (s *Set[T]) AddOne(v T) {
 }
 
 func (s *Set[T]) AddAll(elements c.Iterable[T]) {
+	if s == nil || elements == nil {
+		return
+	}
 	loop.ForEach(elements.Begin().Next, s.AddOne)
 }
 
 func (s *Set[T]) AddAllNew(elements c.Iterable[T]) bool {
+	if s == nil || elements == nil {
+		return false
+	}
 	var ok bool
 	loop.ForEach(elements.Begin().Next, func(v T) { ok = s.AddOneNew(v) || ok })
 	return ok
@@ -164,6 +207,9 @@ func (s *Set[T]) DeleteOne(v T) {
 }
 
 func (s *Set[T]) DeleteActual(elements ...T) bool {
+	if s == nil {
+		return false
+	}
 	ok := false
 	for i := range elements {
 		ok = s.DeleteActualOne(elements[i]) || ok
@@ -172,6 +218,9 @@ func (s *Set[T]) DeleteActual(elements ...T) bool {
 }
 
 func (s *Set[T]) DeleteActualOne(v T) bool {
+	if s == nil {
+		return false
+	}
 	u := s.uniques
 	if pos, ok := u[v]; ok {
 		delete(u, v)
@@ -188,11 +237,17 @@ func (s *Set[T]) DeleteActualOne(v T) bool {
 }
 
 func (s *Set[T]) Filter(filter func(T) bool) c.Pipe[T] {
+	if s == nil {
+		return nil
+	}
 	h := s.Head()
 	return iter.NewPipe[T](iter.Filter(h, h.Next, filter))
 }
 
 func (s *Set[T]) Convert(by func(T) T) c.Pipe[T] {
+	if s == nil {
+		return nil
+	}
 	h := s.Head()
 	return iter.NewPipe[T](iter.Convert(h, h.Next, by))
 }
@@ -211,11 +266,16 @@ func (s *Set[T]) StableSort(less slice.Less[T]) *Set[T] {
 }
 
 func (s *Set[T]) sortBy(sorter slice.Sorter, less slice.Less[T]) *Set[T] {
-	slice.Sort(s.elements, sorter, less)
+	if s != nil {
+		slice.Sort(s.elements, sorter, less)
+	}
 	return s
 }
 
 func (s *Set[T]) String() string {
+	if s == nil {
+		return ""
+	}
 	return slice.ToString(s.elements)
 }
 

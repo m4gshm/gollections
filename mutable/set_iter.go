@@ -6,8 +6,8 @@ import (
 )
 
 // NewSetIter creates SetIter instance.
-func NewSetIter[K comparable](uniques map[K]struct{}, del func(element K)) *SetIter[K] {
-	return &SetIter[K]{Key: iter.NewKey(uniques), del: del}
+func NewSetIter[K comparable](uniques map[K]struct{}, del func(element K)) SetIter[K] {
+	return SetIter[K]{Key: *iter.NewKey(uniques), del: del}
 }
 
 // SetIter is the Set Iterator implementation.
@@ -23,15 +23,17 @@ var (
 	_ c.DelIterator[int] = (*SetIter[int])(nil)
 )
 
-func (i *SetIter[K]) Next() (K, bool) {
-	key, _, ok := i.EmbedMapKVIter.Next()
-	i.currentKey = key
-	i.ok = ok
-	return key, ok
+func (i *SetIter[K]) Next() (key K, ok bool) {
+	if i != nil {
+		key, _, ok = i.EmbedMapKVIter.Next()
+		i.currentKey = key
+		i.ok = ok
+	}
+	return
 }
 
 func (i *SetIter[K]) Delete() {
-	if i.ok {
+	if i != nil && i.ok {
 		i.del(i.currentKey)
 	}
 }
