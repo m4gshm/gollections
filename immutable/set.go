@@ -30,7 +30,7 @@ func WrapSet[T comparable](elements map[T]struct{}) *Set[T] {
 func ToSet[T comparable](elements c.Iterator[T]) *Set[T] {
 	internal := map[T]struct{}{}
 	if elements != nil {
-		for e, ok := elements.Next(); !ok; e, ok = elements.Next() {
+		for e, ok := elements.Next(); ok; e, ok = elements.Next() {
 			internal[e] = struct{}{}
 		}
 	}
