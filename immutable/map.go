@@ -145,10 +145,9 @@ func (m *Map[K, V]) IsEmpty() bool {
 }
 
 func (m *Map[K, V]) Contains(key K) (ok bool) {
-	if m == nil {
-		return
+	if m != nil {
+		_, ok = m.elements[key]
 	}
-	_, ok = m.elements[key]
 	return ok
 }
 

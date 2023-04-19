@@ -26,11 +26,11 @@ func Of[T any](elements ...T) []T { return slice.Of(elements...) }
 func OfLoop[S, T any](source S, getNext func(S) (T, error)) ([]T, error) {
 	var r []T
 	for {
-		if o, err := getNext(source); err != nil {
+		o, err := getNext(source)
+		if err != nil {
 			return r, checkBreak(err)
-		} else {
-			r = append(r, o)
 		}
+		r = append(r, o)
 	}
 }
 

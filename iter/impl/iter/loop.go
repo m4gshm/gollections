@@ -23,15 +23,16 @@ var (
 )
 
 // Next implements c.Iterator
-func (i *LoopIter[S, T]) Next() (t T, ok bool) {
-	if i != nil && i.abort == nil && i.hasNext(i.source) {
-		next, err := i.getNext(i.source)
-		if err == nil {
-			return next, true
+func (i *LoopIter[S, T]) Next() (next T, ok bool) {
+	if i != nil {
+		abort := i.abort
+		if abort == nil && i.hasNext(i.source) {
+			next, abort = i.getNext(i.source)
+			i.abort = abort
+			return next, abort == nil
 		}
-		i.abort = err
 	}
-	return
+	return next, false
 }
 
 // Error implements c.IteratorBreakable

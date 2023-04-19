@@ -81,34 +81,34 @@ func Test_Map_Nil(t *testing.T) {
 	_, ok = m.Get("")
 	assert.False(t, ok)
 
-	_ = m.For(nil)
+	m.For(nil)
 	m.ForEach(nil)
-	_ = m.Track(nil)
+	m.Track(nil)
 	m.TrackEach(nil)
 
 	m.Filter(nil)
 	m.FilterKey(nil)
 	m.FilterValue(nil)
 
-	_ = m.Values().For(nil)
+	m.Values().For(nil)
 	m.Values().ForEach(nil)
-	_ = m.ConvertValue(nil).Track(nil)
+	m.ConvertValue(nil).Track(nil)
 	m.ConvertValue(nil).TrackEach(nil)
 	m.ConvertValue(nil).Filter(nil).FilterKey(nil)
 	m.ConvertValue(nil).Filter(nil).FilterValue(nil)
 
-	_ = m.Keys().For(nil)
+	m.Keys().For(nil)
 	m.Keys().ForEach(nil)
-	_ = m.ConvertKey(nil).Track(nil)
+	m.ConvertKey(nil).Track(nil)
 	m.ConvertKey(nil).TrackEach(nil)
 	m.ConvertKey(nil).Filter(nil).FilterKey(nil)
 	m.ConvertKey(nil).Filter(nil).FilterValue(nil)
 	m.Convert(nil)
 
-	_ = m.Sort(nil).For(nil)
+	m.Sort(nil).For(nil)
 	m.Sort(nil).ForEach(nil)
 
-	_ = m.StableSort(nil).For(nil)
+	m.StableSort(nil).For(nil)
 	m.StableSort(nil).ForEach(nil)
 }
 
@@ -135,7 +135,7 @@ func Test_Map_Zero(t *testing.T) {
 	_, ok = m.Get("")
 	assert.False(t, ok)
 
-	_ = m.For(nil)
+	m.For(nil)
 	m.ForEach(nil)
 	m.Track(nil)
 	m.TrackEach(nil)

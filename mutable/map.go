@@ -180,7 +180,7 @@ func (m *Map[K, V]) DeleteOne(key K) {
 
 func (m *Map[K, V]) Remove(key K) (v V, ok bool) {
 	if m == nil {
-		return
+		return v, ok
 	}
 	v, ok = m.Get(key)
 	m.Delete(key)

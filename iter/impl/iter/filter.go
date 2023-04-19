@@ -41,7 +41,7 @@ func nextFiltered[T any](next func() (T, bool), filter func(T) bool) (v T, ok bo
 			return v, true
 		}
 	}
-	return
+	return v, false
 }
 
 func nextFilteredKV[K any, V any, IT c.KVIterator[K, V]](iterator IT, filter func(K, V) bool) (key K, val V, filtered bool) {
@@ -50,5 +50,5 @@ func nextFilteredKV[K any, V any, IT c.KVIterator[K, V]](iterator IT, filter fun
 			return key, val, true
 		}
 	}
-	return
+	return key, val, false
 }

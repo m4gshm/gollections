@@ -31,7 +31,7 @@ subpackage. For example the function
 Usage examples:
 
 ``` go
-package slice_examples
+package sliceexamples
 
 import (
     "strconv"
@@ -153,14 +153,14 @@ func Test_Clone(t *testing.T) {
     type entity struct{ val string }
     var (
         entities = []*entity{{"first"}, {"second"}, {"third"}}
-        copy     = clone.Of(entities)
+        c        = clone.Of(entities)
     )
 
-    assert.Equal(t, entities, copy)
-    assert.NotSame(t, entities, copy)
+    assert.Equal(t, entities, c)
+    assert.NotSame(t, entities, c)
 
     for i := range entities {
-        assert.Same(t, entities[i], copy[i])
+        assert.Same(t, entities[i], c[i])
     }
 }
 
@@ -168,15 +168,15 @@ func Test_DeepClone(t *testing.T) {
     type entity struct{ val string }
     var (
         entities = []*entity{{"first"}, {"second"}, {"third"}}
-        copy     = clone.Deep(entities, clone.Ptr[entity])
+        c        = clone.Deep(entities, clone.Ptr[entity])
     )
 
-    assert.Equal(t, entities, copy)
-    assert.NotSame(t, entities, copy)
+    assert.Equal(t, entities, c)
+    assert.NotSame(t, entities, c)
 
     for i := range entities {
-        assert.Equal(t, entities[i], copy[i])
-        assert.NotSame(t, entities[i], copy[i])
+        assert.Equal(t, entities[i], c[i])
+        assert.NotSame(t, entities[i], c[i])
     }
 }
 
@@ -377,7 +377,7 @@ maps.
 Usage examples:
 
 ``` go
-package map_examples
+package mapexamples
 
 import (
     "testing"
@@ -403,25 +403,25 @@ var (
 )
 
 func Test_Clone(t *testing.T) {
-    copy := clone.Of(entities)
+    c := clone.Of(entities)
 
-    assert.Equal(t, entities, copy)
-    assert.NotSame(t, entities, copy)
+    assert.Equal(t, entities, c)
+    assert.NotSame(t, entities, c)
 
     for k := range entities {
-        assert.Same(t, entities[k], copy[k])
+        assert.Same(t, entities[k], c[k])
     }
 }
 
 func Test_DeepClone(t *testing.T) {
-    copy := clone.Deep(entities, func(e *entity) *entity { return ptr.Of(*e) })
+    c := clone.Deep(entities, func(e *entity) *entity { return ptr.Of(*e) })
 
-    assert.Equal(t, entities, copy)
-    assert.NotSame(t, entities, copy)
+    assert.Equal(t, entities, c)
+    assert.NotSame(t, entities, c)
 
     for i := range entities {
-        assert.Equal(t, entities[i], copy[i])
-        assert.NotSame(t, entities[i], copy[i])
+        assert.Equal(t, entities[i], c[i])
+        assert.NotSame(t, entities[i], c[i])
     }
 }
 

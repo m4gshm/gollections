@@ -69,13 +69,12 @@ func (s *Set[T]) First() (iter.Key[T, struct{}], T, bool) {
 }
 
 func (s *Set[T]) Slice() (out []T) {
-	if s == nil {
-		return
-	}
-	elements := s.elements
-	out = make([]T, 0, len(elements))
-	for e := range elements {
-		out = append(out, e)
+	if s != nil {
+		elements := s.elements
+		out = make([]T, 0, len(elements))
+		for e := range elements {
+			out = append(out, e)
+		}
 	}
 	return out
 }

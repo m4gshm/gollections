@@ -172,6 +172,6 @@ func Test_Map_Zero(t *testing.T) {
 	m.Keys().ForEach(func(element string) {})
 	m.Values().For(func(element string) error { return nil })
 	m.Values().ForEach(func(element string) {})
-	m.Values().Convert(as.Is[string]).For(func(element string) error {return nil})
-	m.Values().Filter(func(s string) bool {return true}).ForEach(func(element string) {})
+	m.Values().Convert(as.Is[string]).For(func(element string) error { return nil })
+	m.Values().Filter(func(s string) bool { return true }).ForEach(func(element string) {})
 }

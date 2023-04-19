@@ -58,13 +58,12 @@ func (m *MapKeys[K, V]) IsEmpty() bool {
 }
 
 func (m *MapKeys[K, V]) Slice() (elements []K) {
-	if m == nil {
-		return
-	}
-	uniques := m.uniques
-	elements = make([]K, 0, len(uniques))
-	for key := range uniques {
-		elements = append(elements, key)
+	if m != nil {
+		uniques := m.uniques
+		elements = make([]K, 0, len(uniques))
+		for key := range uniques {
+			elements = append(elements, key)
+		}
 	}
 	return elements
 }

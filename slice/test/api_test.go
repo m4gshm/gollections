@@ -51,14 +51,14 @@ func Test_Clone(t *testing.T) {
 		third  = entity{"third"}
 
 		entities = []*entity{&first, &second, &third}
-		copy     = clone.Of(entities)
+		c        = clone.Of(entities)
 	)
 
-	assert.Equal(t, entities, copy)
-	assert.NotSame(t, entities, copy)
+	assert.Equal(t, entities, c)
+	assert.NotSame(t, entities, c)
 
 	for i := range entities {
-		assert.Same(t, entities[i], copy[i])
+		assert.Same(t, entities[i], c[i])
 	}
 }
 
@@ -70,15 +70,15 @@ func Test_DeepClone(t *testing.T) {
 		third  = entity{"third"}
 
 		entities = []*entity{&first, &second, &third}
-		copy     = clone.Deep(entities, clone.Ptr[entity])
+		c        = clone.Deep(entities, clone.Ptr[entity])
 	)
 
-	assert.Equal(t, entities, copy)
-	assert.NotSame(t, entities, copy)
+	assert.Equal(t, entities, c)
+	assert.NotSame(t, entities, c)
 
 	for i := range entities {
-		assert.Equal(t, entities[i], copy[i])
-		assert.NotSame(t, entities[i], copy[i])
+		assert.Equal(t, entities[i], c[i])
+		assert.NotSame(t, entities[i], c[i])
 	}
 }
 

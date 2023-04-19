@@ -17,13 +17,12 @@ var (
 )
 
 func (c *ConvertFitIter[From, To, IT]) Next() (t To, ok bool) {
-	if c == nil {
-		return
+	if c != nil {
+		if f, ok := nextFiltered(c.next, c.filter); ok {
+			return c.by(f), true
+		}
 	}
-	if V, ok := nextFiltered(c.next, c.filter); ok {
-		return c.by(V), true
-	}
-	return
+	return t, false
 }
 
 // ConvertIter is the iterator wrapper implementation applying a converter to all iterable elements.
@@ -38,13 +37,12 @@ var (
 )
 
 func (c *ConvertIter[From, To, IT]) Next() (t To, ok bool) {
-	if c == nil {
-		return
+	if c != nil {
+		if v, ok := c.next(); ok {
+			return c.by(v), true
+		}
 	}
-	if v, ok := c.next(); ok {
-		return c.by(v), true
-	}
-	return
+	return t, false
 }
 
 // ConvertKVIter is the iterator wrapper implementation applying a converter to all iterable key/value elements.
@@ -57,13 +55,12 @@ var (
 	_ c.KVIterator[any, any] = (*ConvertKVIter[any, any, c.KVIterator[any, any], any, any, func(any, any) (any, any)])(nil)
 )
 
-func (c *ConvertKVIter[K, V, IT, K2, V2, C]) Next() (k K2, v V2, ok bool) {
-	if c == nil {
-		return
+func (c *ConvertKVIter[K, V, IT, K2, V2, C]) Next() (k2 K2, v2 V2, ok bool) {
+	if c != nil {
+		if K, V, ok := c.iterator.Next(); ok {
+			k2, v2 = c.by(K, V)
+			return k2, v2, true
+		}
 	}
-	if K, V, ok := c.iterator.Next(); ok {
-		k2, v2 := c.by(K, V)
-		return k2, v2, true
-	}
-	return
+	return k2, v2, false
 }

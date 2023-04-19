@@ -24,13 +24,13 @@ var (
 
 func (i *SetIter[T]) Next() (t T, ok bool) {
 	if i == nil {
-		return
+		return t, ok
 	}
 	if iter.HasNext(*i.elements, i.current) {
 		i.current++
 		return iter.Gett(*i.elements, i.current)
 	}
-	return
+	return t, ok
 }
 
 func (i *SetIter[T]) Cap() int {

@@ -199,7 +199,7 @@ func Test_Set_Nil(t *testing.T) {
 	set.IsEmpty()
 	set.Len()
 
-	set.For(nil)
+	_ = set.For(nil)
 	set.ForEach(nil)
 
 	set.Slice()

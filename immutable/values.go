@@ -59,12 +59,11 @@ func (m *MapValues[K, V]) IsEmpty() bool {
 }
 
 func (m *MapValues[K, V]) Slice() (elements []V) {
-	if m == nil {
-		return
-	}
-	elements = make([]V, 0, len(m.elements))
-	for _, val := range m.elements {
-		elements = append(elements, val)
+	if m != nil {
+		elements = make([]V, 0, len(m.elements))
+		for _, val := range m.elements {
+			elements = append(elements, val)
+		}
 	}
 	return elements
 }

@@ -38,7 +38,7 @@ func First[T any](next func() (T, bool), filter func(T) bool) (v T, ok bool) {
 			return one, true
 		}
 	}
-	return
+	return v, ok
 }
 
 // Track apply a tracker to position/element pairs retrieved by the 'next' function. To stop traking just return the ErrBreak.

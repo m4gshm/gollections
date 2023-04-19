@@ -29,7 +29,7 @@ func (i *SetIter[K]) Next() (key K, ok bool) {
 		i.currentKey = key
 		i.ok = ok
 	}
-	return
+	return key, ok
 }
 
 func (i *SetIter[K]) Delete() {

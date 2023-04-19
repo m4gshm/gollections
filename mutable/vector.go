@@ -181,14 +181,14 @@ func (v *Vector[T]) DeleteActualOne(index int) bool {
 // Remove removes and returns a element by the index
 func (v *Vector[T]) Remove(index int) (t T, ok bool) {
 	if v == nil {
-		return
+		return t, ok
 	}
 	if e := *v; index >= 0 && index < len(e) {
 		de := e[index]
 		*v = slice.Delete(index, e)
 		return de, true
 	}
-	return
+	return t, ok
 }
 
 // Delete drops elements by indexes

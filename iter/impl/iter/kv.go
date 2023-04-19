@@ -36,11 +36,11 @@ var _ c.KVIterator[int, any] = (*EmbedMapKVIter[int, any])(nil)
 
 func (i *EmbedMapKVIter[K, V]) Next() (key K, value V, ok bool) {
 	if i == nil {
-		return
+		return key, value, false
 	}
 	iterator := i.iterator
 	if iterator == nil {
-		return
+		return key, value, false
 	}
 	if !iterator.initialized() {
 		mapiterinit(i.maptype, i.hmap, iterator)
@@ -49,12 +49,12 @@ func (i *EmbedMapKVIter[K, V]) Next() (key K, value V, ok bool) {
 	}
 	iterkey := mapiterkey(iterator)
 	if iterkey == nil {
-		return
+		return key, value, false
 	}
 	iterelem := mapiterelem(iterator)
-	k := (*K)(iterkey)
-	v := (*V)(iterelem)
-	return *k, *v, true
+	key = *(*K)(iterkey)
+	value = *(*V)(iterelem)
+	return key, value, true
 }
 
 // Cap returns the size of the map
@@ -110,14 +110,13 @@ type OrderedEmbedMapKVIter[K comparable, V any] struct {
 
 var _ c.KVIterator[string, any] = (*OrderedEmbedMapKVIter[string, any])(nil)
 
-func (i *OrderedEmbedMapKVIter[K, V]) Next() (k K, v V, ok bool) {
-	if i == nil {
-		return
+func (i *OrderedEmbedMapKVIter[K, V]) Next() (key K, val V, ok bool) {
+	if i != nil {
+		if key, ok = i.elements.Next(); ok {
+			val = i.uniques[key]
+		}
 	}
-	if key, ok := i.elements.Next(); ok {
-		return key, i.uniques[key], true
-	}
-	return
+	return key, val, ok
 }
 
 func (i *OrderedEmbedMapKVIter[K, V]) Cap() int {

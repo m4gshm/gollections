@@ -124,19 +124,17 @@ func (m *Map[K, V]) IsEmpty() bool {
 	return m.Len() == 0
 }
 
-func (m *Map[K, V]) Contains(key K) bool {
-	if m == nil || m.elements == nil {
-		return false
+func (m *Map[K, V]) Contains(key K) (ok bool) {
+	if !(m == nil || m.elements == nil) {
+		_, ok = m.elements[key]
 	}
-	_, ok := m.elements[key]
 	return ok
 }
 
 func (m *Map[K, V]) Get(key K) (val V, ok bool) {
-	if m == nil || m.elements == nil {
-		return
+	if !(m == nil || m.elements == nil) {
+		val, ok = m.elements[key]
 	}
-	val, ok = m.elements[key]
 	return val, ok
 }
 

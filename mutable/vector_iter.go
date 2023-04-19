@@ -81,14 +81,14 @@ func (i *Iter[TS, T]) Prev() (T, bool) {
 
 func (i *Iter[TS, T]) Get() (t T, ok bool) {
 	if i == nil || i.elements == nil {
-		return
+		return t, ok
 	}
 	current := i.current
 	elements := *i.elements
 	if iter.IsValidIndex(len(elements), current) {
 		return elements[current], true
 	}
-	return
+	return t, ok
 }
 
 func (i *Iter[TS, T]) Cap() int {

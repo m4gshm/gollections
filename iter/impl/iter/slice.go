@@ -94,39 +94,36 @@ func (i *ArrayIter[T]) GetPrev() T {
 }
 
 func (i *ArrayIter[T]) Next() (v T, ok bool) {
-	if i == nil || i.array == nil {
-		return
+	if !(i == nil || i.array == nil) {
+		if current := i.current; CanIterateByRange(NoStarted, i.maxHasNext, current) {
+			current++
+			i.current = current
+			return *(*T)(notsafe.GetArrayElemRef(i.array, current, i.elementSize)), true
+		}
 	}
-	if current := i.current; CanIterateByRange(NoStarted, i.maxHasNext, current) {
-		current++
-		i.current = current
-		return *(*T)(notsafe.GetArrayElemRef(i.array, current, i.elementSize)), true
-	}
-	return
+	return v, ok
 }
 
 func (i *ArrayIter[T]) Prev() (v T, ok bool) {
-	if i == nil || i.array == nil {
-		return
+	if !(i == nil || i.array == nil) {
+		current := i.current
+		if CanIterateByRange(1, i.size, current) {
+			current--
+			i.current = current
+			return *(*T)(notsafe.GetArrayElemRef(i.array, current, i.elementSize)), true
+		}
 	}
-	current := i.current
-	if CanIterateByRange(1, i.size, current) {
-		current--
-		i.current = current
-		return *(*T)(notsafe.GetArrayElemRef(i.array, current, i.elementSize)), true
-	}
-	return
+	return v, ok
 }
 
 func (i *ArrayIter[T]) Get() (v T, ok bool) {
-	if i == nil || i.array == nil {
-		return
+	if !(i == nil || i.array == nil) {
+		current := i.current
+		if IsValidIndex(i.size, current) {
+			return *(*T)(notsafe.GetArrayElemRef(i.array, current, i.elementSize)), true
+		}
 	}
-	current := i.current
-	if IsValidIndex(i.size, current) {
-		return *(*T)(notsafe.GetArrayElemRef(i.array, current, i.elementSize)), true
-	}
-	return
+	return v, ok
 }
 
 func (i *ArrayIter[T]) Cap() int {
