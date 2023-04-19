@@ -2,12 +2,12 @@ package ordered
 
 import (
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/it/impl/it"
+	"github.com/m4gshm/gollections/iter/impl/iter"
 )
 
 // NewSetIter creates a set's iterator.
 func NewSetIter[T any](elements *[]T, del func(v T)) *SetIter[T] {
-	return &SetIter[T]{elements: elements, current: it.NoStarted, del: del}
+	return &SetIter[T]{elements: elements, current: iter.NoStarted, del: del}
 }
 
 // SetIter set iterator
@@ -22,21 +22,29 @@ var (
 	_ c.DelIterator[any] = (*SetIter[any])(nil)
 )
 
-func (i *SetIter[T]) Next() (T, bool) {
-	if it.HasNext(*i.elements, i.current) {
-		i.current++
-		return it.Gett(*i.elements, i.current)
+func (i *SetIter[T]) Next() (t T, ok bool) {
+	if i == nil {
+		return t, ok
 	}
-	var no T
-	return no, false
+	if iter.HasNext(*i.elements, i.current) {
+		i.current++
+		return iter.Gett(*i.elements, i.current)
+	}
+	return t, ok
 }
 
 func (i *SetIter[T]) Cap() int {
+	if i == nil {
+		return 0
+	}
 	return len(*i.elements)
 }
 
 func (i *SetIter[T]) Delete() {
-	if v, ok := it.Gett(*i.elements, i.current); ok {
+	if i == nil {
+		return
+	}
+	if v, ok := iter.Gett(*i.elements, i.current); ok {
 		i.current--
 		i.del(v)
 	}

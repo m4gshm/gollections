@@ -5,88 +5,103 @@ import (
 	"sort"
 
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/it/impl/it"
+	"github.com/m4gshm/gollections/iter/impl/iter"
+	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_"
-	"github.com/m4gshm/gollections/predicate"
-	"github.com/m4gshm/gollections/ptr"
 	"github.com/m4gshm/gollections/slice"
 )
 
 // WrapVal instantiates MapValues using elements as internal storage.
-func WrapVal[K comparable, V any](elements map[K]V) MapValues[K, V] {
-	return MapValues[K, V]{elements}
+func WrapVal[K comparable, V any](elements map[K]V) *MapValues[K, V] {
+	return &MapValues[K, V]{elements}
 }
 
-// MapValues is the wrapper for Map's values.
+// MapValues is the wrapper for Map'm values.
 type MapValues[K comparable, V any] struct {
 	elements map[K]V
 }
 
 var (
-	_ c.Collection[any, []any, c.Iterator[any]] = (*MapValues[int, any])(nil)
-	_ c.Collection[any, []any, c.Iterator[any]] = MapValues[int, any]{}
-	_ fmt.Stringer                              = (*MapValues[int, any])(nil)
-	_ fmt.Stringer                              = MapValues[int, any]{}
+	_ c.Collection[any] = (*MapValues[int, any])(nil)
+	_ fmt.Stringer      = (*MapValues[int, any])(nil)
 )
 
-func (s MapValues[K, V]) Begin() c.Iterator[V] {
-	return ptr.Of(s.Head())
+func (m *MapValues[K, V]) Begin() c.Iterator[V] {
+	h := m.Head()
+	return &h
 }
 
-func (s MapValues[K, V]) Head() it.Val[K, V] {
-	return it.NewVal(s.elements)
+func (m *MapValues[K, V]) Head() iter.Val[K, V] {
+	var elements map[K]V
+	if m != nil {
+		elements = m.elements
+	}
+	return *iter.NewVal(elements)
 }
 
-func (s MapValues[K, V]) First() (it.Val[K, V], V, bool) {
+func (m *MapValues[K, V]) First() (iter.Val[K, V], V, bool) {
 	var (
-		iter      = s.Head()
-		first, ok = iter.Next()
+		iterator  = m.Head()
+		first, ok = iterator.Next()
 	)
-	return iter, first, ok
+	return iterator, first, ok
 }
 
-func (s MapValues[K, V]) Len() int {
-	return len(s.elements)
+func (m *MapValues[K, V]) Len() int {
+	if m == nil {
+		return 0
+	}
+	return len(m.elements)
 }
 
-func (s MapValues[K, V]) IsEmpty() bool {
-	return s.Len() == 0
+func (m *MapValues[K, V]) IsEmpty() bool {
+	return m.Len() == 0
 }
 
-func (s MapValues[K, V]) Collect() []V {
-	elements := make([]V, 0, len(s.elements))
-	for _, val := range s.elements {
-		elements = append(elements, val)
+func (m *MapValues[K, V]) Slice() (elements []V) {
+	if m != nil {
+		elements = make([]V, 0, len(m.elements))
+		for _, val := range m.elements {
+			elements = append(elements, val)
+		}
 	}
 	return elements
 }
 
-func (s MapValues[K, V]) For(walker func(V) error) error {
-	return map_.ForValues(s.elements, walker)
+func (m *MapValues[K, V]) For(walker func(V) error) error {
+	if m == nil {
+		return nil
+	}
+	return map_.ForValues(m.elements, walker)
 }
 
-func (s MapValues[K, V]) ForEach(walker func(V)) {
-	map_.ForEachValue(s.elements, walker)
+func (m *MapValues[K, V]) ForEach(walker func(V)) {
+	if m != nil {
+		map_.ForEachValue(m.elements, walker)
+	}
 }
 
-func (s MapValues[K, V]) Filter(filter predicate.Predicate[V]) c.Pipe[V, []V] {
-	return it.NewPipe[V](it.Filter(ptr.Of(s.Head()), filter))
+func (m *MapValues[K, V]) Filter(filter func(V) bool) c.Pipe[V] {
+	h := m.Head()
+	return iter.NewPipe[V](iter.Filter(h, h.Next, filter))
 }
 
-func (s MapValues[K, V]) Map(by c.Converter[V, V]) c.Pipe[V, []V] {
-	return it.NewPipe[V](it.Map(ptr.Of(s.Head()), by))
+func (m *MapValues[K, V]) Convert(by func(V) V) c.Pipe[V] {
+	h := m.Head()
+	return iter.NewPipe[V](iter.Convert(h, h.Next, by))
 }
 
-func (s MapValues[K, V]) Reduce(by c.Binary[V]) V {
-	return it.Reduce(ptr.Of(s.Head()), by)
+func (m *MapValues[K, V]) Reduce(by func(V, V) V) V {
+	h := m.Head()
+	return loop.Reduce(h.Next, by)
 }
 
-func (s MapValues[K, V]) Sort(less func(e1, e2 V) bool) Vector[V] {
-	var dest = s.Collect()
+func (m *MapValues[K, V]) Sort(less func(e1, e2 V) bool) *Vector[V] {
+	var dest = m.Slice()
 	sort.Slice(dest, func(i, j int) bool { return less(dest[i], dest[j]) })
 	return WrapVector(dest)
 }
 
-func (s MapValues[K, V]) String() string {
-	return slice.ToString(s.Collect())
+func (m *MapValues[K, V]) String() string {
+	return slice.ToString(m.Slice())
 }

@@ -4,9 +4,8 @@ import (
 	"fmt"
 
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/it/impl/it"
-	"github.com/m4gshm/gollections/predicate"
-	"github.com/m4gshm/gollections/ptr"
+	"github.com/m4gshm/gollections/iter/impl/iter"
+	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/slice"
 )
 
@@ -21,26 +20,27 @@ type MapKeys[T comparable] struct {
 }
 
 var (
-	_ c.Collection[int, []int, c.Iterator[int]] = (*MapKeys[int])(nil)
-	_ c.Collection[int, []int, c.Iterator[int]] = MapKeys[int]{}
-	_ fmt.Stringer                              = (*MapKeys[int])(nil)
-	_ fmt.Stringer                              = MapKeys[int]{}
+	_ c.Collection[int] = (*MapKeys[int])(nil)
+	_ c.Collection[int] = MapKeys[int]{}
+	_ fmt.Stringer      = (*MapKeys[int])(nil)
+	_ fmt.Stringer      = MapKeys[int]{}
 )
 
 func (s MapKeys[T]) Begin() c.Iterator[T] {
-	return ptr.Of(s.Head())
+	h := s.Head()
+	return &h
 }
 
-func (s MapKeys[T]) Head() it.ArrayIter[T] {
-	return it.NewHead(s.elements)
+func (s MapKeys[T]) Head() iter.ArrayIter[T] {
+	return iter.NewHead(s.elements)
 }
 
-func (s MapKeys[T]) First() (it.ArrayIter[T], T, bool) {
+func (s MapKeys[T]) First() (iter.ArrayIter[T], T, bool) {
 	var (
-		iter      = s.Head()
-		first, ok = iter.Next()
+		iterator  = s.Head()
+		first, ok = iterator.Next()
 	)
-	return iter, first, ok
+	return iterator, first, ok
 }
 
 func (s MapKeys[T]) Len() int {
@@ -51,7 +51,7 @@ func (s MapKeys[T]) IsEmpty() bool {
 	return s.Len() == 0
 }
 
-func (s MapKeys[T]) Collect() []T {
+func (s MapKeys[T]) Slice() []T {
 	elements := s.elements
 	dest := make([]T, len(elements))
 	copy(dest, elements)
@@ -70,18 +70,21 @@ func (s MapKeys[T]) Get(index int) (T, bool) {
 	return slice.Get(s.elements, index)
 }
 
-func (s MapKeys[T]) Filter(filter predicate.Predicate[T]) c.Pipe[T, []T] {
-	return it.NewPipe[T](it.Filter(ptr.Of(s.Head()), filter))
+func (s MapKeys[T]) Filter(filter func(T) bool) c.Pipe[T] {
+	h := s.Head()
+	return iter.NewPipe[T](iter.Filter(h, h.Next, filter))
 }
 
-func (s MapKeys[T]) Map(by c.Converter[T, T]) c.Pipe[T, []T] {
-	return it.NewPipe[T](it.Map(ptr.Of(s.Head()), by))
+func (s MapKeys[T]) Convert(by func(T) T) c.Pipe[T] {
+	h := s.Head()
+	return iter.NewPipe[T](iter.Convert(h, h.Next, by))
 }
 
-func (s MapKeys[T]) Reduce(by c.Binary[T]) T {
-	return it.Reduce(ptr.Of(s.Head()), by)
+func (s MapKeys[T]) Reduce(by func(T, T) T) T {
+	h := s.Head()
+	return loop.Reduce(h.Next, by)
 }
 
 func (s MapKeys[T]) String() string {
-	return slice.ToString(s.Collect())
+	return slice.ToString(s.Slice())
 }

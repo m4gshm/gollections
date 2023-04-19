@@ -3,7 +3,7 @@ package test
 import (
 	"testing"
 
-	"github.com/m4gshm/gollections/kvit"
+	"github.com/m4gshm/gollections/kviter"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/map_/clone"
 	"github.com/m4gshm/gollections/map_/group"
@@ -25,25 +25,25 @@ var (
 )
 
 func Test_Clone(t *testing.T) {
-	copy := clone.Of(entities)
+	c := clone.Of(entities)
 
-	assert.Equal(t, entities, copy)
-	assert.NotSame(t, entities, copy)
+	assert.Equal(t, entities, c)
+	assert.NotSame(t, entities, c)
 
 	for k := range entities {
-		assert.Same(t, entities[k], copy[k])
+		assert.Same(t, entities[k], c[k])
 	}
 }
 
 func Test_DeepClone(t *testing.T) {
-	copy := clone.Deep(entities, func(e *entity) *entity { return ptr.Of(*e) })
+	c := clone.Deep(entities, func(e *entity) *entity { return ptr.Of(*e) })
 
-	assert.Equal(t, entities, copy)
-	assert.NotSame(t, entities, copy)
+	assert.Equal(t, entities, c)
+	assert.NotSame(t, entities, c)
 
 	for i := range entities {
-		assert.Equal(t, entities[i], copy[i])
-		assert.NotSame(t, entities[i], copy[i])
+		assert.Equal(t, entities[i], c[i])
+		assert.NotSame(t, entities[i], c[i])
 	}
 }
 
@@ -94,7 +94,7 @@ func Test_OfLoopResolv(t *testing.T) {
 	result, _ := map_.OfLoopResolv(stream, (*rows[int]).hasNext, func(r *rows[int]) (bool, int, error) {
 		n, err := r.next()
 		return n%2 == 0, n, err
-	}, kvit.LastVal[bool, int])
+	}, kviter.LastVal[bool, int])
 
 	assert.Equal(t, 4, result[true])
 	assert.Equal(t, 3, result[false])

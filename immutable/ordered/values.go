@@ -4,9 +4,9 @@ import (
 	"fmt"
 
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/it/impl/it"
+	"github.com/m4gshm/gollections/iter/impl/iter"
+	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_"
-	"github.com/m4gshm/gollections/predicate"
 	"github.com/m4gshm/gollections/slice"
 )
 
@@ -22,10 +22,10 @@ type MapValues[K comparable, V any] struct {
 }
 
 var (
-	_ c.Collection[any, []any, c.Iterator[any]] = (*MapValues[int, any])(nil)
-	_ c.Collection[any, []any, c.Iterator[any]] = MapValues[int, any]{}
-	_ fmt.Stringer                              = (*MapValues[int, any])(nil)
-	_ fmt.Stringer                              = MapValues[int, any]{}
+	_ c.Collection[any] = (*MapValues[int, any])(nil)
+	_ c.Collection[any] = MapValues[int, any]{}
+	_ fmt.Stringer      = (*MapValues[int, any])(nil)
+	_ fmt.Stringer      = MapValues[int, any]{}
 )
 
 func (s MapValues[K, V]) Begin() c.Iterator[V] {
@@ -38,10 +38,10 @@ func (s MapValues[K, V]) Head() *ValIter[K, V] {
 
 func (s MapValues[K, V]) First() (*ValIter[K, V], V, bool) {
 	var (
-		iter      = s.Head()
-		first, ok = iter.Next()
+		iterator  = s.Head()
+		first, ok = iterator.Next()
 	)
-	return iter, first, ok
+	return iterator, first, ok
 }
 
 func (s MapValues[K, V]) Len() int {
@@ -52,7 +52,7 @@ func (s MapValues[K, V]) IsEmpty() bool {
 	return s.Len() == 0
 }
 
-func (s MapValues[K, V]) Collect() []V {
+func (s MapValues[K, V]) Slice() []V {
 	elements := make([]V, len(s.order))
 	for i, key := range s.order {
 		val := s.elements[key]
@@ -80,18 +80,20 @@ func (s MapValues[K, V]) Get(index int) (V, bool) {
 	return no, false
 }
 
-func (s MapValues[K, V]) Filter(filter predicate.Predicate[V]) c.Pipe[V, []V] {
-	return it.NewPipe[V](it.Filter(s.Head(), filter))
+func (s MapValues[K, V]) Filter(filter func(V) bool) c.Pipe[V] {
+	h := s.Head()
+	return iter.NewPipe[V](iter.Filter(h, h.Next, filter))
 }
 
-func (s MapValues[K, V]) Map(by c.Converter[V, V]) c.Pipe[V, []V] {
-	return it.NewPipe[V](it.Map(s.Head(), by))
+func (s MapValues[K, V]) Convert(by func(V) V) c.Pipe[V] {
+	h := s.Head()
+	return iter.NewPipe[V](iter.Convert(h, h.Next, by))
 }
 
-func (s MapValues[K, V]) Reduce(by c.Binary[V]) V {
-	return it.Reduce(s.Head(), by)
+func (s MapValues[K, V]) Reduce(by func(V, V) V) V {
+	return loop.Reduce(s.Head().Next, by)
 }
 
 func (s MapValues[K, V]) String() string {
-	return slice.ToString(s.Collect())
+	return slice.ToString(s.Slice())
 }

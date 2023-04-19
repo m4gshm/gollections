@@ -15,6 +15,7 @@ import (
 	"github.com/m4gshm/gollections/slice/clone/reverse"
 	csort "github.com/m4gshm/gollections/slice/clone/sort"
 	cstablesort "github.com/m4gshm/gollections/slice/clone/stablesort"
+	"github.com/m4gshm/gollections/slice/convert"
 	"github.com/m4gshm/gollections/slice/first"
 	"github.com/m4gshm/gollections/slice/last"
 	"github.com/m4gshm/gollections/slice/range_"
@@ -50,14 +51,14 @@ func Test_Clone(t *testing.T) {
 		third  = entity{"third"}
 
 		entities = []*entity{&first, &second, &third}
-		copy     = clone.Of(entities)
+		c        = clone.Of(entities)
 	)
 
-	assert.Equal(t, entities, copy)
-	assert.NotSame(t, entities, copy)
+	assert.Equal(t, entities, c)
+	assert.NotSame(t, entities, c)
 
 	for i := range entities {
-		assert.Same(t, entities[i], copy[i])
+		assert.Same(t, entities[i], c[i])
 	}
 }
 
@@ -69,15 +70,15 @@ func Test_DeepClone(t *testing.T) {
 		third  = entity{"third"}
 
 		entities = []*entity{&first, &second, &third}
-		copy     = clone.Deep(entities, clone.Ptr[entity])
+		c        = clone.Deep(entities, clone.Ptr[entity])
 	)
 
-	assert.Equal(t, entities, copy)
-	assert.NotSame(t, entities, copy)
+	assert.Equal(t, entities, c)
+	assert.NotSame(t, entities, c)
 
 	for i := range entities {
-		assert.Equal(t, entities[i], copy[i])
-		assert.NotSame(t, entities[i], copy[i])
+		assert.Equal(t, entities[i], c[i])
+		assert.NotSame(t, entities[i], c[i])
 	}
 }
 
@@ -136,17 +137,53 @@ func Test_ConvertWithIndex(t *testing.T) {
 	assert.Equal(t, slice.Of(1, 1+3, 2+5, 3+7, 4+9, 5+11), r)
 }
 
+func Test_ConvertNotNil(t *testing.T) {
+	type entity struct{ val string }
+	var (
+		source   = []*entity{{"first"}, nil, {"third"}, nil, {"fifth"}}
+		result   = convert.NotNil(source, func(e *entity) string { return e.val })
+		expected = []string{"first", "third", "fifth"}
+	)
+	assert.Equal(t, expected, result)
+}
+
+func Test_ConvertToNotNil(t *testing.T) {
+	type entity struct{ val *string }
+	var (
+		first    = "first"
+		third    = "third"
+		fifth    = "fifth"
+		source   = []entity{{&first}, {}, {&third}, {}, {&fifth}}
+		result   = convert.ToNotNil(source, func(e entity) *string { return e.val })
+		expected = []*string{&first, &third, &fifth}
+	)
+	assert.Equal(t, expected, result)
+}
+
+func Test_ConvertNilSafe(t *testing.T) {
+	type entity struct{ val *string }
+	var (
+		first    = "first"
+		third    = "third"
+		fifth    = "fifth"
+		source   = []*entity{{&first}, {}, {&third}, nil, {&fifth}}
+		result   = convert.NilSafe(source, func(e *entity) *string { return e.val })
+		expected = []*string{&first, &third, &fifth}
+	)
+	assert.Equal(t, expected, result)
+}
+
 var even = func(v int) bool { return v%2 == 0 }
 
 func Test_ConvertFiltered(t *testing.T) {
 	s := slice.Of(1, 3, 4, 5, 7, 8, 9, 11)
-	r := slice.ConvertFit(s, even, strconv.Itoa)
+	r := slice.FilterAndConvert(s, even, strconv.Itoa)
 	assert.Equal(t, []string{"4", "8"}, r)
 }
 
 func Test_ConvertFilteredWithIndex(t *testing.T) {
 	s := slice.Of(1, 3, 4, 5, 7, 8, 9, 11)
-	r := slice.ConvertFitIndexed(s, func(_ int, elem int) bool { return even(elem) }, func(index int, elem int) string { return strconv.Itoa(index + elem) })
+	r := slice.FilterAndConvertIndexed(s, func(_ int, elem int) bool { return even(elem) }, func(index int, elem int) string { return strconv.Itoa(index + elem) })
 	assert.Equal(t, []string{"6", "13"}, r)
 }
 
@@ -171,21 +208,21 @@ func Test_Flatt(t *testing.T) {
 
 func Test_FlattFilter(t *testing.T) {
 	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
-	f := slice.FlattFit(md, func(from []int) bool { return len(from) > 1 }, func(i []int) []int { return i })
+	f := slice.FilerAndFlatt(md, func(from []int) bool { return len(from) > 1 }, func(i []int) []int { return i })
 	e := []int{1, 2, 3, 5, 6}
 	assert.Equal(t, e, f)
 }
 
 func Test_FlattElemFilter(t *testing.T) {
 	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
-	f := slice.FlattElemFit(md, func(i []int) []int { return i }, even)
+	f := slice.FlattAndFiler(md, func(i []int) []int { return i }, even)
 	e := []int{2, 4, 6}
 	assert.Equal(t, e, f)
 }
 
-func Test_FlattFitFit(t *testing.T) {
+func Test_FilterAndFlattFit(t *testing.T) {
 	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
-	f := slice.FlattFitFit(md, func(from []int) bool { return len(from) > 1 }, func(i []int) []int { return i }, even)
+	f := slice.FilterFlattFilter(md, func(from []int) bool { return len(from) > 1 }, func(i []int) []int { return i }, even)
 	e := []int{2, 6}
 	assert.Equal(t, e, f)
 }

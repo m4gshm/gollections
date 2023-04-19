@@ -3,13 +3,12 @@ package stablesort
 import (
 	"sort"
 
-	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/slice"
 	"golang.org/x/exp/constraints"
 )
 
 // By makes stable sorting of elements in place by converting them to Ordered values and applying the operator <
-func By[T any, o constraints.Ordered, TS ~[]T](elements TS, by c.Converter[T, o]) TS {
+func By[T any, o constraints.Ordered, TS ~[]T](elements TS, by func(T) o) TS {
 	return slice.SortByOrdered(elements, sort.SliceStable, by)
 }
 

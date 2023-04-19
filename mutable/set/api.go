@@ -4,26 +4,43 @@ import (
 	"golang.org/x/exp/constraints"
 
 	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/iter/impl/iter"
 	"github.com/m4gshm/gollections/mutable"
 	"github.com/m4gshm/gollections/mutable/ordered"
 )
 
 // Of instantiates Set with predefined elements.
-func Of[T comparable](elements ...T) mutable.Set[T] {
+func Of[T comparable](elements ...T) *mutable.Set[T] {
+	return mutable.NewSet(elements)
+}
+
+// From creates a Set instance with elements obtained by passing an iterator.
+func From[T comparable](elements c.Iterator[T]) *mutable.Set[T] {
 	return mutable.ToSet(elements)
 }
 
 // Empty instantiates Set with zero capacity.
-func Empty[T comparable]() mutable.Set[T] {
-	return New[T](0)
+func Empty[T comparable]() *mutable.Set[T] {
+	return NewCap[T](0)
 }
 
-// New instantiates Set with a predefined capacity.
-func New[T comparable](capacity int) mutable.Set[T] {
-	return mutable.NewSet[T](capacity)
+// NewCap instantiates Set with a predefined capacity.
+func NewCap[T comparable](capacity int) *mutable.Set[T] {
+	return mutable.NewSetCap[T](capacity)
 }
 
 // Sort sorts a Set in-place by a converter that thransforms a element to an Ordered (int, string and so on).
-func Sort[T comparable, F constraints.Ordered](s mutable.Set[T], by c.Converter[T, F]) *ordered.Set[T] {
+func Sort[T comparable, F constraints.Ordered](s mutable.Set[T], by func(T) F) *ordered.Set[T] {
 	return s.Sort(func(e1, e2 T) bool { return by(e1) < by(e2) })
+}
+
+func Convert[From, To comparable](s *mutable.Set[From], by func(From) To) c.Pipe[To] {
+	h := s.Head()
+	return iter.NewPipe[To](iter.Convert(h, h.Next, by))
+}
+
+func Flatt[From, To comparable](s *mutable.Set[From], by func(From) []To) c.Pipe[To] {
+	h := s.Head()
+	f := iter.Flatt(h, h.Next, by)
+	return iter.NewPipe[To](&f)
 }

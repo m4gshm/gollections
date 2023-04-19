@@ -3,11 +3,16 @@ package predicate
 // Predicate tests value (converts to true or false).
 type Predicate[T any] func(T) bool
 
-func (p Predicate[T]) Or(or Predicate[T]) Predicate[T] { return Or(p, or) }
+func (p Predicate[T]) Or(or Predicate[T]) Predicate[T]   { return Or(p, or) }
 func (p Predicate[T]) And(and Predicate[T]) Predicate[T] { return And(p, and) }
-func (p Predicate[T]) Xor(and Predicate[T]) Predicate[T] { return Xor(p, and) }
+func (p Predicate[T]) Xor(xor Predicate[T]) Predicate[T] { return Xor(p, xor) }
 
-// Not inverts a predicate.
+// Eq makes a predicate to test for equality
+func Eq[T comparable](v T) Predicate[T] {
+	return func(c T) bool { return v == c }
+}
+
+// Not inverts a predicate
 func Not[T any](p Predicate[T]) Predicate[T] {
 	return func(v T) bool { return !p(v) }
 }
@@ -47,7 +52,7 @@ func Union[T any](predicates ...Predicate[T]) Predicate[T] {
 	}
 }
 
-// Always returns v every time
+// Always returns v every time.
 func Always[T any](v bool) Predicate[T] {
 	return func(_ T) bool { return v }
 }
@@ -56,6 +61,3 @@ func Always[T any](v bool) Predicate[T] {
 func Never[T any](v bool) Predicate[T] {
 	return func(_ T) bool { return !v }
 }
-
-// BiPredicate tests values pair (converts to true or false).
-type BiPredicate[v1, v2 any] func(v1, v2) bool

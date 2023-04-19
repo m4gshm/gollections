@@ -6,17 +6,19 @@ import (
 	"github.com/m4gshm/gollections/immutable/oset"
 	"github.com/m4gshm/gollections/immutable/set"
 	"github.com/m4gshm/gollections/immutable/vector"
-	"github.com/m4gshm/gollections/it"
-	impliter "github.com/m4gshm/gollections/it/impl/it"
+	"github.com/m4gshm/gollections/iter"
+	impliter "github.com/m4gshm/gollections/iter/impl/iter"
 	moset "github.com/m4gshm/gollections/mutable/oset"
 	mvector "github.com/m4gshm/gollections/mutable/vector"
+	"github.com/m4gshm/gollections/ptr"
 	"github.com/m4gshm/gollections/slice/range_"
 )
 
 var (
-	max       = 100000
-	values    = range_.Of(1, max)
-	ResultInt = 0
+	max        = 100000
+	values     = range_.Of(1, max)
+	ResultInt  = 0
+	threshhold = max / 2
 )
 
 func HighLoad(v int) {
@@ -40,7 +42,7 @@ type benchCase struct {
 
 var cases = []benchCase{ /*{"high", HighLoad}, */ {"low", LowLoad}}
 
-func BenchmarkLoopImmutableOrderSetFirstNext(b *testing.B) {
+func Benchmark_Loop_ImmutableOrderSet_FirstNext(b *testing.B) {
 	c := oset.Of(values...)
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
@@ -53,7 +55,7 @@ func BenchmarkLoopImmutableOrderSetFirstNext(b *testing.B) {
 	}
 }
 
-func BenchmarkLoopImmutableOrderSetLastPrev(b *testing.B) {
+func Benchmark_Loop_ImmutableOrderSet_LastPrev(b *testing.B) {
 	c := oset.Of(values...)
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
@@ -66,13 +68,13 @@ func BenchmarkLoopImmutableOrderSetLastPrev(b *testing.B) {
 	}
 }
 
-func BenchmarkLoopImmutableVectorBeginNextNext(b *testing.B) {
+func Benchmark_Loop_ImmutableVector_BeginNextNext(b *testing.B) {
 	c := vector.Of(values...)
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				it := c.Begin()
-				for v, ok := it.Next(); ok; v, ok = it.Next() {
+				next := c.Begin().Next
+				for v, ok := next(); ok; v, ok = next() {
 					casee.load(v)
 				}
 			}
@@ -80,7 +82,7 @@ func BenchmarkLoopImmutableVectorBeginNextNext(b *testing.B) {
 	}
 }
 
-func BenchmarkLoopImmutableVectorHeadHasNextGetNext(b *testing.B) {
+func Benchmark_Loop_ImmutableVector_HeadHasNextGetNext(b *testing.B) {
 	c := vector.Of(values...)
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
@@ -93,13 +95,13 @@ func BenchmarkLoopImmutableVectorHeadHasNextGetNext(b *testing.B) {
 	}
 }
 
-func BenchmarkLoopImmutableVectorHeadNextNext(b *testing.B) {
+func Benchmark_Loop_ImmutableVector_HeadNextNext(b *testing.B) {
 	c := vector.Of(values...)
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				it := c.Head()
-				for v, ok := it.Next(); ok; v, ok = it.Next() {
+				next := ptr.Of(c.Head()).Next
+				for v, ok := next(); ok; v, ok = next() {
 					casee.load(v)
 				}
 			}
@@ -107,7 +109,7 @@ func BenchmarkLoopImmutableVectorHeadNextNext(b *testing.B) {
 	}
 }
 
-func BenchmarkLoopImmutableVectorFirstNext(b *testing.B) {
+func Benchmark_Loop_ImmutableVector_FirstNext(b *testing.B) {
 	c := vector.Of(values...)
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
@@ -120,7 +122,7 @@ func BenchmarkLoopImmutableVectorFirstNext(b *testing.B) {
 	}
 }
 
-func BenchmarkLoopImmutableVectorTailPrevPrev(b *testing.B) {
+func Benchmark_Loop_ImmutableVector_TailPrevPrev(b *testing.B) {
 	c := vector.Of(values...)
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
@@ -134,7 +136,7 @@ func BenchmarkLoopImmutableVectorTailPrevPrev(b *testing.B) {
 	}
 }
 
-func BenchmarkLoopImmutableVectorLastPrev(b *testing.B) {
+func Benchmark_Loop_ImmutableVector_LastPrev(b *testing.B) {
 	c := vector.Of(values...)
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
@@ -147,7 +149,7 @@ func BenchmarkLoopImmutableVectorLastPrev(b *testing.B) {
 	}
 }
 
-func BenchmarkLoopMutableVectorHeadHeadNext(b *testing.B) {
+func Benchmark_Loop_MutableVector_FirstNext(b *testing.B) {
 	c := mvector.Of(values...)
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
@@ -160,7 +162,21 @@ func BenchmarkLoopMutableVectorHeadHeadNext(b *testing.B) {
 	}
 }
 
-func BenchmarkLoopImmutableVectorTailHasPrevGetPrev(b *testing.B) {
+func Benchmark_Loop_MutableVector_HeadNext(b *testing.B) {
+	c := mvector.Of(values...)
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				next := ptr.Of(c.Head()).Next
+				for v, ok := next(); ok; v, ok = next() {
+					casee.load(v)
+				}
+			}
+		})
+	}
+}
+
+func Benchmark_Loop_ImmutableVector_TailHasPrevGetPrev(b *testing.B) {
 	c := vector.Of(values...)
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
@@ -173,12 +189,12 @@ func BenchmarkLoopImmutableVectorTailHasPrevGetPrev(b *testing.B) {
 	}
 }
 
-func BenchmarkLoopSliceWrapNextNext(b *testing.B) {
+func Benchmark_Loop_Slice_Wrap_NextNext(b *testing.B) {
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				it := it.Wrap(values)
-				for v, ok := it.Next(); ok; v, ok = it.Next() {
+				next := iter.Wrap(values).Next
+				for v, ok := next(); ok; v, ok = next() {
 					casee.load(v)
 				}
 			}
@@ -186,7 +202,7 @@ func BenchmarkLoopSliceWrapNextNext(b *testing.B) {
 	}
 }
 
-func BenchmarkLoopSliceNewHeadHasNextGetNext(b *testing.B) {
+func Benchmark_Loop_Slice_NewHead_HasNextGetNext(b *testing.B) {
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
@@ -198,7 +214,7 @@ func BenchmarkLoopSliceNewHeadHasNextGetNext(b *testing.B) {
 	}
 }
 
-func BenchmarkLoopSliceEmbeddedForByRange(b *testing.B) {
+func Benchmark_Loop_Slice_Embedded_ForByRange(b *testing.B) {
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
@@ -210,7 +226,7 @@ func BenchmarkLoopSliceEmbeddedForByRange(b *testing.B) {
 	}
 }
 
-func BenchmarkLoopSliceEmbeddedForByRangeIndex(b *testing.B) {
+func Benchmark_Loop_Slice_Embedded_ForByRangeIndex(b *testing.B) {
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
@@ -223,7 +239,7 @@ func BenchmarkLoopSliceEmbeddedForByRangeIndex(b *testing.B) {
 	}
 }
 
-func BenchmarkLoopSliceEmbeddedForByIndex(b *testing.B) {
+func Benchmark_Loop_Slice_Embedded_ForByIndex(b *testing.B) {
 	l := len(values)
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
@@ -237,7 +253,7 @@ func BenchmarkLoopSliceEmbeddedForByIndex(b *testing.B) {
 	}
 }
 
-func BenchmarkLoopMapEmbeddedForByKeyValueRange(b *testing.B) {
+func Benchmark_Loop_Map_Embedded_ForByKeyValueRange(b *testing.B) {
 	values := map[int]struct{}{}
 	for i := 0; i < max; i++ {
 		values[i] = struct{}{}
@@ -254,7 +270,7 @@ func BenchmarkLoopMapEmbeddedForByKeyValueRange(b *testing.B) {
 	}
 }
 
-func BenchmarkLoopNewKVNextNextNext(b *testing.B) {
+func Benchmark_Loop_NewKV_NextNextNext(b *testing.B) {
 	values := map[int]int{}
 	for i := 0; i < max; i++ {
 		values[i] = i
@@ -262,8 +278,8 @@ func BenchmarkLoopNewKVNextNextNext(b *testing.B) {
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				iter := impliter.NewEmbedMapKV(values)
-				for k, _, ok := iter.Next(); ok; k, _, ok = iter.Next() {
+				iterator := impliter.NewEmbedMapKV(values)
+				for k, _, ok := iterator.Next(); ok; k, _, ok = iterator.Next() {
 					casee.load(k)
 				}
 			}
@@ -271,23 +287,23 @@ func BenchmarkLoopNewKVNextNextNext(b *testing.B) {
 	}
 }
 
-func BenchmarkLoopImmutableVectorForEach(b *testing.B) {
+func Benchmark_Loop_ImmutableVector_ForEach(b *testing.B) {
 	c := vector.Of(values...)
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				c.ForEach(func(v int) { casee.load(v) })
+				c.ForEach(casee.load)
 			}
 		})
 	}
 }
 
-func BenchmarkLoopImmutableVectorCollectEmbeddedForByRange(b *testing.B) {
+func Benchmark_Loop_ImmutableVector_ForRangeSlice(b *testing.B) {
 	c := vector.Of(values...)
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				for _, v := range c.Collect() {
+				for _, v := range c.Slice() {
 					casee.load(v)
 				}
 			}
@@ -295,56 +311,34 @@ func BenchmarkLoopImmutableVectorCollectEmbeddedForByRange(b *testing.B) {
 	}
 }
 
-func BenchmarkLoopImmutableSetByOfForEach(b *testing.B) {
+func Benchmark_Loop_ImmutableSet_ForEach(b *testing.B) {
 	c := set.Of(values...)
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				c.ForEach(func(v int) { casee.load(v) })
+				c.ForEach(casee.load)
 			}
 		})
 	}
 }
 
-func BenchmarkLoopImmutableSetByNewForEach(b *testing.B) {
-	c := set.New(values)
-	for _, casee := range cases {
-		b.Run(casee.name, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
-				c.ForEach(func(v int) { casee.load(v) })
-			}
-		})
-	}
-}
-
-func BenchmarkLoopImmutableOrdererSetByOfForEach(b *testing.B) {
+func Benchmark_Loop_ImmutableOrderedSet_ForEach(b *testing.B) {
 	c := oset.Of(values...)
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				c.ForEach(func(v int) { casee.load(v) })
+				c.ForEach(casee.load)
 			}
 		})
 	}
 }
 
-func BenchmarkLoopImmutableOrdererSetByNewForEach(b *testing.B) {
-	c := oset.New(values)
-	for _, casee := range cases {
-		b.Run(casee.name, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
-				c.ForEach(func(v int) { casee.load(v) })
-			}
-		})
-	}
-}
-
-func BenchmarkLoopImmutableOrdererSetCollectByEmbeddedForByRange(b *testing.B) {
+func Benchmark_Loop_ImmutableOrderedSet_ForRangeSlice(b *testing.B) {
 	c := oset.Of(values...)
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				for _, v := range c.Collect() {
+				for _, v := range c.Slice() {
 					casee.load(v)
 				}
 			}
@@ -352,12 +346,12 @@ func BenchmarkLoopImmutableOrdererSetCollectByEmbeddedForByRange(b *testing.B) {
 	}
 }
 
-func LoopMutableOrdererSetByOfForEach(b *testing.B) {
+func Benchmark_Loop_MutableOrdererSet_ForEach(b *testing.B) {
 	c := moset.Of(values...)
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				c.ForEach(func(v int) { casee.load(v) })
+				c.ForEach(casee.load)
 			}
 		})
 	}

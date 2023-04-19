@@ -6,18 +6,31 @@ import (
 
 	"github.com/m4gshm/gollections/as"
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/it/impl/it"
-	"github.com/m4gshm/gollections/kvit"
+	"github.com/m4gshm/gollections/kviter"
+	"github.com/m4gshm/gollections/loop"
 )
 
 // ErrBreak is For, Track breaker
-var ErrBreak = it.ErrBreak
+var ErrBreak = loop.ErrBreak
+
+// Of creates a map from a slice of key/value pairs.
+func Of[K comparable, V any](elements ...c.KV[K, V]) map[K]V {
+	var (
+		uniques = make(map[K]V, len(elements))
+	)
+	for _, kv := range elements {
+		key := kv.Key()
+		val := kv.Value()
+		uniques[key] = val
+	}
+	return uniques
+}
 
 // OfLoop builds a map by iterating key\value pairs of a source.
 // The hasNext specifies a predicate that tests existing of a next pair in the source.
 // The getNext extracts the pair.
 func OfLoop[S any, K comparable, V any](source S, hasNext func(S) bool, getNext func(S) (K, V, error)) (map[K]V, error) {
-	return OfLoopResolv(source, hasNext, getNext, kvit.FirstVal[K, V])
+	return OfLoopResolv(source, hasNext, getNext, kviter.FirstVal[K, V])
 }
 
 // OfLoopResolv builds a map by iterating elements of a source.
@@ -49,7 +62,7 @@ func GroupOfLoop[S any, K comparable, V any](source S, hasNext func(S) bool, get
 // Generate builds a map by an generator function.
 // The next returns an key\value pair, or false if the generation is over, or an error.
 func Generate[K comparable, V any](next func() (K, V, bool, error)) (map[K]V, error) {
-	return GenerateResolv(next, kvit.FirstVal[K, V])
+	return GenerateResolv(next, kviter.FirstVal[K, V])
 }
 
 // GenerateResolv builds a map by an generator function.
@@ -78,7 +91,7 @@ func DeepClone[M ~map[K]V, K comparable, V any](elements M, valCopier func(V) V)
 }
 
 // ConvertValues creates a map with converted values
-func ConvertValues[M ~map[K]V, K comparable, V, Vto any](elements M, by c.Converter[V, Vto]) map[K]Vto {
+func ConvertValues[V, Vto any, K comparable, M ~map[K]V](elements M, by func(V) Vto) map[K]Vto {
 	converted := make(map[K]Vto, len(elements))
 	for key, val := range elements {
 		converted[key] = by(val)
@@ -87,7 +100,7 @@ func ConvertValues[M ~map[K]V, K comparable, V, Vto any](elements M, by c.Conver
 }
 
 // Keys makes a slice of map keys
-func Keys[M ~map[K]V, K comparable, V any](elements M) []K {
+func Keys[K comparable, V any, M ~map[K]V](elements M) []K {
 	keys := make([]K, 0, len(elements))
 	for key := range elements {
 		keys = append(keys, key)
@@ -96,12 +109,12 @@ func Keys[M ~map[K]V, K comparable, V any](elements M) []K {
 }
 
 // Values makes a slice of map values
-func Values[M ~map[K]V, K comparable, V any](elements M) []V {
+func Values[V any, K comparable, M ~map[K]V](elements M) []V {
 	return ValuesConverted(elements, as.Is[V])
 }
 
 // ValuesConverted makes a slice of converted map values
-func ValuesConverted[M ~map[K]V, K comparable, V, Vto any](elements M, by c.Converter[V, Vto]) []Vto {
+func ValuesConverted[M ~map[K]V, K comparable, V, Vto any](elements M, by func(V) Vto) []Vto {
 	values := make([]Vto, 0, len(elements))
 	for _, val := range elements {
 		values = append(values, by(val))

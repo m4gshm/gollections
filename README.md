@@ -31,65 +31,117 @@ subpackage. For example the function
 Usage examples:
 
 ``` go
-package examples
+package sliceexamples
 
 import (
     "strconv"
+    "strings"
     "testing"
 
     "github.com/stretchr/testify/assert"
 
-    "github.com/m4gshm/gollections/conv"
+    "github.com/m4gshm/gollections/as"
     "github.com/m4gshm/gollections/first"
+    "github.com/m4gshm/gollections/immutable/set"
     "github.com/m4gshm/gollections/last"
+    "github.com/m4gshm/gollections/map_"
     "github.com/m4gshm/gollections/op"
     "github.com/m4gshm/gollections/predicate/exclude"
     "github.com/m4gshm/gollections/predicate/less"
     "github.com/m4gshm/gollections/predicate/more"
+    "github.com/m4gshm/gollections/predicate/not"
     "github.com/m4gshm/gollections/predicate/one"
     "github.com/m4gshm/gollections/slice"
     "github.com/m4gshm/gollections/slice/clone"
     "github.com/m4gshm/gollections/slice/clone/sort"
+    sliceconv "github.com/m4gshm/gollections/slice/convert"
+    "github.com/m4gshm/gollections/slice/filter"
     "github.com/m4gshm/gollections/slice/group"
     "github.com/m4gshm/gollections/slice/range_"
     "github.com/m4gshm/gollections/slice/reverse"
     "github.com/m4gshm/gollections/sum"
 )
 
-func Test_SortInt(t *testing.T) {
-    source := []int{1, 3, -1, 2, 0}
-    sorted := sort.Of(source)
-    assert.Equal(t, []int{-1, 0, 1, 2, 3}, sorted)
+type User struct {
+    name  string
+    age   int
+    roles []Role
+}
+
+type Role struct {
+    name string
+}
+
+func (u Role) Name() string {
+    return u.name
+}
+
+func (u User) Name() string {
+    return u.name
+}
+
+func (u User) Age() int {
+    return u.age
+}
+
+func (u User) Roles() []Role {
+    return u.roles
+}
+
+var users = []User{
+    {name: "Bob", age: 26, roles: []Role{{"Admin"}, {"manager"}}},
+    {name: "Alice", age: 35, roles: []Role{{"Manager"}}},
+    {name: "Tom", age: 18},
+}
+
+func Test_GroupBySeveralKeysAndConvertMapValues(t *testing.T) {
+    usersByRole := group.InMultiple(users, func(u User) []string { return sliceconv.AndConvert(u.Roles(), Role.Name, strings.ToLower) })
+    namesByRole := map_.ConvertValues(usersByRole, func(u []User) []string { return slice.Convert(u, User.Name) })
+
+    assert.Equal(t, namesByRole[""], []string{"Tom"})
+    assert.Equal(t, namesByRole["manager"], []string{"Bob", "Alice"})
+    assert.Equal(t, namesByRole["admin"], []string{"Bob"})
+}
+
+func Test_FindFirsManager(t *testing.T) {
+    alice, _ := first.Of(users...).By(func(u User) bool { return set.New(slice.Convert(u.Roles(), Role.Name)).Contains("Manager") })
+
+    assert.Equal(t, "Alice", alice.Name())
+}
+
+func Test_AggregateFilteredRoles(t *testing.T) {
+    roles := slice.Flatt(users, User.Roles)
+    roleNamesExceptManager := sliceconv.AndFilter(roles, Role.Name, not.Eq("Manager"))
+
+    assert.Equal(t, slice.Of("Admin", "manager"), roleNamesExceptManager)
 }
 
 func Test_SortStructs(t *testing.T) {
-    type User struct {
-        name string
-        age  int
-    }
-    var users = []User{{"Bob", 26}, {"Alice", 35}, {"Tom", 18}}
+    var users = []User{{name: "Bob", age: 26}, {name: "Alice", age: 35}, {name: "Tom", age: 18}}
     var (
         //sorted
-        byName = sort.By(users, func(u User) string { return u.name })
-        byAge  = sort.By(users, func(u User) int { return u.age })
+        byName = sort.By(users, User.Name)
+        byAge  = sort.By(users, User.Age)
     )
-    assert.Equal(t, []User{{"Alice", 35}, {"Bob", 26}, {"Tom", 18}}, byName)
-    assert.Equal(t, []User{{"Tom", 18}, {"Bob", 26}, {"Alice", 35}}, byAge)
+    assert.Equal(t, []User{{name: "Alice", age: 35}, {name: "Bob", age: 26}, {name: "Tom", age: 18}}, byName)
+    assert.Equal(t, []User{{name: "Tom", age: 18}, {name: "Bob", age: 26}, {name: "Alice", age: 35}}, byAge)
 }
 
 func Test_SortStructsByLess(t *testing.T) {
-    type User struct {
-        name string
-        age  int
-    }
-    var users = []User{{"Bob", 26}, {"Alice", 35}, {"Tom", 18}}
+    var users = []User{{name: "Bob", age: 26}, {name: "Alice", age: 35}, {name: "Tom", age: 18}}
     var (
         //sorted
         byName       = sort.ByLess(users, func(u1, u2 User) bool { return u1.name < u2.name })
         byAgeReverse = sort.ByLess(users, func(u1, u2 User) bool { return u1.age > u2.age })
     )
-    assert.Equal(t, []User{{"Alice", 35}, {"Bob", 26}, {"Tom", 18}}, byName)
-    assert.Equal(t, []User{{"Alice", 35}, {"Bob", 26}, {"Tom", 18}}, byAgeReverse)
+    assert.Equal(t, []User{{name: "Alice", age: 35}, {name: "Bob", age: 26}, {name: "Tom", age: 18}}, byName)
+    assert.Equal(t, []User{{name: "Alice", age: 35}, {name: "Bob", age: 26}, {name: "Tom", age: 18}}, byAgeReverse)
+}
+
+func Test_SortInt(t *testing.T) {
+    source := []int{1, 3, -1, 2, 0}
+    sorted := sort.Of(source)
+    assert.Equal(t, []int{-1, 0, 1, 2, 3}, sorted)
 }
 
 func Test_Reverse(t *testing.T) {
@@ -101,14 +153,14 @@ func Test_Clone(t *testing.T) {
     type entity struct{ val string }
     var (
         entities = []*entity{{"first"}, {"second"}, {"third"}}
-        copy     = clone.Of(entities)
+        c        = clone.Of(entities)
     )
 
-    assert.Equal(t, entities, copy)
-    assert.NotSame(t, entities, copy)
+    assert.Equal(t, entities, c)
+    assert.NotSame(t, entities, c)
 
     for i := range entities {
-        assert.Same(t, entities[i], copy[i])
+        assert.Same(t, entities[i], c[i])
     }
 }
 
@@ -116,15 +168,15 @@ func Test_DeepClone(t *testing.T) {
     type entity struct{ val string }
     var (
         entities = []*entity{{"first"}, {"second"}, {"third"}}
-        copy     = clone.Deep(entities, clone.Ptr[entity])
+        c        = clone.Deep(entities, clone.Ptr[entity])
     )
 
-    assert.Equal(t, entities, copy)
-    assert.NotSame(t, entities, copy)
+    assert.Equal(t, entities, c)
+    assert.NotSame(t, entities, c)
 
     for i := range entities {
-        assert.Equal(t, entities[i], copy[i])
-        assert.NotSame(t, entities[i], copy[i])
+        assert.Equal(t, entities[i], c[i])
+        assert.NotSame(t, entities[i], c[i])
     }
 }
 
@@ -142,8 +194,30 @@ var even = func(v int) bool { return v%2 == 0 }
 func Test_ConvertFiltered(t *testing.T) {
     var (
         source   = []int{1, 3, 4, 5, 7, 8, 9, 11}
-        result   = slice.ConvertFit(source, even, strconv.Itoa)
+        result   = filter.AndConvert(source, even, strconv.Itoa)
         expected = []string{"4", "8"}
+    )
+    assert.Equal(t, expected, result)
+}
+
+func Test_FilterConverted(t *testing.T) {
+    var (
+        source   = []int{1, 3, 4, 5, 7, 8, 9, 11}
+        result   = sliceconv.AndFilter(source, strconv.Itoa, func(s string) bool { return len(s) == 2 })
+        expected = []string{"11"}
+    )
+    assert.Equal(t, expected, result)
+}
+
+func Test_ConvertNilSafe(t *testing.T) {
+    type entity struct{ val *string }
+    var (
+        first    = "first"
+        third    = "third"
+        fifth    = "fifth"
+        source   = []*entity{{&first}, {}, {&third}, nil, {&fifth}}
+        result   = sliceconv.NilSafe(source, func(e *entity) *string { return e.val })
+        expected = []*string{&first, &third, &fifth}
     )
     assert.Equal(t, expected, result)
 }
@@ -151,7 +225,7 @@ func Test_ConvertFiltered(t *testing.T) {
 func Test_ConvertFilteredWithIndexInPlace(t *testing.T) {
     var (
         source   = slice.Of(1, 3, 4, 5, 7, 8, 9, 11)
-        result   = slice.ConvertCheckIndexed(source, func(index int, elem int) (string, bool) { return strconv.Itoa(index + elem), even(elem) })
+        result   = sliceconv.CheckIndexed(source, func(index int, elem int) (string, bool) { return strconv.Itoa(index + elem), even(elem) })
         expected = []string{"6", "13"}
     )
     assert.Equal(t, expected, result)
@@ -166,10 +240,20 @@ func Test_Slice_Filter(t *testing.T) {
     assert.Equal(t, expected, result)
 }
 
+func Test_FilterNotNil(t *testing.T) {
+    type entity struct{ val string }
+    var (
+        source   = []*entity{{"first"}, nil, {"third"}, nil, {"fifth"}}
+        result   = slice.NotNil(source)
+        expected = []*entity{{"first"}, {"third"}, {"fifth"}}
+    )
+    assert.Equal(t, expected, result)
+}
+
 func Test_Flatt(t *testing.T) {
     var (
         source   = [][]int{{1, 2, 3}, {4}, {5, 6}}
-        result   = slice.Flatt(source, conv.AsIs[[]int])
+        result   = slice.Flatt(source, as.Is[[]int])
         expected = []int{1, 2, 3, 4, 5, 6}
     )
     assert.Equal(t, expected, result)
@@ -204,7 +288,7 @@ func Test_Slice_Sum(t *testing.T) {
 func Test_Slice_Flatt(t *testing.T) {
     var (
         source   = [][]int{{1, 2, 3}, {4}, {5, 6}}
-        result   = slice.Flatt(source, conv.AsIs[[]int])
+        result   = slice.Flatt(source, as.Is[[]int])
         expected = []int{1, 2, 3, 4, 5, 6}
     )
     assert.Equal(t, expected, result)
@@ -293,10 +377,12 @@ maps.
 Usage examples:
 
 ``` go
-package examples
+package mapexamples
 
 import (
     "testing"
+
+    "github.com/stretchr/testify/assert"
 
     "github.com/m4gshm/gollections/map_"
     "github.com/m4gshm/gollections/map_/clone"
@@ -304,7 +390,6 @@ import (
     "github.com/m4gshm/gollections/ptr"
     "github.com/m4gshm/gollections/slice"
     "github.com/m4gshm/gollections/slice/clone/sort"
-    "github.com/stretchr/testify/assert"
 )
 
 type entity struct{ val string }
@@ -318,25 +403,25 @@ var (
 )
 
 func Test_Clone(t *testing.T) {
-    copy := clone.Of(entities)
+    c := clone.Of(entities)
 
-    assert.Equal(t, entities, copy)
-    assert.NotSame(t, entities, copy)
+    assert.Equal(t, entities, c)
+    assert.NotSame(t, entities, c)
 
     for k := range entities {
-        assert.Same(t, entities[k], copy[k])
+        assert.Same(t, entities[k], c[k])
     }
 }
 
 func Test_DeepClone(t *testing.T) {
-    copy := clone.Deep(entities, func(e *entity) *entity { return ptr.Of(*e) })
+    c := clone.Deep(entities, func(e *entity) *entity { return ptr.Of(*e) })
 
-    assert.Equal(t, entities, copy)
-    assert.NotSame(t, entities, copy)
+    assert.Equal(t, entities, c)
+    assert.NotSame(t, entities, c)
 
     for i := range entities {
-        assert.Equal(t, entities[i], copy[i])
-        assert.NotSame(t, entities[i], copy[i])
+        assert.Equal(t, entities[i], c[i])
+        assert.NotSame(t, entities[i], c[i])
     }
 }
 
@@ -452,24 +537,24 @@ import (
 
 func _() {
     var (
-        _ immutable.Vector[int] = vector.Of(1, 2, 3)
-        _ c.Vector[int]         = vector.New([]int{1, 2, 3})
+        _ *immutable.Vector[int] = vector.Of(1, 2, 3)
+        _ c.Vector[int]          = vector.New([]int{1, 2, 3})
     )
     var (
-        _ immutable.Set[int] = set.Of(1, 2, 3)
-        _ c.Set[int]         = set.New([]int{1, 2, 3})
+        _ *immutable.Set[int] = set.Of(1, 2, 3)
+        _ c.Set[int]          = set.New([]int{1, 2, 3})
     )
     var (
-        _ ordered.Set[int] = oset.Of(1, 2, 3)
-        _ c.Set[int]       = oset.New([]int{1, 2, 3})
+        _ *ordered.Set[int] = oset.Of(1, 2, 3)
+        _ c.Set[int]        = oset.New([]int{1, 2, 3})
     )
     var (
-        _ immutable.Map[int, string] = map_.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3"))
-        _ c.Map[int, string]         = map_.New(map[int]string{1: "2", 2: "2", 3: "3"})
+        _ *immutable.Map[int, string] = map_.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3"))
+        _ c.Map[int, string]          = map_.New(map[int]string{1: "2", 2: "2", 3: "3"})
     )
     var (
-        _ ordered.Map[int, string] = omap.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3"))
-        _ c.Map[int, string]       = omap.New(map[int]string{1: "2", 2: "2", 3: "3"}) //source map order is unpredictable
+        _ *ordered.Map[int, string] = omap.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3"))
+        _ c.Map[int, string]        = omap.New(map[int]string{1: "2", 2: "2", 3: "3"}) //source map order is unpredictable
     )
 }
 ```
@@ -502,23 +587,23 @@ func _() {
 
     var (
         _ *mutable.Vector[int] = vector.Of(1, 2, 3)
-        _ c.Vector[int]        = vector.New[int](capacity)
+        _ c.Vector[int]        = vector.NewCap[int](capacity)
         _ c.Vector[int]        = vector.Empty[int]()
     )
     var (
-        _ mutable.Set[int] = set.Of(1, 2, 3)
-        _ c.Set[int]       = set.New[int](capacity)
-        _ c.Set[int]       = set.Empty[int]()
+        _ *mutable.Set[int] = set.Of(1, 2, 3)
+        _ c.Set[int]        = set.NewCap[int](capacity)
+        _ c.Set[int]        = set.Empty[int]()
     )
     var (
         _ *ordered.Set[int] = oset.Of(1, 2, 3)
-        _ c.Set[int]        = oset.New[int](capacity)
+        _ c.Set[int]        = oset.NewCap[int](capacity)
         _ c.Set[int]        = oset.Empty[int]()
     )
     var (
-        _ mutable.Map[int, string] = map_.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3"))
-        _ c.Map[int, string]       = map_.New[int, string](capacity)
-        _ c.Map[int, string]       = map_.Empty[int, string]()
+        _ *mutable.Map[int, string] = map_.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3"))
+        _ c.Map[int, string]        = map_.New[int, string](capacity)
+        _ c.Map[int, string]        = map_.Empty[int, string]()
     )
     var (
         _ *ordered.Map[int, string] = omap.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3"))
@@ -563,11 +648,11 @@ that can be applied to the latest final operation.
 var items immutable.Vector[Item]
 
 var (
-    condition predicate.Predicate[Item]    = func(item Item) ...
-    max       op.Binary[Attribute] = func(attribute1 Attribute, attribute2 Attribute) ...
+    condition = func(item Item) bool { ... }
+    max       = func(attribute1 Attribute, attribute2 Attribute) Attribute { ... }
 )
 
-maxItemAttribute := it.Reduce(it.Map(c.Filer(items, condition), Item.GetAttribute), max)
+maxItemAttribute := it.Reduce(it.Convert(c.Filer(items, condition), Item.GetAttribute), max)
 ```
 
 Functions grouped into packages by applicable type
@@ -600,13 +685,13 @@ import (
 
     "github.com/stretchr/testify/assert"
 
+    "github.com/m4gshm/gollections/as"
     cgroup "github.com/m4gshm/gollections/c/group"
-    "github.com/m4gshm/gollections/conv"
     "github.com/m4gshm/gollections/immutable"
     "github.com/m4gshm/gollections/immutable/oset"
     "github.com/m4gshm/gollections/immutable/set"
-    "github.com/m4gshm/gollections/it"
-    slc "github.com/m4gshm/gollections/it/slice"
+    "github.com/m4gshm/gollections/iter"
+    slc "github.com/m4gshm/gollections/iter/slice"
     "github.com/m4gshm/gollections/op"
     "github.com/m4gshm/gollections/predicate/more"
     "github.com/m4gshm/gollections/slice"
@@ -615,8 +700,8 @@ import (
 
 func Test_Set(t *testing.T) {
     var (
-        s      immutable.Set[int] = set.Of(1, 1, 2, 4, 3, 1)
-        values []int              = s.Collect()
+        s      *immutable.Set[int] = set.Of(1, 1, 2, 4, 3, 1)
+        values []int               = s.Slice()
     )
 
     assert.Equal(t, 4, s.Len())
@@ -631,7 +716,7 @@ func Test_Set(t *testing.T) {
 
 func Test_OrderedSet(t *testing.T) {
     s := oset.Of(1, 1, 2, 4, 3, 1)
-    values := s.Collect()
+    values := s.Slice()
     fmt.Println(s) //[1, 2, 4, 3]
 
     assert.Equal(t, slice.Of(1, 2, 4, 3), values)
@@ -656,9 +741,9 @@ func Test_group_orderset_with_filtering_by_stirng_len(t *testing.T) {
     ), func(v string) int { return len(v) },
     ).FilterKey(
         more.Than(3),
-    ).MapValue(
+    ).ConvertValue(
         func(v string) string { return v + "_" },
-    ).Collect()
+    ).Map()
 
     fmt.Println(groups) //map[int][]string{5:[]string{"first_", "third_", "fifth_", "sixth_", "ninth_", "tenth_", "three_"}, 6:[]string{"second_", "fourth_", "eighth_"}, 7:[]string{"seventh_"}}
 
@@ -677,7 +762,7 @@ func Test_compute_odds_sum(t *testing.T) {
     )
 
     //declarative style
-    oddSum := it.Reduce(it.Filter(it.Flatt(slc.Flatt(multiDimension, conv.To[[][]int]), conv.To[[]int]), odds), op.Sum[int])
+    oddSum := iter.Reduce(iter.Filter(iter.Flatt(slc.Flatt(multiDimension, as.Is[[][]int]), as.Is[[]int]), odds), op.Sum[int])
     assert.Equal(t, expected, oddSum)
 
     //plain old style

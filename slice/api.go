@@ -9,13 +9,13 @@ import (
 	"golang.org/x/exp/constraints"
 
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/it/impl/it"
+	"github.com/m4gshm/gollections/check"
+	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
-	"github.com/m4gshm/gollections/predicate"
 )
 
 // ErrBreak is the 'break' statement of the For, Track methods
-var ErrBreak = it.ErrBreak
+var ErrBreak = loop.ErrBreak
 
 // Of is generic slice constructor
 func Of[T any](elements ...T) []T { return elements }
@@ -24,7 +24,7 @@ func Of[T any](elements ...T) []T { return elements }
 // The hasNext specifies a predicate that tests existing of a next element in the source.
 // The getNext extracts the element.
 func OfLoop[S, T any](source S, hasNext func(S) bool, getNext func(S) (T, error)) ([]T, error) {
-	r := []T{}
+	var r []T
 	for hasNext(source) {
 		o, err := getNext(source)
 		if err != nil {
@@ -38,7 +38,7 @@ func OfLoop[S, T any](source S, hasNext func(S) bool, getNext func(S) (T, error)
 // Generate builds a slice by an generator function.
 // The generator returns an element, or false if the generation is over, or an error.
 func Generate[T any](next func() (T, bool, error)) ([]T, error) {
-	r := []T{}
+	var r []T
 	for {
 		e, ok, err := next()
 		if err != nil || !ok {
@@ -65,22 +65,37 @@ func Delete[TS ~[]T, T any](index int, elements TS) TS {
 	return append(elements[0:index], elements[index+1:]...)
 }
 
-// Group converts the slice into a map with keys computeable by the converter 'by'
-func Group[T any, K comparable, TS ~[]T](elements TS, by c.Converter[T, K]) map[K]TS {
+// Group converts a slice into a map, extracting a key for each element of the slice applying the converter 'keyProducer'
+func Group[T any, K comparable, TS ~[]T](elements TS, keyProducer func(T) K) map[K]TS {
 	groups := map[K]TS{}
 	for _, e := range elements {
-		key := by(e)
-		group := groups[key]
-		if group == nil {
-			group = make([]T, 0)
-		}
-		groups[key] = append(group, e)
+		initGroup(keyProducer(e), e, groups)
 	}
 	return groups
 }
 
+// GroupInMultiple converts a slice into a map, extracting multiple keys per each element of the slice applying the converter 'keyProducer'
+func GroupInMultiple[T any, K comparable, TS ~[]T](elements TS, keysProducer func(T) []K) map[K]TS {
+	groups := map[K]TS{}
+	for _, e := range elements {
+		if keys := keysProducer(e); len(keys) == 0 {
+			var key K
+			initGroup(key, e, groups)
+		} else {
+			for _, key := range keys {
+				initGroup(key, e, groups)
+			}
+		}
+	}
+	return groups
+}
+
+func initGroup[T any, K comparable, TS ~[]T](key K, e T, groups map[K]TS) {
+	groups[key] = append(groups[key], e)
+}
+
 // Convert creates a slice consisting of the transformed elements using the converter 'by'
-func Convert[FS ~[]From, From, To any](elements FS, by c.Converter[From, To]) []To {
+func Convert[FS ~[]From, From, To any](elements FS, by func(From) To) []To {
 	result := make([]To, len(elements))
 	for i, e := range elements {
 		result[i] = by(e)
@@ -88,12 +103,36 @@ func Convert[FS ~[]From, From, To any](elements FS, by c.Converter[From, To]) []
 	return result
 }
 
-// ConvertFit additionally filters 'From' elements
-func ConvertFit[FS ~[]From, From, To any](elements FS, fit predicate.Predicate[From], by c.Converter[From, To]) []To {
-	result := make([]To, 0)
+// FilterAndConvert additionally filters 'From' elements
+func FilterAndConvert[FS ~[]From, From, To any](elements FS, filter func(From) bool, by func(From) To) []To {
+	var result []To
 	for _, e := range elements {
-		if fit(e) {
+		if filter(e) {
 			result = append(result, by(e))
+		}
+	}
+	return result
+}
+
+// ConvertAndFilter additionally filters 'To' elements
+func ConvertAndFilter[FS ~[]From, From, To any](elements FS, by func(From) To, filter func(To) bool) []To {
+	var result []To
+	for _, e := range elements {
+		if r := by(e); filter(r) {
+			result = append(result, r)
+		}
+	}
+	return result
+}
+
+// FilterConvertFilter filters source, converts, and filters converted elements
+func FilterConvertFilter[FS ~[]From, From, To any](elements FS, filter func(From) bool, by func(From) To, filterConverted func(To) bool) []To {
+	var result []To
+	for _, e := range elements {
+		if filter(e) {
+			if r := by(e); filterConverted(r) {
+				result = append(result, r)
+			}
 		}
 	}
 	return result
@@ -108,12 +147,12 @@ func ConvertIndexed[FS ~[]From, From, To any](elements FS, by func(index int, fr
 	return result
 }
 
-// ConvertFitIndexed additionally filters 'From' elements
-func ConvertFitIndexed[FS ~[]From, From, To any](elements FS, fit func(index int, from From) bool, by func(index int, from From) To) []To {
-	result := make([]To, 0)
+// FilterAndConvertIndexed additionally filters 'From' elements
+func FilterAndConvertIndexed[FS ~[]From, From, To any](elements FS, filter func(index int, from From) bool, converter func(index int, from From) To) []To {
+	var result []To
 	for i, e := range elements {
-		if fit(i, e) {
-			result = append(result, by(i, e))
+		if filter(i, e) {
+			result = append(result, converter(i, e))
 		}
 	}
 	return result
@@ -121,7 +160,7 @@ func ConvertFitIndexed[FS ~[]From, From, To any](elements FS, fit func(index int
 
 // ConvertCheck is similar to ConvertFit, but it checks and transforms elements together
 func ConvertCheck[FS ~[]From, From, To any](elements FS, by func(from From) (To, bool)) []To {
-	result := make([]To, 0)
+	var result []To
 	for _, e := range elements {
 		if to, ok := by(e); ok {
 			result = append(result, to)
@@ -132,7 +171,7 @@ func ConvertCheck[FS ~[]From, From, To any](elements FS, by func(from From) (To,
 
 // ConvertCheckIndexed additionally filters 'From' elements
 func ConvertCheckIndexed[FS ~[]From, From, To any](elements FS, by func(index int, from From) (To, bool)) []To {
-	result := make([]To, 0)
+	var result []To
 	for i, e := range elements {
 		if to, ok := by(i, e); ok {
 			result = append(result, to)
@@ -142,8 +181,8 @@ func ConvertCheckIndexed[FS ~[]From, From, To any](elements FS, by func(index in
 }
 
 // Flatt unfolds the n-dimensional slice into a n-1 dimensional slice
-func Flatt[FS ~[]From, From, To any](elements FS, by c.Flatter[From, To]) []To {
-	result := make([]To, 0)
+func Flatt[FS ~[]From, From, To any](elements FS, by func(From) []To) []To {
+	var result []To
 	for _, e := range elements {
 		result = append(result, by(e)...)
 
@@ -151,23 +190,23 @@ func Flatt[FS ~[]From, From, To any](elements FS, by c.Flatter[From, To]) []To {
 	return result
 }
 
-// FlattFit additionally filters 'From' elements.
-func FlattFit[FS ~[]From, From, To any](elements FS, fit predicate.Predicate[From], by c.Flatter[From, To]) []To {
-	result := make([]To, 0)
+// FilerAndFlatt additionally filters 'From' elements.
+func FilerAndFlatt[FS ~[]From, From, To any](elements FS, filter func(From) bool, by func(From) []To) []To {
+	var result []To
 	for _, e := range elements {
-		if fit(e) {
+		if filter(e) {
 			result = append(result, by(e)...)
 		}
 	}
 	return result
 }
 
-// FlattElemFit unfolds the n-dimensional slice into a n-1 dimensional slice with additinal filtering of 'To' elements.
-func FlattElemFit[FS ~[]From, From, To any](elements FS, by c.Flatter[From, To], fit predicate.Predicate[To]) []To {
-	result := make([]To, 0)
+// FlattAndFiler unfolds the n-dimensional slice into a n-1 dimensional slice with additinal filtering of 'To' elements.
+func FlattAndFiler[FS ~[]From, From, To any](elements FS, by func(From) []To, filter func(To) bool) []To {
+	var result []To
 	for _, e := range elements {
 		for _, to := range by(e) {
-			if fit(to) {
+			if filter(to) {
 				result = append(result, to)
 			}
 		}
@@ -175,13 +214,13 @@ func FlattElemFit[FS ~[]From, From, To any](elements FS, by c.Flatter[From, To],
 	return result
 }
 
-// FlattFitFit unfolds the n-dimensional slice 'elements' into a n-1 dimensional slice with additinal filtering of 'From' and 'To' elements.
-func FlattFitFit[FS ~[]From, From, To any](elements FS, fitFrom predicate.Predicate[From], by c.Flatter[From, To], fitTo predicate.Predicate[To]) []To {
-	result := make([]To, 0)
+// FilterFlattFilter unfolds the n-dimensional slice 'elements' into a n-1 dimensional slice with additinal filtering of 'From' and 'To' elements.
+func FilterFlattFilter[FS ~[]From, From, To any](elements FS, filterFrom func(From) bool, by func(From) []To, filterTo func(To) bool) []To {
+	var result []To
 	for _, e := range elements {
-		if fitFrom(e) {
+		if filterFrom(e) {
 			for _, to := range by(e) {
-				if fitTo(to) {
+				if filterTo(to) {
 					result = append(result, to)
 				}
 			}
@@ -190,9 +229,13 @@ func FlattFitFit[FS ~[]From, From, To any](elements FS, fitFrom predicate.Predic
 	return result
 }
 
+func NotNil[TS ~[]*T, T any](elements TS) TS {
+	return Filter(elements, check.NotNil[T])
+}
+
 // Filter creates a slice containing only the filtered elements
-func Filter[TS ~[]T, T any](elements TS, filter predicate.Predicate[T]) []T {
-	result := make([]T, 0)
+func Filter[TS ~[]T, T any](elements TS, filter func(T) bool) []T {
+	var result []T
 	for _, e := range elements {
 		if filter(e) {
 			result = append(result, e)
@@ -201,7 +244,7 @@ func Filter[TS ~[]T, T any](elements TS, filter predicate.Predicate[T]) []T {
 	return result
 }
 
-// Range generates a sclice of integers in the range defined by from and to inclusive.
+// Range generates a slice of integers in the range defined by from and to inclusive.
 func Range[T constraints.Integer](from T, to T) []T {
 	if to == from {
 		return []T{to}
@@ -245,12 +288,12 @@ func Sort[TS ~[]T, T any](elements TS, sorter Sorter, less Less[T]) TS {
 }
 
 // SortByOrdered sorts elements in place by converting them to constraints.Ordered values and applying the operator <
-func SortByOrdered[T any, o constraints.Ordered, TS ~[]T](elements TS, sorter Sorter, by c.Converter[T, o]) TS {
+func SortByOrdered[T any, o constraints.Ordered, TS ~[]T](elements TS, sorter Sorter, by func(T) o) TS {
 	return Sort(elements, sorter, func(e1, e2 T) bool { return by(e1) < by(e2) })
 }
 
 // Reduce reduces elements to an one
-func Reduce[TS ~[]T, T any](elements TS, by c.Binary[T]) T {
+func Reduce[TS ~[]T, T any](elements TS, by func(T, T) T) T {
 	var result T
 	for i, v := range elements {
 		if i == 0 {
@@ -267,8 +310,8 @@ func Sum[T c.Summable, TS ~[]T](elements TS) T {
 	return Reduce(elements, op.Sum[T])
 }
 
-// First returns the first element that satisfies requirements of the predicate 'fit'
-func First[TS ~[]T, T any](elements TS, by predicate.Predicate[T]) (T, bool) {
+// First returns the first element that satisfies requirements of the predicate 'filter'
+func First[TS ~[]T, T any](elements TS, by func(T) bool) (T, bool) {
 	for _, e := range elements {
 		if by(e) {
 			return e, true
@@ -278,8 +321,8 @@ func First[TS ~[]T, T any](elements TS, by predicate.Predicate[T]) (T, bool) {
 	return no, false
 }
 
-// Last returns the latest element that satisfies requirements of the predicate 'fit'
-func Last[TS ~[]T, T any](elements TS, by predicate.Predicate[T]) (T, bool) {
+// Last returns the latest element that satisfies requirements of the predicate 'filter'
+func Last[TS ~[]T, T any](elements TS, by func(T) bool) (T, bool) {
 	for i := len(elements) - 1; i >= 0; i-- {
 		e := elements[i]
 		if by(e) {
@@ -303,7 +346,7 @@ func Get[TS ~[]T, T any](elements TS, index int) (T, bool) {
 // Track applies tracker to elements with error checking. To stop traking just return the ErrBreak
 func Track[TS ~[]T, T any](elements TS, tracker func(int, T) error) error {
 	for i, e := range elements {
-		if err := tracker(i, e); err != ErrBreak {
+		if err := tracker(i, e); err == ErrBreak {
 			return nil
 		} else if err != nil {
 			return err
@@ -322,7 +365,7 @@ func TrackEach[TS ~[]T, T any](elements TS, tracker func(int, T)) {
 // For applies walker to elements. To stop walking just return the ErrBreak
 func For[TS ~[]T, T any](elements TS, walker func(T) error) error {
 	for _, e := range elements {
-		if err := walker(e); err != ErrBreak {
+		if err := walker(e); err == ErrBreak {
 			return nil
 		} else if err != nil {
 			return err
@@ -399,4 +442,15 @@ func StringsBehaveAs[TS ~[]T, T ~string](elements []string) TS {
 	ptr := unsafe.Pointer(&elements)
 	s := *(*TS)(ptr)
 	return s
+}
+
+func NoEmpty[TS ~[]T, T any](elements TS, def []T) TS {
+	if len(elements) > 0 {
+		return elements
+	}
+	return def
+}
+
+func GetNoEmpty[TS ~[]T, T any](elementsProducer func() TS, def []T) TS {
+	return NoEmpty(elementsProducer(), def)
 }

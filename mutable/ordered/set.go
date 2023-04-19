@@ -5,31 +5,47 @@ import (
 	"sort"
 
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/it/impl/it"
-	"github.com/m4gshm/gollections/predicate"
+	"github.com/m4gshm/gollections/iter/impl/iter"
+	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/slice"
 )
 
-// ToSet converts an elements slice to the set containing them.
-func ToSet[T comparable](elements []T) *Set[T] {
+// NewSet instantiates Set and copies elements to it.
+func NewSet[T comparable](elements []T) *Set[T] {
 	var (
 		l       = len(elements)
 		uniques = make(map[T]int, l)
 		order   = make([]T, 0, l)
 	)
 	pos := 0
-	for _, v := range elements {
-		if _, ok := uniques[v]; !ok {
-			order = append(order, v)
-			uniques[v] = pos
+	for _, e := range elements {
+		if _, ok := uniques[e]; !ok {
+			order = append(order, e)
+			uniques[e] = pos
 			pos++
 		}
 	}
 	return WrapSet(order, uniques)
 }
 
-// NewSet creates a set with a predefined capacity.
-func NewSet[T comparable](capacity int) *Set[T] {
+// ToSet creates a Set instance with elements obtained by passing an iterator.
+func ToSet[T comparable](elements c.Iterator[T]) *Set[T] {
+	var (
+		uniques = map[T]int{}
+		order   []T
+		pos     = 0
+	)
+
+	if elements != nil {
+		for e, ok := elements.Next(); ok; e, ok = elements.Next() {
+			order, pos = add(e, uniques, order, pos)
+		}
+	}
+	return WrapSet(order, uniques)
+}
+
+// NewSetCap creates a set with a predefined capacity.
+func NewSetCap[T comparable](capacity int) *Set[T] {
 	return WrapSet(make([]T, 0, capacity), make(map[T]int, capacity))
 }
 
@@ -47,6 +63,8 @@ type Set[T comparable] struct {
 var (
 	_ c.Addable[int]          = (*Set[int])(nil)
 	_ c.AddableNew[int]       = (*Set[int])(nil)
+	_ c.AddableAll[int]       = (*Set[int])(nil)
+	_ c.AddableAllNew[int]    = (*Set[int])(nil)
 	_ c.Deleteable[int]       = (*Set[int])(nil)
 	_ c.DeleteableVerify[int] = (*Set[int])(nil)
 	_ c.Set[int]              = (*Set[int])(nil)
@@ -62,22 +80,49 @@ func (s *Set[T]) BeginEdit() c.DelIterator[T] {
 }
 
 func (s *Set[T]) Head() *SetIter[T] {
+	if s == nil {
+		return nil
+	}
 	return NewSetIter(&s.elements, s.DeleteOne)
 }
 
-func (s *Set[T]) Collect() []T {
+func (s *Set[T]) First() (*SetIter[T], T, bool) {
+	if s == nil {
+		var z T
+		return nil, z, false
+	}
+	var (
+		iterator  = s.Head()
+		first, ok = iterator.Next()
+	)
+	return iterator, first, ok
+}
+
+func (s *Set[T]) Slice() []T {
+	if s == nil {
+		return nil
+	}
 	return slice.Clone(s.elements)
 }
 
 func (s *Set[T]) For(walker func(T) error) error {
+	if s == nil {
+		return nil
+	}
 	return slice.For(s.elements, walker)
 }
 
 func (s *Set[T]) ForEach(walker func(T)) {
+	if s == nil {
+		return
+	}
 	slice.ForEach(s.elements, walker)
 }
 
 func (s *Set[T]) Len() int {
+	if s == nil {
+		return 0
+	}
 	return len(s.elements)
 }
 
@@ -86,20 +131,33 @@ func (s *Set[T]) IsEmpty() bool {
 }
 
 func (s *Set[T]) Contains(v T) bool {
+	if s == nil {
+		return false
+	}
 	_, ok := s.uniques[v]
 	return ok
 }
 
 func (s *Set[T]) AddNew(elements ...T) bool {
+	if s == nil {
+		return false
+	}
 	ok := false
 	for i := range elements {
-		ok = s.AddNewOne(elements[i]) || ok
+		ok = s.AddOneNew(elements[i]) || ok
 	}
 	return ok
 }
 
-func (s *Set[T]) AddNewOne(v T) bool {
+func (s *Set[T]) AddOneNew(v T) bool {
+	if s == nil {
+		return false
+	}
 	u := s.uniques
+	if u == nil {
+		u = map[T]int{}
+		s.uniques = u
+	}
 	if _, ok := u[v]; !ok {
 		e := s.elements
 		u[v] = len(e)
@@ -110,11 +168,30 @@ func (s *Set[T]) AddNewOne(v T) bool {
 }
 
 func (s *Set[T]) Add(elements ...T) {
+	if s == nil || elements == nil {
+		return
+	}
 	s.AddNew(elements...)
 }
 
 func (s *Set[T]) AddOne(v T) {
-	s.AddNewOne(v)
+	s.AddOneNew(v)
+}
+
+func (s *Set[T]) AddAll(elements c.Iterable[T]) {
+	if s == nil || elements == nil {
+		return
+	}
+	loop.ForEach(elements.Begin().Next, s.AddOne)
+}
+
+func (s *Set[T]) AddAllNew(elements c.Iterable[T]) bool {
+	if s == nil || elements == nil {
+		return false
+	}
+	var ok bool
+	loop.ForEach(elements.Begin().Next, func(v T) { ok = s.AddOneNew(v) || ok })
+	return ok
 }
 
 func (s *Set[T]) Delete(elements ...T) {
@@ -126,6 +203,9 @@ func (s *Set[T]) DeleteOne(v T) {
 }
 
 func (s *Set[T]) DeleteActual(elements ...T) bool {
+	if s == nil {
+		return false
+	}
 	ok := false
 	for i := range elements {
 		ok = s.DeleteActualOne(elements[i]) || ok
@@ -134,6 +214,9 @@ func (s *Set[T]) DeleteActual(elements ...T) bool {
 }
 
 func (s *Set[T]) DeleteActualOne(v T) bool {
+	if s == nil {
+		return false
+	}
 	u := s.uniques
 	if pos, ok := u[v]; ok {
 		delete(u, v)
@@ -149,16 +232,24 @@ func (s *Set[T]) DeleteActualOne(v T) bool {
 	return false
 }
 
-func (s *Set[T]) Filter(filter predicate.Predicate[T]) c.Pipe[T, []T] {
-	return it.NewPipe[T](it.Filter(s.Head(), filter))
+func (s *Set[T]) Filter(filter func(T) bool) c.Pipe[T] {
+	if s == nil {
+		return nil
+	}
+	h := s.Head()
+	return iter.NewPipe[T](iter.Filter(h, h.Next, filter))
 }
 
-func (s *Set[T]) Map(by c.Converter[T, T]) c.Pipe[T, []T] {
-	return it.NewPipe[T](it.Map(s.Head(), by))
+func (s *Set[T]) Convert(by func(T) T) c.Pipe[T] {
+	if s == nil {
+		return nil
+	}
+	h := s.Head()
+	return iter.NewPipe[T](iter.Convert(h, h.Next, by))
 }
 
-func (s *Set[T]) Reduce(by c.Binary[T]) T {
-	return it.Reduce(s.Head(), by)
+func (s *Set[T]) Reduce(by func(T, T) T) T {
+	return loop.Reduce(s.Head().Next, by)
 }
 
 // Sort transforms to the ordered Set.
@@ -171,10 +262,24 @@ func (s *Set[T]) StableSort(less slice.Less[T]) *Set[T] {
 }
 
 func (s *Set[T]) sortBy(sorter slice.Sorter, less slice.Less[T]) *Set[T] {
-	slice.Sort(s.elements, sorter, less)
+	if s != nil {
+		slice.Sort(s.elements, sorter, less)
+	}
 	return s
 }
 
 func (s *Set[T]) String() string {
+	if s == nil {
+		return ""
+	}
 	return slice.ToString(s.elements)
+}
+
+func add[T comparable](e T, uniques map[T]int, order []T, pos int) ([]T, int) {
+	if _, ok := uniques[e]; !ok {
+		order = append(order, e)
+		uniques[e] = pos
+		pos++
+	}
+	return order, pos
 }

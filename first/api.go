@@ -1,7 +1,6 @@
 package first
 
 import (
-	"github.com/m4gshm/gollections/predicate"
 	"github.com/m4gshm/gollections/slice/first"
 )
 
@@ -11,13 +10,13 @@ func Of[T any](elements ...T) OfElements[T] {
 }
 
 // By the first part of an expression first.By(tester).Of(elements...)
-func By[T any](by predicate.Predicate[T]) ByPredicate[T] {
+func By[T any](by func(T) bool) ByPredicate[T] {
 	return ByPredicate[T]{by: by}
 }
 
 // ByPredicate is tail prducer of the first.By
 type ByPredicate[T any] struct {
-	by predicate.Predicate[T]
+	by func(T) bool
 }
 
 // Of the finish part of an expression first.By(tester).Of(elements...)
@@ -31,6 +30,11 @@ type OfElements[T any] struct {
 }
 
 // By the finish part of an expression first.Of(elements...).By(tester)
-func (l OfElements[T]) By(by predicate.Predicate[T]) (T, bool) {
-	return first.Of(l.elements, by)
+func (l OfElements[T]) By(by func(T) bool) (T, bool) {
+	return l.Where(by)
+}
+
+// By the finish part of an expression first.Of(elements...).Where(condition)
+func (l OfElements[T]) Where(condition func(T) bool) (T, bool) {
+	return first.Of(l.elements, condition)
 }

@@ -1,32 +1,43 @@
 package test
 
 import (
-	"sort"
+	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/m4gshm/gollections/immutable"
 	"github.com/m4gshm/gollections/immutable/oset"
 	"github.com/m4gshm/gollections/immutable/set"
-	"github.com/m4gshm/gollections/it"
+	"github.com/m4gshm/gollections/iter"
+	"github.com/m4gshm/gollections/iterable"
+	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/ptr"
 	"github.com/m4gshm/gollections/slice"
+	"github.com/m4gshm/gollections/slice/sort"
 	"github.com/m4gshm/gollections/walk/group"
 )
 
+func Test_Set_From(t *testing.T) {
+	set := set.From(iter.Of(1, 1, 2, 2, 3, 4, 3, 2, 1))
+	assert.Equal(t, slice.Of(1, 2, 3, 4), sort.Of(set.Slice()))
+}
+
 func Test_Set_Iterate(t *testing.T) {
 	set := set.Of(1, 1, 2, 4, 3, 1)
-	values := set.Collect()
+	values := sort.Of(set.Slice())
 
 	assert.Equal(t, 4, len(values))
 
 	expected := slice.Of(1, 2, 3, 4)
-	sort.Ints(values)
 	assert.Equal(t, expected, values)
 
-	iterSlice := it.ToSlice(set.Begin())
-	sort.Ints(iterSlice)
+	iterSlice := sort.Of(iter.ToSlice(set.Begin()))
 	assert.Equal(t, expected, iterSlice)
+
+	loopSlice := sort.Of(loop.ToSlice(ptr.Of(set.Head()).Next))
+	assert.Equal(t, expected, loopSlice)
 
 	out := make(map[int]int, 0)
 	for it, v, ok := set.First(); ok; v, ok = it.Next() {
@@ -58,31 +69,27 @@ func Test_Set_Contains(t *testing.T) {
 }
 
 func Test_Set_FilterMapReduce(t *testing.T) {
-	s := set.Of(1, 1, 2, 4, 3, 1).Filter(func(i int) bool { return i%2 == 0 }).Map(func(i int) int { return i * 2 }).Reduce(op.Sum[int])
+	s := set.Of(1, 1, 2, 4, 3, 1).Filter(func(i int) bool { return i%2 == 0 }).Convert(func(i int) int { return i * 2 }).Reduce(op.Sum[int])
 	assert.Equal(t, 12, s)
 }
 
 func Test_Set_Group_By_Walker(t *testing.T) {
 	groups := group.Of(set.Of(0, 1, 1, 2, 4, 3, 1, 6, 7), func(e int) bool { return e%2 == 0 })
 
-	fg := groups[false]
-	sort.Ints(fg)
-	tg := groups[true]
-	sort.Ints(tg)
+	fg := sort.Of(groups[false])
+	tg := sort.Of(groups[true])
 	assert.Equal(t, len(groups), 2)
 	assert.Equal(t, []int{1, 3, 7}, fg)
 	assert.Equal(t, []int{0, 2, 4, 6}, tg)
 }
 
 func Test_Set_Group_By_Iterator(t *testing.T) {
-	groups := it.Group(set.Of(0, 1, 1, 2, 4, 3, 1, 6, 7).Begin(), func(e int) bool { return e%2 == 0 }).Collect()
+	groups := iter.Group(set.Of(0, 1, 1, 2, 4, 3, 1, 6, 7).Begin(), func(e int) bool { return e%2 == 0 }).Map()
 
 	assert.Equal(t, len(groups), 2)
-	fg := groups[false]
+	fg := sort.Of(groups[false])
 
-	sort.Ints(fg)
-	tg := groups[true]
-	sort.Ints(tg)
+	tg := sort.Of(groups[true])
 
 	assert.Equal(t, []int{1, 3, 7}, fg)
 	assert.Equal(t, []int{0, 2, 4, 6}, tg)
@@ -109,6 +116,86 @@ func Test_Set_SortStructByField(t *testing.T) {
 	)
 	assert.Equal(t, oset.Of(alise, anonymous, bob, cherlie), sortedByName)
 	assert.Equal(t, oset.Of(anonymous, bob, alise, cherlie), sortedByAge)
+}
+
+func Test_Set_Convert(t *testing.T) {
+	var (
+		ints     = set.Of(3, 3, 1, 1, 1, 5, 6, 8, 8, 0, -2, -2)
+		strings  = sort.Of(iter.ToSlice(iter.Filter(set.Convert(ints, strconv.Itoa), func(s string) bool { return len(s) == 1 })))
+		strings2 = sort.Of(set.Convert(ints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 }).Slice())
+	)
+	assert.Equal(t, slice.Of("0", "1", "3", "5", "6", "8"), strings)
+	assert.Equal(t, strings, strings2)
+}
+
+func Test_Set_Flatt(t *testing.T) {
+	var (
+		ints        = set.Of(3, 3, 1, 1, 1, 5, 6, 8, 8, 0, -2, -2)
+		fints       = set.Flatt(ints, func(i int) []int { return slice.Of(i) })
+		stringsPipe = iterable.Filter(iterable.Convert(fints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 }), func(s string) bool { return len(s) == 1 })
+	)
+	assert.Equal(t, slice.Of("0", "1", "3", "5", "6", "8"), sort.Of(stringsPipe.Slice()))
+}
+
+func Test_Set_DoubleConvert(t *testing.T) {
+	var (
+		ints               = set.Of(3, 1, 5, 6, 8, 0, -2)
+		stringsPipe        = set.Convert(ints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 })
+		prefixedStrinsPipe = iterable.Convert(stringsPipe, func(s string) string { return "_" + s })
+	)
+	assert.Equal(t, slice.Of("_0", "_1", "_3", "_5", "_6", "_8"), sort.Of(prefixedStrinsPipe.Slice()))
+
+	//second call do nothing
+	var no []string
+	assert.Equal(t, no, stringsPipe.Slice())
+}
+
+func Test_Set_Nil(t *testing.T) {
+	var set *immutable.Set[int]
+
+	assert.False(t, set.Contains(1))
+
+	set.IsEmpty()
+	set.Len()
+
+	set.For(nil)
+	set.ForEach(nil)
+
+	set.Slice()
+
+	set.Convert(nil)
+	set.Filter(nil)
+
+	head := set.Head()
+	_, ok := head.Next()
+	assert.False(t, ok)
+
+	_, _, ok = set.First()
+	assert.False(t, ok)
+}
+
+func Test_Set_Zero(t *testing.T) {
+	var set immutable.Set[int]
+
+	assert.False(t, set.Contains(1))
+
+	set.IsEmpty()
+	set.Len()
+
+	set.For(nil)
+	set.ForEach(nil)
+
+	set.Slice()
+
+	set.Convert(nil)
+	set.Filter(nil)
+
+	head := set.Head()
+	_, ok := head.Next()
+	assert.False(t, ok)
+
+	_, _, ok = set.First()
+	assert.False(t, ok)
 }
 
 type user struct {
