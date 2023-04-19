@@ -17,7 +17,7 @@ var (
 )
 
 func (c *ConvertFitIter[From, To, IT]) Next() (t To, ok bool) {
-	if c == nil || c.by == nil {
+	if c == nil {
 		return
 	}
 	if V, ok := nextFiltered(c.next, c.filter); ok {
@@ -38,7 +38,7 @@ var (
 )
 
 func (c *ConvertIter[From, To, IT]) Next() (t To, ok bool) {
-	if c == nil || c.by == nil {
+	if c == nil {
 		return
 	}
 	if v, ok := c.next(); ok {
@@ -58,7 +58,7 @@ var (
 )
 
 func (c *ConvertKVIter[K, V, IT, K2, V2, C]) Next() (k K2, v V2, ok bool) {
-	if c == nil || c.by == nil {
+	if c == nil {
 		return
 	}
 	if K, V, ok := c.iterator.Next(); ok {

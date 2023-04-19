@@ -153,7 +153,7 @@ func (m *Map[K, V]) Track(tracker func(K, V) error) error {
 }
 
 func (m *Map[K, V]) TrackEach(tracker func(K, V)) {
-	if m == nil || tracker == nil {
+	if m == nil {
 		return
 	}
 	map_.TrackEachOrdered(m.order, m.elements, tracker)

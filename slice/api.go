@@ -50,9 +50,6 @@ func Generate[T any](next func() (T, bool, error)) ([]T, error) {
 
 // Clone makes new slice instance with copied elements
 func Clone[TS ~[]T, T any](elements TS) TS {
-	if elements == nil {
-		return nil
-	}
 	copied := make(TS, len(elements))
 	copy(copied, elements)
 	return copied
@@ -99,9 +96,6 @@ func initGroup[T any, K comparable, TS ~[]T](key K, e T, groups map[K]TS) {
 
 // Convert creates a slice consisting of the transformed elements using the converter 'by'
 func Convert[FS ~[]From, From, To any](elements FS, by func(From) To) []To {
-	if elements == nil {
-		return nil
-	}
 	result := make([]To, len(elements))
 	for i, e := range elements {
 		result[i] = by(e)
@@ -146,9 +140,6 @@ func FilterConvertFilter[FS ~[]From, From, To any](elements FS, filter func(From
 
 // ConvertIndexed creates a slice consisting of the transformed elements using the converter 'by' which additionally applies the index of the element being converted
 func ConvertIndexed[FS ~[]From, From, To any](elements FS, by func(index int, from From) To) []To {
-	if elements == nil {
-		return nil
-	}
 	result := make([]To, len(elements))
 	for i, e := range elements {
 		result[i] = by(i, e)
@@ -354,9 +345,6 @@ func Get[TS ~[]T, T any](elements TS, index int) (T, bool) {
 
 // Track applies tracker to elements with error checking. To stop traking just return the ErrBreak
 func Track[TS ~[]T, T any](elements TS, tracker func(int, T) error) error {
-	if tracker == nil {
-		return nil
-	}
 	for i, e := range elements {
 		if err := tracker(i, e); err == ErrBreak {
 			return nil
@@ -369,9 +357,6 @@ func Track[TS ~[]T, T any](elements TS, tracker func(int, T) error) error {
 
 // TrackEach applies tracker to elements without error checking
 func TrackEach[TS ~[]T, T any](elements TS, tracker func(int, T)) {
-	if tracker == nil {
-		return
-	}
 	for i, e := range elements {
 		tracker(i, e)
 	}
@@ -379,9 +364,6 @@ func TrackEach[TS ~[]T, T any](elements TS, tracker func(int, T)) {
 
 // For applies walker to elements. To stop walking just return the ErrBreak
 func For[TS ~[]T, T any](elements TS, walker func(T) error) error {
-	if walker == nil {
-		return nil
-	}
 	for _, e := range elements {
 		if err := walker(e); err == ErrBreak {
 			return nil
@@ -394,9 +376,6 @@ func For[TS ~[]T, T any](elements TS, walker func(T) error) error {
 
 // ForEach applies walker to elements without error checking
 func ForEach[TS ~[]T, T any](elements TS, walker func(T)) {
-	if walker == nil {
-		return
-	}
 	for _, e := range elements {
 		walker(e)
 	}
@@ -404,9 +383,6 @@ func ForEach[TS ~[]T, T any](elements TS, walker func(T)) {
 
 // ForEachRef applies walker to references without error checking
 func ForEachRef[T any, TS ~[]*T](references TS, walker func(T)) {
-	if walker == nil {
-		return
-	}
 	for _, e := range references {
 		walker(*e)
 	}

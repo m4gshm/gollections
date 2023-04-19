@@ -154,10 +154,10 @@ func Test_Vector_Zero(t *testing.T) {
 	l := vec.Len()
 	assert.Equal(t, 4, l)
 
-	vec.For(nil)
-	vec.ForEach(nil)
-	vec.Track(nil)
-	vec.TrackEach(nil)
+	vec.For(func(s string) error { return nil })
+	vec.ForEach(func(s string) {})
+	vec.Track(func(i int, s string) error { return nil })
+	vec.TrackEach(func(i int, s string) {})
 
 	assert.Equal(t, slice.Of("a", "b", "c", "d"), vec.Slice())
 
