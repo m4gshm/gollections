@@ -19,7 +19,7 @@ func FilterAndConvert[From, To any, IT c.Iterable[From]](elements IT, filter fun
 	return iter.NewPipe[To](iter.FilterAndConvert(b, b.Next, filter, converter))
 }
 
-// Flatt instantiates Iterator that extracts slices of 'To' by a Flatter from elements of 'From' and flattens as one iterable collection of 'To' elements
+// Flatt instantiates Iterator that extracts slices of 'To' by a Flattener from elements of 'From' and flattens as one iterable collection of 'To' elements
 func Flatt[From, To any, IT c.Iterable[From]](elements IT, by func(From) []To) c.Pipe[To] {
 	b := elements.Begin()
 	f := iter.Flatt(b, b.Next, by)

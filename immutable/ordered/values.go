@@ -11,11 +11,11 @@ import (
 )
 
 // WrapVal instantiates MapValues using elements as internal storage.
-func WrapVal[K comparable, V any](order []K, elements map[K]V) MapValues[K, V] {
-	return MapValues[K, V]{order, elements}
+func WrapVal[K comparable, V any](order []K, elements map[K]V) *MapValues[K, V] {
+	return &MapValues[K, V]{order, elements}
 }
 
-// MapValues is the wrapper for Map's values.
+// MapValues is the wrapper for Map'm values.
 type MapValues[K comparable, V any] struct {
 	order    []K
 	elements map[K]V
@@ -23,77 +23,108 @@ type MapValues[K comparable, V any] struct {
 
 var (
 	_ c.Collection[any] = (*MapValues[int, any])(nil)
-	_ c.Collection[any] = MapValues[int, any]{}
 	_ fmt.Stringer      = (*MapValues[int, any])(nil)
-	_ fmt.Stringer      = MapValues[int, any]{}
 )
 
-func (s MapValues[K, V]) Begin() c.Iterator[V] {
-	return s.Head()
+// Begin creates iterator
+func (m *MapValues[K, V]) Begin() c.Iterator[V] {
+	h := m.Head()
+	return &h
 }
 
-func (s MapValues[K, V]) Head() *ValIter[K, V] {
-	return NewValIter(s.order, s.elements)
-}
-
-func (s MapValues[K, V]) First() (*ValIter[K, V], V, bool) {
+// Head creates iterator
+func (m *MapValues[K, V]) Head() ValIter[K, V] {
 	var (
-		iterator  = s.Head()
+		order    []K
+		elements map[K]V
+	)
+	if m != nil {
+		order = m.order
+		elements = m.elements
+	}
+	return *NewValIter(order, elements)
+}
+
+// First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
+// If no more elements then ok==false.
+func (m *MapValues[K, V]) First() (ValIter[K, V], V, bool) {
+	var (
+		iterator  = m.Head()
 		first, ok = iterator.Next()
 	)
 	return iterator, first, ok
 }
 
-func (s MapValues[K, V]) Len() int {
-	return len(s.elements)
-}
-
-func (s MapValues[K, V]) IsEmpty() bool {
-	return s.Len() == 0
-}
-
-func (s MapValues[K, V]) Slice() []V {
-	elements := make([]V, len(s.order))
-	for i, key := range s.order {
-		val := s.elements[key]
-		elements[i] = val
+// Len returns amount of elements
+func (m *MapValues[K, V]) Len() int {
+	if m == nil {
+		return 0
 	}
-	return elements
+	return len(m.elements)
 }
 
-func (s MapValues[K, V]) For(walker func(V) error) error {
-	return map_.ForOrderedValues(s.order, s.elements, walker)
+// IsEmpty returns true if the collection is empty
+func (m *MapValues[K, V]) IsEmpty() bool {
+	return m.Len() == 0
 }
 
-func (s MapValues[K, V]) ForEach(walker func(V)) {
-	map_.ForEachOrderedValues(s.order, s.elements, walker)
+// Slice collects the values to a slice
+func (m *MapValues[K, V]) Slice() (values []V) {
+	if m != nil {
+		values = make([]V, len(m.order))
+		for i, key := range m.order {
+			val := m.elements[key]
+			values[i] = val
+		}
+	}
+	return values
 }
 
-func (s MapValues[K, V]) Get(index int) (V, bool) {
-	keys := s.order
+// For applies the 'walker' function for every value. Return the c.ErrBreak to stop.
+func (m *MapValues[K, V]) For(walker func(V) error) error {
+	if m == nil {
+		return nil
+	}
+	return map_.ForOrderedValues(m.order, m.elements, walker)
+}
+
+// ForEach applies the 'walker' function for every value
+func (m *MapValues[K, V]) ForEach(walker func(V)) {
+	if m != nil {
+		map_.ForEachOrderedValues(m.order, m.elements, walker)
+	}
+}
+
+// Get returns an element by the index, otherwise, if the provided index is ouf of the collection len, returns zero T and false in the second result
+func (m *MapValues[K, V]) Get(index int) (V, bool) {
+	keys := m.order
 	if index >= 0 && index < len(keys) {
 		key := keys[index]
-		val, ok := s.elements[key]
+		val, ok := m.elements[key]
 		return val, ok
 	}
 	var no V
 	return no, false
 }
 
-func (s MapValues[K, V]) Filter(filter func(V) bool) c.Pipe[V] {
-	h := s.Head()
+// Filter returns a pipe consisting of elements that satisfy the condition of the 'predicate' function
+func (m *MapValues[K, V]) Filter(filter func(V) bool) c.Pipe[V] {
+	h := m.Head()
 	return iter.NewPipe[V](iter.Filter(h, h.Next, filter))
 }
 
-func (s MapValues[K, V]) Convert(by func(V) V) c.Pipe[V] {
-	h := s.Head()
-	return iter.NewPipe[V](iter.Convert(h, h.Next, by))
+// Convert returns a pipe that applies the 'converter' function to the collection elements
+func (m *MapValues[K, V]) Convert(converter func(V) V) c.Pipe[V] {
+	h := m.Head()
+	return iter.NewPipe[V](iter.Convert(h, h.Next, converter))
 }
 
-func (s MapValues[K, V]) Reduce(by func(V, V) V) V {
-	return loop.Reduce(s.Head().Next, by)
+// Reduce reduces the elements into an one using the 'merge' function
+func (m *MapValues[K, V]) Reduce(merge func(V, V) V) V {
+	h := m.Head()
+	return loop.Reduce(h.Next, merge)
 }
 
-func (s MapValues[K, V]) String() string {
-	return slice.ToString(s.Slice())
+func (m *MapValues[K, V]) String() string {
+	return slice.ToString(m.Slice())
 }

@@ -23,6 +23,7 @@ var (
 	_ c.DelIterator[int] = (*SetIter[int])(nil)
 )
 
+// Next returns the next element if it exists
 func (i *SetIter[K]) Next() (key K, ok bool) {
 	if i != nil {
 		key, _, ok = i.EmbedMapKVIter.Next()
@@ -32,6 +33,7 @@ func (i *SetIter[K]) Next() (key K, ok bool) {
 	return key, ok
 }
 
+// Delete deletes the current element
 func (i *SetIter[K]) Delete() {
 	if i != nil && i.ok {
 		i.del(i.currentKey)

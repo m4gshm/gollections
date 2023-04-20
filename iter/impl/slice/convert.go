@@ -18,6 +18,9 @@ type ConvertFit[From, To any] struct {
 
 var _ c.Iterator[any] = (*ConvertFit[any, any])(nil)
 
+// Next returns the next element.
+// The ok result indicates whether the element was returned by the iterator.
+// If ok == false, then the iteration must be completed.
 func (s *ConvertFit[From, To]) Next() (To, bool) {
 	if v, ok := nextFiltered(s.array, s.size, s.elemSize, s.filter, &s.i); ok {
 		return s.by(v), true
@@ -26,6 +29,7 @@ func (s *ConvertFit[From, To]) Next() (To, bool) {
 	return no, false
 }
 
+// Cap returns the iterator capacity
 func (s *ConvertFit[From, To]) Cap() int {
 	return s.size
 }
@@ -40,6 +44,9 @@ type Converter[From, To any] struct {
 
 var _ c.Iterator[any] = (*Converter[any, any])(nil)
 
+// Next returns the next element.
+// The ok result indicates whether the element was returned by the iterator.
+// If ok == false, then the iteration must be completed.
 func (s *Converter[From, To]) Next() (To, bool) {
 	if s.i < s.size {
 		v := *(*From)(notsafe.GetArrayElemRef(s.array, s.i, s.elemSize))
@@ -50,6 +57,7 @@ func (s *Converter[From, To]) Next() (To, bool) {
 	return no, false
 }
 
+// Cap returns the iterator capacity
 func (s *Converter[From, To]) Cap() int {
 	return s.size
 }

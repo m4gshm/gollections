@@ -62,8 +62,12 @@ var users = []User{
 }
 
 func Test_GroupBySeveralKeysAndConvertMapValues(t *testing.T) {
-	usersByRole := group.InMultiple(users, func(u User) []string { return sliceconv.AndConvert(u.Roles(), Role.Name, strings.ToLower) })
-	namesByRole := map_.ConvertValues(usersByRole, func(u []User) []string { return slice.Convert(u, User.Name) })
+	usersByRole := group.InMultiple(users, func(u User) []string {
+		return sliceconv.AndConvert(u.Roles(), Role.Name, strings.ToLower)
+	})
+	namesByRole := map_.ConvertValues(usersByRole, func(u []User) []string {
+		return slice.Convert(u, User.Name)
+	})
 
 	assert.Equal(t, namesByRole[""], []string{"Tom"})
 	assert.Equal(t, namesByRole["manager"], []string{"Bob", "Alice"})
@@ -71,7 +75,9 @@ func Test_GroupBySeveralKeysAndConvertMapValues(t *testing.T) {
 }
 
 func Test_FindFirsManager(t *testing.T) {
-	alice, _ := first.Of(users...).By(func(u User) bool { return set.New(slice.Convert(u.Roles(), Role.Name)).Contains("Manager") })
+	alice, _ := first.Of(users...).By(func(u User) bool {
+		return set.New(slice.Convert(u.Roles(), Role.Name)).Contains("Manager")
+	})
 
 	assert.Equal(t, "Alice", alice.Name())
 }
@@ -84,25 +90,49 @@ func Test_AggregateFilteredRoles(t *testing.T) {
 }
 
 func Test_SortStructs(t *testing.T) {
-	var users = []User{{name: "Bob", age: 26}, {name: "Alice", age: 35}, {name: "Tom", age: 18}}
+	var users = []User{
+		{name: "Bob", age: 26},
+		{name: "Alice", age: 35},
+		{name: "Tom", age: 18},
+	}
 	var (
 		//sorted
 		byName = sort.By(users, User.Name)
 		byAge  = sort.By(users, User.Age)
 	)
-	assert.Equal(t, []User{{name: "Alice", age: 35}, {name: "Bob", age: 26}, {name: "Tom", age: 18}}, byName)
-	assert.Equal(t, []User{{name: "Tom", age: 18}, {name: "Bob", age: 26}, {name: "Alice", age: 35}}, byAge)
+	assert.Equal(t, []User{
+		{name: "Alice", age: 35},
+		{name: "Bob", age: 26},
+		{name: "Tom", age: 18},
+	}, byName)
+	assert.Equal(t, []User{
+		{name: "Tom", age: 18},
+		{name: "Bob", age: 26},
+		{name: "Alice", age: 35},
+	}, byAge)
 }
 
 func Test_SortStructsByLess(t *testing.T) {
-	var users = []User{{name: "Bob", age: 26}, {name: "Alice", age: 35}, {name: "Tom", age: 18}}
+	var users = []User{
+		{name: "Bob", age: 26},
+		{name: "Alice", age: 35},
+		{name: "Tom", age: 18},
+	}
 	var (
 		//sorted
 		byName       = sort.ByLess(users, func(u1, u2 User) bool { return u1.name < u2.name })
 		byAgeReverse = sort.ByLess(users, func(u1, u2 User) bool { return u1.age > u2.age })
 	)
-	assert.Equal(t, []User{{name: "Alice", age: 35}, {name: "Bob", age: 26}, {name: "Tom", age: 18}}, byName)
-	assert.Equal(t, []User{{name: "Alice", age: 35}, {name: "Bob", age: 26}, {name: "Tom", age: 18}}, byAgeReverse)
+	assert.Equal(t, []User{
+		{name: "Alice", age: 35},
+		{name: "Bob", age: 26},
+		{name: "Tom", age: 18},
+	}, byName)
+	assert.Equal(t, []User{
+		{name: "Alice", age: 35},
+		{name: "Bob", age: 26},
+		{name: "Tom", age: 18},
+	}, byAgeReverse)
 }
 
 func Test_SortInt(t *testing.T) {
@@ -169,8 +199,10 @@ func Test_ConvertFiltered(t *testing.T) {
 
 func Test_FilterConverted(t *testing.T) {
 	var (
-		source   = []int{1, 3, 4, 5, 7, 8, 9, 11}
-		result   = sliceconv.AndFilter(source, strconv.Itoa, func(s string) bool { return len(s) == 2 })
+		source = []int{1, 3, 4, 5, 7, 8, 9, 11}
+		result = sliceconv.AndFilter(source, strconv.Itoa, func(s string) bool {
+			return len(s) == 2
+		})
 		expected = []string{"11"}
 	)
 	assert.Equal(t, expected, result)
@@ -179,11 +211,13 @@ func Test_FilterConverted(t *testing.T) {
 func Test_ConvertNilSafe(t *testing.T) {
 	type entity struct{ val *string }
 	var (
-		first    = "first"
-		third    = "third"
-		fifth    = "fifth"
-		source   = []*entity{{&first}, {}, {&third}, nil, {&fifth}}
-		result   = sliceconv.NilSafe(source, func(e *entity) *string { return e.val })
+		first  = "first"
+		third  = "third"
+		fifth  = "fifth"
+		source = []*entity{{&first}, {}, {&third}, nil, {&fifth}}
+		result = sliceconv.NilSafe(source, func(e *entity) *string {
+			return e.val
+		})
 		expected = []*string{&first, &third, &fifth}
 	)
 	assert.Equal(t, expected, result)
@@ -191,8 +225,10 @@ func Test_ConvertNilSafe(t *testing.T) {
 
 func Test_ConvertFilteredWithIndexInPlace(t *testing.T) {
 	var (
-		source   = slice.Of(1, 3, 4, 5, 7, 8, 9, 11)
-		result   = sliceconv.CheckIndexed(source, func(index int, elem int) (string, bool) { return strconv.Itoa(index + elem), even(elem) })
+		source = slice.Of(1, 3, 4, 5, 7, 8, 9, 11)
+		result = sliceconv.CheckIndexed(source, func(index int, elem int) (string, bool) {
+			return strconv.Itoa(index + elem), even(elem)
+		})
 		expected = []string{"6", "13"}
 	)
 	assert.Equal(t, expected, result)
@@ -329,8 +365,11 @@ func Test_OfLoop(t *testing.T) {
 func Test_Generate(t *testing.T) {
 	var (
 		counter   = 0
-		result, _ = slice.Generate(func() (int, bool, error) { counter++; return counter, counter < 4, nil })
-		expected  = slice.Of(1, 2, 3)
+		result, _ = slice.Generate(func() (int, bool, error) {
+			counter++
+			return counter, counter < 4, nil
+		})
+		expected = slice.Of(1, 2, 3)
 	)
 	assert.Equal(t, expected, result)
 }

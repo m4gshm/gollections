@@ -5,7 +5,7 @@ import (
 	"github.com/m4gshm/gollections/predicate/eq"
 )
 
-// not.Eq makes a reverse Eq predicate.
+// Eq - not.Eq makes reverse of the eq.To predicate
 func Eq[T comparable](v T) predicate.Predicate[T] {
 	return predicate.Not(eq.To(v))
 }

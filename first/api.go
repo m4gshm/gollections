@@ -34,7 +34,7 @@ func (l OfElements[T]) By(by func(T) bool) (T, bool) {
 	return l.Where(by)
 }
 
-// By the finish part of an expression first.Of(elements...).Where(condition)
+// Where the finish part of an expression first.Of(elements...).Where(condition)
 func (l OfElements[T]) Where(condition func(T) bool) (T, bool) {
 	return first.Of(l.elements, condition)
 }

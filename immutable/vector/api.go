@@ -30,11 +30,13 @@ func Sort[t any, f constraints.Ordered](v *immutable.Vector[t], by func(t) f) *i
 	return v.Sort(func(e1, e2 t) bool { return by(e1) < by(e2) })
 }
 
+// Convert returns a pipe that applies the 'converter' function to the collection elements
 func Convert[From, To any](v *immutable.Vector[From], by func(From) To) c.Pipe[To] {
 	h := v.Head()
 	return iter.NewPipe[To](iter.Convert(h, h.Next, by))
 }
 
+// Flatt returns a pipe that converts the collection elements into slices and then flattens them to one level
 func Flatt[From, To any](v *immutable.Vector[From], by func(From) []To) c.Pipe[To] {
 	h := v.Head()
 	f := iter.Flatt(h, h.Next, by)

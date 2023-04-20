@@ -32,6 +32,8 @@ func _() {
 	)
 	var (
 		_ *ordered.Map[int, string] = omap.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3"))
-		_ c.Map[int, string]        = omap.New(map[int]string{1: "2", 2: "2", 3: "3"}) //source map order is unpredictable
+		_ c.Map[int, string]        = omap.New(map[int]string{
+			1: "2", 2: "2", 3: "3",
+		})
 	)
 }

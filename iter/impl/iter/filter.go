@@ -2,6 +2,7 @@ package iter
 
 import (
 	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/loop"
 )
 
 // Fit is the Iterator wrapper that provides filtering of elements by a Predicate.
@@ -16,6 +17,9 @@ var (
 	_ c.Iterator[any] = Fit[any, any]{}
 )
 
+// Next returns the next element.
+// The ok result indicates whether the element was returned by the iterator.
+// If ok == false, then the iteration must be completed.
 func (s Fit[T, IT]) Next() (T, bool) {
 	return nextFiltered(s.next, s.by)
 }
@@ -31,21 +35,19 @@ var (
 	_ c.KVIterator[any, any] = FitKV[any, any, c.KVIterator[any, any]]{}
 )
 
+// Next returns the next key/value pair.
+// The ok result indicates whether the pair was returned by the iterator.
+// If ok == false, then the iteration must be completed.
 func (s FitKV[K, V, IT]) Next() (K, V, bool) {
-	return nextFilteredKV(s.iterator, s.by)
+	return nextFilteredKV(s.iterator.Next, s.by)
 }
 
 func nextFiltered[T any](next func() (T, bool), filter func(T) bool) (v T, ok bool) {
-	for v, ok := next(); ok; v, ok = next() {
-		if filter(v) {
-			return v, true
-		}
-	}
-	return v, false
+	return loop.First(next, filter)
 }
 
-func nextFilteredKV[K any, V any, IT c.KVIterator[K, V]](iterator IT, filter func(K, V) bool) (key K, val V, filtered bool) {
-	for key, val, ok := iterator.Next(); ok; key, val, ok = iterator.Next() {
+func nextFilteredKV[K any, V any](next func() (K, V, bool), filter func(K, V) bool) (key K, val V, filtered bool) {
+	for key, val, ok := next(); ok; key, val, ok = next() {
 		if filter(key, val) {
 			return key, val, true
 		}

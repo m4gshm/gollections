@@ -31,6 +31,7 @@ var (
 	_ c.DelIterator[any]  = (*Iter[[]any, any])(nil)
 )
 
+// HasNext checks the next element existing
 func (i *Iter[TS, T]) HasNext() bool {
 	if i == nil || i.elements == nil {
 		return false
@@ -38,6 +39,7 @@ func (i *Iter[TS, T]) HasNext() bool {
 	return iter.HasNext(*i.elements, i.current)
 }
 
+// HasPrev checks the previous element existing
 func (i *Iter[TS, T]) HasPrev() bool {
 	if i == nil || i.elements == nil {
 		return false
@@ -45,6 +47,7 @@ func (i *Iter[TS, T]) HasPrev() bool {
 	return iter.HasPrev(*i.elements, i.current)
 }
 
+// GetNext returns the next element
 func (i *Iter[TS, T]) GetNext() (t T) {
 	if i != nil {
 		t, _ = i.Next()
@@ -52,6 +55,7 @@ func (i *Iter[TS, T]) GetNext() (t T) {
 	return
 }
 
+// GetPrev returns the previous element
 func (i *Iter[TS, T]) GetPrev() (t T) {
 	if i != nil {
 		t, _ = i.Prev()
@@ -59,6 +63,9 @@ func (i *Iter[TS, T]) GetPrev() (t T) {
 	return
 }
 
+// Next returns the next element.
+// The ok result indicates whether the element was returned by the iterator.
+// If ok == false, then the iteration must be completed.
 func (i *Iter[TS, T]) Next() (T, bool) {
 	if i.HasNext() {
 		i.current++
@@ -69,6 +76,9 @@ func (i *Iter[TS, T]) Next() (T, bool) {
 	return no, false
 }
 
+// Prev returns the previous element.
+// The ok result indicates whether the element was returned by the iterator.
+// If ok == false, then the iteration must be completed.
 func (i *Iter[TS, T]) Prev() (T, bool) {
 	if i.HasPrev() {
 		i.current--
@@ -79,6 +89,9 @@ func (i *Iter[TS, T]) Prev() (T, bool) {
 	return no, false
 }
 
+// Get returns the current element.
+// The ok result indicates whether the element was returned by the iterator.
+// If ok == false, then the iteration must be completed.
 func (i *Iter[TS, T]) Get() (t T, ok bool) {
 	if i == nil || i.elements == nil {
 		return t, ok
@@ -91,6 +104,7 @@ func (i *Iter[TS, T]) Get() (t T, ok bool) {
 	return t, ok
 }
 
+// Cap returns the iterator capacity
 func (i *Iter[TS, T]) Cap() int {
 	if i == nil || i.elements == nil {
 		return 0
@@ -98,6 +112,7 @@ func (i *Iter[TS, T]) Cap() int {
 	return len(*i.elements)
 }
 
+// Delete deletes the current element
 func (i *Iter[TS, T]) Delete() {
 	if i == nil {
 		return
@@ -106,6 +121,7 @@ func (i *Iter[TS, T]) Delete() {
 	}
 }
 
+// DeleteNext deletes the next element if it exists
 func (i *Iter[TS, T]) DeleteNext() bool {
 	if i == nil {
 		return false
@@ -113,6 +129,7 @@ func (i *Iter[TS, T]) DeleteNext() bool {
 	return i.del(i.current + 1)
 }
 
+// DeletePrev deletes the previos element if it exists
 func (i *Iter[TS, T]) DeletePrev() bool {
 	if i == nil {
 		return false

@@ -69,6 +69,7 @@ var (
 	_ c.PrevIterator[any] = (*ArrayIter[any])(nil)
 )
 
+// HasNext checks the next element existing
 func (i *ArrayIter[T]) HasNext() bool {
 	if i == nil {
 		return false
@@ -76,6 +77,7 @@ func (i *ArrayIter[T]) HasNext() bool {
 	return CanIterateByRange(NoStarted, i.maxHasNext, i.current)
 }
 
+// HasPrev checks the previous element existing
 func (i *ArrayIter[T]) HasPrev() bool {
 	if i == nil {
 		return false
@@ -83,16 +85,21 @@ func (i *ArrayIter[T]) HasPrev() bool {
 	return CanIterateByRange(1, i.size, i.current)
 }
 
+// GetNext returns the next element
 func (i *ArrayIter[T]) GetNext() T {
 	t, _ := i.Next()
 	return t
 }
 
+// GetPrev returns the previous element
 func (i *ArrayIter[T]) GetPrev() T {
 	t, _ := i.Prev()
 	return t
 }
 
+// Next returns the next element.
+// The ok result indicates whether the element was returned by the iterator.
+// If ok == false, then the iteration must be completed.
 func (i *ArrayIter[T]) Next() (v T, ok bool) {
 	if !(i == nil || i.array == nil) {
 		if current := i.current; CanIterateByRange(NoStarted, i.maxHasNext, current) {
@@ -104,6 +111,9 @@ func (i *ArrayIter[T]) Next() (v T, ok bool) {
 	return v, ok
 }
 
+// Prev returns the previos element.
+// The ok result indicates whether the element was returned by the iterator.
+// If ok == false, then the iteration must be completed.
 func (i *ArrayIter[T]) Prev() (v T, ok bool) {
 	if !(i == nil || i.array == nil) {
 		current := i.current
@@ -116,6 +126,9 @@ func (i *ArrayIter[T]) Prev() (v T, ok bool) {
 	return v, ok
 }
 
+// Get returns the current element.
+// The ok result indicates whether the element was returned by the iterator.
+// If ok == false, then the iteration must be completed.
 func (i *ArrayIter[T]) Get() (v T, ok bool) {
 	if !(i == nil || i.array == nil) {
 		current := i.current
@@ -126,6 +139,7 @@ func (i *ArrayIter[T]) Get() (v T, ok bool) {
 	return v, ok
 }
 
+// Cap returns the iterator capacity
 func (i *ArrayIter[T]) Cap() int {
 	if i == nil {
 		return 0
@@ -133,27 +147,27 @@ func (i *ArrayIter[T]) Cap() int {
 	return i.size
 }
 
-// HasNext checks the next element in an iterator by indexs of a current element and slice length.
+// HasNext checks if an iterator can go forward
 func HasNext[T any](elements []T, current int) bool {
 	return HasNextBySize(notsafe.GetLen(elements), current)
 }
 
-// HasPrev checks the previos element in an iterator by indexs of a current element and slice length.
+// HasPrev checks if an iterator can go backwards
 func HasPrev[T any](elements []T, current int) bool {
 	return HasPrevBySize(notsafe.GetLen(elements), current)
 }
 
-// HasNextBySize checks the next element in an iterator by indexs of a current element and slice length.
+// HasNextBySize checks if an iterator can go forward
 func HasNextBySize(size int, current int) bool {
 	return CanIterateByRange(NoStarted, size-2, current)
 }
 
-// HasPrevBySize checks the previos element in an iterator by indexs of a current element and slice length.
+// HasPrevBySize checks if an iterator can go backwards
 func HasPrevBySize(size, current int) bool {
 	return CanIterateByRange(1, size, current)
 }
 
-// CanIterateByRange checks the next element in an iterator by indexes of the first, the last and a current elements of an underlying slice.
+// CanIterateByRange checks if an iterator can go further or stop
 func CanIterateByRange(first, last, current int) bool {
 	return current >= first && current <= last
 }
@@ -168,20 +182,17 @@ func IsValidIndex2(size, index int) bool {
 	return !((index^size == 0) || index < 0)
 }
 
-// Get safely returns an element of a slice by an index or zero value of T if the index is out of range.
+// Get safely returns an element of the 'elements' slice by the 'current' index or return zero value of T if the index is more than size-1 or less 0
 func Get[TS ~[]T, T any](elements TS, current int) T {
 	v, _ := Gett(elements, current)
 	return v
 }
 
-// Gett safely returns an element of a slice adn true by an index or zero value of T and false if the index is out of range.
-func Gett[TS ~[]T, T any](elements TS, current int) (T, bool) {
-	if current >= len(elements) {
-		var no T
-		return no, false
-	} else if current == NoStarted {
-		var no T
-		return no, false
+// Gett safely returns an element of the 'elements' slice by the 'current' index or return zero value of T if the index is more than size-1 or less 0
+// ok == true if success
+func Gett[TS ~[]T, T any](elements TS, current int) (element T, ok bool) {
+	if !(current == NoStarted || current >= len(elements)) {
+		element, ok = (elements)[current], true
 	}
-	return (elements)[current], true
+	return element, ok
 }

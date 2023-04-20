@@ -20,6 +20,9 @@ type FlattenFit[From, To any, IT any] struct {
 
 var _ c.Iterator[any] = (*FlattenFit[any, any, any])(nil)
 
+// Next returns the next element.
+// The ok result indicates whether the element was returned by the iterator.
+// If ok == false, then the iteration must be completed.
 func (s *FlattenFit[From, To, IT]) Next() (To, bool) {
 	sizeTo := s.sizeTo
 	if sizeTo > 0 {
@@ -61,6 +64,9 @@ type Flatten[From, To, IT any] struct {
 
 var _ c.Iterator[any] = (*Flatten[any, any, any])(nil)
 
+// Next returns the next element.
+// The ok result indicates whether the element was returned by the iterator.
+// If ok == false, then the iteration must be completed.
 func (s *Flatten[From, To, IT]) Next() (To, bool) {
 	sizeTo := s.sizeTo
 	if sizeTo > 0 {

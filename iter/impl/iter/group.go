@@ -9,7 +9,7 @@ func NewKeyValuer[T any, K, V any, IT any](iterator IT, next func() (T, bool), k
 	return KeyValuer[T, K, V, IT]{iterator: iterator, next: next, key: keyExtractor, val: valExtractor}
 }
 
-// KeyValuer is the Iterator wrapper that converts a element to a key\value pair and iterates over these pairs
+// KeyValuer is the Iterator wrapper that converts an element to a key\value pair and iterates over these pairs
 type KeyValuer[T, K, V any, IT any] struct {
 	iterator IT
 	next     func() (T, bool)
@@ -20,6 +20,9 @@ type KeyValuer[T, K, V any, IT any] struct {
 var _ c.KVIterator[int, string] = (*KeyValuer[any, int, string, c.Iterator[any]])(nil)
 var _ c.KVIterator[int, string] = KeyValuer[any, int, string, c.Iterator[any]]{}
 
+// Next returns the next element.
+// The ok result indicates whether the element was returned by the iterator.
+// If ok == false, then the iteration must be completed.
 func (s KeyValuer[T, K, V, IT]) Next() (K, V, bool) {
 	elem, ok := s.next()
 	if !ok {

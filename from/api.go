@@ -1,5 +1,6 @@
 package from
 
-func To[F, I, T any](f func(F) I, t func(I) T) func(F) T {
-	return func(v F) T { return t(f(v)) }
+// To transforms converers chain of From->Internal->To into From->To
+func To[From, Internal, To any](from func(From) Internal, to func(Internal) To) func(From) To {
+	return func(v From) To { return to(from(v)) }
 }

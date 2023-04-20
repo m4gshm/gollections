@@ -1,42 +1,43 @@
+// Package check provides common predicate functions
 package check
 
 import (
 	"reflect"
 )
 
-// Nil checks a reference for nil value.
+// Nil checks whether the reference is nil
 func Nil[T any](val *T) bool {
 	return val == nil
 }
 
-// NotNil checks a reference for no nil value.
+// NotNil checks whether the reference is not nil
 func NotNil[T any](val *T) bool {
 	return !Nil(val)
 }
 
-// Zero checks that a value is zero.
-func Zero[T any](val T) bool {
-	return reflect.ValueOf(val).IsZero()
+// Zero checks whether the value is zero
+func Zero[T any](value T) bool {
+	return reflect.ValueOf(value).IsZero()
 }
 
-// Empty checks that a slice is empty.
-func Empty[T Slice | []any](val T) bool {
-	return len(val) == 0
+// Empty checks whether the slice or string is empty
+func Empty[S Slice | []any](s S) bool {
+	return len(s) == 0
 }
 
-// NotEmpty checks that a slice is not empty.
-func NotEmpty[C []T, T any](val C) bool {
-	return len(val) > 0
+// NotEmpty checks whether the slice is no empty
+func NotEmpty[S Slice | []any](slice S) bool {
+	return len(slice) > 0
 }
 
-// EmptyMap checks that a slice is ampty.
-func EmptyMap[K comparable, V any](val map[K]V) bool {
-	return len(val) == 0
+// EmptyMap checks whether the map is empty
+func EmptyMap[K comparable, V any](m map[K]V) bool {
+	return len(m) == 0
 }
 
-// NotEmptyMap checks that a slice is not empty.
-func NotEmptyMap[K comparable, V any](val map[K]V) bool {
-	return len(val) > 0
+// NotEmptyMap checks whether the map is not empty
+func NotEmptyMap[K comparable, V any](m map[K]V) bool {
+	return len(m) > 0
 }
 
 // Slice is the constraint included all slice types
