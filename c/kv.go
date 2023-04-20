@@ -11,14 +11,17 @@ type KV[k any, v any] struct {
 	V v
 }
 
+// Key returns the key
 func (k KV[K, V]) Key() K {
 	return k.K
 }
 
+// Value returns the value
 func (k KV[K, V]) Value() V {
 	return k.V
 }
 
-func (k KV[K, V]) GetNext() (K, V) {
+// Get returns the key/value pair
+func (k KV[K, V]) Get() (K, V) {
 	return k.K, k.V
 }

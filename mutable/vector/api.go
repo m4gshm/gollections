@@ -29,16 +29,18 @@ func From[T any](elements c.Iterator[T]) *mutable.Vector[T] {
 	return mutable.WrapVector(loop.ToSlice(elements.Next))
 }
 
-// Sort sorts a Vector in-place by a converter that thransforms a element to an Ordered (int, string and so on).
+// Sort sorts a Vector in-place by a converter that thransforms an element to an Ordered (int, string and so on).
 func Sort[T any, F constraints.Ordered](v *mutable.Vector[T], by func(T) F) *mutable.Vector[T] {
 	return v.Sort(func(e1, e2 T) bool { return by(e1) < by(e2) })
 }
 
+// Convert returns a pipe that applies the 'converter' function to the collection elements
 func Convert[From, To any](s *mutable.Vector[From], by func(From) To) c.Pipe[To] {
 	h := s.Head()
 	return iter.NewPipe[To](iter.Convert(h, h.Next, by))
 }
 
+// Flatt instantiates Iterator that converts the collection elements into slices and then flattens them to one level
 func Flatt[From, To any](v *mutable.Vector[From], by func(From) []To) c.Pipe[To] {
 	h := v.Head()
 	f := iter.Flatt(h, h.Next, by)

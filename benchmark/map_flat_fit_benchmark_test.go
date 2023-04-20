@@ -514,6 +514,9 @@ func Benchmark_ReduceSum_Slice(b *testing.B) {
 	b.StopTimer()
 }
 
+//go:noinline
+func odds(v int) bool { return v%2 != 0 }
+
 func Benchmark_ReduceSum_Slice_Impl(b *testing.B) {
 	multiDimension := [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
 	expected := 1 + 3 + 5 + 7
@@ -521,7 +524,6 @@ func Benchmark_ReduceSum_Slice_Impl(b *testing.B) {
 	b.ResetTimer()
 	result := 0
 	for i := 0; i < b.N; i++ {
-		odds := func(v int) bool { return v%2 != 0 }
 		f1 := sliceitimpl.Flatt(multiDimension, convert.To[[][]int])
 		f2 := iterimpl.Flatt(f1, f1.Next, convert.To[[]int])
 		result = loop.Reduce(iterimpl.Filter(f2, f2.Next, odds).Next, sop.Sum[int])
@@ -534,8 +536,6 @@ func Benchmark_ReduceSum_Slice_Impl(b *testing.B) {
 
 func Benchmark_ReduceSum_Slice_PlainOld(b *testing.B) {
 	multiDimension := [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
-	isOdd := func(val int) bool { return val%2 != 0 }
-	sum := func(a, v int) int { return a + v }
 	expected := 1 + 3 + 5 + 7
 	b.ResetTimer()
 	result := 0
@@ -544,8 +544,31 @@ func Benchmark_ReduceSum_Slice_PlainOld(b *testing.B) {
 		for _, i := range multiDimension {
 			for _, ii := range i {
 				for _, iii := range ii {
-					if isOdd(iii % 2) {
-						result = sum(result, iii)
+					if odds(iii % 2) {
+						result = sop.Sum(result, iii)
+					}
+				}
+			}
+		}
+	}
+	if result != expected {
+		b.Fatalf("must be %d, but %d", expected, result)
+	}
+	b.StopTimer()
+}
+
+func Benchmark_ReduceSum_Slice_PlainOld_Index(b *testing.B) {
+	multiDimension := [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
+	expected := 1 + 3 + 5 + 7
+	b.ResetTimer()
+	result := 0
+	for j := 0; j < b.N; j++ {
+		result = 0
+		for i := range multiDimension {
+			for ii := range multiDimension[i] {
+				for iii := range multiDimension[i][ii] {
+					if odds(multiDimension[i][ii][iii] % 2) {
+						result = sop.Sum(result, multiDimension[i][ii][iii])
 					}
 				}
 			}

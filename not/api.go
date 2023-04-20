@@ -2,7 +2,7 @@ package not
 
 import "github.com/m4gshm/gollections/check"
 
-// not.Nil checks a reference for no nil value.
-func Nil[T any](val *T) bool {
-	return check.NotNil(val)
+// Nil - not.Nil checks whether the reference is not nil
+func Nil[T any](reference *T) bool {
+	return check.NotNil(reference)
 }

@@ -13,6 +13,7 @@ import (
 	"github.com/m4gshm/gollections/mutable/oset"
 	"github.com/m4gshm/gollections/mutable/vector"
 	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/ptr"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/walk/group"
 )
@@ -34,7 +35,7 @@ func Test_Set_Iterate(t *testing.T) {
 	iterSlice := iter.ToSlice(set.Begin())
 	assert.Equal(t, expected, iterSlice)
 
-	loopSlice := loop.ToSlice(set.Head().Next)
+	loopSlice := loop.ToSlice(ptr.Of(set.Head()).Next)
 	assert.Equal(t, expected, loopSlice)
 
 	out := make([]int, 0)

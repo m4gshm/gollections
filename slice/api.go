@@ -65,7 +65,8 @@ func Delete[TS ~[]T, T any](index int, elements TS) TS {
 	return append(elements[0:index], elements[index+1:]...)
 }
 
-// Group converts a slice into a map, extracting a key for each element of the slice applying the converter 'keyProducer'
+// Group converts the 'elements' slice slice into a map, extracting a key for each element of the slice applying the converter 'keyProducer'.
+// The keysProducer retrieves one key per element.
 func Group[T any, K comparable, TS ~[]T](elements TS, keyProducer func(T) K) map[K]TS {
 	groups := map[K]TS{}
 	for _, e := range elements {
@@ -74,7 +75,8 @@ func Group[T any, K comparable, TS ~[]T](elements TS, keyProducer func(T) K) map
 	return groups
 }
 
-// GroupInMultiple converts a slice into a map, extracting multiple keys per each element of the slice applying the converter 'keyProducer'
+// GroupInMultiple converts the'elements' slice into a map, extracting multiple keys per each element of the slice applying the 'keyProducer' converter.
+// The keysProducer retrieves one or more keys per element.
 func GroupInMultiple[T any, K comparable, TS ~[]T](elements TS, keysProducer func(T) []K) map[K]TS {
 	groups := map[K]TS{}
 	for _, e := range elements {
@@ -138,11 +140,11 @@ func FilterConvertFilter[FS ~[]From, From, To any](elements FS, filter func(From
 	return result
 }
 
-// ConvertIndexed creates a slice consisting of the transformed elements using the converter 'by' which additionally applies the index of the element being converted
-func ConvertIndexed[FS ~[]From, From, To any](elements FS, by func(index int, from From) To) []To {
+// ConvertIndexed creates a slice consisting of the transformed elements using the 'converter' function which additionally applies the index of the element being converted
+func ConvertIndexed[FS ~[]From, From, To any](elements FS, converter func(index int, from From) To) []To {
 	result := make([]To, len(elements))
 	for i, e := range elements {
-		result[i] = by(i, e)
+		result[i] = converter(i, e)
 	}
 	return result
 }
@@ -229,6 +231,7 @@ func FilterFlattFilter[FS ~[]From, From, To any](elements FS, filterFrom func(Fr
 	return result
 }
 
+// NotNil returns only not nil elements
 func NotNil[TS ~[]*T, T any](elements TS) TS {
 	return Filter(elements, check.NotNil[T])
 }
@@ -278,7 +281,11 @@ func Reverse[TS ~[]T, T any](elements TS) []T {
 	return elements
 }
 
-type Less[T any] func(e1, e2 T) bool
+// Less less element qualifier alias.
+// Is a function that must return true it the first element is less the second
+type Less[T any] func(first, second T) bool
+
+// Sorter is alias for sort.Slice or SliceStable functions
 type Sorter func(x any, less func(i, j int) bool)
 
 // Sort sorts elements in place using a function that checks if an element is smaller than the others
@@ -292,14 +299,14 @@ func SortByOrdered[T any, o constraints.Ordered, TS ~[]T](elements TS, sorter So
 	return Sort(elements, sorter, func(e1, e2 T) bool { return by(e1) < by(e2) })
 }
 
-// Reduce reduces elements to an one
-func Reduce[TS ~[]T, T any](elements TS, by func(T, T) T) T {
+// Reduce reduces the elements into an one using the 'merge' function
+func Reduce[TS ~[]T, T any](elements TS, merge func(T, T) T) T {
 	var result T
 	for i, v := range elements {
 		if i == 0 {
 			result = v
 		} else {
-			result = by(result, v)
+			result = merge(result, v)
 		}
 	}
 	return result
@@ -343,7 +350,7 @@ func Get[TS ~[]T, T any](elements TS, index int) (T, bool) {
 	return no, false
 }
 
-// Track applies tracker to elements with error checking. To stop traking just return the ErrBreak
+// Track applies the 'tracker' function to the elements. Return the c.ErrBreak to stop tracking..
 func Track[TS ~[]T, T any](elements TS, tracker func(int, T) error) error {
 	for i, e := range elements {
 		if err := tracker(i, e); err == ErrBreak {
@@ -355,14 +362,14 @@ func Track[TS ~[]T, T any](elements TS, tracker func(int, T) error) error {
 	return nil
 }
 
-// TrackEach applies tracker to elements without error checking
+// TrackEach applies the 'tracker' function to the elements
 func TrackEach[TS ~[]T, T any](elements TS, tracker func(int, T)) {
 	for i, e := range elements {
 		tracker(i, e)
 	}
 }
 
-// For applies walker to elements. To stop walking just return the ErrBreak
+// For applies the 'walker' function for the elements. Return the c.ErrBreak to stop
 func For[TS ~[]T, T any](elements TS, walker func(T) error) error {
 	for _, e := range elements {
 		if err := walker(e); err == ErrBreak {
@@ -374,26 +381,26 @@ func For[TS ~[]T, T any](elements TS, walker func(T) error) error {
 	return nil
 }
 
-// ForEach applies walker to elements without error checking
+// ForEach applies the 'walker' function for the elements
 func ForEach[TS ~[]T, T any](elements TS, walker func(T)) {
 	for _, e := range elements {
 		walker(e)
 	}
 }
 
-// ForEachRef applies walker to references without error checking
+// ForEachRef applies the 'walker' function for the references
 func ForEachRef[T any, TS ~[]*T](references TS, walker func(T)) {
 	for _, e := range references {
 		walker(*e)
 	}
 }
 
-// ToString converts elements to their default string representation
+// ToString converts the elements to their default string representation
 func ToString[TS ~[]T, T any](elements TS) string {
 	return ToStringf(elements, "%+v", " ")
 }
 
-// ToStringf converts elements to a string representation defined by a custom element format and a delimiter
+// ToStringf converts the elements to a string representation defined by the elementFormat and a delimiter
 func ToStringf[TS ~[]T, T any](elements TS, elementFormat, delimeter string) string {
 	str := bytes.Buffer{}
 	str.WriteString("[")
@@ -412,7 +419,7 @@ func ToStringRefs[T any, TS ~[]*T](references TS) string {
 	return ToStringRefsf(references, "%+v", "nil", " ")
 }
 
-// ToStringRefsf converts references to a string representation defined by a delimiter and a nil value representation
+// ToStringRefsf converts references to a string representation defined by the delimiter and the nilValue representation
 func ToStringRefsf[T any, TS ~[]*T](references TS, elementFormat, nilValue, delimeter string) string {
 	str := bytes.Buffer{}
 	str.WriteString("[")
@@ -444,13 +451,15 @@ func StringsBehaveAs[TS ~[]T, T ~string](elements []string) TS {
 	return s
 }
 
-func NoEmpty[TS ~[]T, T any](elements TS, def []T) TS {
+// NoEmpty returns the 'notEmpty' if the 'elements' slise is empty
+func NoEmpty[TS ~[]T, T any](elements TS, notEmpty []T) TS {
 	if len(elements) > 0 {
 		return elements
 	}
-	return def
+	return notEmpty
 }
 
-func GetNoEmpty[TS ~[]T, T any](elementsProducer func() TS, def []T) TS {
-	return NoEmpty(elementsProducer(), def)
+// GetNoEmpty returns the 'notEmpty' if the 'elementsFactory' return an empty slice
+func GetNoEmpty[TS ~[]T, T any](elementsFactory func() TS, def []T) TS {
+	return NoEmpty(elementsFactory(), def)
 }

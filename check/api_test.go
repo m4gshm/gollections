@@ -51,5 +51,4 @@ func Test_Empty(t *testing.T) {
 
 	i := []int{}
 	assert.Equal(t, true, Empty(i))
-
 }

@@ -29,13 +29,15 @@ func Sort[T comparable, f constraints.Ordered](s *ordered.Set[T], by func(T) f) 
 	return s.Sort(func(e1, e2 T) bool { return by(e1) < by(e2) })
 }
 
+// Convert returns a pipe that applies the 'converter' function to the collection elements
 func Convert[From, To comparable](s *ordered.Set[From], by func(From) To) c.Pipe[To] {
 	h := s.Head()
 	return iter.NewPipe[To](iter.Convert(h, h.Next, by))
 }
 
-func Flatt[From, To comparable](s *ordered.Set[From], by func(From) []To) c.Pipe[To] {
+// Flatt returns a pipe that converts the collection elements into slices and then flattens them to one level
+func Flatt[From, To comparable](s *ordered.Set[From], flattener func(From) []To) c.Pipe[To] {
 	h := s.Head()
-	f := iter.Flatt(h, h.Next, by)
+	f := iter.Flatt(h, h.Next, flattener)
 	return iter.NewPipe[To](&f)
 }

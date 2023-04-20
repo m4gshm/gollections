@@ -40,7 +40,7 @@ func ToSet[T comparable](elements c.Iterator[T]) *Set[T] {
 	return WrapSet(order, uniques)
 }
 
-// Set is the Collection implementation that provides element uniqueness and access order. The elements must be comparable.
+// Set is a collection that provides storage for unique elements, prevents duplication, and guarantees access order. The elements must be comparable.
 type Set[T comparable] struct {
 	order    []T
 	elements map[T]struct{}
@@ -52,15 +52,13 @@ var (
 	_ fmt.Stringer = (*Set[int])(nil)
 )
 
-func (s Set[T]) P() *Set[T] {
-	return &s
-}
-
+// Begin creates iterator
 func (s *Set[T]) Begin() c.Iterator[T] {
 	h := s.Head()
 	return &h
 }
 
+// Head creates iterator
 func (s *Set[T]) Head() iter.ArrayIter[T] {
 	var (
 		order []T
@@ -73,7 +71,8 @@ func (s *Set[T]) Head() iter.ArrayIter[T] {
 	return iter.NewHeadS(order, esize)
 }
 
-func (s *Set[T]) Revert() iter.ArrayIter[T] {
+// Tail creates an iterator pointing to the end of the collection
+func (s *Set[T]) Tail() iter.ArrayIter[T] {
 	var (
 		order []T
 		esize uintptr
@@ -85,6 +84,8 @@ func (s *Set[T]) Revert() iter.ArrayIter[T] {
 	return iter.NewTailS(order, esize)
 }
 
+// First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
+// If no more elements then ok==false.
 func (s *Set[T]) First() (iter.ArrayIter[T], T, bool) {
 	var (
 		order []T
@@ -101,6 +102,8 @@ func (s *Set[T]) First() (iter.ArrayIter[T], T, bool) {
 	return iterator, first, ok
 }
 
+// Last returns the latest element of the collection, an iterator to reverse iterate over the remaining elements, and true\false marker of availability previous elements.
+// If no more elements then ok==false.
 func (s *Set[T]) Last() (iter.ArrayIter[T], T, bool) {
 	var (
 		order []T
@@ -117,6 +120,7 @@ func (s *Set[T]) Last() (iter.ArrayIter[T], T, bool) {
 	return iterator, first, ok
 }
 
+// Slice collects the elements to a slice
 func (s *Set[T]) Slice() (out []T) {
 	if s != nil {
 		out = slice.Clone(s.order)
@@ -124,34 +128,7 @@ func (s *Set[T]) Slice() (out []T) {
 	return out
 }
 
-func (s *Set[T]) For(walker func(T) error) error {
-	if s == nil {
-		return nil
-	}
-	return slice.For(s.order, walker)
-}
-
-func (s *Set[T]) ForEach(walker func(T)) {
-	if s != nil {
-		slice.ForEach(s.order, walker)
-	}
-}
-
-func (s *Set[T]) Filter(filter func(T) bool) c.Pipe[T] {
-	h := s.Head()
-	return iter.NewPipe[T](iter.Filter(h, h.Next, filter))
-}
-
-func (s *Set[T]) Convert(by func(T) T) c.Pipe[T] {
-	h := s.Head()
-	return iter.NewPipe[T](iter.Convert(h, h.Next, by))
-}
-
-func (s *Set[T]) Reduce(by func(T, T) T) T {
-	h := s.Head()
-	return loop.Reduce(h.Next, by)
-}
-
+// Len returns amount of elements
 func (s *Set[T]) Len() int {
 	if s == nil {
 		return 0
@@ -159,21 +136,58 @@ func (s *Set[T]) Len() int {
 	return len(s.order)
 }
 
+// IsEmpty returns true if the collection is empty
 func (s *Set[T]) IsEmpty() bool {
 	return s.Len() == 0
 }
 
-func (s *Set[T]) Contains(v T) (ok bool) {
+// For applies the 'walker' function for every element. Return the c.ErrBreak to stop.
+func (s *Set[T]) For(walker func(T) error) error {
+	if s == nil {
+		return nil
+	}
+	return slice.For(s.order, walker)
+}
+
+// ForEach applies the 'walker' function for every element
+func (s *Set[T]) ForEach(walker func(T)) {
 	if s != nil {
-		_, ok = s.elements[v]
+		slice.ForEach(s.order, walker)
+	}
+}
+
+// Filter returns a pipe consisting of elements that satisfy the condition of the 'predicate' function
+func (s *Set[T]) Filter(predicate func(T) bool) c.Pipe[T] {
+	h := s.Head()
+	return iter.NewPipe[T](iter.Filter(h, h.Next, predicate))
+}
+
+// Convert returns a pipe that applies the 'converter' function to the collection elements
+func (s *Set[T]) Convert(by func(T) T) c.Pipe[T] {
+	h := s.Head()
+	return iter.NewPipe[T](iter.Convert(h, h.Next, by))
+}
+
+// Reduce reduces the elements into an one using the 'merge' function
+func (s *Set[T]) Reduce(by func(T, T) T) T {
+	h := s.Head()
+	return loop.Reduce(h.Next, by)
+}
+
+// Contains checks is the collection contains an element
+func (s *Set[T]) Contains(element T) (ok bool) {
+	if s != nil {
+		_, ok = s.elements[element]
 	}
 	return
 }
 
+// Sort sorts the elements
 func (s *Set[T]) Sort(less slice.Less[T]) *Set[T] {
 	return s.sortBy(sort.Slice, less)
 }
 
+// StableSort sorts the elements
 func (s *Set[T]) StableSort(less slice.Less[T]) *Set[T] {
 	return s.sortBy(sort.SliceStable, less)
 }
@@ -188,10 +202,11 @@ func (s *Set[T]) sortBy(sorter slice.Sorter, less slice.Less[T]) *Set[T] {
 }
 
 func (s *Set[T]) String() string {
-	if s == nil {
-		return ""
+	var order []T
+	if s != nil {
+		order = s.order
 	}
-	return slice.ToString(s.order)
+	return slice.ToString(order)
 }
 
 func add[T comparable](e T, uniques map[T]struct{}, order []T) []T {

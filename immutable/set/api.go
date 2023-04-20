@@ -30,11 +30,13 @@ func Sort[T comparable, f constraints.Ordered](s *immutable.Set[T], by func(T) f
 	return s.Sort(func(e1, e2 T) bool { return by(e1) < by(e2) })
 }
 
+// Convert returns a pipe that applies the 'converter' function to the collection elements
 func Convert[From, To comparable](s *immutable.Set[From], by func(From) To) c.Pipe[To] {
 	h := s.Head()
 	return iter.NewPipe[To](iter.Convert(h, h.Next, by))
 }
 
+// Flatt returns a pipe that converts the collection elements into slices and then flattens them to one level
 func Flatt[From, To comparable](s *immutable.Set[From], by func(From) []To) c.Pipe[To] {
 	h := s.Head()
 	f := iter.Flatt(h, h.Next, by)

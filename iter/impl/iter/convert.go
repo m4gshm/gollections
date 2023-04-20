@@ -16,6 +16,9 @@ var (
 	_ c.Iterator[any] = (*ConvertFitIter[any, any, any])(nil)
 )
 
+// Next returns the next element.
+// The ok result indicates whether the element was returned by the iterator.
+// If ok == false, then the iteration must be completed.
 func (c *ConvertFitIter[From, To, IT]) Next() (t To, ok bool) {
 	if c != nil {
 		if f, ok := nextFiltered(c.next, c.filter); ok {
@@ -36,6 +39,9 @@ var (
 	_ c.Iterator[any] = (*ConvertIter[any, any, any])(nil)
 )
 
+// Next returns the next element.
+// The ok result indicates whether the element was returned by the iterator.
+// If ok == false, then the iteration must be completed.
 func (c *ConvertIter[From, To, IT]) Next() (t To, ok bool) {
 	if c != nil {
 		if v, ok := c.next(); ok {
@@ -55,6 +61,9 @@ var (
 	_ c.KVIterator[any, any] = (*ConvertKVIter[any, any, c.KVIterator[any, any], any, any, func(any, any) (any, any)])(nil)
 )
 
+// Next returns the next key/value pair.
+// The ok result indicates whether an pair was returned by the iterator.
+// If ok == false, then the iteration must be completed.
 func (c *ConvertKVIter[K, V, IT, K2, V2, C]) Next() (k2 K2, v2 V2, ok bool) {
 	if c != nil {
 		if K, V, ok := c.iterator.Next(); ok {

@@ -22,15 +22,21 @@ var (
 	_ c.Sized         = (*ValIter[int, any])(nil)
 )
 
-func (s *ValIter[K, V]) Next() (V, bool) {
-	if iter.HasNext(s.elements, s.current) {
-		s.current++
-		return s.uniques[iter.Get(s.elements, s.current)], true
+// Next returns the next element.
+// The ok result indicates whether the element was returned by the iterator.
+// If ok == false, then the iteration must be completed.
+func (v *ValIter[K, V]) Next() (val V, ok bool) {
+	if v != nil && iter.HasNext(v.elements, v.current) {
+		v.current++
+		return v.uniques[iter.Get(v.elements, v.current)], true
 	}
-	var no V
-	return no, false
+	return val, false
 }
 
-func (s *ValIter[K, V]) Cap() int {
-	return len(s.elements)
+// Cap returns the iterator capacity
+func (v *ValIter[K, V]) Cap() int {
+	if v == nil {
+		return 0
+	}
+	return len(v.elements)
 }

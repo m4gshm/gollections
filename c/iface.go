@@ -1,4 +1,4 @@
-// Package c provides common types of containers, utility types and functions.
+// Package c provides common types of containers, utility types and functions
 package c
 
 import (
@@ -8,26 +8,6 @@ import (
 
 // ErrBreak is the 'break' statement of the For, Track methods
 var ErrBreak = loop.ErrBreak
-
-type SliceFactory[T any] interface {
-	Slice() []T
-}
-
-type MapFactory[K comparable, V any, Map map[K]V | map[K][]V] interface {
-	Map() Map
-}
-
-// Collection is the interface of a finite-size container.
-// Where:
-//
-//	T - any arbitrary type
-type Collection[T any] interface {
-	Iterable[T]
-	ForLoop[T]
-	ForEachLoop[T]
-	SliceFactory[T]
-	Transformable[T]
-}
 
 // Vector - collection interface that provides elements order and access by index to the elements.
 type Vector[T any] interface {
@@ -51,14 +31,6 @@ type Set[T any] interface {
 	IsEmpty() bool
 }
 
-type KVCollection[K comparable, V any, M map[K]V | map[K][]V] interface {
-	TrackLoop[V, K]
-	TrackEachLoop[V, K]
-	KVIterable[K, V]
-	MapTransformable[K, V, M]
-	MapFactory[K, V, M]
-}
-
 // Map - collection interface that stores key/value pairs and provide access to an element by its key
 type Map[K comparable, V any] interface {
 	KVCollection[K, V, map[K]V]
@@ -72,9 +44,39 @@ type Map[K comparable, V any] interface {
 	IsEmpty() bool
 }
 
+// Collection is the base interface of non-associative collections
+type Collection[T any] interface {
+	Iterable[T]
+	ForLoop[T]
+	ForEachLoop[T]
+	SliceFactory[T]
+	Transformable[T]
+}
+
+// KVCollection is the base interface of associative collections
+type KVCollection[K comparable, V any, M map[K]V | map[K][]V] interface {
+	TrackLoop[V, K]
+	TrackEachLoop[V, K]
+	KVIterable[K, V]
+	MapTransformable[K, V, M]
+	MapFactory[K, V, M]
+}
+
+// SliceFactory collects the elements of the collection into a slice
+type SliceFactory[T any] interface {
+	Slice() []T
+}
+
+// MapFactory collects the key/value pairs of the collection into a map
+type MapFactory[K comparable, V any, Map map[K]V | map[K][]V] interface {
+	Map() Map
+}
+
 // Iterator provides iterate over elements of a collection
 type Iterator[T any] interface {
-	// retrieves a next element and true or zero value of T and false if no more elements
+	// Next returns the next element.
+	// The ok result indicates whether the element was returned by the iterator.
+	// If ok == false, then the iteration must be completed.
 	Next() (T, bool)
 }
 
@@ -129,12 +131,13 @@ type KVIterable[K, V any] interface {
 
 // ForLoop is the interface of a collection that provides traversing of the elements.
 type ForLoop[IT any] interface {
-	// return ErrBreak for loop breaking
+	//For takes elements of the collection. Can be interrupt by returning ErrBreak.
 	For(func(element IT) error) error
 }
 
 // ForEachLoop is the interface of a collection that provides traversing of the elements without error checking.
 type ForEachLoop[T any] interface {
+	// ForEach takes all elements of the collection
 	ForEach(func(element T))
 }
 
@@ -209,10 +212,12 @@ type AddableNew[T any] interface {
 	AddOneNew(T) bool
 }
 
+// AddableAll provides appending the collection by elements retrieved from another collection
 type AddableAll[T any] interface {
 	AddAll(Iterable[T])
 }
 
+// AddableAllNew provides appending the collection by elements retrieved from another collection
 type AddableAllNew[T any] interface {
 	AddAllNew(Iterable[T]) bool
 }

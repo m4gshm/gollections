@@ -22,7 +22,9 @@ var (
 	_ c.IteratorBreakable[any] = (*LoopIter[any, any])(nil)
 )
 
-// Next implements c.Iterator
+// Next returns the next element.
+// The ok result indicates whether the element was returned by the iterator.
+// If ok == false, then the iteration must be completed.
 func (i *LoopIter[S, T]) Next() (next T, ok bool) {
 	if i != nil {
 		abort := i.abort

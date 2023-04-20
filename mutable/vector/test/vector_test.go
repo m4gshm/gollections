@@ -84,8 +84,8 @@ func Test_Vector_SortStructByField(t *testing.T) {
 		bob       = &user{"Bob", 19}
 
 		elements     = vector.Of(anonymous, cherlie, alise, bob)
-		sortedByName = vector.Sort(elements.Copy(), (*user).Name)
-		sortedByAge  = vector.Sort(elements.Copy(), (*user).Age)
+		sortedByName = vector.Sort(elements.Clone(), (*user).Name)
+		sortedByAge  = vector.Sort(elements.Clone(), (*user).Age)
 	)
 	assert.Equal(t, vector.Of(alise, anonymous, bob, cherlie), sortedByName)
 	assert.Equal(t, vector.Of(anonymous, bob, alise, cherlie), sortedByAge)

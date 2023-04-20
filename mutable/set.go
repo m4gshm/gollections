@@ -56,33 +56,31 @@ var (
 	_ c.DeleteableVerify[int] = (*Set[int])(nil)
 	_ c.Set[int]              = (*Set[int])(nil)
 	_ fmt.Stringer            = (*Set[int])(nil)
-	// _ c.Addable[int]          = Set[int]{}
-	// _ c.AddableNew[int]       = Set[int]{}
-	// _ c.AddableAll[int]       = Set[int]{}
-	// _ c.AddableAllNew[int]    = Set[int]{}
-	// _ c.Deleteable[int]       = Set[int]{}
-	// _ c.DeleteableVerify[int] = Set[int]{}
-	// _ c.Set[int]              = Set[int]{}
-	// _ fmt.Stringer            = Set[int]{}
 )
 
+// Begin creates iterator
 func (s *Set[T]) Begin() c.Iterator[T] {
 	h := s.Head()
 	return &h
 }
 
+// BeginEdit creates iterator that can delete iterable elements
 func (s *Set[T]) BeginEdit() c.DelIterator[T] {
 	h := s.Head()
 	return &h
 }
 
+// Head creates iterator
 func (s *Set[T]) Head() SetIter[T] {
-	if s == nil || s.elements == nil {
-		return NewSetIter[T](nil, nil)
+	var elements map[T]struct{}
+	if s != nil {
+		elements = s.elements
 	}
-	return NewSetIter(s.elements, s.DeleteOne)
+	return NewSetIter(elements, s.DeleteOne)
 }
 
+// First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
+// If no more elements then ok==false.
 func (s *Set[T]) First() (SetIter[T], T, bool) {
 	var (
 		iterator  = s.Head()
@@ -91,48 +89,54 @@ func (s *Set[T]) First() (SetIter[T], T, bool) {
 	return iterator, first, ok
 }
 
-func (s *Set[T]) Slice() []T {
-	if s == nil || s.elements == nil {
-		return nil
+// Slice collects the elements to a slice
+func (s *Set[T]) Slice() (out []T) {
+	if s != nil {
+		out = map_.Keys(s.elements)
 	}
-	return map_.Keys(s.elements)
+	return out
 }
 
-func (s *Set[T]) Copy() *Set[T] {
-	if s == nil || s.elements == nil {
-		return nil
+// Clone returns copy of the collection
+func (s *Set[T]) Clone() *Set[T] {
+	var elements map[T]struct{}
+	if s != nil {
+		elements = map_.Clone(s.elements)
 	}
-	return WrapSet(map_.Clone(s.elements))
+	return WrapSet(elements)
 }
 
+// IsEmpty returns true if the collection is empty
 func (s *Set[T]) IsEmpty() bool {
 	return s.Len() == 0
 }
 
+// Len returns amount of the elements
 func (s *Set[T]) Len() int {
-	if s == nil || s.elements == nil {
+	if s == nil {
 		return 0
 	}
 	return len(s.elements)
 }
 
-func (s *Set[T]) Contains(val T) bool {
-	if s == nil || s.elements == nil {
-		return false
+// Contains checks if the collection contains an element
+func (s *Set[T]) Contains(element T) (ok bool) {
+	if s != nil {
+		_, ok = s.elements[element]
 	}
-	_, ok := s.elements[val]
 	return ok
 }
 
+// Add adds elements in the collection
 func (s *Set[T]) Add(elements ...T) {
-	if s == nil {
-		return
-	}
-	for _, element := range elements {
-		s.AddOne(element)
+	if s != nil {
+		for _, element := range elements {
+			s.AddOne(element)
+		}
 	}
 }
 
+// AddOne adds an element in the collection
 func (s *Set[T]) AddOne(element T) {
 	if s == nil {
 		return
@@ -143,6 +147,7 @@ func (s *Set[T]) AddOne(element T) {
 	}
 }
 
+// AddNew inserts elements if they are not contained in the collection
 func (s *Set[T]) AddNew(elements ...T) bool {
 	if s == nil {
 		return false
@@ -154,49 +159,53 @@ func (s *Set[T]) AddNew(elements ...T) bool {
 	return ok
 }
 
-func (s *Set[T]) AddOneNew(element T) bool {
-	if s == nil {
-		return false
-	}
-	ok := !s.Contains(element)
-	if ok {
-		s.elements[element] = struct{}{}
+// AddOneNew inserts an element if it is not contained in the collection
+func (s *Set[T]) AddOneNew(element T) (ok bool) {
+	if s != nil {
+		elements := s.elements
+		if elements == nil {
+			elements = map[T]struct{}{}
+			s.elements = elements
+		}
+		if ok = !s.Contains(element); ok {
+			elements[element] = struct{}{}
+		}
 	}
 	return ok
 }
 
+// AddAll inserts all elements from the "other" collection
 func (s *Set[T]) AddAll(elements c.Iterable[T]) {
-	if s == nil {
-		return
+	if !(s == nil || elements == nil) {
+		loop.ForEach(elements.Begin().Next, s.AddOne)
 	}
-	loop.ForEach(elements.Begin().Next, s.AddOne)
 }
 
-func (s *Set[T]) AddAllNew(elements c.Iterable[T]) bool {
-	if s == nil {
-		return false
+// AddAllNew inserts elements from the "other" collection if they are not contained in the collection
+func (s *Set[T]) AddAllNew(other c.Iterable[T]) (ok bool) {
+	if !(s == nil || other == nil) {
+		loop.ForEach(other.Begin().Next, func(v T) { ok = s.AddOneNew(v) || ok })
 	}
-	var ok bool
-	loop.ForEach(elements.Begin().Next, func(v T) { ok = s.AddOneNew(v) || ok })
 	return ok
 }
 
+// Delete removes elements from the collection
 func (s *Set[T]) Delete(elements ...T) {
-	if s == nil {
-		return
-	}
-	for _, element := range elements {
-		s.DeleteOne(element)
+	if s != nil {
+		for _, element := range elements {
+			s.DeleteOne(element)
+		}
 	}
 }
 
+// DeleteOne removes an element from the collection
 func (s *Set[T]) DeleteOne(element T) {
-	if s == nil {
-		return
+	if s != nil {
+		delete(s.elements, element)
 	}
-	delete(s.elements, element)
 }
 
+// DeleteActual removes elements only if they are contained in the collection
 func (s *Set[T]) DeleteActual(elements ...T) bool {
 	if s == nil {
 		return false
@@ -208,17 +217,17 @@ func (s *Set[T]) DeleteActual(elements ...T) bool {
 	return ok
 }
 
-func (s *Set[T]) DeleteActualOne(element T) bool {
-	if s == nil || s.elements == nil {
-		return false
-	}
-	_, ok := s.elements[element]
-	if ok {
-		delete(s.elements, element)
+// DeleteActualOne removes an element only if it is contained in the collection
+func (s *Set[T]) DeleteActualOne(element T) (ok bool) {
+	if !(s == nil || s.elements == nil) {
+		if _, ok = s.elements[element]; ok {
+			delete(s.elements, element)
+		}
 	}
 	return ok
 }
 
+// For applies the 'walker' function for the elements. Return the c.ErrBreak to stop.
 func (s *Set[T]) For(walker func(T) error) error {
 	if s == nil {
 		return nil
@@ -226,40 +235,48 @@ func (s *Set[T]) For(walker func(T) error) error {
 	return map_.ForKeys(s.elements, walker)
 }
 
+// ForEach applies the 'walker' function for every element
 func (s *Set[T]) ForEach(walker func(T)) {
 	if s != nil {
 		map_.ForEachKey(s.elements, walker)
 	}
 }
 
-func (s *Set[T]) Filter(filter func(T) bool) c.Pipe[T] {
+// Filter returns a pipe consisting of elements that satisfy the condition of the 'predicate' function
+func (s *Set[T]) Filter(predicate func(T) bool) c.Pipe[T] {
 	h := s.Head()
-	return iter.NewPipe[T](iter.Filter(h, h.Next, filter))
+	return iter.NewPipe[T](iter.Filter(h, h.Next, predicate))
 }
 
-func (s *Set[T]) Convert(by func(T) T) c.Pipe[T] {
+// Convert returns a pipe that applies the 'converter' function to the collection elements
+func (s *Set[T]) Convert(converter func(T) T) c.Pipe[T] {
 	h := s.Head()
-	return iter.NewPipe[T](iter.Convert(h, h.Next, by))
+	return iter.NewPipe[T](iter.Convert(h, h.Next, converter))
 }
 
+// Reduce reduces the elements into an one using the 'merge' function
 func (s *Set[T]) Reduce(by func(T, T) T) T {
 	h := s.Head()
 	return loop.Reduce(h.Next, by)
 }
 
-// Sort transforms to the ordered Set contains sorted elements.
+// Sort transforms to the ordered Set contains sorted elements
 func (s *Set[T]) Sort(less slice.Less[T]) *ordered.Set[T] {
 	return s.sortBy(sort.Slice, less)
 }
 
+// StableSort transforms to the ordered Set contains sorted elements
 func (s *Set[T]) StableSort(less slice.Less[T]) *ordered.Set[T] {
 	return s.sortBy(sort.SliceStable, less)
 }
 
 func (s *Set[T]) sortBy(sorter slice.Sorter, less slice.Less[T]) *ordered.Set[T] {
-	cl := slice.Clone(s.Slice())
-	slice.Sort(cl, sorter, less)
-	return ordered.NewSet(cl)
+	var sortedElements []T
+	if s != nil {
+		sortedElements = slice.Clone(s.Slice())
+		slice.Sort(sortedElements, sorter, less)
+	}
+	return ordered.NewSet(sortedElements)
 }
 
 func (s *Set[T]) String() string {

@@ -9,82 +9,106 @@ import (
 	"github.com/m4gshm/gollections/slice"
 )
 
-// WrapKeys instantiates MapKeys using elements as internal storage
-func WrapKeys[T comparable](elements []T) MapKeys[T] {
-	return MapKeys[T]{elements}
+// WrapKeys instantiates MapKeys using the elements as internal storage
+func WrapKeys[K comparable](elements []K) *MapKeys[K] {
+	return &MapKeys[K]{elements}
 }
 
-// MapKeys is the wrapper for Map's keys
-type MapKeys[T comparable] struct {
-	elements []T
+// MapKeys is the wrapper for Map'm keys
+type MapKeys[K comparable] struct {
+	keys []K
 }
 
 var (
 	_ c.Collection[int] = (*MapKeys[int])(nil)
-	_ c.Collection[int] = MapKeys[int]{}
 	_ fmt.Stringer      = (*MapKeys[int])(nil)
-	_ fmt.Stringer      = MapKeys[int]{}
 )
 
-func (s MapKeys[T]) Begin() c.Iterator[T] {
-	h := s.Head()
+// Begin creates iterator
+func (m *MapKeys[K]) Begin() c.Iterator[K] {
+	h := m.Head()
 	return &h
 }
 
-func (s MapKeys[T]) Head() iter.ArrayIter[T] {
-	return iter.NewHead(s.elements)
+// Head creates iterator
+func (m *MapKeys[K]) Head() iter.ArrayIter[K] {
+	var elements []K
+	if m != nil {
+		elements = m.keys
+	}
+	return iter.NewHead(elements)
 }
 
-func (s MapKeys[T]) First() (iter.ArrayIter[T], T, bool) {
+// First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
+// If no more elements then ok==false.
+func (m *MapKeys[K]) First() (iter.ArrayIter[K], K, bool) {
 	var (
-		iterator  = s.Head()
+		iterator  = m.Head()
 		first, ok = iterator.Next()
 	)
 	return iterator, first, ok
 }
 
-func (s MapKeys[T]) Len() int {
-	return len(s.elements)
+// Len returns amount of elements
+func (m *MapKeys[K]) Len() int {
+	if m == nil {
+		return 0
+	}
+	return len(m.keys)
 }
 
-func (s MapKeys[T]) IsEmpty() bool {
-	return s.Len() == 0
+// IsEmpty returns true if the collection is empty
+func (m *MapKeys[K]) IsEmpty() bool {
+	return m.Len() == 0
 }
 
-func (s MapKeys[T]) Slice() []T {
-	elements := s.elements
-	dest := make([]T, len(elements))
-	copy(dest, elements)
-	return dest
+// Slice collects the elements to a slice
+func (m *MapKeys[K]) Slice() (keys []K) {
+	if m != nil {
+		keys = slice.Clone(m.keys)
+	}
+	return keys
 }
 
-func (s MapKeys[T]) For(walker func(T) error) error {
-	return slice.For(s.elements, walker)
+// For applies the 'walker' function for every key. Return the c.ErrBreak to stop.
+func (m *MapKeys[K]) For(walker func(K) error) error {
+	if m == nil {
+		return nil
+	}
+	return slice.For(m.keys, walker)
 }
 
-func (s MapKeys[T]) ForEach(walker func(T)) {
-	slice.ForEach(s.elements, walker)
+// ForEach applies the 'walker' function for every element
+func (m *MapKeys[K]) ForEach(walker func(K)) {
+	if m != nil {
+		slice.ForEach(m.keys, walker)
+	}
 }
 
-func (s MapKeys[T]) Get(index int) (T, bool) {
-	return slice.Get(s.elements, index)
+// Filter returns a pipe consisting of elements that satisfy the condition of the 'predicate' function
+func (m *MapKeys[K]) Filter(filter func(K) bool) c.Pipe[K] {
+	h := m.Head()
+	return iter.NewPipe[K](iter.Filter(h, h.Next, filter))
 }
 
-func (s MapKeys[T]) Filter(filter func(T) bool) c.Pipe[T] {
-	h := s.Head()
-	return iter.NewPipe[T](iter.Filter(h, h.Next, filter))
+// Convert returns a pipe that applies the 'converter' function to the collection elements
+func (m *MapKeys[K]) Convert(converter func(K) K) c.Pipe[K] {
+	h := m.Head()
+	return iter.NewPipe[K](iter.Convert(h, h.Next, converter))
 }
 
-func (s MapKeys[T]) Convert(by func(T) T) c.Pipe[T] {
-	h := s.Head()
-	return iter.NewPipe[T](iter.Convert(h, h.Next, by))
-}
-
-func (s MapKeys[T]) Reduce(by func(T, T) T) T {
-	h := s.Head()
+// Reduce reduces the elements into an one using the 'merge' function
+func (m *MapKeys[K]) Reduce(by func(K, K) K) K {
+	h := m.Head()
 	return loop.Reduce(h.Next, by)
 }
 
-func (s MapKeys[T]) String() string {
-	return slice.ToString(s.Slice())
+// String returns string representation of the collection
+func (m *MapKeys[K]) String() string {
+	return slice.ToString(m.Slice())
+}
+
+// Get returns an element by the index, otherwise, if the provided index is ouf of the collection len, returns zero T and false in the second result
+func (m *MapKeys[K]) Get(index int) (K, bool) {
+	return slice.Get(m.keys, index)
 }

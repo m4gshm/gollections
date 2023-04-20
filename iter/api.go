@@ -13,6 +13,7 @@ func Of[T any](elements ...T) c.Iterator[T] {
 	return New(elements)
 }
 
+// New instantiates Iterator using a slice as the elements source
 func New[T any](elements []T) c.Iterator[T] {
 	return Wrap(elements)
 }
@@ -25,7 +26,7 @@ func OfLoop[S, T any](source S, hasNext func(S) bool, getNext func(S) (T, error)
 	return &l
 }
 
-// Wrap instantiates Iterator using slice as the elements source
+// Wrap instantiates Iterator using a slice as the elements source
 func Wrap[TS ~[]T, T any](elements TS) *iter.ArrayIter[T] {
 	h := iter.NewHead(elements)
 	return &h
@@ -41,7 +42,7 @@ func FilterAndConvert[From, To any, IT c.Iterator[From]](elements IT, filter fun
 	return iter.FilterAndConvert(elements, elements.Next, filter, converter)
 }
 
-// Flatt instantiates Iterator that extracts slices of 'To' by a Flatter from elements of 'From' and flattens as one iterable collection of 'To' elements
+// Flatt instantiates Iterator that converts the collection elements into slices and then flattens them to one level
 func Flatt[From, To any, IT c.Iterator[From]](elements IT, flatt func(From) []To) c.Iterator[To] {
 	f := iter.Flatt(elements, elements.Next, flatt)
 	return &f
@@ -83,12 +84,12 @@ func Group[T any, K comparable](elements c.Iterator[T], by func(T) K) c.MapPipe[
 	return iter.Group(elements, by)
 }
 
-// ForEach applies a walker to elements of an Iterator
+// ForEach applies the 'walker' function to elements of an Iterator
 func ForEach[T any](elements c.Iterator[T], walker func(T)) {
 	loop.ForEach(elements.Next, walker)
 }
 
-// ForEachFiltered applies a walker to elements that satisfy a predicate condition
+// ForEachFiltered applies the 'walker' function to elements that satisfy a predicate condition
 func ForEachFiltered[T any](elements c.Iterator[T], walker func(T), filter func(T) bool) {
 	loop.ForEachFiltered(elements.Next, walker, filter)
 }

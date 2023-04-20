@@ -29,7 +29,7 @@ func FilterAndConvert[FS ~[]From, From, To any](elements FS, filter func(From) b
 	return &ConvertFit[From, To]{array: array, size: size, elemSize: elemSize, by: converter, filter: filter}
 }
 
-// Flatt instantiates Iterator that extracts slices of 'To' by a Flatter from elements of 'From' and flattens as one iterable collection of 'To' elements.
+// Flatt instantiates Iterator that extracts slices of 'To' by a Flattener from elements of 'From' and flattens as one iterable collection of 'To' elements.
 func Flatt[FS ~[]From, From, To any](elements FS, by func(From) []To) *Flatten[From, To] {
 	var (
 		header       = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))

@@ -19,9 +19,9 @@ func FilterAndConvert[From, To, IT any](iterator IT, next func() (From, bool), f
 	return &ConvertFitIter[From, To, IT]{iterator: iterator, next: next, by: by, filter: filter}
 }
 
-// Flatt instantiates Iterator that extracts slices of 'To' by a Flatter from elements of 'From' and flattens as one iterable collection of 'To' elements.
-func Flatt[From, To, IT any](iterator IT, next func() (From, bool), by func(From) []To) Flatten[From, To, IT] {
-	return Flatten[From, To, IT]{iterator: iterator, next: next, flatt: by, elemSizeTo: notsafe.GetTypeSize[To]()}
+// Flatt instantiates Iterator that extracts slices of 'To' by a Flattener from elements of 'From' and flattens as one iterable collection of 'To' elements.
+func Flatt[From, To, IT any](iterator IT, next func() (From, bool), converter func(From) []To) Flatten[From, To, IT] {
+	return Flatten[From, To, IT]{iterator: iterator, next: next, flatt: converter, elemSizeTo: notsafe.GetTypeSize[To]()}
 }
 
 // FilterAndFlatt additionally filters 'From' elements.

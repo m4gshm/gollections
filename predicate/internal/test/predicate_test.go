@@ -25,22 +25,22 @@ func Test_lessOrEq(t *testing.T) {
 	assert.False(t, lessOrEqC("D"))
 }
 
-func Test_moreThan(t *testing.T) {
-	moreC := more.Than("C")
-	assert.False(t, moreC("A"))
-	assert.False(t, moreC("B"))
-	assert.False(t, moreC("C"))
-	assert.True(t, moreC("D"))
-	assert.True(t, moreC("E"))
+func Test_gtThan(t *testing.T) {
+	gtC := more.Than("C")
+	assert.False(t, gtC("A"))
+	assert.False(t, gtC("B"))
+	assert.False(t, gtC("C"))
+	assert.True(t, gtC("D"))
+	assert.True(t, gtC("E"))
 }
 
-func Test_moreOrEq(t *testing.T) {
-	moreOrEqC := more.OrEq("C")
-	assert.False(t, moreOrEqC("A"))
-	assert.False(t, moreOrEqC("B"))
-	assert.True(t, moreOrEqC("C"))
-	assert.True(t, moreOrEqC("D"))
-	assert.True(t, moreOrEqC("E"))
+func Test_gtOrEq(t *testing.T) {
+	gtOrEqC := more.OrEq("C")
+	assert.False(t, gtOrEqC("A"))
+	assert.False(t, gtOrEqC("B"))
+	assert.True(t, gtOrEqC("C"))
+	assert.True(t, gtOrEqC("D"))
+	assert.True(t, gtOrEqC("E"))
 }
 
 func Test_OneOf(t *testing.T) {
