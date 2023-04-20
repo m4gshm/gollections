@@ -49,8 +49,12 @@ var users = []User{
 func Test_GroupBySeveralKeysAndConvertMapValues(t *testing.T) {
 
 	//new
-	usersByRole := group.InMultiple(users, func(u User) []string { return convert.AndConvert(u.Roles(), Role.Name, strings.ToLower) })
-	namesByRole := map_.ConvertValues(usersByRole, func(u []User) []string { return slice.Convert(u, User.Name) })
+	usersByRole := group.InMultiple(users, func(u User) []string {
+		return convert.AndConvert(u.Roles(), Role.Name, strings.ToLower)
+	})
+	namesByRole := map_.ConvertValues(usersByRole, func(u []User) []string {
+		return slice.Convert(u, User.Name)
+	})
 
 	assert.Equal(t, namesByRole[""], []string{"Tom"})
 	assert.Equal(t, namesByRole["manager"], []string{"Bob", "Alice"})
@@ -82,7 +86,9 @@ func Test_GroupBySeveralKeysAndConvertMapValues(t *testing.T) {
 
 func Test_FindFirsManager(t *testing.T) {
 	//new
-	alice, ok := first.Of(users...).By(func(u User) bool { return set.New(slice.Convert(u.Roles(), Role.Name)).Contains("Manager") })
+	alice, ok := first.Of(users...).By(func(u User) bool { 
+		return set.New(slice.Convert(u.Roles(), Role.Name)).Contains("Manager") 
+	})
 
 	assert.True(t, ok)
 	assert.Equal(t, "Alice", alice.Name())
