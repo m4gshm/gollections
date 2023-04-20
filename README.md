@@ -95,8 +95,12 @@ var users = []User{
 }
 
 func Test_GroupBySeveralKeysAndConvertMapValues(t *testing.T) {
-    usersByRole := group.InMultiple(users, func(u User) []string { return sliceconv.AndConvert(u.Roles(), Role.Name, strings.ToLower) })
-    namesByRole := map_.ConvertValues(usersByRole, func(u []User) []string { return slice.Convert(u, User.Name) })
+    usersByRole := group.InMultiple(users, func(u User) []string {
+        return sliceconv.AndConvert(u.Roles(), Role.Name, strings.ToLower)
+    })
+    namesByRole := map_.ConvertValues(usersByRole, func(u []User) []string {
+        return slice.Convert(u, User.Name)
+    })
 
     assert.Equal(t, namesByRole[""], []string{"Tom"})
     assert.Equal(t, namesByRole["manager"], []string{"Bob", "Alice"})
@@ -104,7 +108,9 @@ func Test_GroupBySeveralKeysAndConvertMapValues(t *testing.T) {
 }
 
 func Test_FindFirsManager(t *testing.T) {
-    alice, _ := first.Of(users...).By(func(u User) bool { return set.New(slice.Convert(u.Roles(), Role.Name)).Contains("Manager") })
+    alice, _ := first.Of(users...).By(func(u User) bool {
+        return set.New(slice.Convert(u.Roles(), Role.Name)).Contains("Manager")
+    })
 
     assert.Equal(t, "Alice", alice.Name())
 }
@@ -117,25 +123,49 @@ func Test_AggregateFilteredRoles(t *testing.T) {
 }
 
 func Test_SortStructs(t *testing.T) {
-    var users = []User{{name: "Bob", age: 26}, {name: "Alice", age: 35}, {name: "Tom", age: 18}}
+    var users = []User{
+        {name: "Bob", age: 26},
+        {name: "Alice", age: 35},
+        {name: "Tom", age: 18},
+    }
     var (
         //sorted
         byName = sort.By(users, User.Name)
         byAge  = sort.By(users, User.Age)
     )
-    assert.Equal(t, []User{{name: "Alice", age: 35}, {name: "Bob", age: 26}, {name: "Tom", age: 18}}, byName)
-    assert.Equal(t, []User{{name: "Tom", age: 18}, {name: "Bob", age: 26}, {name: "Alice", age: 35}}, byAge)
+    assert.Equal(t, []User{
+        {name: "Alice", age: 35},
+        {name: "Bob", age: 26},
+        {name: "Tom", age: 18},
+    }, byName)
+    assert.Equal(t, []User{
+        {name: "Tom", age: 18},
+        {name: "Bob", age: 26},
+        {name: "Alice", age: 35},
+    }, byAge)
 }
 
 func Test_SortStructsByLess(t *testing.T) {
-    var users = []User{{name: "Bob", age: 26}, {name: "Alice", age: 35}, {name: "Tom", age: 18}}
+    var users = []User{
+        {name: "Bob", age: 26},
+        {name: "Alice", age: 35},
+        {name: "Tom", age: 18},
+    }
     var (
         //sorted
         byName       = sort.ByLess(users, func(u1, u2 User) bool { return u1.name < u2.name })
         byAgeReverse = sort.ByLess(users, func(u1, u2 User) bool { return u1.age > u2.age })
     )
-    assert.Equal(t, []User{{name: "Alice", age: 35}, {name: "Bob", age: 26}, {name: "Tom", age: 18}}, byName)
-    assert.Equal(t, []User{{name: "Alice", age: 35}, {name: "Bob", age: 26}, {name: "Tom", age: 18}}, byAgeReverse)
+    assert.Equal(t, []User{
+        {name: "Alice", age: 35},
+        {name: "Bob", age: 26},
+        {name: "Tom", age: 18},
+    }, byName)
+    assert.Equal(t, []User{
+        {name: "Alice", age: 35},
+        {name: "Bob", age: 26},
+        {name: "Tom", age: 18},
+    }, byAgeReverse)
 }
 
 func Test_SortInt(t *testing.T) {
@@ -202,8 +232,10 @@ func Test_ConvertFiltered(t *testing.T) {
 
 func Test_FilterConverted(t *testing.T) {
     var (
-        source   = []int{1, 3, 4, 5, 7, 8, 9, 11}
-        result   = sliceconv.AndFilter(source, strconv.Itoa, func(s string) bool { return len(s) == 2 })
+        source = []int{1, 3, 4, 5, 7, 8, 9, 11}
+        result = sliceconv.AndFilter(source, strconv.Itoa, func(s string) bool {
+            return len(s) == 2
+        })
         expected = []string{"11"}
     )
     assert.Equal(t, expected, result)
@@ -212,11 +244,13 @@ func Test_FilterConverted(t *testing.T) {
 func Test_ConvertNilSafe(t *testing.T) {
     type entity struct{ val *string }
     var (
-        first    = "first"
-        third    = "third"
-        fifth    = "fifth"
-        source   = []*entity{{&first}, {}, {&third}, nil, {&fifth}}
-        result   = sliceconv.NilSafe(source, func(e *entity) *string { return e.val })
+        first  = "first"
+        third  = "third"
+        fifth  = "fifth"
+        source = []*entity{{&first}, {}, {&third}, nil, {&fifth}}
+        result = sliceconv.NilSafe(source, func(e *entity) *string {
+            return e.val
+        })
         expected = []*string{&first, &third, &fifth}
     )
     assert.Equal(t, expected, result)
@@ -224,8 +258,10 @@ func Test_ConvertNilSafe(t *testing.T) {
 
 func Test_ConvertFilteredWithIndexInPlace(t *testing.T) {
     var (
-        source   = slice.Of(1, 3, 4, 5, 7, 8, 9, 11)
-        result   = sliceconv.CheckIndexed(source, func(index int, elem int) (string, bool) { return strconv.Itoa(index + elem), even(elem) })
+        source = slice.Of(1, 3, 4, 5, 7, 8, 9, 11)
+        result = sliceconv.CheckIndexed(source, func(index int, elem int) (string, bool) {
+            return strconv.Itoa(index + elem), even(elem)
+        })
         expected = []string{"6", "13"}
     )
     assert.Equal(t, expected, result)
@@ -362,8 +398,11 @@ func Test_OfLoop(t *testing.T) {
 func Test_Generate(t *testing.T) {
     var (
         counter   = 0
-        result, _ = slice.Generate(func() (int, bool, error) { counter++; return counter, counter < 4, nil })
-        expected  = slice.Of(1, 2, 3)
+        result, _ = slice.Generate(func() (int, bool, error) {
+            counter++
+            return counter, counter < 4, nil
+        })
+        expected = slice.Of(1, 2, 3)
     )
     assert.Equal(t, expected, result)
 }
@@ -432,11 +471,15 @@ func Test_Keys(t *testing.T) {
 
 func Test_Values(t *testing.T) {
     values := map_.Values(entities)
-    assert.Equal(t, slice.Of(&first, &second, &third), sort.By(values, func(e *entity) string { return e.val }))
+    assert.Equal(t, slice.Of(&first, &second, &third), sort.By(values, func(e *entity) string {
+        return e.val
+    }))
 }
 
 func Test_ConvertValues(t *testing.T) {
-    var strValues map[int]string = map_.ConvertValues(entities, func(e *entity) string { return e.val })
+    var strValues map[int]string = map_.ConvertValues(entities, func(e *entity) string {
+        return e.val
+    })
 
     assert.Equal(t, "1_first", strValues[1])
     assert.Equal(t, "2_second", strValues[2])
@@ -458,10 +501,14 @@ func (r *rows[T]) next() (T, error) { e := r.in[r.cursor]; r.cursor++; return e,
 
 func Test_OfLoop(t *testing.T) {
     stream := &rows[int]{slice.Of(1, 2, 3), 0}
-    result, _ := map_.OfLoop(stream, (*rows[int]).hasNext, func(r *rows[int]) (bool, int, error) {
-        n, err := r.next()
-        return n%2 == 0, n, err
-    })
+    result, _ := map_.OfLoop(
+        stream,
+        (*rows[int]).hasNext,
+        func(r *rows[int]) (bool, int, error) {
+            n, err := r.next()
+            return n%2 == 0, n, err
+        },
+    )
 
     assert.Equal(t, 2, result[true])
     assert.Equal(t, 1, result[false])
@@ -469,7 +516,10 @@ func Test_OfLoop(t *testing.T) {
 
 func Test_Generate(t *testing.T) {
     counter := 0
-    result, _ := map_.Generate(func() (bool, int, bool, error) { counter++; return counter%2 == 0, counter, counter < 4, nil })
+    result, _ := map_.Generate(func() (bool, int, bool, error) {
+        counter++
+        return counter%2 == 0, counter, counter < 4, nil
+    })
 
     assert.Equal(t, 2, result[true])
     assert.Equal(t, 1, result[false])
@@ -477,10 +527,14 @@ func Test_Generate(t *testing.T) {
 
 func Test_GroupOfLoop(t *testing.T) {
     stream := &rows[int]{slice.Of(1, 2, 3), 0}
-    result, _ := group.OfLoop(stream, (*rows[int]).hasNext, func(r *rows[int]) (bool, int, error) {
-        n, err := r.next()
-        return n%2 == 0, n, err
-    })
+    result, _ := group.OfLoop(
+        stream,
+        (*rows[int]).hasNext,
+        func(r *rows[int]) (bool, int, error) {
+            n, err := r.next()
+            return n%2 == 0, n, err
+        },
+    )
 
     assert.Equal(t, slice.Of(2), result[true])
     assert.Equal(t, slice.Of(1, 3), result[false])
@@ -554,7 +608,9 @@ func _() {
     )
     var (
         _ *ordered.Map[int, string] = omap.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3"))
-        _ c.Map[int, string]        = omap.New(map[int]string{1: "2", 2: "2", 3: "3"}) //source map order is unpredictable
+        _ c.Map[int, string]        = omap.New(map[int]string{
+            1: "2", 2: "2", 3: "3",
+        })
     )
 }
 ```

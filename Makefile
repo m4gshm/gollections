@@ -1,6 +1,6 @@
 
 .PHONY: all
-all: build test bench readme
+all: build test readme bench
 
 .PHONY: test
 test:
