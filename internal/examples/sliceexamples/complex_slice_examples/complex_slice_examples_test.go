@@ -86,8 +86,8 @@ func Test_GroupBySeveralKeysAndConvertMapValues(t *testing.T) {
 
 func Test_FindFirsManager(t *testing.T) {
 	//new
-	alice, ok := first.Of(users...).By(func(u User) bool { 
-		return set.New(slice.Convert(u.Roles(), Role.Name)).Contains("Manager") 
+	alice, ok := first.Of(users...).By(func(u User) bool {
+		return set.New(slice.Convert(u.Roles(), Role.Name)).Contains("Manager")
 	})
 
 	assert.True(t, ok)
