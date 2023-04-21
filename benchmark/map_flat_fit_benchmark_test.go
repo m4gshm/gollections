@@ -143,7 +143,7 @@ func Benchmark_Map_Iterator_Impl(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		it := iterimpl.New(values)
-		s = loop.ToSlice((iterimpl.Convert(it, it.Next, op)).Next)
+		s = loop.ToSlice(iterimpl.Convert(it, it.Next, op).Next)
 	}
 	_ = s
 	b.StopTimer()
@@ -180,7 +180,7 @@ func Benchmark_Map_Vector_Iterator_Impl(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		h := (items.Head())
-		s = loop.ToSlice((iterimpl.Convert(h, h.Next, op)).Next)
+		s = loop.ToSlice(iterimpl.Convert(h, h.Next, op).Next)
 	}
 	_ = s
 	b.StopTimer()
@@ -270,7 +270,7 @@ func Benchmark_MapAndFilter_Slice_Impl(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		ft := sliceitimpl.Filter(items, even)
-		s = loop.ToSlice((iterimpl.Convert(ft, ft.Next, convert.And(toString, addTail))).Next)
+		s = loop.ToSlice(iterimpl.Convert(ft, ft.Next, convert.And(toString, addTail)).Next)
 	}
 	_ = s
 
@@ -332,7 +332,7 @@ func Benchmark_FilterAndConvert_Iterable_Impl(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		it := iterimpl.NewHead(items)
-		s = loop.ToSlice((iterimpl.FilterAndConvert(&it, it.Next, even, convert.And(toString, addTail))).Next)
+		s = loop.ToSlice(iterimpl.FilterAndConvert(&it, it.Next, even, convert.And(toString, addTail)).Next)
 	}
 	_ = s
 
@@ -663,7 +663,7 @@ func Benchmark_MapFlattStructure_SliceFit_Impl(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		att := sliceitimpl.FilterAndFlatt(items, check.NotNil[Participant], (*Participant).GetAttributes)
-		_ = loop.ToSlice((iterimpl.FilterAndConvert(att, att.Next, check.NotNil[Attributes], (*Attributes).GetName)).Next)
+		_ = loop.ToSlice(iterimpl.FilterAndConvert(att, att.Next, check.NotNil[Attributes], (*Attributes).GetName).Next)
 	}
 	b.StopTimer()
 }
