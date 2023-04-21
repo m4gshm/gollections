@@ -268,9 +268,19 @@ func (s *Set[T]) Convert(converter func(T) T) c.Pipe[T] {
 }
 
 // Reduce reduces the elements into an one using the 'merge' function
-func (s *Set[T]) Reduce(by func(T, T) T) T {
-	h := s.Head()
-	return loop.Reduce(h.Next, by)
+func (s *Set[T]) Reduce(merge func(T, T) T) (t T) {
+	if s != nil {
+		t = slice.Reduce(s.order, merge)
+	}
+	return t
+}
+
+// HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful
+func (s *Set[K]) HasAny(predicate func(K) bool) bool {
+	if s != nil {
+		return slice.HasAny(s.order, predicate)
+	}
+	return false
 }
 
 // Sort sorts the elements

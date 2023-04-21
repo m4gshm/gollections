@@ -177,7 +177,8 @@ func Test_Set_DoubleConvert(t *testing.T) {
 		stringsPipe        = set.Convert(ints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 })
 		prefixedStrinsPipe = iterable.Convert(stringsPipe, func(s string) string { return "_" + s })
 	)
-	assert.Equal(t, slice.Of("_0", "_1", "_3", "_5", "_6", "_8"), sort.Of(prefixedStrinsPipe.Slice()))
+	s := prefixedStrinsPipe.Slice()
+	assert.Equal(t, slice.Of("_0", "_1", "_3", "_5", "_6", "_8"), sort.Of(s))
 
 	//second call do nothing
 	var no []string

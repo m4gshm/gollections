@@ -7,6 +7,7 @@ import (
 	"github.com/m4gshm/gollections/first"
 	"github.com/m4gshm/gollections/immutable/set"
 	"github.com/m4gshm/gollections/map_"
+	"github.com/m4gshm/gollections/predicate/eq"
 	"github.com/m4gshm/gollections/predicate/not"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/convert"
@@ -86,8 +87,8 @@ func Test_GroupBySeveralKeysAndConvertMapValues(t *testing.T) {
 
 func Test_FindFirsManager(t *testing.T) {
 	//new
-	alice, ok := first.Of(users...).By(func(u User) bool {
-		return set.New(slice.Convert(u.Roles(), Role.Name)).Contains("Manager")
+	alice, ok := first.Of(users...).By(func(user User) bool {
+		return set.Convert(set.New(user.Roles()), Role.Name).HasAny(eq.To("Manager"))
 	})
 
 	assert.True(t, ok)

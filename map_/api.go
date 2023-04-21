@@ -300,3 +300,27 @@ func ToStringf[M ~map[K]V, K comparable, V any](elements M, kvFormat, delim stri
 	str.WriteString("]")
 	return str.String()
 }
+
+// Reduce reduces the key/value pairs by the 'next' function into an one pair using the 'merge' function
+func Reduce[M ~map[K]V, K comparable, V any](elements M, merge func(K, V, K, V) (K, V)) (rk K, rv V) {
+	first := true
+	for k, v := range elements {
+		if first {
+			rk, rv = k, v
+			first = false
+		} else {
+			rk, rv = merge(rk, rv, k, v)
+		}
+	}
+	return rk, rv
+}
+
+// HasAny finds the first key/value pair that satisfies the 'predicate' function condition and returns true if successful
+func HasAny[M ~map[K]V, K comparable, V any](elements M, predicate func(K, V) bool) bool {
+	for k, v := range elements {
+		if predicate(k, v) {
+			return true
+		}
+	}
+	return false
+}

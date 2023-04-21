@@ -8,9 +8,9 @@ import (
 )
 
 // Convert instantiates Iterator that converts elements with a converter and returns them
-func Convert[From, To any, IT c.Iterable[From]](elements IT, by func(From) To) c.Pipe[To] {
+func Convert[From, To any, IT c.Iterable[From]](elements IT, converter func(From) To) c.Pipe[To] {
 	b := elements.Begin()
-	return iter.NewPipe[To](iter.Convert(b, b.Next, by))
+	return iter.NewPipe[To](iter.Convert(b, b.Next, converter))
 }
 
 // FilterAndConvert additionally filters 'From' elements
@@ -36,7 +36,8 @@ func FilterAndFlatt[From, To any, IT c.Iterable[From]](elements IT, filter func(
 // Filter instantiates Iterator that checks elements by filters and returns successful ones
 func Filter[T any, IT c.Iterable[T]](elements IT, filter func(T) bool) c.Pipe[T] {
 	b := elements.Begin()
-	return iter.NewPipe[T](iter.Filter(b, b.Next, filter))
+	f := iter.Filter(b, b.Next, filter)
+	return iter.NewPipe[T](f)
 }
 
 // NotNil instantiates Iterator that filters nullable elements
@@ -46,5 +47,6 @@ func NotNil[T any, IT c.Iterable[*T]](elements IT) c.Pipe[*T] {
 
 // Group groups elements to slices by a converter and returns a map
 func Group[T any, K comparable, C c.Iterable[T]](elements C, by func(T) K) c.MapPipe[K, T, map[K][]T] {
-	return iter.Group(elements.Begin(), by)
+	g := iter.Group(elements.Begin(), by)
+	return &g
 }

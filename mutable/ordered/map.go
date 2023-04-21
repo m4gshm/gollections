@@ -8,7 +8,6 @@ import (
 	"github.com/m4gshm/gollections/immutable/ordered"
 	"github.com/m4gshm/gollections/iter/impl/iter"
 	"github.com/m4gshm/gollections/kviter"
-	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/map_/convert"
 	"github.com/m4gshm/gollections/map_/filter"
@@ -48,12 +47,12 @@ type Map[K comparable, V any] struct {
 }
 
 var (
-	_ c.Settable[int, any]                                    = (*Map[int, any])(nil)
-	_ c.SettableNew[int, any]                                 = (*Map[int, any])(nil)
-	_ c.SettableMap[int, any]                                 = (*Map[int, any])(nil)
-	_ c.ImmutableMapConvert[int, any, *ordered.Map[int, any]] = (*Map[int, any])(nil)
-	_ c.Map[int, any]                                         = (*Map[int, any])(nil)
-	_ fmt.Stringer                                            = (*Map[int, any])(nil)
+	_ c.Settable[int, any]                                   = (*Map[int, any])(nil)
+	_ c.SettableNew[int, any]                                = (*Map[int, any])(nil)
+	_ c.SettableMap[int, any]                                = (*Map[int, any])(nil)
+	_ c.ImmutableMapConvert[int, any, ordered.Map[int, any]] = (*Map[int, any])(nil)
+	_ c.Map[int, any]                                        = (*Map[int, any])(nil)
+	_ fmt.Stringer                                           = (*Map[int, any])(nil)
 )
 
 // Begin creates iterator
@@ -74,7 +73,7 @@ func (m *Map[K, V]) Head() iter.OrderedEmbedMapKVIter[K, V] {
 		order = m.order
 		ksize = m.ksize
 	}
-	return *iter.NewOrderedEmbedMapKV(elements, iter.NewHeadS(order, ksize))
+	return iter.NewOrderedEmbedMapKV(elements, iter.NewHeadS(order, ksize))
 }
 
 // Tail creates an iterator pointing to the end of the collection
@@ -89,7 +88,7 @@ func (m *Map[K, V]) Tail() iter.OrderedEmbedMapKVIter[K, V] {
 		order = m.order
 		ksize = m.ksize
 	}
-	return *iter.NewOrderedEmbedMapKV(elements, iter.NewTailS(order, ksize))
+	return iter.NewOrderedEmbedMapKV(elements, iter.NewTailS(order, ksize))
 }
 
 // First returns the first key/value pair of the map, an iterator to iterate over the remaining pair, and true\false marker of availability next pairs.
@@ -233,7 +232,7 @@ func (m *Map[K, V]) Keys() c.Collection[K] {
 }
 
 // K resutrns keys collection impl
-func (m *Map[K, V]) K() *ordered.MapKeys[K] {
+func (m *Map[K, V]) K() ordered.MapKeys[K] {
 	var order []K
 	if m != nil {
 		order = m.order
@@ -247,7 +246,7 @@ func (m *Map[K, V]) Values() c.Collection[V] {
 }
 
 // V resutrns values collection impl
-func (m *Map[K, V]) V() *ordered.MapValues[K, V] {
+func (m *Map[K, V]) V() ordered.MapValues[K, V] {
 	var (
 		order    []K
 		elements map[K]V
@@ -307,13 +306,20 @@ func (m *Map[K, V]) Convert(converter func(K, V) (K, V)) c.MapPipe[K, V, map[K]V
 }
 
 // Reduce reduces the key/value pairs of the map into an one pair using the 'merge' function
-func (m *Map[K, V]) Reduce(by c.Quaternary[K, V]) (K, V) {
-	h := m.Head()
-	return loop.ReduceKV(h.Next, by)
+func (m *Map[K, V]) Reduce(merge func(K, V, K, V) (K, V)) (k K, v V) {
+	if m != nil {
+		k, v = map_.Reduce(m.elements, merge)
+	}
+	return k, v
+}
+
+// HasAny finds the first key/value pair that satisfies the 'predicate' function condition and returns true if successful
+func (m *Map[K, V]) HasAny(predicate func(K, V) bool) bool {
+	return map_.HasAny(m.elements, predicate)
 }
 
 // Immutable converts to an immutable map instance
-func (m *Map[K, V]) Immutable() *ordered.Map[K, V] {
+func (m *Map[K, V]) Immutable() ordered.Map[K, V] {
 	var e map[K]V
 	var o []K
 	if m != nil {

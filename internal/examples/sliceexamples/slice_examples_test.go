@@ -9,7 +9,6 @@ import (
 
 	"github.com/m4gshm/gollections/as"
 	"github.com/m4gshm/gollections/first"
-	"github.com/m4gshm/gollections/immutable/set"
 	"github.com/m4gshm/gollections/last"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/op"
@@ -21,7 +20,7 @@ import (
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/clone"
 	"github.com/m4gshm/gollections/slice/clone/sort"
-	sliceconv "github.com/m4gshm/gollections/slice/convert"
+	sConvert "github.com/m4gshm/gollections/slice/convert"
 	"github.com/m4gshm/gollections/slice/filter"
 	"github.com/m4gshm/gollections/slice/group"
 	"github.com/m4gshm/gollections/slice/range_"
@@ -63,7 +62,7 @@ var users = []User{
 
 func Test_GroupBySeveralKeysAndConvertMapValues(t *testing.T) {
 	usersByRole := group.InMultiple(users, func(u User) []string {
-		return sliceconv.AndConvert(u.Roles(), Role.Name, strings.ToLower)
+		return sConvert.AndConvert(u.Roles(), Role.Name, strings.ToLower)
 	})
 	namesByRole := map_.ConvertValues(usersByRole, func(u []User) []string {
 		return slice.Convert(u, User.Name)
@@ -75,8 +74,9 @@ func Test_GroupBySeveralKeysAndConvertMapValues(t *testing.T) {
 }
 
 func Test_FindFirsManager(t *testing.T) {
-	alice, _ := first.Of(users...).By(func(u User) bool {
-		return set.New(slice.Convert(u.Roles(), Role.Name)).Contains("Manager")
+	alice, _ := first.Of(users...).By(func(user User) bool {
+		roles := slice.Convert(user.Roles(), Role.Name)
+		return slice.Contains(roles, "Manager")
 	})
 
 	assert.Equal(t, "Alice", alice.Name())
@@ -84,7 +84,7 @@ func Test_FindFirsManager(t *testing.T) {
 
 func Test_AggregateFilteredRoles(t *testing.T) {
 	roles := slice.Flatt(users, User.Roles)
-	roleNamesExceptManager := sliceconv.AndFilter(roles, Role.Name, not.Eq("Manager"))
+	roleNamesExceptManager := sConvert.AndFilter(roles, Role.Name, not.Eq("Manager"))
 
 	assert.Equal(t, slice.Of("Admin", "manager"), roleNamesExceptManager)
 }
@@ -200,7 +200,7 @@ func Test_ConvertFiltered(t *testing.T) {
 func Test_FilterConverted(t *testing.T) {
 	var (
 		source = []int{1, 3, 4, 5, 7, 8, 9, 11}
-		result = sliceconv.AndFilter(source, strconv.Itoa, func(s string) bool {
+		result = sConvert.AndFilter(source, strconv.Itoa, func(s string) bool {
 			return len(s) == 2
 		})
 		expected = []string{"11"}
@@ -215,7 +215,7 @@ func Test_ConvertNilSafe(t *testing.T) {
 		third  = "third"
 		fifth  = "fifth"
 		source = []*entity{{&first}, {}, {&third}, nil, {&fifth}}
-		result = sliceconv.NilSafe(source, func(e *entity) *string {
+		result = sConvert.NilSafe(source, func(e *entity) *string {
 			return e.val
 		})
 		expected = []*string{&first, &third, &fifth}
@@ -226,7 +226,7 @@ func Test_ConvertNilSafe(t *testing.T) {
 func Test_ConvertFilteredWithIndexInPlace(t *testing.T) {
 	var (
 		source = slice.Of(1, 3, 4, 5, 7, 8, 9, 11)
-		result = sliceconv.CheckIndexed(source, func(index int, elem int) (string, bool) {
+		result = sConvert.CheckIndexed(source, func(index int, elem int) (string, bool) {
 			return strconv.Itoa(index + elem), even(elem)
 		})
 		expected = []string{"6", "13"}

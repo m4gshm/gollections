@@ -27,9 +27,9 @@ func NewCap[T comparable](capacity int) *ordered.Set[T] {
 }
 
 // Convert returns a pipe that applies the 'converter' function to the collection elements
-func Convert[From, To comparable](s *ordered.Set[From], by func(From) To) c.Pipe[To] {
-	h := s.Head()
-	return iter.NewPipe[To](iter.Convert(h, h.Next, by))
+func Convert[From, To comparable](collection *ordered.Set[From], converter func(From) To) c.Pipe[To] {
+	h := collection.Head()
+	return iter.NewPipe[To](iter.Convert(h, h.Next, converter))
 }
 
 // Flatt instantiates Iterator that converts the collection elements into slices and then flattens them to one level

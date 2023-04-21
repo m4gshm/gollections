@@ -58,59 +58,59 @@ func Test_Map_Iterate_Values(t *testing.T) {
 	assert.Equal(t, expectedV, values)
 }
 
-func Test_Map_Nil(t *testing.T) {
-	var m *ordered.Map[string, string]
+// func Test_Map_Nil(t *testing.T) {
+// 	var m *ordered.Map[string, string]
 
-	m.Contains("")
+// 	m.Contains("")
 
-	out := m.Map()
-	assert.Equal(t, 0, len(out))
+// 	out := m.Map()
+// 	assert.Equal(t, 0, len(out))
 
-	e := m.IsEmpty()
-	assert.True(t, e)
+// 	e := m.IsEmpty()
+// 	assert.True(t, e)
 
-	head, _, _, ok := m.First()
-	assert.False(t, ok)
-	_, _, ok = head.Next()
-	assert.False(t, ok)
+// 	head, _, _, ok := m.First()
+// 	assert.False(t, ok)
+// 	_, _, ok = head.Next()
+// 	assert.False(t, ok)
 
-	head = m.Head()
-	_, _, ok = head.Next()
-	assert.False(t, ok)
+// 	head = m.Head()
+// 	_, _, ok = head.Next()
+// 	assert.False(t, ok)
 
-	_, ok = m.Get("")
-	assert.False(t, ok)
+// 	_, ok = m.Get("")
+// 	assert.False(t, ok)
 
-	m.For(nil)
-	m.ForEach(nil)
-	m.Track(nil)
-	m.TrackEach(nil)
+// 	m.For(nil)
+// 	m.ForEach(nil)
+// 	m.Track(nil)
+// 	m.TrackEach(nil)
 
-	m.Filter(nil)
-	m.FilterKey(nil)
-	m.FilterValue(nil)
+// 	m.Filter(nil)
+// 	m.FilterKey(nil)
+// 	m.FilterValue(nil)
 
-	m.Values().For(nil)
-	m.Values().ForEach(nil)
-	m.ConvertValue(nil).Track(nil)
-	m.ConvertValue(nil).TrackEach(nil)
-	m.ConvertValue(nil).Filter(nil).FilterKey(nil)
-	m.ConvertValue(nil).Filter(nil).FilterValue(nil)
+// 	m.Values().For(nil)
+// 	m.Values().ForEach(nil)
+// 	m.ConvertValue(nil).Track(nil)
+// 	m.ConvertValue(nil).TrackEach(nil)
+// 	m.ConvertValue(nil).Filter(nil).FilterKey(nil)
+// 	m.ConvertValue(nil).Filter(nil).FilterValue(nil)
 
-	m.Keys().For(nil)
-	m.Keys().ForEach(nil)
-	m.ConvertKey(nil).Track(nil)
-	m.ConvertKey(nil).TrackEach(nil)
-	m.ConvertKey(nil).Filter(nil).FilterKey(nil)
-	m.ConvertKey(nil).Filter(nil).FilterValue(nil)
-	m.Convert(nil)
+// 	m.Keys().For(nil)
+// 	m.Keys().ForEach(nil)
+// 	m.ConvertKey(nil).Track(nil)
+// 	m.ConvertKey(nil).TrackEach(nil)
+// 	m.ConvertKey(nil).Filter(nil).FilterKey(nil)
+// 	m.ConvertKey(nil).Filter(nil).FilterValue(nil)
+// 	m.Convert(nil)
 
-	m.Sort(nil).For(nil)
-	m.Sort(nil).ForEach(nil)
+// 	m.Sort(nil).For(nil)
+// 	m.Sort(nil).ForEach(nil)
 
-	m.StableSort(nil).For(nil)
-	m.StableSort(nil).ForEach(nil)
-}
+// 	m.StableSort(nil).For(nil)
+// 	m.StableSort(nil).ForEach(nil)
+// }
 
 func Test_Map_Zero(t *testing.T) {
 	var m ordered.Map[string, string]

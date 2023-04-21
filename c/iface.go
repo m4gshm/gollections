@@ -51,6 +51,9 @@ type Collection[T any] interface {
 	ForEachLoop[T]
 	SliceFactory[T]
 	Transformable[T]
+
+	Reduce(merger func(T, T) T) T
+	HasAny(predicate func(T) bool) bool
 }
 
 // KVCollection is the base interface of associative collections
@@ -60,6 +63,9 @@ type KVCollection[K comparable, V any, M map[K]V | map[K][]V] interface {
 	KVIterable[K, V]
 	MapTransformable[K, V, M]
 	MapFactory[K, V, M]
+
+	Reduce(merger func(K, V, K, V) (K, V)) (K, V)
+	HasAny(predicate func(K, V) bool) bool
 }
 
 // SliceFactory collects the elements of the collection into a slice
@@ -160,29 +166,27 @@ type Checkable[T any] interface {
 // Transformable provides limited kit of container transformation methods.
 // The full kit of transformer functions are in the package 'c'
 type Transformable[T any] interface {
-	Filter(func(T) bool) Pipe[T]
-	Convert(func(T) T) Pipe[T]
+	Filter(predicate func(T) bool) Pipe[T]
+	Convert(converter func(T) T) Pipe[T]
 }
 
 // Pipe extends Transformable by finalize methods like ForEach, Collect or Reduce.
 type Pipe[T any] interface {
 	Iterator[T]
 	Collection[T]
-
-	Reduce(func(T, T) T) T
 }
 
 // MapTransformable provides limited kit of map transformation methods.
 // The full kit of transformer functions are in the package 'c/map_'
 type MapTransformable[K comparable, V any, Map map[K]V | map[K][]V] interface {
-	Filter(func(K, V) bool) MapPipe[K, V, Map]
-	Convert(func(K, V) (K, V)) MapPipe[K, V, Map]
+	Filter(predicate func(K, V) bool) MapPipe[K, V, Map]
+	Convert(converter func(K, V) (K, V)) MapPipe[K, V, Map]
 
-	FilterKey(func(K) bool) MapPipe[K, V, Map]
-	ConvertKey(func(K) K) MapPipe[K, V, Map]
+	FilterKey(predicate func(K) bool) MapPipe[K, V, Map]
+	ConvertKey(converter func(K) K) MapPipe[K, V, Map]
 
-	FilterValue(func(V) bool) MapPipe[K, V, Map]
-	ConvertValue(func(V) V) MapPipe[K, V, Map]
+	FilterValue(predicate func(V) bool) MapPipe[K, V, Map]
+	ConvertValue(converter func(V) V) MapPipe[K, V, Map]
 }
 
 // MapPipe extends MapTransformable by finalize methods like ForEach, Collect or Reduce.

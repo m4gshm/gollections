@@ -140,3 +140,27 @@ func Test_StringRepresentation(t *testing.T) {
 	expected := "[4:4 3:3 2:2 1:1]"
 	assert.Equal(t, expected, actual)
 }
+
+func Test_Reduce(t *testing.T) {
+	elements := map[int]string{4: "4", 2: "2", 1: "1", 3: "3"}
+	k, _ := map_.Reduce(elements, func(k int, v string, k2 int, v2 string) (int, string) {
+		return k + k2, ""
+	})
+
+	assert.Equal(t, 1+2+3+4, k)
+}
+
+func Test_MatchAny(t *testing.T) {
+	elements := map[int]string{4: "4", 2: "2", 1: "1", 3: "3"}
+	ok := map_.HasAny(elements, func(k int, v string) bool {
+		return k == 2 || v == "4"
+	})
+
+	assert.True(t, ok)
+
+	noOk := map_.HasAny(elements, func(k int, v string) bool {
+		return k > 5
+	})
+
+	assert.False(t, noOk)
+}

@@ -7,28 +7,33 @@ import (
 )
 
 // Convert instantiates Iterator that converts elements with a converter and returns them
-func Convert[FS ~[]From, From, To any](elements FS, by func(From) To) c.Iterator[To] {
-	return slice.Convert(elements, by)
+func Convert[FS ~[]From, From, To any](elements FS, by func(From) To) *slice.Converter[From, To] {
+	conv := slice.Convert(elements, by)
+	return &conv
 }
 
 // FilterAndConvert additionally filters 'From' elements.
-func FilterAndConvert[FS ~[]From, From, To any](elements FS, filter func(From) bool, by func(From) To) c.Iterator[To] {
-	return slice.FilterAndConvert(elements, filter, by)
+func FilterAndConvert[FS ~[]From, From, To any](elements FS, filter func(From) bool, by func(From) To) *slice.ConvertFit[From, To] {
+	f := slice.FilterAndConvert(elements, filter, by)
+	return &f
 }
 
 // Flatt instantiates Iterator that extracts slices of 'To' by a Flattener from elements of 'From' and flattens as one iterable collection of 'To' elements.
 func Flatt[FS ~[]From, From, To any](elements FS, by func(From) []To) c.Iterator[To] {
-	return slice.Flatt(elements, by)
+	f := slice.Flatt(elements, by)
+	return &f
 }
 
 // FilterAndFlatt additionally filters 'From' elements.
 func FilterAndFlatt[FS ~[]From, From, To any](elements FS, filter func(From) bool, flatt func(From) []To) *slice.FlattenFit[From, To] {
-	return slice.FilterAndFlatt(elements, filter, flatt)
+	f := slice.FilterAndFlatt(elements, filter, flatt)
+	return &f
 }
 
 // Filter instantiates Iterator that checks elements by filters and returns successful ones.
-func Filter[TS ~[]T, T any](elements TS, filter func(T) bool) c.Iterator[T] {
-	return slice.Filter(elements, filter)
+func Filter[TS ~[]T, T any](elements TS, filter func(T) bool) *slice.Fit[T] {
+	f := slice.Filter(elements, filter)
+	return &f
 }
 
 // NotNil instantiates Iterator that filters nullable elements.

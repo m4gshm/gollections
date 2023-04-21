@@ -56,7 +56,8 @@ func FilterAndFlatt[From, To any, IT c.Iterator[From]](elements IT, filter func(
 
 // Filter instantiates Iterator that checks elements by a filter and returns successful ones
 func Filter[T any, IT c.Iterator[T]](elements IT, filter func(T) bool) c.Iterator[T] {
-	return iter.Filter(elements, elements.Next, filter)
+	f := iter.Filter(elements, elements.Next, filter)
+	return &f
 }
 
 // NotNil instantiates Iterator that filters nullable elements

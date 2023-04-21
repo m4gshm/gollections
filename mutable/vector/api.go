@@ -35,14 +35,14 @@ func Sort[T any, F constraints.Ordered](v *mutable.Vector[T], by func(T) F) *mut
 }
 
 // Convert returns a pipe that applies the 'converter' function to the collection elements
-func Convert[From, To any](s *mutable.Vector[From], by func(From) To) c.Pipe[To] {
-	h := s.Head()
-	return iter.NewPipe[To](iter.Convert(h, h.Next, by))
+func Convert[From, To any](collection *mutable.Vector[From], converter func(From) To) c.Pipe[To] {
+	h := collection.Head()
+	return iter.NewPipe[To](iter.Convert(h, h.Next, converter))
 }
 
 // Flatt instantiates Iterator that converts the collection elements into slices and then flattens them to one level
-func Flatt[From, To any](v *mutable.Vector[From], by func(From) []To) c.Pipe[To] {
-	h := v.Head()
+func Flatt[From, To any](collection *mutable.Vector[From], by func(From) []To) c.Pipe[To] {
+	h := collection.Head()
 	f := iter.Flatt(h, h.Next, by)
 	return iter.NewPipe[To](&f)
 }

@@ -7,7 +7,6 @@ import (
 	"github.com/m4gshm/gollections/immutable"
 	"github.com/m4gshm/gollections/iter/impl/iter"
 	"github.com/m4gshm/gollections/kviter"
-	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/map_/convert"
 	"github.com/m4gshm/gollections/map_/filter"
@@ -42,14 +41,14 @@ func WrapMap[K comparable, V any](elements map[K]V) *Map[K, V] {
 type Map[K comparable, V any] map[K]V
 
 var (
-	_ c.Deleteable[int]                                         = (*Map[int, any])(nil)
-	_ c.Removable[int, any]                                     = (*Map[int, any])(nil)
-	_ c.Settable[int, any]                                      = (*Map[int, any])(nil)
-	_ c.SettableNew[int, any]                                   = (*Map[int, any])(nil)
-	_ c.SettableMap[int, any]                                   = (*Map[int, any])(nil)
-	_ c.ImmutableMapConvert[int, any, *immutable.Map[int, any]] = (*Map[int, any])(nil)
-	_ c.Map[int, any]                                           = (*Map[int, any])(nil)
-	_ fmt.Stringer                                              = (*Map[int, any])(nil)
+	_ c.Deleteable[int]                                        = (*Map[int, any])(nil)
+	_ c.Removable[int, any]                                    = (*Map[int, any])(nil)
+	_ c.Settable[int, any]                                     = (*Map[int, any])(nil)
+	_ c.SettableNew[int, any]                                  = (*Map[int, any])(nil)
+	_ c.SettableMap[int, any]                                  = (*Map[int, any])(nil)
+	_ c.ImmutableMapConvert[int, any, immutable.Map[int, any]] = (*Map[int, any])(nil)
+	_ c.Map[int, any]                                          = (*Map[int, any])(nil)
+	_ fmt.Stringer                                             = (*Map[int, any])(nil)
 )
 
 // Begin creates iterator
@@ -64,7 +63,7 @@ func (m *Map[K, V]) Head() iter.EmbedMapKVIter[K, V] {
 	if m != nil {
 		out = *m
 	}
-	return *iter.NewEmbedMapKV(out)
+	return iter.NewEmbedMapKV(out)
 }
 
 // First returns the first key/value pair of the map, an iterator to iterate over the remaining pair, and true\false marker of availability next pairs.
@@ -75,7 +74,7 @@ func (m *Map[K, V]) First() (iter.EmbedMapKVIter[K, V], K, V, bool) {
 		out = *m
 	}
 	var (
-		iterator           = *iter.NewEmbedMapKV(out)
+		iterator           = iter.NewEmbedMapKV(out)
 		firstK, firstV, ok = iterator.Next()
 	)
 	return iterator, firstK, firstV, ok
@@ -204,7 +203,7 @@ func (m *Map[K, V]) Keys() c.Collection[K] {
 }
 
 // K resutrns keys collection impl
-func (m *Map[K, V]) K() *immutable.MapKeys[K, V] {
+func (m *Map[K, V]) K() immutable.MapKeys[K, V] {
 	var elements map[K]V
 	if m != nil {
 		elements = *m
@@ -218,7 +217,7 @@ func (m *Map[K, V]) Values() c.Collection[V] {
 }
 
 // V resutrns values collection impl
-func (m *Map[K, V]) V() *immutable.MapValues[K, V] {
+func (m *Map[K, V]) V() immutable.MapValues[K, V] {
 	var out map[K]V
 	if m != nil {
 		out = *m
@@ -272,13 +271,23 @@ func (m *Map[K, V]) Convert(converter func(K, V) (K, V)) c.MapPipe[K, V, map[K]V
 }
 
 // Reduce reduces the key/value pairs of the map into an one pair using the 'merge' function
-func (m *Map[K, V]) Reduce(by c.Quaternary[K, V]) (K, V) {
-	h := m.Head()
-	return loop.ReduceKV(h.Next, by)
+func (m *Map[K, V]) Reduce(merge func(K, V, K, V) (K, V)) (k K, v V) {
+	if m != nil {
+		k, v = map_.Reduce(*m, merge)
+	}
+	return k, v
+}
+
+// HasAny finds the first key/value pair that satisfies the 'predicate' function condition and returns true if successful
+func (m *Map[K, V]) HasAny(predicate func(K, V) bool) bool {
+	if m != nil {
+		return map_.HasAny(*m, predicate)
+	}
+	return false
 }
 
 // Immutable converts to an immutable map instance
-func (m *Map[K, V]) Immutable() *immutable.Map[K, V] {
+func (m *Map[K, V]) Immutable() immutable.Map[K, V] {
 	return immutable.WrapMap(m.Map())
 }
 

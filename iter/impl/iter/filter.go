@@ -20,13 +20,17 @@ var (
 // Next returns the next element.
 // The ok result indicates whether the element was returned by the iterator.
 // If ok == false, then the iteration must be completed.
-func (s Fit[T, IT]) Next() (T, bool) {
-	return nextFiltered(s.next, s.by)
+func (f Fit[T, IT]) Next() (element T, ok bool) {
+	if next, by := f.next, f.by; next != nil && by != nil {
+		element, ok = nextFiltered(next, by)
+	}
+	return element, ok
 }
 
 // FitKV is the KVIterator wrapper that provides filtering of key/value elements by a Predicate.
 type FitKV[K, V any, IT c.KVIterator[K, V]] struct {
 	iterator IT
+	next     func() (K, V, bool)
 	by       func(K, V) bool
 }
 
@@ -38,8 +42,11 @@ var (
 // Next returns the next key/value pair.
 // The ok result indicates whether the pair was returned by the iterator.
 // If ok == false, then the iteration must be completed.
-func (s FitKV[K, V, IT]) Next() (K, V, bool) {
-	return nextFilteredKV(s.iterator.Next, s.by)
+func (f FitKV[K, V, IT]) Next() (key K, value V, ok bool) {
+	if !(f.next == nil || f.by == nil) {
+		key, value, ok = nextFilteredKV(f.next, f.by)
+	}
+	return key, value, ok
 }
 
 func nextFiltered[T any](next func() (T, bool), filter func(T) bool) (v T, ok bool) {

@@ -12,6 +12,7 @@ import (
 	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/predicate"
 )
 
 // ErrBreak is the 'break' statement of the For, Track methods
@@ -460,6 +461,17 @@ func NoEmpty[TS ~[]T, T any](elements TS, notEmpty []T) TS {
 }
 
 // GetNoEmpty returns the 'notEmpty' if the 'elementsFactory' return an empty slice
-func GetNoEmpty[TS ~[]T, T any](elementsFactory func() TS, def []T) TS {
-	return NoEmpty(elementsFactory(), def)
+func GetNoEmpty[TS ~[]T, T any](elementsFactory func() TS, notEmpty []T) TS {
+	return NoEmpty(elementsFactory(), notEmpty)
+}
+
+// HasAny tests if the 'elements' slice contains an element that satisfies the "predicate" condition
+func HasAny[TS ~[]T, T any](elements TS, predicate func(T) bool) bool {
+	_, ok := First(elements, predicate)
+	return ok
+}
+
+// Contains checks is the 'elements' slice contains the element
+func Contains[TS ~[]T, T comparable](elements TS, element T) bool {
+	return HasAny(elements, predicate.Eq(element))
 }

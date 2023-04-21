@@ -10,6 +10,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/predicate/eq"
+	"github.com/m4gshm/gollections/predicate/more"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/clone"
 	"github.com/m4gshm/gollections/slice/clone/reverse"
@@ -341,4 +343,14 @@ func Test_StableSortCloned(t *testing.T) {
 	sorted := cstablesort.Of(src)
 	assert.Equal(t, slice.Of(-1, 0, 1, 2, 3), sorted)
 	assert.NotEqual(t, (*reflect.SliceHeader)(unsafe.Pointer(&src)).Data, (*reflect.SliceHeader)(unsafe.Pointer(&sorted)).Data)
+}
+
+func Test_MatchAny(t *testing.T) {
+	elements := slice.Of(1, 2, 3, 4)
+
+	ok := slice.HasAny(elements, eq.To(4))
+	assert.True(t, ok)
+
+	noOk := slice.HasAny(elements, more.Than(5))
+	assert.False(t, noOk)
 }

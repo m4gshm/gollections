@@ -6,8 +6,8 @@ import (
 )
 
 // NewValIter is default ValIter constructor
-func NewValIter[K comparable, V any](elements []K, uniques map[K]V) *ValIter[K, V] {
-	return &ValIter[K, V]{elements: elements, uniques: uniques, current: iter.NoStarted}
+func NewValIter[K comparable, V any](elements []K, uniques map[K]V) ValIter[K, V] {
+	return ValIter[K, V]{elements: elements, uniques: uniques, current: iter.NoStarted}
 }
 
 // ValIter is the Iteratoc over Map values
