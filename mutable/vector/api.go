@@ -43,6 +43,6 @@ func Convert[From, To any](collection *mutable.Vector[From], converter func(From
 // Flatt instantiates Iterator that converts the collection elements into slices and then flattens them to one level
 func Flatt[From, To any](collection *mutable.Vector[From], by func(From) []To) c.Pipe[To] {
 	h := collection.Head()
-	f := iter.Flatt(h, h.Next, by)
+	f := iter.Flatt(h.Next, by)
 	return iter.NewPipe[To](&f)
 }

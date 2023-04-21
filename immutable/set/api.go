@@ -39,6 +39,6 @@ func Convert[From, To comparable](collection immutable.Set[From], converter func
 // Flatt returns a pipe that converts the collection elements into slices and then flattens them to one level
 func Flatt[From, To comparable](s immutable.Set[From], by func(From) []To) c.Pipe[To] {
 	h := s.Head()
-	f := iter.Flatt(h, h.Next, by)
+	f := iter.Flatt(h.Next, by)
 	return iter.NewPipe[To](&f)
 }

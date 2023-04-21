@@ -31,14 +31,14 @@ func (p Pipe[T, IT]) Next() (element T, ok bool) {
 
 // Filter returns a pipe consisting of elements that satisfy the condition of the 'predicate' function
 func (p Pipe[T, IT]) Filter(predicate func(T) bool) c.Pipe[T] {
-	f := Filter(p.iter, p.next, predicate)
-	return NewPipe[T, c.Iterator[T]](&f)
+	f := Filter(p.next, predicate)
+	return NewPipe[T, c.Iterator[T]](f)
 }
 
 // Convert returns a pipe that applies the 'converter' function to the collection elements
 func (p Pipe[T, IT]) Convert(converter func(T) T) c.Pipe[T] {
 	conv := Convert(p.iter, p.next, converter)
-	return NewPipe[T, c.Iterator[T]](&conv)
+	return NewPipe[T, c.Iterator[T]](conv)
 }
 
 // ForEach applies the 'walker' function for every element

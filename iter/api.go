@@ -44,20 +44,20 @@ func FilterAndConvert[From, To any, IT c.Iterator[From]](elements IT, filter fun
 
 // Flatt instantiates Iterator that converts the collection elements into slices and then flattens them to one level
 func Flatt[From, To any, IT c.Iterator[From]](elements IT, flatt func(From) []To) c.Iterator[To] {
-	f := iter.Flatt(elements, elements.Next, flatt)
+	f := iter.Flatt(elements.Next, flatt)
 	return &f
 }
 
 // FilterAndFlatt additionally filters 'From' elements
 func FilterAndFlatt[From, To any, IT c.Iterator[From]](elements IT, filter func(From) bool, flatt func(From) []To) c.Iterator[To] {
-	f := iter.FilterAndFlatt(elements, elements.Next, filter, flatt)
+	f := iter.FilterAndFlatt(elements.Next, filter, flatt)
 	return &f
 }
 
 // Filter instantiates Iterator that checks elements by a filter and returns successful ones
 func Filter[T any, IT c.Iterator[T]](elements IT, filter func(T) bool) c.Iterator[T] {
-	f := iter.Filter(elements, elements.Next, filter)
-	return &f
+	f := iter.Filter(elements.Next, filter)
+	return f
 }
 
 // NotNil instantiates Iterator that filters nullable elements
@@ -82,7 +82,7 @@ func ToSlice[T any](elements c.Iterator[T]) []T {
 
 // Group transforms iterable elements to the MapPipe based on applying key extractor to the elements
 func Group[T any, K comparable](elements c.Iterator[T], by func(T) K) c.MapPipe[K, T, map[K][]T] {
-	return iter.Group(elements, by)
+	return iter.Group(elements.Next, by)
 }
 
 // ForEach applies the 'walker' function to elements of an Iterator
@@ -107,6 +107,6 @@ func First[T any, IT c.Iterator[T]](elements IT, filter func(T) bool) (T, bool) 
 
 // ToPairs converts a c.Iterator to a c.KVIterator using key and value extractors
 func ToPairs[T, K, V any](elements c.Iterator[T], keyExtractor func(T) K, valExtractor func(T) V) c.KVIterator[K, V] {
-	kv := iter.NewKeyValuer(elements, elements.Next, keyExtractor, valExtractor)
+	kv := iter.NewKeyValuer(elements.Next, keyExtractor, valExtractor)
 	return &kv
 }

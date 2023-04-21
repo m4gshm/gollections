@@ -77,7 +77,7 @@ func (m MapValues[K, V]) ForEach(walker func(V)) {
 // Filter returns a pipe consisting of elements that satisfy the condition of the 'predicate' function
 func (m MapValues[K, V]) Filter(filter func(V) bool) c.Pipe[V] {
 	h := m.Head()
-	return iter.NewPipe[V](iter.Filter(h, h.Next, filter))
+	return iter.NewPipe[V](iter.Filter(h.Next, filter))
 }
 
 // Convert returns a pipe that applies the 'converter' function to the collection elements
