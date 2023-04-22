@@ -235,37 +235,37 @@ func (m *Map[K, V]) String() string {
 }
 
 // FilterKey returns a pipe consisting of key/value pairs where the key satisfies the condition of the 'predicate' function
-func (m *Map[K, V]) FilterKey(predicate func(K) bool) c.MapPipe[K, V, map[K]V] {
+func (m *Map[K, V]) FilterKey(predicate func(K) bool) c.MapTransform[K, V, map[K]V] {
 	h := m.Head()
 	return iter.NewKVPipe(iter.FilterKV(h.Next, filter.Key[V](predicate)).Next, kviter.ToMap[K, V])
 }
 
 // ConvertKey returns a pipe that applies the 'converter' function to keys of the map
-func (m *Map[K, V]) ConvertKey(converter func(K) K) c.MapPipe[K, V, map[K]V] {
+func (m *Map[K, V]) ConvertKey(converter func(K) K) c.MapTransform[K, V, map[K]V] {
 	h := m.Head()
 	return iter.NewKVPipe(iter.ConvertKV(h.Next, convert.Key[V](converter)).Next, kviter.ToMap[K, V])
 }
 
 // FilterValue returns a pipe consisting of key/value pairs where the value satisfies the condition of the 'predicate' function
-func (m *Map[K, V]) FilterValue(predicate func(V) bool) c.MapPipe[K, V, map[K]V] {
+func (m *Map[K, V]) FilterValue(predicate func(V) bool) c.MapTransform[K, V, map[K]V] {
 	h := m.Head()
 	return iter.NewKVPipe(iter.FilterKV(h.Next, filter.Value[K](predicate)).Next, kviter.ToMap[K, V])
 }
 
 // ConvertValue returns a pipe that applies the 'converter' function to values of the map
-func (m *Map[K, V]) ConvertValue(converter func(V) V) c.MapPipe[K, V, map[K]V] {
+func (m *Map[K, V]) ConvertValue(converter func(V) V) c.MapTransform[K, V, map[K]V] {
 	h := m.Head()
 	return iter.NewKVPipe(iter.ConvertKV(h.Next, convert.Value[K](converter)).Next, kviter.ToMap[K, V])
 }
 
 // Filter returns a pipe consisting of elements that satisfy the condition of the 'predicate' function
-func (m *Map[K, V]) Filter(predicate func(K, V) bool) c.MapPipe[K, V, map[K]V] {
+func (m *Map[K, V]) Filter(predicate func(K, V) bool) c.MapTransform[K, V, map[K]V] {
 	h := m.Head()
 	return iter.NewKVPipe(iter.FilterKV(h.Next, predicate).Next, kviter.ToMap[K, V])
 }
 
 // Convert returns a pipe that applies the 'converter' function to the collection elements
-func (m *Map[K, V]) Convert(converter func(K, V) (K, V)) c.MapPipe[K, V, map[K]V] {
+func (m *Map[K, V]) Convert(converter func(K, V) (K, V)) c.MapTransform[K, V, map[K]V] {
 	h := m.Head()
 	return iter.NewKVPipe(iter.ConvertKV(h.Next, converter).Next, kviter.ToMap[K, V])
 }

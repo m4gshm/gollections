@@ -8,6 +8,7 @@ import (
 	"github.com/m4gshm/gollections/immutable"
 	"github.com/m4gshm/gollections/immutable/ordered"
 	"github.com/m4gshm/gollections/iter/impl/iter"
+	"github.com/m4gshm/gollections/iterable/transform"
 )
 
 // Of instantiates Set with predefined elements.
@@ -31,14 +32,14 @@ func Sort[T comparable, f constraints.Ordered](s immutable.Set[T], by func(T) f)
 }
 
 // Convert returns a pipe that applies the 'converter' function to the collection elements
-func Convert[From, To comparable](collection immutable.Set[From], converter func(From) To) c.Pipe[To] {
+func Convert[From, To comparable](collection immutable.Set[From], converter func(From) To) c.Transform[To] {
 	h := collection.Head()
-	return iter.NewPipe(iter.Convert(h.Next, converter).Next)
+	return transform.New(iter.Convert(h.Next, converter).Next)
 }
 
 // Flatt returns a pipe that converts the collection elements into slices and then flattens them to one level
-func Flatt[From, To comparable](s immutable.Set[From], by func(From) []To) c.Pipe[To] {
+func Flatt[From, To comparable](s immutable.Set[From], by func(From) []To) c.Transform[To] {
 	h := s.Head()
 	f := iter.Flatt(h.Next, by)
-	return iter.NewPipe(f.Next)
+	return transform.New(f.Next)
 }

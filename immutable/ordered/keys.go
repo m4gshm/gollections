@@ -6,6 +6,7 @@ import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/iter/impl/iter"
 	iterslice "github.com/m4gshm/gollections/iter/impl/slice"
+	"github.com/m4gshm/gollections/iterable/transform"
 	"github.com/m4gshm/gollections/slice"
 )
 
@@ -74,15 +75,15 @@ func (m MapKeys[K]) ForEach(walker func(K)) {
 }
 
 // Filter returns a pipe consisting of elements that satisfy the condition of the 'predicate' function
-func (m MapKeys[K]) Filter(filter func(K) bool) c.Pipe[K] {
+func (m MapKeys[K]) Filter(filter func(K) bool) c.Transform[K] {
 	f := iterslice.Filter(m.keys, filter)
-	return iter.NewPipe[K](f.Next)
+	return transform.New[K](f.Next)
 }
 
 // Convert returns a pipe that applies the 'converter' function to the collection elements
-func (m MapKeys[K]) Convert(converter func(K) K) c.Pipe[K] {
+func (m MapKeys[K]) Convert(converter func(K) K) c.Transform[K] {
 	conv := iterslice.Convert(m.keys, converter)
-	return iter.NewPipe[K](conv.Next)
+	return transform.New[K](conv.Next)
 }
 
 // Reduce reduces the elements into an one using the 'merge' function

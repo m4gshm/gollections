@@ -66,22 +66,22 @@ func OfLoop[S, k, V any](source S, hasNext func(S) bool, getNext func(S) (k, V, 
 }
 
 // Map instantiates key/value iterator that converts elements with a converter and returns them
-func Map[K comparable, V any, Kto comparable, Vto any](elements c.KVIterator[K, V], by func(K, V) (Kto, Vto)) c.MapPipe[Kto, Vto, map[Kto]Vto] {
+func Map[K comparable, V any, Kto comparable, Vto any](elements c.KVIterator[K, V], by func(K, V) (Kto, Vto)) c.MapTransform[Kto, Vto, map[Kto]Vto] {
 	return implit.NewKVPipe(implit.ConvertKV(elements.Next, by).Next, ToMap[Kto, Vto])
 }
 
 // Filter instantiates key/value iterator that iterates only over filtered elements
-func Filter[K comparable, V any, IT c.KVIterator[K, V]](elements IT, filter func(K, V) bool) c.MapPipe[K, V, map[K]V] {
+func Filter[K comparable, V any, IT c.KVIterator[K, V]](elements IT, filter func(K, V) bool) c.MapTransform[K, V, map[K]V] {
 	return implit.NewKVPipe(implit.FilterKV(elements.Next, filter).Next, ToMap[K, V])
 }
 
 // FilterKey instantiates key/value iterator that iterates only over elements that filtered by the key
-func FilterKey[K comparable, V any](elements c.KVIterator[K, V], fit func(K) bool) c.MapPipe[K, V, map[K]V] {
+func FilterKey[K comparable, V any](elements c.KVIterator[K, V], fit func(K) bool) c.MapTransform[K, V, map[K]V] {
 	return Filter(elements, filter.Key[V](fit))
 }
 
 // FilterValue instantiates key/value iterator that iterates only over elements that filtered by the value
-func FilterValue[K comparable, V any](elements c.KVIterator[K, V], fit func(V) bool) c.MapPipe[K, V, map[K]V] {
+func FilterValue[K comparable, V any](elements c.KVIterator[K, V], fit func(V) bool) c.MapTransform[K, V, map[K]V] {
 	return Filter(elements, filter.Value[K](fit))
 }
 

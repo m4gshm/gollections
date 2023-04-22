@@ -5,6 +5,7 @@ import (
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/iter/impl/iter"
+	"github.com/m4gshm/gollections/iterable/transform"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/mutable"
 )
@@ -35,14 +36,14 @@ func Sort[T any, F constraints.Ordered](v *mutable.Vector[T], by func(T) F) *mut
 }
 
 // Convert returns a pipe that applies the 'converter' function to the collection elements
-func Convert[From, To any](collection *mutable.Vector[From], converter func(From) To) c.Pipe[To] {
+func Convert[From, To any](collection *mutable.Vector[From], converter func(From) To) c.Transform[To] {
 	h := collection.Head()
-	return iter.NewPipe(iter.Convert(h.Next, converter).Next)
+	return transform.New(iter.Convert(h.Next, converter).Next)
 }
 
 // Flatt instantiates Iterator that converts the collection elements into slices and then flattens them to one level
-func Flatt[From, To any](collection *mutable.Vector[From], by func(From) []To) c.Pipe[To] {
+func Flatt[From, To any](collection *mutable.Vector[From], by func(From) []To) c.Transform[To] {
 	h := collection.Head()
 	f := iter.Flatt(h.Next, by)
-	return iter.NewPipe(f.Next)
+	return transform.New(f.Next)
 }

@@ -81,7 +81,7 @@ func ToSlice[T any](elements c.Iterator[T]) []T {
 }
 
 // Group transforms iterable elements to the MapPipe based on applying key extractor to the elements
-func Group[T any, K comparable](elements c.Iterator[T], by func(T) K) c.MapPipe[K, T, map[K][]T] {
+func Group[T any, K comparable](elements c.Iterator[T], by func(T) K) c.MapTransform[K, T, map[K][]T] {
 	return iter.Group(elements.Next, by)
 }
 

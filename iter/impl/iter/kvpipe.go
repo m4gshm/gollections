@@ -19,13 +19,13 @@ type KVIterPipe[K comparable, V any, M map[K]V | map[K][]V] struct {
 }
 
 var (
-	_ c.KVIterator[string, any]                = (*KVIterPipe[string, any, map[string]any])(nil)
-	_ c.MapPipe[string, any, map[string]any]   = (*KVIterPipe[string, any, map[string]any])(nil)
-	_ c.MapPipe[string, any, map[string][]any] = (*KVIterPipe[string, any, map[string][]any])(nil)
+	_ c.KVIterator[string, any]                     = (*KVIterPipe[string, any, map[string]any])(nil)
+	_ c.MapTransform[string, any, map[string]any]   = (*KVIterPipe[string, any, map[string]any])(nil)
+	_ c.MapTransform[string, any, map[string][]any] = (*KVIterPipe[string, any, map[string][]any])(nil)
 
-	_ c.KVIterator[string, any]                = KVIterPipe[string, any, map[string]any]{}
-	_ c.MapPipe[string, any, map[string]any]   = KVIterPipe[string, any, map[string]any]{}
-	_ c.MapPipe[string, any, map[string][]any] = KVIterPipe[string, any, map[string][]any]{}
+	_ c.KVIterator[string, any]                     = KVIterPipe[string, any, map[string]any]{}
+	_ c.MapTransform[string, any, map[string]any]   = KVIterPipe[string, any, map[string]any]{}
+	_ c.MapTransform[string, any, map[string][]any] = KVIterPipe[string, any, map[string][]any]{}
 )
 
 // Next implements c.KVIterator
@@ -34,32 +34,32 @@ func (k KVIterPipe[K, V, M]) Next() (K, V, bool) {
 }
 
 // FilterKey returns a pipe consisting of key/value pairs where the key satisfies the condition of the 'predicate' function
-func (k KVIterPipe[K, V, M]) FilterKey(predicate func(K) bool) c.MapPipe[K, V, M] {
+func (k KVIterPipe[K, V, M]) FilterKey(predicate func(K) bool) c.MapTransform[K, V, M] {
 	return NewKVPipe(FilterKV(k.next, filter.Key[V](predicate)).Next, k.collector)
 }
 
 // ConvertKey returns a pipe that applies the 'converter' function to keys of the map
-func (k KVIterPipe[K, V, M]) ConvertKey(by func(K) K) c.MapPipe[K, V, M] {
+func (k KVIterPipe[K, V, M]) ConvertKey(by func(K) K) c.MapTransform[K, V, M] {
 	return NewKVPipe(ConvertKV(k.next, convert.Key[V](by)).Next, k.collector)
 }
 
 // FilterValue returns a pipe consisting of key/value pairs where the value satisfies the condition of the 'predicate' function
-func (k KVIterPipe[K, V, M]) FilterValue(predicate func(V) bool) c.MapPipe[K, V, M] {
+func (k KVIterPipe[K, V, M]) FilterValue(predicate func(V) bool) c.MapTransform[K, V, M] {
 	return NewKVPipe(FilterKV(k.next, filter.Value[K](predicate)).Next, k.collector)
 }
 
 // ConvertValue returns a pipe that applies the 'converter' function to values of the map
-func (k KVIterPipe[K, V, M]) ConvertValue(by func(V) V) c.MapPipe[K, V, M] {
+func (k KVIterPipe[K, V, M]) ConvertValue(by func(V) V) c.MapTransform[K, V, M] {
 	return NewKVPipe(ConvertKV(k.next, convert.Value[K](by)).Next, k.collector)
 }
 
 // Filter returns a pipe consisting of elements that satisfy the condition of the 'predicate' function
-func (k KVIterPipe[K, V, M]) Filter(predicate func(K, V) bool) c.MapPipe[K, V, M] {
+func (k KVIterPipe[K, V, M]) Filter(predicate func(K, V) bool) c.MapTransform[K, V, M] {
 	return NewKVPipe(FilterKV(k.next, predicate).Next, k.collector)
 }
 
 // Convert returns a pipe that applies the 'converter' function to the collection elements
-func (k KVIterPipe[K, V, M]) Convert(converter func(K, V) (K, V)) c.MapPipe[K, V, M] {
+func (k KVIterPipe[K, V, M]) Convert(converter func(K, V) (K, V)) c.MapTransform[K, V, M] {
 	return NewKVPipe(ConvertKV(k.next, converter).Next, k.collector)
 }
 

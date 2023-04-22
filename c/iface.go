@@ -50,7 +50,9 @@ type Collection[T any] interface {
 	ForLoop[T]
 	ForEachLoop[T]
 	SliceFactory[T]
-	Transformable[T]
+
+	Filter(predicate func(T) bool) Transform[T]
+	Convert(converter func(T) T) Transform[T]
 
 	Reduce(merger func(T, T) T) T
 	HasAny(predicate func(T) bool) bool
@@ -163,15 +165,8 @@ type Checkable[T any] interface {
 	Contains(T) bool
 }
 
-// Transformable provides limited kit of container transformation methods.
-// The full kit of transformer functions are in the package 'c'
-type Transformable[T any] interface {
-	Filter(predicate func(T) bool) Pipe[T]
-	Convert(converter func(T) T) Pipe[T]
-}
-
-// Pipe extends Transformable by finalize methods like ForEach, Collect or Reduce.
-type Pipe[T any] interface {
+// Transform extends Transformable by finalize methods like ForEach, Collect or Reduce.
+type Transform[T any] interface {
 	Iterator[T]
 	Collection[T]
 }
@@ -179,18 +174,18 @@ type Pipe[T any] interface {
 // MapTransformable provides limited kit of map transformation methods.
 // The full kit of transformer functions are in the package 'c/map_'
 type MapTransformable[K comparable, V any, Map map[K]V | map[K][]V] interface {
-	Filter(predicate func(K, V) bool) MapPipe[K, V, Map]
-	Convert(converter func(K, V) (K, V)) MapPipe[K, V, Map]
+	Filter(predicate func(K, V) bool) MapTransform[K, V, Map]
+	Convert(converter func(K, V) (K, V)) MapTransform[K, V, Map]
 
-	FilterKey(predicate func(K) bool) MapPipe[K, V, Map]
-	ConvertKey(converter func(K) K) MapPipe[K, V, Map]
+	FilterKey(predicate func(K) bool) MapTransform[K, V, Map]
+	ConvertKey(converter func(K) K) MapTransform[K, V, Map]
 
-	FilterValue(predicate func(V) bool) MapPipe[K, V, Map]
-	ConvertValue(converter func(V) V) MapPipe[K, V, Map]
+	FilterValue(predicate func(V) bool) MapTransform[K, V, Map]
+	ConvertValue(converter func(V) V) MapTransform[K, V, Map]
 }
 
-// MapPipe extends MapTransformable by finalize methods like ForEach, Collect or Reduce.
-type MapPipe[K comparable, V any, M map[K]V | map[K][]V] interface {
+// MapTransform extends MapTransformable by finalize methods like ForEach, Collect or Reduce.
+type MapTransform[K comparable, V any, M map[K]V | map[K][]V] interface {
 	KVIterator[K, V]
 	KVCollection[K, V, M]
 }
