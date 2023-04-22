@@ -3,13 +3,17 @@ name: Run Tests
 on:
   push:
     branches:
+      - master
       - main
+      - dev
       - "releases/**"
       - "feature/**"
       - "bugfix/**"
   pull_request:
     branches:
+      - master
       - main
+      - dev
       - "releases/**"
       - "feature/**"
       - "bugfix/**"
