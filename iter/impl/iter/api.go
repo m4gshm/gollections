@@ -10,51 +10,52 @@ import (
 )
 
 // Convert instantiates Iterator that converts elements with a converter and returns them.
-func Convert[From, To any, IT any](elements IT, next func() (From, bool), by func(From) To) *ConvertIter[From, To, IT] {
-	return &ConvertIter[From, To, IT]{iterator: elements, next: next, by: by}
+func Convert[From, To any, IT any](elements IT, next func() (From, bool), converter func(From) To) ConvertIter[From, To] {
+	return ConvertIter[From, To]{next: next, converter: converter}
 }
 
 // FilterAndConvert additionally filters 'From' elements.
-func FilterAndConvert[From, To, IT any](iterator IT, next func() (From, bool), filter func(From) bool, by func(From) To) *ConvertFitIter[From, To, IT] {
-	return &ConvertFitIter[From, To, IT]{iterator: iterator, next: next, by: by, filter: filter}
+func FilterAndConvert[From, To any, IT any](iterator IT, next func() (From, bool), filter func(From) bool, by func(From) To) ConvertFitIter[From, To] {
+	return ConvertFitIter[From, To]{next: next, by: by, filter: filter}
 }
 
 // Flatt instantiates Iterator that extracts slices of 'To' by a Flattener from elements of 'From' and flattens as one iterable collection of 'To' elements.
-func Flatt[From, To, IT any](iterator IT, next func() (From, bool), converter func(From) []To) Flatten[From, To, IT] {
-	return Flatten[From, To, IT]{iterator: iterator, next: next, flatt: converter, elemSizeTo: notsafe.GetTypeSize[To]()}
+func Flatt[From, To any](next func() (From, bool), converter func(From) []To) Flatten[From, To] {
+	return Flatten[From, To]{next: next, flatt: converter, elemSizeTo: notsafe.GetTypeSize[To]()}
 }
 
 // FilterAndFlatt additionally filters 'From' elements.
-func FilterAndFlatt[From, To, IT any](iterator IT, next func() (From, bool), filter func(From) bool, flatt func(From) []To) FlattenFit[From, To, IT] {
-	return FlattenFit[From, To, IT]{iterator: iterator, next: next, flatt: flatt, filter: filter, elemSizeTo: notsafe.GetTypeSize[To]()}
+func FilterAndFlatt[From, To any](next func() (From, bool), filter func(From) bool, flatt func(From) []To) FlattenFit[From, To] {
+	return FlattenFit[From, To]{next: next, flatt: flatt, filter: filter, elemSizeTo: notsafe.GetTypeSize[To]()}
 }
 
 // Filter creates an Iterator that checks elements by filters and returns successful ones.
-func Filter[T, IT any](iterator IT, next func() (T, bool), filter func(T) bool) Fit[T, IT] {
-	return Fit[T, IT]{iterator: iterator, next: next, by: filter}
+func Filter[T any](next func() (T, bool), filter func(T) bool) Fit[T] {
+	return Fit[T]{next: next, by: filter}
 }
 
 // NotNil creates an Iterator that filters nullable elements.
-func NotNil[T any, IT c.Iterator[*T]](elements IT) Fit[*T, IT] {
-	return Filter(elements, elements.Next, check.NotNil[T])
+func NotNil[T any](next func() (*T, bool)) Fit[*T] {
+	return Filter(next, check.NotNil[T])
 }
 
 // ConvertKV creates an Iterator that applies a transformer to iterable key\values.
-func ConvertKV[K, V any, IT c.KVIterator[K, V], k2, v2 any](elements IT, by func(K, V) (k2, v2)) *ConvertKVIter[K, V, IT, k2, v2, func(K, V) (k2, v2)] {
-	return &ConvertKVIter[K, V, IT, k2, v2, func(K, V) (k2, v2)]{iterator: elements, by: by}
+func ConvertKV[K, V any, IT c.KVIterator[K, V], k2, v2 any](elements IT, by func(K, V) (k2, v2)) ConvertKVIter[K, V, k2, v2, func(K, V) (k2, v2)] {
+	return ConvertKVIter[K, V, k2, v2, func(K, V) (k2, v2)]{next: elements.Next, by: by}
 }
 
 // FilterKV creates an Iterator that checks elements by a filter and returns successful ones
-func FilterKV[K, V any, IT c.KVIterator[K, V]](elements IT, filter func(K, V) bool) FitKV[K, V, IT] {
-	return FitKV[K, V, IT]{iterator: elements, by: filter}
+func FilterKV[K, V any, IT c.KVIterator[K, V]](elements IT, filter func(K, V) bool) FitKV[K, V] {
+	return FitKV[K, V]{next: elements.Next, by: filter}
 }
 
 // Group transforms iterable elements to the MapPipe based on applying key extractor to the elements
-func Group[T any, K comparable, IT c.Iterator[T]](elements IT, keyExtractor func(T) K) c.MapPipe[K, T, map[K][]T] {
-	return GroupAndConvert(elements, keyExtractor, as.Is[T])
+func Group[T any, K comparable](next func() (T, bool), keyExtractor func(T) K) KVIterPipe[K, T, map[K][]T] {
+	return GroupAndConvert(next, keyExtractor, as.Is[T])
 }
 
 // GroupAndConvert transforms iterable elements to the MapPipe based on applying key extractor to the elements
-func GroupAndConvert[T any, K comparable, V any, IT c.Iterator[T]](elements IT, keyExtractor func(T) K, valueConverter func(T) V) c.MapPipe[K, V, map[K][]V] {
-	return NewKVPipe(NewKeyValuer(elements, elements.Next, keyExtractor, valueConverter), group.Of[K, V])
+func GroupAndConvert[T any, K comparable, V any](next func() (T, bool), keyExtractor func(T) K, valueConverter func(T) V) KVIterPipe[K, V, map[K][]V] {
+	kv := NewKeyValuer(next, keyExtractor, valueConverter)
+	return NewKVPipe(&kv, group.Of[K, V])
 }

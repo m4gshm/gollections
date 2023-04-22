@@ -253,7 +253,7 @@ func Test_IsValidIndex2(t *testing.T) {
 	assert.False(t, r)
 }
 
-func Test_Head_Tail_Nil_Safety(t *testing.T) {
+func Test_Head_Tail_Nil_Arg_Safety(t *testing.T) {
 	var values []int
 
 	head := iter.NewHead(values)
@@ -281,4 +281,21 @@ func Test_Head_Tail_Nil_Safety(t *testing.T) {
 	_, ok = tail.Prev()
 	assert.False(t, ok)
 	tail.Cap()
+}
+
+func Test_Key_Zero_Safety(t *testing.T) {
+	var it iter.Key[int, string]
+
+	it.Next()
+	it.Cap()
+
+	//OrderedEmbedMapKVIter
+}
+
+func Test_OrderedEmbedMapKVIter_Safety(t *testing.T) {
+	var it iter.OrderedEmbedMapKVIter[int, string]
+
+	it.Next()
+	it.Cap()
+
 }

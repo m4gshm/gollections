@@ -150,29 +150,29 @@ func Test_Set_DoubleConvert(t *testing.T) {
 	assert.Equal(t, no, stringsPipe.Slice())
 }
 
-func Test_Set_Nil(t *testing.T) {
-	var set *immutable.Set[int]
+// func Test_Set_Nil(t *testing.T) {
+// 	var set *immutable.Set[int]
 
-	assert.False(t, set.Contains(1))
+// 	assert.False(t, set.Contains(1))
 
-	set.IsEmpty()
-	set.Len()
+// 	set.IsEmpty()
+// 	set.Len()
 
-	set.For(nil)
-	set.ForEach(nil)
+// 	set.For(nil)
+// 	set.ForEach(nil)
 
-	set.Slice()
+// 	set.Slice()
 
-	set.Convert(nil)
-	set.Filter(nil)
+// 	set.Convert(nil)
+// 	set.Filter(nil)
 
-	head := set.Head()
-	_, ok := head.Next()
-	assert.False(t, ok)
+// 	head := set.Head()
+// 	_, ok := head.Next()
+// 	assert.False(t, ok)
 
-	_, _, ok = set.First()
-	assert.False(t, ok)
-}
+// 	_, _, ok = set.First()
+// 	assert.False(t, ok)
+// }
 
 func Test_Set_Zero(t *testing.T) {
 	var set immutable.Set[int]

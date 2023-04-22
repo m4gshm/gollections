@@ -275,21 +275,29 @@ func (v *Vector[T]) SetNew(index int, value T) bool {
 // Filter returns a pipe consisting of vector elements matching the filter
 func (v *Vector[T]) Filter(filter func(T) bool) c.Pipe[T] {
 	h := v.Head()
-	f := iter.Filter(h, h.Next, filter)
-	return iter.NewPipe[T](f)
+	return iter.NewPipe[T](iter.Filter(h.Next, filter))
 }
 
 // Convert returns a pipe that applies the 'converter' function to the collection elements
 func (v *Vector[T]) Convert(converter func(T) T) c.Pipe[T] {
 	h := v.Head()
-	c := iter.Convert(h, h.Next, converter)
-	return iter.NewPipe[T](c)
+	return iter.NewPipe[T](iter.Convert(h, h.Next, converter))
 }
 
 // Reduce reduces the elements into an one using the 'merge' function
-func (v *Vector[T]) Reduce(by func(T, T) T) T {
-	h := v.Head()
-	return loop.Reduce(h.Next, by)
+func (v *Vector[T]) Reduce(merge func(T, T) T) (out T) {
+	if v != nil {
+		out = slice.Reduce(*v, merge)
+	}
+	return out
+}
+
+// HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful
+func (v *Vector[T]) HasAny(predicate func(T) bool) (ok bool) {
+	if v != nil {
+		ok = slice.HasAny(*v, predicate)
+	}
+	return ok
 }
 
 // Sort sorts the Vector in-place and returns it

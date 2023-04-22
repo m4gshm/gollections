@@ -245,7 +245,7 @@ func (s *Set[T]) ForEach(walker func(T)) {
 // Filter returns a pipe consisting of elements that satisfy the condition of the 'predicate' function
 func (s *Set[T]) Filter(predicate func(T) bool) c.Pipe[T] {
 	h := s.Head()
-	return iter.NewPipe[T](iter.Filter(h, h.Next, predicate))
+	return iter.NewPipe[T](iter.Filter(h.Next, predicate))
 }
 
 // Convert returns a pipe that applies the 'converter' function to the collection elements
@@ -255,9 +255,23 @@ func (s *Set[T]) Convert(converter func(T) T) c.Pipe[T] {
 }
 
 // Reduce reduces the elements into an one using the 'merge' function
-func (s *Set[T]) Reduce(by func(T, T) T) T {
-	h := s.Head()
-	return loop.Reduce(h.Next, by)
+func (s *Set[T]) Reduce(merge func(T, T) T) (t T) {
+	if s != nil {
+		t, _ = map_.Reduce(s.elements, func(t1 T, _ struct{}, t2 T, _ struct{}) (t T, out struct{}) {
+			return merge(t1, t2), out
+		})
+	}
+	return t
+}
+
+// HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful
+func (s *Set[K]) HasAny(predicate func(K) bool) bool {
+	if s != nil {
+		return map_.HasAny(s.elements, func(k K, _ struct{}) bool {
+			return predicate(k)
+		})
+	}
+	return false
 }
 
 // Sort transforms to the ordered Set contains sorted elements

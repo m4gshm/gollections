@@ -7,7 +7,7 @@ import (
 
 // NewSetIter creates SetIter instance.
 func NewSetIter[K comparable](uniques map[K]struct{}, del func(element K)) SetIter[K] {
-	return SetIter[K]{Key: *iter.NewKey(uniques), del: del}
+	return SetIter[K]{Key: iter.NewKey(uniques), del: del}
 }
 
 // SetIter is the Set Iterator implementation.

@@ -12,6 +12,7 @@ import (
 	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/predicate"
 )
 
 // ErrBreak is the 'break' statement of the For, Track methods
@@ -50,6 +51,9 @@ func Generate[T any](next func() (T, bool, error)) ([]T, error) {
 
 // Clone makes new slice instance with copied elements
 func Clone[TS ~[]T, T any](elements TS) TS {
+	if elements == nil {
+		return nil
+	}
 	copied := make(TS, len(elements))
 	copy(copied, elements)
 	return copied
@@ -62,12 +66,18 @@ func DeepClone[TS ~[]T, T any](elements TS, copier func(T) T) TS {
 
 // Delete removes an element by index from the slice 'elements'
 func Delete[TS ~[]T, T any](index int, elements TS) TS {
+	if elements == nil {
+		return nil
+	}
 	return append(elements[0:index], elements[index+1:]...)
 }
 
 // Group converts the 'elements' slice slice into a map, extracting a key for each element of the slice applying the converter 'keyProducer'.
 // The keysProducer retrieves one key per element.
 func Group[T any, K comparable, TS ~[]T](elements TS, keyProducer func(T) K) map[K]TS {
+	if elements == nil {
+		return nil
+	}
 	groups := map[K]TS{}
 	for _, e := range elements {
 		initGroup(keyProducer(e), e, groups)
@@ -78,6 +88,9 @@ func Group[T any, K comparable, TS ~[]T](elements TS, keyProducer func(T) K) map
 // GroupInMultiple converts the'elements' slice into a map, extracting multiple keys per each element of the slice applying the 'keyProducer' converter.
 // The keysProducer retrieves one or more keys per element.
 func GroupInMultiple[T any, K comparable, TS ~[]T](elements TS, keysProducer func(T) []K) map[K]TS {
+	if elements == nil {
+		return nil
+	}
 	groups := map[K]TS{}
 	for _, e := range elements {
 		if keys := keysProducer(e); len(keys) == 0 {
@@ -98,6 +111,9 @@ func initGroup[T any, K comparable, TS ~[]T](key K, e T, groups map[K]TS) {
 
 // Convert creates a slice consisting of the transformed elements using the converter 'by'
 func Convert[FS ~[]From, From, To any](elements FS, by func(From) To) []To {
+	if elements == nil {
+		return nil
+	}
 	result := make([]To, len(elements))
 	for i, e := range elements {
 		result[i] = by(e)
@@ -107,7 +123,10 @@ func Convert[FS ~[]From, From, To any](elements FS, by func(From) To) []To {
 
 // FilterAndConvert additionally filters 'From' elements
 func FilterAndConvert[FS ~[]From, From, To any](elements FS, filter func(From) bool, by func(From) To) []To {
-	var result []To
+	if elements == nil {
+		return nil
+	}
+	var result = make([]To, 0, len(elements)/2)
 	for _, e := range elements {
 		if filter(e) {
 			result = append(result, by(e))
@@ -118,7 +137,10 @@ func FilterAndConvert[FS ~[]From, From, To any](elements FS, filter func(From) b
 
 // ConvertAndFilter additionally filters 'To' elements
 func ConvertAndFilter[FS ~[]From, From, To any](elements FS, by func(From) To, filter func(To) bool) []To {
-	var result []To
+	if elements == nil {
+		return nil
+	}
+	var result = make([]To, 0, len(elements)/2)
 	for _, e := range elements {
 		if r := by(e); filter(r) {
 			result = append(result, r)
@@ -129,7 +151,10 @@ func ConvertAndFilter[FS ~[]From, From, To any](elements FS, by func(From) To, f
 
 // FilterConvertFilter filters source, converts, and filters converted elements
 func FilterConvertFilter[FS ~[]From, From, To any](elements FS, filter func(From) bool, by func(From) To, filterConverted func(To) bool) []To {
-	var result []To
+	if elements == nil {
+		return nil
+	}
+	var result = make([]To, 0, len(elements)/4)
 	for _, e := range elements {
 		if filter(e) {
 			if r := by(e); filterConverted(r) {
@@ -142,6 +167,9 @@ func FilterConvertFilter[FS ~[]From, From, To any](elements FS, filter func(From
 
 // ConvertIndexed creates a slice consisting of the transformed elements using the 'converter' function which additionally applies the index of the element being converted
 func ConvertIndexed[FS ~[]From, From, To any](elements FS, converter func(index int, from From) To) []To {
+	if elements == nil {
+		return nil
+	}
 	result := make([]To, len(elements))
 	for i, e := range elements {
 		result[i] = converter(i, e)
@@ -151,7 +179,10 @@ func ConvertIndexed[FS ~[]From, From, To any](elements FS, converter func(index 
 
 // FilterAndConvertIndexed additionally filters 'From' elements
 func FilterAndConvertIndexed[FS ~[]From, From, To any](elements FS, filter func(index int, from From) bool, converter func(index int, from From) To) []To {
-	var result []To
+	if elements == nil {
+		return nil
+	}
+	var result = make([]To, 0, len(elements)/2)
 	for i, e := range elements {
 		if filter(i, e) {
 			result = append(result, converter(i, e))
@@ -162,7 +193,10 @@ func FilterAndConvertIndexed[FS ~[]From, From, To any](elements FS, filter func(
 
 // ConvertCheck is similar to ConvertFit, but it checks and transforms elements together
 func ConvertCheck[FS ~[]From, From, To any](elements FS, by func(from From) (To, bool)) []To {
-	var result []To
+	if elements == nil {
+		return nil
+	}
+	var result = make([]To, 0, len(elements))
 	for _, e := range elements {
 		if to, ok := by(e); ok {
 			result = append(result, to)
@@ -173,7 +207,10 @@ func ConvertCheck[FS ~[]From, From, To any](elements FS, by func(from From) (To,
 
 // ConvertCheckIndexed additionally filters 'From' elements
 func ConvertCheckIndexed[FS ~[]From, From, To any](elements FS, by func(index int, from From) (To, bool)) []To {
-	var result []To
+	if elements == nil {
+		return nil
+	}
+	var result = make([]To, 0, len(elements))
 	for i, e := range elements {
 		if to, ok := by(i, e); ok {
 			result = append(result, to)
@@ -184,7 +221,10 @@ func ConvertCheckIndexed[FS ~[]From, From, To any](elements FS, by func(index in
 
 // Flatt unfolds the n-dimensional slice into a n-1 dimensional slice
 func Flatt[FS ~[]From, From, To any](elements FS, by func(From) []To) []To {
-	var result []To
+	if elements == nil {
+		return nil
+	}
+	var result = make([]To, 0, int(float32(len(elements))*1.618))
 	for _, e := range elements {
 		result = append(result, by(e)...)
 
@@ -194,7 +234,10 @@ func Flatt[FS ~[]From, From, To any](elements FS, by func(From) []To) []To {
 
 // FilerAndFlatt additionally filters 'From' elements.
 func FilerAndFlatt[FS ~[]From, From, To any](elements FS, filter func(From) bool, by func(From) []To) []To {
-	var result []To
+	if elements == nil {
+		return nil
+	}
+	var result = make([]To, 0, int(float32(len(elements)/2)*1.618))
 	for _, e := range elements {
 		if filter(e) {
 			result = append(result, by(e)...)
@@ -205,7 +248,10 @@ func FilerAndFlatt[FS ~[]From, From, To any](elements FS, filter func(From) bool
 
 // FlattAndFiler unfolds the n-dimensional slice into a n-1 dimensional slice with additinal filtering of 'To' elements.
 func FlattAndFiler[FS ~[]From, From, To any](elements FS, by func(From) []To, filter func(To) bool) []To {
-	var result []To
+	if elements == nil {
+		return nil
+	}
+	var result = make([]To, 0, int(float32(len(elements))*1.618)/2)
 	for _, e := range elements {
 		for _, to := range by(e) {
 			if filter(to) {
@@ -218,7 +264,10 @@ func FlattAndFiler[FS ~[]From, From, To any](elements FS, by func(From) []To, fi
 
 // FilterFlattFilter unfolds the n-dimensional slice 'elements' into a n-1 dimensional slice with additinal filtering of 'From' and 'To' elements.
 func FilterFlattFilter[FS ~[]From, From, To any](elements FS, filterFrom func(From) bool, by func(From) []To, filterTo func(To) bool) []To {
-	var result []To
+	if elements == nil {
+		return nil
+	}
+	var result = make([]To, 0, int(float32(len(elements)/2)*1.618)/2)
 	for _, e := range elements {
 		if filterFrom(e) {
 			for _, to := range by(e) {
@@ -238,7 +287,10 @@ func NotNil[TS ~[]*T, T any](elements TS) TS {
 
 // Filter creates a slice containing only the filtered elements
 func Filter[TS ~[]T, T any](elements TS, filter func(T) bool) []T {
-	var result []T
+	if elements == nil {
+		return nil
+	}
+	var result = make([]T, 0, len(elements)/2)
 	for _, e := range elements {
 		if filter(e) {
 			result = append(result, e)
@@ -270,6 +322,9 @@ func Range[T constraints.Integer](from T, to T) []T {
 
 // Reverse inverts elements order
 func Reverse[TS ~[]T, T any](elements TS) []T {
+	if elements == nil {
+		return nil
+	}
 	l := 0
 	h := len(elements) - 1
 	for l < h {
@@ -460,6 +515,17 @@ func NoEmpty[TS ~[]T, T any](elements TS, notEmpty []T) TS {
 }
 
 // GetNoEmpty returns the 'notEmpty' if the 'elementsFactory' return an empty slice
-func GetNoEmpty[TS ~[]T, T any](elementsFactory func() TS, def []T) TS {
-	return NoEmpty(elementsFactory(), def)
+func GetNoEmpty[TS ~[]T, T any](elementsFactory func() TS, notEmpty []T) TS {
+	return NoEmpty(elementsFactory(), notEmpty)
+}
+
+// HasAny tests if the 'elements' slice contains an element that satisfies the "predicate" condition
+func HasAny[TS ~[]T, T any](elements TS, predicate func(T) bool) bool {
+	_, ok := First(elements, predicate)
+	return ok
+}
+
+// Contains checks is the 'elements' slice contains the element
+func Contains[TS ~[]T, T comparable](elements TS, element T) bool {
+	return HasAny(elements, predicate.Eq(element))
 }

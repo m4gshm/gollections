@@ -1,6 +1,8 @@
 package loop
 
-import "errors"
+import (
+	"errors"
+)
 
 // ErrBreak is the 'break' statement of the For, Track methods
 var ErrBreak = errors.New("Break")
@@ -24,7 +26,7 @@ func ForEach[T any](next func() (T, bool), walker func(T)) {
 	}
 }
 
-// ForEachFiltered applies the 'walker' function to the elements retrieved by the 'next' function that satisfy the condition of the 'predicate' function
+// ForEachFiltered applies the 'walker' function to the elements retrieved by the 'next' function that satisfy the 'predicate' function condition
 func ForEachFiltered[T any](next func() (T, bool), walker func(T), predicate func(T) bool) {
 	for v, ok := next(); ok && predicate(v); v, ok = next() {
 		walker(v)
@@ -93,4 +95,20 @@ func ReduceKV[K, V any](next func() (K, V, bool), merge func(K, V, K, V) (K, V))
 		rk, rv = merge(rk, rv, k, v)
 	}
 	return rk, rv
+}
+
+// HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful
+func HasAny[T any](next func() (T, bool), predicate func(T) bool) bool {
+	_, ok := First(next, predicate)
+	return ok
+}
+
+// HasAnyKV finds the first key/value pair that satisfies the 'predicate' function condition and returns true if successful
+func HasAnyKV[K, V any](next func() (K, V, bool), predicate func(K, V) bool) bool {
+	for k, v, ok := next(); ok; k, v, ok = next() {
+		if predicate(k, v) {
+			return true
+		}
+	}
+	return false
 }

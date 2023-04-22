@@ -186,6 +186,58 @@ func Test_Vector_Zero(t *testing.T) {
 	assert.Equal(t, 4, c)
 }
 
+func Test_Vector_new(t *testing.T) {
+	var vec = new(mutable.Vector[string])
+
+	var nilValues []string
+	vec.Add("a", "b", "c")
+	vec.Add(nilValues...)
+	vec.AddOne("d")
+	vec.AddAll(vec)
+
+	vec.Delete(0, 1, 2)
+	var nilIndexes []int
+	vec.Delete(nilIndexes...)
+	vec.DeleteOne(0)
+
+	e := vec.IsEmpty()
+	assert.False(t, e)
+
+	l := vec.Len()
+	assert.Equal(t, 4, l)
+
+	vec.For(func(s string) error { return nil })
+	vec.ForEach(func(s string) {})
+	vec.Track(func(i int, s string) error { return nil })
+	vec.TrackEach(func(i int, s string) {})
+
+	assert.Equal(t, slice.Of("a", "b", "c", "d"), vec.Slice())
+
+	head := vec.Head()
+	assert.True(t, head.HasNext())
+	assert.False(t, head.HasPrev())
+
+	_, ok := head.Get()
+	assert.False(t, ok)
+	fv, ok := head.Next()
+	assert.True(t, ok)
+	assert.Equal(t, "a", fv)
+	c := head.Cap()
+	assert.Equal(t, 4, c)
+
+	tail := vec.Tail()
+	assert.False(t, tail.HasNext())
+	assert.True(t, tail.HasPrev())
+
+	_, ok = tail.Get()
+	assert.False(t, ok)
+	tv, ok := tail.Prev()
+	assert.True(t, ok)
+	assert.Equal(t, "d", tv)
+	c = tail.Cap()
+	assert.Equal(t, 4, c)
+}
+
 func Test_Vector_AddAllOfSelf(t *testing.T) {
 	vec := vector.Of(1, 2, 3)
 	vec.AddAll(vec)

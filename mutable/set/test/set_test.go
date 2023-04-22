@@ -177,7 +177,8 @@ func Test_Set_DoubleConvert(t *testing.T) {
 		stringsPipe        = set.Convert(ints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 })
 		prefixedStrinsPipe = iterable.Convert(stringsPipe, func(s string) string { return "_" + s })
 	)
-	assert.Equal(t, slice.Of("_0", "_1", "_3", "_5", "_6", "_8"), sort.Of(prefixedStrinsPipe.Slice()))
+	s := prefixedStrinsPipe.Slice()
+	assert.Equal(t, slice.Of("_0", "_1", "_3", "_5", "_6", "_8"), sort.Of(s))
 
 	//second call do nothing
 	var no []string
@@ -220,6 +221,34 @@ func Test_Set_Zero(t *testing.T) {
 	mset.AddAll(&mset)
 
 	assert.Equal(t, *set.Of(1, 2, 3, 4), mset)
+	assert.Equal(t, slice.Of(1, 2, 3, 4), sort.Of(mset.Slice()))
+
+	mset.Delete(1, 2, 3)
+	mset.Delete(nils...)
+	mset.DeleteOne(4)
+
+	assert.True(t, mset.IsEmpty())
+	assert.Equal(t, 0, mset.Len())
+
+	mset.For(nil)
+	mset.ForEach(nil)
+
+	head := mset.Head()
+	_, ok := head.Next()
+	assert.False(t, ok)
+	head.Delete()
+}
+
+func Test_Set_new(t *testing.T) {
+	var mset = new(mutable.Set[int])
+	var nils []int
+	mset.Add(1, 2, 3)
+	assert.False(t, mset.IsEmpty())
+	mset.Add(nils...)
+	mset.AddOne(4)
+	mset.AddAll(mset)
+
+	assert.Equal(t, set.Of(1, 2, 3, 4), mset)
 	assert.Equal(t, slice.Of(1, 2, 3, 4), sort.Of(mset.Slice()))
 
 	mset.Delete(1, 2, 3)
