@@ -6,6 +6,9 @@ import (
 
 	"github.com/m4gshm/gollections/first"
 	"github.com/m4gshm/gollections/immutable/set"
+	"github.com/m4gshm/gollections/iter"
+	sliceIter "github.com/m4gshm/gollections/iter/slice"
+	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/predicate/eq"
 	"github.com/m4gshm/gollections/predicate/not"
@@ -100,11 +103,54 @@ func Test_FindFirsManager(t *testing.T) {
 		for _, r := range u.Roles() {
 			if r.Name() == "Manager" {
 				legacyAlice = u
-
 			}
 		}
 	}
 	assert.Equal(t, "Alice", legacyAlice.Name())
+}
+
+func Benchmark_FindFirsManager_Set(b *testing.B) {
+	//new
+	for i := 0; i < b.N; i++ {
+		alice, ok := first.Of(users...).By(func(user User) bool {
+			return set.Convert(set.New(user.Roles()), Role.Name).HasAny(eq.To("Manager"))
+		})
+		_, _ = alice, ok
+	}
+}
+
+func Benchmark_FindFirsManager_Slice(b *testing.B) {
+	//new
+	for i := 0; i < b.N; i++ {
+		alice, ok := first.Of(users...).By(func(user User) bool {
+			return slice.Contains(slice.Convert(user.Roles(), Role.Name), "Manager")
+		})
+		_, _ = alice, ok
+	}
+}
+
+func Benchmark_FindFirsManager_Iter(b *testing.B) {
+	//new
+	for i := 0; i < b.N; i++ {
+		alice, ok := first.Of(users...).By(func(user User) bool {
+			return loop.HasAny(sliceIter.Convert(user.Roles(), Role.Name).Next, eq.To("Manager"))
+		})
+		_, _ = alice, ok
+	}
+}
+
+func Benchmark_FindFirsManager_Old(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		legacyAlice := User{}
+		for _, u := range users {
+			for _, r := range u.Roles() {
+				if r.Name() == "Manager" {
+					legacyAlice = u
+				}
+			}
+		}
+		_ = legacyAlice
+	}
 }
 
 func Test_AggregateFilteredRoles(t *testing.T) {
@@ -124,4 +170,34 @@ func Test_AggregateFilteredRoles(t *testing.T) {
 		}
 	}
 	assert.Equal(t, slice.Of("Admin", "manager"), legacyRoleNamesExceptManager)
+}
+
+func Benchmark_AggregateFilteredRoles_Slice(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		roles := slice.Flatt(users, User.Roles)
+		roleNamesExceptManager := convert.AndFilter(roles, Role.Name, not.Eq("Manager"))
+		_ = roleNamesExceptManager
+	}
+}
+
+func Benchmark_AggregateFilteredRoles_Iter(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		roles := sliceIter.Flatt(users, User.Roles)
+		roleNamesExceptManager := iter.Filter(iter.Convert(roles, Role.Name), not.Eq("Manager"))
+		_ = roleNamesExceptManager
+	}
+}
+
+func Benchmark_AggregateFilteredRoles_Old(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		legacyRoleNamesExceptManager := []string{}
+		for _, u := range users {
+			for _, r := range u.Roles() {
+				if n := r.Name(); n != "Manager" {
+					legacyRoleNamesExceptManager = append(legacyRoleNamesExceptManager, n)
+				}
+			}
+		}
+		_ = legacyRoleNamesExceptManager
+	}
 }

@@ -371,7 +371,7 @@ func Benchmark_FilterAndConvert_Slice(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		f := sliceit.FilterAndConvert(items, even, convert.And(toString, addTail))
-		s = iter.ToSlice[string](f)
+		s = iter.ToSlice(f)
 	}
 	_ = s
 
@@ -478,10 +478,10 @@ func Benchmark_ReduceSum_Iterable(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		result = iter.Reduce(iter.Filter(iter.Flatt(iter.Flatt(iter.Wrap(multiDimension), convert.To[[][]int]), convert.To[[]int]), odds), sop.Sum[int])
 	}
+	b.StopTimer()
 	if result != expected {
 		b.Fatalf("must be %d, but %d", expected, result)
 	}
-	b.StopTimer()
 }
 
 func Benchmark_ReduceSum_Iterable_Impl(b *testing.B) {
@@ -497,10 +497,10 @@ func Benchmark_ReduceSum_Iterable_Impl(b *testing.B) {
 		f3 := iterimpl.Filter(f2.Next, odds)
 		result = loop.Reduce(f3.Next, sop.Sum[int])
 	}
+	b.StopTimer()
 	if result != expected {
 		b.Fatalf("must be %d, but %d", expected, result)
 	}
-	b.StopTimer()
 }
 
 func Benchmark_ReduceSum_Slice(b *testing.B) {
@@ -512,10 +512,10 @@ func Benchmark_ReduceSum_Slice(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		result = iter.Reduce(iter.Filter(iter.Flatt(sliceit.Flatt(multiDimension, convert.To[[][]int]), convert.To[[]int]), odds), sop.Sum[int])
 	}
+	b.StopTimer()
 	if result != expected {
 		b.Fatalf("must be %d, but %d", expected, result)
 	}
-	b.StopTimer()
 }
 
 //go:noinline
@@ -533,10 +533,10 @@ func Benchmark_ReduceSum_Slice_Impl(b *testing.B) {
 		f3 := iterimpl.Filter(f2.Next, odds)
 		result = loop.Reduce(f3.Next, sop.Sum[int])
 	}
+	b.StopTimer()
 	if result != expected {
 		b.Fatalf("must be %d, but %d", expected, result)
 	}
-	b.StopTimer()
 }
 
 func Benchmark_ReduceSum_Slice_PlainOld(b *testing.B) {
@@ -556,10 +556,10 @@ func Benchmark_ReduceSum_Slice_PlainOld(b *testing.B) {
 			}
 		}
 	}
+	b.StopTimer()
 	if result != expected {
 		b.Fatalf("must be %d, but %d", expected, result)
 	}
-	b.StopTimer()
 }
 
 func Benchmark_ReduceSum_Slice_PlainOld_Index(b *testing.B) {
@@ -579,10 +579,10 @@ func Benchmark_ReduceSum_Slice_PlainOld_Index(b *testing.B) {
 			}
 		}
 	}
+	b.StopTimer()
 	if result != expected {
 		b.Fatalf("must be %d, but %d", expected, result)
 	}
-	b.StopTimer()
 }
 
 type (
@@ -642,7 +642,7 @@ func Benchmark_MapFlattStructure_IterableFit_Impl(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		it := iterimpl.NewHead(items)
 		attr := iterimpl.FilterAndFlatt(it.Next, check.NotNil[Participant], (*Participant).GetAttributes)
-		f := iterimpl.FilterAndConvert[*Attributes, string, any](nil, (&attr).Next, check.NotNil[Attributes], (*Attributes).GetName)
+		f := iterimpl.FilterAndConvert[*Attributes, string, any](attr, attr.Next, check.NotNil[Attributes], (*Attributes).GetName)
 		_ = loop.ToSlice(f.Next)
 	}
 	b.StopTimer()
