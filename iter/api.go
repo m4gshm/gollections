@@ -34,12 +34,12 @@ func Wrap[TS ~[]T, T any](elements TS) *iter.ArrayIter[T] {
 
 // Convert instantiates Iterator that converts elements with a converter and returns them
 func Convert[From, To any, IT c.Iterator[From]](elements IT, converter func(From) To) c.Iterator[To] {
-	return iter.Convert(elements, elements.Next, converter)
+	return iter.Convert(elements.Next, converter)
 }
 
 // FilterAndConvert additionally filters 'From' elements.
 func FilterAndConvert[From, To any, IT c.Iterator[From]](elements IT, filter func(From) bool, converter func(From) To) c.Iterator[To] {
-	return iter.FilterAndConvert(elements, elements.Next, filter, converter)
+	return iter.FilterAndConvert(elements.Next, filter, converter)
 }
 
 // Flatt instantiates Iterator that converts the collection elements into slices and then flattens them to one level

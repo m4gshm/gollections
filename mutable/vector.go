@@ -275,13 +275,13 @@ func (v *Vector[T]) SetNew(index int, value T) bool {
 // Filter returns a pipe consisting of vector elements matching the filter
 func (v *Vector[T]) Filter(filter func(T) bool) c.Pipe[T] {
 	h := v.Head()
-	return iter.NewPipe[T](iter.Filter(h.Next, filter))
+	return iter.NewPipe(iter.Filter(h.Next, filter).Next)
 }
 
 // Convert returns a pipe that applies the 'converter' function to the collection elements
 func (v *Vector[T]) Convert(converter func(T) T) c.Pipe[T] {
 	h := v.Head()
-	return iter.NewPipe[T](iter.Convert(h, h.Next, converter))
+	return iter.NewPipe(iter.Convert(h.Next, converter).Next)
 }
 
 // Reduce reduces the elements into an one using the 'merge' function

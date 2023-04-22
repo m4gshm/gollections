@@ -29,12 +29,12 @@ func NewCap[T comparable](capacity int) *ordered.Set[T] {
 // Convert returns a pipe that applies the 'converter' function to the collection elements
 func Convert[From, To comparable](collection *ordered.Set[From], converter func(From) To) c.Pipe[To] {
 	h := collection.Head()
-	return iter.NewPipe[To](iter.Convert(h, h.Next, converter))
+	return iter.NewPipe(iter.Convert(h.Next, converter).Next)
 }
 
 // Flatt instantiates Iterator that converts the collection elements into slices and then flattens them to one level
 func Flatt[From, To comparable](s *ordered.Set[From], by func(From) []To) c.Pipe[To] {
 	h := s.Head()
 	f := iter.Flatt(h.Next, by)
-	return iter.NewPipe[To](&f)
+	return iter.NewPipe(f.Next)
 }

@@ -99,13 +99,13 @@ func (s Set[T]) ForEach(walker func(T)) {
 // Filter returns a pipe consisting of elements that satisfy the condition of the 'predicate' function
 func (s Set[T]) Filter(predicate func(T) bool) c.Pipe[T] {
 	h := s.Head()
-	return iter.NewPipe[T](iter.Filter(h.Next, predicate))
+	return iter.NewPipe[T](iter.Filter(h.Next, predicate).Next)
 }
 
 // Convert returns a pipe that applies the 'converter' function to the collection elements
 func (s Set[T]) Convert(converter func(T) T) c.Pipe[T] {
 	h := s.Head()
-	return iter.NewPipe[T](iter.Convert(h, h.Next, converter))
+	return iter.NewPipe[T](iter.Convert(h.Next, converter).Next)
 }
 
 // Reduce reduces the elements into an one using the 'merge' function

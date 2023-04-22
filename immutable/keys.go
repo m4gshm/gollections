@@ -75,13 +75,13 @@ func (m MapKeys[K, V]) ForEach(walker func(K)) {
 // Filter returns a pipe consisting of elements that satisfy the condition of the 'predicate' function
 func (m MapKeys[K, V]) Filter(filter func(K) bool) c.Pipe[K] {
 	h := m.Head()
-	return iter.NewPipe[K](iter.Filter(h.Next, filter))
+	return iter.NewPipe(iter.Filter(h.Next, filter).Next)
 }
 
 // Convert returns a pipe that applies the 'converter' function to the collection elements
 func (m MapKeys[K, V]) Convert(converter func(K) K) c.Pipe[K] {
 	h := m.Head()
-	return iter.NewPipe[K](iter.Convert(h, h.Next, converter))
+	return iter.NewPipe(iter.Convert(h.Next, converter).Next)
 }
 
 // Reduce reduces the elements into an one using the 'merge' function

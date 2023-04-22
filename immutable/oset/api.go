@@ -32,12 +32,12 @@ func Sort[T comparable, f constraints.Ordered](s ordered.Set[T], by func(T) f) o
 // Convert returns a pipe that applies the 'converter' function to the collection elements
 func Convert[From, To comparable](collection ordered.Set[From], converter func(From) To) c.Pipe[To] {
 	h := collection.Head()
-	return iter.NewPipe[To](iter.Convert(h, h.Next, converter))
+	return iter.NewPipe(iter.Convert(h.Next, converter).Next)
 }
 
 // Flatt returns a pipe that converts the collection elements into slices and then flattens them to one level
 func Flatt[From, To comparable](s ordered.Set[From], flattener func(From) []To) c.Pipe[To] {
 	h := s.Head()
 	f := iter.Flatt(h.Next, flattener)
-	return iter.NewPipe[To](&f)
+	return iter.NewPipe(f.Next)
 }
