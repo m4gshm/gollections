@@ -175,3 +175,51 @@ func Test_Map_Zero(t *testing.T) {
 	m.Values().Convert(as.Is[string]).For(func(element string) error { return nil })
 	m.Values().Filter(func(s string) bool { return true }).ForEach(func(element string) {})
 }
+
+func Test_Map_new(t *testing.T) {
+	var m = new(mutable.Map[string, string])
+
+	m.Set("a", "A")
+	assert.True(t, m.SetNew("b", "B"))
+	assert.False(t, m.SetNew("b", "B"))
+
+	m.SetMap(nil)
+	m.SetMap(map_.Of(K.V("d", "D")))
+
+	out := m.Map()
+	assert.Equal(t, 3, len(out))
+
+	m.Delete("b")
+	var nilKeys []string
+	m.Delete(nilKeys...)
+	m.DeleteOne("a")
+
+	e := m.IsEmpty()
+	assert.False(t, e)
+
+	l := m.Len()
+	assert.Equal(t, 1, l)
+
+	head, k, v, ok := m.First()
+	assert.True(t, ok)
+	assert.Equal(t, "d", k)
+	assert.Equal(t, "D", v)
+
+	head = m.Head()
+	_, _, ok = head.Next()
+	assert.True(t, ok)
+
+	m.Reduce(func(k1, v1, k2, v2 string) (string, string) { return k1 + k2, v1 + v2 })
+	m.Convert(func(s1, s2 string) (string, string) { return s1, s2 }).Track(func(position, element string) error { return nil })
+	m.ConvertKey(as.Is[string]).Next()
+	m.ConvertValue(as.Is[string]).Next()
+	m.Filter(func(s1, s2 string) bool { return true }).Convert(func(s1, s2 string) (string, string) { return s1, s2 }).Track(func(position, element string) error { return nil })
+	m.Filter(func(s1, s2 string) bool { return true }).Convert(func(s1, s2 string) (string, string) { return s1, s2 }).TrackEach(func(position, element string) {})
+
+	m.Keys().For(func(element string) error { return nil })
+	m.Keys().ForEach(func(element string) {})
+	m.Values().For(func(element string) error { return nil })
+	m.Values().ForEach(func(element string) {})
+	m.Values().Convert(as.Is[string]).For(func(element string) error { return nil })
+	m.Values().Filter(func(s string) bool { return true }).ForEach(func(element string) {})
+}

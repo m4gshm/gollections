@@ -207,3 +207,30 @@ func Test_Set_Zero(t *testing.T) {
 	assert.False(t, ok)
 	head.Delete()
 }
+
+func Test_Set_new(t *testing.T) {
+	var mset = new(ordered.Set[int])
+	var nils []int
+	mset.Add(1, 2, 3)
+	assert.False(t, mset.IsEmpty())
+	mset.Add(nils...)
+	mset.AddOne(4)
+	mset.AddAll(mset)
+
+	assert.Equal(t, slice.Of(1, 2, 3, 4), mset.Slice())
+
+	mset.Delete(1, 2, 3)
+	mset.Delete(nils...)
+	mset.DeleteOne(4)
+
+	assert.True(t, mset.IsEmpty())
+	assert.Equal(t, 0, mset.Len())
+
+	mset.For(nil)
+	mset.ForEach(nil)
+
+	head := mset.Head()
+	_, ok := head.Next()
+	assert.False(t, ok)
+	head.Delete()
+}
