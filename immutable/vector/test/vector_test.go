@@ -134,40 +134,6 @@ func Test_Vector_DoubleConvert(t *testing.T) {
 	assert.Equal(t, no, stringsPipe.Slice())
 }
 
-// func Test_Vector_Nil(t *testing.T) {
-// 	var vec *immutable.Vector[int]
-
-// 	vec.IsEmpty()
-// 	vec.Len()
-
-// 	vec.For(nil)
-// 	vec.ForEach(nil)
-// 	vec.Track(nil)
-// 	vec.TrackEach(nil)
-
-// 	vec.Slice()
-
-// 	head := vec.Head()
-// 	assert.False(t, head.HasNext())
-// 	assert.False(t, head.HasPrev())
-
-// 	_, ok := head.Get()
-// 	assert.False(t, ok)
-// 	_, ok = head.Next()
-// 	assert.False(t, ok)
-// 	head.Cap()
-
-// 	tail := vec.Tail()
-// 	assert.False(t, tail.HasNext())
-// 	assert.False(t, tail.HasPrev())
-
-// 	_, ok = tail.Get()
-// 	assert.False(t, ok)
-// 	_, ok = tail.Next()
-// 	assert.False(t, ok)
-// 	tail.Cap()
-// }
-
 func Test_Vector_Zero(t *testing.T) {
 	var vec immutable.Vector[int]
 
