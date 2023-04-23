@@ -1,10 +1,11 @@
-package K
+package k
 
 import (
 	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/kv"
 )
 
-// V is K.V shortening for map_.NewKV
+// V is k.V shortening for map_.NewKV
 func V[k, v any](key k, value v) c.KV[k, v] {
-	return c.NewKV(key, value)
+	return kv.New(key, value)
 }

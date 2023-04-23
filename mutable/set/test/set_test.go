@@ -4,17 +4,17 @@ import (
 	"strconv"
 	"testing"
 
-	cgroup "github.com/m4gshm/gollections/c/group"
 	"github.com/m4gshm/gollections/iter"
 	"github.com/m4gshm/gollections/iterable"
+	iterableGroup "github.com/m4gshm/gollections/iterable/group"
 	"github.com/m4gshm/gollections/mutable"
 	"github.com/m4gshm/gollections/mutable/set"
 	"github.com/m4gshm/gollections/mutable/vector"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/sort"
-
 	"github.com/m4gshm/gollections/walk/group"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -142,7 +142,7 @@ func Test_Set_Group_By_Walker(t *testing.T) {
 }
 
 func Test_Set_Group_By_Iterator(t *testing.T) {
-	groups := cgroup.Of(set.Of(0, 1, 1, 2, 4, 3, 1, 6, 7), func(e int) bool { return e%2 == 0 }).Map()
+	groups := iterableGroup.Of(set.Of(0, 1, 1, 2, 4, 3, 1, 6, 7), func(e int) bool { return e%2 == 0 }).Map()
 
 	assert.Equal(t, len(groups), 2)
 	fg := sort.Of(groups[false])

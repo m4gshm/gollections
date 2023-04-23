@@ -4,15 +4,15 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/m4gshm/gollections/K"
 	"github.com/m4gshm/gollections/immutable"
 	"github.com/m4gshm/gollections/immutable/map_"
+	"github.com/m4gshm/gollections/k"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/stretchr/testify/assert"
 )
 
 func Test_Map_Iterate(t *testing.T) {
-	dict := map_.Of(K.V(1, "1"), K.V(1, "1"), K.V(2, "2"), K.V(4, "4"), K.V(3, "3"), K.V(1, "1"))
+	dict := map_.Of(k.V(1, "1"), k.V(1, "1"), k.V(2, "2"), k.V(4, "4"), k.V(3, "3"), k.V(1, "1"))
 
 	assert.Equal(t, 4, dict.Len())
 	assert.Equal(t, 4, len(dict.Map()))
@@ -43,7 +43,7 @@ func Test_Map_Iterate(t *testing.T) {
 }
 
 func Test_Map_Iterate_Keys(t *testing.T) {
-	dict := map_.Of(K.V(1, "1"), K.V(1, "1"), K.V(2, "2"), K.V(4, "4"), K.V(3, "3"), K.V(1, "1"))
+	dict := map_.Of(k.V(1, "1"), k.V(1, "1"), k.V(2, "2"), k.V(4, "4"), k.V(3, "3"), k.V(1, "1"))
 	assert.Equal(t, 4, len(dict.Map()))
 
 	expectedK := slice.Of(1, 2, 3, 4)
@@ -59,7 +59,7 @@ func Test_Map_Iterate_Keys(t *testing.T) {
 }
 
 func Test_Map_Iterate_Values(t *testing.T) {
-	ordered := map_.Of(K.V(1, "1"), K.V(1, "1"), K.V(2, "2"), K.V(4, "4"), K.V(3, "3"), K.V(1, "1"))
+	ordered := map_.Of(k.V(1, "1"), k.V(1, "1"), k.V(2, "2"), k.V(4, "4"), k.V(3, "3"), k.V(1, "1"))
 	assert.Equal(t, 4, len(ordered.Map()))
 
 	expectedV := slice.Of("1", "2", "3", "4")

@@ -1,12 +1,10 @@
-package kviter
+package iter
 
 import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/iter"
-	"github.com/m4gshm/gollections/kviter/group"
-	"github.com/m4gshm/gollections/loop"
-	kviter "github.com/m4gshm/gollections/loop/kv/iter"
-	"github.com/m4gshm/gollections/loop/kv/stream"
+	"github.com/m4gshm/gollections/kv/loop"
+	"github.com/m4gshm/gollections/kv/iter/group"
 	"github.com/m4gshm/gollections/map_/filter"
 )
 
@@ -39,18 +37,18 @@ func Group[K comparable, V any](it c.KVIterator[K, V]) map[K][]V {
 // The hasNext specifies a predicate that tests existing of a next element in the source.
 // The getNext extracts the element.
 func OfLoop[S, k, V any](source S, hasNext func(S) bool, getNext func(S) (k, V, error)) c.KVIteratorBreakable[k, V] {
-	l := kviter.New(source, hasNext, getNext)
+	l := loop.NewIter(source, hasNext, getNext)
 	return &l
 }
 
 // Map instantiates key/value iterator that converts elements with a converter and returns them
 func Map[K comparable, V any, Kto comparable, Vto any](elements c.KVIterator[K, V], by func(K, V) (Kto, Vto)) c.MapStream[Kto, Vto, map[Kto]Vto] {
-	return stream.New(kviter.Convert(elements.Next, by).Next, stream.ToMap[Kto, Vto])
+	return loop.Stream(loop.Convert(elements.Next, by).Next, loop.ToMap[Kto, Vto])
 }
 
 // Filter instantiates key/value iterator that iterates only over filtered elements
 func Filter[K comparable, V any, IT c.KVIterator[K, V]](elements IT, filter func(K, V) bool) c.MapStream[K, V, map[K]V] {
-	return stream.New(kviter.Filter(elements.Next, filter).Next, stream.ToMap[K, V])
+	return loop.Stream(loop.Filter(elements.Next, filter).Next, loop.ToMap[K, V])
 }
 
 // FilterKey instantiates key/value iterator that iterates only over elements that filtered by the key
@@ -65,5 +63,5 @@ func FilterValue[K comparable, V any](elements c.KVIterator[K, V], fit func(V) b
 
 // Reduce reduces keys/value pairs to an one pair
 func Reduce[K comparable, V any](elements c.KVIterator[K, V], by c.Quaternary[K, V]) (K, V) {
-	return loop.ReduceKV(elements.Next, by)
+	return loop.Reduce(elements.Next, by)
 }

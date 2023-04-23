@@ -4,8 +4,8 @@ import (
 	"golang.org/x/exp/constraints"
 
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/loop/iter"
-	"github.com/m4gshm/gollections/loop/stream"
+	"github.com/m4gshm/gollections/loop"
+	iter "github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/mutable"
 	"github.com/m4gshm/gollections/mutable/ordered"
 )
@@ -38,12 +38,12 @@ func Sort[T comparable, F constraints.Ordered](s mutable.Set[T], by func(T) F) *
 // Convert returns a pipe that applies the 'converter' function to the collection elements
 func Convert[From, To comparable](collection *mutable.Set[From], converter func(From) To) c.Stream[To] {
 	h := collection.Head()
-	return stream.New(iter.Convert(h.Next, converter).Next)
+	return loop.Stream(loop.Convert(h.Next, converter).Next)
 }
 
 // Flatt instantiates Iterator that converts the collection elements into slices and then flattens them to one level
 func Flatt[From, To comparable](s *mutable.Set[From], by func(From) []To) c.Stream[To] {
 	h := s.Head()
 	f := iter.Flatt(h.Next, by)
-	return stream.New(f.Next)
+	return loop.Stream(f.Next)
 }

@@ -4,8 +4,9 @@ import (
 	"fmt"
 
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/loop/iter"
-	"github.com/m4gshm/gollections/loop/stream"
+	oMapIter "github.com/m4gshm/gollections/immutable/ordered/map_/iter"
+	"github.com/m4gshm/gollections/loop"
+	iter "github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/slice"
 )
@@ -33,7 +34,7 @@ func (m MapValues[K, V]) Begin() c.Iterator[V] {
 }
 
 // Head creates iterator
-func (m MapValues[K, V]) Head() ValIter[K, V] {
+func (m MapValues[K, V]) Head() oMapIter.ValIter[K, V] {
 	var (
 		order    []K
 		elements map[K]V
@@ -42,12 +43,12 @@ func (m MapValues[K, V]) Head() ValIter[K, V] {
 	order = m.order
 	elements = m.elements
 
-	return NewValIter(order, elements)
+	return oMapIter.NewValIter(order, elements)
 }
 
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
-func (m MapValues[K, V]) First() (ValIter[K, V], V, bool) {
+func (m MapValues[K, V]) First() (oMapIter.ValIter[K, V], V, bool) {
 	var (
 		iterator  = m.Head()
 		first, ok = iterator.Next()
@@ -100,13 +101,13 @@ func (m MapValues[K, V]) Get(index int) (V, bool) {
 // Filter returns a pipe consisting of elements that satisfy the condition of the 'predicate' function
 func (m MapValues[K, V]) Filter(filter func(V) bool) c.Stream[V] {
 	h := m.Head()
-	return stream.New(iter.Filter(h.Next, filter).Next)
+	return loop.Stream(iter.Filter(h.Next, filter).Next)
 }
 
 // Convert returns a pipe that applies the 'converter' function to the collection elements
 func (m MapValues[K, V]) Convert(converter func(V) V) c.Stream[V] {
 	h := m.Head()
-	return stream.New(iter.Convert(h.Next, converter).Next)
+	return loop.Stream(loop.Convert(h.Next, converter).Next)
 }
 
 // Reduce reduces the elements into an one using the 'merge' function

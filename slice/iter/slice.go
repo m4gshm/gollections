@@ -11,23 +11,23 @@ import (
 const NoStarted = -1
 
 // New instantiates Iter based on elements Iter and returs its reference
-func New[TS ~[]T, T any](elements TS) ArrayIter[T] {
+func New[TS ~[]T, T any](elements TS) SliceIter[T] {
 	return NewHead(elements)
 }
 
 // NewHead instantiates Iter based on elements slice
-func NewHead[TS ~[]T, T any](elements TS) ArrayIter[T] {
+func NewHead[TS ~[]T, T any](elements TS) SliceIter[T] {
 	return NewHeadS(elements, notsafe.GetTypeSize[T]())
 }
 
 // NewHeadS instantiates Iter based on elements slice with predefined element size
-func NewHeadS[TS ~[]T, T any](elements TS, elementSize uintptr) ArrayIter[T] {
+func NewHeadS[TS ~[]T, T any](elements TS, elementSize uintptr) SliceIter[T] {
 	var (
 		header = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
 		array  = unsafe.Pointer(header.Data)
 		size   = header.Len
 	)
-	return ArrayIter[T]{
+	return SliceIter[T]{
 		array:       array,
 		elementSize: elementSize,
 		size:        size,
@@ -37,18 +37,18 @@ func NewHeadS[TS ~[]T, T any](elements TS, elementSize uintptr) ArrayIter[T] {
 }
 
 // NewTail instantiates Iter based on elements slice for reverse iterating
-func NewTail[T any](elements []T) ArrayIter[T] {
+func NewTail[T any](elements []T) SliceIter[T] {
 	return NewTailS(elements, notsafe.GetTypeSize[T]())
 }
 
 // NewTailS instantiates Iter based on elements slice with predefined element size for reverse iterating
-func NewTailS[T any](elements []T, elementSize uintptr) ArrayIter[T] {
+func NewTailS[T any](elements []T, elementSize uintptr) SliceIter[T] {
 	var (
 		header = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
 		array  = unsafe.Pointer(header.Data)
 		size   = header.Len
 	)
-	return ArrayIter[T]{
+	return SliceIter[T]{
 		array:       array,
 		elementSize: elementSize,
 		size:        size,
@@ -57,20 +57,20 @@ func NewTailS[T any](elements []T, elementSize uintptr) ArrayIter[T] {
 	}
 }
 
-// ArrayIter is the Iterator implementation.
-type ArrayIter[T any] struct {
+// SliceIter is the Iterator implementation.
+type SliceIter[T any] struct {
 	array                     unsafe.Pointer
 	elementSize               uintptr
 	size, maxHasNext, current int
 }
 
 var (
-	_ c.Iterator[any]     = (*ArrayIter[any])(nil)
-	_ c.PrevIterator[any] = (*ArrayIter[any])(nil)
+	_ c.Iterator[any]     = (*SliceIter[any])(nil)
+	_ c.PrevIterator[any] = (*SliceIter[any])(nil)
 )
 
 // HasNext checks the next element existing
-func (i *ArrayIter[T]) HasNext() bool {
+func (i *SliceIter[T]) HasNext() bool {
 	if i == nil {
 		return false
 	}
@@ -78,7 +78,7 @@ func (i *ArrayIter[T]) HasNext() bool {
 }
 
 // HasPrev checks the previous element existing
-func (i *ArrayIter[T]) HasPrev() bool {
+func (i *SliceIter[T]) HasPrev() bool {
 	if i == nil {
 		return false
 	}
@@ -86,13 +86,13 @@ func (i *ArrayIter[T]) HasPrev() bool {
 }
 
 // GetNext returns the next element
-func (i *ArrayIter[T]) GetNext() T {
+func (i *SliceIter[T]) GetNext() T {
 	t, _ := i.Next()
 	return t
 }
 
 // GetPrev returns the previous element
-func (i *ArrayIter[T]) GetPrev() T {
+func (i *SliceIter[T]) GetPrev() T {
 	t, _ := i.Prev()
 	return t
 }
@@ -100,7 +100,7 @@ func (i *ArrayIter[T]) GetPrev() T {
 // Next returns the next element.
 // The ok result indicates whether the element was returned by the iterator.
 // If ok == false, then the iteration must be completed.
-func (i *ArrayIter[T]) Next() (v T, ok bool) {
+func (i *SliceIter[T]) Next() (v T, ok bool) {
 	if !(i == nil || i.array == nil) {
 		if current := i.current; CanIterateByRange(NoStarted, i.maxHasNext, current) {
 			current++
@@ -114,7 +114,7 @@ func (i *ArrayIter[T]) Next() (v T, ok bool) {
 // Prev returns the previos element.
 // The ok result indicates whether the element was returned by the iterator.
 // If ok == false, then the iteration must be completed.
-func (i *ArrayIter[T]) Prev() (v T, ok bool) {
+func (i *SliceIter[T]) Prev() (v T, ok bool) {
 	if !(i == nil || i.array == nil) {
 		current := i.current
 		if CanIterateByRange(1, i.size, current) {
@@ -129,7 +129,7 @@ func (i *ArrayIter[T]) Prev() (v T, ok bool) {
 // Get returns the current element.
 // The ok result indicates whether the element was returned by the iterator.
 // If ok == false, then the iteration must be completed.
-func (i *ArrayIter[T]) Get() (v T, ok bool) {
+func (i *SliceIter[T]) Get() (v T, ok bool) {
 	if !(i == nil || i.array == nil) {
 		current := i.current
 		if IsValidIndex(i.size, current) {
@@ -140,7 +140,7 @@ func (i *ArrayIter[T]) Get() (v T, ok bool) {
 }
 
 // Cap returns the iterator capacity
-func (i *ArrayIter[T]) Cap() int {
+func (i *SliceIter[T]) Cap() int {
 	if i == nil {
 		return 0
 	}

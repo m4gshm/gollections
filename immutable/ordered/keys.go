@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/loop/stream"
+	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/iter"
 )
@@ -34,13 +34,13 @@ func (m MapKeys[K]) Begin() c.Iterator[K] {
 }
 
 // Head creates iterator
-func (m MapKeys[K]) Head() iter.ArrayIter[K] {
+func (m MapKeys[K]) Head() iter.SliceIter[K] {
 	return iter.NewHead(m.keys)
 }
 
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
-func (m MapKeys[K]) First() (iter.ArrayIter[K], K, bool) {
+func (m MapKeys[K]) First() (iter.SliceIter[K], K, bool) {
 	var (
 		iterator  = m.Head()
 		first, ok = iterator.Next()
@@ -76,13 +76,13 @@ func (m MapKeys[K]) ForEach(walker func(K)) {
 // Filter returns a pipe consisting of elements that satisfy the condition of the 'predicate' function
 func (m MapKeys[K]) Filter(filter func(K) bool) c.Stream[K] {
 	f := iter.Filter(m.keys, filter)
-	return stream.New[K](f.Next)
+	return loop.Stream(f.Next)
 }
 
 // Convert returns a pipe that applies the 'converter' function to the collection elements
 func (m MapKeys[K]) Convert(converter func(K) K) c.Stream[K] {
 	conv := iter.Convert(m.keys, converter)
-	return stream.New[K](conv.Next)
+	return loop.Stream(conv.Next)
 }
 
 // Reduce reduces the elements into an one using the 'merge' function

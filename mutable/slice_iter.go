@@ -6,33 +6,33 @@ import (
 )
 
 // NewHead instantiates Iter starting at the first element of a slice.
-func NewHead[TS ~[]T, T any](elements *TS, del func(int) bool) Iter[TS, T] {
-	return Iter[TS, T]{elements: elements, current: iter.NoStarted, del: del}
+func NewHead[TS ~[]T, T any](elements *TS, del func(int) bool) SliceIter[TS, T] {
+	return SliceIter[TS, T]{elements: elements, current: iter.NoStarted, del: del}
 }
 
 // NewTail instantiates Iter starting at the last element of a slice.
-func NewTail[TS ~[]T, T any](elements *TS, del func(int) bool) Iter[TS, T] {
+func NewTail[TS ~[]T, T any](elements *TS, del func(int) bool) SliceIter[TS, T] {
 	if elements == nil {
-		return Iter[TS, T]{}
+		return SliceIter[TS, T]{}
 	}
-	return Iter[TS, T]{elements: elements, current: len(*elements), del: del}
+	return SliceIter[TS, T]{elements: elements, current: len(*elements), del: del}
 }
 
-// Iter is the Iterator implementation for mutable containers.
-type Iter[TS ~[]T, T any] struct {
+// SliceIter is the Iterator implementation for mutable containers.
+type SliceIter[TS ~[]T, T any] struct {
 	elements      *TS
 	current, step int
 	del           func(index int) bool
 }
 
 var (
-	_ c.Iterator[any]     = (*Iter[[]any, any])(nil)
-	_ c.PrevIterator[any] = (*Iter[[]any, any])(nil)
-	_ c.DelIterator[any]  = (*Iter[[]any, any])(nil)
+	_ c.Iterator[any]     = (*SliceIter[[]any, any])(nil)
+	_ c.PrevIterator[any] = (*SliceIter[[]any, any])(nil)
+	_ c.DelIterator[any]  = (*SliceIter[[]any, any])(nil)
 )
 
 // HasNext checks the next element existing
-func (i *Iter[TS, T]) HasNext() bool {
+func (i *SliceIter[TS, T]) HasNext() bool {
 	if i == nil || i.elements == nil {
 		return false
 	}
@@ -40,7 +40,7 @@ func (i *Iter[TS, T]) HasNext() bool {
 }
 
 // HasPrev checks the previous element existing
-func (i *Iter[TS, T]) HasPrev() bool {
+func (i *SliceIter[TS, T]) HasPrev() bool {
 	if i == nil || i.elements == nil {
 		return false
 	}
@@ -48,7 +48,7 @@ func (i *Iter[TS, T]) HasPrev() bool {
 }
 
 // GetNext returns the next element
-func (i *Iter[TS, T]) GetNext() (t T) {
+func (i *SliceIter[TS, T]) GetNext() (t T) {
 	if i != nil {
 		t, _ = i.Next()
 	}
@@ -56,7 +56,7 @@ func (i *Iter[TS, T]) GetNext() (t T) {
 }
 
 // GetPrev returns the previous element
-func (i *Iter[TS, T]) GetPrev() (t T) {
+func (i *SliceIter[TS, T]) GetPrev() (t T) {
 	if i != nil {
 		t, _ = i.Prev()
 	}
@@ -66,7 +66,7 @@ func (i *Iter[TS, T]) GetPrev() (t T) {
 // Next returns the next element.
 // The ok result indicates whether the element was returned by the iterator.
 // If ok == false, then the iteration must be completed.
-func (i *Iter[TS, T]) Next() (T, bool) {
+func (i *SliceIter[TS, T]) Next() (T, bool) {
 	if i.HasNext() {
 		i.current++
 		i.step = 1
@@ -79,7 +79,7 @@ func (i *Iter[TS, T]) Next() (T, bool) {
 // Prev returns the previous element.
 // The ok result indicates whether the element was returned by the iterator.
 // If ok == false, then the iteration must be completed.
-func (i *Iter[TS, T]) Prev() (T, bool) {
+func (i *SliceIter[TS, T]) Prev() (T, bool) {
 	if i.HasPrev() {
 		i.current--
 		i.step = 0
@@ -92,7 +92,7 @@ func (i *Iter[TS, T]) Prev() (T, bool) {
 // Get returns the current element.
 // The ok result indicates whether the element was returned by the iterator.
 // If ok == false, then the iteration must be completed.
-func (i *Iter[TS, T]) Get() (t T, ok bool) {
+func (i *SliceIter[TS, T]) Get() (t T, ok bool) {
 	if i == nil || i.elements == nil {
 		return t, ok
 	}
@@ -105,7 +105,7 @@ func (i *Iter[TS, T]) Get() (t T, ok bool) {
 }
 
 // Cap returns the iterator capacity
-func (i *Iter[TS, T]) Cap() int {
+func (i *SliceIter[TS, T]) Cap() int {
 	if i == nil || i.elements == nil {
 		return 0
 	}
@@ -113,7 +113,7 @@ func (i *Iter[TS, T]) Cap() int {
 }
 
 // Delete deletes the current element
-func (i *Iter[TS, T]) Delete() {
+func (i *SliceIter[TS, T]) Delete() {
 	if i == nil {
 		return
 	} else if deleted := i.del(i.current); deleted {
@@ -122,7 +122,7 @@ func (i *Iter[TS, T]) Delete() {
 }
 
 // DeleteNext deletes the next element if it exists
-func (i *Iter[TS, T]) DeleteNext() bool {
+func (i *SliceIter[TS, T]) DeleteNext() bool {
 	if i == nil {
 		return false
 	}
@@ -130,7 +130,7 @@ func (i *Iter[TS, T]) DeleteNext() bool {
 }
 
 // DeletePrev deletes the previos element if it exists
-func (i *Iter[TS, T]) DeletePrev() bool {
+func (i *SliceIter[TS, T]) DeletePrev() bool {
 	if i == nil {
 		return false
 	} else if deleted := i.del(i.current - 1); deleted {

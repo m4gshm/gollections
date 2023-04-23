@@ -1,8 +1,8 @@
 package examples
 
 import (
-	"github.com/m4gshm/gollections/K"
 	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/k"
 	"github.com/m4gshm/gollections/mutable"
 	"github.com/m4gshm/gollections/mutable/map_"
 	"github.com/m4gshm/gollections/mutable/omap"
@@ -34,13 +34,13 @@ func _() {
 		_ c.Set[int]        = oset.Empty[int]()
 	)
 	var (
-		_ *mutable.Map[int, string] = map_.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3"))
+		_ *mutable.Map[int, string] = map_.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
 		_ *mutable.Map[int, string] = new(mutable.Map[int, string])
 		_ c.Map[int, string]        = map_.New[int, string](capacity)
 		_ c.Map[int, string]        = map_.Empty[int, string]()
 	)
 	var (
-		_ *ordered.Map[int, string] = omap.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3"))
+		_ *ordered.Map[int, string] = omap.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
 		_ *ordered.Map[int, string] = new(ordered.Map[int, string])
 		_ c.Map[int, string]        = omap.New[int, string](capacity)
 		_ c.Map[int, string]        = omap.Empty[int, string]()

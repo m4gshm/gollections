@@ -5,8 +5,7 @@ import (
 	"sort"
 
 	"github.com/m4gshm/gollections/c"
-	loopIter "github.com/m4gshm/gollections/loop/iter"
-	"github.com/m4gshm/gollections/loop/stream"
+	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/notsafe"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/iter"
@@ -42,18 +41,18 @@ func (v Vector[T]) Begin() c.Iterator[T] {
 }
 
 // Head creates iterator
-func (v Vector[T]) Head() iter.ArrayIter[T] {
+func (v Vector[T]) Head() iter.SliceIter[T] {
 	return iter.NewHeadS(v.elements, v.esize)
 }
 
 // Tail creates an iterator pointing to the end of the collection
-func (v Vector[T]) Tail() iter.ArrayIter[T] {
+func (v Vector[T]) Tail() iter.SliceIter[T] {
 	return iter.NewTailS(v.elements, v.esize)
 }
 
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
-func (v Vector[T]) First() (iter.ArrayIter[T], T, bool) {
+func (v Vector[T]) First() (iter.SliceIter[T], T, bool) {
 	var (
 		iterator  = iter.NewHeadS(v.elements, v.esize)
 		first, ok = iterator.Next()
@@ -63,7 +62,7 @@ func (v Vector[T]) First() (iter.ArrayIter[T], T, bool) {
 
 // Last returns the latest element of the collection, an iterator to reverse iterate over the remaining elements, and true\false marker of availability previous elements.
 // If no more elements then ok==false.
-func (v Vector[T]) Last() (iter.ArrayIter[T], T, bool) {
+func (v Vector[T]) Last() (iter.SliceIter[T], T, bool) {
 	var (
 		iterator  = iter.NewTailS(v.elements, v.esize)
 		first, ok = iterator.Prev()
@@ -115,13 +114,13 @@ func (v Vector[T]) ForEach(walker func(T)) {
 // Filter returns a pipe consisting of elements that satisfy the condition of the 'predicate' function
 func (v Vector[T]) Filter(filter func(T) bool) c.Stream[T] {
 	h := v.Head()
-	return stream.New(loopIter.Filter(h.Next, filter).Next)
+	return loop.Stream(loop.Filter(h.Next, filter).Next)
 }
 
 // Convert returns a pipe that applies the 'converter' function to the collection elements
 func (v Vector[T]) Convert(converter func(T) T) c.Stream[T] {
 	h := v.Head()
-	return stream.New(loopIter.Convert(h.Next, converter).Next)
+	return loop.Stream(loop.Convert(h.Next, converter).Next)
 }
 
 // Reduce reduces the elements into an one using the 'merge' function

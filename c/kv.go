@@ -1,10 +1,5 @@
 package c
 
-// NewKV creates a key/value pair holder.
-func NewKV[K any, V any](key K, value V) KV[K, V] {
-	return KV[K, V]{K: key, V: value}
-}
-
 // KV is the simplest implementation of a key/value pair.
 type KV[k any, v any] struct {
 	K k

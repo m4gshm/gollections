@@ -4,16 +4,16 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/m4gshm/gollections/K"
 	"github.com/m4gshm/gollections/iter"
-	"github.com/m4gshm/gollections/kviter"
-	kvstream "github.com/m4gshm/gollections/loop/kv/stream"
+	"github.com/m4gshm/gollections/k"
+	kviter "github.com/m4gshm/gollections/kv/iter"
+	"github.com/m4gshm/gollections/kv/loop"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/stretchr/testify/assert"
 )
 
 func Test_Collect_Group(t *testing.T) {
-	groups := kviter.Group(kviter.OfPairs(K.V(1, "1"), K.V(2, "2"), K.V(2, "22")))
+	groups := kviter.Group(kviter.OfPairs(k.V(1, "1"), k.V(2, "2"), k.V(2, "22")))
 
 	assert.Equal(t, len(groups), 2)
 	assert.Equal(t, []string{"1"}, groups[1])
@@ -21,7 +21,7 @@ func Test_Collect_Group(t *testing.T) {
 }
 
 func Test_Collect_Map(t *testing.T) {
-	groups := kvstream.ToMap(kviter.FromPairs(iter.Of(K.V(1, "1"), K.V(2, "2"), K.V(2, "22"))))
+	groups := loop.ToMap(kviter.FromPairs(iter.Of(k.V(1, "1"), k.V(2, "2"), k.V(2, "22"))).Next)
 
 	assert.Equal(t, len(groups), 2)
 	assert.Equal(t, "1", groups[1])
@@ -61,7 +61,7 @@ func Test_OfLoop(t *testing.T) {
 
 	iterator := kviter.OfLoop(data, (*rows[int]).hasNext, evens)
 
-	m := kvstream.ToMap[bool, int](iterator)
+	m := loop.ToMap(iterator.Next)
 
 	assert.Equal(t, 2, m[true])
 	assert.Equal(t, 1, m[false])
@@ -69,7 +69,7 @@ func Test_OfLoop(t *testing.T) {
 
 	streamWithError := &rows[int]{slice.Of(1, 2, 3, 4), 0}
 	iterWithError := kviter.OfLoop(streamWithError, (*rows[int]).hasNext, evens)
-	m2 := kvstream.ToMap[bool, int](iterWithError)
+	m2 := loop.ToMap(iterWithError.Next)
 
 	assert.Equal(t, 2, m2[true])
 	assert.Equal(t, "next error", iterWithError.Error().Error())

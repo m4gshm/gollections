@@ -7,12 +7,12 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/m4gshm/gollections/as"
-	cgroup "github.com/m4gshm/gollections/c/group"
 	"github.com/m4gshm/gollections/immutable"
 	"github.com/m4gshm/gollections/immutable/oset"
 	"github.com/m4gshm/gollections/immutable/set"
 	"github.com/m4gshm/gollections/iter"
 	slc "github.com/m4gshm/gollections/iter/slice"
+	iterableGroup "github.com/m4gshm/gollections/iterable/group"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/predicate/more"
 	"github.com/m4gshm/gollections/slice"
@@ -53,7 +53,7 @@ func Test_group_orderset_odd_even(t *testing.T) {
 }
 
 func Test_group_orderset_with_filtering_by_stirng_len(t *testing.T) {
-	var groups = cgroup.Of(oset.Of(
+	var groups = iterableGroup.Of(oset.Of(
 		"seventh", "seventh", //duplicated
 		"first", "second", "third", "fourth",
 		"fifth", "sixth", "eighth",
@@ -65,8 +65,6 @@ func Test_group_orderset_with_filtering_by_stirng_len(t *testing.T) {
 	).ConvertValue(
 		func(v string) string { return v + "_" },
 	).Map()
-
-	fmt.Println(groups) //map[int][]string{5:[]string{"first_", "third_", "fifth_", "sixth_", "ninth_", "tenth_", "three_"}, 6:[]string{"second_", "fourth_", "eighth_"}, 7:[]string{"seventh_"}}
 
 	assert.Equal(t, map[int][]string{
 		5: {"first_", "third_", "fifth_", "sixth_", "ninth_", "tenth_", "three_"},

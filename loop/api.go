@@ -1,11 +1,13 @@
 package loop
 
 import (
-	"errors"
+	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/check"
+	"github.com/m4gshm/gollections/notsafe"
 )
 
 // ErrBreak is the 'break' statement of the For, Track methods
-var ErrBreak = errors.New("Break")
+var ErrBreak = c.ErrBreak
 
 // For applies the 'walker' function for the elements retrieved by the 'next' function. Return the c.ErrBreak to stop
 func For[T any](next func() (T, bool), walker func(T) error) error {
@@ -84,31 +86,44 @@ func Reduce[T any](next func() (T, bool), merger func(T, T) T) (result T) {
 	return result
 }
 
-// ReduceKV reduces the key/value pairs retrieved by the 'next' function into an one pair using the 'merge' function
-func ReduceKV[K, V any](next func() (K, V, bool), merge func(K, V, K, V) (K, V)) (rk K, rv V) {
-	if k, v, ok := next(); ok {
-		rk, rv = k, v
-	} else {
-		return rk, rv
-	}
-	for k, v, ok := next(); ok; k, v, ok = next() {
-		rk, rv = merge(rk, rv, k, v)
-	}
-	return rk, rv
-}
-
 // HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful
 func HasAny[T any](next func() (T, bool), predicate func(T) bool) bool {
 	_, ok := First(next, predicate)
 	return ok
 }
 
-// HasAnyKV finds the first key/value pair that satisfies the 'predicate' function condition and returns true if successful
-func HasAnyKV[K, V any](next func() (K, V, bool), predicate func(K, V) bool) bool {
-	for k, v, ok := next(); ok; k, v, ok = next() {
-		if predicate(k, v) {
-			return true
-		}
-	}
-	return false
+// Convert instantiates Iterator that converts elements with a converter and returns them.
+func Convert[From, To any](next func() (From, bool), converter func(From) To) ConvertIter[From, To] {
+	return ConvertIter[From, To]{next: next, converter: converter}
+}
+
+// FilterAndConvert additionally filters 'From' elements.
+func FilterAndConvert[From, To any](next func() (From, bool), filter func(From) bool, by func(From) To) ConvertFitIter[From, To] {
+	return ConvertFitIter[From, To]{next: next, by: by, filter: filter}
+}
+
+// Flatt instantiates Iterator that extracts slices of 'To' by a Flattener from elements of 'From' and flattens as one iterable collection of 'To' elements.
+func Flatt[From, To any](next func() (From, bool), converter func(From) []To) Flatten[From, To] {
+	return Flatten[From, To]{next: next, flatt: converter, elemSizeTo: notsafe.GetTypeSize[To]()}
+}
+
+// FilterAndFlatt additionally filters 'From' elements.
+func FilterAndFlatt[From, To any](next func() (From, bool), filter func(From) bool, flatt func(From) []To) FlattenFit[From, To] {
+	return FlattenFit[From, To]{next: next, flatt: flatt, filter: filter, elemSizeTo: notsafe.GetTypeSize[To]()}
+}
+
+// Filter creates an Iterator that checks elements by filters and returns successful ones.
+func Filter[T any](next func() (T, bool), filter func(T) bool) Fit[T] {
+	return Fit[T]{next: next, by: filter}
+}
+
+// NotNil creates an Iterator that filters nullable elements.
+func NotNil[T any](next func() (*T, bool)) Fit[*T] {
+	return Filter(next, check.NotNil[T])
+}
+
+// ToKV transforms iterable elements to key/value iterator based on applying key extractor to the elements
+func ToKV[T any, K comparable, V any](next func() (T, bool), keyExtractor func(T) K, valueConverter func(T) V) KeyValuer[T, K, V] {
+	kv := NewKeyValuer(next, keyExtractor, valueConverter)
+	return kv
 }

@@ -2,7 +2,6 @@
 package examples
 
 import (
-	"github.com/m4gshm/gollections/K"
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/immutable"
 	"github.com/m4gshm/gollections/immutable/map_"
@@ -11,6 +10,7 @@ import (
 	"github.com/m4gshm/gollections/immutable/oset"
 	"github.com/m4gshm/gollections/immutable/set"
 	"github.com/m4gshm/gollections/immutable/vector"
+	"github.com/m4gshm/gollections/k"
 )
 
 func _() {
@@ -27,13 +27,13 @@ func _() {
 		_ c.Set[int]       = oset.New([]int{1, 2, 3})
 	)
 	var (
-		_ immutable.Map[int, string] = map_.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3"))
+		_ immutable.Map[int, string] = map_.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
 		_ c.Map[int, string]         = map_.New(map[int]string{1: "2", 2: "2", 3: "3"})
 	)
 	var (
-		_ ordered.Map[int, string] = omap.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3"))
-		_ c.Map[int, string]       = omap.New(map[int]string{
-			1: "2", 2: "2", 3: "3",
-		})
+		_ ordered.Map[int, string] = omap.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
+		_ c.Map[int, string]       = omap.New(
+			/*uniques*/ map[int]string{1: "2", 2: "2", 3: "3"} /*order*/, []int{3, 1, 2},
+		)
 	)
 }

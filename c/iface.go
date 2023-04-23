@@ -2,12 +2,13 @@
 package c
 
 import (
-	"github.com/m4gshm/gollections/loop"
+	"errors"
+
 	"golang.org/x/exp/constraints"
 )
 
 // ErrBreak is the 'break' statement of the For, Track methods
-var ErrBreak = loop.ErrBreak
+var ErrBreak = errors.New("Break")
 
 // Vector - collection interface that provides elements order and access by index to the elements.
 type Vector[T any] interface {

@@ -14,7 +14,7 @@ import (
 	"github.com/m4gshm/gollections/iterable"
 	"github.com/m4gshm/gollections/last"
 	"github.com/m4gshm/gollections/loop"
-	loopIter "github.com/m4gshm/gollections/loop/iter"
+	loopIter "github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/mutable"
 	mvector "github.com/m4gshm/gollections/mutable/vector"
 	sop "github.com/m4gshm/gollections/op"

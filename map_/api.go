@@ -6,6 +6,7 @@ import (
 
 	"github.com/m4gshm/gollections/as"
 	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/kv"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_/resolv"
 )
@@ -148,7 +149,7 @@ func TrackEach[M ~map[K]V, K comparable, V any](elements M, tracker func(K, V)) 
 // For applies the 'walker' function for key/value pairs from the elements. Return the c.ErrBreak to stop.
 func For[M ~map[K]V, K comparable, V any](elements M, walker func(c.KV[K, V]) error) error {
 	for key, val := range elements {
-		if err := walker(c.NewKV(key, val)); err == ErrBreak {
+		if err := walker(kv.New(key, val)); err == ErrBreak {
 			return nil
 		} else if err != nil {
 			return err
@@ -160,7 +161,7 @@ func For[M ~map[K]V, K comparable, V any](elements M, walker func(c.KV[K, V]) er
 // ForEach applies the 'walker' function for every key/value pair from the elements map
 func ForEach[M ~map[K]V, K comparable, V any](elements M, walker func(c.KV[K, V])) {
 	for key, val := range elements {
-		walker(c.NewKV(key, val))
+		walker(kv.New(key, val))
 	}
 }
 
@@ -186,7 +187,7 @@ func TrackEachOrdered[M ~map[K]V, K comparable, V any](order []K, uniques M, tra
 // ForOrdered applies the 'walker' function for every key/value pair from the 'elements' map in order of the 'order' slice. Return the c.ErrBreak to stop.
 func ForOrdered[M ~map[K]V, K comparable, V any](order []K, elements M, walker func(c.KV[K, V]) error) error {
 	for _, key := range order {
-		if err := walker(c.NewKV(key, elements[key])); err == ErrBreak {
+		if err := walker(kv.New(key, elements[key])); err == ErrBreak {
 			return nil
 		} else if err != nil {
 			return err
@@ -198,7 +199,7 @@ func ForOrdered[M ~map[K]V, K comparable, V any](order []K, elements M, walker f
 // ForEachOrdered applies the 'walker' function for every key/value pair from the 'elements' map in order of the 'order' slice.
 func ForEachOrdered[M ~map[K]V, K comparable, V any](order []K, elements M, walker func(c.KV[K, V])) {
 	for _, key := range order {
-		walker(c.NewKV(key, elements[key]))
+		walker(kv.New(key, elements[key]))
 	}
 }
 

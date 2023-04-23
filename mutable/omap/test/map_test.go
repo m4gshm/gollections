@@ -3,8 +3,8 @@ package test
 import (
 	"testing"
 
-	"github.com/m4gshm/gollections/K"
 	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/k"
 	"github.com/m4gshm/gollections/mutable/map_"
 	"github.com/m4gshm/gollections/mutable/omap"
 	"github.com/m4gshm/gollections/mutable/ordered"
@@ -13,7 +13,7 @@ import (
 )
 
 func Test_Map_Iterate(t *testing.T) {
-	ordered := omap.Of(K.V(1, "1"), K.V(1, "1"), K.V(2, "2"), K.V(4, "4"), K.V(3, "3"), K.V(1, "1"))
+	ordered := omap.Of(k.V(1, "1"), k.V(1, "1"), k.V(2, "2"), k.V(4, "4"), k.V(3, "3"), k.V(1, "1"))
 	assert.Equal(t, 4, len(ordered.Map()))
 
 	expectedK := slice.Of(1, 2, 4, 3)
@@ -56,7 +56,7 @@ func Test_Map_Nil(t *testing.T) {
 	assert.False(t, m.Contains("b"))
 
 	m.SetMap(nil)
-	m.SetMap(map_.Of(K.V("d", "D")))
+	m.SetMap(map_.Of(k.V("d", "D")))
 
 	out := m.Map()
 	assert.Equal(t, 0, len(out))
@@ -106,7 +106,7 @@ func Test_Map_Zero(t *testing.T) {
 	assert.True(t, m.Contains("b"))
 
 	m.SetMap(nil)
-	m.SetMap(map_.Of(K.V("d", "D")))
+	m.SetMap(map_.Of(k.V("d", "D")))
 
 	out := m.Map()
 	assert.Equal(t, 3, len(out))
@@ -164,7 +164,7 @@ func Test_Map_new(t *testing.T) {
 	assert.True(t, m.Contains("b"))
 
 	m.SetMap(nil)
-	m.SetMap(map_.Of(K.V("d", "D")))
+	m.SetMap(map_.Of(k.V("d", "D")))
 
 	out := m.Map()
 	assert.Equal(t, 3, len(out))

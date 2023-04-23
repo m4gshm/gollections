@@ -5,8 +5,7 @@ import (
 	"sort"
 
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/loop/iter"
-	"github.com/m4gshm/gollections/loop/stream"
+	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/notsafe"
 	"github.com/m4gshm/gollections/slice"
 	sliceIter "github.com/m4gshm/gollections/slice/iter"
@@ -62,18 +61,18 @@ func (s Set[T]) Begin() c.Iterator[T] {
 }
 
 // Head creates iterator
-func (s Set[T]) Head() sliceIter.ArrayIter[T] {
+func (s Set[T]) Head() sliceIter.SliceIter[T] {
 	return sliceIter.NewHeadS(s.order, s.esize)
 }
 
 // Tail creates an iterator pointing to the end of the collection
-func (s Set[T]) Tail() sliceIter.ArrayIter[T] {
+func (s Set[T]) Tail() sliceIter.SliceIter[T] {
 	return sliceIter.NewTailS(s.order, s.esize)
 }
 
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
-func (s Set[T]) First() (sliceIter.ArrayIter[T], T, bool) {
+func (s Set[T]) First() (sliceIter.SliceIter[T], T, bool) {
 	var (
 		iterator  = sliceIter.NewHeadS(s.order, s.esize)
 		first, ok = iterator.Next()
@@ -83,7 +82,7 @@ func (s Set[T]) First() (sliceIter.ArrayIter[T], T, bool) {
 
 // Last returns the latest element of the collection, an iterator to reverse iterate over the remaining elements, and true\false marker of availability previous elements.
 // If no more elements then ok==false.
-func (s Set[T]) Last() (sliceIter.ArrayIter[T], T, bool) {
+func (s Set[T]) Last() (sliceIter.SliceIter[T], T, bool) {
 	var (
 		iterator  = sliceIter.NewTailS(s.order, s.esize)
 		first, ok = iterator.Prev()
@@ -119,13 +118,13 @@ func (s Set[T]) ForEach(walker func(T)) {
 // Filter returns a pipe consisting of elements that satisfy the condition of the 'predicate' function
 func (s Set[T]) Filter(predicate func(T) bool) c.Stream[T] {
 	h := s.Head()
-	return stream.New[T](iter.Filter(h.Next, predicate).Next)
+	return loop.Stream(loop.Filter(h.Next, predicate).Next)
 }
 
 // Convert returns a pipe that applies the 'converter' function to the collection elements
 func (s Set[T]) Convert(by func(T) T) c.Stream[T] {
 	h := s.Head()
-	return stream.New[T](iter.Convert(h.Next, by).Next)
+	return loop.Stream(loop.Convert(h.Next, by).Next)
 }
 
 // Reduce reduces the elements into an one using the 'merge' function

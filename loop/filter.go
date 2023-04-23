@@ -1,8 +1,7 @@
-package iter
+package loop
 
 import (
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/loop"
 )
 
 // Fit is the Iterator wrapper that provides filtering of elements by a Predicate.
@@ -27,5 +26,5 @@ func (f Fit[T]) Next() (element T, ok bool) {
 }
 
 func nextFiltered[T any](next func() (T, bool), filter func(T) bool) (v T, ok bool) {
-	return loop.First(next, filter)
+	return First(next, filter)
 }

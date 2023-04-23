@@ -578,7 +578,7 @@ purposes.
 package examples
 
 import (
-    "github.com/m4gshm/gollections/K"
+    "github.com/m4gshm/gollections/k"
     "github.com/m4gshm/gollections/c"
     "github.com/m4gshm/gollections/immutable"
     "github.com/m4gshm/gollections/immutable/map_"
@@ -603,11 +603,11 @@ func _() {
         _ c.Set[int]       = oset.New([]int{1, 2, 3})
     )
     var (
-        _ immutable.Map[int, string] = map_.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3"))
+        _ immutable.Map[int, string] = map_.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
         _ c.Map[int, string]         = map_.New(map[int]string{1: "2", 2: "2", 3: "3"})
     )
     var (
-        _ ordered.Map[int, string] = omap.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3"))
+        _ ordered.Map[int, string] = omap.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
         _ c.Map[int, string]       = omap.New(map[int]string{
             1: "2", 2: "2", 3: "3",
         })
@@ -619,7 +619,7 @@ where [vector](./immutable/vector/api.go),
 [set](./immutable/set/api.go), [oset](./immutable/oset/api.go),
 [map\_](./immutable/map_/api.go), [omap](./immutable/omap/api.go) are
 packages from [github.com/m4gshm/gollections/immutable](./immutable/)
-and [K.V](./K/v.go) is the method V from the package [K](./K/)
+and [k.V](./K/v.go) is the method V from the package [K](./K/)
 
 #### Mutable
 
@@ -627,7 +627,7 @@ and [K.V](./K/v.go) is the method V from the package [K](./K/)
 package examples
 
 import (
-    "github.com/m4gshm/gollections/K"
+    "github.com/m4gshm/gollections/k"
     "github.com/m4gshm/gollections/c"
     "github.com/m4gshm/gollections/mutable"
     "github.com/m4gshm/gollections/mutable/map_"
@@ -660,13 +660,13 @@ func _() {
         _ c.Set[int]        = oset.Empty[int]()
     )
     var (
-        _ *mutable.Map[int, string] = map_.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3"))
+        _ *mutable.Map[int, string] = map_.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
         _ *mutable.Map[int, string] = new(mutable.Map[int, string])
         _ c.Map[int, string]        = map_.New[int, string](capacity)
         _ c.Map[int, string]        = map_.Empty[int, string]()
     )
     var (
-        _ *ordered.Map[int, string] = omap.Of(K.V(1, "1"), K.V(2, "2"), K.V(3, "3"))
+        _ *ordered.Map[int, string] = omap.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
         _ *ordered.Map[int, string] = new(ordered.Map[int, string])
         _ c.Map[int, string]        = omap.New[int, string](capacity)
         _ c.Map[int, string]        = omap.Empty[int, string]()
@@ -677,7 +677,7 @@ func _() {
 where [vector](./mutable/vector/api.go), [set](./mutable/set/api.go),
 [oset](./mutable/oset/api.go), [map\_](./mutable/map_/api.go),
 [omap](./mutable/omap/api.go) are packages from
-[github.com/m4gshm/gollections/mutable](./mutable/) and [K.V](./K/v.go)
+[github.com/m4gshm/gollections/mutable](./mutable/) and [k.V](./K/v.go)
 is the method V from the package [K](./K/)
 
 ## Pipe functions
