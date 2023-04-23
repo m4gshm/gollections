@@ -3,8 +3,8 @@ package test
 import (
 	"testing"
 
-	"github.com/m4gshm/gollections/map_/iter"
 	oMapIter "github.com/m4gshm/gollections/immutable/ordered/map_/iter"
+	"github.com/m4gshm/gollections/map_/iter"
 )
 
 func Test_Key_Zero_Safety(t *testing.T) {

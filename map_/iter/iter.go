@@ -7,7 +7,6 @@ import (
 	"github.com/m4gshm/gollections/op"
 )
 
-
 // New returns the KVIterator based on map elements
 func New[K comparable, V any](elements map[K]V) MapIter[K, V] {
 	hmap := *(*unsafe.Pointer)(unsafe.Pointer(&elements))

@@ -2,15 +2,15 @@ package loop
 
 import "github.com/m4gshm/gollections/c"
 
-// NewIter creates an LoopIter instance that loops over elements of a source.
+// NewIter creates an Iter instance that loops over elements of a source.
 // The hasNext specifies a predicate that tests existing of a next element in the source.
 // The getNext extracts the element.
-func NewIter[S, T any](source S, hasNext func(S) bool, getNext func(S) (T, error)) LoopIter[S, T] {
-	return LoopIter[S, T]{source: source, hasNext: hasNext, next: getNext}
+func NewIter[S, T any](source S, hasNext func(S) bool, getNext func(S) (T, error)) Iter[S, T] {
+	return Iter[S, T]{source: source, hasNext: hasNext, next: getNext}
 }
 
-// LoopIter - universal c.Iterator implementation
-type LoopIter[S, T any] struct {
+// Iter - universal c.Iterator implementation
+type Iter[S, T any] struct {
 	source  S
 	hasNext func(S) bool
 	next    func(S) (T, error)
@@ -18,14 +18,14 @@ type LoopIter[S, T any] struct {
 }
 
 var (
-	_ c.Iterator[any]          = (*LoopIter[any, any])(nil)
-	_ c.IteratorBreakable[any] = (*LoopIter[any, any])(nil)
+	_ c.Iterator[any]          = (*Iter[any, any])(nil)
+	_ c.IteratorBreakable[any] = (*Iter[any, any])(nil)
 )
 
 // Next returns the next element.
 // The ok result indicates whether the element was returned by the iterator.
 // If ok == false, then the iteration must be completed.
-func (i *LoopIter[S, T]) Next() (next T, ok bool) {
+func (i *Iter[S, T]) Next() (next T, ok bool) {
 	if i != nil {
 		abort := i.abort
 		if abort == nil && i.hasNext(i.source) {
@@ -38,7 +38,7 @@ func (i *LoopIter[S, T]) Next() (next T, ok bool) {
 }
 
 // Error implements c.IteratorBreakable
-func (i *LoopIter[S, T]) Error() error {
+func (i *Iter[S, T]) Error() error {
 	if i == nil {
 		return nil
 	}

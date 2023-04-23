@@ -5,7 +5,6 @@ import (
 	"github.com/m4gshm/gollections/slice/iter"
 )
 
-
 // NewOrdered is the OrderedKV constructor
 func NewOrdered[K comparable, V any](uniques map[K]V, elements iter.SliceIter[K]) OrderedMapIter[K, V] {
 	return OrderedMapIter[K, V]{elements: elements, uniques: uniques}
@@ -36,7 +35,6 @@ func (i *OrderedMapIter[K, V]) Cap() int {
 	return i.elements.Cap()
 }
 
-
 // NewValIter is default ValIter constructor
 func NewValIter[K comparable, V any](elements []K, uniques map[K]V) ValIter[K, V] {
 	return ValIter[K, V]{elements: elements, uniques: uniques, current: iter.NoStarted}
@@ -57,18 +55,18 @@ var (
 // Next returns the next element.
 // The ok result indicates whether the element was returned by the iterator.
 // If ok == false, then the iteration must be completed.
-func (v *ValIter[K, V]) Next() (val V, ok bool) {
-	if v != nil && iter.HasNext(v.elements, v.current) {
-		v.current++
-		return v.uniques[iter.Get(v.elements, v.current)], true
+func (i *ValIter[K, V]) Next() (val V, ok bool) {
+	if i != nil && iter.HasNext(i.elements, i.current) {
+		i.current++
+		return i.uniques[iter.Get(i.elements, i.current)], true
 	}
 	return val, false
 }
 
 // Cap returns the iterator capacity
-func (v *ValIter[K, V]) Cap() int {
-	if v == nil {
+func (i *ValIter[K, V]) Cap() int {
+	if i == nil {
 		return 0
 	}
-	return len(v.elements)
+	return len(i.elements)
 }

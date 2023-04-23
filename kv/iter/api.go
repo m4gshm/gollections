@@ -3,8 +3,8 @@ package iter
 import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/iter"
-	"github.com/m4gshm/gollections/kv/loop"
 	"github.com/m4gshm/gollections/kv/iter/group"
+	"github.com/m4gshm/gollections/kv/loop"
 	"github.com/m4gshm/gollections/map_/filter"
 )
 
