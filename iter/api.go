@@ -3,9 +3,11 @@ package iter
 import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/check"
-	"github.com/m4gshm/gollections/iter/impl/iter"
 	"github.com/m4gshm/gollections/loop"
+	"github.com/m4gshm/gollections/loop/iter"
+	"github.com/m4gshm/gollections/loop/kv/stream"
 	"github.com/m4gshm/gollections/op"
+	sliceIter "github.com/m4gshm/gollections/slice/iter"
 )
 
 // Of instantiates Iterator of predefined elements
@@ -22,13 +24,13 @@ func New[T any](elements []T) c.Iterator[T] {
 // The hasNext specifies a predicate that tests existing of a next element in the source.
 // The getNext extracts the element.
 func OfLoop[S, T any](source S, hasNext func(S) bool, getNext func(S) (T, error)) c.IteratorBreakable[T] {
-	l := iter.NewLoop(source, hasNext, getNext)
+	l := iter.New(source, hasNext, getNext)
 	return &l
 }
 
 // Wrap instantiates Iterator using a slice as the elements source
-func Wrap[TS ~[]T, T any](elements TS) *iter.ArrayIter[T] {
-	h := iter.NewHead(elements)
+func Wrap[TS ~[]T, T any](elements TS) *sliceIter.ArrayIter[T] {
+	h := sliceIter.NewHead(elements)
 	return &h
 }
 
@@ -71,7 +73,7 @@ func Reduce[T any](elements c.Iterator[T], by func(T, T) T) T {
 }
 
 // ReduceKV reduces key/value elements to an one
-func ReduceKV[K, V any](elements c.KVIterator[K, V], by c.Quaternary[K, V]) (K, V) {
+func ReduceKV[K, V any](elements c.KVIterator[K, V], by func(k1 K, v1 V, k2 K, v2 V) (K, V)) (K, V) {
 	return loop.ReduceKV(elements.Next, by)
 }
 
@@ -81,8 +83,8 @@ func ToSlice[T any](elements c.Iterator[T]) []T {
 }
 
 // Group transforms iterable elements to the MapPipe based on applying key extractor to the elements
-func Group[T any, K comparable](elements c.Iterator[T], by func(T) K) c.MapTransform[K, T, map[K][]T] {
-	return iter.Group(elements.Next, by)
+func Group[T any, K comparable](elements c.Iterator[T], by func(T) K) c.MapStream[K, T, map[K][]T] {
+	return stream.Group(elements.Next, by)
 }
 
 // ForEach applies the 'walker' function to elements of an Iterator

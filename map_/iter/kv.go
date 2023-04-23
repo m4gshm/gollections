@@ -5,15 +5,16 @@ import (
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/slice/iter"
 )
 
-// NewOrderedEmbedMapKV is the OrderedKV constructor
-func NewOrderedEmbedMapKV[K comparable, V any](uniques map[K]V, elements ArrayIter[K]) OrderedEmbedMapKVIter[K, V] {
+// NewOrdered is the OrderedKV constructor
+func NewOrdered[K comparable, V any](uniques map[K]V, elements iter.ArrayIter[K]) OrderedEmbedMapKVIter[K, V] {
 	return OrderedEmbedMapKVIter[K, V]{elements: elements, uniques: uniques}
 }
 
-// NewEmbedMapKV returns the KVIterator based on map elements
-func NewEmbedMapKV[K comparable, V any](elements map[K]V) EmbedMapKVIter[K, V] {
+// New returns the KVIterator based on map elements
+func New[K comparable, V any](elements map[K]V) EmbedMapKVIter[K, V] {
 	hmap := *(*unsafe.Pointer)(unsafe.Pointer(&elements))
 	i := any(elements)
 	maptype := *(*unsafe.Pointer)(unsafe.Pointer(&i))
@@ -107,7 +108,7 @@ func (h *hiter) initialized() bool {
 
 // OrderedEmbedMapKVIter is the ordered key/value pairs Iterator implementation
 type OrderedEmbedMapKVIter[K comparable, V any] struct {
-	elements ArrayIter[K]
+	elements iter.ArrayIter[K]
 	uniques  map[K]V
 }
 
@@ -132,7 +133,7 @@ func (i *OrderedEmbedMapKVIter[K, V]) Cap() int {
 
 // NewKey it the Key constructor.
 func NewKey[K comparable, V any](uniques map[K]V) Key[K, V] {
-	return Key[K, V]{EmbedMapKVIter: NewEmbedMapKV(uniques)}
+	return Key[K, V]{EmbedMapKVIter: New(uniques)}
 }
 
 // Key is the Iterator implementation that provides iterating over keys of a key/value pairs iterator
@@ -160,7 +161,7 @@ func (i Key[K, V]) Cap() int {
 
 // NewVal is the Val constructor
 func NewVal[K comparable, V any](uniques map[K]V) Val[K, V] {
-	return Val[K, V]{EmbedMapKVIter: NewEmbedMapKV(op.IfElse(uniques != nil, uniques, map[K]V{}))}
+	return Val[K, V]{EmbedMapKVIter: New(op.IfElse(uniques != nil, uniques, map[K]V{}))}
 }
 
 // Val is the Iterator implementation that provides iterating over values of a key/value pairs iterator

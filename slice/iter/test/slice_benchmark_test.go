@@ -3,7 +3,7 @@ package test
 import (
 	"testing"
 
-	"github.com/m4gshm/gollections/iter/impl/iter"
+	"github.com/m4gshm/gollections/slice/iter"
 )
 
 func Benchmark_IsValidIndex(b *testing.B) {

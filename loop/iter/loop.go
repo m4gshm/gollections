@@ -2,10 +2,10 @@ package iter
 
 import "github.com/m4gshm/gollections/c"
 
-// NewLoop creates an LoopIter instance that loops over elements of a source.
+// New creates an LoopIter instance that loops over elements of a source.
 // The hasNext specifies a predicate that tests existing of a next element in the source.
 // The getNext extracts the element.
-func NewLoop[S, T any](source S, hasNext func(S) bool, getNext func(S) (T, error)) LoopIter[S, T] {
+func New[S, T any](source S, hasNext func(S) bool, getNext func(S) (T, error)) LoopIter[S, T] {
 	return LoopIter[S, T]{source: source, hasNext: hasNext, getNext: getNext}
 }
 

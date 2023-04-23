@@ -12,7 +12,7 @@ const NoStarted = -1
 
 // New instantiates Iter based on elements Iter and returs its reference
 func New[TS ~[]T, T any](elements TS) ArrayIter[T] {
-	return NewHeadS(elements, notsafe.GetTypeSize[T]())
+	return NewHead(elements)
 }
 
 // NewHead instantiates Iter based on elements slice

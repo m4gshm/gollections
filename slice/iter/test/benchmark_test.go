@@ -16,6 +16,5 @@ func Benchmark_GetTypeSize(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		size = notsafe.GetTypeSize[someType]()
 	}
-
 	_ = size
 }

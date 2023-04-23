@@ -3,14 +3,14 @@ package slice
 import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/check"
-	"github.com/m4gshm/gollections/iter/impl/slice"
-	"github.com/m4gshm/gollections/iterable/transform"
+	"github.com/m4gshm/gollections/loop/stream"
+	slice "github.com/m4gshm/gollections/slice/iter"
 )
 
 // Convert instantiates Iterator that converts elements with a converter and returns them
 func Convert[FS ~[]From, From, To any](elements FS, by func(From) To) c.Iterator[To] {
 	conv := slice.Convert(elements, by)
-	return transform.New(conv.Next)
+	return stream.New(conv.Next)
 }
 
 // FilterAndConvert additionally filters 'From' elements.

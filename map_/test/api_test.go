@@ -3,10 +3,10 @@ package test
 import (
 	"testing"
 
-	"github.com/m4gshm/gollections/kviter"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/map_/clone"
 	"github.com/m4gshm/gollections/map_/group"
+	"github.com/m4gshm/gollections/map_/resolv"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/ptr"
 	"github.com/m4gshm/gollections/slice"
@@ -94,7 +94,7 @@ func Test_OfLoopResolv(t *testing.T) {
 	result, _ := map_.OfLoopResolv(stream, (*rows[int]).hasNext, func(r *rows[int]) (bool, int, error) {
 		n, err := r.next()
 		return n%2 == 0, n, err
-	}, kviter.LastVal[bool, int])
+	}, resolv.LastVal[bool, int])
 
 	assert.Equal(t, 4, result[true])
 	assert.Equal(t, 3, result[false])

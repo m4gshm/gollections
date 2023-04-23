@@ -10,13 +10,13 @@ import (
 	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/convert"
 	"github.com/m4gshm/gollections/iter"
-	impl "github.com/m4gshm/gollections/iter/impl/iter"
 	sliceit "github.com/m4gshm/gollections/iter/slice"
-	"github.com/m4gshm/gollections/iterable/transform"
 	"github.com/m4gshm/gollections/loop"
+	"github.com/m4gshm/gollections/loop/stream"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/ptr"
 	"github.com/m4gshm/gollections/slice"
+	sliceIter "github.com/m4gshm/gollections/slice/iter"
 )
 
 func Test_FilterAndConvert(t *testing.T) {
@@ -158,7 +158,7 @@ func Test_Iterate(t *testing.T) {
 		values[i] = i
 	}
 
-	stream := transform.New(ptr.Of(impl.New(values)).Next)
+	stream := stream.New(ptr.Of(sliceIter.New(values)).Next)
 
 	result := make([]int, 0)
 

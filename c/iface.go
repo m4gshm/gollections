@@ -51,8 +51,8 @@ type Collection[T any] interface {
 	ForEachLoop[T]
 	SliceFactory[T]
 
-	Filter(predicate func(T) bool) Transform[T]
-	Convert(converter func(T) T) Transform[T]
+	Filter(predicate func(T) bool) Stream[T]
+	Convert(converter func(T) T) Stream[T]
 
 	Reduce(merger func(T, T) T) T
 	HasAny(predicate func(T) bool) bool
@@ -165,8 +165,8 @@ type Checkable[T any] interface {
 	Contains(T) bool
 }
 
-// Transform extends Transformable by finalize methods like ForEach, Collect or Reduce.
-type Transform[T any] interface {
+// Stream is collection or stream of elements in transformation state.
+type Stream[T any] interface {
 	Iterator[T]
 	Collection[T]
 }
@@ -174,18 +174,18 @@ type Transform[T any] interface {
 // MapTransformable provides limited kit of map transformation methods.
 // The full kit of transformer functions are in the package 'c/map_'
 type MapTransformable[K comparable, V any, Map map[K]V | map[K][]V] interface {
-	Filter(predicate func(K, V) bool) MapTransform[K, V, Map]
-	Convert(converter func(K, V) (K, V)) MapTransform[K, V, Map]
+	Filter(predicate func(K, V) bool) MapStream[K, V, Map]
+	Convert(converter func(K, V) (K, V)) MapStream[K, V, Map]
 
-	FilterKey(predicate func(K) bool) MapTransform[K, V, Map]
-	ConvertKey(converter func(K) K) MapTransform[K, V, Map]
+	FilterKey(predicate func(K) bool) MapStream[K, V, Map]
+	ConvertKey(converter func(K) K) MapStream[K, V, Map]
 
-	FilterValue(predicate func(V) bool) MapTransform[K, V, Map]
-	ConvertValue(converter func(V) V) MapTransform[K, V, Map]
+	FilterValue(predicate func(V) bool) MapStream[K, V, Map]
+	ConvertValue(converter func(V) V) MapStream[K, V, Map]
 }
 
-// MapTransform extends MapTransformable by finalize methods like ForEach, Collect or Reduce.
-type MapTransform[K comparable, V any, M map[K]V | map[K][]V] interface {
+// MapStream is map or key/value stream of elements in transformation state.
+type MapStream[K comparable, V any, M map[K]V | map[K][]V] interface {
 	KVIterator[K, V]
 	KVCollection[K, V, M]
 }

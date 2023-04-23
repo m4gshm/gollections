@@ -5,10 +5,11 @@ import (
 	"sort"
 
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/iter/impl/iter"
-	"github.com/m4gshm/gollections/iterable/transform"
+	loopIter "github.com/m4gshm/gollections/loop/iter"
+	"github.com/m4gshm/gollections/loop/stream"
 	"github.com/m4gshm/gollections/notsafe"
 	"github.com/m4gshm/gollections/slice"
+	"github.com/m4gshm/gollections/slice/iter"
 )
 
 // NewVector instantiates Vector and copies elements to it.
@@ -112,15 +113,15 @@ func (v Vector[T]) ForEach(walker func(T)) {
 }
 
 // Filter returns a pipe consisting of elements that satisfy the condition of the 'predicate' function
-func (v Vector[T]) Filter(filter func(T) bool) c.Transform[T] {
+func (v Vector[T]) Filter(filter func(T) bool) c.Stream[T] {
 	h := v.Head()
-	return transform.New(iter.Filter(h.Next, filter).Next)
+	return stream.New(loopIter.Filter(h.Next, filter).Next)
 }
 
 // Convert returns a pipe that applies the 'converter' function to the collection elements
-func (v Vector[T]) Convert(converter func(T) T) c.Transform[T] {
+func (v Vector[T]) Convert(converter func(T) T) c.Stream[T] {
 	h := v.Head()
-	return transform.New(iter.Convert(h.Next, converter).Next)
+	return stream.New(loopIter.Convert(h.Next, converter).Next)
 }
 
 // Reduce reduces the elements into an one using the 'merge' function

@@ -1,11 +1,11 @@
-package kvit
+package iter
 
 import "github.com/m4gshm/gollections/c"
 
-// NewLoop creates an LoopKVIter instance that loops over key\value elements of a source.
+// New creates an LoopKVIter instance that loops over key\value elements of a source.
 // The hasNext specifies a predicate that tests existing of a next element in the source.
 // The getNext extracts the one.
-func NewLoop[S, K, V any](source S, hasNext func(S) bool, getNext func(S) (K, V, error)) LoopKVIter[S, K, V] {
+func New[S, K, V any](source S, hasNext func(S) bool, getNext func(S) (K, V, error)) LoopKVIter[S, K, V] {
 	return LoopKVIter[S, K, V]{source: source, hasNext: hasNext, getNext: getNext}
 }
 

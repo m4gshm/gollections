@@ -5,9 +5,9 @@ import (
 	"sort"
 
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/iter/impl/iter"
-	"github.com/m4gshm/gollections/iterable/transform"
 	"github.com/m4gshm/gollections/loop"
+	"github.com/m4gshm/gollections/loop/iter"
+	"github.com/m4gshm/gollections/loop/stream"
 	"github.com/m4gshm/gollections/notsafe"
 	"github.com/m4gshm/gollections/slice"
 )
@@ -274,15 +274,15 @@ func (v *Vector[T]) SetNew(index int, value T) bool {
 }
 
 // Filter returns a pipe consisting of vector elements matching the filter
-func (v *Vector[T]) Filter(filter func(T) bool) c.Transform[T] {
+func (v *Vector[T]) Filter(filter func(T) bool) c.Stream[T] {
 	h := v.Head()
-	return transform.New(iter.Filter(h.Next, filter).Next)
+	return stream.New(iter.Filter(h.Next, filter).Next)
 }
 
 // Convert returns a pipe that applies the 'converter' function to the collection elements
-func (v *Vector[T]) Convert(converter func(T) T) c.Transform[T] {
+func (v *Vector[T]) Convert(converter func(T) T) c.Stream[T] {
 	h := v.Head()
-	return transform.New(iter.Convert(h.Next, converter).Next)
+	return stream.New(iter.Convert(h.Next, converter).Next)
 }
 
 // Reduce reduces the elements into an one using the 'merge' function

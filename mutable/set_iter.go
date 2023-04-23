@@ -2,7 +2,7 @@ package mutable
 
 import (
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/iter/impl/iter"
+	"github.com/m4gshm/gollections/map_/iter"
 )
 
 // NewSetIter creates SetIter instance.

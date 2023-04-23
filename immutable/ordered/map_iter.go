@@ -2,7 +2,7 @@ package ordered
 
 import (
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/iter/impl/iter"
+	"github.com/m4gshm/gollections/slice/iter"
 )
 
 // NewValIter is default ValIter constructor

@@ -6,9 +6,10 @@ import (
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/immutable/ordered"
-	"github.com/m4gshm/gollections/iter/impl/iter"
-	"github.com/m4gshm/gollections/iterable/transform"
+	loopIter "github.com/m4gshm/gollections/loop/iter"
+	"github.com/m4gshm/gollections/loop/stream"
 	"github.com/m4gshm/gollections/map_"
+	"github.com/m4gshm/gollections/map_/iter"
 	"github.com/m4gshm/gollections/slice"
 )
 
@@ -98,15 +99,15 @@ func (s Set[T]) ForEach(walker func(T)) {
 }
 
 // Filter returns a pipe consisting of elements that satisfy the condition of the 'predicate' function
-func (s Set[T]) Filter(predicate func(T) bool) c.Transform[T] {
+func (s Set[T]) Filter(predicate func(T) bool) c.Stream[T] {
 	h := s.Head()
-	return transform.New[T](iter.Filter(h.Next, predicate).Next)
+	return stream.New[T](loopIter.Filter(h.Next, predicate).Next)
 }
 
 // Convert returns a pipe that applies the 'converter' function to the collection elements
-func (s Set[T]) Convert(converter func(T) T) c.Transform[T] {
+func (s Set[T]) Convert(converter func(T) T) c.Stream[T] {
 	h := s.Head()
-	return transform.New[T](iter.Convert(h.Next, converter).Next)
+	return stream.New[T](loopIter.Convert(h.Next, converter).Next)
 }
 
 // Reduce reduces the elements into an one using the 'merge' function

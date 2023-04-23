@@ -6,11 +6,12 @@ import (
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/immutable/ordered"
-	"github.com/m4gshm/gollections/iter/impl/iter"
-	"github.com/m4gshm/gollections/kviter"
+	kviter "github.com/m4gshm/gollections/loop/kv/iter"
+	"github.com/m4gshm/gollections/loop/kv/stream"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/map_/convert"
 	"github.com/m4gshm/gollections/map_/filter"
+	"github.com/m4gshm/gollections/map_/iter"
 	"github.com/m4gshm/gollections/slice"
 )
 
@@ -57,7 +58,7 @@ func (m Map[K, V]) Begin() c.KVIterator[K, V] {
 
 // Head creates iterator
 func (m Map[K, V]) Head() iter.EmbedMapKVIter[K, V] {
-	return iter.NewEmbedMapKV(m.elements)
+	return iter.New(m.elements)
 }
 
 // First returns the first key/value pair of the map, an iterator to iterate over the remaining pair, and true\false marker of availability next pairs.
@@ -161,39 +162,39 @@ func (m Map[K, V]) ForEach(walker func(c.KV[K, V])) {
 }
 
 // FilterKey returns a pipe consisting of key/value pairs where the key satisfies the condition of the 'predicate' function
-func (m Map[K, V]) FilterKey(predicate func(K) bool) c.MapTransform[K, V, map[K]V] {
+func (m Map[K, V]) FilterKey(predicate func(K) bool) c.MapStream[K, V, map[K]V] {
 	h := m.Head()
-	return iter.NewKVPipe(iter.FilterKV(h.Next, filter.Key[V](predicate)).Next, kviter.ToMap[K, V])
+	return stream.New(kviter.Filter(h.Next, filter.Key[V](predicate)).Next, stream.ToMap[K, V])
 }
 
 // ConvertKey returns a pipe that applies the 'converter' function to keys of the map
-func (m Map[K, V]) ConvertKey(by func(K) K) c.MapTransform[K, V, map[K]V] {
+func (m Map[K, V]) ConvertKey(by func(K) K) c.MapStream[K, V, map[K]V] {
 	h := m.Head()
-	return iter.NewKVPipe(iter.ConvertKV(h.Next, convert.Key[V](by)).Next, kviter.ToMap[K, V])
+	return stream.New(kviter.Convert(h.Next, convert.Key[V](by)).Next, stream.ToMap[K, V])
 }
 
 // FilterValue returns a pipe consisting of key/value pairs where the value satisfies the condition of the 'predicate' function
-func (m Map[K, V]) FilterValue(predicate func(V) bool) c.MapTransform[K, V, map[K]V] {
+func (m Map[K, V]) FilterValue(predicate func(V) bool) c.MapStream[K, V, map[K]V] {
 	h := m.Head()
-	return iter.NewKVPipe(iter.FilterKV(h.Next, filter.Value[K](predicate)).Next, kviter.ToMap[K, V])
+	return stream.New(kviter.Filter(h.Next, filter.Value[K](predicate)).Next, stream.ToMap[K, V])
 }
 
 // ConvertValue returns a pipe that applies the 'converter' function to values of the map
-func (m Map[K, V]) ConvertValue(by func(V) V) c.MapTransform[K, V, map[K]V] {
+func (m Map[K, V]) ConvertValue(by func(V) V) c.MapStream[K, V, map[K]V] {
 	h := m.Head()
-	return iter.NewKVPipe(iter.ConvertKV(h.Next, convert.Value[K](by)).Next, kviter.ToMap[K, V])
+	return stream.New(kviter.Convert(h.Next, convert.Value[K](by)).Next, stream.ToMap[K, V])
 }
 
 // Filter returns a pipe consisting of elements that satisfy the condition of the 'predicate' function
-func (m Map[K, V]) Filter(predicate func(K, V) bool) c.MapTransform[K, V, map[K]V] {
+func (m Map[K, V]) Filter(predicate func(K, V) bool) c.MapStream[K, V, map[K]V] {
 	h := m.Head()
-	return iter.NewKVPipe(iter.FilterKV(h.Next, predicate).Next, kviter.ToMap[K, V])
+	return stream.New(kviter.Filter(h.Next, predicate).Next, stream.ToMap[K, V])
 }
 
 // Convert returns a pipe that applies the 'converter' function to the collection elements
-func (m Map[K, V]) Convert(converter func(K, V) (K, V)) c.MapTransform[K, V, map[K]V] {
+func (m Map[K, V]) Convert(converter func(K, V) (K, V)) c.MapStream[K, V, map[K]V] {
 	h := m.Head()
-	return iter.NewKVPipe(iter.ConvertKV(h.Next, converter).Next, kviter.ToMap[K, V])
+	return stream.New(kviter.Convert(h.Next, converter).Next, stream.ToMap[K, V])
 }
 
 // Reduce reduces the key/value pairs of the map into an one pair using the 'merge' function

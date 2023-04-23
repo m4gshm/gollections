@@ -2,7 +2,7 @@ package mutable
 
 import (
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/iter/impl/iter"
+	"github.com/m4gshm/gollections/slice/iter"
 )
 
 // NewHead instantiates Iter starting at the first element of a slice.

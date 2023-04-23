@@ -2,9 +2,7 @@
 package iter
 
 import (
-	"github.com/m4gshm/gollections/as"
 	"github.com/m4gshm/gollections/check"
-	"github.com/m4gshm/gollections/kviter/group"
 	"github.com/m4gshm/gollections/notsafe"
 )
 
@@ -36,25 +34,4 @@ func Filter[T any](next func() (T, bool), filter func(T) bool) Fit[T] {
 // NotNil creates an Iterator that filters nullable elements.
 func NotNil[T any](next func() (*T, bool)) Fit[*T] {
 	return Filter(next, check.NotNil[T])
-}
-
-// ConvertKV creates an Iterator that applies a transformer to iterable key\values.
-func ConvertKV[K, V any, k2, v2 any](next func() (K, V, bool), by func(K, V) (k2, v2)) ConvertKVIter[K, V, k2, v2, func(K, V) (k2, v2)] {
-	return ConvertKVIter[K, V, k2, v2, func(K, V) (k2, v2)]{next: next, by: by}
-}
-
-// FilterKV creates an Iterator that checks elements by a filter and returns successful ones
-func FilterKV[K, V any](next func() (K, V, bool), filter func(K, V) bool) FitKV[K, V] {
-	return FitKV[K, V]{next: next, by: filter}
-}
-
-// Group transforms iterable elements to the MapPipe based on applying key extractor to the elements
-func Group[T any, K comparable](next func() (T, bool), keyExtractor func(T) K) KVIterPipe[K, T, map[K][]T] {
-	return GroupAndConvert(next, keyExtractor, as.Is[T])
-}
-
-// GroupAndConvert transforms iterable elements to the MapPipe based on applying key extractor to the elements
-func GroupAndConvert[T any, K comparable, V any](next func() (T, bool), keyExtractor func(T) K, valueConverter func(T) V) KVIterPipe[K, V, map[K][]V] {
-	kv := NewKeyValuer(next, keyExtractor, valueConverter)
-	return NewKVPipe(kv.Next, group.Of[K, V])
 }

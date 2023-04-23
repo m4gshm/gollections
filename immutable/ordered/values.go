@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/iter/impl/iter"
-	"github.com/m4gshm/gollections/iterable/transform"
+	"github.com/m4gshm/gollections/loop/iter"
+	"github.com/m4gshm/gollections/loop/stream"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/slice"
 )
@@ -98,15 +98,15 @@ func (m MapValues[K, V]) Get(index int) (V, bool) {
 }
 
 // Filter returns a pipe consisting of elements that satisfy the condition of the 'predicate' function
-func (m MapValues[K, V]) Filter(filter func(V) bool) c.Transform[V] {
+func (m MapValues[K, V]) Filter(filter func(V) bool) c.Stream[V] {
 	h := m.Head()
-	return transform.New(iter.Filter(h.Next, filter).Next)
+	return stream.New(iter.Filter(h.Next, filter).Next)
 }
 
 // Convert returns a pipe that applies the 'converter' function to the collection elements
-func (m MapValues[K, V]) Convert(converter func(V) V) c.Transform[V] {
+func (m MapValues[K, V]) Convert(converter func(V) V) c.Stream[V] {
 	h := m.Head()
-	return transform.New(iter.Convert(h.Next, converter).Next)
+	return stream.New(iter.Convert(h.Next, converter).Next)
 }
 
 // Reduce reduces the elements into an one using the 'merge' function

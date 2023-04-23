@@ -7,10 +7,11 @@ import (
 	"github.com/m4gshm/gollections/immutable/set"
 	"github.com/m4gshm/gollections/immutable/vector"
 	"github.com/m4gshm/gollections/iter"
-	impliter "github.com/m4gshm/gollections/iter/impl/iter"
+	mapIter "github.com/m4gshm/gollections/map_/iter"
 	moset "github.com/m4gshm/gollections/mutable/oset"
 	mvector "github.com/m4gshm/gollections/mutable/vector"
 	"github.com/m4gshm/gollections/ptr"
+	sliceIter "github.com/m4gshm/gollections/slice/iter"
 	"github.com/m4gshm/gollections/slice/range_"
 )
 
@@ -208,7 +209,7 @@ func Benchmark_Loop_Slice_NewHead_HasNextGetNext(b *testing.B) {
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				for it := impliter.NewHead(values); it.HasNext(); {
+				for it := sliceIter.NewHead(values); it.HasNext(); {
 					casee.load(it.GetNext())
 				}
 			}
@@ -280,7 +281,7 @@ func Benchmark_Loop_NewKV_NextNextNext(b *testing.B) {
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				iterator := impliter.NewEmbedMapKV(values)
+				iterator := mapIter.New(values)
 				for k, _, ok := iterator.Next(); ok; k, _, ok = iterator.Next() {
 					casee.load(k)
 				}
