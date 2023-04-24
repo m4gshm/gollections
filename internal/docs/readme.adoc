@@ -80,7 +80,7 @@ include::../examples/constructors_mutable.go[]
 
 where link:./mutable/vector/api.go[vector], link:./mutable/set/api.go[set], link:./mutable/oset/api.go[oset], link:./mutable/map_/api.go[map_], link:./mutable/omap/api.go[omap] are packages from link:./mutable/[github.com/m4gshm/gollections/mutable] and link:./k/v.go[k.V] is the method V from the package link:./k/[k]
 
-=== Pipe functions
+=== Stream functions
 
 There are three groups of operations:
 

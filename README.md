@@ -53,7 +53,7 @@ import (
     "github.com/m4gshm/gollections/slice"
     "github.com/m4gshm/gollections/slice/clone"
     "github.com/m4gshm/gollections/slice/clone/sort"
-    sliceConvert "github.com/m4gshm/gollections/slice/convert"
+    "github.com/m4gshm/gollections/slice/convert"
     "github.com/m4gshm/gollections/slice/filter"
     "github.com/m4gshm/gollections/slice/flatt"
     "github.com/m4gshm/gollections/slice/group"
@@ -96,7 +96,7 @@ var users = []User{
 
 func Test_GroupBySeveralKeysAndConvertMapValues(t *testing.T) {
     usersByRole := group.InMultiple(users, func(u User) []string {
-        return sliceConvert.AndConvert(u.Roles(), Role.Name, strings.ToLower)
+        return convert.AndConvert(u.Roles(), Role.Name, strings.ToLower)
     })
     namesByRole := map_.ConvertValues(usersByRole, func(u []User) []string {
         return slice.Convert(u, User.Name)
@@ -234,7 +234,7 @@ func Test_ConvertFiltered(t *testing.T) {
 func Test_FilterConverted(t *testing.T) {
     var (
         source = []int{1, 3, 4, 5, 7, 8, 9, 11}
-        result = sliceConvert.AndFilter(source, strconv.Itoa, func(s string) bool {
+        result = convert.AndFilter(source, strconv.Itoa, func(s string) bool {
             return len(s) == 2
         })
         expected = []string{"11"}
@@ -249,7 +249,7 @@ func Test_ConvertNilSafe(t *testing.T) {
         third  = "third"
         fifth  = "fifth"
         source = []*entity{{&first}, {}, {&third}, nil, {&fifth}}
-        result = sliceConvert.NilSafe(source, func(e *entity) *string {
+        result = convert.NilSafe(source, func(e *entity) *string {
             return e.val
         })
         expected = []*string{&first, &third, &fifth}
@@ -260,7 +260,7 @@ func Test_ConvertNilSafe(t *testing.T) {
 func Test_ConvertFilteredWithIndexInPlace(t *testing.T) {
     var (
         source = slice.Of(1, 3, 4, 5, 7, 8, 9, 11)
-        result = sliceConvert.CheckIndexed(source, func(index int, elem int) (string, bool) {
+        result = convert.CheckIndexed(source, func(index int, elem int) (string, bool) {
             return strconv.Itoa(index + elem), even(elem)
         })
         expected = []string{"6", "13"}
@@ -681,7 +681,7 @@ where [vector](./mutable/vector/api.go), [set](./mutable/set/api.go),
 [github.com/m4gshm/gollections/mutable](./mutable/) and [k.V](./k/v.go)
 is the method V from the package [k](./k/)
 
-## Pipe functions
+## Stream functions
 
 There are three groups of operations:
 
