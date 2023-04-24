@@ -2,7 +2,7 @@
 
 Golang generic containers and functions.
 
-Supports Go version 1.18 or higher.
+Supports Go version 1.20 or higher.
 
 ## Installation
 
