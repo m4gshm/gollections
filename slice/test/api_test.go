@@ -9,6 +9,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/m4gshm/gollections/as"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/predicate/eq"
 	"github.com/m4gshm/gollections/predicate/more"
@@ -208,9 +209,25 @@ func Test_Flatt(t *testing.T) {
 	assert.Equal(t, e, f)
 }
 
+func Benchmark_Flatt(b *testing.B) {
+	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
+
+	for i := 0; i < b.N; i++ {
+		_ = slice.Flatt(md, func(i []int) []int { return i })
+	}
+}
+
+func Benchmark_Flatt_Convert_AsIs(b *testing.B) {
+	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
+
+	for i := 0; i < b.N; i++ {
+		_ = slice.FlattAndConvert(md, func(i []int) []int { return i }, as.Is[int])
+	}
+}
+
 func Test_FlattFilter(t *testing.T) {
 	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
-	f := slice.FilerAndFlatt(md, func(from []int) bool { return len(from) > 1 }, func(i []int) []int { return i })
+	f := slice.FilterAndFlatt(md, func(from []int) bool { return len(from) > 1 }, func(i []int) []int { return i })
 	e := []int{1, 2, 3, 5, 6}
 	assert.Equal(t, e, f)
 }
@@ -312,7 +329,7 @@ func Test_OfLoop(t *testing.T) {
 
 func Test_Generate(t *testing.T) {
 	counter := 0
-	result, _ := slice.Generate(func() (int, bool, error) { counter++; return counter, counter < 4, nil })
+	result := slice.Generate(func() (int, bool) { counter++; return counter, counter < 4 })
 
 	assert.Equal(t, slice.Of(1, 2, 3), result)
 }

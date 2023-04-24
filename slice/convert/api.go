@@ -7,7 +7,7 @@ import (
 
 // AndConvert - convert.AndConvert makes double converts From->Intermediate->To of the elements
 func AndConvert[FS ~[]From, From, I, To any](elements FS, firsConverter func(From) I, secondConverter func(I) To) []To {
-	return slice.Convert(slice.Convert(elements, firsConverter), secondConverter)
+	return slice.Convert(elements, func(from From) To { return secondConverter(firsConverter(from)) })
 }
 
 // AndFilter - convert.AndFilter converts only filtered elements and returns them

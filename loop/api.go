@@ -4,10 +4,28 @@ import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/notsafe"
+	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/predicate/always"
 )
 
 // ErrBreak is the 'break' statement of the For, Track methods
 var ErrBreak = c.ErrBreak
+
+// Of wrap the elements by loop function
+func Of[T any](elements ...T) func() (e T, ok bool) {
+	l := len(elements)
+	i := 0
+	if l == 0 || i < 0 || i >= l {
+		return func() (e T, ok bool) { return e, false }
+	}
+	return func() (e T, ok bool) {
+		if i < l {
+			e, ok = elements[i], true
+			i++
+		}
+		return e, ok
+	}
+}
 
 // For applies the 'walker' function for the elements retrieved by the 'next' function. Return the c.ErrBreak to stop
 func For[T any](next func() (T, bool), walker func(T) error) error {
@@ -86,10 +104,25 @@ func Reduce[T any](next func() (T, bool), merger func(T, T) T) (result T) {
 	return result
 }
 
+// Sum returns the sum of all elements
+func Sum[T c.Summable](next func() (T, bool)) T {
+	return Reduce(next, op.Sum[T])
+}
+
 // HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful
 func HasAny[T any](next func() (T, bool), predicate func(T) bool) bool {
 	_, ok := First(next, predicate)
 	return ok
+}
+
+// Contains  finds the first element that equal to the example and returns true
+func Contains[T comparable](next func() (T, bool), example T) bool {
+	for one, ok := next(); ok; one, ok = next() {
+		if one == example {
+			return true
+		}
+	}
+	return false
 }
 
 // Convert instantiates Iterator that converts elements with a converter and returns them.
@@ -97,28 +130,53 @@ func Convert[From, To any](next func() (From, bool), converter func(From) To) Co
 	return ConvertIter[From, To]{next: next, converter: converter}
 }
 
+// ConvertCheck is similar to ConvertFit, but it checks and transforms elements together
+func ConvertCheck[From, To any](next func() (From, bool), converter func(from From) (To, bool)) ConvertCheckIter[From, To] {
+	return ConvertCheckIter[From, To]{next: next, converter: converter}
+}
+
 // FilterAndConvert additionally filters 'From' elements.
-func FilterAndConvert[From, To any](next func() (From, bool), filter func(From) bool, by func(From) To) ConvertFitIter[From, To] {
-	return ConvertFitIter[From, To]{next: next, by: by, filter: filter}
+func FilterAndConvert[From, To any](next func() (From, bool), filter func(From) bool, converter func(From) To) ConvertFitIter[From, To] {
+	return FilterConvertFilter(next, filter, converter, always.True[To])
+}
+
+// FilterAndConvert filters source, converts, and filters converted elements
+func FilterConvertFilter[From, To any](next func() (From, bool), filter func(From) bool, converter func(From) To, filterTo func(To) bool) ConvertFitIter[From, To] {
+	return ConvertFitIter[From, To]{next: next, converter: converter, filterFrom: filter, filterTo: filterTo}
+}
+
+// ConvertAndFilter additionally filters 'To' elements
+func ConvertAndFilter[From, To any](next func() (From, bool), converter func(From) To, filter func(To) bool) ConvertFitIter[From, To] {
+	return FilterConvertFilter(next, always.True[From], converter, filter)
 }
 
 // Flatt instantiates Iterator that extracts slices of 'To' by a Flattener from elements of 'From' and flattens as one iterable collection of 'To' elements.
-func Flatt[From, To any](next func() (From, bool), converter func(From) []To) Flatten[From, To] {
-	return Flatten[From, To]{next: next, flatt: converter, elemSizeTo: notsafe.GetTypeSize[To]()}
+func Flatt[From, To any](next func() (From, bool), Flattener func(From) []To) FlatIter[From, To] {
+	return FlatIter[From, To]{next: next, flatt: Flattener, elemSizeTo: notsafe.GetTypeSize[To]()}
 }
 
-// FilterAndFlatt additionally filters 'From' elements.
-func FilterAndFlatt[From, To any](next func() (From, bool), filter func(From) bool, flatt func(From) []To) FlattenFit[From, To] {
-	return FlattenFit[From, To]{next: next, flatt: flatt, filter: filter, elemSizeTo: notsafe.GetTypeSize[To]()}
+// FilterAndFlatt filters source elements and extracts slices of 'To' by the 'flattener' function
+func FilterAndFlatt[From, To any](next func() (From, bool), filter func(From) bool, flattener func(From) []To) FlattenFitIter[From, To] {
+	return FilterFlattFilter(next, filter, flattener, always.True[To])
+}
+
+// FlattAndFilter extracts slices of 'To' by the 'flattener' function and filters extracted elements
+func FlattAndFilter[From, To any](next func() (From, bool), flattener func(From) []To, filterTo func(To) bool) FlattenFitIter[From, To] {
+	return FilterFlattFilter(next, always.True[From], flattener, filterTo)
+}
+
+// FilterFlattFilter filters source elements, extracts slices of 'To' by the 'flattener' function and filters extracted elements
+func FilterFlattFilter[From, To any](next func() (From, bool), filterFrom func(From) bool, flattener func(From) []To, filterTo func(To) bool) FlattenFitIter[From, To] {
+	return FlattenFitIter[From, To]{next: next, filterFrom: filterFrom, flatt: flattener, filterTo: filterTo, elemSizeTo: notsafe.GetTypeSize[To]()}
 }
 
 // Filter creates an Iterator that checks elements by filters and returns successful ones.
-func Filter[T any](next func() (T, bool), filter func(T) bool) Fit[T] {
-	return Fit[T]{next: next, by: filter}
+func Filter[T any](next func() (T, bool), filter func(T) bool) FitIter[T] {
+	return FitIter[T]{next: next, by: filter}
 }
 
 // NotNil creates an Iterator that filters nullable elements.
-func NotNil[T any](next func() (*T, bool)) Fit[*T] {
+func NotNil[T any](next func() (*T, bool)) FitIter[*T] {
 	return Filter(next, check.NotNil[T])
 }
 
@@ -126,4 +184,35 @@ func NotNil[T any](next func() (*T, bool)) Fit[*T] {
 func ToKV[T any, K comparable, V any](next func() (T, bool), keyExtractor func(T) K, valueConverter func(T) V) KeyValuer[T, K, V] {
 	kv := NewKeyValuer(next, keyExtractor, valueConverter)
 	return kv
+}
+
+// Group converts the 'elements' slice into a map, extracting a key for each element of the slice applying the converter 'keyProducer'.
+// The keysProducer retrieves one key per element.
+func Group[T any, K comparable](next func() (T, bool), keyProducer func(T) K) map[K][]T {
+	groups := map[K][]T{}
+	for e, ok := next(); ok; e, ok = next() {
+		initGroup(keyProducer(e), e, groups)
+	}
+	return groups
+}
+
+// GroupInMultiple converts the'elements' slice into a map, extracting multiple keys per each element of the slice applying the 'keyProducer' converter.
+// The keysProducer retrieves one or more keys per element.
+func GroupInMultiple[T any, K comparable](next func() (T, bool), keysProducer func(T) []K) map[K][]T {
+	groups := map[K][]T{}
+	for e, ok := next(); ok; e, ok = next() {
+		if keys := keysProducer(e); len(keys) == 0 {
+			var key K
+			initGroup(key, e, groups)
+		} else {
+			for _, key := range keys {
+				initGroup(key, e, groups)
+			}
+		}
+	}
+	return groups
+}
+
+func initGroup[T any, K comparable, TS ~[]T](key K, e T, groups map[K]TS) {
+	groups[key] = append(groups[key], e)
 }

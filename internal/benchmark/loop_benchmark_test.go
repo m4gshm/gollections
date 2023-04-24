@@ -349,6 +349,33 @@ func Benchmark_Loop_ImmutableOrderedSet_ForRangeSlice(b *testing.B) {
 	}
 }
 
+func Benchmark_Loop_MutableOrdererSet_FirstNext(b *testing.B) {
+	c := moset.Of(values...)
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for i, e, ok := c.First(); ok; e, ok = i.Next() {
+					casee.load(e)
+				}
+			}
+		})
+	}
+}
+
+func Benchmark_Loop_MutableOrdererSet_Head(b *testing.B) {
+	c := moset.Of(values...)
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				i := c.Head()
+				for e, ok := i.Next(); ok; e, ok = i.Next() {
+					casee.load(e)
+				}
+			}
+		})
+	}
+}
+
 func Benchmark_Loop_MutableOrdererSet_ForEach(b *testing.B) {
 	c := moset.Of(values...)
 	for _, casee := range cases {

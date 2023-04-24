@@ -13,6 +13,7 @@ import (
 	"github.com/m4gshm/gollections/mutable/oset"
 	"github.com/m4gshm/gollections/mutable/vector"
 	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/predicate/eq"
 	"github.com/m4gshm/gollections/ptr"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/walk/group"
@@ -217,7 +218,8 @@ func Test_Set_new(t *testing.T) {
 	mset.AddOne(4)
 	mset.AddAll(mset)
 
-	assert.Equal(t, slice.Of(1, 2, 3, 4), mset.Slice())
+	s := mset.Slice()
+	assert.Equal(t, slice.Of(1, 2, 3, 4), s)
 
 	mset.Delete(1, 2, 3)
 	mset.Delete(nils...)
@@ -233,4 +235,25 @@ func Test_Set_new(t *testing.T) {
 	_, ok := head.Next()
 	assert.False(t, ok)
 	head.Delete()
+}
+
+func Test_Set_CopyByValue(t *testing.T) {
+	set := oset.Of[int]()
+
+	set.Add(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
+
+	s := copySet(*set)
+	set2 := &s
+
+	set2.Add(17, 18, 19, 20)
+
+	c := set.Contains(20)
+	assert.True(t, c)
+
+	heq := set.HasAny(eq.To(20))
+	assert.True(t, heq)
+}
+
+func copySet[T comparable](set ordered.Set[T]) ordered.Set[T] {
+	return set
 }

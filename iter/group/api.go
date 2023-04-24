@@ -6,6 +6,6 @@ import (
 )
 
 // Of - group.Of synonym for the it.Group.
-func Of[T any, K comparable, IT c.Iterator[T]](elements IT, by func(T) K) c.MapStream[K, T, map[K][]T] {
+func Of[T any, K comparable, IT c.Iterator[T]](elements IT, by func(T) K) c.KVStream[K, T, map[K][]T] {
 	return iter.Group[T](elements, by)
 }

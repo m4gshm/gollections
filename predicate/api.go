@@ -56,13 +56,3 @@ func Union[T any](predicates ...Predicate[T]) Predicate[T] {
 		return true
 	}
 }
-
-// Always returns v every time.
-func Always[T any](v bool) Predicate[T] {
-	return func(_ T) bool { return v }
-}
-
-// Never returns the negative of v every time
-func Never[T any](v bool) Predicate[T] {
-	return func(_ T) bool { return !v }
-}

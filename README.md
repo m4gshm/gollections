@@ -53,8 +53,9 @@ import (
     "github.com/m4gshm/gollections/slice"
     "github.com/m4gshm/gollections/slice/clone"
     "github.com/m4gshm/gollections/slice/clone/sort"
-    sConvert "github.com/m4gshm/gollections/slice/convert"
+    sliceConvert "github.com/m4gshm/gollections/slice/convert"
     "github.com/m4gshm/gollections/slice/filter"
+    "github.com/m4gshm/gollections/slice/flatt"
     "github.com/m4gshm/gollections/slice/group"
     "github.com/m4gshm/gollections/slice/range_"
     "github.com/m4gshm/gollections/slice/reverse"
@@ -95,7 +96,7 @@ var users = []User{
 
 func Test_GroupBySeveralKeysAndConvertMapValues(t *testing.T) {
     usersByRole := group.InMultiple(users, func(u User) []string {
-        return sConvert.AndConvert(u.Roles(), Role.Name, strings.ToLower)
+        return sliceConvert.AndConvert(u.Roles(), Role.Name, strings.ToLower)
     })
     namesByRole := map_.ConvertValues(usersByRole, func(u []User) []string {
         return slice.Convert(u, User.Name)
@@ -107,7 +108,7 @@ func Test_GroupBySeveralKeysAndConvertMapValues(t *testing.T) {
 }
 
 func Test_FindFirsManager(t *testing.T) {
-    alice, _ := first.Of(users...).By(func(user User) bool {
+    alice, _ := slice.First(users, func(user User) bool {
         roles := slice.Convert(user.Roles(), Role.Name)
         return slice.Contains(roles, "Manager")
     })
@@ -116,8 +117,8 @@ func Test_FindFirsManager(t *testing.T) {
 }
 
 func Test_AggregateFilteredRoles(t *testing.T) {
-    roles := slice.Flatt(users, User.Roles)
-    roleNamesExceptManager := sConvert.AndFilter(roles, Role.Name, not.Eq("Manager"))
+    roles := flatt.AndConvert(users, User.Roles, Role.Name)
+    roleNamesExceptManager := slice.Filter(roles, not.Eq("Manager"))
 
     assert.Equal(t, slice.Of("Admin", "manager"), roleNamesExceptManager)
 }
@@ -233,7 +234,7 @@ func Test_ConvertFiltered(t *testing.T) {
 func Test_FilterConverted(t *testing.T) {
     var (
         source = []int{1, 3, 4, 5, 7, 8, 9, 11}
-        result = sConvert.AndFilter(source, strconv.Itoa, func(s string) bool {
+        result = sliceConvert.AndFilter(source, strconv.Itoa, func(s string) bool {
             return len(s) == 2
         })
         expected = []string{"11"}
@@ -248,7 +249,7 @@ func Test_ConvertNilSafe(t *testing.T) {
         third  = "third"
         fifth  = "fifth"
         source = []*entity{{&first}, {}, {&third}, nil, {&fifth}}
-        result = sConvert.NilSafe(source, func(e *entity) *string {
+        result = sliceConvert.NilSafe(source, func(e *entity) *string {
             return e.val
         })
         expected = []*string{&first, &third, &fifth}
@@ -259,7 +260,7 @@ func Test_ConvertNilSafe(t *testing.T) {
 func Test_ConvertFilteredWithIndexInPlace(t *testing.T) {
     var (
         source = slice.Of(1, 3, 4, 5, 7, 8, 9, 11)
-        result = sConvert.CheckIndexed(source, func(index int, elem int) (string, bool) {
+        result = sliceConvert.CheckIndexed(source, func(index int, elem int) (string, bool) {
             return strconv.Itoa(index + elem), even(elem)
         })
         expected = []string{"6", "13"}
@@ -397,10 +398,10 @@ func Test_OfLoop(t *testing.T) {
 
 func Test_Generate(t *testing.T) {
     var (
-        counter   = 0
-        result, _ = slice.Generate(func() (int, bool, error) {
+        counter = 0
+        result  = slice.Generate(func() (int, bool) {
             counter++
-            return counter, counter < 4, nil
+            return counter, counter < 4
         })
         expected = slice.Of(1, 2, 3)
     )
@@ -578,7 +579,6 @@ purposes.
 package examples
 
 import (
-    "github.com/m4gshm/gollections/k"
     "github.com/m4gshm/gollections/c"
     "github.com/m4gshm/gollections/immutable"
     "github.com/m4gshm/gollections/immutable/map_"
@@ -587,6 +587,7 @@ import (
     "github.com/m4gshm/gollections/immutable/oset"
     "github.com/m4gshm/gollections/immutable/set"
     "github.com/m4gshm/gollections/immutable/vector"
+    "github.com/m4gshm/gollections/k"
 )
 
 func _() {
@@ -608,9 +609,9 @@ func _() {
     )
     var (
         _ ordered.Map[int, string] = omap.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
-        _ c.Map[int, string]       = omap.New(map[int]string{
-            1: "2", 2: "2", 3: "3",
-        })
+        _ c.Map[int, string]       = omap.New(
+            /*uniques*/ map[int]string{1: "2", 2: "2", 3: "3"} /*order*/, []int{3, 1, 2},
+        )
     )
 }
 ```
@@ -619,7 +620,7 @@ where [vector](./immutable/vector/api.go),
 [set](./immutable/set/api.go), [oset](./immutable/oset/api.go),
 [map\_](./immutable/map_/api.go), [omap](./immutable/omap/api.go) are
 packages from [github.com/m4gshm/gollections/immutable](./immutable/)
-and [k.V](./K/v.go) is the method V from the package [K](./K/)
+and [k.V](./k/v.go) is the method V from the package [k](./k/)
 
 #### Mutable
 
@@ -627,8 +628,8 @@ and [k.V](./K/v.go) is the method V from the package [K](./K/)
 package examples
 
 import (
-    "github.com/m4gshm/gollections/k"
     "github.com/m4gshm/gollections/c"
+    "github.com/m4gshm/gollections/k"
     "github.com/m4gshm/gollections/mutable"
     "github.com/m4gshm/gollections/mutable/map_"
     "github.com/m4gshm/gollections/mutable/omap"
@@ -677,8 +678,8 @@ func _() {
 where [vector](./mutable/vector/api.go), [set](./mutable/set/api.go),
 [oset](./mutable/oset/api.go), [map\_](./mutable/map_/api.go),
 [omap](./mutable/omap/api.go) are packages from
-[github.com/m4gshm/gollections/mutable](./mutable/) and [k.V](./K/v.go)
-is the method V from the package [K](./K/)
+[github.com/m4gshm/gollections/mutable](./mutable/) and [k.V](./k/v.go)
+is the method V from the package [k](./k/)
 
 ## Pipe functions
 
@@ -747,12 +748,12 @@ import (
     "github.com/stretchr/testify/assert"
 
     "github.com/m4gshm/gollections/as"
-    cgroup "github.com/m4gshm/gollections/c/group"
     "github.com/m4gshm/gollections/immutable"
     "github.com/m4gshm/gollections/immutable/oset"
     "github.com/m4gshm/gollections/immutable/set"
     "github.com/m4gshm/gollections/iter"
     slc "github.com/m4gshm/gollections/iter/slice"
+    iterableGroup "github.com/m4gshm/gollections/iterable/group"
     "github.com/m4gshm/gollections/op"
     "github.com/m4gshm/gollections/predicate/more"
     "github.com/m4gshm/gollections/slice"
@@ -793,7 +794,7 @@ func Test_group_orderset_odd_even(t *testing.T) {
 }
 
 func Test_group_orderset_with_filtering_by_stirng_len(t *testing.T) {
-    var groups = cgroup.Of(oset.Of(
+    var groups = iterableGroup.Of(oset.Of(
         "seventh", "seventh", //duplicated
         "first", "second", "third", "fourth",
         "fifth", "sixth", "eighth",
@@ -805,8 +806,6 @@ func Test_group_orderset_with_filtering_by_stirng_len(t *testing.T) {
     ).ConvertValue(
         func(v string) string { return v + "_" },
     ).Map()
-
-    fmt.Println(groups) //map[int][]string{5:[]string{"first_", "third_", "fifth_", "sixth_", "ninth_", "tenth_", "three_"}, 6:[]string{"second_", "fourth_", "eighth_"}, 7:[]string{"seventh_"}}
 
     assert.Equal(t, map[int][]string{
         5: {"first_", "third_", "fifth_", "sixth_", "ninth_", "tenth_", "three_"},

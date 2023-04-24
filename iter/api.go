@@ -41,7 +41,7 @@ func Convert[From, To any, IT c.Iterator[From]](elements IT, converter func(From
 
 // FilterAndConvert additionally filters 'From' elements.
 func FilterAndConvert[From, To any, IT c.Iterator[From]](elements IT, filter func(From) bool, converter func(From) To) c.Iterator[To] {
-	return loop.FilterAndConvert(elements.Next, filter, converter)
+	return loop.Convert(loop.Filter(elements.Next, filter).Next, converter)
 }
 
 // Flatt instantiates Iterator that converts the collection elements into slices and then flattens them to one level
@@ -83,7 +83,7 @@ func ToSlice[T any](elements c.Iterator[T]) []T {
 }
 
 // Group transforms iterable elements to the MapPipe based on applying key extractor to the elements
-func Group[T any, K comparable](elements c.Iterator[T], by func(T) K) c.MapStream[K, T, map[K][]T] {
+func Group[T any, K comparable](elements c.Iterator[T], by func(T) K) c.KVStream[K, T, map[K][]T] {
 	return kvloop.Stream(loop.NewKeyValuer(elements.Next, by, as.Is[T]).Next, kvloop.Group[K, T])
 }
 

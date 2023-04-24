@@ -64,7 +64,7 @@ type KVCollection[K comparable, V any, M map[K]V | map[K][]V] interface {
 	TrackLoop[V, K]
 	TrackEachLoop[V, K]
 	KVIterable[K, V]
-	MapTransformable[K, V, M]
+	KVTransformable[K, V, M]
 	MapFactory[K, V, M]
 
 	Reduce(merger func(K, V, K, V) (K, V)) (K, V)
@@ -172,21 +172,21 @@ type Stream[T any] interface {
 	Collection[T]
 }
 
-// MapTransformable provides limited kit of map transformation methods.
+// KVTransformable provides limited kit of map transformation methods.
 // The full kit of transformer functions are in the package 'c/map_'
-type MapTransformable[K comparable, V any, Map map[K]V | map[K][]V] interface {
-	Filter(predicate func(K, V) bool) MapStream[K, V, Map]
-	Convert(converter func(K, V) (K, V)) MapStream[K, V, Map]
+type KVTransformable[K comparable, V any, Map map[K]V | map[K][]V] interface {
+	Filter(predicate func(K, V) bool) KVStream[K, V, Map]
+	Convert(converter func(K, V) (K, V)) KVStream[K, V, Map]
 
-	FilterKey(predicate func(K) bool) MapStream[K, V, Map]
-	ConvertKey(converter func(K) K) MapStream[K, V, Map]
+	FilterKey(predicate func(K) bool) KVStream[K, V, Map]
+	ConvertKey(converter func(K) K) KVStream[K, V, Map]
 
-	FilterValue(predicate func(V) bool) MapStream[K, V, Map]
-	ConvertValue(converter func(V) V) MapStream[K, V, Map]
+	FilterValue(predicate func(V) bool) KVStream[K, V, Map]
+	ConvertValue(converter func(V) V) KVStream[K, V, Map]
 }
 
-// MapStream is map or key/value stream of elements in transformation state.
-type MapStream[K comparable, V any, M map[K]V | map[K][]V] interface {
+// KVStream is map or key/value stream of elements in transformation state.
+type KVStream[K comparable, V any, M map[K]V | map[K][]V] interface {
 	KVIterator[K, V]
 	KVCollection[K, V, M]
 }

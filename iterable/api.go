@@ -49,7 +49,7 @@ func NotNil[T any, IT c.Iterable[*T]](elements IT) c.Stream[*T] {
 }
 
 // Group groups elements to slices by a converter and returns a map
-func Group[T any, K comparable, C c.Iterable[T]](elements C, by func(T) K) c.MapStream[K, T, map[K][]T] {
+func Group[T any, K comparable, C c.Iterable[T]](elements C, by func(T) K) c.KVStream[K, T, map[K][]T] {
 	it := loop.NewKeyValuer(elements.Begin().Next, by, as.Is[T])
 	return kvloop.Stream(it.Next, kvloop.Group[K, T])
 }

@@ -12,7 +12,6 @@ import (
 	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
-	"github.com/m4gshm/gollections/predicate"
 )
 
 // ErrBreak is the 'break' statement of the For, Track methods
@@ -38,12 +37,12 @@ func OfLoop[S, T any](source S, hasNext func(S) bool, getNext func(S) (T, error)
 
 // Generate builds a slice by an generator function.
 // The generator returns an element, or false if the generation is over, or an error.
-func Generate[T any](next func() (T, bool, error)) ([]T, error) {
+func Generate[T any](next func() (T, bool)) []T {
 	var r []T
 	for {
-		e, ok, err := next()
-		if err != nil || !ok {
-			return r, err
+		e, ok := next()
+		if !ok {
+			return r
 		}
 		r = append(r, e)
 	}
@@ -72,7 +71,7 @@ func Delete[TS ~[]T, T any](index int, elements TS) TS {
 	return append(elements[0:index], elements[index+1:]...)
 }
 
-// Group converts the 'elements' slice slice into a map, extracting a key for each element of the slice applying the converter 'keyProducer'.
+// Group converts the 'elements' slice into a map, extracting a key for each element of the slice applying the converter 'keyProducer'.
 // The keysProducer retrieves one key per element.
 func Group[T any, K comparable, TS ~[]T](elements TS, keyProducer func(T) K) map[K]TS {
 	if elements == nil {
@@ -220,27 +219,41 @@ func ConvertCheckIndexed[FS ~[]From, From, To any](elements FS, by func(index in
 }
 
 // Flatt unfolds the n-dimensional slice into a n-1 dimensional slice
-func Flatt[FS ~[]From, From, To any](elements FS, by func(From) []To) []To {
+func Flatt[FS ~[]From, From, To any](elements FS, flattener func(From) []To) []To {
 	if elements == nil {
 		return nil
 	}
 	var result = make([]To, 0, int(float32(len(elements))*1.618))
 	for _, e := range elements {
-		result = append(result, by(e)...)
+		result = append(result, flattener(e)...)
 
 	}
 	return result
 }
 
-// FilerAndFlatt additionally filters 'From' elements.
-func FilerAndFlatt[FS ~[]From, From, To any](elements FS, filter func(From) bool, by func(From) []To) []To {
+// Flatt unfolds the n-dimensional slice into a n-1 dimensional slice and converts the elements
+func FlattAndConvert[FS ~[]From, From, I, To any](elements FS, flattener func(From) []I, convert func(I) To) []To {
+	if elements == nil {
+		return nil
+	}
+	var result = make([]To, 0, int(float32(len(elements))*1.618))
+	for _, e := range elements {
+		for _, f := range flattener(e) {
+			result = append(result, convert(f))
+		}
+	}
+	return result
+}
+
+// FilterAndFlatt additionally filters 'From' elements.
+func FilterAndFlatt[FS ~[]From, From, To any](elements FS, filter func(From) bool, flattener func(From) []To) []To {
 	if elements == nil {
 		return nil
 	}
 	var result = make([]To, 0, int(float32(len(elements)/2)*1.618))
 	for _, e := range elements {
 		if filter(e) {
-			result = append(result, by(e)...)
+			result = append(result, flattener(e)...)
 		}
 	}
 	return result
@@ -525,7 +538,12 @@ func HasAny[TS ~[]T, T any](elements TS, predicate func(T) bool) bool {
 	return ok
 }
 
-// Contains checks is the 'elements' slice contains the element
-func Contains[TS ~[]T, T comparable](elements TS, element T) bool {
-	return HasAny(elements, predicate.Eq(element))
+// Contains checks is the 'elements' slice contains the example
+func Contains[TS ~[]T, T comparable](elements TS, example T) bool {
+	for _, e := range elements {
+		if e == example {
+			return true
+		}
+	}
+	return false
 }

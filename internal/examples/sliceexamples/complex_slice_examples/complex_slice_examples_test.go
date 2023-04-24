@@ -9,12 +9,15 @@ import (
 	"github.com/m4gshm/gollections/iter"
 	sliceIter "github.com/m4gshm/gollections/iter/slice"
 	"github.com/m4gshm/gollections/loop"
+	loopConv "github.com/m4gshm/gollections/loop/convert"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/predicate/eq"
 	"github.com/m4gshm/gollections/predicate/not"
+	"github.com/m4gshm/gollections/ptr"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/convert"
 	"github.com/m4gshm/gollections/slice/group"
+	sIter "github.com/m4gshm/gollections/slice/iter"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -131,11 +134,11 @@ func Benchmark_FindFirsManager_Slice(b *testing.B) {
 	}
 }
 
-func Benchmark_FindFirsManager_Iter(b *testing.B) {
+func Benchmark_FindFirsManager_Loop_SliceIter(b *testing.B) {
 	//new
 	for i := 0; i < b.N; i++ {
 		alice, ok := first.Of(users...).By(func(user User) bool {
-			return loop.HasAny(sliceIter.Convert(user.Roles(), Role.Name).Next, eq.To("Manager"))
+			return loop.Contains(ptr.Of(sIter.Convert(user.Roles(), Role.Name)).Next, "Manager")
 		})
 		_, _ = alice, ok
 	}
@@ -178,6 +181,14 @@ func Benchmark_AggregateFilteredRoles_Slice(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		roles := slice.Flatt(users, User.Roles)
 		roleNamesExceptManager := convert.AndFilter(roles, Role.Name, not.Eq("Manager"))
+		_ = roleNamesExceptManager
+	}
+}
+
+func Benchmark_AggregateFilteredRoles_Loop(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		roles := sIter.Flatt(users, User.Roles)
+		roleNamesExceptManager := loopConv.AndFilter(roles.Next, Role.Name, not.Eq("Manager"))
 		_ = roleNamesExceptManager
 	}
 }

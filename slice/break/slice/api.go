@@ -5,7 +5,6 @@ import (
 	"errors"
 
 	"github.com/m4gshm/gollections/loop"
-	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
 )
 
@@ -27,10 +26,16 @@ func OfLoop[S, T any](source S, getNext func(S) (T, error)) ([]T, error) {
 	var r []T
 	for {
 		o, err := getNext(source)
-		if err != nil {
-			return r, checkBreak(err)
+		if err == nil {
+			r = append(r, o)
+		} else if errors.Is(err, ErrBreak) {
+			r = append(r, o)
+			return r, nil
+		} else if errors.Is(err, ErrIgnoreAndBreak) {
+			return r, nil
+		} else if !errors.Is(err, ErrIgnore) {
+			return r, err
 		}
-		r = append(r, o)
 	}
 }
 
@@ -207,7 +212,11 @@ func First[TS ~[]T, T any](elements TS, by func(T) (bool, error)) (T, bool, erro
 	for _, e := range elements {
 		if ok, err := by(e); err != nil {
 			var no T
-			return no, false, checkBreak(err)
+			if errors.Is(err, ErrBreak) || errors.Is(err, ErrIgnoreAndBreak)  {
+				return no, false, nil
+			} else if !errors.Is(err, ErrIgnore) {
+				return no, false, err
+			}			
 		} else if ok {
 			return e, true, nil
 		}
@@ -222,7 +231,11 @@ func Last[TS ~[]T, T any](elements TS, by func(T) (bool, error)) (T, bool, error
 		e := elements[i]
 		if ok, err := by(e); err != nil {
 			var no T
-			return no, false, checkBreak(err)
+			if errors.Is(err, ErrBreak) || errors.Is(err, ErrIgnoreAndBreak)  {
+				return no, false, nil
+			} else if !errors.Is(err, ErrIgnore) {
+				return no, false, err
+			}			
 		} else if ok {
 			return e, true, nil
 		}
@@ -230,5 +243,3 @@ func Last[TS ~[]T, T any](elements TS, by func(T) (bool, error)) (T, bool, error
 	var no T
 	return no, false, nil
 }
-
-func checkBreak(err error) error { return op.IfElse(errors.Is(err, ErrBreak), nil, err) }

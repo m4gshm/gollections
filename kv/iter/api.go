@@ -36,28 +36,28 @@ func Group[K comparable, V any](it c.KVIterator[K, V]) map[K][]V {
 // OfLoop creates an IteratorBreakable instance that loops over elements of a source
 // The hasNext specifies a predicate that tests existing of a next element in the source.
 // The getNext extracts the element.
-func OfLoop[S, k, V any](source S, hasNext func(S) bool, getNext func(S) (k, V, error)) c.KVIteratorBreakable[k, V] {
+func OfLoop[S, K, V any](source S, hasNext func(S) bool, getNext func(S) (K, V, error)) c.KVIteratorBreakable[K, V] {
 	l := loop.NewIter(source, hasNext, getNext)
 	return &l
 }
 
 // Map instantiates key/value iterator that converts elements with a converter and returns them
-func Map[K comparable, V any, Kto comparable, Vto any](elements c.KVIterator[K, V], by func(K, V) (Kto, Vto)) c.MapStream[Kto, Vto, map[Kto]Vto] {
-	return loop.Stream(loop.Convert(elements.Next, by).Next, loop.ToMap[Kto, Vto])
+func Map[K comparable, V any, KOUT comparable, VOUT any](elements c.KVIterator[K, V], by func(K, V) (KOUT, VOUT)) c.KVStream[KOUT, VOUT, map[KOUT]VOUT] {
+	return loop.Stream(loop.Convert(elements.Next, by).Next, loop.ToMap[KOUT, VOUT])
 }
 
 // Filter instantiates key/value iterator that iterates only over filtered elements
-func Filter[K comparable, V any, IT c.KVIterator[K, V]](elements IT, filter func(K, V) bool) c.MapStream[K, V, map[K]V] {
+func Filter[K comparable, V any, IT c.KVIterator[K, V]](elements IT, filter func(K, V) bool) c.KVStream[K, V, map[K]V] {
 	return loop.Stream(loop.Filter(elements.Next, filter).Next, loop.ToMap[K, V])
 }
 
 // FilterKey instantiates key/value iterator that iterates only over elements that filtered by the key
-func FilterKey[K comparable, V any](elements c.KVIterator[K, V], fit func(K) bool) c.MapStream[K, V, map[K]V] {
+func FilterKey[K comparable, V any](elements c.KVIterator[K, V], fit func(K) bool) c.KVStream[K, V, map[K]V] {
 	return Filter(elements, filter.Key[V](fit))
 }
 
 // FilterValue instantiates key/value iterator that iterates only over elements that filtered by the value
-func FilterValue[K comparable, V any](elements c.KVIterator[K, V], fit func(V) bool) c.MapStream[K, V, map[K]V] {
+func FilterValue[K comparable, V any](elements c.KVIterator[K, V], fit func(V) bool) c.KVStream[K, V, map[K]V] {
 	return Filter(elements, filter.Value[K](fit))
 }
 

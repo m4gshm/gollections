@@ -52,12 +52,12 @@ func NewSetCap[T comparable](capacity int) *Set[T] {
 
 // WrapSet creates a set using a map and an order slice as the internal storage.
 func WrapSet[T comparable](elements []T, uniques map[T]int) *Set[T] {
-	return &Set[T]{order: elements, elements: uniques}
+	return &Set[T]{order: &elements, elements: uniques}
 }
 
 // Set is the Collection implementation that provides element uniqueness and access order. Elements must be comparable.
 type Set[T comparable] struct {
-	order    []T
+	order    *[]T
 	elements map[T]int
 }
 
@@ -88,7 +88,7 @@ func (s *Set[T]) BeginEdit() c.DelIterator[T] {
 func (s *Set[T]) Head() SetIter[T] {
 	var elements *[]T
 	if s != nil {
-		elements = &s.order
+		elements = s.order
 	}
 	return NewSetIter(elements, s.DeleteOne)
 }
@@ -106,7 +106,9 @@ func (s *Set[T]) First() (SetIter[T], T, bool) {
 // Slice collects the elements to a slice
 func (s *Set[T]) Slice() (out []T) {
 	if s != nil {
-		out = slice.Clone(s.order)
+		if order := s.order; order != nil {
+			out = slice.Clone(*s.order)
+		}
 	}
 	return out
 }
@@ -118,7 +120,9 @@ func (s *Set[T]) Clone() *Set[T] {
 		uniques  map[T]int
 	)
 	if s != nil {
-		elements = slice.Clone(s.order)
+		if order := s.order; order != nil {
+			elements = slice.Clone(*s.order)
+		}
 		uniques = map_.Clone(s.elements)
 	}
 	return WrapSet(elements, uniques)
@@ -134,7 +138,10 @@ func (s *Set[T]) Len() int {
 	if s == nil {
 		return 0
 	}
-	return len(s.order)
+	if order := s.order; order != nil {
+		return len(*s.order)
+	}
+	return 0
 }
 
 // Contains checks if the collection contains an element
@@ -174,11 +181,14 @@ func (s *Set[T]) AddOneNew(element T) (ok bool) {
 		if elements == nil {
 			elements = map[T]int{}
 			s.elements = elements
+			s.order = &[]T{}
 		}
 		if ok = !s.Contains(element); ok {
 			order := s.order
-			elements[element] = len(order)
-			s.order = append(order, element)
+			if order != nil {
+				elements[element] = len(*order)
+				*(s.order) = append(*order, element)
+			}
 		}
 	}
 	return ok
@@ -229,11 +239,11 @@ func (s *Set[T]) DeleteActualOne(element T) bool {
 			delete(elements, element)
 			//todo: need optimize
 			order := s.order
-			ne := slice.Delete(pos, order)
+			ne := slice.Delete(pos, *order)
 			for i := pos; i < len(ne); i++ {
 				elements[ne[i]]--
 			}
-			s.order = ne
+			*(s.order) = ne
 			return true
 		}
 	}
@@ -245,13 +255,19 @@ func (s *Set[T]) For(walker func(T) error) error {
 	if s == nil {
 		return nil
 	}
-	return slice.For(s.order, walker)
+	order := s.order
+	if order == nil {
+		return nil
+	}
+	return slice.For(*order, walker)
 }
 
 // ForEach applies the 'walker' function for every element
 func (s *Set[T]) ForEach(walker func(T)) {
 	if s != nil {
-		slice.ForEach(s.order, walker)
+		if order := s.order; order != nil {
+			slice.ForEach(*order, walker)
+		}
 	}
 }
 
@@ -270,7 +286,9 @@ func (s *Set[T]) Convert(converter func(T) T) c.Stream[T] {
 // Reduce reduces the elements into an one using the 'merge' function
 func (s *Set[T]) Reduce(merge func(T, T) T) (t T) {
 	if s != nil {
-		t = slice.Reduce(s.order, merge)
+		if order := s.order; order != nil {
+			t = slice.Reduce(*order, merge)
+		}
 	}
 	return t
 }
@@ -278,7 +296,9 @@ func (s *Set[T]) Reduce(merge func(T, T) T) (t T) {
 // HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful
 func (s *Set[K]) HasAny(predicate func(K) bool) bool {
 	if s != nil {
-		return slice.HasAny(s.order, predicate)
+		if order := s.order; order != nil {
+			return slice.HasAny(*order, predicate)
+		}
 	}
 	return false
 }
@@ -295,7 +315,9 @@ func (s *Set[T]) StableSort(less slice.Less[T]) *Set[T] {
 
 func (s *Set[T]) sortBy(sorter slice.Sorter, less slice.Less[T]) *Set[T] {
 	if s != nil {
-		slice.Sort(s.order, sorter, less)
+		if order := s.order; order != nil {
+			slice.Sort(*order, sorter, less)
+		}
 	}
 	return s
 }
@@ -303,7 +325,9 @@ func (s *Set[T]) sortBy(sorter slice.Sorter, less slice.Less[T]) *Set[T] {
 func (s *Set[T]) String() string {
 	var elements []T
 	if s != nil {
-		elements = s.order
+		if order := s.order; order != nil {
+			elements = *order
+		}
 	}
 	return slice.ToString(elements)
 }

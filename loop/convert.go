@@ -4,11 +4,13 @@ import (
 	"github.com/m4gshm/gollections/c"
 )
 
-// ConvertFitIter is the Converter with elements filtering.
+// ConvertFitIter iterator implementation that retrieves an element by the 'next' function, converts by the 'converter' and addition checks by the 'filter'.
+// If the filter returns true then the converted element is returned as next.
 type ConvertFitIter[From, To any] struct {
-	next   func() (From, bool)
-	by     func(From) To
-	filter func(From) bool
+	next       func() (From, bool)
+	converter  func(From) To
+	filterFrom func(From) bool
+	filterTo   func(To) bool
 }
 
 var (
@@ -20,15 +22,19 @@ var (
 // The ok result indicates whether the element was returned by the iterator.
 // If ok == false, then the iteration must be completed.
 func (c ConvertFitIter[From, To]) Next() (t To, ok bool) {
-	if next, filter := c.next, c.filter; next != nil && filter != nil {
-		if f, ok := nextFiltered(next, filter); ok {
-			return c.by(f), true
+	if next, filterFrom := c.next, c.filterFrom; next != nil && filterFrom != nil {
+		for f, ok := nextFiltered(next, filterFrom); ok; f, ok = nextFiltered(next, filterFrom) {
+			if filterTo := c.filterTo; filterTo != nil {
+				if t = c.converter(f); filterTo(t) {
+					return t, ok
+				}
+			}
 		}
 	}
 	return t, false
 }
 
-// ConvertIter is the iterator wrapper implementation applying a converter to all iterable elements.
+// ConvertIter iterator implementation that retrieves an element by the 'next' function and converts by the 'converter'
 type ConvertIter[From, To any] struct {
 	next      func() (From, bool)
 	converter func(From) To
@@ -46,6 +52,31 @@ func (c ConvertIter[From, To]) Next() (t To, ok bool) {
 	if next := c.next; next != nil {
 		if v, ok := next(); ok {
 			return c.converter(v), true
+		}
+	}
+	return t, false
+}
+
+// ConvertCheckIter converts and filters elements at the same time
+type ConvertCheckIter[From, To any] struct {
+	next      func() (From, bool)
+	converter func(From) (To, bool)
+}
+
+var (
+	_ c.Iterator[any] = (*ConvertIter[any, any])(nil)
+	_ c.Iterator[any] = ConvertIter[any, any]{}
+)
+
+// Next returns the next element.
+// The ok result indicates whether the element was returned by the iterator.
+// If ok == false, then the iteration must be completed.
+func (c ConvertCheckIter[From, To]) Next() (t To, ok bool) {
+	if next, converter := c.next, c.converter; next != nil && converter != nil {
+		for e, ok := next(); ok; e, ok = next() {
+			if t, ok := converter(e); ok {
+				return t, true
+			}
 		}
 	}
 	return t, false
