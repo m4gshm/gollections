@@ -27,23 +27,18 @@ go get -u github.com/m4gshm/gollections@HEAD
 The package provides helper subpackages and functions for using with slices. +
 Most helpers organized as pair of a main function and short aliases in a subpackage. For example the function link:./slice/api.go#L247[slice.SortByOrdered] has aliases link:./slice/sort/api.go#L12[sort.By] and link:./slice/sort/api.go#L23[sort.Of].
 
-Usage examples:
+Usage examples link:./internal/examples/sliceexamples/slice_examples_test.go[here].
 
-[source,go]
-----
-include::../examples/sliceexamples/slice_examples_test.go[]
-----
+
+==== Slices - link:./slice/api.go[github.com/m4gshm/gollections/slice]
+
+TODO
 
 ==== Maps - link:./map_/api.go[github.com/m4gshm/gollections/map_]
 
 The package provides helper subpackages and functions for using with maps. +
 
-Usage examples:
-
-[source,go]
-----
-include::../examples/mapexamples/map_examples_test.go[]
-----
+Usage examples link:./internal/examples/mapexamples/map_examples_test.go[here].
 
 ==== Mutable containers
 
