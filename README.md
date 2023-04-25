@@ -31,7 +31,7 @@ subpackage. For example the function
 Usage examples
 [here](./internal/examples/sliceexamples/slice_examples_test.go).
 
-### Slices - [github.com/m4gshm/gollections/slice](./slice/api.go)
+### Loops - [github.com/m4gshm/gollections/loop](./loop/api.go), [github.com/m4gshm/gollections/kv/loop](./kv/loop/api.go)
 
 TODO
 
