@@ -30,7 +30,7 @@ Most helpers organized as pair of a main function and short aliases in a subpack
 Usage examples link:./internal/examples/sliceexamples/slice_examples_test.go[here].
 
 
-==== Loops - link:./loop/api.go[github.com/m4gshm/gollections/loop], link:./kv/loop/api.go[github.com/m4gshm/gollections/kv/loop]
+==== Loops - link:./loop/api.go[loop], link:./kv/loop/api.go[kv/loop]
 
 TODO
 
