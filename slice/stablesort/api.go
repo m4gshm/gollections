@@ -1,3 +1,4 @@
+// Package stablesort provides stable sorting in place slice elements
 package stablesort
 
 import (

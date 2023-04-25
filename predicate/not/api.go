@@ -1,3 +1,4 @@
+// Package not provides negalive predicate builders like 'not equals to'
 package not
 
 import (

@@ -1,3 +1,4 @@
+// Package not provides negalive predicates like 'not equals to'
 package not
 
 import "github.com/m4gshm/gollections/check"

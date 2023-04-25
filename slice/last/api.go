@@ -1,3 +1,4 @@
+// Package last provides helpers for retrieving the last element of a slice
 package last
 
 import (

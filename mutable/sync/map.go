@@ -1,3 +1,4 @@
+// Package sync provides parametrized Map implementation
 package sync
 
 import (

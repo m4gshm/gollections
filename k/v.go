@@ -1,3 +1,4 @@
+// Package k provides the k.V constructor for building key/value pairs
 package k
 
 import (

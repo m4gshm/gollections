@@ -1,3 +1,4 @@
+// Package first provides helpers for retrieving a first element of a slice that satisfies a condition
 package first
 
 import (

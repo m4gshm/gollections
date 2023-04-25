@@ -1,3 +1,4 @@
+// Package slice provides constructors for slice based itarators
 package slice
 
 import (

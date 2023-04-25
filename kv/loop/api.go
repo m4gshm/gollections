@@ -1,3 +1,4 @@
+// Package loop provides helpers for loop operation over key/value pairs and iterator implementations
 package loop
 
 // Group collects sets of values grouped by keys obtained by passing a key/value iterator
@@ -44,10 +45,10 @@ func Filter[K, V any](next func() (K, V, bool), filter func(K, V) bool) FitKV[K,
 
 // ToMapResolv collects key\value elements to a map by iterating over the elements with resolving of duplicated key values
 func ToMapResolv[K comparable, V any](next func() (K, V, bool), resolver func(bool, K, V, V) V) map[K]V {
-	e := map[K]V{}
+	m := map[K]V{}
 	for k, v, ok := next(); ok; k, v, ok = next() {
-		exists, ok := e[k]
-		e[k] = resolver(ok, k, exists, v)
+		exists, ok := m[k]
+		m[k] = resolver(ok, k, exists, v)
 	}
-	return e
+	return m
 }

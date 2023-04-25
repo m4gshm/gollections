@@ -1,3 +1,4 @@
+// Package from provides conver adapter functions
 package from
 
 // To transforms converers chain of From->Internal->To into From->To

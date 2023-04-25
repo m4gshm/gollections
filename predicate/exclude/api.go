@@ -1,3 +1,4 @@
+// Package exclude provides predicate builders
 package exclude
 
 import (

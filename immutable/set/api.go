@@ -1,4 +1,4 @@
-// Package set provides the unordered set container implementation
+// Package set provides unordered immutable.Set constructors and helpers
 package set
 
 import (
@@ -31,13 +31,13 @@ func Sort[T comparable, f constraints.Ordered](s immutable.Set[T], by func(T) f)
 	return s.Sort(func(e1, e2 T) bool { return by(e1) < by(e2) })
 }
 
-// Convert returns a pipe that applies the 'converter' function to the collection elements
+// Convert returns a stream that applies the 'converter' function to the collection elements
 func Convert[From, To comparable](collection immutable.Set[From], converter func(From) To) c.Stream[To] {
 	h := collection.Head()
 	return loop.Stream(loop.Convert(h.Next, converter).Next)
 }
 
-// Flatt returns a pipe that converts the collection elements into slices and then flattens them to one level
+// Flatt returns a stream that converts the collection elements into slices and then flattens them to one level
 func Flatt[From, To comparable](s immutable.Set[From], by func(From) []To) c.Stream[To] {
 	h := s.Head()
 	f := iter.Flatt(h.Next, by)

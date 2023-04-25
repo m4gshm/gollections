@@ -1,3 +1,4 @@
+// Package group provides short aliases for grouping functions
 package group
 
 import (

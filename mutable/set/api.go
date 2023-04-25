@@ -1,3 +1,4 @@
+// Package set provides unordered mutable.Set constructors and helpers
 package set
 
 import (
@@ -35,7 +36,7 @@ func Sort[T comparable, F constraints.Ordered](s mutable.Set[T], by func(T) F) *
 	return s.Sort(func(e1, e2 T) bool { return by(e1) < by(e2) })
 }
 
-// Convert returns a pipe that applies the 'converter' function to the collection elements
+// Convert returns a stream that applies the 'converter' function to the collection elements
 func Convert[From, To comparable](collection *mutable.Set[From], converter func(From) To) c.Stream[To] {
 	h := collection.Head()
 	return loop.Stream(loop.Convert(h.Next, converter).Next)

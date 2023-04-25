@@ -1,3 +1,4 @@
+// Package filter provides aliases for loop filtering helpers
 package filter
 
 import (

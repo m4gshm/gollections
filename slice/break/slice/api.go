@@ -212,11 +212,11 @@ func First[TS ~[]T, T any](elements TS, by func(T) (bool, error)) (T, bool, erro
 	for _, e := range elements {
 		if ok, err := by(e); err != nil {
 			var no T
-			if errors.Is(err, ErrBreak) || errors.Is(err, ErrIgnoreAndBreak)  {
+			if errors.Is(err, ErrBreak) || errors.Is(err, ErrIgnoreAndBreak) {
 				return no, false, nil
 			} else if !errors.Is(err, ErrIgnore) {
 				return no, false, err
-			}			
+			}
 		} else if ok {
 			return e, true, nil
 		}
@@ -231,11 +231,11 @@ func Last[TS ~[]T, T any](elements TS, by func(T) (bool, error)) (T, bool, error
 		e := elements[i]
 		if ok, err := by(e); err != nil {
 			var no T
-			if errors.Is(err, ErrBreak) || errors.Is(err, ErrIgnoreAndBreak)  {
+			if errors.Is(err, ErrBreak) || errors.Is(err, ErrIgnoreAndBreak) {
 				return no, false, nil
 			} else if !errors.Is(err, ErrIgnore) {
 				return no, false, err
-			}			
+			}
 		} else if ok {
 			return e, true, nil
 		}

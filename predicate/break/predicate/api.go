@@ -1,3 +1,4 @@
+// Package predicate provides breakable predicate builders
 package predicate
 
 // Predicate tests value (converts to true or false) or aborts by an error.

@@ -1,3 +1,4 @@
+// Package vector provides mutable.Vector constructors and helpers
 package vector
 
 import (
@@ -33,7 +34,7 @@ func Sort[T any, F constraints.Ordered](v *mutable.Vector[T], by func(T) F) *mut
 	return v.Sort(func(e1, e2 T) bool { return by(e1) < by(e2) })
 }
 
-// Convert returns a pipe that applies the 'converter' function to the collection elements
+// Convert returns a stream that applies the 'converter' function to the collection elements
 func Convert[From, To any](collection *mutable.Vector[From], converter func(From) To) c.Stream[To] {
 	h := collection.Head()
 	return loop.Stream(loop.Convert(h.Next, converter).Next)

@@ -1,3 +1,4 @@
+// Package convert provides converting helpers
 package convert
 
 // To helper for Map, Flatt

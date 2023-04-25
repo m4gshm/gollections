@@ -1,3 +1,4 @@
+// Package convert provides slice converation helpers
 package convert
 
 import (

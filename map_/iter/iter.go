@@ -1,3 +1,4 @@
+// Package iter provides map based iterator implementations
 package iter
 
 import (

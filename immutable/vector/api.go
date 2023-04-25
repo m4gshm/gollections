@@ -1,4 +1,4 @@
-// Package vector provides the Vector (ordered) implementation
+// Package vector provides ordered immutable.Vector constructors and helpers
 package vector
 
 import (
@@ -29,13 +29,13 @@ func Sort[t any, f constraints.Ordered](v immutable.Vector[t], by func(t) f) imm
 	return v.Sort(func(e1, e2 t) bool { return by(e1) < by(e2) })
 }
 
-// Convert returns a pipe that applies the 'converter' function to the collection elements
+// Convert returns a stream that applies the 'converter' function to the collection elements
 func Convert[From, To any](collection immutable.Vector[From], converter func(From) To) c.Stream[To] {
 	h := collection.Head()
 	return loop.Stream(loop.Convert(h.Next, converter).Next)
 }
 
-// Flatt returns a pipe that converts the collection elements into slices and then flattens them to one level
+// Flatt returns a stream that converts the collection elements into slices and then flattens them to one level
 func Flatt[From, To any](collection immutable.Vector[From], by func(From) []To) c.Stream[To] {
 	h := collection.Head()
 	f := loop.Flatt(h.Next, by)

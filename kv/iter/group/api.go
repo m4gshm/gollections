@@ -1,3 +1,4 @@
+// Package group provides short aliases for functions used to group key/values retieved by an iterator
 package group
 
 import (

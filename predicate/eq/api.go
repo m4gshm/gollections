@@ -1,3 +1,4 @@
+// Package eq provides predicate builder short aliases
 package eq
 
 import "github.com/m4gshm/gollections/predicate"

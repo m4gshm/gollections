@@ -60,7 +60,7 @@ func Test_ConvertToNotNil(t *testing.T) {
 		third    = "third"
 		fifth    = "fifth"
 		source   = loop.Of([]entity{{&first}, {}, {&third}, {}, {&fifth}}...)
-		result   =convert.ToNotNil(source, func(e entity) *string { return e.val })
+		result   = convert.ToNotNil(source, func(e entity) *string { return e.val })
 		expected = []*string{&first, &third, &fifth}
 	)
 	assert.Equal(t, expected, slice.Generate(result.Next))

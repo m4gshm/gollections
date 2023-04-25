@@ -1,3 +1,4 @@
+// Package oset provides mutable ordered.Set constructors and helpers
 package oset
 
 import (
@@ -26,7 +27,7 @@ func NewCap[T comparable](capacity int) *ordered.Set[T] {
 	return ordered.NewSetCap[T](capacity)
 }
 
-// Convert returns a pipe that applies the 'converter' function to the collection elements
+// Convert returns a stream that applies the 'converter' function to the collection elements
 func Convert[From, To comparable](collection *ordered.Set[From], converter func(From) To) c.Stream[To] {
 	h := collection.Head()
 	return loop.Stream(loop.Convert(h.Next, converter).Next)

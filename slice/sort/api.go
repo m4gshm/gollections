@@ -1,3 +1,4 @@
+// Package sort provides sorting in place slice elements
 package sort
 
 import (

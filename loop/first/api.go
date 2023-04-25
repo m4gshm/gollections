@@ -1,3 +1,4 @@
+// Package first provides short aliases for loop functions for retrieving a first element
 package first
 
 import (

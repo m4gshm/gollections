@@ -73,13 +73,13 @@ func (m MapKeys[K, V]) ForEach(walker func(K)) {
 	map_.ForEachKey(m.elements, walker)
 }
 
-// Filter returns a pipe consisting of elements that satisfy the condition of the 'predicate' function
+// Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function
 func (m MapKeys[K, V]) Filter(filter func(K) bool) c.Stream[K] {
 	h := m.Head()
 	return loop.Stream(loop.Filter(h.Next, filter).Next)
 }
 
-// Convert returns a pipe that applies the 'converter' function to the collection elements
+// Convert returns a stream that applies the 'converter' function to the collection elements
 func (m MapKeys[K, V]) Convert(converter func(K) K) c.Stream[K] {
 	h := m.Head()
 	return loop.Stream(loop.Convert(h.Next, converter).Next)

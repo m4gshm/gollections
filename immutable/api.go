@@ -1,2 +1,2 @@
-// Package immutable provides implementations of constant containers.
+// Package immutable provides immutable collection implementations
 package immutable

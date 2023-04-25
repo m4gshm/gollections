@@ -1,3 +1,4 @@
+// Package convert provides key, value convert adapters
 package convert
 
 // Key adapts a key converter to the key/value converter that converts only keys

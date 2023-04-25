@@ -1,3 +1,4 @@
+// Package iter provides ordered map iterator implementations
 package iter
 
 import (

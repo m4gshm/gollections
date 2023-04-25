@@ -1,4 +1,4 @@
-// Package oset provides the ordered set container implementation
+// Package oset provides ordered.Set constructors and helpers
 package oset
 
 import (
@@ -29,13 +29,13 @@ func Sort[T comparable, f constraints.Ordered](s ordered.Set[T], by func(T) f) o
 	return s.Sort(func(e1, e2 T) bool { return by(e1) < by(e2) })
 }
 
-// Convert returns a pipe that applies the 'converter' function to the collection elements
+// Convert returns a stream that applies the 'converter' function to the collection elements
 func Convert[From, To comparable](collection ordered.Set[From], converter func(From) To) c.Stream[To] {
 	h := collection.Head()
 	return loop.Stream(loop.Convert(h.Next, converter).Next)
 }
 
-// Flatt returns a pipe that converts the collection elements into slices and then flattens them to one level
+// Flatt returns a stream that converts the collection elements into slices and then flattens them to one level
 func Flatt[From, To comparable](s ordered.Set[From], flattener func(From) []To) c.Stream[To] {
 	h := s.Head()
 	f := loop.Flatt(h.Next, flattener)

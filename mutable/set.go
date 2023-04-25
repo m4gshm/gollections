@@ -242,13 +242,13 @@ func (s *Set[T]) ForEach(walker func(T)) {
 	}
 }
 
-// Filter returns a pipe consisting of elements that satisfy the condition of the 'predicate' function
+// Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function
 func (s *Set[T]) Filter(predicate func(T) bool) c.Stream[T] {
 	h := s.Head()
 	return loop.Stream[T](iter.Filter(h.Next, predicate).Next)
 }
 
-// Convert returns a pipe that applies the 'converter' function to the collection elements
+// Convert returns a stream that applies the 'converter' function to the collection elements
 func (s *Set[T]) Convert(converter func(T) T) c.Stream[T] {
 	h := s.Head()
 	return loop.Stream[T](loop.Convert(h.Next, converter).Next)

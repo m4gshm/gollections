@@ -1,3 +1,4 @@
+// Package as provides as.Is alias
 package as
 
 import (

@@ -1,3 +1,4 @@
+// Package clone provides map clone aliases
 package clone
 
 import "github.com/m4gshm/gollections/map_"

@@ -1,3 +1,4 @@
+// Package kv provides generic key/value pair constructors and helpers
 package kv
 
 import "github.com/m4gshm/gollections/c"

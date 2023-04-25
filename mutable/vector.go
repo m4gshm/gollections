@@ -271,13 +271,13 @@ func (v *Vector[T]) SetNew(index int, value T) bool {
 	return true
 }
 
-// Filter returns a pipe consisting of vector elements matching the filter
+// Filter returns a stream consisting of vector elements matching the filter
 func (v *Vector[T]) Filter(filter func(T) bool) c.Stream[T] {
 	h := v.Head()
 	return loop.Stream(loop.Filter(h.Next, filter).Next)
 }
 
-// Convert returns a pipe that applies the 'converter' function to the collection elements
+// Convert returns a stream that applies the 'converter' function to the collection elements
 func (v *Vector[T]) Convert(converter func(T) T) c.Stream[T] {
 	h := v.Head()
 	return loop.Stream(loop.Convert(h.Next, converter).Next)

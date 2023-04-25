@@ -1,10 +1,12 @@
+// Package always provides constant predicate implementations
 package always
 
-
-func True[T any](t T) bool {
+// True always return true
+func True[T any](_ T) bool {
 	return true
 }
 
-func False[T any](t T) bool {
+// False always return false
+func False[T any](_ T) bool {
 	return false
 }

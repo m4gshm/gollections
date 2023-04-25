@@ -1,3 +1,4 @@
+// Package iter provides generic constructors and helpers for iterators
 package iter
 
 import (

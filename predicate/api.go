@@ -1,3 +1,4 @@
+// Package predicate provides predicate builders
 package predicate
 
 // Predicate tests value (converts to true or false).

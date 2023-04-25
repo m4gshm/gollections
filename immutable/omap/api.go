@@ -1,4 +1,4 @@
-// Package omap provides the ordered map container implementation
+// Package omap provides immutale ordered.Map constructors
 package omap
 
 import (

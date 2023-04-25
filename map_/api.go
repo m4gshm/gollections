@@ -1,3 +1,4 @@
+// Package map_ provides map processing helper functions
 package map_
 
 import (

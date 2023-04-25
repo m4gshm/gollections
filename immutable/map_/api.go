@@ -1,4 +1,4 @@
-// Package map_ provides the unordered map container implementation
+// Package map_ provides immutable.Map constructors
 package map_ //nilint
 
 import (

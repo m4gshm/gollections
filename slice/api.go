@@ -84,7 +84,7 @@ func Group[T any, K comparable, TS ~[]T](elements TS, keyProducer func(T) K) map
 	return groups
 }
 
-// GroupInMultiple converts the'elements' slice into a map, extracting multiple keys per each element of the slice applying the 'keyProducer' converter.
+// GroupInMultiple converts the 'elements' slice into a map, extracting multiple keys per each element of the slice applying the 'keyProducer' converter.
 // The keysProducer retrieves one or more keys per element.
 func GroupInMultiple[T any, K comparable, TS ~[]T](elements TS, keysProducer func(T) []K) map[K]TS {
 	if elements == nil {
@@ -231,7 +231,7 @@ func Flatt[FS ~[]From, From, To any](elements FS, flattener func(From) []To) []T
 	return result
 }
 
-// Flatt unfolds the n-dimensional slice into a n-1 dimensional slice and converts the elements
+// FlattAndConvert unfolds the n-dimensional slice into a n-1 dimensional slice and converts the elements
 func FlattAndConvert[FS ~[]From, From, I, To any](elements FS, flattener func(From) []I, convert func(I) To) []To {
 	if elements == nil {
 		return nil

@@ -1,3 +1,4 @@
+// Package iter provides implementations of slice based itarators
 package iter
 
 import (

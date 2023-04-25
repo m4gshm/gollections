@@ -1,3 +1,4 @@
+// Package reverse provides shor aliases for reversng order of a slice
 package reverse
 
 import (

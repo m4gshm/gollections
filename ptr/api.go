@@ -1,3 +1,4 @@
+// Package ptr provides value, pointer convert helpers
 package ptr
 
 // Of is value-to-pointer conversion helper

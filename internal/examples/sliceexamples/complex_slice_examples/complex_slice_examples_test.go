@@ -92,7 +92,7 @@ func Test_GroupBySeveralKeysAndConvertMapValues(t *testing.T) {
 }
 
 func Test_FindFirsManager(t *testing.T) {
-	// hasManager:=pipe.Convert[User](Role.Name).HasAny(eq.To("Manager"))
+	// hasManager:=stream.Convert[User](Role.Name).HasAny(eq.To("Manager"))
 	//new
 	alice, ok := first.Of(users...).By(func(user User) bool {
 		// return hasManager(user.Roles())

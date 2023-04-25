@@ -1,10 +1,11 @@
+// Package iter provides generic constructors and helpers for key/value iterators
 package iter
 
 import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/iter"
-	"github.com/m4gshm/gollections/kv/iter/group"
 	"github.com/m4gshm/gollections/kv/loop"
+	"github.com/m4gshm/gollections/kv/loop/group"
 	"github.com/m4gshm/gollections/map_/filter"
 )
 
@@ -18,7 +19,7 @@ func WrapPairs[K, V any, P ~[]c.KV[K, V]](pairs P) c.KVIterator[K, V] {
 	return FromPairs[K, V](iter.Wrap(pairs))
 }
 
-// FromPairs converts a iterator of key\value pair elements to a KVIterator
+// FromPairs converts an iterator of key\value pair elements to a KVIterator
 func FromPairs[K, V any](elements c.Iterator[c.KV[K, V]]) c.KVIterator[K, V] {
 	return FromIter(elements, (c.KV[K, V]).Key, (c.KV[K, V]).Value)
 }
@@ -30,7 +31,7 @@ func FromIter[T, K, V any](elements c.Iterator[T], keyExtractor func(T) K, valEx
 
 // Group collects sets of values grouped by keys obtained by passing a key/value iterator
 func Group[K comparable, V any](it c.KVIterator[K, V]) map[K][]V {
-	return group.Of(it)
+	return group.Of(it.Next)
 }
 
 // OfLoop creates an IteratorBreakable instance that loops over elements of a source

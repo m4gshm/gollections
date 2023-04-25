@@ -1,3 +1,4 @@
+// Package convert provides loop converation helpers
 package convert
 
 import (

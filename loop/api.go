@@ -1,3 +1,4 @@
+// Package loop provides helpers for loop operation and iterator implementations
 package loop
 
 import (
@@ -140,7 +141,7 @@ func FilterAndConvert[From, To any](next func() (From, bool), filter func(From) 
 	return FilterConvertFilter(next, filter, converter, always.True[To])
 }
 
-// FilterAndConvert filters source, converts, and filters converted elements
+// FilterConvertFilter filters source, converts, and filters converted elements
 func FilterConvertFilter[From, To any](next func() (From, bool), filter func(From) bool, converter func(From) To, filterTo func(To) bool) ConvertFitIter[From, To] {
 	return ConvertFitIter[From, To]{next: next, converter: converter, filterFrom: filter, filterTo: filterTo}
 }
@@ -196,7 +197,7 @@ func Group[T any, K comparable](next func() (T, bool), keyProducer func(T) K) ma
 	return groups
 }
 
-// GroupInMultiple converts the'elements' slice into a map, extracting multiple keys per each element of the slice applying the 'keyProducer' converter.
+// GroupInMultiple converts the 'elements' slice into a map, extracting multiple keys per each element of the slice applying the 'keyProducer' converter.
 // The keysProducer retrieves one or more keys per element.
 func GroupInMultiple[T any, K comparable](next func() (T, bool), keysProducer func(T) []K) map[K][]T {
 	groups := map[K][]T{}

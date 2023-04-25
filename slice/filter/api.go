@@ -1,3 +1,4 @@
+// Package filter provides aliases for slice filtering helpers
 package filter
 
 import (

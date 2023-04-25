@@ -1,3 +1,4 @@
+// Package sum provides sum.Of alias
 package sum
 
 import (

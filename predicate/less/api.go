@@ -1,3 +1,4 @@
+// Package less provides predicate builders
 package less
 
 import (

@@ -1,6 +1,6 @@
 
 .PHONY: all
-all: build test readme bench
+all: build test readme lint bench
 
 .PHONY: test
 test:
@@ -43,8 +43,8 @@ lint:
 	errcheck -ignoretests ./...
 	go install github.com/alexkohler/nakedret/cmd/nakedret@latest
 	nakedret ./...
-	go install golang.org/x/lint/golint@latest
-	golint ./...
+	# go install golang.org/x/lint/golint@latest
+	# golint ./...
 	go install github.com/mgechev/revive@latest
 	revive ./...
 

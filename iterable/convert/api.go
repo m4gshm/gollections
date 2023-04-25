@@ -1,3 +1,4 @@
+// Package convert provides converation helpers for collection implementations
 package convert
 
 import (

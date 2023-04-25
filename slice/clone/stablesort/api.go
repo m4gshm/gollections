@@ -1,3 +1,4 @@
+// Package stablesort provides stable sorting of cloned slice elements
 package stablesort
 
 import (

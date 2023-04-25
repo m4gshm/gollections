@@ -9,7 +9,7 @@ func Stream[T any](next func() (T, bool)) StreamIter[T] {
 	return StreamIter[T]{next: next}
 }
 
-// StreamIter is the Iterator based pipe implementation.
+// StreamIter is the Iterator based stream implementation.
 type StreamIter[T any] struct {
 	next func() (T, bool)
 }
@@ -27,13 +27,13 @@ func (t StreamIter[T]) Next() (element T, ok bool) {
 	return element, ok
 }
 
-// Filter returns a pipe consisting of elements that satisfy the condition of the 'predicate' function
+// Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function
 func (t StreamIter[T]) Filter(predicate func(T) bool) c.Stream[T] {
 	f := Filter(t.next, predicate)
 	return Stream(f.Next)
 }
 
-// Convert returns a pipe that applies the 'converter' function to the collection elements
+// Convert returns a stream that applies the 'converter' function to the collection elements
 func (t StreamIter[T]) Convert(converter func(T) T) c.Stream[T] {
 	conv := Convert(t.next, converter)
 	return Stream(conv.Next)

@@ -1,3 +1,4 @@
+// Package last provides helpers for retrieving a last element of a slice that satisfies a condition
 package last
 
 import (
@@ -11,16 +12,17 @@ func Of[T any](elements ...T) OfElements[T] {
 
 // By an alias of the slice.Last
 func By[T any](by func(T) bool) ByPredicate[T] {
-	return ByPredicate[T]{by: by}
+	return ByPredicate[T]{predicate: by}
 }
 
 // ByPredicate tail of the By method
 type ByPredicate[T any] struct {
-	by func(T) bool
+	predicate func(T) bool
 }
 
+// Of the predicate apply method
 func (l ByPredicate[T]) Of(elements ...T) (T, bool) {
-	return last.Of(elements, l.by)
+	return last.Of(elements, l.predicate)
 }
 
 // OfElements tail of the Of method
@@ -28,6 +30,7 @@ type OfElements[T any] struct {
 	elements []T
 }
 
-func (l OfElements[T]) By(by func(T) bool) (T, bool) {
-	return last.Of(l.elements, by)
+// By the predicate apply method
+func (l OfElements[T]) By(predicate func(T) bool) (T, bool) {
+	return last.Of(l.elements, predicate)
 }

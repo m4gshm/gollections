@@ -111,13 +111,13 @@ func (v Vector[T]) ForEach(walker func(T)) {
 	slice.ForEach(v.elements, walker)
 }
 
-// Filter returns a pipe consisting of elements that satisfy the condition of the 'predicate' function
+// Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function
 func (v Vector[T]) Filter(filter func(T) bool) c.Stream[T] {
 	h := v.Head()
 	return loop.Stream(loop.Filter(h.Next, filter).Next)
 }
 
-// Convert returns a pipe that applies the 'converter' function to the collection elements
+// Convert returns a stream that applies the 'converter' function to the collection elements
 func (v Vector[T]) Convert(converter func(T) T) c.Stream[T] {
 	h := v.Head()
 	return loop.Stream(loop.Convert(h.Next, converter).Next)

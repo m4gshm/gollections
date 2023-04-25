@@ -1,3 +1,4 @@
+// Package omap provides mutable ordered.Map constructors
 package omap
 
 import (

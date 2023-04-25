@@ -1,3 +1,4 @@
+// Package more provides predicate builders
 package more
 
 import (

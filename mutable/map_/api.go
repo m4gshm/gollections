@@ -1,3 +1,4 @@
+// Package map_ provides unordered mutable.Map constructors
 package map_
 
 import (
@@ -17,5 +18,5 @@ func Empty[K comparable, V any]() *mutable.Map[K, V] {
 
 // New instantiates a Map with a predefined capacity.
 func New[K comparable, V any](capacity int) *mutable.Map[K, V] {
-	return mutable.NewMap[K, V](0)
+	return mutable.NewMap[K, V](capacity)
 }

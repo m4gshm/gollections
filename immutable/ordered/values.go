@@ -98,13 +98,13 @@ func (m MapValues[K, V]) Get(index int) (V, bool) {
 	return no, false
 }
 
-// Filter returns a pipe consisting of elements that satisfy the condition of the 'predicate' function
+// Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function
 func (m MapValues[K, V]) Filter(filter func(V) bool) c.Stream[V] {
 	h := m.Head()
 	return loop.Stream(iter.Filter(h.Next, filter).Next)
 }
 
-// Convert returns a pipe that applies the 'converter' function to the collection elements
+// Convert returns a stream that applies the 'converter' function to the collection elements
 func (m MapValues[K, V]) Convert(converter func(V) V) c.Stream[V] {
 	h := m.Head()
 	return loop.Stream(loop.Convert(h.Next, converter).Next)
