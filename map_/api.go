@@ -14,10 +14,6 @@ import (
 // ErrBreak is For, Track breaker
 var ErrBreak = c.ErrBreak
 
-func New[K comparable, V any]() map[K]V {
-	return map[K]V{}
-}
-
 // Of creates a map from a slice of key/value pairs.
 func Of[K comparable, V any](elements ...c.KV[K, V]) map[K]V {
 	var (

@@ -2,10 +2,12 @@ package test
 
 import (
 	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
+	kvloop "github.com/m4gshm/gollections/kv/loop"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/loop/convert"
 	"github.com/m4gshm/gollections/loop/first"
@@ -155,4 +157,34 @@ func Test_MatchAny(t *testing.T) {
 
 	noOk := loop.HasAny(elements, more.Than(5))
 	assert.False(t, noOk)
+}
+
+func Test_MultipleKeyValuer(t *testing.T) {
+	type Role struct {
+		name string
+	}
+
+	type User struct {
+		name  string
+		age   int
+		roles []Role
+	}
+
+	var users = []User{
+		{name: "Bob", age: 26, roles: []Role{{"Admin"}, {"manager"}}},
+		{name: "Alice", age: 35, roles: []Role{{"Manager"}}},
+		{name: "Tom", age: 18}, {},
+	}
+
+	m := kvloop.Group(loop.ToMultipleKV(loop.Of(users...),
+		func(u User) []string {
+			return slice.Convert(u.roles, func(r Role) string { return strings.ToLower(r.name) })
+		},
+		func(u User) []string { return []string{u.name, strings.ToLower(u.name)} },
+	).Next)
+
+	assert.Equal(t, m["admin"], slice.Of("Bob", "bob"))
+	assert.Equal(t, m["manager"], slice.Of("Bob", "bob", "Alice", "alice"))
+	assert.Equal(t, m[""], slice.Of("Tom", "tom", "", ""))
+
 }

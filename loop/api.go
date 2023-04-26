@@ -4,7 +4,6 @@ package loop
 import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/check"
-	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/map_/resolv"
 	"github.com/m4gshm/gollections/notsafe"
 	"github.com/m4gshm/gollections/op"
@@ -189,11 +188,17 @@ func ToKV[T any, K comparable, V any](next func() (T, bool), keyProducer func(T)
 	return kv
 }
 
+// ToMultipleKV transforms iterable elements to key/value iterator based on applying key extractor to the elements
+func ToMultipleKV[T any, K comparable, V any](next func() (T, bool), keysProducer func(T) []K, valsProducer func(T) []V) *MultipleKeyValuer[T, K, V] {
+	kv := NewMultipleKeyValuer(next, keysProducer, valsProducer)
+	return kv
+}
+
 // Group converts elements retrieved by the 'next' function into a map, extracting a key for each element applying the converter 'keyProducer'.
 // The keyProducer converts an element to an key.
 // The valProducer converts an element to an value.
 func Group[T any, K comparable, V any](next func() (T, bool), keyProducer func(T) K, valProducer func(T) V) map[K][]V {
-	return ToMapResolv(next, keyProducer, valProducer, map_.New[K, []V], resolv.Append[K, V])
+	return ToMapResolv(next, keyProducer, valProducer, resolv.Append[K, V])
 }
 
 // GroupByMultiple converts elements retrieved by the 'next' function into a map, extracting multiple keys, values per each element applying the 'keysProducer' and 'valsProducer' functions.
@@ -264,8 +269,8 @@ func initGroup[T any, K comparable, TS ~[]T](key K, e T, groups map[K]TS) {
 }
 
 // ToMapResolv collects key\value elements to a map by iterating over the elements with resolving of duplicated key values
-func ToMapResolv[T any, M map[K]VR, K comparable, V, VR any](next func() (T, bool), keyProducer func(T) K, valProducer func(T) V, mapBuilder func() M, resolver func(bool, K, VR, V) VR) M {
-	m := mapBuilder()
+func ToMapResolv[T any, K comparable, V, VR any](next func() (T, bool), keyProducer func(T) K, valProducer func(T) V, resolver func(bool, K, VR, V) VR) map[K]VR {
+	m := map[K]VR{}
 	for e, ok := next(); ok; e, ok = next() {
 		k, v := keyProducer(e), valProducer(e)
 		exists, ok := m[k]

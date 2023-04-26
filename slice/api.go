@@ -11,7 +11,6 @@ import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/loop"
-	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/map_/resolv"
 	"github.com/m4gshm/gollections/op"
 )
@@ -80,7 +79,7 @@ func Group[TS ~[]T, T any, K comparable, V any](elements TS, keyProducer func(T)
 	if elements == nil {
 		return nil
 	}
-	return ToMapResolv(elements, keyProducer, valProducer, map_.New[K, []V], resolv.Append[K, V])
+	return ToMapResolv(elements, keyProducer, valProducer, resolv.Append[K, V])
 }
 
 // GroupByMultiple converts the 'elements' slice into a map, extracting multiple keys, values per each element applying the 'keysProducer' and 'valsProducer' functions.
@@ -600,8 +599,8 @@ func Contains[TS ~[]T, T comparable](elements TS, example T) bool {
 }
 
 // ToMapResolv collects key\value elements to a map by iterating over the elements with resolving of duplicated key values
-func ToMapResolv[TS ~[]T, T any, M map[K]VR, K comparable, V, VR any](elements TS, keyProducer func(T) K, valProducer func(T) V, mapBuilder func() M, resolver func(bool, K, VR, V) VR) M {
-	m := mapBuilder()
+func ToMapResolv[TS ~[]T, T any, K comparable, V, VR any](elements TS, keyProducer func(T) K, valProducer func(T) V, resolver func(bool, K, VR, V) VR) map[K]VR {
+	m := map[K]VR{}
 	for _, e := range elements {
 		k, v := keyProducer(e), valProducer(e)
 		exists, ok := m[k]
