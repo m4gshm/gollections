@@ -5,7 +5,6 @@ import (
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_/convert"
 	"github.com/m4gshm/gollections/map_/filter"
-	"github.com/m4gshm/gollections/map_/resolv"
 )
 
 // Stream instantiates Iterator wrapper that converts the elements into key/value pairs and iterates over them.
@@ -97,8 +96,3 @@ func (k StreamIter[K, V, M]) Map() M {
 
 // MapCollector is Converter of key/value Iterator that collects all values to any slice or map, mostly used to extract slice fields to flatting a result
 type MapCollector[K comparable, V any, M map[K]V | map[K][]V] func(next func() (K, V, bool)) M
-
-// ToMap collects key\value elements to a map by iterating over the elements
-func ToMap[K comparable, V any](next func() (K, V, bool)) map[K]V {
-	return ToMapResolv(next, resolv.FirstVal[K, V])
-}

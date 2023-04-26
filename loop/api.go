@@ -4,6 +4,8 @@ package loop
 import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/check"
+	"github.com/m4gshm/gollections/map_"
+	"github.com/m4gshm/gollections/map_/resolv"
 	"github.com/m4gshm/gollections/notsafe"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/predicate/always"
@@ -182,32 +184,75 @@ func NotNil[T any](next func() (*T, bool)) FitIter[*T] {
 }
 
 // ToKV transforms iterable elements to key/value iterator based on applying key extractor to the elements
-func ToKV[T any, K comparable, V any](next func() (T, bool), keyExtractor func(T) K, valueConverter func(T) V) KeyValuer[T, K, V] {
-	kv := NewKeyValuer(next, keyExtractor, valueConverter)
+func ToKV[T any, K comparable, V any](next func() (T, bool), keyProducer func(T) K, valProducer func(T) V) KeyValuer[T, K, V] {
+	kv := NewKeyValuer(next, keyProducer, valProducer)
 	return kv
 }
 
-// Group converts the 'elements' slice into a map, extracting a key for each element of the slice applying the converter 'keyProducer'.
-// The keysProducer retrieves one key per element.
-func Group[T any, K comparable](next func() (T, bool), keyProducer func(T) K) map[K][]T {
-	groups := map[K][]T{}
+// Group converts elements retrieved by the 'next' function into a map, extracting a key for each element applying the converter 'keyProducer'.
+// The keyProducer converts an element to an key.
+// The valProducer converts an element to an value.
+func Group[T any, K comparable, V any](next func() (T, bool), keyProducer func(T) K, valProducer func(T) V) map[K][]V {
+	return ToMapResolv(next, keyProducer, valProducer, map_.New[K, []V], resolv.Append[K, V])
+}
+
+// GroupByMultiple converts elements retrieved by the 'next' function into a map, extracting multiple keys, values per each element applying the 'keysProducer' and 'valsProducer' functions.
+// The keysProducer retrieves one or more keys per element.
+// The valsProducer retrieves one or more values per element.
+func GroupByMultiple[T any, K comparable, V any](next func() (T, bool), keysProducer func(T) []K, valsProducer func(T) []V) map[K][]V {
+	groups := map[K][]V{}
 	for e, ok := next(); ok; e, ok = next() {
-		initGroup(keyProducer(e), e, groups)
+		if keys, vals := keysProducer(e), valsProducer(e); len(keys) == 0 {
+			var key K
+			for _, v := range vals {
+				initGroup(key, v, groups)
+			}
+		} else {
+			for _, key := range keys {
+				if len(vals) == 0 {
+					var v V
+					initGroup(key, v, groups)
+				} else {
+					for _, v := range vals {
+						initGroup(key, v, groups)
+					}
+				}
+			}
+		}
 	}
 	return groups
 }
 
-// GroupInMultiple converts the 'elements' slice into a map, extracting multiple keys per each element of the slice applying the 'keyProducer' converter.
+// GroupByMultipleKeys converts elements retrieved by the 'next' function into a map, extracting multiple keys, one value per each element applying the 'keysProducer' and 'valProducer' functions.
 // The keysProducer retrieves one or more keys per element.
-func GroupInMultiple[T any, K comparable](next func() (T, bool), keysProducer func(T) []K) map[K][]T {
-	groups := map[K][]T{}
+// The valProducer converts an element to a value.
+func GroupByMultipleKeys[T any, K comparable, V any](next func() (T, bool), keysProducer func(T) []K, valProducer func(T) V) map[K][]V {
+	groups := map[K][]V{}
 	for e, ok := next(); ok; e, ok = next() {
-		if keys := keysProducer(e); len(keys) == 0 {
+		if keys, v := keysProducer(e), valProducer(e); len(keys) == 0 {
 			var key K
-			initGroup(key, e, groups)
+			initGroup(key, v, groups)
 		} else {
 			for _, key := range keys {
-				initGroup(key, e, groups)
+				initGroup(key, v, groups)
+			}
+		}
+	}
+	return groups
+}
+
+// GroupByMultipleValues converts elements retrieved by the 'next' function into a map, extracting one key, multiple values per each element applying the 'keyProducer' and 'valsProducer' functions.
+// The keyProducer converts an element to a key.
+// The valsProducer retrieves one or more values per element.
+func GroupByMultipleValues[T any, K comparable, V any](next func() (T, bool), keyProducer func(T) K, valsProducer func(T) []V) map[K][]V {
+	groups := map[K][]V{}
+	for e, ok := next(); ok; e, ok = next() {
+		if key, vals := keyProducer(e), valsProducer(e); len(vals) == 0 {
+			var v V
+			initGroup(key, v, groups)
+		} else {
+			for _, v := range vals {
+				initGroup(key, v, groups)
 			}
 		}
 	}
@@ -216,4 +261,15 @@ func GroupInMultiple[T any, K comparable](next func() (T, bool), keysProducer fu
 
 func initGroup[T any, K comparable, TS ~[]T](key K, e T, groups map[K]TS) {
 	groups[key] = append(groups[key], e)
+}
+
+// ToMapResolv collects key\value elements to a map by iterating over the elements with resolving of duplicated key values
+func ToMapResolv[T any, M map[K]VR, K comparable, V, VR any](next func() (T, bool), keyProducer func(T) K, valProducer func(T) V, mapBuilder func() M, resolver func(bool, K, VR, V) VR) M {
+	m := mapBuilder()
+	for e, ok := next(); ok; e, ok = next() {
+		k, v := keyProducer(e), valProducer(e)
+		exists, ok := m[k]
+		m[k] = resolver(ok, k, exists, v)
+	}
+	return m
 }

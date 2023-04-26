@@ -8,12 +8,15 @@ import (
 	"github.com/m4gshm/gollections/as"
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/kv"
-	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_/resolv"
 )
 
 // ErrBreak is For, Track breaker
-var ErrBreak = loop.ErrBreak
+var ErrBreak = c.ErrBreak
+
+func New[K comparable, V any]() map[K]V {
+	return map[K]V{}
+}
 
 // Of creates a map from a slice of key/value pairs.
 func Of[K comparable, V any](elements ...c.KV[K, V]) map[K]V {

@@ -10,7 +10,6 @@ import (
 	"github.com/m4gshm/gollections/as"
 	"github.com/m4gshm/gollections/first"
 	"github.com/m4gshm/gollections/last"
-	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/predicate/exclude"
 	"github.com/m4gshm/gollections/predicate/less"
@@ -62,12 +61,9 @@ var users = []User{
 }
 
 func Test_GroupBySeveralKeysAndConvertMapValues(t *testing.T) {
-	usersByRole := group.InMultiple(users, func(u User) []string {
+	namesByRole := group.ByMultipleKeys(users, func(u User) []string {
 		return convert.AndConvert(u.Roles(), Role.Name, strings.ToLower)
-	})
-	namesByRole := map_.ConvertValues(usersByRole, func(u []User) []string {
-		return slice.Convert(u, User.Name)
-	})
+	}, User.Name)
 
 	assert.Equal(t, namesByRole[""], []string{"Tom"})
 	assert.Equal(t, namesByRole["manager"], []string{"Bob", "Alice"})
@@ -266,7 +262,7 @@ func Test_Flatt(t *testing.T) {
 func Test_Slice_Group(t *testing.T) {
 	var (
 		source   = []int{1, 2, 3, 4, 5, 6}
-		result   = group.Of(source, even)
+		result   = group.Of(source, even, as.Is[int])
 		expected = map[bool][]int{false: {1, 3, 5}, true: {2, 4, 6}}
 	)
 	assert.Equal(t, expected, result)

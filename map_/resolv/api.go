@@ -10,3 +10,8 @@ func FirstVal[K, V any](exists bool, _ K, old, new V) V { return op.IfElse(exist
 
 // LastVal - ToMap value resolver
 func LastVal[K, V any](_ bool, _ K, _, new V) V { return new }
+
+// Append - ToMap value resolver
+func Append[K, V any](ok bool, k K, rv []V, v V) []V {
+	return append(rv, v)
+}

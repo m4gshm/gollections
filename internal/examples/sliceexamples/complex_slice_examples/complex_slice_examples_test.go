@@ -10,7 +10,6 @@ import (
 	sliceIter "github.com/m4gshm/gollections/iter/slice"
 	"github.com/m4gshm/gollections/loop"
 	loopConv "github.com/m4gshm/gollections/loop/convert"
-	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/predicate/eq"
 	"github.com/m4gshm/gollections/predicate/not"
 	"github.com/m4gshm/gollections/ptr"
@@ -56,12 +55,9 @@ var users = []User{
 func Test_GroupBySeveralKeysAndConvertMapValues(t *testing.T) {
 
 	//new
-	usersByRole := group.InMultiple(users, func(u User) []string {
+	namesByRole := group.ByMultipleKeys(users, func(u User) []string {
 		return convert.AndConvert(u.Roles(), Role.Name, strings.ToLower)
-	})
-	namesByRole := map_.ConvertValues(usersByRole, func(u []User) []string {
-		return slice.Convert(u, User.Name)
-	})
+	}, User.Name)
 
 	assert.Equal(t, namesByRole[""], []string{"Tom"})
 	assert.Equal(t, namesByRole["manager"], []string{"Bob", "Alice"})
@@ -127,7 +123,7 @@ func Benchmark_FindFirsManager_Set(b *testing.B) {
 func Benchmark_FindFirsManager_Slice(b *testing.B) {
 	//new
 	for i := 0; i < b.N; i++ {
-		alice, ok := first.Of(users...).By(func(user User) bool {
+		alice, ok := slice.First(users, func(user User) bool {
 			return slice.Contains(slice.Convert(user.Roles(), Role.Name), "Manager")
 		})
 		_, _ = alice, ok
