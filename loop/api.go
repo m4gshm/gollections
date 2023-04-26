@@ -4,6 +4,7 @@ package loop
 import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/check"
+	"github.com/m4gshm/gollections/convert"
 	"github.com/m4gshm/gollections/map_/resolv"
 	"github.com/m4gshm/gollections/notsafe"
 	"github.com/m4gshm/gollections/op"
@@ -182,15 +183,27 @@ func NotNil[T any](next func() (*T, bool)) FitIter[*T] {
 	return Filter(next, check.NotNil[T])
 }
 
-// ToKV transforms iterable elements to key/value iterator based on applying key extractor to the elements
+// ToKV transforms iterable elements to key/value iterator based on applying key, value extractors to the elements
 func ToKV[T any, K comparable, V any](next func() (T, bool), keyProducer func(T) K, valProducer func(T) V) KeyValuer[T, K, V] {
 	kv := NewKeyValuer(next, keyProducer, valProducer)
 	return kv
 }
 
-// ToMultipleKV transforms iterable elements to key/value iterator based on applying key extractor to the elements
-func ToMultipleKV[T any, K comparable, V any](next func() (T, bool), keysProducer func(T) []K, valsProducer func(T) []V) *MultipleKeyValuer[T, K, V] {
+// ToMultipleKV transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
+func ToMultipleKV[T, K, V any](next func() (T, bool), keysProducer func(T) []K, valsProducer func(T) []V) *MultipleKeyValuer[T, K, V] {
 	kv := NewMultipleKeyValuer(next, keysProducer, valsProducer)
+	return kv
+}
+
+// ToMultipleKeys transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
+func ToMultipleKeys[T, K, V any](next func() (T, bool), keysProducer func(T) []K, valProducer func(T) V) *MultipleKeyValuer[T, K, V] {
+	kv := NewMultipleKeyValuer(next, keysProducer, func(t T) []V { return convert.AsSlice(valProducer(t)) })
+	return kv
+}
+
+// ToMultipleValues transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
+func ToMultipleValues[T, K, V any](next func() (T, bool), keyProducer func(T) K, valsProducer func(T) []V) *MultipleKeyValuer[T, K, V] {
+	kv := NewMultipleKeyValuer(next, func(t T) []K { return convert.AsSlice(keyProducer(t)) }, valsProducer)
 	return kv
 }
 

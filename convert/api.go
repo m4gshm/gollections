@@ -23,3 +23,7 @@ func Or[I, O comparable](first func(I) O, second func(I) O) func(I) O {
 		return c
 	}
 }
+
+func ToSlice[T any](value T) []T { return []T{value} }
+
+func AsSlice[T any](value T) []T { return ToSlice(value) }
