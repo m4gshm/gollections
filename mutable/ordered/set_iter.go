@@ -2,6 +2,7 @@ package ordered
 
 import (
 	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/slice/iter"
 )
 
@@ -21,6 +22,16 @@ var (
 	_ c.Iterator[any]    = (*SetIter[any])(nil)
 	_ c.DelIterator[any] = (*SetIter[any])(nil)
 )
+
+// For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
+func (i *SetIter[T]) For(walker func(element T) error) error {
+	return loop.For(i.Next, walker)
+}
+
+// ForEach takes all elements retrieved by the iterator.
+func (i *SetIter[T]) ForEach(walker func(element T)) {
+	loop.ForEach(i.Next, walker)
+}
 
 // Next returns the next element.
 // The ok result indicates whether the element was returned by the iterator.

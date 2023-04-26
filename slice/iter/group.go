@@ -1,0 +1,100 @@
+package iter
+
+import (
+	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/loop"
+)
+
+// KeyValuer is the Iterator wrapper that converts an element to a key\value pair and iterates over these pairs
+type KeyValuer[T, K, V any] struct {
+	iter        SliceIter[T]
+	keyProducer func(T) K
+	valProducer func(T) V
+}
+
+var _ c.KVIterator[int, string] = (*KeyValuer[any, int, string])(nil)
+
+// Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak
+func (kv KeyValuer[T, K, V]) Track(traker func(key K, value V) error) error {
+	return loop.Track(kv.Next, traker)
+}
+
+// TrackEach takes all key, value pairs retrieved by the iterator
+func (kv *KeyValuer[T, K, V]) TrackEach(traker func(key K, value V)) {
+	loop.TrackEach(kv.Next, traker)
+}
+
+// Next returns the next element.
+// The ok result indicates whether the element was returned by the iterator.
+// If ok == false, then the iteration must be completed.
+func (kv *KeyValuer[T, K, V]) Next() (key K, value V, ok bool) {
+	next := kv.iter.Next
+	if elem, nextOk := next(); nextOk {
+		key = kv.keyProducer(elem)
+		value = kv.valProducer(elem)
+		ok = true
+	}
+	return key, value, ok
+}
+
+// MultipleKeyValuer is the Iterator wrapper that converts an element to a key\value pair and iterates over these pairs
+type MultipleKeyValuer[T, K, V any] struct {
+	iter         SliceIter[T]
+	keysProducer func(T) []K
+	valsProducer func(T) []V
+	keys         []K
+	values       []V
+	ki, vi       int
+}
+
+var _ c.KVIterator[int, string] = (*MultipleKeyValuer[any, int, string])(nil)
+
+// Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak
+func (kv *MultipleKeyValuer[T, K, V]) Track(traker func(key K, value V) error) error {
+	return loop.Track(kv.Next, traker)
+}
+
+// TrackEach takes all key, value pairs retrieved by the iterator
+func (kv *MultipleKeyValuer[T, K, V]) TrackEach(traker func(key K, value V)) {
+	loop.TrackEach(kv.Next, traker)
+}
+
+// Next returns the next element.
+// The ok result indicates whether the element was returned by the iterator.
+// If ok == false, then the iteration must be completed.
+func (kv *MultipleKeyValuer[T, K, V]) Next() (key K, value V, ok bool) {
+	if kv != nil {
+		next := kv.iter.Next
+		for !ok {
+			var (
+				keys, values               = kv.keys, kv.values
+				keysLen, valuesLen         = len(keys), len(values)
+				lastKeyIndex, lastValIndex = keysLen - 1, valuesLen - 1
+			)
+
+			if keysLen > 0 && kv.ki >= 0 && kv.ki <= lastKeyIndex {
+				key = keys[kv.ki]
+				ok = true
+			}
+			if valuesLen > 0 && kv.vi >= 0 && kv.vi <= lastValIndex {
+				value = values[kv.vi]
+				ok = true
+			}
+
+			if kv.ki < lastKeyIndex {
+				kv.ki++
+			} else if kv.vi < lastValIndex {
+				kv.ki = 0
+				kv.vi++
+			} else if elem, nextOk := next(); nextOk {
+				kv.keys = kv.keysProducer(elem)
+				kv.values = kv.valsProducer(elem)
+				kv.ki, kv.vi = 0, 0
+			} else {
+				kv.keys, kv.values = nil, nil
+				break
+			}
+		}
+	}
+	return key, value, ok
+}

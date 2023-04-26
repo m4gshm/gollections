@@ -70,3 +70,13 @@ func Filter[TS ~[]T, T any](elements TS, filter func(T) bool) FitIter[T] {
 func NotNil[T any, TRS ~[]*T](elements TRS) FitIter[*T] {
 	return Filter(elements, check.NotNil[T])
 }
+
+// NewKeyValuer creates instance of the KeyValuer
+func NewKeyValuer[TS ~[]T, T any, K, V any](elements TS, keyProducer func(T) K, valsProducer func(T) V) KeyValuer[T, K, V] {
+	return KeyValuer[T, K, V]{iter: NewHead(elements), keyProducer: keyProducer, valProducer: valsProducer}
+}
+
+// NewMultipleKeyValuer creates instance of the MultipleKeyValuer
+func NewMultipleKeyValuer[TS ~[]T, T any, K, V any](elements TS, keysProducer func(T) []K, valsProducer func(T) []V) MultipleKeyValuer[T, K, V] {
+	return MultipleKeyValuer[T, K, V]{iter: NewHead(elements), keysProducer: keysProducer, valsProducer: valsProducer}
+}

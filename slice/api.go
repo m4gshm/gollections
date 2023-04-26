@@ -10,9 +10,11 @@ import (
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/check"
+	"github.com/m4gshm/gollections/convert"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_/resolv"
 	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/slice/iter"
 )
 
 // ErrBreak is the 'break' statement of the For, Track methods
@@ -70,6 +72,30 @@ func Delete[TS ~[]T, T any](index int, elements TS) TS {
 		return nil
 	}
 	return append(elements[0:index], elements[index+1:]...)
+}
+
+// ToKV transforms iterable elements to key/value iterator based on applying key, value extractors to the elements
+func ToKV[TS ~[]T, T any, K comparable, V any](elements TS, keyProducer func(T) K, valProducer func(T) V) iter.KeyValuer[T, K, V] {
+	kv := iter.NewKeyValuer(elements, keyProducer, valProducer)
+	return kv
+}
+
+// ToMultipleKV transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
+func ToMultipleKV[TS ~[]T, T, K, V any](elements TS, keysProducer func(T) []K, valsProducer func(T) []V) *iter.MultipleKeyValuer[T, K, V] {
+	kv := iter.NewMultipleKeyValuer(elements, keysProducer, valsProducer)
+	return &kv
+}
+
+// ToMultipleKeys transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
+func ToMultipleKeys[TS ~[]T, T, K, V any](elements TS, keysProducer func(T) []K, valProducer func(T) V) *iter.MultipleKeyValuer[T, K, V] {
+	kv := iter.NewMultipleKeyValuer(elements, keysProducer, func(t T) []V { return convert.AsSlice(valProducer(t)) })
+	return &kv
+}
+
+// ToMultipleValues transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
+func ToMultipleValues[TS ~[]T, T, K, V any](elements TS, keyProducer func(T) K, valsProducer func(T) []V) *iter.MultipleKeyValuer[T, K, V] {
+	kv := iter.NewMultipleKeyValuer(elements, func(t T) []K { return convert.AsSlice(keyProducer(t)) }, valsProducer)
+	return &kv
 }
 
 // Group converts the 'elements' slice into a map, extracting a key for each element applying the converter 'keyProducer'.

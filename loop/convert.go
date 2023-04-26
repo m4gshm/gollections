@@ -18,6 +18,16 @@ var (
 	_ c.Iterator[any] = ConvertFitIter[any, any]{}
 )
 
+// For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
+func (c ConvertFitIter[From, To]) For(walker func(element To) error) error {
+	return For(c.Next, walker)
+}
+
+// ForEach FlatIter all elements retrieved by the iterator
+func (c ConvertFitIter[From, To]) ForEach(walker func(element To)) {
+	ForEach(c.Next, walker)
+}
+
 // Next returns the next element.
 // The ok result indicates whether the element was returned by the iterator.
 // If ok == false, then the iteration must be completed.
@@ -44,6 +54,16 @@ var (
 	_ c.Iterator[any] = (*ConvertIter[any, any])(nil)
 	_ c.Iterator[any] = ConvertIter[any, any]{}
 )
+
+// For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
+func (c ConvertIter[From, To]) For(walker func(element To) error) error {
+	return For(c.Next, walker)
+}
+
+// ForEach FlatIter all elements retrieved by the iterator
+func (c ConvertIter[From, To]) ForEach(walker func(element To)) {
+	ForEach(c.Next, walker)
+}
 
 // Next returns the next element.
 // The ok result indicates whether the element was returned by the iterator.

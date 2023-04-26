@@ -2,6 +2,7 @@ package mutable
 
 import (
 	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/slice/iter"
 )
 
@@ -30,6 +31,16 @@ var (
 	_ c.PrevIterator[any] = (*SliceIter[[]any, any])(nil)
 	_ c.DelIterator[any]  = (*SliceIter[[]any, any])(nil)
 )
+
+// For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
+func (i *SliceIter[TS, T]) For(walker func(element T) error) error {
+	return loop.For(i.Next, walker)
+}
+
+// ForEach FlatIter all elements retrieved by the iterator
+func (i *SliceIter[TS, T]) ForEach(walker func(element T)) {
+	loop.ForEach(i.Next, walker)
+}
 
 // HasNext checks the next element existing
 func (i *SliceIter[TS, T]) HasNext() bool {

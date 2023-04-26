@@ -22,6 +22,16 @@ var (
 	_ c.IteratorBreakable[any] = (*Iter[any, any])(nil)
 )
 
+// For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
+func (i *Iter[S, T]) For(walker func(element T) error) error {
+	return For(i.Next, walker)
+}
+
+// ForEach FlatIter all elements retrieved by the iterator
+func (i *Iter[S, T]) ForEach(walker func(element T)) {
+	ForEach(i.Next, walker)
+}
+
 // Next returns the next element.
 // The ok result indicates whether the element was returned by the iterator.
 // If ok == false, then the iteration must be completed.

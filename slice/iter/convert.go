@@ -4,6 +4,7 @@ import (
 	"unsafe"
 
 	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/notsafe"
 )
 
@@ -18,6 +19,16 @@ type ConvertFit[From, To any] struct {
 }
 
 var _ c.Iterator[any] = (*ConvertFit[any, any])(nil)
+
+// For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
+func (f *ConvertFit[From, To]) For(walker func(element To) error) error {
+	return loop.For(f.Next, walker)
+}
+
+// ForEach FlatIter all elements retrieved by the iterator
+func (f *ConvertFit[From, To]) ForEach(walker func(element To)) {
+	loop.ForEach(f.Next, walker)
+}
 
 // Next returns the next element.
 // The ok result indicates whether the element was returned by the iterator.
@@ -49,6 +60,16 @@ type ConvertIter[From, To any] struct {
 }
 
 var _ c.Iterator[any] = (*ConvertIter[any, any])(nil)
+
+// For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
+func (f *ConvertIter[From, To]) For(walker func(element To) error) error {
+	return loop.For(f.Next, walker)
+}
+
+// ForEach FlatIter all elements retrieved by the iterator
+func (f *ConvertIter[From, To]) ForEach(walker func(element To)) {
+	loop.ForEach(f.Next, walker)
+}
 
 // Next returns the next element.
 // The ok result indicates whether the element was returned by the iterator.

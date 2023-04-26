@@ -3,6 +3,9 @@ package test
 import (
 	"testing"
 
+	"github.com/m4gshm/gollections/as"
+	kvloop "github.com/m4gshm/gollections/kv/loop"
+	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/iter"
 	"github.com/stretchr/testify/assert"
 )
@@ -281,4 +284,27 @@ func Test_Head_Tail_Nil_Arg_Safety(t *testing.T) {
 	_, ok = tail.Prev()
 	assert.False(t, ok)
 	tail.Cap()
+}
+
+func Test_ForLoop(t *testing.T) {
+
+	expected := []int{1, 2, 3, 4, 5, 6, 7}
+	actual := []int{}
+	it := iter.NewHead(expected)
+	it.For(func(element int) error { actual = append(actual, element); return nil })
+	assert.Equal(t, expected, actual)
+
+	actual2 := []int{}
+	it = iter.NewHead(expected)
+	it.ForEach(func(element int) { actual2 = append(actual2, element) })
+	assert.Equal(t, expected, actual2)
+}
+
+func Test_group_odd_even(t *testing.T) {
+	var (
+		even   = func(v int) bool { return v%2 == 0 }
+		it     = iter.NewKeyValuer(slice.Of(1, 1, 2, 4, 3, 1), even, as.Is[int])
+		groups = kvloop.Group(it.Next)
+	)
+	assert.Equal(t, map[bool][]int{false: {1, 1, 3, 1}, true: {2, 4}}, groups)
 }

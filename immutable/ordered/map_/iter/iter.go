@@ -3,6 +3,7 @@ package iter
 
 import (
 	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/slice/iter"
 )
 
@@ -18,6 +19,16 @@ type OrderedMapIter[K comparable, V any] struct {
 }
 
 var _ c.KVIterator[string, any] = (*OrderedMapIter[string, any])(nil)
+
+// Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak
+func (i *OrderedMapIter[K, V]) Track(traker func(key K, value V) error) error {
+	return loop.Track(i.Next, traker)
+}
+
+// TrackEach takes all key, value pairs retrieved by the iterator
+func (i *OrderedMapIter[K, V]) TrackEach(traker func(key K, value V)) {
+	loop.TrackEach(i.Next, traker)
+}
 
 // Next returns the next key/value pair.
 // The ok result indicates whether the pair was returned by the iterator.
@@ -52,6 +63,16 @@ var (
 	_ c.Iterator[any] = (*ValIter[int, any])(nil)
 	_ c.Sized         = (*ValIter[int, any])(nil)
 )
+
+// For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
+func (i *ValIter[K, V]) For(walker func(element V) error) error {
+	return loop.For(i.Next, walker)
+}
+
+// ForEach FlatIter all elements retrieved by the iterator
+func (i *ValIter[K, V]) ForEach(walker func(element V)) {
+	loop.ForEach(i.Next, walker)
+}
 
 // Next returns the next element.
 // The ok result indicates whether the element was returned by the iterator.

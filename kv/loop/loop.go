@@ -1,6 +1,9 @@
 package loop
 
-import "github.com/m4gshm/gollections/c"
+import (
+	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/loop"
+)
 
 // NewIter creates an KVIter instance that loops over key\value elements of a source.
 // The hasNext specifies a predicate that tests existing of a next element in the source.
@@ -21,6 +24,16 @@ var (
 	_ c.KVIterator[any, any]          = (*KVIter[any, any, any])(nil)
 	_ c.KVIteratorBreakable[any, any] = (*KVIter[any, any, any])(nil)
 )
+
+// Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak
+func (kv *KVIter[S, K, V]) Track(traker func(key K, value V) error) error {
+	return loop.Track(kv.Next, traker)
+}
+
+// TrackEach takes all key, value pairs retrieved by the iterator
+func (kv *KVIter[S, K, V]) TrackEach(traker func(key K, value V)) {
+	loop.TrackEach(kv.Next, traker)
+}
 
 // Next implements c.KVIterator
 func (i *KVIter[S, K, V]) Next() (K, V, bool) {

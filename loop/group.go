@@ -10,8 +10,8 @@ func NewKeyValuer[T any, K, V any](next func() (T, bool), keyProducer func(T) K,
 }
 
 // NewMultipleKeyValuer creates instance of the MultipleKeyValuer
-func NewMultipleKeyValuer[T any, K, V any](next func() (T, bool), keysProducer func(T) []K, valsProducer func(T) []V) *MultipleKeyValuer[T, K, V] {
-	return &MultipleKeyValuer[T, K, V]{next: next, keysProducer: keysProducer, valsProducer: valsProducer}
+func NewMultipleKeyValuer[T any, K, V any](next func() (T, bool), keysProducer func(T) []K, valsProducer func(T) []V) MultipleKeyValuer[T, K, V] {
+	return MultipleKeyValuer[T, K, V]{next: next, keysProducer: keysProducer, valsProducer: valsProducer}
 }
 
 // KeyValuer is the Iterator wrapper that converts an element to a key\value pair and iterates over these pairs
@@ -23,6 +23,16 @@ type KeyValuer[T, K, V any] struct {
 
 var _ c.KVIterator[int, string] = (*KeyValuer[any, int, string])(nil)
 var _ c.KVIterator[int, string] = KeyValuer[any, int, string]{}
+
+// Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak
+func (kv KeyValuer[T, K, V]) Track(traker func(key K, value V) error) error {
+	return Track(kv.Next, traker)
+}
+
+// TrackEach takes all key, value pairs retrieved by the iterator
+func (kv KeyValuer[T, K, V]) TrackEach(traker func(key K, value V)) {
+	TrackEach(kv.Next, traker)
+}
 
 // Next returns the next element.
 // The ok result indicates whether the element was returned by the iterator.
@@ -49,6 +59,16 @@ type MultipleKeyValuer[T, K, V any] struct {
 }
 
 var _ c.KVIterator[int, string] = (*MultipleKeyValuer[any, int, string])(nil)
+
+// Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak
+func (kv *MultipleKeyValuer[T, K, V]) Track(traker func(key K, value V) error) error {
+	return Track(kv.Next, traker)
+}
+
+// TrackEach takes all key, value pairs retrieved by the iterator
+func (kv *MultipleKeyValuer[T, K, V]) TrackEach(traker func(key K, value V)) {
+	TrackEach(kv.Next, traker)
+}
 
 // Next returns the next element.
 // The ok result indicates whether the element was returned by the iterator.

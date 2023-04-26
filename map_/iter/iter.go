@@ -5,6 +5,7 @@ import (
 	"unsafe"
 
 	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
 )
 
@@ -29,6 +30,16 @@ type MapIter[K comparable, V any] struct {
 }
 
 var _ c.KVIterator[int, any] = (*MapIter[int, any])(nil)
+
+// Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak
+func (i *MapIter[K, V]) Track(traker func(key K, value V) error) error {
+	return loop.Track(i.Next, traker)
+}
+
+// TrackEach takes all key, value pairs retrieved by the iterator
+func (i *MapIter[K, V]) TrackEach(traker func(key K, value V)) {
+	loop.TrackEach(i.Next, traker)
+}
 
 // Next returns the next element.
 // The ok result indicates whether the element was returned by the iterator.
@@ -116,6 +127,16 @@ var (
 	_ c.Iterator[string] = KeyIter[string, any]{}
 )
 
+// For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
+func (i KeyIter[K, V]) For(walker func(element K) error) error {
+	return loop.For(i.Next, walker)
+}
+
+// ForEach FlatIter all elements retrieved by the iterator
+func (i KeyIter[K, V]) ForEach(walker func(element K)) {
+	loop.ForEach(i.Next, walker)
+}
+
 // Next returns the next element.
 // The ok result indicates whether the element was returned by the iterator.
 // If ok == false, then the iteration must be completed.
@@ -143,6 +164,16 @@ var (
 	_ c.Iterator[any] = (*ValIter[int, any])(nil)
 	_ c.Iterator[any] = ValIter[int, any]{}
 )
+
+// For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
+func (f ValIter[K, V]) For(walker func(element V) error) error {
+	return loop.For(f.Next, walker)
+}
+
+// ForEach FlatIter all elements retrieved by the iterator
+func (f ValIter[K, V]) ForEach(walker func(element V)) {
+	loop.ForEach(f.Next, walker)
+}
 
 // Next returns the next element.
 // The ok result indicates whether the element was returned by the iterator.

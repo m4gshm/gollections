@@ -192,19 +192,19 @@ func ToKV[T any, K comparable, V any](next func() (T, bool), keyProducer func(T)
 // ToMultipleKV transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
 func ToMultipleKV[T, K, V any](next func() (T, bool), keysProducer func(T) []K, valsProducer func(T) []V) *MultipleKeyValuer[T, K, V] {
 	kv := NewMultipleKeyValuer(next, keysProducer, valsProducer)
-	return kv
+	return &kv
 }
 
 // ToMultipleKeys transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
 func ToMultipleKeys[T, K, V any](next func() (T, bool), keysProducer func(T) []K, valProducer func(T) V) *MultipleKeyValuer[T, K, V] {
 	kv := NewMultipleKeyValuer(next, keysProducer, func(t T) []V { return convert.AsSlice(valProducer(t)) })
-	return kv
+	return &kv
 }
 
 // ToMultipleValues transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
 func ToMultipleValues[T, K, V any](next func() (T, bool), keyProducer func(T) K, valsProducer func(T) []V) *MultipleKeyValuer[T, K, V] {
 	kv := NewMultipleKeyValuer(next, func(t T) []K { return convert.AsSlice(keyProducer(t)) }, valsProducer)
-	return kv
+	return &kv
 }
 
 // Group converts elements retrieved by the 'next' function into a map, extracting a key for each element applying the converter 'keyProducer'.

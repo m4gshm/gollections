@@ -87,6 +87,9 @@ type Iterator[T any] interface {
 	// The ok result indicates whether the element was returned by the iterator.
 	// If ok == false, then the iteration must be completed.
 	Next() (T, bool)
+
+	ForLoop[T]
+	ForEachLoop[T]
 }
 
 // Sized - storage interface with measurable capacity
@@ -119,6 +122,8 @@ type DelIterator[T any] interface {
 type KVIterator[K, V any] interface {
 	//retrieves next elements or zero values if no more elements
 	Next() (K, V, bool)
+	TrackLoop[V, K]
+	TrackEachLoop[V, K]
 }
 
 // KVIteratorBreakable provides iterate over key/value pairs, where an iteration can be interrupted by an error
