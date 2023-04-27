@@ -12,7 +12,6 @@ import (
 	loopConv "github.com/m4gshm/gollections/loop/convert"
 	"github.com/m4gshm/gollections/predicate/eq"
 	"github.com/m4gshm/gollections/predicate/not"
-	"github.com/m4gshm/gollections/ptr"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/convert"
 	"github.com/m4gshm/gollections/slice/group"
@@ -121,7 +120,6 @@ func Benchmark_FindFirsManager_Set(b *testing.B) {
 }
 
 func Benchmark_FindFirsManager_Slice(b *testing.B) {
-	//new
 	for i := 0; i < b.N; i++ {
 		alice, ok := slice.First(users, func(user User) bool {
 			return slice.Contains(slice.Convert(user.Roles(), Role.Name), "Manager")
@@ -131,10 +129,9 @@ func Benchmark_FindFirsManager_Slice(b *testing.B) {
 }
 
 func Benchmark_FindFirsManager_Loop_SliceIter(b *testing.B) {
-	//new
 	for i := 0; i < b.N; i++ {
 		alice, ok := first.Of(users...).By(func(user User) bool {
-			return loop.Contains(ptr.Of(sIter.Convert(user.Roles(), Role.Name)).Next, "Manager")
+			return loop.Contains(sIter.Convert(user.Roles(), Role.Name).Next, "Manager")
 		})
 		_, _ = alice, ok
 	}

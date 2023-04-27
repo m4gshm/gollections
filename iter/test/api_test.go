@@ -13,7 +13,6 @@ import (
 	sliceit "github.com/m4gshm/gollections/iter/slice"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
-	"github.com/m4gshm/gollections/ptr"
 	"github.com/m4gshm/gollections/slice"
 	sliceIter "github.com/m4gshm/gollections/slice/iter"
 )
@@ -157,7 +156,7 @@ func Test_Iterate(t *testing.T) {
 		values[i] = i
 	}
 
-	stream := loop.Stream(ptr.Of(sliceIter.New(values)).Next)
+	stream := loop.Stream(sliceIter.New(values).Next)
 
 	result := make([]int, 0)
 

@@ -12,8 +12,9 @@ import (
 const NoStarted = -1
 
 // New instantiates Iter based on elements Iter and returs its reference
-func New[TS ~[]T, T any](elements TS) SliceIter[T] {
-	return NewHead(elements)
+func New[TS ~[]T, T any](elements TS) *SliceIter[T] {
+	h := NewHead(elements)
+	return &h
 }
 
 // NewHead instantiates Iter based on elements slice
