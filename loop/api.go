@@ -184,43 +184,43 @@ func NotNil[T any](next func() (*T, bool)) FitIter[*T] {
 }
 
 // ToKV transforms iterable elements to key/value iterator based on applying key, value extractors to the elements
-func ToKV[T any, K comparable, V any](next func() (T, bool), keyProducer func(T) K, valProducer func(T) V) KeyValuer[T, K, V] {
-	kv := NewKeyValuer(next, keyProducer, valProducer)
+func ToKV[T any, K comparable, V any](next func() (T, bool), keyExtractor func(T) K, valExtractor func(T) V) KeyValuer[T, K, V] {
+	kv := NewKeyValuer(next, keyExtractor, valExtractor)
 	return kv
 }
 
-// ToMultipleKV transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
-func ToMultipleKV[T, K, V any](next func() (T, bool), keysProducer func(T) []K, valsProducer func(T) []V) *MultipleKeyValuer[T, K, V] {
-	kv := NewMultipleKeyValuer(next, keysProducer, valsProducer)
+// ToKVs transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
+func ToKVs[T, K, V any](next func() (T, bool), keysExtractor func(T) []K, valsExtractor func(T) []V) *MultipleKeyValuer[T, K, V] {
+	kv := NewMultipleKeyValuer(next, keysExtractor, valsExtractor)
 	return &kv
 }
 
-// ToMultipleKeys transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
-func ToMultipleKeys[T, K, V any](next func() (T, bool), keysProducer func(T) []K, valProducer func(T) V) *MultipleKeyValuer[T, K, V] {
-	kv := NewMultipleKeyValuer(next, keysProducer, func(t T) []V { return convert.AsSlice(valProducer(t)) })
+// FlattKeys transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
+func FlattKeys[T, K, V any](next func() (T, bool), keysExtractor func(T) []K, valExtractor func(T) V) *MultipleKeyValuer[T, K, V] {
+	kv := NewMultipleKeyValuer(next, keysExtractor, func(t T) []V { return convert.AsSlice(valExtractor(t)) })
 	return &kv
 }
 
-// ToMultipleValues transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
-func ToMultipleValues[T, K, V any](next func() (T, bool), keyProducer func(T) K, valsProducer func(T) []V) *MultipleKeyValuer[T, K, V] {
-	kv := NewMultipleKeyValuer(next, func(t T) []K { return convert.AsSlice(keyProducer(t)) }, valsProducer)
+// FlattValues transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
+func FlattValues[T, K, V any](next func() (T, bool), keyExtractor func(T) K, valsExtractor func(T) []V) *MultipleKeyValuer[T, K, V] {
+	kv := NewMultipleKeyValuer(next, func(t T) []K { return convert.AsSlice(keyExtractor(t)) }, valsExtractor)
 	return &kv
 }
 
-// Group converts elements retrieved by the 'next' function into a map, extracting a key for each element applying the converter 'keyProducer'.
-// The keyProducer converts an element to an key.
-// The valProducer converts an element to an value.
-func Group[T any, K comparable, V any](next func() (T, bool), keyProducer func(T) K, valProducer func(T) V) map[K][]V {
-	return ToMapResolv(next, keyProducer, valProducer, resolv.Append[K, V])
+// Group converts elements retrieved by the 'next' function into a map, extracting a key for each element applying the converter 'keyExtractor'.
+// The keyExtractor converts an element to an key.
+// The valExtractor converts an element to an value.
+func Group[T any, K comparable, V any](next func() (T, bool), keyExtractor func(T) K, valExtractor func(T) V) map[K][]V {
+	return ToMapResolv(next, keyExtractor, valExtractor, resolv.Append[K, V])
 }
 
-// GroupByMultiple converts elements retrieved by the 'next' function into a map, extracting multiple keys, values per each element applying the 'keysProducer' and 'valsProducer' functions.
-// The keysProducer retrieves one or more keys per element.
-// The valsProducer retrieves one or more values per element.
-func GroupByMultiple[T any, K comparable, V any](next func() (T, bool), keysProducer func(T) []K, valsProducer func(T) []V) map[K][]V {
+// GroupByMultiple converts elements retrieved by the 'next' function into a map, extracting multiple keys, values per each element applying the 'keysExtractor' and 'valsExtractor' functions.
+// The keysExtractor retrieves one or more keys per element.
+// The valsExtractor retrieves one or more values per element.
+func GroupByMultiple[T any, K comparable, V any](next func() (T, bool), keysExtractor func(T) []K, valsExtractor func(T) []V) map[K][]V {
 	groups := map[K][]V{}
 	for e, ok := next(); ok; e, ok = next() {
-		if keys, vals := keysProducer(e), valsProducer(e); len(keys) == 0 {
+		if keys, vals := keysExtractor(e), valsExtractor(e); len(keys) == 0 {
 			var key K
 			for _, v := range vals {
 				initGroup(key, v, groups)
@@ -241,13 +241,13 @@ func GroupByMultiple[T any, K comparable, V any](next func() (T, bool), keysProd
 	return groups
 }
 
-// GroupByMultipleKeys converts elements retrieved by the 'next' function into a map, extracting multiple keys, one value per each element applying the 'keysProducer' and 'valProducer' functions.
-// The keysProducer retrieves one or more keys per element.
-// The valProducer converts an element to a value.
-func GroupByMultipleKeys[T any, K comparable, V any](next func() (T, bool), keysProducer func(T) []K, valProducer func(T) V) map[K][]V {
+// GroupByMultipleKeys converts elements retrieved by the 'next' function into a map, extracting multiple keys, one value per each element applying the 'keysExtractor' and 'valExtractor' functions.
+// The keysExtractor retrieves one or more keys per element.
+// The valExtractor converts an element to a value.
+func GroupByMultipleKeys[T any, K comparable, V any](next func() (T, bool), keysExtractor func(T) []K, valExtractor func(T) V) map[K][]V {
 	groups := map[K][]V{}
 	for e, ok := next(); ok; e, ok = next() {
-		if keys, v := keysProducer(e), valProducer(e); len(keys) == 0 {
+		if keys, v := keysExtractor(e), valExtractor(e); len(keys) == 0 {
 			var key K
 			initGroup(key, v, groups)
 		} else {
@@ -259,13 +259,13 @@ func GroupByMultipleKeys[T any, K comparable, V any](next func() (T, bool), keys
 	return groups
 }
 
-// GroupByMultipleValues converts elements retrieved by the 'next' function into a map, extracting one key, multiple values per each element applying the 'keyProducer' and 'valsProducer' functions.
-// The keyProducer converts an element to a key.
-// The valsProducer retrieves one or more values per element.
-func GroupByMultipleValues[T any, K comparable, V any](next func() (T, bool), keyProducer func(T) K, valsProducer func(T) []V) map[K][]V {
+// GroupByMultipleValues converts elements retrieved by the 'next' function into a map, extracting one key, multiple values per each element applying the 'keyExtractor' and 'valsExtractor' functions.
+// The keyExtractor converts an element to a key.
+// The valsExtractor retrieves one or more values per element.
+func GroupByMultipleValues[T any, K comparable, V any](next func() (T, bool), keyExtractor func(T) K, valsExtractor func(T) []V) map[K][]V {
 	groups := map[K][]V{}
 	for e, ok := next(); ok; e, ok = next() {
-		if key, vals := keyProducer(e), valsProducer(e); len(vals) == 0 {
+		if key, vals := keyExtractor(e), valsExtractor(e); len(vals) == 0 {
 			var v V
 			initGroup(key, v, groups)
 		} else {
@@ -282,10 +282,10 @@ func initGroup[T any, K comparable, TS ~[]T](key K, e T, groups map[K]TS) {
 }
 
 // ToMapResolv collects key\value elements to a map by iterating over the elements with resolving of duplicated key values
-func ToMapResolv[T any, K comparable, V, VR any](next func() (T, bool), keyProducer func(T) K, valProducer func(T) V, resolver func(bool, K, VR, V) VR) map[K]VR {
+func ToMapResolv[T any, K comparable, V, VR any](next func() (T, bool), keyExtractor func(T) K, valExtractor func(T) V, resolver func(bool, K, VR, V) VR) map[K]VR {
 	m := map[K]VR{}
 	for e, ok := next(); ok; e, ok = next() {
-		k, v := keyProducer(e), valProducer(e)
+		k, v := keyExtractor(e), valExtractor(e)
 		exists, ok := m[k]
 		m[k] = resolver(ok, k, exists, v)
 	}

@@ -6,21 +6,21 @@ import (
 )
 
 // Of is a short alias for loop.Group
-func Of[T any, K comparable, V any](next func() (T, bool), keyProducer func(T) K, valProducer func(T) V) map[K][]V {
-	return loop.Group(next, keyProducer, valProducer)
+func Of[T any, K comparable, V any](next func() (T, bool), keyExtractor func(T) K, valExtractor func(T) V) map[K][]V {
+	return loop.Group(next, keyExtractor, valExtractor)
 }
 
 // ByMultiple is a short alias for loop.GroupByMultiple
-func ByMultiple[T any, K comparable, V any](next func() (T, bool), keysProducer func(T) []K, valsProducer func(T) []V) map[K][]V {
-	return loop.GroupByMultiple(next, keysProducer, valsProducer)
+func ByMultiple[T any, K comparable, V any](next func() (T, bool), keysExtractor func(T) []K, valsExtractor func(T) []V) map[K][]V {
+	return loop.GroupByMultiple(next, keysExtractor, valsExtractor)
 }
 
 // ByMultipleKeys is a short alias for loop.GroupByMultipleKeys
-func ByMultipleKeys[T any, K comparable, V any](next func() (T, bool), keysProducer func(T) []K, valProducer func(T) V) map[K][]V {
-	return loop.GroupByMultipleKeys(next, keysProducer, valProducer)
+func ByMultipleKeys[T any, K comparable, V any](next func() (T, bool), keysExtractor func(T) []K, valExtractor func(T) V) map[K][]V {
+	return loop.GroupByMultipleKeys(next, keysExtractor, valExtractor)
 }
 
 // ByMultipleValues is a short alias for loop.GroupByMultipleVals
-func ByMultipleValues[T any, K comparable, V any](next func() (T, bool), keyProducer func(T) K, valsProducer func(T) []V) map[K][]V {
-	return loop.GroupByMultipleValues(next, keyProducer, valsProducer)
+func ByMultipleValues[T any, K comparable, V any](next func() (T, bool), keyExtractor func(T) K, valsExtractor func(T) []V) map[K][]V {
+	return loop.GroupByMultipleValues(next, keyExtractor, valsExtractor)
 }

@@ -62,11 +62,11 @@ func Delete[TS ~[]T, T any](index int, elements TS) (TS, error) {
 	return append(elements[0:index], elements[index+1:]...), nil
 }
 
-// Group converts a slice into a map, extracting a key for each element of the slice applying the converter 'keyProducer'
-func Group[T any, K comparable, TS ~[]T](elements TS, keyProducer func(T) (K, error)) (map[K]TS, error) {
+// Group converts a slice into a map, extracting a key for each element of the slice applying the converter 'keyExtractor'
+func Group[T any, K comparable, TS ~[]T](elements TS, keyExtractor func(T) (K, error)) (map[K]TS, error) {
 	groups := map[K]TS{}
 	for _, e := range elements {
-		if k, err := keyProducer(e); err == nil {
+		if k, err := keyExtractor(e); err == nil {
 			initGroup(k, e, groups)
 		} else if errors.Is(err, ErrBreak) {
 			initGroup(k, e, groups)
@@ -80,11 +80,11 @@ func Group[T any, K comparable, TS ~[]T](elements TS, keyProducer func(T) (K, er
 	return groups, nil
 }
 
-// GroupInMultiple converts a slice into a map, extracting multiple keys per each element of the slice applying the converter 'keyProducer'
-func GroupInMultiple[T any, K comparable, TS ~[]T](elements TS, keysProducer func(T) ([]K, error)) (map[K]TS, error) {
+// GroupInMultiple converts a slice into a map, extracting multiple keys per each element of the slice applying the converter 'keyExtractor'
+func GroupInMultiple[T any, K comparable, TS ~[]T](elements TS, keysExtractor func(T) ([]K, error)) (map[K]TS, error) {
 	groups := map[K]TS{}
 	for _, e := range elements {
-		if keys, err := keysProducer(e); err == nil {
+		if keys, err := keysExtractor(e); err == nil {
 			initGroups(keys, e, groups)
 		} else if errors.Is(err, ErrBreak) {
 			initGroups(keys, e, groups)

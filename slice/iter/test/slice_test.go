@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/m4gshm/gollections/as"
-	kvloop "github.com/m4gshm/gollections/kv/loop"
+	"github.com/m4gshm/gollections/kv/group"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/iter"
 	"github.com/stretchr/testify/assert"
@@ -303,8 +303,8 @@ func Test_ForLoop(t *testing.T) {
 func Test_group_odd_even(t *testing.T) {
 	var (
 		even   = func(v int) bool { return v%2 == 0 }
-		it     = iter.NewKeyValuer(slice.Of(1, 1, 2, 4, 3, 1), even, as.Is[int])
-		groups = kvloop.Group(it.Next)
+		it     = slice.ToKV(slice.Of(1, 1, 2, 4, 3, 1), even, as.Is[int])
+		groups = group.Of(it)
 	)
 	assert.Equal(t, map[bool][]int{false: {1, 1, 3, 1}, true: {2, 4}}, groups)
 }

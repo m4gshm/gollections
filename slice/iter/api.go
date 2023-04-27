@@ -5,6 +5,7 @@ import (
 	"unsafe"
 
 	"github.com/m4gshm/gollections/check"
+	"github.com/m4gshm/gollections/convert"
 	"github.com/m4gshm/gollections/notsafe"
 	"github.com/m4gshm/gollections/predicate/always"
 )
@@ -72,11 +73,35 @@ func NotNil[T any, TRS ~[]*T](elements TRS) FitIter[*T] {
 }
 
 // NewKeyValuer creates instance of the KeyValuer
-func NewKeyValuer[TS ~[]T, T any, K, V any](elements TS, keyProducer func(T) K, valsProducer func(T) V) KeyValuer[T, K, V] {
-	return KeyValuer[T, K, V]{iter: NewHead(elements), keyProducer: keyProducer, valProducer: valsProducer}
+func NewKeyValuer[TS ~[]T, T any, K, V any](elements TS, keyExtractor func(T) K, valsExtractor func(T) V) KeyValuer[T, K, V] {
+	return KeyValuer[T, K, V]{iter: NewHead(elements), keyExtractor: keyExtractor, valExtractor: valsExtractor}
 }
 
 // NewMultipleKeyValuer creates instance of the MultipleKeyValuer
-func NewMultipleKeyValuer[TS ~[]T, T any, K, V any](elements TS, keysProducer func(T) []K, valsProducer func(T) []V) MultipleKeyValuer[T, K, V] {
-	return MultipleKeyValuer[T, K, V]{iter: NewHead(elements), keysProducer: keysProducer, valsProducer: valsProducer}
+func NewMultipleKeyValuer[TS ~[]T, T any, K, V any](elements TS, keysExtractor func(T) []K, valsExtractor func(T) []V) MultipleKeyValuer[T, K, V] {
+	return MultipleKeyValuer[T, K, V]{iter: NewHead(elements), keysExtractor: keysExtractor, valsExtractor: valsExtractor}
+}
+
+// ToKV transforms iterable elements to key/value iterator based on applying key, value extractors to the elements
+func ToKV[TS ~[]T, T any, K comparable, V any](elements TS, keyExtractor func(T) K, valExtractor func(T) V) KeyValuer[T, K, V] {
+	kv := NewKeyValuer(elements, keyExtractor, valExtractor)
+	return kv
+}
+
+// ToKVs transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
+func ToKVs[TS ~[]T, T, K, V any](elements TS, keysExtractor func(T) []K, valsExtractor func(T) []V) *MultipleKeyValuer[T, K, V] {
+	kv := NewMultipleKeyValuer(elements, keysExtractor, valsExtractor)
+	return &kv
+}
+
+// FlattKeys transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
+func FlattKeys[TS ~[]T, T, K, V any](elements TS, keysExtractor func(T) []K, valExtractor func(T) V) *MultipleKeyValuer[T, K, V] {
+	kv := NewMultipleKeyValuer(elements, keysExtractor, func(t T) []V { return convert.AsSlice(valExtractor(t)) })
+	return &kv
+}
+
+// FlattValues transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
+func FlattValues[TS ~[]T, T, K, V any](elements TS, keyExtractor func(T) K, valsExtractor func(T) []V) *MultipleKeyValuer[T, K, V] {
+	kv := NewMultipleKeyValuer(elements, func(t T) []K { return convert.AsSlice(keyExtractor(t)) }, valsExtractor)
+	return &kv
 }

@@ -176,7 +176,7 @@ func Test_MultipleKeyValuer(t *testing.T) {
 		{name: "Tom", age: 18}, {},
 	}
 
-	m := kvloop.Group(loop.ToMultipleKV(loop.Of(users...),
+	m := kvloop.Group(loop.ToKVs(loop.Of(users...),
 		func(u User) []string {
 			return slice.Convert(u.roles, func(r Role) string { return strings.ToLower(r.name) })
 		},

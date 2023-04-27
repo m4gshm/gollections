@@ -26,7 +26,7 @@ func FromPairs[K, V any](elements c.Iterator[c.KV[K, V]]) c.KVIterator[K, V] {
 
 // FromIter converts a c.Iterator to a c.KVIterator using key and value extractors
 func FromIter[T, K, V any](elements c.Iterator[T], keyExtractor func(T) K, valExtractor func(T) V) c.KVIterator[K, V] {
-	return iter.ToPairs(elements, keyExtractor, valExtractor)
+	return iter.ToKV(elements, keyExtractor, valExtractor)
 }
 
 // Group collects sets of values grouped by keys obtained by passing a key/value iterator

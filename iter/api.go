@@ -108,8 +108,8 @@ func First[T any, IT c.Iterator[T]](elements IT, filter func(T) bool) (T, bool) 
 	return loop.First(elements.Next, filter)
 }
 
-// ToPairs converts a c.Iterator to a c.KVIterator using key and value extractors
-func ToPairs[T, K, V any](elements c.Iterator[T], keyExtractor func(T) K, valExtractor func(T) V) c.KVIterator[K, V] {
+// ToKV converts a c.Iterator to a c.KVIterator using key and value extractors
+func ToKV[T, K, V any](elements c.Iterator[T], keyExtractor func(T) K, valExtractor func(T) V) c.KVIterator[K, V] {
 	kv := loop.NewKeyValuer(elements.Next, keyExtractor, valExtractor)
 	return &kv
 }

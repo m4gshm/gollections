@@ -7,9 +7,9 @@ import (
 
 // KeyValuer is the Iterator wrapper that converts an element to a key\value pair and iterates over these pairs
 type KeyValuer[T, K, V any] struct {
-	iter        SliceIter[T]
-	keyProducer func(T) K
-	valProducer func(T) V
+	iter         SliceIter[T]
+	keyExtractor func(T) K
+	valExtractor func(T) V
 }
 
 var _ c.KVIterator[int, string] = (*KeyValuer[any, int, string])(nil)
@@ -30,8 +30,8 @@ func (kv *KeyValuer[T, K, V]) TrackEach(traker func(key K, value V)) {
 func (kv *KeyValuer[T, K, V]) Next() (key K, value V, ok bool) {
 	next := kv.iter.Next
 	if elem, nextOk := next(); nextOk {
-		key = kv.keyProducer(elem)
-		value = kv.valProducer(elem)
+		key = kv.keyExtractor(elem)
+		value = kv.valExtractor(elem)
 		ok = true
 	}
 	return key, value, ok
@@ -39,12 +39,12 @@ func (kv *KeyValuer[T, K, V]) Next() (key K, value V, ok bool) {
 
 // MultipleKeyValuer is the Iterator wrapper that converts an element to a key\value pair and iterates over these pairs
 type MultipleKeyValuer[T, K, V any] struct {
-	iter         SliceIter[T]
-	keysProducer func(T) []K
-	valsProducer func(T) []V
-	keys         []K
-	values       []V
-	ki, vi       int
+	iter          SliceIter[T]
+	keysExtractor func(T) []K
+	valsExtractor func(T) []V
+	keys          []K
+	values        []V
+	ki, vi        int
 }
 
 var _ c.KVIterator[int, string] = (*MultipleKeyValuer[any, int, string])(nil)
@@ -87,8 +87,8 @@ func (kv *MultipleKeyValuer[T, K, V]) Next() (key K, value V, ok bool) {
 				kv.ki = 0
 				kv.vi++
 			} else if elem, nextOk := next(); nextOk {
-				kv.keys = kv.keysProducer(elem)
-				kv.values = kv.valsProducer(elem)
+				kv.keys = kv.keysExtractor(elem)
+				kv.values = kv.valsExtractor(elem)
 				kv.ki, kv.vi = 0, 0
 			} else {
 				kv.keys, kv.values = nil, nil
