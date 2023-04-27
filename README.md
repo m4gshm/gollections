@@ -255,6 +255,7 @@ import (
     "github.com/m4gshm/gollections/iter"
     slc "github.com/m4gshm/gollections/iter/slice"
     iterableGroup "github.com/m4gshm/gollections/iterable/group"
+    "github.com/m4gshm/gollections/loop"
     "github.com/m4gshm/gollections/op"
     "github.com/m4gshm/gollections/predicate/more"
     "github.com/m4gshm/gollections/slice"
@@ -323,7 +324,7 @@ func Test_compute_odds_sum(t *testing.T) {
     )
 
     //declarative style
-    oddSum := iter.Reduce(iter.Filter(iter.Flatt(slc.Flatt(multiDimension, as.Is[[][]int]), as.Is[[]int]), odds), op.Sum[int])
+    oddSum := loop.Reduce(iter.Filter(iter.Flatt(slc.Flatt(multiDimension, as.Is[[][]int]), as.Is[[]int]), odds).Next, op.Sum[int])
     assert.Equal(t, expected, oddSum)
 
     //plain old style

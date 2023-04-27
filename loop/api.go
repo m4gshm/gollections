@@ -208,7 +208,7 @@ func FlattValues[T, K, V any](next func() (T, bool), keyExtractor func(T) K, val
 }
 
 // Group converts elements retrieved by the 'next' function into a map, extracting a key for each element applying the converter 'keyExtractor'.
-// The keyExtractor converts an element to an key.
+// The keyExtractor converts an element to a key.
 // The valExtractor converts an element to an value.
 func Group[T any, K comparable, V any](next func() (T, bool), keyExtractor func(T) K, valExtractor func(T) V) map[K][]V {
 	return ToMapResolv(next, keyExtractor, valExtractor, resolv.Append[K, V])

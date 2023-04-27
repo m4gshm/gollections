@@ -29,18 +29,16 @@ func NewSet[T comparable](elements []T) *Set[T] {
 	return WrapSet(order, uniques)
 }
 
-// ToSet creates a Set instance with elements obtained by passing an iterator.
-func ToSet[T comparable](elements c.Iterator[T]) *Set[T] {
+// SetFromLoop creates a set with elements retrieved by the 'next' function.
+// The next returns an element with true or zero value with false if there are no more elements.
+func SetFromLoop[T comparable](next func() (T, bool)) *Set[T] {
 	var (
 		uniques = map[T]int{}
 		order   []T
 		pos     = 0
 	)
-
-	if elements != nil {
-		for e, ok := elements.Next(); ok; e, ok = elements.Next() {
-			order, pos = add(e, uniques, order, pos)
-		}
+	for e, ok := next(); ok; e, ok = next() {
+		order, pos = add(e, uniques, order, pos)
 	}
 	return WrapSet(order, uniques)
 }

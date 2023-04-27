@@ -19,12 +19,12 @@ func New[T comparable](elements []T) ordered.Set[T] {
 	return ordered.NewSet(elements)
 }
 
-// From creates a Set instance with elements obtained by passing an iterator.
-func From[T comparable](elements c.Iterator[T]) ordered.Set[T] {
-	return ordered.ToSet(elements)
+// From instantiates a set with elements retrieved by the 'next' function
+func From[T comparable](next func() (T, bool)) ordered.Set[T] {
+	return ordered.SetFromLoop(next)
 }
 
-// Sort instantiates Set and puts sorted elements to it.
+// Sort copy the specified set with sorted elements
 func Sort[T comparable, f constraints.Ordered](s ordered.Set[T], by func(T) f) ordered.Set[T] {
 	return s.Sort(func(e1, e2 T) bool { return by(e1) < by(e2) })
 }

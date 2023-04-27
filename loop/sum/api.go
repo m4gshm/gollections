@@ -6,7 +6,7 @@ import (
 	"github.com/m4gshm/gollections/loop"
 )
 
-// Of an alias of the it.Sum
-func Of[T c.Summable, IT c.Iterator[T]](elements IT) T {
-	return loop.Sum(elements.Next)
+// Of an alias of the loop.Sum
+func Of[T c.Summable, IT c.Iterator[T]](sum func() (T, bool)) T {
+	return loop.Sum(sum)
 }

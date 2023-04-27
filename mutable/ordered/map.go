@@ -16,8 +16,8 @@ import (
 	sliceIter "github.com/m4gshm/gollections/slice/iter"
 )
 
-// AsMap converts a slice of key/value pairs to teh Map.
-func AsMap[K comparable, V any](elements []c.KV[K, V]) *Map[K, V] {
+// NewMapKV instantiates an ortered Map using a key/value slice
+func NewMapKV[K comparable, V any](elements []c.KV[K, V]) *Map[K, V] {
 	var (
 		l       = len(elements)
 		uniques = make(map[K]V, l)
@@ -34,12 +34,12 @@ func AsMap[K comparable, V any](elements []c.KV[K, V]) *Map[K, V] {
 	return WrapMap(order, uniques)
 }
 
-// WrapMap instantiates ordered Map using a map and an order slice as internal storage.
+// WrapMap instantiates an ordered Map using a map and an order slice as internal storage
 func WrapMap[K comparable, V any](order []K, elements map[K]V) *Map[K, V] {
 	return &Map[K, V]{order: order, elements: elements, ksize: notsafe.GetTypeSize[K]()}
 }
 
-// Map is the Collection implementation that provides element access by an unique key..
+// Map is the Collection implementation that provides element access by an unique key
 type Map[K comparable, V any] struct {
 	order      []K
 	elements   map[K]V

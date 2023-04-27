@@ -16,9 +16,9 @@ func Of[T comparable](elements ...T) *mutable.Set[T] {
 	return mutable.NewSet(elements)
 }
 
-// From creates a Set instance with elements obtained by passing an iterator.
-func From[T comparable](elements c.Iterator[T]) *mutable.Set[T] {
-	return mutable.ToSet(elements)
+// From instantiates a set with elements retrieved by the 'next' function
+func From[T comparable](next func() (T, bool)) *mutable.Set[T] {
+	return mutable.SetFromLoop(next)
 }
 
 // Empty instantiates Set with zero capacity.

@@ -9,7 +9,7 @@ import (
 	"github.com/m4gshm/gollections/mutable"
 )
 
-// Of instantiates Vector with predefined elements.
+// Of instantiates a vector with the specified elements
 func Of[T any](elements ...T) *mutable.Vector[T] {
 	return mutable.NewVector(elements)
 }
@@ -24,12 +24,13 @@ func NewCap[T any](capacity int) *mutable.Vector[T] {
 	return mutable.NewVectorCap[T](capacity)
 }
 
-// From creates a Vector instance with elements obtained by passing an iterator.
-func From[T any](elements c.Iterator[T]) *mutable.Vector[T] {
-	return mutable.WrapVector(loop.ToSlice(elements.Next))
+// From instantiates a vector with elements retrieved by the 'next' function.
+// The next returns an element with true or zero value with false if there are no more elements.
+func From[T any](next func() (T, bool)) *mutable.Vector[T] {
+	return mutable.WrapVector(loop.ToSlice(next))
 }
 
-// Sort sorts a Vector in-place by a converter that thransforms an element to an Ordered (int, string and so on).
+// Sort sorts the specified vector in-place by a converter that thransforms an element to an Ordered (int, string and so on).
 func Sort[T any, F constraints.Ordered](v *mutable.Vector[T], by func(T) F) *mutable.Vector[T] {
 	return v.Sort(func(e1, e2 T) bool { return by(e1) < by(e2) })
 }

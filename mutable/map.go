@@ -17,8 +17,8 @@ func NewMap[K comparable, V any](capacity int) *Map[K, V] {
 	return WrapMap(make(map[K]V, capacity))
 }
 
-// AsMap converts a slice of key/value pairs into a Map instance.
-func AsMap[K comparable, V any](elements []c.KV[K, V]) *Map[K, V] {
+// NewMapKV converts a slice of key/value pairs into a Map instance.
+func NewMapKV[K comparable, V any](elements []c.KV[K, V]) *Map[K, V] {
 	return WrapMap(map_.Of(elements...))
 }
 

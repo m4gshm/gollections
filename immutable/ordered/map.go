@@ -35,7 +35,7 @@ func NewMapKV[K comparable, V any](elements []c.KV[K, V]) Map[K, V] {
 }
 
 // NewMap instantiates Map populated by the 'elements' map key/values
-func NewMap[K comparable, V any](elements map[K]V, order []K) Map[K, V] {
+func NewMap[K comparable, V any](order []K, elements map[K]V) Map[K, V] {
 	uniques := make(map[K]V, len(elements))
 	for _, key := range order {
 		uniques[key] = elements[key]

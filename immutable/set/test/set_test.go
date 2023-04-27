@@ -20,7 +20,7 @@ import (
 )
 
 func Test_Set_From(t *testing.T) {
-	set := set.From(iter.Of(1, 1, 2, 2, 3, 4, 3, 2, 1))
+	set := set.From(iter.Of(1, 1, 2, 2, 3, 4, 3, 2, 1).Next)
 	assert.Equal(t, slice.Of(1, 2, 3, 4), sort.Of(set.Slice()))
 }
 

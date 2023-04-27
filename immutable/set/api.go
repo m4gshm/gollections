@@ -21,9 +21,10 @@ func New[T comparable](elements []T) immutable.Set[T] {
 	return immutable.NewSet(elements)
 }
 
-// From creates a Set instance with elements obtained by passing an iterator.
-func From[T comparable](elements c.Iterator[T]) immutable.Set[T] {
-	return immutable.ToSet(elements)
+// From instantiates a map with key/values retrieved by the 'next' function.
+// The next returns a key/value pairs with true or zero values with false if there are no more elements.
+func From[T comparable](next func() (T, bool)) immutable.Set[T] {
+	return immutable.SetFromLoop(next)
 }
 
 // Sort instantiates Set and puts sorted elements to it.

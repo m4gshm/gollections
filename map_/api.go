@@ -14,7 +14,7 @@ import (
 // ErrBreak is For, Track breaker
 var ErrBreak = c.ErrBreak
 
-// Of creates a map from a slice of key/value pairs.
+// Of instantiates a ap from the specified key/value pairs
 func Of[K comparable, V any](elements ...c.KV[K, V]) map[K]V {
 	var (
 		uniques = make(map[K]V, len(elements))
@@ -61,13 +61,13 @@ func GroupOfLoop[S any, K comparable, V any](source S, hasNext func(S) bool, get
 }
 
 // Generate builds a map by an generator function.
-// The next returns an key\value pair, or false if the generation is over, or an error.
+// The next returns a key\value pair, or false if the generation is over, or an error.
 func Generate[K comparable, V any](next func() (K, V, bool, error)) (map[K]V, error) {
 	return GenerateResolv(next, resolv.FirstVal[K, V])
 }
 
 // GenerateResolv builds a map by an generator function.
-// The next returns an key\value pair, or false if the generation is over, or an error.
+// The next returns a key\value pair, or false if the generation is over, or an error.
 // The resolv selects value for duplicated keys.
 func GenerateResolv[K comparable, V any](next func() (K, V, bool, error), resolv func(bool, K, V, V) V) (map[K]V, error) {
 	r := map[K]V{}

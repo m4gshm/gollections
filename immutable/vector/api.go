@@ -9,22 +9,23 @@ import (
 	"github.com/m4gshm/gollections/loop"
 )
 
-// Of instantiates Vector with predefined elements.
+// Of instantiates a vector with the specified elements
 func Of[T any](elements ...T) immutable.Vector[T] {
 	return immutable.NewVector(elements)
 }
 
-// New instantiates Vector and copies elements to it.
+// New instantiates a vector with the specified elements
 func New[T any](elements []T) immutable.Vector[T] {
 	return immutable.NewVector(elements)
 }
 
-// From creates a Vector instance with elements obtained by passing an iterator.
-func From[T any](elements c.Iterator[T]) immutable.Vector[T] {
-	return immutable.WrapVector(loop.ToSlice(elements.Next))
+// From instantiates a vector with elements retrieved by the 'next' function.
+// The next returns an element with true or zero value with false if there are no more elements.
+func From[T any](next func() (T, bool)) immutable.Vector[T] {
+	return immutable.WrapVector(loop.ToSlice(next))
 }
 
-// Sort instantiates Vector and puts sorted elements to it.
+// Sort copy the specified vector with sorted elements
 func Sort[t any, f constraints.Ordered](v immutable.Vector[t], by func(t) f) immutable.Vector[t] {
 	return v.Sort(func(e1, e2 t) bool { return by(e1) < by(e2) })
 }

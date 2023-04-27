@@ -26,13 +26,12 @@ func NewSet[T comparable](elements []T) *Set[T] {
 	return WrapSet(internal)
 }
 
-// ToSet creates a Set instance with elements obtained by passing an iterator.
-func ToSet[T comparable](elements c.Iterator[T]) *Set[T] {
+// SetFromLoop creates a set with elements retrieved by the 'next' function.
+// The next returns an element with true or zero value with false if there are no more elements.
+func SetFromLoop[T comparable](next func() (T, bool)) *Set[T] {
 	internal := map[T]struct{}{}
-	if elements != nil {
-		for e, ok := elements.Next(); ok; e, ok = elements.Next() {
-			internal[e] = struct{}{}
-		}
+	for e, ok := next(); ok; e, ok = next() {
+		internal[e] = struct{}{}
 	}
 	return WrapSet(internal)
 }

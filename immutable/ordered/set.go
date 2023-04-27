@@ -28,13 +28,14 @@ func WrapSet[T comparable](order []T, elements map[T]struct{}) Set[T] {
 	return Set[T]{order: order, elements: elements, esize: notsafe.GetTypeSize[T]()}
 }
 
-// ToSet creates a Set instance with elements obtained by passing an iterator.
-func ToSet[T comparable](elements c.Iterator[T]) Set[T] {
+// SetFromLoop creates a set with elements retrieved by the 'next' function.
+// The next returns an element with true or zero value with false if there are no more elements.
+func SetFromLoop[T comparable](next func() (T, bool)) Set[T] {
 	var (
 		uniques = map[T]struct{}{}
 		order   []T
 	)
-	for e, ok := elements.Next(); ok; e, ok = elements.Next() {
+	for e, ok := next(); ok; e, ok = next() {
 		order = add(e, uniques, order)
 	}
 	return WrapSet(order, uniques)

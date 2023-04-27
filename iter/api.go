@@ -7,7 +7,6 @@ import (
 	"github.com/m4gshm/gollections/check"
 	kvloop "github.com/m4gshm/gollections/kv/loop"
 	"github.com/m4gshm/gollections/loop"
-	"github.com/m4gshm/gollections/op"
 	sliceIter "github.com/m4gshm/gollections/slice/iter"
 )
 
@@ -68,16 +67,6 @@ func NotNil[T any, IT c.Iterator[*T]](elements IT) c.Iterator[*T] {
 	return Filter(elements, check.NotNil[T])
 }
 
-// Reduce reduces elements to an one
-func Reduce[T any](elements c.Iterator[T], by func(T, T) T) T {
-	return loop.Reduce(elements.Next, by)
-}
-
-// ReduceKV reduces key/value elements to an one
-func ReduceKV[K, V any](elements c.KVIterator[K, V], by func(k1 K, v1 V, k2 K, v2 V) (K, V)) (K, V) {
-	return kvloop.Reduce(elements.Next, by)
-}
-
 // ToSlice converts an Iterator to a slice
 func ToSlice[T any](elements c.Iterator[T]) []T {
 	return loop.ToSlice(elements.Next)
@@ -96,11 +85,6 @@ func ForEach[T any](elements c.Iterator[T], walker func(T)) {
 // ForEachFiltered applies the 'walker' function to elements that satisfy a predicate condition
 func ForEachFiltered[T any](elements c.Iterator[T], walker func(T), filter func(T) bool) {
 	loop.ForEachFiltered(elements.Next, walker, filter)
-}
-
-// Sum returns the sum of all elements
-func Sum[T c.Summable](elements c.Iterator[T]) T {
-	return loop.Reduce(elements.Next, op.Sum[T])
 }
 
 // First returns the first element that satisfies requirements of the predicate 'filter'

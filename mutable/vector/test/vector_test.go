@@ -15,7 +15,7 @@ import (
 )
 
 func Test_Vector_From(t *testing.T) {
-	set := vector.From(iter.Of(1, 1, 2, 2, 3, 4, 3, 2, 1))
+	set := vector.From(iter.Of(1, 1, 2, 2, 3, 4, 3, 2, 1).Next)
 	assert.Equal(t, slice.Of(1, 1, 2, 2, 3, 4, 3, 2, 1), set.Slice())
 }
 

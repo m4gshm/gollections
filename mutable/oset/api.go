@@ -12,9 +12,9 @@ func Of[T comparable](elements ...T) *ordered.Set[T] {
 	return ordered.NewSet(elements)
 }
 
-// From creates a Set instance with elements obtained by passing an iterator.
-func From[T comparable](elements c.Iterator[T]) *ordered.Set[T] {
-	return ordered.ToSet(elements)
+// From instantiates a set with elements retrieved by the 'next' function
+func From[T comparable](next func() (T, bool)) *ordered.Set[T] {
+	return ordered.SetFromLoop(next)
 }
 
 // Empty instantiates Set with zero capacity.

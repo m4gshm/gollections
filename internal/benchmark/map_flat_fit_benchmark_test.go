@@ -468,7 +468,7 @@ func Benchmark_ReduceSum_Iterable(b *testing.B) {
 	b.ResetTimer()
 	result := 0
 	for i := 0; i < b.N; i++ {
-		result = iter.Reduce(iter.Filter(iter.Flatt(iter.Flatt(iter.Wrap(multiDimension), convert.To[[][]int]), convert.To[[]int]), odds), sop.Sum[int])
+		result = loop.Reduce(iter.Filter(iter.Flatt(iter.Flatt(iter.Wrap(multiDimension), convert.To[[][]int]), convert.To[[]int]), odds).Next, sop.Sum[int])
 	}
 	b.StopTimer()
 	if result != expected {
@@ -502,7 +502,7 @@ func Benchmark_ReduceSum_Slice(b *testing.B) {
 	b.ResetTimer()
 	result := 0
 	for i := 0; i < b.N; i++ {
-		result = iter.Reduce(iter.Filter(iter.Flatt(sliceit.Flatt(multiDimension, convert.To[[][]int]), convert.To[[]int]), odds), sop.Sum[int])
+		result = loop.Reduce(iter.Filter(iter.Flatt(sliceit.Flatt(multiDimension, convert.To[[][]int]), convert.To[[]int]), odds).Next, sop.Sum[int])
 	}
 	b.StopTimer()
 	if result != expected {

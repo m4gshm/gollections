@@ -84,10 +84,10 @@ func Test_ReduceSlices(t *testing.T) {
 
 	e := 1 + 3 + 5 + 7
 
-	oddSum := iter.Reduce(iter.Filter(iter.Flatt(iter.Flatt(iter.Wrap(multiDimension), convert.To[[][]int]), convert.To[[]int]), odds), op.Sum[int])
+	oddSum := loop.Reduce(iter.Filter(iter.Flatt(iter.Flatt(iter.Wrap(multiDimension), convert.To[[][]int]), convert.To[[]int]), odds).Next, op.Sum[int])
 	assert.Equal(t, e, oddSum)
 
-	oddSum = iter.Reduce(iter.Filter(iter.Flatt(sliceit.Flatt(multiDimension, convert.To[[][]int]), convert.To[[]int]), odds), op.Sum[int])
+	oddSum = loop.Reduce(iter.Filter(iter.Flatt(sliceit.Flatt(multiDimension, convert.To[[][]int]), convert.To[[]int]), odds).Next, op.Sum[int])
 	assert.Equal(t, e, oddSum)
 
 	//plain old style
