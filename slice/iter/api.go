@@ -8,7 +8,12 @@ import (
 	"github.com/m4gshm/gollections/convert"
 	"github.com/m4gshm/gollections/notsafe"
 	"github.com/m4gshm/gollections/predicate/always"
+	"github.com/m4gshm/gollections/slice"
 )
+
+func New[TS ~[]T, T any](elements TS) *slice.Iter[T] {
+	return slice.NewIter(elements)
+}
 
 // Convert instantiates Iterator that converts elements with a converter and returns them
 func Convert[FS ~[]From, From, To any](elements FS, by func(From) To) *ConvertIter[From, To] {
@@ -74,12 +79,12 @@ func NotNil[T any, TRS ~[]*T](elements TRS) *FilterIter[*T] {
 
 // NewKeyValuer creates instance of the KeyValuer
 func NewKeyValuer[TS ~[]T, T any, K, V any](elements TS, keyExtractor func(T) K, valsExtractor func(T) V) *KeyValuer[T, K, V] {
-	return &KeyValuer[T, K, V]{iter: NewHead(elements), keyExtractor: keyExtractor, valExtractor: valsExtractor}
+	return &KeyValuer[T, K, V]{iter: slice.NewHead(elements), keyExtractor: keyExtractor, valExtractor: valsExtractor}
 }
 
 // NewMultipleKeyValuer creates instance of the MultipleKeyValuer
 func NewMultipleKeyValuer[TS ~[]T, T any, K, V any](elements TS, keysExtractor func(T) []K, valsExtractor func(T) []V) *MultipleKeyValuer[T, K, V] {
-	return &MultipleKeyValuer[T, K, V]{iter: NewHead(elements), keysExtractor: keysExtractor, valsExtractor: valsExtractor}
+	return &MultipleKeyValuer[T, K, V]{iter: slice.NewHead(elements), keysExtractor: keysExtractor, valsExtractor: valsExtractor}
 }
 
 // ToKV transforms iterable elements to key/value iterator based on applying key, value extractors to the elements

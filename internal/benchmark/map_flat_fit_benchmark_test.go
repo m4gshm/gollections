@@ -152,7 +152,7 @@ func Benchmark_Convert_Loop(b *testing.B) {
 	var s []string
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		it := sliceIter.NewHead(values)
+		it := slice.NewHead(values)
 		s = loop.ToSlice(loop.Convert(it.Next, op).Next)
 	}
 	_ = s
@@ -165,7 +165,7 @@ func Benchmark_Convert_Vector_Iterator(b *testing.B) {
 	var s []string
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		s = iterable.Convert[*sliceIter.SliceIter[int]](items, concat).Slice()
+		s = iterable.Convert[*slice.Iter[int]](items, concat).Slice()
 	}
 	_ = s
 
@@ -177,7 +177,7 @@ func Benchmark_Convert_Vector_Iterator_No_Cache_Operation(b *testing.B) {
 	var s []string
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		s = iterable.Convert[*sliceIter.SliceIter[int]](items, convert.And(toString, addTail)).Slice()
+		s = iterable.Convert[*slice.Iter[int]](items, convert.And(toString, addTail)).Slice()
 	}
 	_ = s
 	b.StopTimer()
@@ -237,7 +237,7 @@ func Benchmark_ConvertAndFilter_Slice_Loop(b *testing.B) {
 	var s []string
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		it := sliceIter.New(items)
+		it := slice.NewIter(items)
 		ft := loop.Filter(it.Next, even)
 		s = loop.ToSlice(loop.Convert(ft.Next, convert.And(toString, addTail)).Next)
 	}

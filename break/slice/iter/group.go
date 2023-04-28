@@ -3,12 +3,12 @@ package iter
 import (
 	"github.com/m4gshm/gollections/break/loop"
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/slice/iter"
+	"github.com/m4gshm/gollections/slice"
 )
 
 // KeyValuer is the Iterator wrapper that converts an element to a key\value pair and iterates over these pairs
 type KeyValuer[T, K, V any] struct {
-	iter         iter.SliceIter[T]
+	iter         slice.Iter[T]
 	keyExtractor func(T) (K, error)
 	valExtractor func(T) (V, error)
 }
@@ -37,7 +37,7 @@ func (kv *KeyValuer[T, K, V]) Next() (key K, value V, ok bool, err error) {
 
 // MultipleKeyValuer is the Iterator wrapper that converts an element to a key\value pair and iterates over these pairs
 type MultipleKeyValuer[T, K, V any] struct {
-	iter          iter.SliceIter[T]
+	iter          slice.Iter[T]
 	keysExtractor func(T) ([]K, error)
 	valsExtractor func(T) ([]V, error)
 	keys          []K

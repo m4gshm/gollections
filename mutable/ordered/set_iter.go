@@ -3,12 +3,12 @@ package ordered
 import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/loop"
-	"github.com/m4gshm/gollections/slice/iter"
+	"github.com/m4gshm/gollections/slice"
 )
 
 // NewSetIter creates a set's iterator.
 func NewSetIter[T any](elements *[]T, del func(v T)) SetIter[T] {
-	return SetIter[T]{elements: elements, current: iter.NoStarted, del: del}
+	return SetIter[T]{elements: elements, current: slice.IterNoStarted, del: del}
 }
 
 // SetIter set iterator
@@ -38,9 +38,9 @@ func (i *SetIter[T]) ForEach(walker func(element T)) {
 // If ok == false, then the iteration must be completed.
 func (i *SetIter[T]) Next() (t T, ok bool) {
 	if !(i == nil || i.elements == nil) {
-		if iter.HasNext(*i.elements, i.current) {
+		if slice.HasNext(*i.elements, i.current) {
 			i.current++
-			return iter.Gett(*i.elements, i.current)
+			return slice.Gett(*i.elements, i.current)
 		}
 	}
 	return t, ok
@@ -57,7 +57,7 @@ func (i *SetIter[T]) Cap() (capacity int) {
 // Delete deletes the current element
 func (i *SetIter[T]) Delete() {
 	if !(i == nil || i.elements == nil) {
-		if v, ok := iter.Gett(*i.elements, i.current); ok {
+		if v, ok := slice.Gett(*i.elements, i.current); ok {
 			i.current--
 			i.del(v)
 		}

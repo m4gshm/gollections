@@ -9,7 +9,6 @@ import (
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/notsafe"
 	"github.com/m4gshm/gollections/slice"
-	"github.com/m4gshm/gollections/slice/iter"
 )
 
 // NewVector instantiates Vector and copies elements to it.
@@ -29,33 +28,33 @@ type Vector[T any] struct {
 }
 
 var (
-	_ c.Vector[any, *iter.SliceIter[any]] = (*Vector[any])(nil)
-	_ fmt.Stringer                        = (*Vector[any])(nil)
-	_ c.Vector[any, *iter.SliceIter[any]] = Vector[any]{}
-	_ fmt.Stringer                        = Vector[any]{}
+	_ c.Vector[any, *slice.Iter[any]] = (*Vector[any])(nil)
+	_ fmt.Stringer                    = (*Vector[any])(nil)
+	_ c.Vector[any, *slice.Iter[any]] = Vector[any]{}
+	_ fmt.Stringer                    = Vector[any]{}
 )
 
 // Begin creates iterator
-func (v Vector[T]) Begin() *iter.SliceIter[T] {
+func (v Vector[T]) Begin() *slice.Iter[T] {
 	h := v.Head()
 	return &h
 }
 
 // Head creates iterator
-func (v Vector[T]) Head() iter.SliceIter[T] {
-	return iter.NewHeadS(v.elements, v.esize)
+func (v Vector[T]) Head() slice.Iter[T] {
+	return slice.NewHeadS(v.elements, v.esize)
 }
 
 // Tail creates an iterator pointing to the end of the collection
-func (v Vector[T]) Tail() iter.SliceIter[T] {
-	return iter.NewTailS(v.elements, v.esize)
+func (v Vector[T]) Tail() slice.Iter[T] {
+	return slice.NewTailS(v.elements, v.esize)
 }
 
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
-func (v Vector[T]) First() (iter.SliceIter[T], T, bool) {
+func (v Vector[T]) First() (slice.Iter[T], T, bool) {
 	var (
-		iterator  = iter.NewHeadS(v.elements, v.esize)
+		iterator  = slice.NewHeadS(v.elements, v.esize)
 		first, ok = iterator.Next()
 	)
 	return iterator, first, ok
@@ -63,9 +62,9 @@ func (v Vector[T]) First() (iter.SliceIter[T], T, bool) {
 
 // Last returns the latest element of the collection, an iterator to reverse iterate over the remaining elements, and true\false marker of availability previous elements.
 // If no more elements then ok==false.
-func (v Vector[T]) Last() (iter.SliceIter[T], T, bool) {
+func (v Vector[T]) Last() (slice.Iter[T], T, bool) {
 	var (
-		iterator  = iter.NewTailS(v.elements, v.esize)
+		iterator  = slice.NewTailS(v.elements, v.esize)
 		first, ok = iterator.Prev()
 	)
 	return iterator, first, ok
@@ -88,7 +87,7 @@ func (v Vector[T]) IsEmpty() bool {
 
 // Get returns an element by the index, otherwise, if the provided index is ouf of the vector len, returns zero T and false in the second result
 func (v Vector[T]) Get(index int) (out T, ok bool) {
-	return slice.Get(v.elements, index)
+	return slice.Gett(v.elements, index)
 }
 
 // Track applies the 'tracker' function for elements. Return the c.ErrBreak to stop.

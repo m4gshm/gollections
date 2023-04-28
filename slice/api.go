@@ -452,16 +452,6 @@ func Last[TS ~[]T, T any](elements TS, by func(T) bool) (T, bool) {
 	return no, false
 }
 
-// Get returns an element from the elements by index, otherwise, if the provided index is ouf of the elements, returns zero T and false in the second result
-func Get[TS ~[]T, T any](elements TS, index int) (T, bool) {
-	l := len(elements)
-	if l > 0 && (index >= 0 || index < l) {
-		return elements[index], true
-	}
-	var no T
-	return no, false
-}
-
 // Track applies the 'tracker' function to the elements. Return the c.ErrBreak to stop tracking..
 func Track[TS ~[]T, T any](elements TS, tracker func(int, T) error) error {
 	for i, e := range elements {

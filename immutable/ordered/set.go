@@ -9,7 +9,6 @@ import (
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/notsafe"
 	"github.com/m4gshm/gollections/slice"
-	sliceIter "github.com/m4gshm/gollections/slice/iter"
 )
 
 // NewSet instantiates Set and copies elements to it.
@@ -50,33 +49,33 @@ type Set[T comparable] struct {
 }
 
 var (
-	_ c.Set[int, *sliceIter.SliceIter[int]] = (*Set[int])(nil)
-	_ fmt.Stringer                          = (*Set[int])(nil)
-	_ c.Set[int, *sliceIter.SliceIter[int]] = Set[int]{}
-	_ fmt.Stringer                          = Set[int]{}
+	_ c.Set[int, *slice.Iter[int]] = (*Set[int])(nil)
+	_ fmt.Stringer                 = (*Set[int])(nil)
+	_ c.Set[int, *slice.Iter[int]] = Set[int]{}
+	_ fmt.Stringer                 = Set[int]{}
 )
 
 // Begin creates iterator
-func (s Set[T]) Begin() *sliceIter.SliceIter[T] {
+func (s Set[T]) Begin() *slice.Iter[T] {
 	h := s.Head()
 	return &h
 }
 
 // Head creates iterator
-func (s Set[T]) Head() sliceIter.SliceIter[T] {
-	return sliceIter.NewHeadS(s.order, s.esize)
+func (s Set[T]) Head() slice.Iter[T] {
+	return slice.NewHeadS(s.order, s.esize)
 }
 
 // Tail creates an iterator pointing to the end of the collection
-func (s Set[T]) Tail() sliceIter.SliceIter[T] {
-	return sliceIter.NewTailS(s.order, s.esize)
+func (s Set[T]) Tail() slice.Iter[T] {
+	return slice.NewTailS(s.order, s.esize)
 }
 
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
-func (s Set[T]) First() (sliceIter.SliceIter[T], T, bool) {
+func (s Set[T]) First() (slice.Iter[T], T, bool) {
 	var (
-		iterator  = sliceIter.NewHeadS(s.order, s.esize)
+		iterator  = slice.NewHeadS(s.order, s.esize)
 		first, ok = iterator.Next()
 	)
 	return iterator, first, ok
@@ -84,9 +83,9 @@ func (s Set[T]) First() (sliceIter.SliceIter[T], T, bool) {
 
 // Last returns the latest element of the collection, an iterator to reverse iterate over the remaining elements, and true\false marker of availability previous elements.
 // If no more elements then ok==false.
-func (s Set[T]) Last() (sliceIter.SliceIter[T], T, bool) {
+func (s Set[T]) Last() (slice.Iter[T], T, bool) {
 	var (
-		iterator  = sliceIter.NewTailS(s.order, s.esize)
+		iterator  = slice.NewTailS(s.order, s.esize)
 		first, ok = iterator.Prev()
 	)
 	return iterator, first, ok

@@ -4,17 +4,17 @@ package iter
 import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/loop"
-	"github.com/m4gshm/gollections/slice/iter"
+	"github.com/m4gshm/gollections/slice"
 )
 
 // NewOrdered is the OrderedKV constructor
-func NewOrdered[K comparable, V any](uniques map[K]V, elements iter.SliceIter[K]) OrderedMapIter[K, V] {
+func NewOrdered[K comparable, V any](uniques map[K]V, elements slice.Iter[K]) OrderedMapIter[K, V] {
 	return OrderedMapIter[K, V]{elements: elements, uniques: uniques}
 }
 
 // OrderedMapIter is the ordered key/value pairs Iterator implementation
 type OrderedMapIter[K comparable, V any] struct {
-	elements iter.SliceIter[K]
+	elements slice.Iter[K]
 	uniques  map[K]V
 }
 
@@ -49,7 +49,7 @@ func (i *OrderedMapIter[K, V]) Cap() int {
 
 // NewValIter is default ValIter constructor
 func NewValIter[K comparable, V any](elements []K, uniques map[K]V) ValIter[K, V] {
-	return ValIter[K, V]{elements: elements, uniques: uniques, current: iter.NoStarted}
+	return ValIter[K, V]{elements: elements, uniques: uniques, current: slice.IterNoStarted}
 }
 
 // ValIter is the Iteratoc over Map values
@@ -78,9 +78,9 @@ func (i *ValIter[K, V]) ForEach(walker func(element V)) {
 // The ok result indicates whether the element was returned by the iterator.
 // If ok == false, then the iteration must be completed.
 func (i *ValIter[K, V]) Next() (val V, ok bool) {
-	if i != nil && iter.HasNext(i.elements, i.current) {
+	if i != nil && slice.HasNext(i.elements, i.current) {
 		i.current++
-		return i.uniques[iter.Get(i.elements, i.current)], true
+		return i.uniques[slice.Get(i.elements, i.current)], true
 	}
 	return val, false
 }

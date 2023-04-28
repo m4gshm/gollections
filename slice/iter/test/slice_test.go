@@ -6,7 +6,6 @@ import (
 	"github.com/m4gshm/gollections/as"
 	"github.com/m4gshm/gollections/kv/group"
 	"github.com/m4gshm/gollections/slice"
-	"github.com/m4gshm/gollections/slice/iter"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -18,7 +17,7 @@ func Test_PointerBasedIter(t *testing.T) {
 	}
 
 	expected := []someType{{"123", 123}, {"2", 2}, {"3", 3}, {"4", 4}}
-	iterator := iter.NewHead(expected)
+	iterator := slice.NewHead(expected)
 	result := make([]someType, 0)
 	for iterator.HasNext() {
 		n := iterator.GetNext()
@@ -36,7 +35,7 @@ func Test_PointerBasedIter2(t *testing.T) {
 	}
 
 	expected := []someType{{"123", 123}, {"2", 2}, {"3", 3}, {"4", 4}}
-	iterator := iter.NewHead(expected)
+	iterator := slice.NewHead(expected)
 	result := make([]someType, 0)
 	for v, ok := iterator.Next(); ok; v, ok = iterator.Next() {
 		result = append(result, v)
@@ -54,7 +53,7 @@ func Test_PointerBasedIter2Reverse(t *testing.T) {
 
 	values := []someType{{"123", 123}, {"2", 2}, {"3", 3}, {"4", 4}}
 	expected := []someType{{"4", 4}, {"3", 3}, {"2", 2}, {"123", 123}}
-	iterator := iter.NewTail(values)
+	iterator := slice.NewTail(values)
 	result := make([]someType, 0)
 	for v, ok := iterator.Prev(); ok; v, ok = iterator.Prev() {
 		result = append(result, v)
@@ -71,7 +70,7 @@ func Test_PointerBasedIterTailGetNext(t *testing.T) {
 	}
 
 	values := []someType{{"123", 123}, {"2", 2}, {"3", 3}, {"4", 4}}
-	iterator := iter.NewTail(values)
+	iterator := slice.NewTail(values)
 
 	v, ok := iterator.Get() //out of range
 	_ = v
@@ -118,7 +117,7 @@ func Test_PointerBasedIterHeadGetPrev(t *testing.T) {
 	}
 
 	values := []someType{{"123", 123}, {"2", 2}, {"3", 3}, {"4", 4}}
-	iterator := iter.NewHead(values)
+	iterator := slice.NewHead(values)
 
 	v, ok := iterator.Prev()
 	_ = v
@@ -162,7 +161,7 @@ func Test_PointerBasedEmptyIter(t *testing.T) {
 
 	values := []someType{}
 
-	iterator := iter.NewHead(values)
+	iterator := slice.NewHead(values)
 
 	v, ok := iterator.Prev()
 	_ = v
@@ -176,7 +175,7 @@ func Test_PointerBasedEmptyIter(t *testing.T) {
 
 	//tail
 
-	iterator = iter.NewTail(values)
+	iterator = slice.NewTail(values)
 
 	v, ok = iterator.Prev()
 	_ = v
@@ -197,7 +196,7 @@ func Test_PointerBasedOneElementIter(t *testing.T) {
 	}
 
 	values := []someType{{"only one", 1}}
-	iterator := iter.NewHead(values)
+	iterator := slice.NewHead(values)
 
 	v, ok := iterator.Prev()
 	_ = v
@@ -209,7 +208,7 @@ func Test_PointerBasedOneElementIter(t *testing.T) {
 	v, ok = iterator.Get()
 	assert.True(t, ok)
 
-	iterator = iter.NewTail(values)
+	iterator = slice.NewTail(values)
 
 	v, ok = iterator.Next()
 	_ = v
@@ -223,43 +222,31 @@ func Test_PointerBasedOneElementIter(t *testing.T) {
 }
 
 func Test_CanIterateByRange(t *testing.T) {
-	r := iter.CanIterateByRange(iter.NoStarted, 5, 4)
+	r := slice.CanIterateByRange(slice.IterNoStarted, 5, 4)
 	assert.True(t, r)
 
-	r = iter.CanIterateByRange(iter.NoStarted, 5, 6)
+	r = slice.CanIterateByRange(slice.IterNoStarted, 5, 6)
 	assert.False(t, r)
 
-	r = iter.CanIterateByRange(iter.NoStarted, 5, iter.NoStarted)
+	r = slice.CanIterateByRange(slice.IterNoStarted, 5, slice.IterNoStarted)
 	assert.True(t, r)
 }
 
 func Test_IsValidIndex(t *testing.T) {
-	r := iter.IsValidIndex(5, 0)
+	r := slice.IsValidIndex(5, 0)
 	assert.True(t, r)
 
-	r = iter.IsValidIndex(5, 5)
+	r = slice.IsValidIndex(5, 5)
 	assert.False(t, r)
 
-	r = iter.IsValidIndex(5, -1)
-	assert.False(t, r)
-
-}
-
-func Test_IsValidIndex2(t *testing.T) {
-	r := iter.IsValidIndex2(5, 0)
-	assert.True(t, r)
-
-	r = iter.IsValidIndex2(5, 5)
-	assert.False(t, r)
-
-	r = iter.IsValidIndex2(5, -1)
+	r = slice.IsValidIndex(5, -1)
 	assert.False(t, r)
 }
 
 func Test_Head_Tail_Nil_Arg_Safety(t *testing.T) {
 	var values []int
 
-	head := iter.NewHead(values)
+	head := slice.NewHead(values)
 
 	assert.False(t, head.HasNext())
 	assert.False(t, head.HasPrev())
@@ -273,7 +260,7 @@ func Test_Head_Tail_Nil_Arg_Safety(t *testing.T) {
 	assert.False(t, ok)
 	head.Cap()
 
-	tail := iter.NewTail(values)
+	tail := slice.NewTail(values)
 
 	assert.False(t, tail.HasNext())
 	assert.False(t, tail.HasPrev())
@@ -290,12 +277,12 @@ func Test_ForLoop(t *testing.T) {
 
 	expected := []int{1, 2, 3, 4, 5, 6, 7}
 	actual := []int{}
-	it := iter.NewHead(expected)
+	it := slice.NewHead(expected)
 	it.For(func(element int) error { actual = append(actual, element); return nil })
 	assert.Equal(t, expected, actual)
 
 	actual2 := []int{}
-	it = iter.NewHead(expected)
+	it = slice.NewHead(expected)
 	it.ForEach(func(element int) { actual2 = append(actual2, element) })
 	assert.Equal(t, expected, actual2)
 }

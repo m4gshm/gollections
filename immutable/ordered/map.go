@@ -16,7 +16,6 @@ import (
 	"github.com/m4gshm/gollections/notsafe"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/clone"
-	sliceIter "github.com/m4gshm/gollections/slice/iter"
 )
 
 // NewMapKV converts a slice of key/value pairs to the Map.
@@ -75,7 +74,7 @@ func (m Map[K, V]) Begin() c.KVIterator[K, V] {
 
 // Head creates iterator
 func (m Map[K, V]) Head() oMapIter.OrderedMapIter[K, V] {
-	return oMapIter.NewOrdered(m.elements, sliceIter.NewHeadS(m.order, m.ksize))
+	return oMapIter.NewOrdered(m.elements, slice.NewHeadS(m.order, m.ksize))
 }
 
 // First returns the first key/value pair of the map, an iterator to iterate over the remaining pair, and true\false marker of availability next pairs.
@@ -90,7 +89,7 @@ func (m Map[K, V]) First() (oMapIter.OrderedMapIter[K, V], K, V, bool) {
 
 // Tail creates an iterator pointing to the end of the map
 func (m Map[K, V]) Tail() oMapIter.OrderedMapIter[K, V] {
-	return oMapIter.NewOrdered(m.elements, sliceIter.NewTailS(m.order, m.ksize))
+	return oMapIter.NewOrdered(m.elements, slice.NewTailS(m.order, m.ksize))
 }
 
 // Map collects the key/value pairs to a map

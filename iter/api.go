@@ -7,7 +7,7 @@ import (
 	"github.com/m4gshm/gollections/check"
 	kvloop "github.com/m4gshm/gollections/kv/loop"
 	"github.com/m4gshm/gollections/loop"
-	sliceIter "github.com/m4gshm/gollections/slice/iter"
+	"github.com/m4gshm/gollections/slice"
 )
 
 // Of instantiates Iterator of predefined elements
@@ -21,8 +21,8 @@ func New[T any](elements []T) c.Iterator[T] {
 }
 
 // Wrap instantiates Iterator using a slice as the elements source
-func Wrap[TS ~[]T, T any](elements TS) *sliceIter.SliceIter[T] {
-	h := sliceIter.NewHead(elements)
+func Wrap[TS ~[]T, T any](elements TS) *slice.Iter[T] {
+	h := slice.NewHead(elements)
 	return &h
 }
 

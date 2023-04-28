@@ -144,7 +144,7 @@ func (v *Vector[T]) Get(index int) (t T, ok bool) {
 	if v == nil {
 		return
 	}
-	return slice.Get(*v, index)
+	return slice.Gett(*v, index)
 }
 
 // Add adds elements to the end of the vector

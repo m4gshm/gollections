@@ -4,11 +4,11 @@ import (
 	"fmt"
 
 	breakLoop "github.com/m4gshm/gollections/break/loop"
+	breakIter "github.com/m4gshm/gollections/break/slice/iter"
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/iter"
-	breakIter "github.com/m4gshm/gollections/break/slice/iter"
 )
 
 // WrapKeys instantiates MapKeys using the elements as internal storage
@@ -22,27 +22,27 @@ type MapKeysIter[K comparable] struct {
 }
 
 var (
-	_ c.Collection[int, *iter.SliceIter[int]] = (*MapKeysIter[int])(nil)
-	_ fmt.Stringer                            = (*MapKeysIter[int])(nil)
+	_ c.Collection[int, *slice.Iter[int]] = (*MapKeysIter[int])(nil)
+	_ fmt.Stringer                        = (*MapKeysIter[int])(nil)
 
-	_ c.Collection[int, *iter.SliceIter[int]] = MapKeysIter[int]{}
-	_ fmt.Stringer                            = MapKeysIter[int]{}
+	_ c.Collection[int, *slice.Iter[int]] = MapKeysIter[int]{}
+	_ fmt.Stringer                        = MapKeysIter[int]{}
 )
 
 // Begin creates iterator
-func (m MapKeysIter[K]) Begin() *iter.SliceIter[K] {
+func (m MapKeysIter[K]) Begin() *slice.Iter[K] {
 	h := m.Head()
 	return &h
 }
 
 // Head creates iterator
-func (m MapKeysIter[K]) Head() iter.SliceIter[K] {
-	return iter.NewHead(m.keys)
+func (m MapKeysIter[K]) Head() slice.Iter[K] {
+	return slice.NewHead(m.keys)
 }
 
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
-func (m MapKeysIter[K]) First() (iter.SliceIter[K], K, bool) {
+func (m MapKeysIter[K]) First() (slice.Iter[K], K, bool) {
 	var (
 		iterator  = m.Head()
 		first, ok = iterator.Next()
@@ -116,5 +116,5 @@ func (m MapKeysIter[K]) String() string {
 
 // Get returns an element by the index, otherwise, if the provided index is ouf of the collection len, returns zero T and false in the second result
 func (m MapKeysIter[K]) Get(index int) (K, bool) {
-	return slice.Get(m.keys, index)
+	return slice.Gett(m.keys, index)
 }

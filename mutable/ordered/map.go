@@ -16,7 +16,6 @@ import (
 	"github.com/m4gshm/gollections/map_/filter"
 	"github.com/m4gshm/gollections/notsafe"
 	"github.com/m4gshm/gollections/slice"
-	sliceIter "github.com/m4gshm/gollections/slice/iter"
 )
 
 // NewMapKV instantiates an ortered Map using a key/value slice
@@ -78,7 +77,7 @@ func (m *Map[K, V]) Head() oMapIter.OrderedMapIter[K, V] {
 		order = m.order
 		ksize = m.ksize
 	}
-	return oMapIter.NewOrdered(elements, sliceIter.NewHeadS(order, ksize))
+	return oMapIter.NewOrdered(elements, slice.NewHeadS(order, ksize))
 }
 
 // Tail creates an iterator pointing to the end of the collection
@@ -93,7 +92,7 @@ func (m *Map[K, V]) Tail() oMapIter.OrderedMapIter[K, V] {
 		order = m.order
 		ksize = m.ksize
 	}
-	return oMapIter.NewOrdered(elements, sliceIter.NewTailS(order, ksize))
+	return oMapIter.NewOrdered(elements, slice.NewTailS(order, ksize))
 }
 
 // First returns the first key/value pair of the map, an iterator to iterate over the remaining pair, and true\false marker of availability next pairs.

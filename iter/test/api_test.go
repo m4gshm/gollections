@@ -15,7 +15,6 @@ import (
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
-	sliceIter "github.com/m4gshm/gollections/slice/iter"
 )
 
 func Test_FilterAndConvert(t *testing.T) {
@@ -158,14 +157,14 @@ func Test_Iterate(t *testing.T) {
 		values[i] = i
 	}
 
-	stream := loop.Stream(sliceIter.New(values).Next)
+	stream := loop.Stream(slice.NewIter(values).Next)
 
 	result := make([]int, 0)
 
 	stream.ForEach(func(i int) { result = append(result, i) })
 
 	result = make([]int, 0)
-	iter.ForEach(iter.New(values), func(i int) { result = append(result, i) })
+	iter.ForEach[int](slice.NewIter(values), func(i int) { result = append(result, i) })
 
 	assert.Equal(t, values, result)
 
