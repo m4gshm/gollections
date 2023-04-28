@@ -15,7 +15,6 @@ func Benchmark_IsValidIndex(b *testing.B) {
 	}
 }
 
-
 func Benchmark_CanIterateByRange(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		r := slice.CanIterateByRange(slice.IterNoStarted, 5, 4)

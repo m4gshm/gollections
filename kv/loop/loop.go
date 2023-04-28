@@ -21,7 +21,7 @@ type KVIter[S, K, V any] struct {
 }
 
 var (
-	_ c.KVIterator[any, any]          = (*KVIter[any, any, any])(nil)
+	_ c.KVIterator[any, any] = (*KVIter[any, any, any])(nil)
 	_ c.KVIterator[any, any] = (*KVIter[any, any, any])(nil)
 )
 

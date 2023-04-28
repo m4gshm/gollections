@@ -14,7 +14,8 @@ import (
 )
 
 func Test_Collect_Group(t *testing.T) {
-	groups := kviter.Group(kviter.OfPairs(k.V(1, "1"), k.V(2, "2"), k.V(2, "22")))
+	pairs := kviter.OfPairs(k.V(1, "1"), k.V(2, "2"), k.V(2, "22"))
+	groups := kviter.Group[int, string](pairs)
 
 	assert.Equal(t, len(groups), 2)
 	assert.Equal(t, []string{"1"}, groups[1])
@@ -22,7 +23,7 @@ func Test_Collect_Group(t *testing.T) {
 }
 
 func Test_Collect_Map(t *testing.T) {
-	groups := loop.ToMap(kviter.FromPairs(iter.Of(k.V(1, "1"), k.V(2, "2"), k.V(2, "22"))).Next)
+	groups := loop.ToMap(kviter.FromPairs[int, string](iter.Of(k.V(1, "1"), k.V(2, "2"), k.V(2, "22"))).Next)
 
 	assert.Equal(t, len(groups), 2)
 	assert.Equal(t, "1", groups[1])

@@ -3,8 +3,8 @@ package group
 
 import (
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/kv/loop"
 	"github.com/m4gshm/gollections/iter"
+	"github.com/m4gshm/gollections/kv/loop"
 )
 
 // Of - group.Of synonym of the c.Group

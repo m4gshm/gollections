@@ -11,12 +11,12 @@ import (
 )
 
 // Of instantiates Iterator of predefined elements
-func Of[T any](elements ...T) c.Iterator[T] {
+func Of[T any](elements ...T) *slice.Iter[T] {
 	return New(elements)
 }
 
 // New instantiates Iterator using a slice as the elements source
-func New[T any](elements []T) c.Iterator[T] {
+func New[T any](elements []T) *slice.Iter[T] {
 	return Wrap(elements)
 }
 
@@ -65,7 +65,7 @@ func ToSlice[T any, I c.Iterator[T]](elements I) []T {
 }
 
 // Group transforms iterable elements to the MapPipe based on applying key extractor to the elements
-func Group[T any, K comparable](elements c.Iterator[T], by func(T) K) kvloop.StreamIter[K, T, map[K][]T] {
+func Group[T any, K comparable, I c.Iterator[T]](elements I, by func(T) K) kvloop.StreamIter[K, T, map[K][]T] {
 	return kvloop.Stream(loop.NewKeyValuer(elements.Next, by, as.Is[T]).Next, kvloop.Group[K, T])
 }
 
