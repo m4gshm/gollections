@@ -8,7 +8,6 @@ import (
 	"github.com/m4gshm/gollections/immutable"
 	"github.com/m4gshm/gollections/immutable/ordered"
 	"github.com/m4gshm/gollections/loop"
-	iter "github.com/m4gshm/gollections/loop"
 	breakLoop "github.com/m4gshm/gollections/loop/break/loop"
 )
 
@@ -46,15 +45,15 @@ func Conv[From, To comparable](collection immutable.Set[From], converter func(Fr
 }
 
 // Flatt returns a stream that converts the collection elements into slices and then flattens them to one level
-func Flatt[From, To comparable](s immutable.Set[From], by func(From) []To) c.Stream[To] {
+func Flatt[From, To comparable](s immutable.Set[From], flattener func(From) []To) c.Stream[To] {
 	h := s.Head()
-	f := iter.Flatt(h.Next, by)
+	f := loop.Flatt(h.Next, flattener)
 	return loop.Stream(f.Next)
 }
 
 // Flat returns a breakable stream that converts the collection elements into slices and then flattens them to one level
-func Flat[From, To comparable](s immutable.Set[From], by func(From) ([]To, error)) c.StreamBreakable[To] {
+func Flat[From, To comparable](s immutable.Set[From], flattener func(From) ([]To, error)) c.StreamBreakable[To] {
 	h := s.Head()
-	f := breakLoop.Flat(breakLoop.From(h.Next), by)
+	f := breakLoop.Flat(breakLoop.From(h.Next), flattener)
 	return breakLoop.Stream(f.Next)
 }
