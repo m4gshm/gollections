@@ -4,12 +4,12 @@ import (
 	"testing"
 
 	oMapIter "github.com/m4gshm/gollections/immutable/ordered/map_/iter"
-	"github.com/m4gshm/gollections/map_/iter"
+	"github.com/m4gshm/gollections/map_"
 	"github.com/stretchr/testify/assert"
 )
 
 func Test_Key_Zero_Safety(t *testing.T) {
-	var it iter.KeyIter[int, string]
+	var it map_.KeyIter[int, string]
 
 	_, ok := it.Next()
 	assert.False(t, ok)

@@ -7,7 +7,6 @@ import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_"
-	"github.com/m4gshm/gollections/map_/iter"
 	"github.com/m4gshm/gollections/slice"
 )
 
@@ -22,26 +21,26 @@ type MapKeys[K comparable, V any] struct {
 }
 
 var (
-	_ c.Collection[int, *iter.KeyIter[int, any]] = (*MapKeys[int, any])(nil)
+	_ c.Collection[int, *map_.KeyIter[int, any]] = (*MapKeys[int, any])(nil)
 	_ fmt.Stringer                               = (*MapKeys[int, any])(nil)
-	_ c.Collection[int, *iter.KeyIter[int, any]] = MapKeys[int, any]{}
+	_ c.Collection[int, *map_.KeyIter[int, any]] = MapKeys[int, any]{}
 	_ fmt.Stringer                               = MapKeys[int, any]{}
 )
 
 // Begin creates iterator
-func (m MapKeys[K, V]) Begin() *iter.KeyIter[K, V] {
+func (m MapKeys[K, V]) Begin() *map_.KeyIter[K, V] {
 	h := m.Head()
 	return &h
 }
 
 // Head creates iterator
-func (m MapKeys[K, V]) Head() iter.KeyIter[K, V] {
-	return iter.NewKey(m.elements)
+func (m MapKeys[K, V]) Head() map_.KeyIter[K, V] {
+	return map_.NewKeyIter(m.elements)
 }
 
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
-func (m MapKeys[K, V]) First() (iter.KeyIter[K, V], K, bool) {
+func (m MapKeys[K, V]) First() (map_.KeyIter[K, V], K, bool) {
 	var (
 		iterator  = m.Head()
 		first, ok = iterator.Next()

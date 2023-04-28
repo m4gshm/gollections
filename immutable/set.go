@@ -9,7 +9,6 @@ import (
 	"github.com/m4gshm/gollections/immutable/ordered"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_"
-	"github.com/m4gshm/gollections/map_/iter"
 	"github.com/m4gshm/gollections/slice"
 )
 
@@ -43,26 +42,26 @@ type Set[T comparable] struct {
 }
 
 var (
-	_ c.Set[int, *iter.KeyIter[int, struct{}]] = (*Set[int])(nil)
+	_ c.Set[int, *map_.KeyIter[int, struct{}]] = (*Set[int])(nil)
 	_ fmt.Stringer                             = (*Set[int])(nil)
-	_ c.Set[int, *iter.KeyIter[int, struct{}]] = Set[int]{}
+	_ c.Set[int, *map_.KeyIter[int, struct{}]] = Set[int]{}
 	_ fmt.Stringer                             = Set[int]{}
 )
 
 // Begin creates iterator
-func (s Set[T]) Begin() *iter.KeyIter[T, struct{}] {
+func (s Set[T]) Begin() *map_.KeyIter[T, struct{}] {
 	h := s.Head()
 	return &h
 }
 
 // Head creates iterator
-func (s Set[T]) Head() iter.KeyIter[T, struct{}] {
-	return iter.NewKey(s.elements)
+func (s Set[T]) Head() map_.KeyIter[T, struct{}] {
+	return map_.NewKeyIter(s.elements)
 }
 
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
-func (s Set[T]) First() (iter.KeyIter[T, struct{}], T, bool) {
+func (s Set[T]) First() (map_.KeyIter[T, struct{}], T, bool) {
 	var (
 		iterator  = s.Head()
 		first, ok = iterator.Next()

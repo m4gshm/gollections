@@ -1,5 +1,5 @@
 // Package iter provides map based iterator implementations
-package iter
+package map_
 
 import (
 	"unsafe"
@@ -9,8 +9,8 @@ import (
 	"github.com/m4gshm/gollections/op"
 )
 
-// New returns the KVIterator based on map elements
-func New[K comparable, V any](elements map[K]V) MapIter[K, V] {
+// NewIter returns the MapIter based on map elements
+func NewIter[K comparable, V any](elements map[K]V) Iter[K, V] {
 	hmap := *(*unsafe.Pointer)(unsafe.Pointer(&elements))
 	i := any(elements)
 	maptype := *(*unsafe.Pointer)(unsafe.Pointer(&i))
@@ -18,33 +18,33 @@ func New[K comparable, V any](elements map[K]V) MapIter[K, V] {
 	if hmap != nil {
 		iterator = new(hiter)
 	}
-	return MapIter[K, V]{maptype: maptype, hmap: hmap, size: len(elements), iterator: iterator}
+	return Iter[K, V]{maptype: maptype, hmap: hmap, size: len(elements), iterator: iterator}
 }
 
-// MapIter is the embedded map based Iterator implementation
-type MapIter[K comparable, V any] struct {
+// Iter is the embedded map based Iterator implementation
+type Iter[K comparable, V any] struct {
 	iterator *hiter
 	maptype  unsafe.Pointer
 	hmap     unsafe.Pointer
 	size     int
 }
 
-var _ c.KVIterator[int, any] = (*MapIter[int, any])(nil)
+var _ c.KVIterator[int, any] = (*Iter[int, any])(nil)
 
 // Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak
-func (i *MapIter[K, V]) Track(traker func(key K, value V) error) error {
+func (i *Iter[K, V]) Track(traker func(key K, value V) error) error {
 	return loop.Track(i.Next, traker)
 }
 
 // TrackEach takes all key, value pairs retrieved by the iterator
-func (i *MapIter[K, V]) TrackEach(traker func(key K, value V)) {
+func (i *Iter[K, V]) TrackEach(traker func(key K, value V)) {
 	loop.TrackEach(i.Next, traker)
 }
 
 // Next returns the next element.
 // The ok result indicates whether the element was returned by the iterator.
 // If ok == false, then the iteration must be completed.
-func (i *MapIter[K, V]) Next() (key K, value V, ok bool) {
+func (i *Iter[K, V]) Next() (key K, value V, ok bool) {
 	if i == nil {
 		return key, value, false
 	}
@@ -68,7 +68,7 @@ func (i *MapIter[K, V]) Next() (key K, value V, ok bool) {
 }
 
 // Cap returns the size of the map
-func (i *MapIter[K, V]) Cap() int {
+func (i *Iter[K, V]) Cap() int {
 	if i == nil {
 		return 0
 	}
@@ -112,14 +112,14 @@ func (h *hiter) initialized() bool {
 	return h.t != nil
 }
 
-// NewKey it the Key constructor.
-func NewKey[K comparable, V any](uniques map[K]V) KeyIter[K, V] {
-	return KeyIter[K, V]{MapIter: New(uniques)}
+// NewKeyIter instantiates a map keys iterator
+func NewKeyIter[K comparable, V any](uniques map[K]V) KeyIter[K, V] {
+	return KeyIter[K, V]{Iter: NewIter(uniques)}
 }
 
 // KeyIter is the Iterator implementation that provides iterating over keys of a key/value pairs iterator
 type KeyIter[K comparable, V any] struct {
-	MapIter[K, V]
+	Iter[K, V]
 }
 
 var (
@@ -141,49 +141,49 @@ func (i KeyIter[K, V]) ForEach(walker func(element K)) {
 // The ok result indicates whether the element was returned by the iterator.
 // If ok == false, then the iteration must be completed.
 func (i KeyIter[K, V]) Next() (K, bool) {
-	key, _, ok := i.MapIter.Next()
+	key, _, ok := i.Iter.Next()
 	return key, ok
 }
 
 // Cap returns the iterator capacity
 func (i KeyIter[K, V]) Cap() int {
-	return i.MapIter.Cap()
+	return i.Iter.Cap()
 }
 
 // NewVal is the Val constructor
-func NewVal[K comparable, V any](uniques map[K]V) ValIter[K, V] {
-	return ValIter[K, V]{MapIter: New(op.IfElse(uniques != nil, uniques, map[K]V{}))}
+func NewVal[K comparable, V any](uniques map[K]V) NewValIter[K, V] {
+	return NewValIter[K, V]{Iter: NewIter(op.IfElse(uniques != nil, uniques, map[K]V{}))}
 }
 
-// ValIter is the Iterator implementation that provides iterating over values of a key/value pairs iterator
-type ValIter[K comparable, V any] struct {
-	MapIter[K, V]
+// NewKeyIter instantiates a map values iterator
+type NewValIter[K comparable, V any] struct {
+	Iter[K, V]
 }
 
 var (
-	_ c.Iterator[any] = (*ValIter[int, any])(nil)
-	_ c.Iterator[any] = ValIter[int, any]{}
+	_ c.Iterator[any] = (*NewValIter[int, any])(nil)
+	_ c.Iterator[any] = NewValIter[int, any]{}
 )
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
-func (f ValIter[K, V]) For(walker func(element V) error) error {
+func (f NewValIter[K, V]) For(walker func(element V) error) error {
 	return loop.For(f.Next, walker)
 }
 
 // ForEach FlatIter all elements retrieved by the iterator
-func (f ValIter[K, V]) ForEach(walker func(element V)) {
+func (f NewValIter[K, V]) ForEach(walker func(element V)) {
 	loop.ForEach(f.Next, walker)
 }
 
 // Next returns the next element.
 // The ok result indicates whether the element was returned by the iterator.
 // If ok == false, then the iteration must be completed.
-func (i ValIter[K, V]) Next() (V, bool) {
-	_, val, ok := i.MapIter.Next()
+func (i NewValIter[K, V]) Next() (V, bool) {
+	_, val, ok := i.Iter.Next()
 	return val, ok
 }
 
 // Cap returns the size of the map
-func (i ValIter[K, V]) Cap() int {
-	return i.MapIter.Cap()
+func (i NewValIter[K, V]) Cap() int {
+	return i.Iter.Cap()
 }

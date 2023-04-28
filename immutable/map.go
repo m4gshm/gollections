@@ -13,7 +13,6 @@ import (
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/map_/convert"
 	"github.com/m4gshm/gollections/map_/filter"
-	"github.com/m4gshm/gollections/map_/iter"
 	"github.com/m4gshm/gollections/slice"
 )
 
@@ -61,13 +60,13 @@ func (m Map[K, V]) Begin() c.KVIterator[K, V] {
 }
 
 // Head creates iterator
-func (m Map[K, V]) Head() iter.MapIter[K, V] {
-	return iter.New(m.elements)
+func (m Map[K, V]) Head() map_.Iter[K, V] {
+	return map_.NewIter(m.elements)
 }
 
 // First returns the first key/value pair of the map, an iterator to iterate over the remaining pair, and true\false marker of availability next pairs.
 // If no more then ok==false.
-func (m Map[K, V]) First() (iter.MapIter[K, V], K, V, bool) {
+func (m Map[K, V]) First() (map_.Iter[K, V], K, V, bool) {
 	var (
 		iterator           = m.Head()
 		firstK, firstV, ok = iterator.Next()

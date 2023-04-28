@@ -7,7 +7,7 @@ import (
 	"github.com/m4gshm/gollections/immutable/set"
 	"github.com/m4gshm/gollections/immutable/vector"
 	"github.com/m4gshm/gollections/iter"
-	mapIter "github.com/m4gshm/gollections/map_/iter"
+	"github.com/m4gshm/gollections/map_"
 	moset "github.com/m4gshm/gollections/mutable/oset"
 	mvector "github.com/m4gshm/gollections/mutable/vector"
 	"github.com/m4gshm/gollections/ptr"
@@ -279,7 +279,7 @@ func Benchmark_Loop_NewKV_NextNextNext(b *testing.B) {
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				iterator := mapIter.New(values)
+				iterator := map_.NewIter(values)
 				for k, _, ok := iterator.Next(); ok; k, _, ok = iterator.Next() {
 					casee.load(k)
 				}

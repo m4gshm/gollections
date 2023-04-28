@@ -8,7 +8,6 @@ import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_"
-	"github.com/m4gshm/gollections/map_/iter"
 	"github.com/m4gshm/gollections/slice"
 )
 
@@ -23,27 +22,27 @@ type MapValues[K comparable, V any] struct {
 }
 
 var (
-	_ c.Collection[any, *iter.ValIter[int, any]] = (*MapValues[int, any])(nil)
-	_ fmt.Stringer                               = (*MapValues[int, any])(nil)
+	_ c.Collection[any, *map_.NewValIter[int, any]] = (*MapValues[int, any])(nil)
+	_ fmt.Stringer                                  = (*MapValues[int, any])(nil)
 
-	_ c.Collection[any, *iter.ValIter[int, any]] = MapValues[int, any]{}
-	_ fmt.Stringer                               = MapValues[int, any]{}
+	_ c.Collection[any, *map_.NewValIter[int, any]] = MapValues[int, any]{}
+	_ fmt.Stringer                                  = MapValues[int, any]{}
 )
 
 // Begin creates iterator
-func (m MapValues[K, V]) Begin() *iter.ValIter[K, V] {
+func (m MapValues[K, V]) Begin() *map_.NewValIter[K, V] {
 	h := m.Head()
 	return &h
 }
 
 // Head creates iterator
-func (m MapValues[K, V]) Head() iter.ValIter[K, V] {
-	return iter.NewVal(m.elements)
+func (m MapValues[K, V]) Head() map_.NewValIter[K, V] {
+	return map_.NewVal(m.elements)
 }
 
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
-func (m MapValues[K, V]) First() (iter.ValIter[K, V], V, bool) {
+func (m MapValues[K, V]) First() (map_.NewValIter[K, V], V, bool) {
 	var (
 		iterator  = m.Head()
 		first, ok = iterator.Next()
