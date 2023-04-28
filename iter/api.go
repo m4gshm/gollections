@@ -6,6 +6,7 @@ import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/check"
 	kvloop "github.com/m4gshm/gollections/kv/loop"
+	"github.com/m4gshm/gollections/kv/stream"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/slice"
 )
@@ -65,8 +66,8 @@ func ToSlice[T any, I c.Iterator[T]](elements I) []T {
 }
 
 // Group transforms iterable elements to the MapPipe based on applying key extractor to the elements
-func Group[T any, K comparable, I c.Iterator[T]](elements I, by func(T) K) kvloop.StreamIter[K, T, map[K][]T] {
-	return kvloop.Stream(loop.NewKeyValuer(elements.Next, by, as.Is[T]).Next, kvloop.Group[K, T])
+func Group[T any, K comparable, I c.Iterator[T]](elements I, by func(T) K) stream.Iter[K, T, map[K][]T] {
+	return stream.New(loop.NewKeyValuer(elements.Next, by, as.Is[T]).Next, kvloop.Group[K, T])
 }
 
 // ForEach applies the 'walker' function to elements of an Iterator

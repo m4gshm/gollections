@@ -9,6 +9,7 @@ import (
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/slice"
+	"github.com/m4gshm/gollections/stream"
 )
 
 // WrapVal instantiates MapValues using elements as internal storage.
@@ -99,9 +100,9 @@ func (m MapValuesIter[K, V]) Get(index int) (V, bool) {
 }
 
 // Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function
-func (m MapValuesIter[K, V]) Filter(filter func(V) bool) loop.StreamIter[V] {
+func (m MapValuesIter[K, V]) Filter(filter func(V) bool) stream.Iter[V] {
 	h := m.Head()
-	return loop.Stream(loop.Filter(h.Next, filter).Next)
+	return stream.New(loop.Filter(h.Next, filter).Next)
 }
 
 // Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function
@@ -111,9 +112,9 @@ func (m MapValuesIter[K, V]) Filt(filter func(V) (bool, error)) breakLoop.Stream
 }
 
 // Convert returns a stream that applies the 'converter' function to the collection elements
-func (m MapValuesIter[K, V]) Convert(converter func(V) V) loop.StreamIter[V] {
+func (m MapValuesIter[K, V]) Convert(converter func(V) V) stream.Iter[V] {
 	h := m.Head()
-	return loop.Stream(loop.Convert(h.Next, converter).Next)
+	return stream.New(loop.Convert(h.Next, converter).Next)
 }
 
 // Convert returns a stream that applies the 'converter' function to the collection elements

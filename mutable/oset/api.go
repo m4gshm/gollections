@@ -5,6 +5,7 @@ import (
 	breakLoop "github.com/m4gshm/gollections/break/loop"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/mutable/ordered"
+	"github.com/m4gshm/gollections/stream"
 )
 
 // Of instantiates Set with predefined elements.
@@ -28,9 +29,9 @@ func NewCap[T comparable](capacity int) *ordered.Set[T] {
 }
 
 // Convert returns a stream that applies the 'converter' function to the collection elements
-func Convert[From, To comparable](collection *ordered.Set[From], converter func(From) To) loop.StreamIter[To] {
+func Convert[From, To comparable](collection *ordered.Set[From], converter func(From) To) stream.Iter[To] {
 	h := collection.Head()
-	return loop.Stream(loop.Convert(h.Next, converter).Next)
+	return stream.New(loop.Convert(h.Next, converter).Next)
 }
 
 // Conv returns a breakable stream that applies the 'converter' function to the collection elements
@@ -40,10 +41,10 @@ func Conv[From, To comparable](collection *ordered.Set[From], converter func(Fro
 }
 
 // Flatt returns a stream that converts the collection elements into slices and then flattens them to one level
-func Flatt[From, To comparable](s *ordered.Set[From], flattener func(From) []To) loop.StreamIter[To] {
+func Flatt[From, To comparable](s *ordered.Set[From], flattener func(From) []To) stream.Iter[To] {
 	h := s.Head()
 	f := loop.Flatt(h.Next, flattener)
-	return loop.Stream(f.Next)
+	return stream.New(f.Next)
 }
 
 // Flat returns a breakable stream that converts the collection elements into slices and then flattens them to one level

@@ -15,6 +15,7 @@ import (
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
+	"github.com/m4gshm/gollections/stream"
 )
 
 func Test_FilterAndConvert(t *testing.T) {
@@ -157,7 +158,7 @@ func Test_Iterate(t *testing.T) {
 		values[i] = i
 	}
 
-	stream := loop.Stream(slice.NewIter(values).Next)
+	stream := stream.New(slice.NewIter(values).Next)
 
 	result := make([]int, 0)
 

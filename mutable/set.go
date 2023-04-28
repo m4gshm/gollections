@@ -11,6 +11,7 @@ import (
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/mutable/ordered"
 	"github.com/m4gshm/gollections/slice"
+	"github.com/m4gshm/gollections/stream"
 )
 
 // NewSetCap creates a set with a predefined capacity.
@@ -243,9 +244,9 @@ func (s *Set[T]) ForEach(walker func(T)) {
 }
 
 // Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function
-func (s *Set[T]) Filter(predicate func(T) bool) loop.StreamIter[T] {
+func (s *Set[T]) Filter(predicate func(T) bool) stream.Iter[T] {
 	h := s.Head()
-	return loop.Stream(iter.Filter(h.Next, predicate).Next)
+	return stream.New(iter.Filter(h.Next, predicate).Next)
 }
 
 // Filt returns a stream consisting of elements that satisfy the condition of the 'predicate' function
@@ -255,9 +256,9 @@ func (s Set[T]) Filt(predicate func(T) (bool, error)) breakLoop.StreamIter[T] {
 }
 
 // Convert returns a stream that applies the 'converter' function to the collection elements
-func (s *Set[T]) Convert(converter func(T) T) loop.StreamIter[T] {
+func (s *Set[T]) Convert(converter func(T) T) stream.Iter[T] {
 	h := s.Head()
-	return loop.Stream(loop.Convert(h.Next, converter).Next)
+	return stream.New(loop.Convert(h.Next, converter).Next)
 }
 
 // Convert returns a stream that applies the 'converter' function to the collection elements

@@ -6,6 +6,7 @@ import (
 	"github.com/m4gshm/gollections/iter"
 	kvLoop "github.com/m4gshm/gollections/kv/loop"
 	"github.com/m4gshm/gollections/kv/loop/group"
+	"github.com/m4gshm/gollections/kv/stream"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_/filter"
 )
@@ -37,12 +38,12 @@ func Group[K comparable, V any, I c.KVIterator[K, V]](it I) map[K][]V {
 
 // Map instantiates key/value iterator that converts elements with a converter and returns them
 func Map[K comparable, V any, KOUT comparable, VOUT any](elements c.KVIterator[K, V], by func(K, V) (KOUT, VOUT)) c.KVStream[KOUT, VOUT, map[KOUT]VOUT] {
-	return kvLoop.Stream(kvLoop.Convert(elements.Next, by).Next, kvLoop.ToMap[KOUT, VOUT])
+	return stream.New(kvLoop.Convert(elements.Next, by).Next, kvLoop.ToMap[KOUT, VOUT])
 }
 
 // Filter instantiates key/value iterator that iterates only over filtered elements
 func Filter[K comparable, V any, IT c.KVIterator[K, V]](elements IT, filter func(K, V) bool) c.KVStream[K, V, map[K]V] {
-	return kvLoop.Stream(kvLoop.Filter(elements.Next, filter).Next, kvLoop.ToMap[K, V])
+	return stream.New(kvLoop.Filter(elements.Next, filter).Next, kvLoop.ToMap[K, V])
 }
 
 // FilterKey instantiates key/value iterator that iterates only over elements that filtered by the key

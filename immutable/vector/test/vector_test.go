@@ -10,8 +10,8 @@ import (
 	"github.com/m4gshm/gollections/immutable/vector"
 	"github.com/m4gshm/gollections/iter"
 	"github.com/m4gshm/gollections/iterable"
-	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/slice"
+	"github.com/m4gshm/gollections/stream"
 )
 
 func Test_Vector_From(t *testing.T) {
@@ -117,8 +117,8 @@ func Test_Vector_Flatt(t *testing.T) {
 	var (
 		deepInts    = vector.Of(vector.Of(3, 1), vector.Of(5, 6, 8, 0, -2))
 		ints        = vector.Flatt(deepInts, immutable.Vector[int].Slice)
-		c           = iterable.Convert[loop.StreamIter[int]](ints, strconv.Itoa)
-		stringsPipe = iterable.Filter[loop.StreamIter[string]](c.Filter(func(s string) bool { return len(s) == 1 }), func(s string) bool { return len(s) == 1 })
+		c           = iterable.Convert[stream.Iter[int]](ints, strconv.Itoa)
+		stringsPipe = iterable.Filter[stream.Iter[string]](c.Filter(func(s string) bool { return len(s) == 1 }), func(s string) bool { return len(s) == 1 })
 	)
 	assert.Equal(t, slice.Of("3", "1", "5", "6", "8", "0"), stringsPipe.Slice())
 }
@@ -127,7 +127,7 @@ func Test_Vector_DoubleConvert(t *testing.T) {
 	var (
 		ints               = vector.Of(3, 1, 5, 6, 8, 0, -2)
 		stringsPipe        = vector.Convert(ints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 })
-		prefixedStrinsPipe = iterable.Convert[loop.StreamIter[string]](stringsPipe, func(s string) string { return "_" + s })
+		prefixedStrinsPipe = iterable.Convert[stream.Iter[string]](stringsPipe, func(s string) string { return "_" + s })
 	)
 	assert.Equal(t, slice.Of("_3", "_1", "_5", "_6", "_8", "_0"), prefixedStrinsPipe.Slice())
 

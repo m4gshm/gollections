@@ -9,6 +9,7 @@ import (
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/notsafe"
 	"github.com/m4gshm/gollections/slice"
+	"github.com/m4gshm/gollections/stream"
 )
 
 // NewSet instantiates Set and copies elements to it.
@@ -117,9 +118,9 @@ func (s Set[T]) ForEach(walker func(T)) {
 }
 
 // Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function
-func (s Set[T]) Filter(predicate func(T) bool) loop.StreamIter[T] {
+func (s Set[T]) Filter(predicate func(T) bool) stream.Iter[T] {
 	h := s.Head()
-	return loop.Stream(loop.Filter(h.Next, predicate).Next)
+	return stream.New(loop.Filter(h.Next, predicate).Next)
 }
 
 // Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function
@@ -129,9 +130,9 @@ func (s Set[T]) Filt(predicate func(T) (bool, error)) breakLoop.StreamIter[T] {
 }
 
 // Convert returns a stream that applies the 'converter' function to the collection elements
-func (s Set[T]) Convert(converter func(T) T) loop.StreamIter[T] {
+func (s Set[T]) Convert(converter func(T) T) stream.Iter[T] {
 	h := s.Head()
-	return loop.Stream(loop.Convert(h.Next, converter).Next)
+	return stream.New(loop.Convert(h.Next, converter).Next)
 }
 
 // Convert returns a stream that applies the 'converter' function to the collection elements

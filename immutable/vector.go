@@ -9,6 +9,7 @@ import (
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/notsafe"
 	"github.com/m4gshm/gollections/slice"
+	"github.com/m4gshm/gollections/stream"
 )
 
 // NewVector instantiates Vector and copies elements to it.
@@ -112,9 +113,9 @@ func (v Vector[T]) ForEach(walker func(T)) {
 }
 
 // Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function
-func (v Vector[T]) Filter(filter func(T) bool) loop.StreamIter[T] {
+func (v Vector[T]) Filter(filter func(T) bool) stream.Iter[T] {
 	h := v.Head()
-	return loop.Stream(loop.Filter(h.Next, filter).Next)
+	return stream.New(loop.Filter(h.Next, filter).Next)
 }
 
 // Filt returns a stream consisting of elements that satisfy the condition of the 'predicate' function
@@ -124,9 +125,9 @@ func (v Vector[T]) Filt(predicate func(T) (bool, error)) breakLoop.StreamIter[T]
 }
 
 // Convert returns a stream that applies the 'converter' function to the collection elements
-func (v Vector[T]) Convert(converter func(T) T) loop.StreamIter[T] {
+func (v Vector[T]) Convert(converter func(T) T) stream.Iter[T] {
 	h := v.Head()
-	return loop.Stream(loop.Convert(h.Next, converter).Next)
+	return stream.New(loop.Convert(h.Next, converter).Next)
 }
 
 // Convert returns a stream that applies the 'converter' function to the collection elements
