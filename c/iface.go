@@ -11,11 +11,11 @@ import (
 var ErrBreak = errors.New("Break")
 
 // Vector - collection interface that provides elements order and access by index to the elements.
-type Vector[T any] interface {
-	Collection[T]
+type Vector[T, I any] interface {
+	Collection[T, I]
 
-	TrackLoop[T, int]
-	TrackEachLoop[T, int]
+	TrackLoop[int, T]
+	TrackEachLoop[int, T]
 
 	Access[int, T]
 
@@ -24,8 +24,8 @@ type Vector[T any] interface {
 }
 
 // Set - collection interface that ensures the uniqueness of elements (does not insert duplicate values).
-type Set[T any] interface {
-	Collection[T]
+type Set[T, I any] interface {
+	Collection[T, I]
 	Checkable[T]
 
 	Len() int
@@ -38,36 +38,41 @@ type Map[K comparable, V any] interface {
 	Checkable[K]
 	Access[K, V]
 
-	Keys() Collection[K]
-	Values() Collection[V]
-
 	Len() int
 	IsEmpty() bool
 }
 
+type KeyVal[Keys any, Vals any] interface {
+	Keys() Keys
+	Values() Vals
+}
+
 // Collection is the base interface of non-associative collections
-type Collection[T any] interface {
-	Iterable[T]
+type Collection[T, I any] interface {
+	Iterable[I]
 	ForLoop[T]
 	ForEachLoop[T]
 	SliceFactory[T]
-
-	Filter(predicate func(T) bool) Stream[T]
-	Filt(predicate func(T) (bool, error)) StreamBreakable[T]
-
-	Convert(converter func(T) T) Stream[T]
-	Conv(converter func(T) (T, error)) StreamBreakable[T]
 
 	Reduce(merger func(T, T) T) T
 	HasAny(predicate func(T) bool) bool
 }
 
+type Filterable[T, Stream, StreamBreakable any] interface {
+	Filter(predicate func(T) bool) Stream
+	Filt(predicate func(T) (bool, error)) StreamBreakable
+}
+
+type Convertrable[T, Stream, StreamBreakable any] interface {
+	Convert(converter func(T) T) Stream
+	Conv(converter func(T) (T, error)) StreamBreakable
+}
+
 // KVCollection is the base interface of associative collections
 type KVCollection[K comparable, V any, M map[K]V | map[K][]V] interface {
-	TrackLoop[V, K]
-	TrackEachLoop[V, K]
+	TrackLoop[K, V]
+	TrackEachLoop[K, V]
 	KVIterable[K, V]
-	KVTransformable[K, V, M]
 	MapFactory[K, V, M]
 
 	Reduce(merger func(K, V, K, V) (K, V)) (K, V)
@@ -130,8 +135,8 @@ type KVIterator[K, V any] interface {
 	// The ok result indicates whether the element was returned by the iterator.
 	// If ok == false, then the iteration must be completed.
 	Next() (key K, value V, ok bool)
-	TrackLoop[V, K]
-	TrackEachLoop[V, K]
+	TrackLoop[K, V]
+	TrackEachLoop[K, V]
 }
 
 // KVIteratorBreakable provides iterate over key/value pairs, where an iteration can be interrupted by an error
@@ -140,12 +145,12 @@ type KVIteratorBreakable[K, V any] interface {
 	// The ok result indicates whether the element was returned by the iterator.
 	// If ok == false, then the iteration must be completed.
 	Next() (key K, value V, ok bool, err error)
-	TrackLoop[V, K]
+	TrackLoop[K, V]
 }
 
 // Iterable is an iterator supplier interface
-type Iterable[T any] interface {
-	Begin() Iterator[T]
+type Iterable[I any] interface {
+	Begin() I
 }
 
 // KVIterable is an iterator supplier interface
@@ -166,13 +171,13 @@ type ForEachLoop[T any] interface {
 }
 
 // TrackLoop is the interface of a collection that provides traversing of the elements with position tracking (index, key, coordinates, etc.).
-type TrackLoop[T any, P any] interface {
+type TrackLoop[P any, T any] interface {
 	// return ErrBreak for loop breaking
 	Track(func(position P, element T) error) error
 }
 
 // TrackEachLoop is the interface of a collection that provides traversing of the elements with position tracking (index, key, coordinates, etc.) without error checking
-type TrackEachLoop[T any, P any] interface {
+type TrackEachLoop[P any, T any] interface {
 	TrackEach(func(position P, element T))
 }
 
@@ -182,23 +187,23 @@ type Checkable[T any] interface {
 }
 
 // Stream is collection or stream of elements in transformation state.
-type Stream[T any] interface {
+type Stream[T, I any] interface {
 	Iterator[T]
-	Collection[T]
+	Collection[T, I]
 }
 
 // StreamBreakable is collection or stream of elements in transformation state.
 // It supports interrupting on an error that may occur in intermediate or final executor functions.
-type StreamBreakable[T any] interface {
+type StreamBreakable[T, I any] interface {
 	IteratorBreakable[T]
-	Begin() IteratorBreakable[T]
+	Begin() I
 
 	Slice() ([]T, error)
 
-	Filt(predicate func(T) (bool, error)) StreamBreakable[T]
-	Filter(predicate func(T) bool) StreamBreakable[T]
-	Conv(converter func(T) (T, error)) StreamBreakable[T]
-	Convert(converter func(T) T) StreamBreakable[T]
+	// Filt(predicate func(T) (bool, error)) StreamBreakable[T]
+	// Filter(predicate func(T) bool) StreamBreakable[T]
+	// Conv(converter func(T) (T, error)) StreamBreakable[T]
+	// Convert(converter func(T) T) StreamBreakable[T]
 
 	Reduce(merger func(T, T) (T, error)) (T, error)
 	HasAny(predicate func(T) (bool, error)) (bool, error)
@@ -206,22 +211,24 @@ type StreamBreakable[T any] interface {
 
 // KVTransformable provides limited kit of map transformation methods.
 // The full kit of transformer functions are in the package 'c/map_'
-type KVTransformable[K comparable, V any, Map map[K]V | map[K][]V] interface {
-	Filter(predicate func(K, V) bool) KVStream[K, V, Map]
-	FilterKey(predicate func(K) bool) KVStream[K, V, Map]
-	FilterValue(predicate func(V) bool) KVStream[K, V, Map]
+type KVTransformable[K, V, KVStream, KVStreamBreakable any] interface {
+	Filter(predicate func(K, V) bool) KVStream
+	Filt(predicate func(K, V) (bool, error)) KVStreamBreakable
 
-	Filt(predicate func(K, V) (bool, error)) KVStreamBreakable[K, V, Map]
-	FiltKey(predicate func(K) (bool, error)) KVStreamBreakable[K, V, Map]
-	FiltValue(predicate func(V) (bool, error)) KVStreamBreakable[K, V, Map]
+	FilterKey(predicate func(K) bool) KVStream
+	FilterValue(predicate func(V) bool) KVStream
 
-	Convert(converter func(K, V) (K, V)) KVStream[K, V, Map]
-	ConvertKey(converter func(K) K) KVStream[K, V, Map]
-	ConvertValue(converter func(V) V) KVStream[K, V, Map]
+	FiltKey(predicate func(K) (bool, error)) KVStreamBreakable
+	FiltValue(predicate func(V) (bool, error)) KVStreamBreakable
 
-	Conv(converter func(K, V) (K, V, error)) KVStreamBreakable[K, V, Map]
-	ConvKey(converter func(K) (K, error)) KVStreamBreakable[K, V, Map]
-	ConvValue(converter func(V) (V, error)) KVStreamBreakable[K, V, Map]
+	Convert(converter func(K, V) (K, V)) KVStream
+	Conv(converter func(K, V) (K, V, error)) KVStreamBreakable
+
+	ConvertKey(converter func(K) K) KVStream
+	ConvertValue(converter func(V) V) KVStream
+
+	ConvKey(converter func(K) (K, error)) KVStreamBreakable
+	ConvValue(converter func(V) (V, error)) KVStreamBreakable
 }
 
 // KVStream is map or key/value stream of elements in transformation state.
@@ -235,13 +242,13 @@ type KVStreamBreakable[K comparable, V any, Map map[K]V | map[K][]V] interface {
 	KVIteratorBreakable[K, V]
 	Begin() KVIteratorBreakable[K, V]
 
-	Filter(predicate func(K, V) bool) KVStreamBreakable[K, V, Map]
-	FilterKey(predicate func(K) bool) KVStreamBreakable[K, V, Map]
-	FilterValue(predicate func(V) bool) KVStreamBreakable[K, V, Map]
+	// Filter(predicate func(K, V) bool) KVStreamBreakable[K, V, Map]
+	// FilterKey(predicate func(K) bool) KVStreamBreakable[K, V, Map]
+	// FilterValue(predicate func(V) bool) KVStreamBreakable[K, V, Map]
 
-	Filt(predicate func(K, V) (bool, error)) KVStreamBreakable[K, V, Map]
-	FiltKey(predicate func(K) (bool, error)) KVStreamBreakable[K, V, Map]
-	FiltValue(predicate func(V) (bool, error)) KVStreamBreakable[K, V, Map]
+	// Filt(predicate func(K, V) (bool, error)) KVStreamBreakable[K, V, Map]
+	// FiltKey(predicate func(K) (bool, error)) KVStreamBreakable[K, V, Map]
+	// FiltValue(predicate func(V) (bool, error)) KVStreamBreakable[K, V, Map]
 
 	Map() (Map, error)
 
@@ -271,13 +278,13 @@ type AddableNew[T any] interface {
 }
 
 // AddableAll provides appending the collection by elements retrieved from another collection
-type AddableAll[T any] interface {
-	AddAll(Iterable[T])
+type AddableAll[Iterable any] interface {
+	AddAll(Iterable)
 }
 
 // AddableAllNew provides appending the collection by elements retrieved from another collection
-type AddableAllNew[T any] interface {
-	AddAllNew(Iterable[T]) bool
+type AddableAllNew[Iterable any] interface {
+	AddAllNew(Iterable) bool
 }
 
 // Settable provides element insertion or replacement by its pointer (index or key).
@@ -291,8 +298,8 @@ type SettableNew[P any, V any] interface {
 }
 
 // SettableMap provides element insertion or replacement with an equal key element of a map.
-type SettableMap[K comparable, V any] interface {
-	SetMap(m Map[K, V])
+type SettableMap[Map any] interface {
+	SetMap(m Map)
 }
 
 // Deleteable provides removing any elements from the collection.
@@ -308,7 +315,7 @@ type DeleteableVerify[k any] interface {
 }
 
 // ImmutableMapConvert provides converting to an immutable map instance.
-type ImmutableMapConvert[K comparable, V any, M Map[K, V]] interface {
+type ImmutableMapConvert[M any] interface {
 	Immutable() M
 }
 

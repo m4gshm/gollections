@@ -31,18 +31,18 @@ func WrapVector[T any](elements []T) *Vector[T] {
 type Vector[T any] []T
 
 var (
-	_ c.Addable[any]          = (*Vector[any])(nil)
-	_ c.AddableAll[any]       = (*Vector[any])(nil)
-	_ c.Deleteable[int]       = (*Vector[any])(nil)
-	_ c.DeleteableVerify[int] = (*Vector[any])(nil)
-	_ c.Settable[int, any]    = (*Vector[any])(nil)
-	_ c.SettableNew[int, any] = (*Vector[any])(nil)
-	_ c.Vector[any]           = (*Vector[any])(nil)
-	_ fmt.Stringer            = (*Vector[any])(nil)
+	_ c.Addable[any]                              = (*Vector[any])(nil)
+	_ c.AddableAll[c.ForEachLoop[any]]            = (*Vector[any])(nil)
+	_ c.Deleteable[int]                           = (*Vector[any])(nil)
+	_ c.DeleteableVerify[int]                     = (*Vector[any])(nil)
+	_ c.Settable[int, any]                        = (*Vector[any])(nil)
+	_ c.SettableNew[int, any]                     = (*Vector[any])(nil)
+	_ c.Vector[any, *SliceIter[Vector[any], any]] = (*Vector[any])(nil)
+	_ fmt.Stringer                                = (*Vector[any])(nil)
 )
 
 // Begin creates iterator
-func (v *Vector[T]) Begin() c.Iterator[T] {
+func (v *Vector[T]) Begin() *SliceIter[Vector[T], T] {
 	h := v.Head()
 	return &h
 }
@@ -162,9 +162,9 @@ func (v *Vector[T]) AddOne(element T) {
 }
 
 // AddAll inserts all elements from the "other" collection
-func (v *Vector[T]) AddAll(elements c.Iterable[T]) {
+func (v *Vector[T]) AddAll(other c.ForEachLoop[T]) {
 	if v != nil {
-		*v = append(*v, loop.ToSlice(elements.Begin().Next)...)
+		other.ForEach(func(element T) { *v = append(*v, element) })
 	}
 }
 
@@ -273,25 +273,25 @@ func (v *Vector[T]) SetNew(index int, value T) bool {
 }
 
 // Filter returns a stream consisting of vector elements matching the filter
-func (v *Vector[T]) Filter(filter func(T) bool) c.Stream[T] {
+func (v *Vector[T]) Filter(filter func(T) bool) loop.StreamIter[T] {
 	h := v.Head()
 	return loop.Stream(loop.Filter(h.Next, filter).Next)
 }
 
 // Filt returns a stream consisting of elements that satisfy the condition of the 'predicate' function
-func (v *Vector[T]) Filt(predicate func(T) (bool, error)) c.StreamBreakable[T] {
+func (v *Vector[T]) Filt(predicate func(T) (bool, error)) breakLoop.StreamIter[T] {
 	h := v.Head()
 	return breakLoop.Stream(breakLoop.Filt(breakLoop.From(h.Next), predicate).Next)
 }
 
 // Convert returns a stream that applies the 'converter' function to the collection elements
-func (v *Vector[T]) Convert(converter func(T) T) c.Stream[T] {
+func (v *Vector[T]) Convert(converter func(T) T) loop.StreamIter[T] {
 	h := v.Head()
 	return loop.Stream(loop.Convert(h.Next, converter).Next)
 }
 
 // Convert returns a stream that applies the 'converter' function to the collection elements
-func (v *Vector[T]) Conv(converter func(T) (T, error)) c.StreamBreakable[T] {
+func (v *Vector[T]) Conv(converter func(T) (T, error)) breakLoop.StreamIter[T] {
 	h := v.Head()
 	return breakLoop.Stream(breakLoop.Conv(breakLoop.From(h.Next), converter).Next)
 }

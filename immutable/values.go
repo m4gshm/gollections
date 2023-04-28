@@ -23,15 +23,15 @@ type MapValues[K comparable, V any] struct {
 }
 
 var (
-	_ c.Collection[any] = (*MapValues[int, any])(nil)
-	_ fmt.Stringer      = (*MapValues[int, any])(nil)
+	_ c.Collection[any, *iter.ValIter[int, any]] = (*MapValues[int, any])(nil)
+	_ fmt.Stringer                               = (*MapValues[int, any])(nil)
 
-	_ c.Collection[any] = MapValues[int, any]{}
-	_ fmt.Stringer      = MapValues[int, any]{}
+	_ c.Collection[any, *iter.ValIter[int, any]] = MapValues[int, any]{}
+	_ fmt.Stringer                               = MapValues[int, any]{}
 )
 
 // Begin creates iterator
-func (m MapValues[K, V]) Begin() c.Iterator[V] {
+func (m MapValues[K, V]) Begin() *iter.ValIter[K, V] {
 	h := m.Head()
 	return &h
 }
@@ -77,25 +77,25 @@ func (m MapValues[K, V]) ForEach(walker func(V)) {
 }
 
 // Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function
-func (m MapValues[K, V]) Filter(filter func(V) bool) c.Stream[V] {
+func (m MapValues[K, V]) Filter(filter func(V) bool) loop.StreamIter[V] {
 	h := m.Head()
 	return loop.Stream(loop.Filter(h.Next, filter).Next)
 }
 
 // Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function
-func (m MapValues[K, V]) Filt(filter func(V) (bool, error)) c.StreamBreakable[V] {
+func (m MapValues[K, V]) Filt(filter func(V) (bool, error)) breakLoop.StreamIter[V] {
 	h := m.Head()
 	return breakLoop.Stream(breakLoop.Filt(breakLoop.From(h.Next), filter).Next)
 }
 
 // Convert returns a stream that applies the 'converter' function to the collection elements
-func (m MapValues[K, V]) Convert(converter func(V) V) c.Stream[V] {
+func (m MapValues[K, V]) Convert(converter func(V) V) loop.StreamIter[V] {
 	h := m.Head()
 	return loop.Stream(loop.Convert(h.Next, converter).Next)
 }
 
 // Convert returns a stream that applies the 'converter' function to the collection elements
-func (m MapValues[K, V]) Conv(converter func(V) (V, error)) c.StreamBreakable[V] {
+func (m MapValues[K, V]) Conv(converter func(V) (V, error)) breakLoop.StreamIter[V] {
 	h := m.Head()
 	return breakLoop.Stream(breakLoop.Conv(breakLoop.From(h.Next), converter).Next)
 }

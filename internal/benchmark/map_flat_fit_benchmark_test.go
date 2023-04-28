@@ -130,7 +130,7 @@ func Benchmark_Convert_Iterator(b *testing.B) {
 	var s []string
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		s = iter.ToSlice(iter.Convert(iter.Of(values...), op))
+		s = iter.ToSlice[string](iter.Convert(iter.Of(values...), op))
 	}
 	_ = s
 	b.StopTimer()
@@ -165,7 +165,7 @@ func Benchmark_Convert_Vector_Iterator(b *testing.B) {
 	var s []string
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		s = iterable.Convert(items, concat).Slice()
+		s = iterable.Convert[*sliceIter.SliceIter[int]](items, concat).Slice()
 	}
 	_ = s
 
@@ -177,7 +177,7 @@ func Benchmark_Convert_Vector_Iterator_No_Cache_Operation(b *testing.B) {
 	var s []string
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		s = iterable.Convert(items, convert.And(toString, addTail)).Slice()
+		s = iterable.Convert[*sliceIter.SliceIter[int]](items, convert.And(toString, addTail)).Slice()
 	}
 	_ = s
 	b.StopTimer()
@@ -220,7 +220,7 @@ func Benchmark_ConvertAndFilter_Iterable(b *testing.B) {
 	var s []string
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		s = iter.ToSlice(iter.Convert(iter.Filter(iter.Wrap(items), even), convert.And(toString, addTail)))
+		s = iter.ToSlice[string](iter.Convert(iter.Filter(iter.Wrap(items), even), convert.And(toString, addTail)))
 	}
 	_ = s
 
@@ -256,7 +256,7 @@ func Benchmark_ConvertAndFilter_Slice_Iterated(b *testing.B) {
 	var s []string
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		s = iter.ToSlice(iter.Convert(sliceit.Filter(items, even), convert.And(toString, addTail)))
+		s = iter.ToSlice[string](iter.Convert(sliceit.Filter(items, even), convert.And(toString, addTail)))
 	}
 	_ = s
 
@@ -313,7 +313,7 @@ func Benchmark_FilterAndConvert_Iterable(b *testing.B) {
 	var s []string
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		s = iter.ToSlice(iter.FilterAndConvert(iter.Wrap(items), even, convert.And(toString, addTail)))
+		s = iter.ToSlice[string](iter.FilterAndConvert(iter.Wrap(items), even, convert.And(toString, addTail)))
 
 	}
 	_ = s
@@ -367,7 +367,7 @@ func Benchmark_FilterAndConvert_Slice(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		f := sliceit.FilterAndConvert(items, even, convert.And(toString, addTail))
-		s = iter.ToSlice(f)
+		s = iter.ToSlice[string](f)
 	}
 	_ = s
 
@@ -397,7 +397,7 @@ func Benchmark_Flatt_Iterable(b *testing.B) {
 	multiDimension := [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		oneDimension := iter.ToSlice(iter.Filter(iter.Flatt(iter.Flatt(iter.Wrap(multiDimension), convert.To[[][]int]), convert.To[[]int]), odds))
+		oneDimension := iter.ToSlice[int](iter.Filter(iter.Flatt(iter.Flatt(iter.Wrap(multiDimension), convert.To[[][]int]), convert.To[[]int]), odds))
 		_ = oneDimension
 	}
 	b.StopTimer()
@@ -423,7 +423,7 @@ func Benchmark_Flatt_Slice_Iterated(b *testing.B) {
 	multiDimension := [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		oneDimension := iter.ToSlice(iter.Filter(iter.Flatt(sliceit.Flatt(multiDimension, convert.To[[][]int]), convert.To[[]int]), odds))
+		oneDimension := iter.ToSlice[int](iter.Filter(iter.Flatt(sliceit.Flatt(multiDimension, convert.To[[][]int]), convert.To[[]int]), odds))
 		_ = oneDimension
 	}
 	b.StopTimer()
@@ -600,7 +600,7 @@ func Benchmark_ConvertFlattStructure_IterableNotNil(b *testing.B) {
 	items := []*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_ = iter.ToSlice(iter.Convert(iter.NotNil[Attributes](iter.Flatt(iter.NotNil[Participant](iter.Wrap(items)), (*Participant).GetAttributes)), (*Attributes).GetName))
+		_ = iter.ToSlice[string](iter.Convert(iter.NotNil[Attributes](iter.Flatt(iter.NotNil[Participant](iter.Wrap(items)), (*Participant).GetAttributes)), (*Attributes).GetName))
 	}
 	b.StopTimer()
 }
@@ -609,7 +609,7 @@ func Benchmark_ConvertFlattStructure_IterableWithoutNotNilFiltering(b *testing.B
 	items := []*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_ = iter.ToSlice(iter.Convert(iter.Flatt(iter.Wrap(items), (*Participant).GetAttributes), (*Attributes).GetName))
+		_ = iter.ToSlice[string](iter.Convert(iter.Flatt(iter.Wrap(items), (*Participant).GetAttributes), (*Attributes).GetName))
 	}
 	b.StopTimer()
 }
@@ -620,7 +620,7 @@ func Benchmark_ConvertFlattStructure_IterableFit(b *testing.B) {
 	result := []string{}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		result = iter.ToSlice(iter.FilterAndConvert(iter.FilterAndFlatt(iter.Wrap(items), check.NotNil[Participant], (*Participant).GetAttributes), check.NotNil[Attributes], (*Attributes).GetName))
+		result = iter.ToSlice[string](iter.FilterAndConvert(iter.FilterAndFlatt(iter.Wrap(items), check.NotNil[Participant], (*Participant).GetAttributes), check.NotNil[Attributes], (*Attributes).GetName))
 	}
 	if !reflect.DeepEqual(expected, result) {
 		b.Fatalf("must be %v, but %v", expected, result)
@@ -645,7 +645,7 @@ func Benchmark_ConvertFlattStructure_SliceFit(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		att := sliceit.FilterAndFlatt(items, check.NotNil[Participant], (*Participant).GetAttributes)
-		_ = iter.ToSlice(iter.FilterAndConvert(att, check.NotNil[Attributes], (*Attributes).GetName))
+		_ = iter.ToSlice[string](iter.FilterAndConvert(att, check.NotNil[Attributes], (*Attributes).GetName))
 	}
 	b.StopTimer()
 }

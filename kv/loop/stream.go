@@ -37,62 +37,62 @@ func (k StreamIter[K, V, M]) Next() (K, V, bool) {
 }
 
 // FilterKey returns a stream consisting of key/value pairs where the key satisfies the condition of the 'predicate' function
-func (k StreamIter[K, V, M]) FilterKey(predicate func(K) bool) c.KVStream[K, V, M] {
+func (k StreamIter[K, V, M]) FilterKey(predicate func(K) bool) StreamIter[K, V, M] {
 	return Stream(Filter(k.next, filter.Key[V](predicate)).Next, k.collector)
 }
 
 // FilterKey returns a stream consisting of key/value pairs where the key satisfies the condition of the 'predicate' function
-func (k StreamIter[K, V, M]) FiltKey(predicate func(K) (bool, error)) c.KVStreamBreakable[K, V, M] {
+func (k StreamIter[K, V, M]) FiltKey(predicate func(K) (bool, error)) breakKvLoop.StreamIter[K, V, M] {
 	return breakKvLoop.Stream(breakKvLoop.Filt(breakKvLoop.From(k.next), breakFilter.Key[V](predicate)).Next, collect(k.collector))
 }
 
 // ConvertKey returns a stream that applies the 'converter' function to keys of the map
-func (k StreamIter[K, V, M]) ConvertKey(by func(K) K) c.KVStream[K, V, M] {
+func (k StreamIter[K, V, M]) ConvertKey(by func(K) K) StreamIter[K, V, M] {
 	return Stream(Convert(k.next, convert.Key[V](by)).Next, k.collector)
 }
 
 // ConvertKey returns a stream that applies the 'converter' function to keys of the map
-func (k StreamIter[K, V, M]) ConvKey(by func(K) (K, error)) c.KVStreamBreakable[K, V, M] {
+func (k StreamIter[K, V, M]) ConvKey(by func(K) (K, error)) breakKvLoop.StreamIter[K, V, M] {
 	return breakKvLoop.Stream(breakKvLoop.Conv(breakKvLoop.From(k.next), breakMapConvert.Key[V](by)).Next, collect(k.collector))
 }
 
 // FilterValue returns a stream consisting of key/value pairs where the value satisfies the condition of the 'predicate' function
-func (k StreamIter[K, V, M]) FilterValue(predicate func(V) bool) c.KVStream[K, V, M] {
+func (k StreamIter[K, V, M]) FilterValue(predicate func(V) bool) StreamIter[K, V, M] {
 	return Stream(Filter(k.next, filter.Value[K](predicate)).Next, k.collector)
 }
 
 // FilterValue returns a stream consisting of key/value pairs where the value satisfies the condition of the 'predicate' function
-func (k StreamIter[K, V, M]) FiltValue(predicate func(V) (bool, error)) c.KVStreamBreakable[K, V, M] {
+func (k StreamIter[K, V, M]) FiltValue(predicate func(V) (bool, error)) breakKvLoop.StreamIter[K, V, M] {
 	return breakKvLoop.Stream(breakKvLoop.Filt(breakKvLoop.From(k.next), breakFilter.Value[K](predicate)).Next, collect(k.collector))
 }
 
 // ConvertValue returns a stream that applies the 'converter' function to values of the map
-func (k StreamIter[K, V, M]) ConvertValue(converter func(V) V) c.KVStream[K, V, M] {
+func (k StreamIter[K, V, M]) ConvertValue(converter func(V) V) StreamIter[K, V, M] {
 	return Stream(Convert(k.next, convert.Value[K](converter)).Next, k.collector)
 }
 
 // ConvertValue returns a stream that applies the 'converter' function to values of the map
-func (k StreamIter[K, V, M]) ConvValue(converter func(V) (V, error)) c.KVStreamBreakable[K, V, M] {
+func (k StreamIter[K, V, M]) ConvValue(converter func(V) (V, error)) breakKvLoop.StreamIter[K, V, M] {
 	return breakKvLoop.Stream(breakKvLoop.Conv(breakKvLoop.From(k.next), breakMapConvert.Value[K](converter)).Next, collect(k.collector))
 }
 
 // Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function
-func (k StreamIter[K, V, M]) Filter(predicate func(K, V) bool) c.KVStream[K, V, M] {
+func (k StreamIter[K, V, M]) Filter(predicate func(K, V) bool) StreamIter[K, V, M] {
 	return Stream(Filter(k.next, predicate).Next, k.collector)
 }
 
 // Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function
-func (k StreamIter[K, V, M]) Filt(predicate func(K, V) (bool, error)) c.KVStreamBreakable[K, V, M] {
+func (k StreamIter[K, V, M]) Filt(predicate func(K, V) (bool, error)) breakKvLoop.StreamIter[K, V, M] {
 	return breakKvLoop.Stream(breakKvLoop.Filt(breakKvLoop.From(k.next), predicate).Next, collect(k.collector))
 }
 
 // Convert returns a stream that applies the 'converter' function to the collection elements
-func (k StreamIter[K, V, M]) Convert(converter func(K, V) (K, V)) c.KVStream[K, V, M] {
+func (k StreamIter[K, V, M]) Convert(converter func(K, V) (K, V)) StreamIter[K, V, M] {
 	return Stream(Convert(k.next, converter).Next, k.collector)
 }
 
 // Convert returns a stream that applies the 'converter' function to the collection elements
-func (k StreamIter[K, V, M]) Conv(converter func(K, V) (K, V, error)) c.KVStreamBreakable[K, V, M] {
+func (k StreamIter[K, V, M]) Conv(converter func(K, V) (K, V, error)) breakKvLoop.StreamIter[K, V, M] {
 	return breakKvLoop.Stream(breakKvLoop.Conv(breakKvLoop.From(k.next), converter).Next, collect(k.collector))
 }
 

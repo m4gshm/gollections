@@ -43,14 +43,14 @@ type Set[T comparable] struct {
 }
 
 var (
-	_ c.Set[int]   = (*Set[int])(nil)
-	_ fmt.Stringer = (*Set[int])(nil)
-	_ c.Set[int]   = Set[int]{}
-	_ fmt.Stringer = Set[int]{}
+	_ c.Set[int, *iter.KeyIter[int, struct{}]] = (*Set[int])(nil)
+	_ fmt.Stringer                             = (*Set[int])(nil)
+	_ c.Set[int, *iter.KeyIter[int, struct{}]] = Set[int]{}
+	_ fmt.Stringer                             = Set[int]{}
 )
 
 // Begin creates iterator
-func (s Set[T]) Begin() c.Iterator[T] {
+func (s Set[T]) Begin() *iter.KeyIter[T, struct{}] {
 	h := s.Head()
 	return &h
 }
@@ -98,25 +98,25 @@ func (s Set[T]) ForEach(walker func(T)) {
 }
 
 // Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function
-func (s Set[T]) Filter(predicate func(T) bool) c.Stream[T] {
+func (s Set[T]) Filter(predicate func(T) bool) loop.StreamIter[T] {
 	h := s.Head()
 	return loop.Stream(loop.Filter(h.Next, predicate).Next)
 }
 
 // Filt returns a stream consisting of elements that satisfy the condition of the 'predicate' function
-func (s Set[T]) Filt(predicate func(T) (bool, error)) c.StreamBreakable[T] {
+func (s Set[T]) Filt(predicate func(T) (bool, error)) breakLoop.StreamIter[T] {
 	h := s.Head()
 	return breakLoop.Stream(breakLoop.Filt(breakLoop.From(h.Next), predicate).Next)
 }
 
 // Convert returns a stream that applies the 'converter' function to the collection elements
-func (s Set[T]) Convert(converter func(T) T) c.Stream[T] {
+func (s Set[T]) Convert(converter func(T) T) loop.StreamIter[T] {
 	h := s.Head()
 	return loop.Stream(loop.Convert(h.Next, converter).Next)
 }
 
 // Convert returns a stream that applies the 'converter' function to the collection elements
-func (s Set[T]) Conv(converter func(T) (T, error)) c.StreamBreakable[T] {
+func (s Set[T]) Conv(converter func(T) (T, error)) breakLoop.StreamIter[T] {
 	h := s.Head()
 	return breakLoop.Stream(breakLoop.Conv(breakLoop.From(h.Next), converter).Next)
 }

@@ -46,10 +46,12 @@ type Map[K comparable, V any] struct {
 }
 
 var (
-	_ c.Map[int, any] = (*Map[int, any])(nil)
-	_ fmt.Stringer    = (*Map[int, any])(nil)
-	_ c.Map[int, any] = Map[int, any]{}
-	_ fmt.Stringer    = Map[int, any]{}
+	_ c.Map[int, any]                                  = (*Map[int, any])(nil)
+	_ c.KeyVal[MapKeys[int, any], MapValues[int, any]] = (*Map[int, any])(nil)
+	_ fmt.Stringer                                     = (*Map[int, any])(nil)
+	_ c.Map[int, any]                                  = Map[int, any]{}
+	_ c.KeyVal[MapKeys[int, any], MapValues[int, any]] = Map[int, any]{}
+	_ fmt.Stringer                                     = Map[int, any]{}
 )
 
 // Begin creates iterator
@@ -106,7 +108,7 @@ func (m Map[K, V]) Get(key K) (element V, ok bool) {
 }
 
 // Keys resutrns keys collection
-func (m Map[K, V]) Keys() c.Collection[K] {
+func (m Map[K, V]) Keys() MapKeys[K, V] {
 	return m.K()
 }
 
@@ -116,7 +118,7 @@ func (m Map[K, V]) K() MapKeys[K, V] {
 }
 
 // Values resutrns values collection
-func (m Map[K, V]) Values() c.Collection[V] {
+func (m Map[K, V]) Values() MapValues[K, V] {
 	return m.V()
 }
 
@@ -164,7 +166,7 @@ func (m Map[K, V]) ForEach(walker func(c.KV[K, V])) {
 }
 
 // FilterKey returns a stream consisting of key/value pairs where the key satisfies the condition of the 'predicate' function
-func (m Map[K, V]) FilterKey(predicate func(K) bool) c.KVStream[K, V, map[K]V] {
+func (m Map[K, V]) FilterKey(predicate func(K) bool) loop.StreamIter[K, V, map[K]V] {
 	h := m.Head()
 	return loop.Stream(loop.Filter(h.Next, filter.Key[V](predicate)).Next, loop.ToMap[K, V])
 }
@@ -176,7 +178,7 @@ func (m Map[K, V]) FiltKey(predicate func(K) (bool, error)) c.KVStreamBreakable[
 }
 
 // ConvertKey returns a stream that applies the 'converter' function to keys of the map
-func (m Map[K, V]) ConvertKey(by func(K) K) c.KVStream[K, V, map[K]V] {
+func (m Map[K, V]) ConvertKey(by func(K) K) loop.StreamIter[K, V, map[K]V] {
 	h := m.Head()
 	return loop.Stream(loop.Convert(h.Next, convert.Key[V](by)).Next, loop.ToMap[K, V])
 }
@@ -188,7 +190,7 @@ func (m Map[K, V]) ConvKey(converter func(K) (K, error)) c.KVStreamBreakable[K, 
 }
 
 // FilterValue returns a stream consisting of key/value pairs where the value satisfies the condition of the 'predicate' function
-func (m Map[K, V]) FilterValue(predicate func(V) bool) c.KVStream[K, V, map[K]V] {
+func (m Map[K, V]) FilterValue(predicate func(V) bool) loop.StreamIter[K, V, map[K]V] {
 	h := m.Head()
 	return loop.Stream(loop.Filter(h.Next, filter.Value[K](predicate)).Next, loop.ToMap[K, V])
 }
@@ -200,7 +202,7 @@ func (m Map[K, V]) FiltValue(predicate func(V) (bool, error)) c.KVStreamBreakabl
 }
 
 // ConvertValue returns a stream that applies the 'converter' function to values of the map
-func (m Map[K, V]) ConvertValue(by func(V) V) c.KVStream[K, V, map[K]V] {
+func (m Map[K, V]) ConvertValue(by func(V) V) loop.StreamIter[K, V, map[K]V] {
 	h := m.Head()
 	return loop.Stream(loop.Convert(h.Next, convert.Value[K](by)).Next, loop.ToMap[K, V])
 }
@@ -212,7 +214,7 @@ func (m Map[K, V]) ConvValue(converter func(V) (V, error)) c.KVStreamBreakable[K
 }
 
 // Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function
-func (m Map[K, V]) Filter(predicate func(K, V) bool) c.KVStream[K, V, map[K]V] {
+func (m Map[K, V]) Filter(predicate func(K, V) bool) loop.StreamIter[K, V, map[K]V] {
 	h := m.Head()
 	return loop.Stream(loop.Filter(h.Next, predicate).Next, loop.ToMap[K, V])
 }
@@ -224,7 +226,7 @@ func (m Map[K, V]) Filt(predicate func(K, V) (bool, error)) c.KVStreamBreakable[
 }
 
 // Convert returns a stream that applies the 'converter' function to the collection elements
-func (m Map[K, V]) Convert(converter func(K, V) (K, V)) c.KVStream[K, V, map[K]V] {
+func (m Map[K, V]) Convert(converter func(K, V) (K, V)) loop.StreamIter[K, V, map[K]V] {
 	h := m.Head()
 	return loop.Stream(loop.Convert(h.Next, converter).Next, loop.ToMap[K, V])
 }

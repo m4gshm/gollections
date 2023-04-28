@@ -16,8 +16,9 @@ type StreamIter[T any] struct {
 }
 
 var (
-	_ c.StreamBreakable[any] = (*StreamIter[any])(nil)
-	_ c.StreamBreakable[any] = StreamIter[any]{}
+	_ c.StreamBreakable[any, StreamIter[any]]             = (*StreamIter[any])(nil)
+	_ c.StreamBreakable[any, StreamIter[any]]             = StreamIter[any]{}
+	_ c.Filterable[any, StreamIter[any], StreamIter[any]] = StreamIter[any]{}
 )
 
 // Next implements c.Iterator
@@ -29,25 +30,25 @@ func (t StreamIter[T]) Next() (element T, ok bool, err error) {
 }
 
 // Filt returns a stream consisting of elements that satisfy the condition of the 'predicate' function
-func (t StreamIter[T]) Filt(predicate func(T) (bool, error)) c.StreamBreakable[T] {
+func (t StreamIter[T]) Filt(predicate func(T) (bool, error)) StreamIter[T] {
 	f := Filt(t.next, predicate)
 	return Stream(f.Next)
 }
 
 // Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function
-func (t StreamIter[T]) Filter(predicate func(T) bool) c.StreamBreakable[T] {
+func (t StreamIter[T]) Filter(predicate func(T) bool) StreamIter[T] {
 	f := Filt(t.next, as.ErrTail(predicate))
 	return Stream(f.Next)
 }
 
 // Convert returns a stream that applies the 'converter' function to the collection elements
-func (t StreamIter[T]) Convert(converter func(T) T) c.StreamBreakable[T] {
+func (t StreamIter[T]) Convert(converter func(T) T) StreamIter[T] {
 	conv := Conv(t.next, as.ErrTail(converter))
 	return Stream(conv.Next)
 }
 
 // Conv returns a stream that applies the 'converter' function to the collection elements
-func (t StreamIter[T]) Conv(converter func(T) (T, error)) c.StreamBreakable[T] {
+func (t StreamIter[T]) Conv(converter func(T) (T, error)) StreamIter[T] {
 	conv := Conv(t.next, converter)
 	return Stream(conv.Next)
 }
@@ -63,7 +64,7 @@ func (t StreamIter[T]) Reduce(merger func(T, T) (T, error)) (T, error) {
 }
 
 // Begin creates iterator
-func (t StreamIter[T]) Begin() c.IteratorBreakable[T] {
+func (t StreamIter[T]) Begin() StreamIter[T] {
 	return t
 }
 

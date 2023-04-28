@@ -44,14 +44,15 @@ func WrapMap[K comparable, V any](elements map[K]V) *Map[K, V] {
 type Map[K comparable, V any] map[K]V
 
 var (
-	_ c.Deleteable[int]                                        = (*Map[int, any])(nil)
-	_ c.Removable[int, any]                                    = (*Map[int, any])(nil)
-	_ c.Settable[int, any]                                     = (*Map[int, any])(nil)
-	_ c.SettableNew[int, any]                                  = (*Map[int, any])(nil)
-	_ c.SettableMap[int, any]                                  = (*Map[int, any])(nil)
-	_ c.ImmutableMapConvert[int, any, immutable.Map[int, any]] = (*Map[int, any])(nil)
-	_ c.Map[int, any]                                          = (*Map[int, any])(nil)
-	_ fmt.Stringer                                             = (*Map[int, any])(nil)
+	_ c.Deleteable[int]                                                    = (*Map[int, any])(nil)
+	_ c.Removable[int, any]                                                = (*Map[int, any])(nil)
+	_ c.Settable[int, any]                                                 = (*Map[int, any])(nil)
+	_ c.SettableNew[int, any]                                              = (*Map[int, any])(nil)
+	_ c.SettableMap[c.TrackEachLoop[int, any]]                             = (*Map[int, any])(nil)
+	_ c.ImmutableMapConvert[immutable.Map[int, any]]                       = (*Map[int, any])(nil)
+	_ c.Map[int, any]                                                      = (*Map[int, any])(nil)
+	_ c.KeyVal[immutable.MapKeys[int, any], immutable.MapValues[int, any]] = (*Map[int, any])(nil)
+	_ fmt.Stringer                                                         = (*Map[int, any])(nil)
 )
 
 // Begin creates iterator
@@ -201,7 +202,7 @@ func (m *Map[K, V]) Remove(key K) (v V, ok bool) {
 }
 
 // Keys resutrns keys collection
-func (m *Map[K, V]) Keys() c.Collection[K] {
+func (m *Map[K, V]) Keys() immutable.MapKeys[K, V] {
 	return m.K()
 }
 
@@ -215,7 +216,7 @@ func (m *Map[K, V]) K() immutable.MapKeys[K, V] {
 }
 
 // Values resutrns values collection
-func (m *Map[K, V]) Values() c.Collection[V] {
+func (m *Map[K, V]) Values() immutable.MapValues[K, V] {
 	return m.V()
 }
 
@@ -238,7 +239,7 @@ func (m *Map[K, V]) String() string {
 }
 
 // FilterKey returns a stream consisting of key/value pairs where the key satisfies the condition of the 'predicate' function
-func (m *Map[K, V]) FilterKey(predicate func(K) bool) c.KVStream[K, V, map[K]V] {
+func (m *Map[K, V]) FilterKey(predicate func(K) bool) loop.StreamIter[K, V, map[K]V] {
 	h := m.Head()
 	return loop.Stream(loop.Filter(h.Next, filter.Key[V](predicate)).Next, loop.ToMap[K, V])
 }
@@ -250,7 +251,7 @@ func (m Map[K, V]) FiltKey(predicate func(K) (bool, error)) c.KVStreamBreakable[
 }
 
 // ConvertKey returns a stream that applies the 'converter' function to keys of the map
-func (m *Map[K, V]) ConvertKey(converter func(K) K) c.KVStream[K, V, map[K]V] {
+func (m *Map[K, V]) ConvertKey(converter func(K) K) loop.StreamIter[K, V, map[K]V] {
 	h := m.Head()
 	return loop.Stream(loop.Convert(h.Next, convert.Key[V](converter)).Next, loop.ToMap[K, V])
 }
@@ -262,7 +263,7 @@ func (m Map[K, V]) ConvKey(converter func(K) (K, error)) c.KVStreamBreakable[K, 
 }
 
 // FilterValue returns a stream consisting of key/value pairs where the value satisfies the condition of the 'predicate' function
-func (m *Map[K, V]) FilterValue(predicate func(V) bool) c.KVStream[K, V, map[K]V] {
+func (m *Map[K, V]) FilterValue(predicate func(V) bool) loop.StreamIter[K, V, map[K]V] {
 	h := m.Head()
 	return loop.Stream(loop.Filter(h.Next, filter.Value[K](predicate)).Next, loop.ToMap[K, V])
 }
@@ -274,7 +275,7 @@ func (m *Map[K, V]) FiltValue(predicate func(V) (bool, error)) c.KVStreamBreakab
 }
 
 // ConvertValue returns a stream that applies the 'converter' function to values of the map
-func (m *Map[K, V]) ConvertValue(converter func(V) V) c.KVStream[K, V, map[K]V] {
+func (m *Map[K, V]) ConvertValue(converter func(V) V) loop.StreamIter[K, V, map[K]V] {
 	h := m.Head()
 	return loop.Stream(loop.Convert(h.Next, convert.Value[K](converter)).Next, loop.ToMap[K, V])
 }
@@ -286,7 +287,7 @@ func (m Map[K, V]) ConvValue(converter func(V) (V, error)) c.KVStreamBreakable[K
 }
 
 // Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function
-func (m *Map[K, V]) Filter(predicate func(K, V) bool) c.KVStream[K, V, map[K]V] {
+func (m *Map[K, V]) Filter(predicate func(K, V) bool) loop.StreamIter[K, V, map[K]V] {
 	h := m.Head()
 	return loop.Stream(loop.Filter(h.Next, predicate).Next, loop.ToMap[K, V])
 }
@@ -298,7 +299,7 @@ func (m *Map[K, V]) Filt(predicate func(K, V) (bool, error)) c.KVStreamBreakable
 }
 
 // Convert returns a stream that applies the 'converter' function to the collection elements
-func (m *Map[K, V]) Convert(converter func(K, V) (K, V)) c.KVStream[K, V, map[K]V] {
+func (m *Map[K, V]) Convert(converter func(K, V) (K, V)) loop.StreamIter[K, V, map[K]V] {
 	h := m.Head()
 	return loop.Stream(loop.Convert(h.Next, converter).Next, loop.ToMap[K, V])
 }
@@ -331,7 +332,7 @@ func (m *Map[K, V]) Immutable() immutable.Map[K, V] {
 }
 
 // SetMap inserts all elements from the 'other' map
-func (m *Map[K, V]) SetMap(other c.Map[K, V]) {
+func (m *Map[K, V]) SetMap(other c.TrackEachLoop[K, V]) {
 	if m == nil || other == nil {
 		return
 	}

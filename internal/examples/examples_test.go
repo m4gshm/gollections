@@ -12,6 +12,7 @@ import (
 	"github.com/m4gshm/gollections/immutable/set"
 	"github.com/m4gshm/gollections/iter"
 	slc "github.com/m4gshm/gollections/iter/slice"
+	sliceIter "github.com/m4gshm/gollections/slice/iter"
 	iterableGroup "github.com/m4gshm/gollections/iterable/group"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
@@ -54,7 +55,7 @@ func Test_group_orderset_odd_even(t *testing.T) {
 }
 
 func Test_group_orderset_with_filtering_by_stirng_len(t *testing.T) {
-	var groups = iterableGroup.Of(oset.Of(
+	var groups = iterableGroup.Of[*sliceIter.SliceIter[string]](oset.Of(
 		"seventh", "seventh", //duplicated
 		"first", "second", "third", "fourth",
 		"fifth", "sixth", "eighth",

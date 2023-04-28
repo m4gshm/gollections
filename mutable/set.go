@@ -48,18 +48,18 @@ type Set[T comparable] struct {
 }
 
 var (
-	_ c.Addable[int]          = (*Set[int])(nil)
-	_ c.AddableNew[int]       = (*Set[int])(nil)
-	_ c.AddableAll[int]       = (*Set[int])(nil)
-	_ c.AddableAllNew[int]    = (*Set[int])(nil)
-	_ c.Deleteable[int]       = (*Set[int])(nil)
-	_ c.DeleteableVerify[int] = (*Set[int])(nil)
-	_ c.Set[int]              = (*Set[int])(nil)
-	_ fmt.Stringer            = (*Set[int])(nil)
+	_ c.Addable[int]                      = (*Set[int])(nil)
+	_ c.AddableNew[int]                   = (*Set[int])(nil)
+	_ c.AddableAll[c.ForEachLoop[int]]    = (*Set[int])(nil)
+	_ c.AddableAllNew[c.ForEachLoop[int]] = (*Set[int])(nil)
+	_ c.Deleteable[int]                   = (*Set[int])(nil)
+	_ c.DeleteableVerify[int]             = (*Set[int])(nil)
+	_ c.Set[int, *SetIter[int]]           = (*Set[int])(nil)
+	_ fmt.Stringer                        = (*Set[int])(nil)
 )
 
 // Begin creates iterator
-func (s *Set[T]) Begin() c.Iterator[T] {
+func (s *Set[T]) Begin() *SetIter[T] {
 	h := s.Head()
 	return &h
 }
@@ -175,16 +175,16 @@ func (s *Set[T]) AddOneNew(element T) (ok bool) {
 }
 
 // AddAll inserts all elements from the "other" collection
-func (s *Set[T]) AddAll(elements c.Iterable[T]) {
+func (s *Set[T]) AddAll(elements c.ForEachLoop[T]) {
 	if !(s == nil || elements == nil) {
-		loop.ForEach(elements.Begin().Next, s.AddOne)
+		elements.ForEach(s.AddOne)
 	}
 }
 
 // AddAllNew inserts elements from the "other" collection if they are not contained in the collection
-func (s *Set[T]) AddAllNew(other c.Iterable[T]) (ok bool) {
+func (s *Set[T]) AddAllNew(other c.ForEachLoop[T]) (ok bool) {
 	if !(s == nil || other == nil) {
-		loop.ForEach(other.Begin().Next, func(v T) { ok = s.AddOneNew(v) || ok })
+		other.ForEach(func(element T) { ok = s.AddOneNew(element) || ok })
 	}
 	return ok
 }
@@ -243,25 +243,25 @@ func (s *Set[T]) ForEach(walker func(T)) {
 }
 
 // Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function
-func (s *Set[T]) Filter(predicate func(T) bool) c.Stream[T] {
+func (s *Set[T]) Filter(predicate func(T) bool) loop.StreamIter[T] {
 	h := s.Head()
-	return loop.Stream[T](iter.Filter(h.Next, predicate).Next)
+	return loop.Stream(iter.Filter(h.Next, predicate).Next)
 }
 
 // Filt returns a stream consisting of elements that satisfy the condition of the 'predicate' function
-func (s Set[T]) Filt(predicate func(T) (bool, error)) c.StreamBreakable[T] {
+func (s Set[T]) Filt(predicate func(T) (bool, error)) breakLoop.StreamIter[T] {
 	h := s.Head()
 	return breakLoop.Stream(breakLoop.Filt(breakLoop.From(h.Next), predicate).Next)
 }
 
 // Convert returns a stream that applies the 'converter' function to the collection elements
-func (s *Set[T]) Convert(converter func(T) T) c.Stream[T] {
+func (s *Set[T]) Convert(converter func(T) T) loop.StreamIter[T] {
 	h := s.Head()
-	return loop.Stream[T](loop.Convert(h.Next, converter).Next)
+	return loop.Stream(loop.Convert(h.Next, converter).Next)
 }
 
 // Convert returns a stream that applies the 'converter' function to the collection elements
-func (s *Set[T]) Conv(converter func(T) (T, error)) c.StreamBreakable[T] {
+func (s *Set[T]) Conv(converter func(T) (T, error)) breakLoop.StreamIter[T] {
 	h := s.Head()
 	return breakLoop.Stream(breakLoop.Conv(breakLoop.From(h.Next), converter).Next)
 }

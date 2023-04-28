@@ -16,8 +16,12 @@ type StreamIter[T any] struct {
 }
 
 var (
-	_ c.Stream[any] = (*StreamIter[any])(nil)
-	_ c.Stream[any] = StreamIter[any]{}
+	_ c.Stream[any, StreamIter[any]]                                = (*StreamIter[any])(nil)
+	_ c.Stream[any, StreamIter[any]]                                = StreamIter[any]{}
+	_ c.Filterable[any, StreamIter[any], breakLoop.StreamIter[any]] = (*StreamIter[any])(nil)
+	_ c.Filterable[any, StreamIter[any], breakLoop.StreamIter[any]] = StreamIter[any]{}
+	_ c.Iterator[any]                                               = (*StreamIter[any])(nil)
+	_ c.Iterator[any]                                               = StreamIter[any]{}
 )
 
 // Next implements c.Iterator
@@ -29,25 +33,25 @@ func (t StreamIter[T]) Next() (element T, ok bool) {
 }
 
 // Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function
-func (t StreamIter[T]) Filter(predicate func(T) bool) c.Stream[T] {
+func (t StreamIter[T]) Filter(predicate func(T) bool) StreamIter[T] {
 	f := Filter(t.next, predicate)
 	return Stream(f.Next)
 }
 
 // Filt returns a stream consisting of elements that satisfy the condition of the 'predicate' function
-func (t StreamIter[T]) Filt(predicate func(T) (bool, error)) c.StreamBreakable[T] {
+func (t StreamIter[T]) Filt(predicate func(T) (bool, error)) breakLoop.StreamIter[T] {
 	f := breakLoop.Filt(breakLoop.From(t.next), predicate)
 	return breakLoop.Stream(f.Next)
 }
 
 // Convert returns a stream that applies the 'converter' function to the collection elements
-func (t StreamIter[T]) Convert(converter func(T) T) c.Stream[T] {
+func (t StreamIter[T]) Convert(converter func(T) T) StreamIter[T] {
 	conv := Convert(t.next, converter)
 	return Stream(conv.Next)
 }
 
 // Conv returns a stream that applies the 'converter' function to the collection elements
-func (t StreamIter[T]) Conv(converter func(T) (T, error)) c.StreamBreakable[T] {
+func (t StreamIter[T]) Conv(converter func(T) (T, error)) breakLoop.StreamIter[T] {
 	conv := breakLoop.Conv(breakLoop.From(t.next), converter)
 	return breakLoop.Stream(conv.Next)
 }
@@ -68,7 +72,7 @@ func (t StreamIter[T]) Reduce(by func(T, T) T) T {
 }
 
 // Begin creates iterator
-func (t StreamIter[T]) Begin() c.Iterator[T] {
+func (t StreamIter[T]) Begin() StreamIter[T] {
 	return t
 }
 

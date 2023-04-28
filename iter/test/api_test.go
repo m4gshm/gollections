@@ -49,10 +49,11 @@ func Test_FlattSlices(t *testing.T) {
 		multiDimension = [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
 		expected       = slice.Of(1, 3, 5, 7)
 	)
-	a := iter.ToSlice(iter.Filter(iter.Flatt(iter.Flatt(iter.Wrap(multiDimension), convert.To[[][]int]), convert.To[[]int]), odds))
+	f := iter.Filter(iter.Flatt(iter.Flatt(iter.Wrap(multiDimension), convert.To[[][]int]), convert.To[[]int]), odds)
+	a := iter.ToSlice[int](f)
 	assert.Equal(t, expected, a)
 
-	a = iter.ToSlice(iter.Filter(iter.Flatt(sliceit.Flatt(multiDimension, convert.To[[][]int]), convert.To[[]int]), odds))
+	a = iter.ToSlice[int](iter.Filter(iter.Flatt(sliceit.Flatt(multiDimension, convert.To[[][]int]), convert.To[[]int]), odds))
 	assert.Equal(t, expected, a)
 
 	//plain old style

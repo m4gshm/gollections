@@ -21,7 +21,7 @@ var (
 	_ c.Settable[int, any]      = (*Map[int, any])(nil)
 	_ c.Deleteable[int]         = (*Map[int, any])(nil)
 	_ c.Removable[int, any]     = (*Map[int, any])(nil)
-	_ c.TrackEachLoop[any, int] = (*Map[int, any])(nil)
+	_ c.TrackEachLoop[int, any] = (*Map[int, any])(nil)
 	_ c.Access[int, any]        = (*Map[int, any])(nil)
 )
 
