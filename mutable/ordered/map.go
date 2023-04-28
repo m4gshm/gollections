@@ -8,8 +8,11 @@ import (
 	"github.com/m4gshm/gollections/immutable/ordered"
 	oMapIter "github.com/m4gshm/gollections/immutable/ordered/map_/iter"
 	"github.com/m4gshm/gollections/kv/loop"
+	breakLoop "github.com/m4gshm/gollections/kv/loop/break/loop"
 	"github.com/m4gshm/gollections/map_"
+	breakMapFilter "github.com/m4gshm/gollections/map_/break/map_/filter"
 	"github.com/m4gshm/gollections/map_/convert"
+	breakMapConvert "github.com/m4gshm/gollections/map_/break/map_/convert"
 	"github.com/m4gshm/gollections/map_/filter"
 	"github.com/m4gshm/gollections/notsafe"
 	"github.com/m4gshm/gollections/slice"
@@ -276,10 +279,22 @@ func (m *Map[K, V]) FilterKey(predicate func(K) bool) c.KVStream[K, V, map[K]V] 
 	return loop.Stream(loop.Filter(h.Next, filter.Key[V](predicate)).Next, loop.ToMap[K, V])
 }
 
+// FilterKey returns a stream consisting of key/value pairs where the key satisfies the condition of the 'predicate' function
+func (m Map[K, V]) FiltKey(predicate func(K) (bool, error)) c.KVStreamBreakable[K, V, map[K]V] {
+	h := m.Head()
+	return breakLoop.Stream(breakLoop.Filt(breakLoop.From(h.Next), breakMapFilter.Key[V](predicate)).Next, breakLoop.ToMap[K, V])
+}
+
 // ConvertKey returns a stream that applies the 'converter' function to keys of the map
 func (m *Map[K, V]) ConvertKey(converter func(K) K) c.KVStream[K, V, map[K]V] {
 	h := m.Head()
 	return loop.Stream(loop.Convert(h.Next, convert.Key[V](converter)).Next, loop.ToMap[K, V])
+}
+
+// ConvertKey returns a stream that applies the 'converter' function to keys of the map
+func (m *Map[K, V]) ConvKey(converter func(K) (K, error)) c.KVStreamBreakable[K, V, map[K]V] {
+	h := m.Head()
+	return breakLoop.Stream(breakLoop.Conv(breakLoop.From(h.Next), breakMapConvert.Key[V](converter)).Next, breakLoop.ToMap[K, V])
 }
 
 // FilterValue returns a stream consisting of key/value pairs where the value satisfies the condition of the 'predicate' function
@@ -288,10 +303,22 @@ func (m *Map[K, V]) FilterValue(predicate func(V) bool) c.KVStream[K, V, map[K]V
 	return loop.Stream(loop.Filter(h.Next, filter.Value[K](predicate)).Next, loop.ToMap[K, V])
 }
 
+// FilterValue returns a stream consisting of key/value pairs where the value satisfies the condition of the 'predicate' function
+func (m *Map[K, V]) FiltValue(predicate func(V) (bool, error)) c.KVStreamBreakable[K, V, map[K]V] {
+	h := m.Head()
+	return breakLoop.Stream(breakLoop.Filt(breakLoop.From(h.Next), breakMapFilter.Value[K](predicate)).Next, breakLoop.ToMap[K, V])
+}
+
 // ConvertValue returns a stream that applies the 'converter' function to values of the map
 func (m *Map[K, V]) ConvertValue(converter func(V) V) c.KVStream[K, V, map[K]V] {
 	h := m.Head()
 	return loop.Stream(loop.Convert(h.Next, convert.Value[K](converter)).Next, loop.ToMap[K, V])
+}
+
+// ConvertValue returns a stream that applies the 'converter' function to values of the map
+func (m Map[K, V]) ConvValue(converter func(V) (V, error)) c.KVStreamBreakable[K, V, map[K]V] {
+	h := m.Head()
+	return breakLoop.Stream(breakLoop.Conv(breakLoop.From(h.Next), breakMapConvert.Value[K](converter)).Next, breakLoop.ToMap[K, V])
 }
 
 // Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function
@@ -300,10 +327,22 @@ func (m *Map[K, V]) Filter(predicate func(K, V) bool) c.KVStream[K, V, map[K]V] 
 	return loop.Stream(loop.Filter(h.Next, predicate).Next, loop.ToMap[K, V])
 }
 
+// Filt returns a stream consisting of elements that satisfy the condition of the 'predicate' function
+func (m *Map[K, V]) Filt(predicate func(K, V) (bool, error)) c.KVStreamBreakable[K, V, map[K]V] {
+	h := m.Head()
+	return breakLoop.Stream(breakLoop.Filt(breakLoop.From(h.Next), predicate).Next, breakLoop.ToMap[K, V])
+}
+
 // Convert returns a stream that applies the 'converter' function to the collection elements
 func (m *Map[K, V]) Convert(converter func(K, V) (K, V)) c.KVStream[K, V, map[K]V] {
 	h := m.Head()
 	return loop.Stream(loop.Convert(h.Next, converter).Next, loop.ToMap[K, V])
+}
+
+// Convert returns a stream that applies the 'converter' function to the collection elements
+func (m *Map[K, V]) Conv(converter func(K, V) (K, V, error)) c.KVStreamBreakable[K, V, map[K]V] {
+	h := m.Head()
+	return breakLoop.Stream(breakLoop.Conv(breakLoop.From(h.Next), converter).Next, breakLoop.ToMap[K, V])
 }
 
 // Reduce reduces the key/value pairs of the map into an one pair using the 'merge' function

@@ -34,14 +34,6 @@ func Group[K comparable, V any](it c.KVIterator[K, V]) map[K][]V {
 	return group.Of(it.Next)
 }
 
-// OfLoop creates an IteratorBreakable instance that loops over elements of a source
-// The hasNext specifies a predicate that tests existing of a next element in the source.
-// The getNext extracts the element.
-func OfLoop[S, K, V any](source S, hasNext func(S) bool, getNext func(S) (K, V, error)) c.KVIteratorBreakable[K, V] {
-	l := loop.NewIter(source, hasNext, getNext)
-	return &l
-}
-
 // Map instantiates key/value iterator that converts elements with a converter and returns them
 func Map[K comparable, V any, KOUT comparable, VOUT any](elements c.KVIterator[K, V], by func(K, V) (KOUT, VOUT)) c.KVStream[KOUT, VOUT, map[KOUT]VOUT] {
 	return loop.Stream(loop.Convert(elements.Next, by).Next, loop.ToMap[KOUT, VOUT])

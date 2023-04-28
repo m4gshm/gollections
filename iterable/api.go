@@ -22,7 +22,7 @@ func FilterAndConvert[From, To any, IT c.Iterable[From]](elements IT, filter fun
 	return loop.Stream(f.Next)
 }
 
-// Flatt instantiates Iterator that extracts slices of 'To' by a Flattener from elements of 'From' and flattens as one iterable collection of 'To' elements
+// Flatt instantiates Iterator that extracts slices of 'To' by a flattener from elements of 'From' and flattens as one iterable collection of 'To' elements
 func Flatt[From, To any, IT c.Iterable[From]](elements IT, by func(From) []To) c.Stream[To] {
 	b := elements.Begin()
 	f := loop.Flatt(b.Next, by)

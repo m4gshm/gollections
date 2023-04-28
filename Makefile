@@ -1,17 +1,21 @@
 
 .PHONY: all
-all: build test readme lint bench
+all: clean build test readme lint bench
 
 .PHONY: test
 test:
 	$(info #Running tests...)
-	go clean -testcache
 	go test ./...
+
+.PHONY: clean
+clean:
+	$(info #Building...)
+	go clean -cache
+	go clean -testcache
 
 .PHONY: build
 build:
 	$(info #Building...)
-	go clean -cache
 	go build ./...
 
 .PHONY: builda

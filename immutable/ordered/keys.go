@@ -5,8 +5,10 @@ import (
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/loop"
+	breakLoop "github.com/m4gshm/gollections/loop/break/loop"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/iter"
+	breakIter "github.com/m4gshm/gollections/slice/iter/break/iter"
 )
 
 // WrapKeys instantiates MapKeys using the elements as internal storage
@@ -79,10 +81,22 @@ func (m MapKeys[K]) Filter(filter func(K) bool) c.Stream[K] {
 	return loop.Stream(f.Next)
 }
 
+// Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function
+func (m MapKeys[K]) Filt(filter func(K) (bool, error)) c.StreamBreakable[K] {
+	f := breakIter.Filt(m.keys, filter)
+	return breakLoop.Stream(f.Next)
+}
+
 // Convert returns a stream that applies the 'converter' function to the collection elements
 func (m MapKeys[K]) Convert(converter func(K) K) c.Stream[K] {
 	conv := iter.Convert(m.keys, converter)
 	return loop.Stream(conv.Next)
+}
+
+// Convert returns a stream that applies the 'converter' function to the collection elements
+func (m MapKeys[K]) Conv(converter func(K) (K, error)) c.StreamBreakable[K] {
+	conv := breakIter.Conv(m.keys, converter)
+	return breakLoop.Stream(conv.Next)
 }
 
 // Reduce reduces the elements into an one using the 'merge' function

@@ -2,9 +2,10 @@ package loop
 
 import (
 	"github.com/m4gshm/gollections/c"
+	breakLoop "github.com/m4gshm/gollections/loop/break/loop"
 )
 
-// Stream instantiates Pipe based on iterator elements.
+// / Stream is default Stream constructor/
 func Stream[T any](next func() (T, bool)) StreamIter[T] {
 	return StreamIter[T]{next: next}
 }
@@ -33,10 +34,22 @@ func (t StreamIter[T]) Filter(predicate func(T) bool) c.Stream[T] {
 	return Stream(f.Next)
 }
 
+// Filt returns a stream consisting of elements that satisfy the condition of the 'predicate' function
+func (t StreamIter[T]) Filt(predicate func(T) (bool, error)) c.StreamBreakable[T] {
+	f := breakLoop.Filt(breakLoop.From(t.next), predicate)
+	return breakLoop.Stream(f.Next)
+}
+
 // Convert returns a stream that applies the 'converter' function to the collection elements
 func (t StreamIter[T]) Convert(converter func(T) T) c.Stream[T] {
 	conv := Convert(t.next, converter)
 	return Stream(conv.Next)
+}
+
+// Conv returns a stream that applies the 'converter' function to the collection elements
+func (t StreamIter[T]) Conv(converter func(T) (T, error)) c.StreamBreakable[T] {
+	conv := breakLoop.Conv(breakLoop.From(t.next), converter)
+	return breakLoop.Stream(conv.Next)
 }
 
 // ForEach applies the 'walker' function for every element

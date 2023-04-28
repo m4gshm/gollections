@@ -6,6 +6,7 @@ import (
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/loop"
+	breakLoop "github.com/m4gshm/gollections/loop/break/loop"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/map_/iter"
 	"github.com/m4gshm/gollections/slice"
@@ -81,10 +82,23 @@ func (m MapValues[K, V]) Filter(filter func(V) bool) c.Stream[V] {
 	return loop.Stream(loop.Filter(h.Next, filter).Next)
 }
 
+// Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function
+func (m MapValues[K, V]) Filt(filter func(V) (bool, error)) c.StreamBreakable[V] {
+	h := m.Head()
+	return breakLoop.Stream(breakLoop.Filt(breakLoop.From(h.Next), filter).Next)
+}
+
 // Convert returns a stream that applies the 'converter' function to the collection elements
 func (m MapValues[K, V]) Convert(converter func(V) V) c.Stream[V] {
 	h := m.Head()
 	return loop.Stream(loop.Convert(h.Next, converter).Next)
+}
+
+
+// Convert returns a stream that applies the 'converter' function to the collection elements
+func (m MapValues[K, V]) Conv(converter func(V) (V, error)) c.StreamBreakable[V] {
+	h := m.Head()
+	return breakLoop.Stream(breakLoop.Conv(breakLoop.From(h.Next), converter).Next)
 }
 
 // Reduce reduces the elements into an one using the 'merge' function

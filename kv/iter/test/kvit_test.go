@@ -8,6 +8,7 @@ import (
 	"github.com/m4gshm/gollections/k"
 	kviter "github.com/m4gshm/gollections/kv/iter"
 	"github.com/m4gshm/gollections/kv/loop"
+	breakLoop "github.com/m4gshm/gollections/kv/loop/break/loop"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/stretchr/testify/assert"
 )
@@ -48,7 +49,6 @@ func (r *rows[T]) next() (T, error) {
 }
 
 func Test_OfLoop(t *testing.T) {
-
 	data := &rows[int]{slice.Of(1, 2, 3), 0}
 
 	evens := func(r *rows[int]) (bool, int, error) {
@@ -59,18 +59,18 @@ func Test_OfLoop(t *testing.T) {
 		return next%2 == 0, next, nil
 	}
 
-	iterator := kviter.OfLoop(data, (*rows[int]).hasNext, evens)
+	iterator := breakLoop.New(data, (*rows[int]).hasNext, evens)
 
-	m := loop.ToMap(iterator.Next)
+	m, err := breakLoop.ToMap(iterator)
 
 	assert.Equal(t, 2, m[true])
 	assert.Equal(t, 1, m[false])
-	assert.Nil(t, iterator.Error())
+	assert.Nil(t, err)
 
 	streamWithError := &rows[int]{slice.Of(1, 2, 3, 4), 0}
-	iterWithError := kviter.OfLoop(streamWithError, (*rows[int]).hasNext, evens)
-	m2 := loop.ToMap(iterWithError.Next)
+	iterWithError := breakLoop.New(streamWithError, (*rows[int]).hasNext, evens)
+	m2, err2 := breakLoop.ToMap(iterWithError)
 
 	assert.Equal(t, 2, m2[true])
-	assert.Equal(t, "next error", iterWithError.Error().Error())
+	assert.Equal(t, "next error", err2.Error())
 }

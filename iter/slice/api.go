@@ -20,7 +20,7 @@ func FilterAndConvert[FS ~[]From, From, To any](elements FS, filter func(From) b
 	return f
 }
 
-// Flatt instantiates Iterator that extracts slices of 'To' by a Flattener from elements of 'From' and flattens as one iterable collection of 'To' elements.
+// Flatt instantiates Iterator that extracts slices of 'To' by a flattener from elements of 'From' and flattens as one iterable collection of 'To' elements.
 func Flatt[FS ~[]From, From, To any](elements FS, by func(From) []To) c.Iterator[To] {
 	f := slice.Flatt(elements, by)
 	return f

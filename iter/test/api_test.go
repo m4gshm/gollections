@@ -12,6 +12,7 @@ import (
 	"github.com/m4gshm/gollections/iter"
 	sliceit "github.com/m4gshm/gollections/iter/slice"
 	"github.com/m4gshm/gollections/loop"
+	breakLoop "github.com/m4gshm/gollections/loop/break/loop"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
 	sliceIter "github.com/m4gshm/gollections/slice/iter"
@@ -214,16 +215,16 @@ func (r *rows[T]) next() (T, error) {
 
 func Test_OfLoop(t *testing.T) {
 	stream := &rows[int]{slice.Of(1, 2, 3), 0}
-	iterator := iter.OfLoop(stream, (*rows[int]).hasNext, (*rows[int]).next)
-	s := iter.ToSlice[int](iterator)
+	iter := breakLoop.New(stream, (*rows[int]).hasNext, (*rows[int]).next)
+	s, err := breakLoop.ToSlice(iter)
 
 	assert.Equal(t, slice.Of(1, 2, 3), s)
-	assert.Nil(t, iterator.Error())
+	assert.Nil(t, err)
 
 	streamWithError := &rows[int]{slice.Of(1, 2, 3, 4), 0}
-	iterWithError := iter.OfLoop(streamWithError, (*rows[int]).hasNext, (*rows[int]).next)
-	s2 := iter.ToSlice[int](iterWithError)
+	iterWithError := breakLoop.New(streamWithError, (*rows[int]).hasNext, (*rows[int]).next)
+	s2, err2 := breakLoop.ToSlice(iterWithError)
 
 	assert.Equal(t, slice.Of(1, 2, 3), s2)
-	assert.Equal(t, "next error", iterWithError.Error().Error())
+	assert.Equal(t, "next error", err2.Error())
 }

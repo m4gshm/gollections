@@ -101,3 +101,4 @@ func (c ConvertCheckIter[From, To]) Next() (t To, ok bool) {
 	}
 	return t, false
 }
+

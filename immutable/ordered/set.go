@@ -6,6 +6,7 @@ import (
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/loop"
+	breakLoop "github.com/m4gshm/gollections/loop/break/loop"
 	"github.com/m4gshm/gollections/notsafe"
 	"github.com/m4gshm/gollections/slice"
 	sliceIter "github.com/m4gshm/gollections/slice/iter"
@@ -28,7 +29,7 @@ func WrapSet[T comparable](order []T, elements map[T]struct{}) Set[T] {
 	return Set[T]{order: order, elements: elements, esize: notsafe.GetTypeSize[T]()}
 }
 
-// SetFromLoop creates a set with elements retrieved by the 'next' function.
+// SetFromLoop creates a set with elements retrieved converter the 'next' function.
 // The next returns an element with true or zero value with false if there are no more elements.
 func SetFromLoop[T comparable](next func() (T, bool)) Set[T] {
 	var (
@@ -122,10 +123,22 @@ func (s Set[T]) Filter(predicate func(T) bool) c.Stream[T] {
 	return loop.Stream(loop.Filter(h.Next, predicate).Next)
 }
 
-// Convert returns a stream that applies the 'converter' function to the collection elements
-func (s Set[T]) Convert(by func(T) T) c.Stream[T] {
+// Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function
+func (s Set[T]) Filt(predicate func(T) (bool, error)) c.StreamBreakable[T] {
 	h := s.Head()
-	return loop.Stream(loop.Convert(h.Next, by).Next)
+	return breakLoop.Stream(breakLoop.Filt(breakLoop.From(h.Next), predicate).Next)
+}
+
+// Convert returns a stream that applies the 'converter' function to the collection elements
+func (s Set[T]) Convert(converter func(T) T) c.Stream[T] {
+	h := s.Head()
+	return loop.Stream(loop.Convert(h.Next, converter).Next)
+}
+
+// Convert returns a stream that applies the 'converter' function to the collection elements
+func (s Set[T]) Conv(converter func(T) (T, error)) c.StreamBreakable[T] {
+	h := s.Head()
+	return breakLoop.Stream(breakLoop.Conv(breakLoop.From(h.Next), converter).Next)
 }
 
 // Reduce reduces the elements into an one using the 'merge' function

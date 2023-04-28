@@ -35,7 +35,7 @@ func Not[T any](p Predicate[T]) Predicate[T] {
 func And[T any](p1, p2 Predicate[T]) Predicate[T] {
 	return func(v T) (bool, error) {
 		if ok, err := p1(v); err != nil || !ok {
-			return ok, err
+			return false, err
 		}
 		return p2(v)
 	}

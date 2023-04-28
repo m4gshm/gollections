@@ -32,7 +32,7 @@ func FilterAndConvert[FS ~[]From, From, To any](elements FS, filter func(From) b
 	return &ConvertFit[From, To]{array: array, size: size, elemSize: elemSize, converter: converter, filterFrom: filter, filterTo: always.True[To]}
 }
 
-// Flatt instantiates Iterator that extracts slices of 'To' by a Flattener from elements of 'From' and flattens as one iterable collection of 'To' elements.
+// Flatt instantiates Iterator that extracts slices of 'To' by a flattener from elements of 'From' and flattens as one iterable collection of 'To' elements.
 func Flatt[FS ~[]From, From, To any](elements FS, by func(From) []To) *Flatten[From, To] {
 	var (
 		header       = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
@@ -57,18 +57,18 @@ func FilterAndFlatt[FS ~[]From, From, To any](elements FS, filter func(From) boo
 }
 
 // Filter instantiates Iterator that checks elements by filters and returns successful ones.
-func Filter[TS ~[]T, T any](elements TS, filter func(T) bool) *FitIter[T] {
+func Filter[TS ~[]T, T any](elements TS, filter func(T) bool) *FilterIter[T] {
 	var (
 		header   = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
 		array    = unsafe.Pointer(header.Data)
 		size     = header.Len
 		elemSize = notsafe.GetTypeSize[T]()
 	)
-	return &FitIter[T]{array: array, size: size, elemSize: elemSize, filter: filter}
+	return &FilterIter[T]{array: array, size: size, elemSize: elemSize, filter: filter}
 }
 
 // NotNil instantiates Iterator that filters nullable elements.
-func NotNil[T any, TRS ~[]*T](elements TRS) *FitIter[*T] {
+func NotNil[T any, TRS ~[]*T](elements TRS) *FilterIter[*T] {
 	return Filter(elements, check.NotNil[T])
 }
 

@@ -42,7 +42,7 @@ func Convert[K, V any, k2, v2 any](next func() (K, V, bool), by func(K, V) (k2, 
 
 // Filter creates an Iterator that checks elements by a filter and returns successful ones
 func Filter[K, V any](next func() (K, V, bool), filter func(K, V) bool) FitKV[K, V] {
-	return FitKV[K, V]{next: next, by: filter}
+	return FitKV[K, V]{next: next, filter: filter}
 }
 
 // ToMapResolv collects key\value elements to a map by iterating over the elements with resolving of duplicated key values

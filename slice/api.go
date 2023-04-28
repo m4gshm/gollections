@@ -40,14 +40,7 @@ func OfLoop[S, T any](source S, hasNext func(S) bool, getNext func(S) (T, error)
 // Generate builds a slice by an generator function.
 // The generator returns an element, or false if the generation is over, or an error.
 func Generate[T any](next func() (T, bool)) []T {
-	var r []T
-	for {
-		e, ok := next()
-		if !ok {
-			return r
-		}
-		r = append(r, e)
-	}
+	return loop.ToSlice(next)
 }
 
 // Clone makes new slice instance with copied elements

@@ -7,8 +7,8 @@ import (
 
 // FitKV is the KVIterator wrapper that provides filtering of key/value elements by a Predicate.
 type FitKV[K, V any] struct {
-	next func() (K, V, bool)
-	by   func(K, V) bool
+	next   func() (K, V, bool)
+	filter func(K, V) bool
 }
 
 var (
@@ -30,8 +30,8 @@ func (f FitKV[K, V]) TrackEach(traker func(key K, value V)) {
 // The ok result indicates whether the pair was returned by the iterator.
 // If ok == false, then the iteration must be completed.
 func (f FitKV[K, V]) Next() (key K, value V, ok bool) {
-	if !(f.next == nil || f.by == nil) {
-		key, value, ok = nextFilteredKV(f.next, f.by)
+	if !(f.next == nil || f.filter == nil) {
+		key, value, ok = nextFilteredKV(f.next, f.filter)
 	}
 	return key, value, ok
 }

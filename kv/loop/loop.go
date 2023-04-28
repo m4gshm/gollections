@@ -22,7 +22,7 @@ type KVIter[S, K, V any] struct {
 
 var (
 	_ c.KVIterator[any, any]          = (*KVIter[any, any, any])(nil)
-	_ c.KVIteratorBreakable[any, any] = (*KVIter[any, any, any])(nil)
+	_ c.KVIterator[any, any] = (*KVIter[any, any, any])(nil)
 )
 
 // Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak

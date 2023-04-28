@@ -6,6 +6,7 @@ import (
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/loop"
+	breakLoop "github.com/m4gshm/gollections/loop/break/loop"
 	"github.com/m4gshm/gollections/notsafe"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/iter"
@@ -117,10 +118,22 @@ func (v Vector[T]) Filter(filter func(T) bool) c.Stream[T] {
 	return loop.Stream(loop.Filter(h.Next, filter).Next)
 }
 
+// Filt returns a stream consisting of elements that satisfy the condition of the 'predicate' function
+func (v Vector[T]) Filt(predicate func(T) (bool, error)) c.StreamBreakable[T] {
+	h := v.Head()
+	return breakLoop.Stream(breakLoop.Filt(breakLoop.From(h.Next), predicate).Next)
+}
+
 // Convert returns a stream that applies the 'converter' function to the collection elements
 func (v Vector[T]) Convert(converter func(T) T) c.Stream[T] {
 	h := v.Head()
 	return loop.Stream(loop.Convert(h.Next, converter).Next)
+}
+
+// Convert returns a stream that applies the 'converter' function to the collection elements
+func (v Vector[T]) Conv(converter func(T) (T, error)) c.StreamBreakable[T] {
+	h := v.Head()
+	return breakLoop.Stream(breakLoop.Conv(breakLoop.From(h.Next), converter).Next)
 }
 
 // Reduce reduces the elements into an one using the 'merge' function

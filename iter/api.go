@@ -20,14 +20,6 @@ func New[T any](elements []T) c.Iterator[T] {
 	return Wrap(elements)
 }
 
-// OfLoop creates an IteratorBreakable instance that loops over elements of a source
-// The hasNext specifies a predicate that tests existing of a next element in the source.
-// The getNext extracts the element.
-func OfLoop[S, T any](source S, hasNext func(S) bool, next func(S) (T, error)) c.IteratorBreakable[T] {
-	l := loop.NewIter(source, hasNext, next)
-	return &l
-}
-
 // Wrap instantiates Iterator using a slice as the elements source
 func Wrap[TS ~[]T, T any](elements TS) *sliceIter.SliceIter[T] {
 	h := sliceIter.NewHead(elements)

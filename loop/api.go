@@ -153,9 +153,9 @@ func ConvertAndFilter[From, To any](next func() (From, bool), converter func(Fro
 	return FilterConvertFilter(next, always.True[From], converter, filter)
 }
 
-// Flatt instantiates Iterator that extracts slices of 'To' by a Flattener from elements of 'From' and flattens as one iterable collection of 'To' elements.
-func Flatt[From, To any](next func() (From, bool), Flattener func(From) []To) FlatIter[From, To] {
-	return FlatIter[From, To]{next: next, flatt: Flattener, elemSizeTo: notsafe.GetTypeSize[To]()}
+// Flatt instantiates Iterator that extracts slices of 'To' by a flattener from elements of 'From' and flattens as one iterable collection of 'To' elements.
+func Flatt[From, To any](next func() (From, bool), flattener func(From) []To) FlatIter[From, To] {
+	return FlatIter[From, To]{next: next, flatt: flattener, elemSizeTo: notsafe.GetTypeSize[To]()}
 }
 
 // FilterAndFlatt filters source elements and extracts slices of 'To' by the 'flattener' function
@@ -290,4 +290,13 @@ func ToMapResolv[T any, K comparable, V, VR any](next func() (T, bool), keyExtra
 		m[k] = resolver(ok, k, exists, v)
 	}
 	return m
+}
+
+func New[S, T any](source S, hasNext func(S) bool, getNext func(S) T) func() (T, bool) {
+	return func() (out T, ok bool) {
+		if hasNext(source) {
+			out, ok = getNext(source), true
+		}
+		return out, ok
+	}
 }

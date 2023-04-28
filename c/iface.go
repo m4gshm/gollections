@@ -53,7 +53,10 @@ type Collection[T any] interface {
 	SliceFactory[T]
 
 	Filter(predicate func(T) bool) Stream[T]
+	Filt(predicate func(T) (bool, error)) StreamBreakable[T]
+
 	Convert(converter func(T) T) Stream[T]
+	Conv(converter func(T) (T, error)) StreamBreakable[T]
 
 	Reduce(merger func(T, T) T) T
 	HasAny(predicate func(T) bool) bool
@@ -86,7 +89,7 @@ type Iterator[T any] interface {
 	// Next returns the next element.
 	// The ok result indicates whether the element was returned by the iterator.
 	// If ok == false, then the iteration must be completed.
-	Next() (T, bool)
+	Next() (out T, ok bool)
 
 	ForLoop[T]
 	ForEachLoop[T]
@@ -98,11 +101,14 @@ type Sized interface {
 	Cap() int
 }
 
-// IteratorBreakable provides iterate over elements of a source, where an iteration can be interrupted by an error.
+// IteratorBreakable provides iterate over elements of a source, where an iteration can be interrupted by an error
 type IteratorBreakable[T any] interface {
-	Iterator[T]
-	//returns an iteration abort error
-	Error() error
+	// Next returns the next element.
+	// The ok result indicates whether the element was returned by the iterator.
+	// If ok == false, then the iteration must be completed.
+	Next() (out T, ok bool, err error)
+
+	ForLoop[T]
 }
 
 // PrevIterator is the Iterator that provides reverse iteration over elements of a collection
@@ -120,17 +126,21 @@ type DelIterator[T any] interface {
 
 // KVIterator provides iterate over key/value pairs
 type KVIterator[K, V any] interface {
-	//retrieves next elements or zero values if no more elements
-	Next() (K, V, bool)
+	// Next returns the next key/value pair.
+	// The ok result indicates whether the element was returned by the iterator.
+	// If ok == false, then the iteration must be completed.
+	Next() (key K, value V, ok bool)
 	TrackLoop[V, K]
 	TrackEachLoop[V, K]
 }
 
 // KVIteratorBreakable provides iterate over key/value pairs, where an iteration can be interrupted by an error
 type KVIteratorBreakable[K, V any] interface {
-	KVIterator[K, V]
-	//returns an iteration abort error
-	Error() error
+	// Next returns the next key/value pair.
+	// The ok result indicates whether the element was returned by the iterator.
+	// If ok == false, then the iteration must be completed.
+	Next() (key K, value V, ok bool, err error)
+	TrackLoop[V, K]
 }
 
 // Iterable is an iterator supplier interface
@@ -177,23 +187,66 @@ type Stream[T any] interface {
 	Collection[T]
 }
 
+// StreamBreakable is collection or stream of elements in transformation state.
+// It supports interrupting on an error that may occur in intermediate or final executor functions.
+type StreamBreakable[T any] interface {
+	IteratorBreakable[T]
+	Begin() IteratorBreakable[T]
+
+	Slice() ([]T, error)
+
+	Filt(predicate func(T) (bool, error)) StreamBreakable[T]
+	Filter(predicate func(T) bool) StreamBreakable[T]
+	Conv(converter func(T) (T, error)) StreamBreakable[T]
+	Convert(converter func(T) T) StreamBreakable[T]
+
+	Reduce(merger func(T, T) (T, error)) (T, error)
+	HasAny(predicate func(T) (bool, error)) (bool, error)
+}
+
 // KVTransformable provides limited kit of map transformation methods.
 // The full kit of transformer functions are in the package 'c/map_'
 type KVTransformable[K comparable, V any, Map map[K]V | map[K][]V] interface {
 	Filter(predicate func(K, V) bool) KVStream[K, V, Map]
-	Convert(converter func(K, V) (K, V)) KVStream[K, V, Map]
-
 	FilterKey(predicate func(K) bool) KVStream[K, V, Map]
-	ConvertKey(converter func(K) K) KVStream[K, V, Map]
-
 	FilterValue(predicate func(V) bool) KVStream[K, V, Map]
+
+	Filt(predicate func(K, V) (bool, error)) KVStreamBreakable[K, V, Map]
+	FiltKey(predicate func(K) (bool, error)) KVStreamBreakable[K, V, Map]
+	FiltValue(predicate func(V) (bool, error)) KVStreamBreakable[K, V, Map]
+
+	Convert(converter func(K, V) (K, V)) KVStream[K, V, Map]
+	ConvertKey(converter func(K) K) KVStream[K, V, Map]
 	ConvertValue(converter func(V) V) KVStream[K, V, Map]
+
+	Conv(converter func(K, V) (K, V, error)) KVStreamBreakable[K, V, Map]
+	ConvKey(converter func(K) (K, error)) KVStreamBreakable[K, V, Map]
+	ConvValue(converter func(V) (V, error)) KVStreamBreakable[K, V, Map]
 }
 
 // KVStream is map or key/value stream of elements in transformation state.
 type KVStream[K comparable, V any, M map[K]V | map[K][]V] interface {
 	KVIterator[K, V]
 	KVCollection[K, V, M]
+}
+
+// KVStream is map or key/value stream of elements in transformation state.
+type KVStreamBreakable[K comparable, V any, Map map[K]V | map[K][]V] interface {
+	KVIteratorBreakable[K, V]
+	Begin() KVIteratorBreakable[K, V]
+
+	Filter(predicate func(K, V) bool) KVStreamBreakable[K, V, Map]
+	FilterKey(predicate func(K) bool) KVStreamBreakable[K, V, Map]
+	FilterValue(predicate func(V) bool) KVStreamBreakable[K, V, Map]
+
+	Filt(predicate func(K, V) (bool, error)) KVStreamBreakable[K, V, Map]
+	FiltKey(predicate func(K) (bool, error)) KVStreamBreakable[K, V, Map]
+	FiltValue(predicate func(V) (bool, error)) KVStreamBreakable[K, V, Map]
+
+	Map() (Map, error)
+
+	Reduce(merger func(K, V, K, V) (K, V, error)) (K, V, error)
+	HasAny(predicate func(K, V) (bool, error)) (bool, error)
 }
 
 // Access provides access to an element by its pointer (index, key, coordinate, etc.)
