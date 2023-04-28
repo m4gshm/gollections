@@ -3,8 +3,8 @@ package iter
 import (
 	"unsafe"
 
+	"github.com/m4gshm/gollections/break/loop"
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/loop/break/loop"
 	"github.com/m4gshm/gollections/notsafe"
 )
 

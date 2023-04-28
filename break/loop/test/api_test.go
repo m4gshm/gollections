@@ -8,12 +8,12 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/m4gshm/gollections/as"
-	kvBreakLoop "github.com/m4gshm/gollections/kv/loop/break/loop"
+	breakKvLoop "github.com/m4gshm/gollections/break/kv/loop"
+	breakLoop "github.com/m4gshm/gollections/break/loop"
+	"github.com/m4gshm/gollections/break/op"
+	"github.com/m4gshm/gollections/break/predicate/eq"
+	"github.com/m4gshm/gollections/break/predicate/more"
 	"github.com/m4gshm/gollections/loop"
-	breakLoop "github.com/m4gshm/gollections/loop/break/loop"
-	"github.com/m4gshm/gollections/op/break/op"
-	"github.com/m4gshm/gollections/predicate/break/predicate/eq"
-	"github.com/m4gshm/gollections/predicate/break/predicate/more"
 	"github.com/m4gshm/gollections/slice"
 )
 
@@ -171,7 +171,7 @@ func Test_MultipleKeyValuer(t *testing.T) {
 		{name: "Tom", age: 18}, {},
 	}
 
-	m, _ := kvBreakLoop.Group(breakLoop.ToKVs(breakLoop.From(loop.Of(users...)),
+	m, _ := breakKvLoop.Group(breakLoop.ToKVs(breakLoop.From(loop.Of(users...)),
 		func(u User) ([]string, error) {
 			return slice.Convert(u.roles, func(r Role) string { return strings.ToLower(r.name) }), nil
 		},

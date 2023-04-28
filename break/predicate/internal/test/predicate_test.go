@@ -3,9 +3,9 @@ package test
 import (
 	"testing"
 
-	"github.com/m4gshm/gollections/predicate/break/predicate/less"
-	"github.com/m4gshm/gollections/predicate/break/predicate/more"
-	"github.com/m4gshm/gollections/predicate/break/predicate/one"
+	"github.com/m4gshm/gollections/break/predicate/less"
+	"github.com/m4gshm/gollections/break/predicate/more"
+	"github.com/m4gshm/gollections/break/predicate/one"
 	"github.com/stretchr/testify/assert"
 )
 

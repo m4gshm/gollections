@@ -3,13 +3,13 @@ package mutable
 import (
 	"fmt"
 
+	breakLoop "github.com/m4gshm/gollections/break/kv/loop"
+	breakMapConvert "github.com/m4gshm/gollections/break/map_/convert"
+	breakMapFilter "github.com/m4gshm/gollections/break/map_/filter"
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/immutable"
 	"github.com/m4gshm/gollections/kv/loop"
-	breakLoop "github.com/m4gshm/gollections/kv/loop/break/loop"
 	"github.com/m4gshm/gollections/map_"
-	breakMapConvert "github.com/m4gshm/gollections/map_/break/map_/convert"
-	breakMapFilter "github.com/m4gshm/gollections/map_/break/map_/filter"
 	"github.com/m4gshm/gollections/map_/convert"
 	"github.com/m4gshm/gollections/map_/filter"
 	"github.com/m4gshm/gollections/map_/iter"

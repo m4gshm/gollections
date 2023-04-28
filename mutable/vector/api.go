@@ -4,9 +4,9 @@ package vector
 import (
 	"golang.org/x/exp/constraints"
 
+	breakLoop "github.com/m4gshm/gollections/break/loop"
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/loop"
-	breakLoop "github.com/m4gshm/gollections/loop/break/loop"
 	"github.com/m4gshm/gollections/mutable"
 )
 

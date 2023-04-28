@@ -2,8 +2,8 @@
 package not
 
 import (
-	"github.com/m4gshm/gollections/predicate/break/predicate"
-	"github.com/m4gshm/gollections/predicate/break/predicate/eq"
+	"github.com/m4gshm/gollections/break/predicate"
+	"github.com/m4gshm/gollections/break/predicate/eq"
 )
 
 // Eq - not.Eq makes reverse of the eq.To predicate

@@ -3,10 +3,10 @@ package ordered
 import (
 	"fmt"
 
+	breakLoop "github.com/m4gshm/gollections/break/loop"
 	"github.com/m4gshm/gollections/c"
 	oMapIter "github.com/m4gshm/gollections/immutable/ordered/map_/iter"
 	"github.com/m4gshm/gollections/loop"
-	breakLoop "github.com/m4gshm/gollections/loop/break/loop"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/slice"
 )

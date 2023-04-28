@@ -1,8 +1,8 @@
 package iter
 
 import (
+	"github.com/m4gshm/gollections/break/loop"
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/loop/break/loop"
 	"github.com/m4gshm/gollections/slice/iter"
 )
 

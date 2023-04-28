@@ -3,8 +3,8 @@ package iter
 import (
 	"unsafe"
 
+	"github.com/m4gshm/gollections/break/loop"
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/loop/break/loop"
 )
 
 // FitIter is the array based Iterator implementation that provides filtering of elements by a Predicate.

@@ -4,11 +4,11 @@ import (
 	"errors"
 	"testing"
 
+	breakLoop "github.com/m4gshm/gollections/break/kv/loop"
 	"github.com/m4gshm/gollections/iter"
 	"github.com/m4gshm/gollections/k"
 	kviter "github.com/m4gshm/gollections/kv/iter"
 	"github.com/m4gshm/gollections/kv/loop"
-	breakLoop "github.com/m4gshm/gollections/kv/loop/break/loop"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/stretchr/testify/assert"
 )

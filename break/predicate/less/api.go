@@ -2,7 +2,7 @@
 package less
 
 import (
-	"github.com/m4gshm/gollections/predicate/break/predicate"
+	"github.com/m4gshm/gollections/break/predicate"
 	"golang.org/x/exp/constraints"
 )
 

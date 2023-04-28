@@ -2,8 +2,8 @@
 package exclude
 
 import (
-	"github.com/m4gshm/gollections/predicate/break/predicate"
-	"github.com/m4gshm/gollections/predicate/break/predicate/one"
+	"github.com/m4gshm/gollections/break/predicate"
+	"github.com/m4gshm/gollections/break/predicate/one"
 )
 
 // All - exclude.All creates a predicate that tests  if a value is not in the excluded values

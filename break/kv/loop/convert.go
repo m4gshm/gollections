@@ -1,8 +1,8 @@
 package loop
 
 import (
+	"github.com/m4gshm/gollections/break/loop"
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/loop/break/loop"
 )
 
 // ConvertKVIter is the iterator wrapper implementation applying a converter to all iterable key/value elements.

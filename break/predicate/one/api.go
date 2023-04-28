@@ -3,8 +3,8 @@ package one
 
 import (
 	"github.com/m4gshm/gollections/as"
+	"github.com/m4gshm/gollections/break/predicate"
 	"github.com/m4gshm/gollections/immutable/set"
-	"github.com/m4gshm/gollections/predicate/break/predicate"
 )
 
 // Of creates a predicate that can be used to compare a value with predefined expected values

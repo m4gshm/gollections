@@ -1,8 +1,8 @@
 package loop
 
 import (
+	breakLoop "github.com/m4gshm/gollections/break/loop"
 	"github.com/m4gshm/gollections/c"
-	breakLoop "github.com/m4gshm/gollections/loop/break/loop"
 )
 
 // / Stream is default Stream constructor/
@@ -29,7 +29,7 @@ func (t StreamIter[T]) Next() (element T, ok bool) {
 }
 
 // Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function
-func (t StreamIter[T]) Filter(predicate func(T) bool) c.Stream[T] {
+func (t StreamIter[T]) Filter(predicate func(T) bool) StreamIter[T][T] {
 	f := Filter(t.next, predicate)
 	return Stream(f.Next)
 }

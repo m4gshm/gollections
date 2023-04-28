@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"sort"
 
+	breakLoop "github.com/m4gshm/gollections/break/loop"
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/loop"
-	breakLoop "github.com/m4gshm/gollections/loop/break/loop"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/map_/iter"
 	"github.com/m4gshm/gollections/slice"
@@ -93,7 +93,6 @@ func (m MapValues[K, V]) Convert(converter func(V) V) c.Stream[V] {
 	h := m.Head()
 	return loop.Stream(loop.Convert(h.Next, converter).Next)
 }
-
 
 // Convert returns a stream that applies the 'converter' function to the collection elements
 func (m MapValues[K, V]) Conv(converter func(V) (V, error)) c.StreamBreakable[V] {

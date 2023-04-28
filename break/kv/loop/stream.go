@@ -1,9 +1,9 @@
 package loop
 
 import (
+	breakLoop "github.com/m4gshm/gollections/break/loop"
+	breakFilter "github.com/m4gshm/gollections/break/map_/filter"
 	"github.com/m4gshm/gollections/c"
-	breakLoop "github.com/m4gshm/gollections/loop/break/loop"
-	breakFilter "github.com/m4gshm/gollections/map_/break/map_/filter"
 	"github.com/m4gshm/gollections/map_/filter"
 )
 

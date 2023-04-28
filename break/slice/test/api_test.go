@@ -6,9 +6,9 @@ import (
 	"runtime"
 	"testing"
 
+	"github.com/m4gshm/gollections/break/predicate"
+	"github.com/m4gshm/gollections/break/slice"
 	"github.com/m4gshm/gollections/op"
-	"github.com/m4gshm/gollections/predicate/break/predicate"
-	"github.com/m4gshm/gollections/slice/break/slice"
 	"github.com/stretchr/testify/assert"
 )
 

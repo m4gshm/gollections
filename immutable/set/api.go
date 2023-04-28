@@ -4,11 +4,11 @@ package set
 import (
 	"golang.org/x/exp/constraints"
 
+	breakLoop "github.com/m4gshm/gollections/break/loop"
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/immutable"
 	"github.com/m4gshm/gollections/immutable/ordered"
 	"github.com/m4gshm/gollections/loop"
-	breakLoop "github.com/m4gshm/gollections/loop/break/loop"
 )
 
 // Of instantiates Set with predefined elements.

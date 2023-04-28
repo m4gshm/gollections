@@ -1,8 +1,8 @@
 package loop
 
 import (
+	"github.com/m4gshm/gollections/break/loop"
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/loop/break/loop"
 )
 
 // FiltKV is the KVIterator wrapper that provides filtering of key/value elements by a Predicate.
