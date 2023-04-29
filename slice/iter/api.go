@@ -38,7 +38,7 @@ func FilterAndConvert[FS ~[]From, From, To any](elements FS, filter func(From) b
 }
 
 // Flatt instantiates Iterator that extracts slices of 'To' by a flattener from elements of 'From' and flattens as one iterable collection of 'To' elements.
-func Flatt[FS ~[]From, From, To any](elements FS, by func(From) []To) *Flatten[From, To] {
+func Flatt[FS ~[]From, From, To any](elements FS, by func(From) []To) *FlatIter[From, To] {
 	var (
 		header       = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
 		array        = unsafe.Pointer(header.Data)
@@ -46,7 +46,7 @@ func Flatt[FS ~[]From, From, To any](elements FS, by func(From) []To) *Flatten[F
 		elemSizeFrom = notsafe.GetTypeSize[From]()
 		elemSizeTo   = notsafe.GetTypeSize[To]()
 	)
-	return &Flatten[From, To]{arrayFrom: array, sizeFrom: size, elemSizeFrom: elemSizeFrom, elemSizeTo: elemSizeTo, flatt: by}
+	return &FlatIter[From, To]{arrayFrom: array, sizeFrom: size, elemSizeFrom: elemSizeFrom, elemSizeTo: elemSizeTo, flattener: by}
 }
 
 // FilterAndFlatt additionally filters –'From' elements.

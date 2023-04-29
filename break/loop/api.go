@@ -175,12 +175,12 @@ func ConvertAndFilter[From, To any](next func() (From, bool, error), converter f
 
 // Flat instantiates Iterator that extracts slices of 'To' by a flattener from elements of 'From' and flattens as one iterable collection of 'To' elements.
 func Flat[From, To any](next func() (From, bool, error), flattener func(From) ([]To, error)) FlatIter[From, To] {
-	return FlatIter[From, To]{next: next, flatt: flattener, elemSizeTo: notsafe.GetTypeSize[To]()}
+	return FlatIter[From, To]{next: next, flattener: flattener, elemSizeTo: notsafe.GetTypeSize[To]()}
 }
 
 // Flatt instantiates Iterator that extracts slices of 'To' by a flattener from elements of 'From' and flattens as one iterable collection of 'To' elements.
 func Flatt[From, To any](next func() (From, bool, error), flattener func(From) []To) FlatIter[From, To] {
-	return FlatIter[From, To]{next: next, flatt: func(f From) ([]To, error) { return flattener(f), nil }, elemSizeTo: notsafe.GetTypeSize[To]()}
+	return FlatIter[From, To]{next: next, flattener: func(f From) ([]To, error) { return flattener(f), nil }, elemSizeTo: notsafe.GetTypeSize[To]()}
 }
 
 // FitAndFlat filters source elements and extracts slices of 'To' by the 'flattener' function

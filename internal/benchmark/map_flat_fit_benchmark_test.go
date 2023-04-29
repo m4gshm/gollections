@@ -10,7 +10,6 @@ import (
 	"github.com/m4gshm/gollections/first"
 	"github.com/m4gshm/gollections/immutable/vector"
 	"github.com/m4gshm/gollections/iter"
-	sliceit "github.com/m4gshm/gollections/iter/slice"
 	"github.com/m4gshm/gollections/iterable"
 	"github.com/m4gshm/gollections/last"
 	"github.com/m4gshm/gollections/loop"
@@ -256,7 +255,7 @@ func Benchmark_ConvertAndFilter_Slice_Iterated(b *testing.B) {
 	var s []string
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		s = iter.ToSlice[string](iter.Convert(sliceit.Filter(items, even), convert.And(toString, addTail)))
+		s = iter.ToSlice[string](iter.Convert(sliceIter.Filter(items, even), convert.And(toString, addTail)))
 	}
 	_ = s
 
@@ -366,7 +365,7 @@ func Benchmark_FilterAndConvert_Slice(b *testing.B) {
 	var s []string
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		f := sliceit.FilterAndConvert(items, even, convert.And(toString, addTail))
+		f := sliceIter.FilterAndConvert(items, even, convert.And(toString, addTail))
 		s = iter.ToSlice[string](f)
 	}
 	_ = s
@@ -423,7 +422,7 @@ func Benchmark_Flatt_Slice_Iterated(b *testing.B) {
 	multiDimension := [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		oneDimension := iter.ToSlice[int](iter.Filter(iter.Flatt(sliceit.Flatt(multiDimension, convert.To[[][]int]), convert.To[[]int]), odds))
+		oneDimension := iter.ToSlice[int](iter.Filter(iter.Flatt(sliceIter.Flatt(multiDimension, convert.To[[][]int]), convert.To[[]int]), odds))
 		_ = oneDimension
 	}
 	b.StopTimer()
@@ -502,7 +501,7 @@ func Benchmark_ReduceSum_Slice(b *testing.B) {
 	b.ResetTimer()
 	result := 0
 	for i := 0; i < b.N; i++ {
-		result = loop.Reduce(iter.Filter(iter.Flatt(sliceit.Flatt(multiDimension, convert.To[[][]int]), convert.To[[]int]), odds).Next, sop.Sum[int])
+		result = loop.Reduce(iter.Filter(iter.Flatt(sliceIter.Flatt(multiDimension, convert.To[[][]int]), convert.To[[]int]), odds).Next, sop.Sum[int])
 	}
 	b.StopTimer()
 	if result != expected {
@@ -644,7 +643,7 @@ func Benchmark_ConvertFlattStructure_SliceFit(b *testing.B) {
 	items := []*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		att := sliceit.FilterAndFlatt(items, check.NotNil[Participant], (*Participant).GetAttributes)
+		att := sliceIter.FilterAndFlatt(items, check.NotNil[Participant], (*Participant).GetAttributes)
 		_ = iter.ToSlice[string](iter.FilterAndConvert(att, check.NotNil[Attributes], (*Attributes).GetName))
 	}
 	b.StopTimer()

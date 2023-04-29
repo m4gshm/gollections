@@ -82,7 +82,7 @@ type FlatIter[From, To any] struct {
 	elemSizeTo    uintptr
 	indTo, sizeTo int
 	next          func() (From, bool, error)
-	flatt         func(From) ([]To, error)
+	flattener     func(From) ([]To, error)
 }
 
 var _ c.IteratorBreakable[any] = (*FlatIter[any, any])(nil)
@@ -112,7 +112,7 @@ func (i *FlatIter[From, To]) Next() (t To, ok bool, err error) {
 			return t, false, err
 		} else if !ok {
 			return t, false, nil
-		} else if elementsTo, err := i.flatt(v); err != nil {
+		} else if elementsTo, err := i.flattener(v); err != nil {
 			return t, false, err
 		} else if len(elementsTo) > 0 {
 			i.indTo = 1

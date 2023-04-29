@@ -7,6 +7,6 @@ import (
 )
 
 // Of collects sets of values grouped by keys obtained by passing a key/value iterator
-func Of[K comparable, V any](it c.KVIterator[K, V]) map[K][]V {
-	return loop.Group(it.Next)
+func Of[K comparable, V any, I c.KVIterator[K, V]](elements I) map[K][]V {
+	return loop.Group(elements.Next)
 }

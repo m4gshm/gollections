@@ -33,8 +33,8 @@ type Set[T, I any] interface {
 }
 
 // Map - collection interface that stores key/value pairs and provide access to an element by its key
-type Map[K comparable, V any] interface {
-	KVCollection[K, V, map[K]V]
+type Map[K comparable, V, I any] interface {
+	KVCollection[K, V, I, map[K]V]
 	Checkable[K]
 	Access[K, V]
 
@@ -69,10 +69,10 @@ type Convertrable[T, Stream, StreamBreakable any] interface {
 }
 
 // KVCollection is the base interface of associative collections
-type KVCollection[K comparable, V any, M map[K]V | map[K][]V] interface {
+type KVCollection[K comparable, V, I any, M map[K]V | map[K][]V] interface {
 	TrackLoop[K, V]
 	TrackEachLoop[K, V]
-	KVIterable[K, V]
+	KVIterable[I]
 	MapFactory[K, V, M]
 
 	Reduce(merger func(K, V, K, V) (K, V)) (K, V)
@@ -154,8 +154,8 @@ type Iterable[I any] interface {
 }
 
 // KVIterable is an iterator supplier interface
-type KVIterable[K, V any] interface {
-	Begin() KVIterator[K, V]
+type KVIterable[I any] interface {
+	Begin() I
 }
 
 // ForLoop is the interface of a collection that provides traversing of the elements.
@@ -232,9 +232,9 @@ type KVTransformable[K, V, KVStream, KVStreamBreakable any] interface {
 }
 
 // KVStream is map or key/value stream of elements in transformation state.
-type KVStream[K comparable, V any, M map[K]V | map[K][]V] interface {
+type KVStream[K comparable, V, I any, M map[K]V | map[K][]V] interface {
 	KVIterator[K, V]
-	KVCollection[K, V, M]
+	KVCollection[K, V, I, M]
 }
 
 // KVStream is map or key/value stream of elements in transformation state.

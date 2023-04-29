@@ -11,10 +11,10 @@ import (
 	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/convert"
 	"github.com/m4gshm/gollections/iter"
-	sliceit "github.com/m4gshm/gollections/iter/slice"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
+	sliceIter "github.com/m4gshm/gollections/slice/iter"
 	"github.com/m4gshm/gollections/stream"
 )
 
@@ -28,7 +28,7 @@ func Test_FilterAndConvert(t *testing.T) {
 	converted := iter.FilterAndConvert(iter.Wrap(items), func(v int) bool { return v%2 == 0 }, convert.And(toString, addTail))
 	assert.Equal(t, slice.Of("2_tail", "4_tail"), loop.ToSlice(converted.Next))
 
-	converted2 := sliceit.FilterAndConvert(items, func(v int) bool { return v%2 == 0 }, convert.And(toString, addTail))
+	converted2 := sliceIter.FilterAndConvert(items, func(v int) bool { return v%2 == 0 }, convert.And(toString, addTail))
 	assert.Equal(t, slice.Of("2_tail", "4_tail"), loop.ToSlice(converted2.Next))
 
 	//plain old style
@@ -53,7 +53,7 @@ func Test_FlattSlices(t *testing.T) {
 	a := iter.ToSlice[int](f)
 	assert.Equal(t, expected, a)
 
-	a = iter.ToSlice[int](iter.Filter(iter.Flatt(sliceit.Flatt(multiDimension, convert.To[[][]int]), convert.To[[]int]), odds))
+	a = iter.ToSlice[int](iter.Filter(iter.Flatt(sliceIter.Flatt(multiDimension, convert.To[[][]int]), convert.To[[]int]), odds))
 	assert.Equal(t, expected, a)
 
 	//plain old style
@@ -89,7 +89,7 @@ func Test_ReduceSlices(t *testing.T) {
 	oddSum := loop.Reduce(iter.Filter(iter.Flatt(iter.Flatt(iter.Wrap(multiDimension), convert.To[[][]int]), convert.To[[]int]), odds).Next, op.Sum[int])
 	assert.Equal(t, e, oddSum)
 
-	oddSum = loop.Reduce(iter.Filter(iter.Flatt(sliceit.Flatt(multiDimension, convert.To[[][]int]), convert.To[[]int]), odds).Next, op.Sum[int])
+	oddSum = loop.Reduce(iter.Filter(iter.Flatt(sliceIter.Flatt(multiDimension, convert.To[[][]int]), convert.To[[]int]), odds).Next, op.Sum[int])
 	assert.Equal(t, e, oddSum)
 
 	//plain old style
@@ -135,7 +135,7 @@ func Test_ConvertFlattStructure_Iterable(t *testing.T) {
 	names := loop.ToSlice(iter.Convert(iter.Flatt(iter.Wrap(items), (*Participant).GetAttributes), (*Attributes).GetName).Next)
 	assert.Equal(t, expected, names)
 
-	names = loop.ToSlice(iter.Convert(sliceit.Flatt(items, (*Participant).GetAttributes), (*Attributes).GetName).Next)
+	names = loop.ToSlice(iter.Convert(sliceIter.Flatt(items, (*Participant).GetAttributes), (*Attributes).GetName).Next)
 	assert.Equal(t, expected, names)
 }
 
@@ -147,7 +147,7 @@ func Test_ConvertFilterAndFlattStructure_Iterable(t *testing.T) {
 	names := loop.ToSlice(iter.Convert(iter.FilterAndFlatt(iter.Wrap(items), check.NotNil[Participant], (*Participant).GetAttributes), (*Attributes).GetName).Next)
 	assert.Equal(t, expected, names)
 
-	names = loop.ToSlice(iter.Convert(sliceit.FilterAndFlatt(items, check.NotNil[Participant], (*Participant).GetAttributes), (*Attributes).GetName).Next)
+	names = loop.ToSlice(iter.Convert(sliceIter.FilterAndFlatt(items, check.NotNil[Participant], (*Participant).GetAttributes), (*Attributes).GetName).Next)
 	assert.Equal(t, expected, names)
 }
 

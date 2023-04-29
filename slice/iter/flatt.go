@@ -65,32 +65,32 @@ func (f *FlattenFitIter[From, To]) Cap() int {
 	return f.cap
 }
 
-// Flatten is the array based Iterator impelementation that converts an element to a slice and iterates over the elements of that slice.
-// For example, Flatten can be used to iterate over all the elements of a multi-dimensional array as if it were a one-dimensional array ([][]int -> []int).
-type Flatten[From, To any] struct {
+// FlatIter is the array based Iterator impelementation that converts an element to a slice and iterates over the elements of that slice.
+// For example, FlatIter can be used to iterate over all the elements of a multi-dimensional array as if it were a one-dimensional array ([][]int -> []int).
+type FlatIter[From, To any] struct {
 	arrayFrom, arrayTo       unsafe.Pointer
 	elemSizeFrom, elemSizeTo uintptr
 	sizeFrom, sizeTo         int
 	indFrom, indTo           int
-	flatt                    func(From) []To
+	flattener                func(From) []To
 }
 
-var _ c.Iterator[any] = (*Flatten[any, any])(nil)
+var _ c.Iterator[any] = (*FlatIter[any, any])(nil)
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
-func (f *Flatten[From, To]) For(walker func(element To) error) error {
+func (f *FlatIter[From, To]) For(walker func(element To) error) error {
 	return loop.For(f.Next, walker)
 }
 
 // ForEach FlatIter all elements retrieved by the iterator
-func (f *Flatten[From, To]) ForEach(walker func(element To)) {
+func (f *FlatIter[From, To]) ForEach(walker func(element To)) {
 	loop.ForEach(f.Next, walker)
 }
 
 // Next returns the next element.
 // The ok result indicates whether the element was returned by the iterator.
 // If ok == false, then the iteration must be completed.
-func (f *Flatten[From, To]) Next() (To, bool) {
+func (f *FlatIter[From, To]) Next() (To, bool) {
 	sizeTo := f.sizeTo
 	if sizeTo > 0 {
 		if indTo := f.indTo; indTo < sizeTo {
@@ -102,7 +102,7 @@ func (f *Flatten[From, To]) Next() (To, bool) {
 		f.sizeTo = 0
 	}
 	for indFrom := f.indFrom; indFrom < f.sizeFrom; indFrom++ {
-		if elementsTo := f.flatt(*(*From)(notsafe.GetArrayElemRef(f.arrayFrom, indFrom, f.elemSizeFrom))); len(elementsTo) > 0 {
+		if elementsTo := f.flattener(*(*From)(notsafe.GetArrayElemRef(f.arrayFrom, indFrom, f.elemSizeFrom))); len(elementsTo) > 0 {
 			f.indFrom = indFrom + 1
 			f.indTo = 1
 			header := notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elementsTo))
@@ -116,6 +116,6 @@ func (f *Flatten[From, To]) Next() (To, bool) {
 }
 
 // Cap returns the iterator capacity
-func (f *Flatten[From, To]) Cap() int {
+func (f *FlatIter[From, To]) Cap() int {
 	return f.sizeFrom
 }
