@@ -24,20 +24,26 @@ type MapValues[K comparable, V any] struct {
 }
 
 var (
-	_ c.Collection[any, *map_.NewValIter[int, any]] = (*MapValues[int, any])(nil)
-	_ fmt.Stringer                                  = (*MapValues[int, any])(nil)
-
-	_ c.Collection[any, *map_.NewValIter[int, any]] = MapValues[int, any]{}
-	_ fmt.Stringer                                  = MapValues[int, any]{}
+	_ c.Collection[any]                            = (*MapValues[int, any])(nil)
+	_ c.Collection[any]                            = MapValues[int, any]{}
+	_ loop.Looper[any, *map_.NewValIter[int, any]] = (*MapValues[int, any])(nil)
+	_ loop.Looper[any, *map_.NewValIter[int, any]] = MapValues[int, any]{}
+	_ fmt.Stringer                                 = (*MapValues[int, any])(nil)
+	_ fmt.Stringer                                 = MapValues[int, any]{}
 )
 
-// Begin creates iterator
-func (m MapValues[K, V]) Begin() *map_.NewValIter[K, V] {
+// Iter creates an iterator
+func (m MapValues[K, V]) Iter() c.Iterator[V] {
 	h := m.Head()
 	return &h
 }
 
-// Head creates iterator
+func (m MapValues[K, V]) Loop() *map_.NewValIter[K, V] {
+	h := m.Head()
+	return &h
+}
+
+// Head creates an iterator value object
 func (m MapValues[K, V]) Head() map_.NewValIter[K, V] {
 	return map_.NewVal(m.elements)
 }

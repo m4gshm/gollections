@@ -54,7 +54,7 @@ func Test_group_orderset_odd_even(t *testing.T) {
 }
 
 func Test_group_orderset_with_filtering_by_stirng_len(t *testing.T) {
-	var groups = iterableGroup.Of[*slice.Iter[string]](oset.Of(
+	var groups = iterableGroup.Of(oset.Of(
 		"seventh", "seventh", //duplicated
 		"first", "second", "third", "fourth",
 		"fifth", "sixth", "eighth",

@@ -8,11 +8,11 @@ import (
 )
 
 // AndConvert - filter.AndConvert is short alias of iterable.FilterAndConvert
-func AndConvert[I c.Iterator[From],From, To any, IT c.Iterable[I]](elements IT, filter func(From) bool, converter func(From) To) stream.Iter[To] {
-	return iterable.FilterAndConvert[I](elements, filter, converter)
+func AndConvert[From, To any, IT c.Iterable[From]](elements IT, filter func(From) bool, converter func(From) To) stream.Iter[To] {
+	return iterable.FilterAndConvert(elements, filter, converter)
 }
 
 // ConvertFilter - filter.ConvertFilter is short alias of slice.FilterConvertFilter
-func ConvertFilter[I c.Iterator[From], From, To any, IT c.Iterable[I]](elements IT, filterFrom func(From) bool, converter func(From) To, filterTo func(To) bool) stream.Iter[To] {
-	return iterable.FilterAndConvert[I](elements, filterFrom, converter).Filter(filterTo)
+func ConvertFilter[From, To any, IT c.Iterable[From]](elements IT, filterFrom func(From) bool, converter func(From) To, filterTo func(To) bool) stream.Iter[To] {
+	return iterable.FilterAndConvert(elements, filterFrom, converter).Filter(filterTo)
 }

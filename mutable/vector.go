@@ -33,41 +33,47 @@ func WrapVector[T any](elements []T) *Vector[T] {
 type Vector[T any] []T
 
 var (
-	_ c.Addable[any]                              = (*Vector[any])(nil)
-	_ c.AddableAll[c.ForEachLoop[any]]            = (*Vector[any])(nil)
-	_ c.Deleteable[int]                           = (*Vector[any])(nil)
-	_ c.DeleteableVerify[int]                     = (*Vector[any])(nil)
-	_ c.Settable[int, any]                        = (*Vector[any])(nil)
-	_ c.SettableNew[int, any]                     = (*Vector[any])(nil)
-	_ c.Vector[any, *SliceIter[Vector[any], any]] = (*Vector[any])(nil)
-	_ fmt.Stringer                                = (*Vector[any])(nil)
+	_ c.Addable[any]                    = (*Vector[any])(nil)
+	_ c.AddableAll[c.ForEachLoop[any]]  = (*Vector[any])(nil)
+	_ c.Deleteable[int]                 = (*Vector[any])(nil)
+	_ c.DeleteableVerify[int]           = (*Vector[any])(nil)
+	_ c.Settable[int, any]              = (*Vector[any])(nil)
+	_ c.SettableNew[int, any]           = (*Vector[any])(nil)
+	_ c.Vector[any]                     = (*Vector[any])(nil)
+	_ loop.Looper[any, *SliceIter[any]] = (*Vector[any])(nil)
+	_ fmt.Stringer                      = (*Vector[any])(nil)
 )
 
-// Begin creates iterator
-func (v *Vector[T]) Begin() *SliceIter[Vector[T], T] {
+// Iter creates an iterator
+func (v *Vector[T]) Iter() c.Iterator[T] {
 	h := v.Head()
 	return &h
 }
 
-// BeginEdit creates iterator that can delete iterable elements
-func (v *Vector[T]) BeginEdit() c.DelIterator[T] {
+func (v *Vector[T]) Loop() *SliceIter[T] {
 	h := v.Head()
 	return &h
 }
 
-// Head creates iterator
-func (v *Vector[T]) Head() SliceIter[Vector[T], T] {
+// IterEdit creates iterator that can delete iterable elements
+func (v *Vector[T]) IterEdit() c.DelIterator[T] {
+	h := v.Head()
+	return &h
+}
+
+// Head creates an iterator value object
+func (v *Vector[T]) Head() SliceIter[T] {
 	return NewHead(v, v.DeleteActualOne)
 }
 
 // Tail creates an iterator pointing to the end of the collection
-func (v *Vector[T]) Tail() SliceIter[Vector[T], T] {
+func (v *Vector[T]) Tail() SliceIter[T] {
 	return NewTail(v, v.DeleteActualOne)
 }
 
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
-func (v *Vector[T]) First() (SliceIter[Vector[T], T], T, bool) {
+func (v *Vector[T]) First() (SliceIter[T], T, bool) {
 	var (
 		iterator  = NewHead(v, v.DeleteActualOne)
 		first, ok = iterator.Next()
@@ -77,7 +83,7 @@ func (v *Vector[T]) First() (SliceIter[Vector[T], T], T, bool) {
 
 // Last returns the latest element of the collection, an iterator to reverse iterate over the remaining elements, and true\false marker of availability previous elements.
 // If no more elements then ok==false.
-func (v *Vector[T]) Last() (SliceIter[Vector[T], T], T, bool) {
+func (v *Vector[T]) Last() (SliceIter[T], T, bool) {
 	var (
 		iterator  = NewTail(v, v.DeleteActualOne)
 		first, ok = iterator.Prev()

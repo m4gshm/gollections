@@ -63,8 +63,8 @@ func (t Iter[T]) Reduce(merger func(T, T) (T, error)) (T, error) {
 	return loop.Reduce(t.next, merger)
 }
 
-// Begin creates iterator
-func (t Iter[T]) Begin() Iter[T] {
+// Iter creates an iterator
+func (t Iter[T]) Iter() Iter[T] {
 	return t
 }
 

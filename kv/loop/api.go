@@ -7,6 +7,10 @@ import (
 	"github.com/m4gshm/gollections/map_/resolv"
 )
 
+type Looper[K, V any, I interface{ Next() (K, V, bool) }] interface {
+	Loop() I
+}
+
 // Group collects sets of values grouped by keys obtained by passing a key/value iterator
 func Group[K comparable, V any](next func() (K, V, bool)) map[K][]V {
 	return ToMapResolv(next, resolv.Append[K, V])

@@ -56,18 +56,24 @@ var (
 	_ c.SettableNew[int, any]                                             = (*Map[int, any])(nil)
 	_ c.SettableMap[c.TrackEachLoop[int, any]]                            = (*Map[int, any])(nil)
 	_ c.ImmutableMapConvert[ordered.Map[int, any]]                        = (*Map[int, any])(nil)
-	_ c.Map[int, any, *omap.Iter[int, any]]                               = (*Map[int, any])(nil)
+	_ c.Map[int, any]                                                     = (*Map[int, any])(nil)
+	_ loop.Looper[int, any, *omap.Iter[int, any]]                         = (*Map[int, any])(nil)
 	_ c.KeyVal[ordered.MapKeysIter[int], ordered.MapValuesIter[int, any]] = (*Map[int, any])(nil)
 	_ fmt.Stringer                                                        = (*Map[int, any])(nil)
 )
 
-// Begin creates iterator
-func (m *Map[K, V]) Begin() *omap.Iter[K, V] {
+// Iter creates an iterator
+func (m *Map[K, V]) Iter() c.KVIterator[K, V] {
 	h := m.Head()
 	return &h
 }
 
-// Head creates iterator
+func (m *Map[K, V]) Loop() *omap.Iter[K, V] {
+	h := m.Head()
+	return &h
+}
+
+// Head creates an iterator value object
 func (m *Map[K, V]) Head() omap.Iter[K, V] {
 	var (
 		order    []K

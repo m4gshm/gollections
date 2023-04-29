@@ -14,7 +14,6 @@ import (
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/sort"
-	"github.com/m4gshm/gollections/stream"
 	"github.com/m4gshm/gollections/walk/group"
 
 	"github.com/stretchr/testify/assert"
@@ -34,11 +33,11 @@ func Test_Set_Iterate(t *testing.T) {
 	expected := slice.Of(1, 2, 3, 4)
 	assert.Equal(t, expected, values)
 
-	iterSlice := sort.Of(loop.ToSlice[int](set.Begin().Next))
+	iterSlice := sort.Of(loop.ToSlice[int](set.Iter().Next))
 	assert.Equal(t, expected, iterSlice)
 
 	out := make(map[int]int, 0)
-	it := set.Begin()
+	it := set.Iter()
 	for v, ok := it.Next(); ok; v, ok = it.Next() {
 		out[v] = v
 	}
@@ -106,7 +105,7 @@ func Test_Set_Delete(t *testing.T) {
 
 func Test_Set_DeleteByIterator(t *testing.T) {
 	set := set.Of(1, 1, 2, 4, 3, 1)
-	iterator := set.BeginEdit()
+	iterator := set.IterEdit()
 
 	i := 0
 	for _, ok := iterator.Next(); ok; _, ok = iterator.Next() {
@@ -144,7 +143,7 @@ func Test_Set_Group_By_Walker(t *testing.T) {
 }
 
 func Test_Set_Group_By_Iterator(t *testing.T) {
-	groups := iterableGroup.Of[*mutable.SetIter[int]](set.Of(0, 1, 1, 2, 4, 3, 1, 6, 7), func(e int) bool { return e%2 == 0 }).Map()
+	groups := iterableGroup.Of(set.Of(0, 1, 1, 2, 4, 3, 1, 6, 7), func(e int) bool { return e%2 == 0 }).Map()
 
 	assert.Equal(t, len(groups), 2)
 	fg := sort.Of(groups[false])
@@ -168,7 +167,7 @@ func Test_Set_Flatt(t *testing.T) {
 	var (
 		ints        = set.Of(3, 3, 1, 1, 1, 5, 6, 8, 8, 0, -2, -2)
 		fints       = set.Flatt(ints, func(i int) []int { return slice.Of(i) })
-		stringsPipe = iterable.Filter[stream.Iter[string]](iterable.Convert[stream.Iter[int]](fints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 }), func(s string) bool { return len(s) == 1 })
+		stringsPipe = iterable.Filter(iterable.Convert(fints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 }), func(s string) bool { return len(s) == 1 })
 	)
 	assert.Equal(t, slice.Of("0", "1", "3", "5", "6", "8"), sort.Of(stringsPipe.Slice()))
 }
@@ -177,7 +176,7 @@ func Test_Set_DoubleConvert(t *testing.T) {
 	var (
 		ints               = set.Of(3, 1, 5, 6, 8, 0, -2)
 		stringsPipe        = set.Convert(ints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 })
-		prefixedStrinsPipe = iterable.Convert[stream.Iter[string]](stringsPipe, func(s string) string { return "_" + s })
+		prefixedStrinsPipe = iterable.Convert(stringsPipe, func(s string) string { return "_" + s })
 	)
 	s := prefixedStrinsPipe.Slice()
 	assert.Equal(t, slice.Of("_0", "_1", "_3", "_5", "_6", "_8"), sort.Of(s))

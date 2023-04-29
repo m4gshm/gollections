@@ -30,19 +30,26 @@ type Vector[T any] struct {
 }
 
 var (
-	_ c.Vector[any, *slice.Iter[any]] = (*Vector[any])(nil)
-	_ fmt.Stringer                    = (*Vector[any])(nil)
-	_ c.Vector[any, *slice.Iter[any]] = Vector[any]{}
-	_ fmt.Stringer                    = Vector[any]{}
+	_ c.Vector[any]                      = (*Vector[any])(nil)
+	_ c.Vector[any]                      = Vector[any]{}
+	_ loop.Looper[any, *slice.Iter[any]] = (*Vector[any])(nil)
+	_ loop.Looper[any, *slice.Iter[any]] = Vector[any]{}
+	_ fmt.Stringer                       = (*Vector[any])(nil)
+	_ fmt.Stringer                       = Vector[any]{}
 )
 
-// Begin creates iterator
-func (v Vector[T]) Begin() *slice.Iter[T] {
+// Iter creates an iterator
+func (v Vector[T]) Iter() c.Iterator[T] {
 	h := v.Head()
 	return &h
 }
 
-// Head creates iterator
+func (v Vector[T]) Loop() *slice.Iter[T] {
+	h := v.Head()
+	return &h
+}
+
+// Head creates an iterator value object
 func (v Vector[T]) Head() slice.Iter[T] {
 	return slice.NewHeadS(v.elements, v.esize)
 }

@@ -44,19 +44,26 @@ type Set[T comparable] struct {
 }
 
 var (
-	_ c.Set[int, *map_.KeyIter[int, struct{}]] = (*Set[int])(nil)
-	_ fmt.Stringer                             = (*Set[int])(nil)
-	_ c.Set[int, *map_.KeyIter[int, struct{}]] = Set[int]{}
-	_ fmt.Stringer                             = Set[int]{}
+	_ c.Set[int]                                     = (*Set[int])(nil)
+	_ c.Set[int]                                     = Set[int]{}
+	_ loop.Looper[int, *map_.KeyIter[int, struct{}]] = (*Set[int])(nil)
+	_ loop.Looper[int, *map_.KeyIter[int, struct{}]] = Set[int]{}
+	_ fmt.Stringer                                   = (*Set[int])(nil)
+	_ fmt.Stringer                                   = Set[int]{}
 )
 
-// Begin creates iterator
-func (s Set[T]) Begin() *map_.KeyIter[T, struct{}] {
+// Iter creates an iterator
+func (s Set[T]) Iter() c.Iterator[T] {
 	h := s.Head()
 	return &h
 }
 
-// Head creates iterator
+func (s Set[T]) Loop() *map_.KeyIter[T, struct{}] {
+	h := s.Head()
+	return &h
+}
+
+// Head creates an iterator value object
 func (s Set[T]) Head() map_.KeyIter[T, struct{}] {
 	return map_.NewKeyIter(s.elements)
 }

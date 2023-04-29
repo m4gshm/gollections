@@ -164,7 +164,7 @@ func Benchmark_Convert_Vector_Iterator(b *testing.B) {
 	var s []string
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		s = iterable.Convert[*slice.Iter[int]](items, concat).Slice()
+		s = iterable.Convert(items, concat).Slice()
 	}
 	_ = s
 
@@ -176,7 +176,7 @@ func Benchmark_Convert_Vector_Iterator_No_Cache_Operation(b *testing.B) {
 	var s []string
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		s = iterable.Convert[*slice.Iter[int]](items, convert.And(toString, addTail)).Slice()
+		s = iterable.Convert(items, convert.And(toString, addTail)).Slice()
 	}
 	_ = s
 	b.StopTimer()

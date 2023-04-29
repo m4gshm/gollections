@@ -6,7 +6,7 @@ import "github.com/m4gshm/gollections/c"
 // It supports interrupting on an error that may occur in intermediate or final executor functions.
 type Stream[T, I any] interface {
 	c.IteratorBreakable[T]
-	Begin() I
+	Iter() I
 
 	Slice() ([]T, error)
 

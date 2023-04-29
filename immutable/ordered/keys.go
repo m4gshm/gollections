@@ -6,6 +6,7 @@ import (
 	breakIter "github.com/m4gshm/gollections/break/slice/iter"
 	breakStream "github.com/m4gshm/gollections/break/stream"
 	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/iter"
 	"github.com/m4gshm/gollections/stream"
@@ -22,20 +23,26 @@ type MapKeysIter[K comparable] struct {
 }
 
 var (
-	_ c.Collection[int, *slice.Iter[int]] = (*MapKeysIter[int])(nil)
-	_ fmt.Stringer                        = (*MapKeysIter[int])(nil)
-
-	_ c.Collection[int, *slice.Iter[int]] = MapKeysIter[int]{}
-	_ fmt.Stringer                        = MapKeysIter[int]{}
+	_ c.Collection[int]                  = (*MapKeysIter[int])(nil)
+	_ c.Collection[int]                  = MapKeysIter[int]{}
+	_ loop.Looper[int, *slice.Iter[int]] = (*MapKeysIter[int])(nil)
+	_ loop.Looper[int, *slice.Iter[int]] = MapKeysIter[int]{}
+	_ fmt.Stringer                       = (*MapKeysIter[int])(nil)
+	_ fmt.Stringer                       = MapKeysIter[int]{}
 )
 
-// Begin creates iterator
-func (m MapKeysIter[K]) Begin() *slice.Iter[K] {
+// Iter creates an iterator
+func (m MapKeysIter[K]) Iter() c.Iterator[K] {
 	h := m.Head()
 	return &h
 }
 
-// Head creates iterator
+func (m MapKeysIter[K]) Loop() *slice.Iter[K] {
+	h := m.Head()
+	return &h
+}
+
+// Head creates an iterator value object
 func (m MapKeysIter[K]) Head() slice.Iter[K] {
 	return slice.NewHead(m.keys)
 }

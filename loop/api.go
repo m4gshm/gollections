@@ -14,6 +14,10 @@ import (
 // ErrBreak is the 'break' statement of the For, Track methods
 var ErrBreak = c.ErrBreak
 
+type Looper[T any, I interface{ Next() (T, bool) }] interface {
+	Loop() I
+}
+
 // Of wrap the elements by loop function
 func Of[T any](elements ...T) func() (e T, ok bool) {
 	l := len(elements)

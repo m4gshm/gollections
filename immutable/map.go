@@ -47,21 +47,28 @@ type Map[K comparable, V any] struct {
 }
 
 var (
-	_ c.Map[int, any, *map_.Iter[int, any]]            = (*Map[int, any])(nil)
+	_ c.Map[int, any]                                  = (*Map[int, any])(nil)
+	_ c.Map[int, any]                                  = Map[int, any]{}
+	_ loop.Looper[int, any, *map_.Iter[int, any]]      = (*Map[int, any])(nil)
+	_ loop.Looper[int, any, *map_.Iter[int, any]]      = Map[int, any]{}
 	_ c.KeyVal[MapKeys[int, any], MapValues[int, any]] = (*Map[int, any])(nil)
-	_ fmt.Stringer                                     = (*Map[int, any])(nil)
-	_ c.Map[int, any, *map_.Iter[int, any]]            = Map[int, any]{}
 	_ c.KeyVal[MapKeys[int, any], MapValues[int, any]] = Map[int, any]{}
+	_ fmt.Stringer                                     = (*Map[int, any])(nil)
 	_ fmt.Stringer                                     = Map[int, any]{}
 )
 
-// Begin creates iterator
-func (m Map[K, V]) Begin() *map_.Iter[K, V] {
+// Iter creates an iterator
+func (m Map[K, V]) Iter() c.KVIterator[K, V] {
 	h := m.Head()
 	return &h
 }
 
-// Head creates iterator
+func (m Map[K, V]) Loop() *map_.Iter[K, V] {
+	h := m.Head()
+	return &h
+}
+
+// Head creates an iterator value object
 func (m Map[K, V]) Head() map_.Iter[K, V] {
 	return map_.NewIter(m.elements)
 }

@@ -11,8 +11,8 @@ import (
 var ErrBreak = errors.New("Break")
 
 // Vector - collection interface that provides elements order and access by index to the elements.
-type Vector[T, I any] interface {
-	Collection[T, I]
+type Vector[T any] interface {
+	Collection[T]
 
 	TrackLoop[int, T]
 	TrackEachLoop[int, T]
@@ -24,8 +24,8 @@ type Vector[T, I any] interface {
 }
 
 // Set - collection interface that ensures the uniqueness of elements (does not insert duplicate values).
-type Set[T, I any] interface {
-	Collection[T, I]
+type Set[T comparable] interface {
+	Collection[T]
 	Checkable[T]
 
 	Len() int
@@ -33,8 +33,8 @@ type Set[T, I any] interface {
 }
 
 // Map - collection interface that stores key/value pairs and provide access to an element by its key
-type Map[K comparable, V, I any] interface {
-	KVCollection[K, V, I, map[K]V]
+type Map[K comparable, V any] interface {
+	KVCollection[K, V, map[K]V]
 	Checkable[K]
 	Access[K, V]
 
@@ -48,8 +48,8 @@ type KeyVal[Keys any, Vals any] interface {
 }
 
 // Collection is the base interface of non-associative collections
-type Collection[T, I any] interface {
-	Iterable[I]
+type Collection[T any] interface {
+	Iterable[T]
 	ForLoop[T]
 	ForEachLoop[T]
 	SliceFactory[T]
@@ -69,10 +69,10 @@ type Convertrable[T, Stream, StreamBreakable any] interface {
 }
 
 // KVCollection is the base interface of associative collections
-type KVCollection[K comparable, V, I any, M map[K]V | map[K][]V] interface {
+type KVCollection[K comparable, V any, M map[K]V | map[K][]V] interface {
 	TrackLoop[K, V]
 	TrackEachLoop[K, V]
-	KVIterable[I]
+	KVIterable[K, V]
 	MapFactory[K, V, M]
 
 	Reduce(merger func(K, V, K, V) (K, V)) (K, V)
@@ -149,13 +149,13 @@ type KVIteratorBreakable[K, V any] interface {
 }
 
 // Iterable is an iterator supplier interface
-type Iterable[I any] interface {
-	Begin() I
+type Iterable[T any] interface {
+	Iter() Iterator[T]
 }
 
 // KVIterable is an iterator supplier interface
-type KVIterable[I any] interface {
-	Begin() I
+type KVIterable[K, V any] interface {
+	Iter() KVIterator[K, V]
 }
 
 // ForLoop is the interface of a collection that provides traversing of the elements.

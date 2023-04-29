@@ -18,8 +18,10 @@ type Iter[T any] struct {
 }
 
 var (
-	_ Stream[any, Iter[any]]                              = (*Iter[any])(nil)
-	_ Stream[any, Iter[any]]                              = Iter[any]{}
+	_ Stream[any]                                         = (*Iter[any])(nil)
+	_ Stream[any]                                         = Iter[any]{}
+	_ loop.Looper[any, Iter[any]]                         = (*Iter[any])(nil)
+	_ loop.Looper[any, Iter[any]]                         = Iter[any]{}
 	_ c.Filterable[any, Iter[any], breakStream.Iter[any]] = (*Iter[any])(nil)
 	_ c.Filterable[any, Iter[any], breakStream.Iter[any]] = Iter[any]{}
 	_ c.Iterator[any]                                     = (*Iter[any])(nil)
@@ -73,8 +75,12 @@ func (t Iter[T]) Reduce(by func(T, T) T) T {
 	return loop.Reduce(t.next, by)
 }
 
-// Begin creates iterator
-func (t Iter[T]) Begin() Iter[T] {
+// Iter returns as an iterator
+func (t Iter[T]) Iter() c.Iterator[T] {
+	return t
+}
+
+func (t Iter[T]) Loop() Iter[T] {
 	return t
 }
 

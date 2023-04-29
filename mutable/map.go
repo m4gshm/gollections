@@ -51,18 +51,24 @@ var (
 	_ c.SettableNew[int, any]                                              = (*Map[int, any])(nil)
 	_ c.SettableMap[c.TrackEachLoop[int, any]]                             = (*Map[int, any])(nil)
 	_ c.ImmutableMapConvert[immutable.Map[int, any]]                       = (*Map[int, any])(nil)
-	_ c.Map[int, any, *map_.Iter[int, any]]                                = (*Map[int, any])(nil)
+	_ c.Map[int, any]                                                      = (*Map[int, any])(nil)
+	_ loop.Looper[int, any, *map_.Iter[int, any]]                          = (*Map[int, any])(nil)
 	_ c.KeyVal[immutable.MapKeys[int, any], immutable.MapValues[int, any]] = (*Map[int, any])(nil)
 	_ fmt.Stringer                                                         = (*Map[int, any])(nil)
 )
 
-// Begin creates iterator
-func (m *Map[K, V]) Begin() *map_.Iter[K, V] {
+// Iter creates an iterator
+func (m *Map[K, V]) Iter() c.KVIterator[K, V] {
 	h := m.Head()
 	return &h
 }
 
-// Head creates iterator
+func (m *Map[K, V]) Loop() *map_.Iter[K, V] {
+	h := m.Head()
+	return &h
+}
+
+// Head creates an iterator value object
 func (m *Map[K, V]) Head() map_.Iter[K, V] {
 	var out map[K]V
 	if m != nil {

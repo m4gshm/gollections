@@ -553,6 +553,16 @@ func StringsBehaveAs[TS ~[]T, T ~string](elements []string) TS {
 	return s
 }
 
+func BaseType[TS ~[]T, T any](elements TS) []T {
+	return *BaseTypeRef(&elements)
+}
+
+func BaseTypeRef[TS ~[]T, T any](elements *TS) *[]T {
+	ptr := unsafe.Pointer(elements)
+	s := (*[]T)(ptr)
+	return s
+}
+
 // NoEmpty returns the 'notEmpty' if the 'elements' slise is empty
 func NoEmpty[TS ~[]T, T any](elements TS, notEmpty []T) TS {
 	if len(elements) > 0 {

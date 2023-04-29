@@ -25,17 +25,23 @@ type MapValuesIter[K comparable, V any] struct {
 }
 
 var (
-	_ c.Collection[any, *omap.ValIter[int, any]] = (*MapValuesIter[int, any])(nil)
-	_ fmt.Stringer                               = (*MapValuesIter[int, any])(nil)
+	_ c.Collection[any]                         = (*MapValuesIter[int, any])(nil)
+	_ loop.Looper[any, *omap.ValIter[int, any]] = (*MapValuesIter[int, any])(nil)
+	_ fmt.Stringer                              = (*MapValuesIter[int, any])(nil)
 )
 
-// Begin creates iterator
-func (m MapValuesIter[K, V]) Begin() *omap.ValIter[K, V] {
+// Iter creates an iterator
+func (m MapValuesIter[K, V]) Iter() c.Iterator[V] {
 	h := m.Head()
 	return &h
 }
 
-// Head creates iterator
+func (m MapValuesIter[K, V]) Loop() *omap.ValIter[K, V] {
+	h := m.Head()
+	return &h
+}
+
+// Head creates an iterator value object
 func (m MapValuesIter[K, V]) Head() omap.ValIter[K, V] {
 	var (
 		order    []K

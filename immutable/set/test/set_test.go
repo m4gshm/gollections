@@ -17,7 +17,6 @@ import (
 	"github.com/m4gshm/gollections/ptr"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/sort"
-	"github.com/m4gshm/gollections/stream"
 	"github.com/m4gshm/gollections/walk/group"
 )
 
@@ -83,7 +82,7 @@ func Test_Set_Group_By_Walker(t *testing.T) {
 }
 
 func Test_Set_Group_By_Iterator(t *testing.T) {
-	groups := loop.Group(set.Of(0, 1, 1, 2, 4, 3, 1, 6, 7).Begin().Next, func(e int) bool { return e%2 == 0 }, as.Is[int])
+	groups := loop.Group(set.Of(0, 1, 1, 2, 4, 3, 1, 6, 7).Iter().Next, func(e int) bool { return e%2 == 0 }, as.Is[int])
 
 	assert.Equal(t, len(groups), 2)
 	fg := sort.Of(groups[false])
@@ -132,8 +131,8 @@ func Test_Set_Flatt(t *testing.T) {
 	var (
 		ints        = set.Of(3, 3, 1, 1, 1, 5, 6, 8, 8, 0, -2, -2)
 		fints       = set.Flatt(ints, func(i int) []int { return slice.Of(i) })
-		convFilt    = iterable.Convert[stream.Iter[int]](fints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 })
-		stringsPipe = iterable.Filter[stream.Iter[string]](convFilt, func(s string) bool { return len(s) == 1 })
+		convFilt    = iterable.Convert(fints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 })
+		stringsPipe = iterable.Filter(convFilt, func(s string) bool { return len(s) == 1 })
 	)
 	assert.Equal(t, slice.Of("0", "1", "3", "5", "6", "8"), sort.Of(stringsPipe.Slice()))
 }
@@ -142,7 +141,7 @@ func Test_Set_DoubleConvert(t *testing.T) {
 	var (
 		ints               = set.Of(3, 1, 5, 6, 8, 0, -2)
 		stringsPipe        = set.Convert(ints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 })
-		prefixedStrinsPipe = iterable.Convert[stream.Iter[string]](stringsPipe, func(s string) string { return "_" + s })
+		prefixedStrinsPipe = iterable.Convert(stringsPipe, func(s string) string { return "_" + s })
 	)
 	assert.Equal(t, slice.Of("_0", "_1", "_3", "_5", "_6", "_8"), sort.Of(prefixedStrinsPipe.Slice()))
 

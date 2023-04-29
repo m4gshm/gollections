@@ -24,13 +24,17 @@ type Iter[K comparable, V any, M map[K]V | map[K][]V] struct {
 }
 
 var (
-	_ c.KVIterator[string, any]                                                  = (*Iter[string, any, map[string]any])(nil)
-	_ Stream[string, any, Iter[string, any, map[string]any], map[string]any]     = (*Iter[string, any, map[string]any])(nil)
-	_ Stream[string, any, Iter[string, any, map[string][]any], map[string][]any] = (*Iter[string, any, map[string][]any])(nil)
+	_ c.KVIterator[string, any]                                       = (*Iter[string, any, map[string]any])(nil)
+	_ Stream[string, any, map[string]any]                             = (*Iter[string, any, map[string]any])(nil)
+	_ Stream[string, any, map[string][]any]                           = (*Iter[string, any, map[string][]any])(nil)
+	_ kvloop.Looper[string, any, Iter[string, any, map[string]any]]   = (*Iter[string, any, map[string]any])(nil)
+	_ kvloop.Looper[string, any, Iter[string, any, map[string][]any]] = (*Iter[string, any, map[string][]any])(nil)
 
-	_ c.KVIterator[string, any]                                                  = Iter[string, any, map[string]any]{}
-	_ Stream[string, any, Iter[string, any, map[string]any], map[string]any]     = Iter[string, any, map[string]any]{}
-	_ Stream[string, any, Iter[string, any, map[string][]any], map[string][]any] = Iter[string, any, map[string][]any]{}
+	_ c.KVIterator[string, any]                                       = Iter[string, any, map[string]any]{}
+	_ Stream[string, any, map[string]any]                             = Iter[string, any, map[string]any]{}
+	_ Stream[string, any, map[string][]any]                           = Iter[string, any, map[string][]any]{}
+	_ kvloop.Looper[string, any, Iter[string, any, map[string]any]]   = Iter[string, any, map[string]any]{}
+	_ kvloop.Looper[string, any, Iter[string, any, map[string][]any]] = Iter[string, any, map[string][]any]{}
 )
 
 // Next implements c.KVIterator
@@ -119,8 +123,11 @@ func (k Iter[K, V, M]) HasAny(predicate func(K, V) bool) bool {
 	return kvloop.HasAny(next, predicate)
 }
 
-// Begin creates iterator
-func (k Iter[K, V, M]) Begin() Iter[K, V, M] {
+func (k Iter[K, V, M]) Iter() c.KVIterator[K, V] {
+	return k
+}
+
+func (k Iter[K, V, M]) Loop() Iter[K, V, M] {
 	return k
 }
 

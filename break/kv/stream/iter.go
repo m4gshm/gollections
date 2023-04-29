@@ -94,8 +94,8 @@ func (k Iter[K, V, M]) HasAny(predicate func(K, V) (bool, error)) (bool, error) 
 	return loop.HasAny(next, predicate)
 }
 
-// Begin creates iterator
-func (k Iter[K, V, M]) Begin() Iter[K, V, M] {
+// Iter creates an iterator
+func (k Iter[K, V, M]) Iter() Iter[K, V, M] {
 	return k
 }
 

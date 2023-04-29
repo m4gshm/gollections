@@ -69,23 +69,29 @@ var (
 	_ c.AddableAllNew[c.ForEachLoop[int]] = (*Set[int])(nil)
 	_ c.Deleteable[int]                   = (*Set[int])(nil)
 	_ c.DeleteableVerify[int]             = (*Set[int])(nil)
-	_ c.Set[int, *SetIter[int]]           = (*Set[int])(nil)
+	_ c.Set[int]                          = (*Set[int])(nil)
+	_ loop.Looper[int, *SetIter[int]]     = (*Set[int])(nil)
 	_ fmt.Stringer                        = (*Set[int])(nil)
 )
 
-// Begin creates iterator
-func (s *Set[T]) Begin() *SetIter[T] {
+// Iter creates an iterator
+func (s *Set[T]) Iter() c.Iterator[T] {
 	h := s.Head()
 	return &h
 }
 
-// BeginEdit creates iterator that can delete iterable elements
-func (s *Set[T]) BeginEdit() c.DelIterator[T] {
+func (s *Set[T]) Loop() *SetIter[T] {
 	h := s.Head()
 	return &h
 }
 
-// Head creates iterator
+// IterEdit creates iterator that can delete iterable elements
+func (s *Set[T]) IterEdit() c.DelIterator[T] {
+	h := s.Head()
+	return &h
+}
+
+// Head creates an iterator value object
 func (s *Set[T]) Head() SetIter[T] {
 	var elements *[]T
 	if s != nil {
