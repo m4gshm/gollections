@@ -5,6 +5,7 @@ import (
 	"golang.org/x/exp/constraints"
 
 	breakLoop "github.com/m4gshm/gollections/break/loop"
+	breakStream "github.com/m4gshm/gollections/break/stream"
 	"github.com/m4gshm/gollections/immutable"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/stream"
@@ -38,9 +39,9 @@ func Convert[From, To any](collection immutable.Vector[From], converter func(Fro
 }
 
 // Conv returns a breakable stream that applies the 'converter' function to the collection elements
-func Conv[From, To comparable](collection immutable.Vector[From], converter func(From) (To, error)) breakLoop.StreamIter[To] {
+func Conv[From, To comparable](collection immutable.Vector[From], converter func(From) (To, error)) breakStream.Iter[To] {
 	h := collection.Head()
-	return breakLoop.Stream(breakLoop.Conv(breakLoop.From(h.Next), converter).Next)
+	return breakStream.New(breakLoop.Conv(breakLoop.From(h.Next), converter).Next)
 }
 
 // Flatt returns a stream that converts the collection elements into slices and then flattens them to one level
@@ -51,8 +52,8 @@ func Flatt[From any, To any](collection immutable.Vector[From], flattener func(F
 }
 
 // Flat returns a breakable stream that converts the collection elements into slices and then flattens them to one level
-func Flat[From, To comparable](s immutable.Vector[From], flattener func(From) ([]To, error)) breakLoop.StreamIter[To] {
+func Flat[From, To comparable](s immutable.Vector[From], flattener func(From) ([]To, error)) breakStream.Iter[To] {
 	h := s.Head()
 	f := breakLoop.Flat(breakLoop.From(h.Next), flattener)
-	return breakLoop.Stream(f.Next)
+	return breakStream.New(f.Next)
 }

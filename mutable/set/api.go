@@ -5,6 +5,7 @@ import (
 	"golang.org/x/exp/constraints"
 
 	breakLoop "github.com/m4gshm/gollections/break/loop"
+	breakStream "github.com/m4gshm/gollections/break/stream"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/mutable"
 	"github.com/m4gshm/gollections/mutable/ordered"
@@ -43,9 +44,9 @@ func Convert[From, To comparable](collection *mutable.Set[From], converter func(
 }
 
 // Conv returns a breakable stream that applies the 'converter' function to the collection elements
-func Conv[From, To comparable](collection *mutable.Set[From], converter func(From) (To, error)) breakLoop.StreamIter[To] {
+func Conv[From, To comparable](collection *mutable.Set[From], converter func(From) (To, error)) breakStream.Iter[To] {
 	h := collection.Head()
-	return breakLoop.Stream(breakLoop.Conv(breakLoop.From(h.Next), converter).Next)
+	return breakStream.New(breakLoop.Conv(breakLoop.From(h.Next), converter).Next)
 }
 
 // Flatt returns a stream that converts the collection elements into slices and then flattens them to one level
@@ -56,8 +57,8 @@ func Flatt[From, To comparable](s *mutable.Set[From], flattener func(From) []To)
 }
 
 // Flat returns a breakable stream that converts the collection elements into slices and then flattens them to one level
-func Flat[From, To comparable](s *mutable.Set[From], flattener func(From) ([]To, error)) breakLoop.StreamIter[To] {
+func Flat[From, To comparable](s *mutable.Set[From], flattener func(From) ([]To, error)) breakStream.Iter[To] {
 	h := s.Head()
 	f := breakLoop.Flat(breakLoop.From(h.Next), flattener)
-	return breakLoop.Stream(f.Next)
+	return breakStream.New(f.Next)
 }

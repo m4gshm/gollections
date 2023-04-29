@@ -2,6 +2,7 @@ package stream
 
 import (
 	breakLoop "github.com/m4gshm/gollections/break/loop"
+	breakStream "github.com/m4gshm/gollections/break/stream"
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/loop"
 )
@@ -17,12 +18,12 @@ type Iter[T any] struct {
 }
 
 var (
-	_ c.Stream[any, Iter[any]]                                = (*Iter[any])(nil)
-	_ c.Stream[any, Iter[any]]                                = Iter[any]{}
-	_ c.Filterable[any, Iter[any], breakLoop.StreamIter[any]] = (*Iter[any])(nil)
-	_ c.Filterable[any, Iter[any], breakLoop.StreamIter[any]] = Iter[any]{}
-	_ c.Iterator[any]                                         = (*Iter[any])(nil)
-	_ c.Iterator[any]                                         = Iter[any]{}
+	_ c.Stream[any, Iter[any]]                            = (*Iter[any])(nil)
+	_ c.Stream[any, Iter[any]]                            = Iter[any]{}
+	_ c.Filterable[any, Iter[any], breakStream.Iter[any]] = (*Iter[any])(nil)
+	_ c.Filterable[any, Iter[any], breakStream.Iter[any]] = Iter[any]{}
+	_ c.Iterator[any]                                     = (*Iter[any])(nil)
+	_ c.Iterator[any]                                     = Iter[any]{}
 )
 
 // Next implements c.Iterator
@@ -40,9 +41,9 @@ func (t Iter[T]) Filter(predicate func(T) bool) Iter[T] {
 }
 
 // Filt returns a stream consisting of elements that satisfy the condition of the 'predicate' function
-func (t Iter[T]) Filt(predicate func(T) (bool, error)) breakLoop.StreamIter[T] {
+func (t Iter[T]) Filt(predicate func(T) (bool, error)) breakStream.Iter[T] {
 	f := breakLoop.Filt(breakLoop.From(t.next), predicate)
-	return breakLoop.Stream(f.Next)
+	return breakStream.New(f.Next)
 }
 
 // Convert returns a stream that applies the 'converter' function to the collection elements
@@ -52,9 +53,9 @@ func (t Iter[T]) Convert(converter func(T) T) Iter[T] {
 }
 
 // Conv returns a stream that applies the 'converter' function to the collection elements
-func (t Iter[T]) Conv(converter func(T) (T, error)) breakLoop.StreamIter[T] {
+func (t Iter[T]) Conv(converter func(T) (T, error)) breakStream.Iter[T] {
 	conv := breakLoop.Conv(breakLoop.From(t.next), converter)
-	return breakLoop.Stream(conv.Next)
+	return breakStream.New(conv.Next)
 }
 
 // ForEach applies the 'walker' function for every element
