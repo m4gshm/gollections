@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/m4gshm/gollections/collection"
-	"github.com/m4gshm/gollections/iter"
 	cGroup "github.com/m4gshm/gollections/collection/group"
+	"github.com/m4gshm/gollections/iter"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/mutable"
 	"github.com/m4gshm/gollections/mutable/set"

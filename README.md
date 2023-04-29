@@ -249,16 +249,15 @@ import (
     "github.com/stretchr/testify/assert"
 
     "github.com/m4gshm/gollections/as"
+    cGroup "github.com/m4gshm/gollections/collection/group"
     "github.com/m4gshm/gollections/immutable"
     "github.com/m4gshm/gollections/immutable/oset"
     "github.com/m4gshm/gollections/immutable/set"
     "github.com/m4gshm/gollections/iter"
-    sliceIter "github.com/m4gshm/gollections/slice/iter"
-    iterableGroup "github.com/m4gshm/gollections/iterable/group"
-    "github.com/m4gshm/gollections/loop"
     "github.com/m4gshm/gollections/op"
     "github.com/m4gshm/gollections/predicate/more"
     "github.com/m4gshm/gollections/slice"
+    sliceIter "github.com/m4gshm/gollections/slice/iter"
     "github.com/m4gshm/gollections/walk/group"
 )
 
@@ -296,7 +295,7 @@ func Test_group_orderset_odd_even(t *testing.T) {
 }
 
 func Test_group_orderset_with_filtering_by_stirng_len(t *testing.T) {
-    var groups = iterableGroup.Of(oset.Of(
+    var groups = cGroup.Of(oset.Of(
         "seventh", "seventh", //duplicated
         "first", "second", "third", "fourth",
         "fifth", "sixth", "eighth",
@@ -324,7 +323,7 @@ func Test_compute_odds_sum(t *testing.T) {
     )
 
     //declarative style
-    oddSum := loop.Reduce(iter.Filter(iter.Flatt(sliceIter.Flatt(multiDimension, as.Is[[][]int]), as.Is[[]int]), odds).Next, op.Sum[int])
+    oddSum := iter.Reduce(iter.Filter(iter.Flatt(sliceIter.Flatt(multiDimension, as.Is[[][]int]), as.Is[[]int]), odds), op.Sum[int])
     assert.Equal(t, expected, oddSum)
 
     //plain old style

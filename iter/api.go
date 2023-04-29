@@ -49,6 +49,11 @@ func NotNil[T any, I c.Iterator[*T]](elements I) loop.FitIter[*T] {
 	return Filter(elements, check.NotNil[T])
 }
 
+// Reduce reduces elements to an one
+func Reduce[T any, I c.Iterator[T]](elements I, by func(T, T) T) T {
+	return loop.Reduce(elements.Next, by)
+}
+
 // Group transforms iterable elements to the MapPipe based on applying key extractor to the elements
 func Group[T any, K comparable, I c.Iterator[T]](elements I, by func(T) K) stream.Iter[K, T, map[K][]T] {
 	return stream.New(loop.NewKeyValuer(elements.Next, by, as.Is[T]).Next, kvloop.Group[K, T])

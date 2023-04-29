@@ -247,13 +247,25 @@ func ToKVs[T, K, V any](next func() (T, bool, error), keysExtractor func(T) ([]K
 }
 
 // FlattKeys transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
-func FlattKeys[T, K, V any](next func() (T, bool, error), keysExtractor func(T) ([]K, error), valExtractor func(T) (V, error)) *MultipleKeyValuer[T, K, V] {
+func FlattKeys[T, K, V any](next func() (T, bool, error), keysExtractor func(T) []K, valExtractor func(T) V) *MultipleKeyValuer[T, K, V] {
+	kv := NewMultipleKeyValuer(next, func(t T) ([]K, error) { return keysExtractor(t), nil }, convSlice(func(t T) (V, error) { return valExtractor(t), nil }))
+	return &kv
+}
+
+// FlatKeys transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
+func FlatKeys[T, K, V any](next func() (T, bool, error), keysExtractor func(T) ([]K, error), valExtractor func(T) (V, error)) *MultipleKeyValuer[T, K, V] {
 	kv := NewMultipleKeyValuer(next, keysExtractor, convSlice(valExtractor))
 	return &kv
 }
 
 // FlattValues transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
-func FlattValues[T, K, V any](next func() (T, bool, error), keyExtractor func(T) (K, error), valsExtractor func(T) ([]V, error)) *MultipleKeyValuer[T, K, V] {
+func FlattValues[T, K, V any](next func() (T, bool, error), keyExtractor func(T) K, valsExtractor func(T) []V) *MultipleKeyValuer[T, K, V] {
+	kv := NewMultipleKeyValuer(next, convSlice(func(t T) (K, error) { return keyExtractor(t), nil }), func(t T) ([]V, error) { return valsExtractor(t), nil })
+	return &kv
+}
+
+// FlatValues transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
+func FlatValues[T, K, V any](next func() (T, bool, error), keyExtractor func(T) (K, error), valsExtractor func(T) ([]V, error)) *MultipleKeyValuer[T, K, V] {
 	kv := NewMultipleKeyValuer(next, convSlice(keyExtractor), valsExtractor)
 	return &kv
 }
