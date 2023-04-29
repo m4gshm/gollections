@@ -24,13 +24,13 @@ type Iter[K comparable, V any, M map[K]V | map[K][]V] struct {
 }
 
 var (
-	_ c.KVIterator[string, any]                                                      = (*Iter[string, any, map[string]any])(nil)
-	_ c.KVStream[string, any, Iter[string, any, map[string]any], map[string]any]     = (*Iter[string, any, map[string]any])(nil)
-	_ c.KVStream[string, any, Iter[string, any, map[string][]any], map[string][]any] = (*Iter[string, any, map[string][]any])(nil)
+	_ c.KVIterator[string, any]                                                  = (*Iter[string, any, map[string]any])(nil)
+	_ Stream[string, any, Iter[string, any, map[string]any], map[string]any]     = (*Iter[string, any, map[string]any])(nil)
+	_ Stream[string, any, Iter[string, any, map[string][]any], map[string][]any] = (*Iter[string, any, map[string][]any])(nil)
 
-	_ c.KVIterator[string, any]                                                      = Iter[string, any, map[string]any]{}
-	_ c.KVStream[string, any, Iter[string, any, map[string]any], map[string]any]     = Iter[string, any, map[string]any]{}
-	_ c.KVStream[string, any, Iter[string, any, map[string][]any], map[string][]any] = Iter[string, any, map[string][]any]{}
+	_ c.KVIterator[string, any]                                                  = Iter[string, any, map[string]any]{}
+	_ Stream[string, any, Iter[string, any, map[string]any], map[string]any]     = Iter[string, any, map[string]any]{}
+	_ Stream[string, any, Iter[string, any, map[string][]any], map[string][]any] = Iter[string, any, map[string][]any]{}
 )
 
 // Next implements c.KVIterator

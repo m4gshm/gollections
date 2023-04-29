@@ -18,8 +18,8 @@ type Iter[T any] struct {
 }
 
 var (
-	_ c.Stream[any, Iter[any]]                            = (*Iter[any])(nil)
-	_ c.Stream[any, Iter[any]]                            = Iter[any]{}
+	_ Stream[any, Iter[any]]                              = (*Iter[any])(nil)
+	_ Stream[any, Iter[any]]                              = Iter[any]{}
 	_ c.Filterable[any, Iter[any], breakStream.Iter[any]] = (*Iter[any])(nil)
 	_ c.Filterable[any, Iter[any], breakStream.Iter[any]] = Iter[any]{}
 	_ c.Iterator[any]                                     = (*Iter[any])(nil)

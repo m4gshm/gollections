@@ -19,13 +19,13 @@ type Iter[K comparable, V any, M map[K]V | map[K][]V] struct {
 }
 
 var (
-	_ c.KVIteratorBreakable[string, any]                 = (*Iter[string, any, map[string]any])(nil)
-	_ c.KVStreamBreakable[string, any, map[string]any]   = (*Iter[string, any, map[string]any])(nil)
-	_ c.KVStreamBreakable[string, any, map[string][]any] = (*Iter[string, any, map[string][]any])(nil)
+	_ c.KVIteratorBreakable[string, any]                                         = (*Iter[string, any, map[string]any])(nil)
+	_ Stream[string, any, Iter[string, any, map[string]any], map[string]any]     = (*Iter[string, any, map[string]any])(nil)
+	_ Stream[string, any, Iter[string, any, map[string][]any], map[string][]any] = (*Iter[string, any, map[string][]any])(nil)
 
-	_ c.KVIteratorBreakable[string, any]                 = Iter[string, any, map[string]any]{}
-	_ c.KVStreamBreakable[string, any, map[string]any]   = Iter[string, any, map[string]any]{}
-	_ c.KVStreamBreakable[string, any, map[string][]any] = Iter[string, any, map[string][]any]{}
+	_ c.KVIteratorBreakable[string, any]                                         = Iter[string, any, map[string]any]{}
+	_ Stream[string, any, Iter[string, any, map[string]any], map[string]any]     = Iter[string, any, map[string]any]{}
+	_ Stream[string, any, Iter[string, any, map[string][]any], map[string][]any] = Iter[string, any, map[string][]any]{}
 )
 
 // Next implements c.KVIterator
@@ -95,7 +95,7 @@ func (k Iter[K, V, M]) HasAny(predicate func(K, V) (bool, error)) (bool, error) 
 }
 
 // Begin creates iterator
-func (k Iter[K, V, M]) Begin() c.KVIteratorBreakable[K, V] {
+func (k Iter[K, V, M]) Begin() Iter[K, V, M] {
 	return k
 }
 

@@ -186,29 +186,6 @@ type Checkable[T any] interface {
 	Contains(T) bool
 }
 
-// Stream is collection or stream of elements in transformation state.
-type Stream[T, I any] interface {
-	Iterator[T]
-	Collection[T, I]
-}
-
-// StreamBreakable is collection or stream of elements in transformation state.
-// It supports interrupting on an error that may occur in intermediate or final executor functions.
-type StreamBreakable[T, I any] interface {
-	IteratorBreakable[T]
-	Begin() I
-
-	Slice() ([]T, error)
-
-	// Filt(predicate func(T) (bool, error)) StreamBreakable[T]
-	// Filter(predicate func(T) bool) StreamBreakable[T]
-	// Conv(converter func(T) (T, error)) StreamBreakable[T]
-	// Convert(converter func(T) T) StreamBreakable[T]
-
-	Reduce(merger func(T, T) (T, error)) (T, error)
-	HasAny(predicate func(T) (bool, error)) (bool, error)
-}
-
 // KVTransformable provides limited kit of map transformation methods.
 // The full kit of transformer functions are in the package 'c/map_'
 type KVTransformable[K, V, KVStream, KVStreamBreakable any] interface {
@@ -229,31 +206,6 @@ type KVTransformable[K, V, KVStream, KVStreamBreakable any] interface {
 
 	ConvKey(converter func(K) (K, error)) KVStreamBreakable
 	ConvValue(converter func(V) (V, error)) KVStreamBreakable
-}
-
-// KVStream is map or key/value stream of elements in transformation state.
-type KVStream[K comparable, V, I any, M map[K]V | map[K][]V] interface {
-	KVIterator[K, V]
-	KVCollection[K, V, I, M]
-}
-
-// KVStream is map or key/value stream of elements in transformation state.
-type KVStreamBreakable[K comparable, V any, Map map[K]V | map[K][]V] interface {
-	KVIteratorBreakable[K, V]
-	Begin() KVIteratorBreakable[K, V]
-
-	// Filter(predicate func(K, V) bool) KVStreamBreakable[K, V, Map]
-	// FilterKey(predicate func(K) bool) KVStreamBreakable[K, V, Map]
-	// FilterValue(predicate func(V) bool) KVStreamBreakable[K, V, Map]
-
-	// Filt(predicate func(K, V) (bool, error)) KVStreamBreakable[K, V, Map]
-	// FiltKey(predicate func(K) (bool, error)) KVStreamBreakable[K, V, Map]
-	// FiltValue(predicate func(V) (bool, error)) KVStreamBreakable[K, V, Map]
-
-	Map() (Map, error)
-
-	Reduce(merger func(K, V, K, V) (K, V, error)) (K, V, error)
-	HasAny(predicate func(K, V) (bool, error)) (bool, error)
 }
 
 // Access provides access to an element by its pointer (index, key, coordinate, etc.)

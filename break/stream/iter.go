@@ -16,8 +16,8 @@ type Iter[T any] struct {
 }
 
 var (
-	_ c.StreamBreakable[any, Iter[any]]       = (*Iter[any])(nil)
-	_ c.StreamBreakable[any, Iter[any]]       = Iter[any]{}
+	_ Stream[any, Iter[any]]                  = (*Iter[any])(nil)
+	_ Stream[any, Iter[any]]                  = Iter[any]{}
 	_ c.Filterable[any, Iter[any], Iter[any]] = Iter[any]{}
 )
 
