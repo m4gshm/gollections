@@ -9,7 +9,7 @@ import (
 	breakMapConvert "github.com/m4gshm/gollections/break/map_/convert"
 	breakMapFilter "github.com/m4gshm/gollections/break/map_/filter"
 	"github.com/m4gshm/gollections/c"
-	oMapIter "github.com/m4gshm/gollections/immutable/ordered/map_/iter"
+	omap "github.com/m4gshm/gollections/immutable/ordered/map_"
 	"github.com/m4gshm/gollections/kv/loop"
 	"github.com/m4gshm/gollections/kv/stream"
 	"github.com/m4gshm/gollections/map_"
@@ -60,28 +60,28 @@ type Map[K comparable, V any] struct {
 }
 
 var (
-	_ c.Map[int, any, *oMapIter.OrderedMapIter[int, any]] = (*Map[int, any])(nil)
+	_ c.Map[int, any, *omap.Iter[int, any]]               = (*Map[int, any])(nil)
 	_ c.KeyVal[MapKeysIter[int], MapValuesIter[int, any]] = (*Map[int, any])(nil)
 	_ fmt.Stringer                                        = (*Map[int, any])(nil)
-	_ c.Map[int, any, *oMapIter.OrderedMapIter[int, any]] = Map[int, any]{}
+	_ c.Map[int, any, *omap.Iter[int, any]]               = Map[int, any]{}
 	_ c.KeyVal[MapKeysIter[int], MapValuesIter[int, any]] = Map[int, any]{}
 	_ fmt.Stringer                                        = Map[int, any]{}
 )
 
 // Begin creates iterator
-func (m Map[K, V]) Begin() *oMapIter.OrderedMapIter[K, V] {
+func (m Map[K, V]) Begin() *omap.Iter[K, V] {
 	h := m.Head()
 	return &h
 }
 
 // Head creates iterator
-func (m Map[K, V]) Head() oMapIter.OrderedMapIter[K, V] {
-	return oMapIter.NewOrdered(m.elements, slice.NewHeadS(m.order, m.ksize))
+func (m Map[K, V]) Head() omap.Iter[K, V] {
+	return omap.NewIter(m.elements, slice.NewHeadS(m.order, m.ksize))
 }
 
 // First returns the first key/value pair of the map, an iterator to iterate over the remaining pair, and true\false marker of availability next pairs.
 // If no more then ok==false.
-func (m Map[K, V]) First() (oMapIter.OrderedMapIter[K, V], K, V, bool) {
+func (m Map[K, V]) First() (omap.Iter[K, V], K, V, bool) {
 	var (
 		iterator           = m.Head()
 		firstK, firstV, ok = iterator.Next()
@@ -90,8 +90,8 @@ func (m Map[K, V]) First() (oMapIter.OrderedMapIter[K, V], K, V, bool) {
 }
 
 // Tail creates an iterator pointing to the end of the map
-func (m Map[K, V]) Tail() oMapIter.OrderedMapIter[K, V] {
-	return oMapIter.NewOrdered(m.elements, slice.NewTailS(m.order, m.ksize))
+func (m Map[K, V]) Tail() omap.Iter[K, V] {
+	return omap.NewIter(m.elements, slice.NewTailS(m.order, m.ksize))
 }
 
 // Map collects the key/value pairs to a map

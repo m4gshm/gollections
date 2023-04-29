@@ -6,7 +6,7 @@ import (
 	breakLoop "github.com/m4gshm/gollections/break/loop"
 	breakStream "github.com/m4gshm/gollections/break/stream"
 	"github.com/m4gshm/gollections/c"
-	oMapIter "github.com/m4gshm/gollections/immutable/ordered/map_/iter"
+	omap "github.com/m4gshm/gollections/immutable/ordered/map_"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/slice"
@@ -25,18 +25,18 @@ type MapValuesIter[K comparable, V any] struct {
 }
 
 var (
-	_ c.Collection[any, *oMapIter.ValIter[int, any]] = (*MapValuesIter[int, any])(nil)
-	_ fmt.Stringer                                   = (*MapValuesIter[int, any])(nil)
+	_ c.Collection[any, *omap.ValIter[int, any]] = (*MapValuesIter[int, any])(nil)
+	_ fmt.Stringer                               = (*MapValuesIter[int, any])(nil)
 )
 
 // Begin creates iterator
-func (m MapValuesIter[K, V]) Begin() *oMapIter.ValIter[K, V] {
+func (m MapValuesIter[K, V]) Begin() *omap.ValIter[K, V] {
 	h := m.Head()
 	return &h
 }
 
 // Head creates iterator
-func (m MapValuesIter[K, V]) Head() oMapIter.ValIter[K, V] {
+func (m MapValuesIter[K, V]) Head() omap.ValIter[K, V] {
 	var (
 		order    []K
 		elements map[K]V
@@ -45,12 +45,12 @@ func (m MapValuesIter[K, V]) Head() oMapIter.ValIter[K, V] {
 	order = m.order
 	elements = m.elements
 
-	return oMapIter.NewValIter(order, elements)
+	return omap.NewValIter(order, elements)
 }
 
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
-func (m MapValuesIter[K, V]) First() (oMapIter.ValIter[K, V], V, bool) {
+func (m MapValuesIter[K, V]) First() (omap.ValIter[K, V], V, bool) {
 	var (
 		iterator  = m.Head()
 		first, ok = iterator.Next()
