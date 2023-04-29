@@ -18,21 +18,21 @@ func Convert[I c.Iterator[From], From, To any, Col c.Iterable[I]](elements Col, 
 }
 
 // FilterAndConvert additionally filters 'From' elements
-func FilterAndConvert[From, To any, Col c.Iterable[c.Iterator[From]]](elements Col, filter func(From) bool, converter func(From) To) stream.Iter[To] {
+func FilterAndConvert[I c.Iterator[From], From, To any, Col c.Iterable[I]](elements Col, filter func(From) bool, converter func(From) To) stream.Iter[To] {
 	b := elements.Begin()
 	f := loop.FilterAndConvert(b.Next, filter, converter)
 	return stream.New(f.Next)
 }
 
 // Flatt instantiates Iterator that extracts slices of 'To' by a flattener from elements of 'From' and flattens as one iterable collection of 'To' elements
-func Flatt[From, To any, Col c.Iterable[c.Iterator[From]]](elements Col, by func(From) []To) stream.Iter[To] {
+func Flatt[I c.Iterator[From], From, To any, Col c.Iterable[I]](elements Col, by func(From) []To) stream.Iter[To] {
 	b := elements.Begin()
 	f := loop.Flatt(b.Next, by)
 	return stream.New(f.Next)
 }
 
 // FilterAndFlatt additionally filters 'From' elements
-func FilterAndFlatt[From, To any, Col c.Iterable[c.Iterator[From]]](elements Col, filter func(From) bool, flatt func(From) []To) stream.Iter[To] {
+func FilterAndFlatt[I c.Iterator[From], From, To any, Col c.Iterable[I]](elements Col, filter func(From) bool, flatt func(From) []To) stream.Iter[To] {
 	b := elements.Begin()
 	f := loop.FilterAndFlatt(b.Next, filter, flatt)
 	return stream.New(f.Next)
@@ -46,12 +46,12 @@ func Filter[I c.Iterator[T], T any, Col c.Iterable[I]](elements Col, filter func
 }
 
 // NotNil instantiates Iterator that filters nullable elements
-func NotNil[T any, Col c.Iterable[c.Iterator[*T]]](elements Col) stream.Iter[*T] {
-	return Filter[c.Iterator[*T]](elements, check.NotNil[T])
+func NotNil[I c.Iterator[*T], T any, Col c.Iterable[I]](elements Col) stream.Iter[*T] {
+	return Filter[I](elements, check.NotNil[T])
 }
 
 // Group groups elements to slices by a converter and returns a map
-func Group[T any, K comparable, C c.Iterable[c.Iterator[T]]](elements C, by func(T) K) kvstream.Iter[K, T, map[K][]T] {
+func Group[I c.Iterator[T], T any, K comparable, C c.Iterable[I]](elements C, by func(T) K) kvstream.Iter[K, T, map[K][]T] {
 	it := loop.NewKeyValuer(elements.Begin().Next, by, as.Is[T])
 	return kvstream.New(it.Next, kvloop.Group[K, T])
 }
