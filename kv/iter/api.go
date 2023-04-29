@@ -9,6 +9,7 @@ import (
 	"github.com/m4gshm/gollections/kv/stream"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_/filter"
+	"github.com/m4gshm/gollections/slice"
 )
 
 // OfPairs instantiates KVIterator of predefined key\value pairs
@@ -18,7 +19,7 @@ func OfPairs[K, V any](pairs ...c.KV[K, V]) loop.KeyValuer[c.KV[K, V], K, V] {
 
 // WrapPairs instantiates KVIterator using slice as the key\value pairs source
 func WrapPairs[K, V any, P ~[]c.KV[K, V]](pairs P) loop.KeyValuer[c.KV[K, V], K, V] {
-	return FromPairs[K, V](iter.Wrap(pairs))
+	return FromPairs[K, V](slice.NewIter(pairs))
 }
 
 // FromPairs converts an iterator of key\value pair elements to a KVIterator

@@ -11,20 +11,9 @@ import (
 	"github.com/m4gshm/gollections/slice"
 )
 
-// Of instantiates Iterator of predefined elements
+// Of instantiates an iterator of predefined elements
 func Of[T any](elements ...T) *slice.Iter[T] {
-	return New(elements)
-}
-
-// New instantiates Iterator using a slice as the elements source
-func New[T any](elements []T) *slice.Iter[T] {
-	return Wrap(elements)
-}
-
-// Wrap instantiates Iterator using a slice as the elements source
-func Wrap[TS ~[]T, T any](elements TS) *slice.Iter[T] {
-	h := slice.NewHead(elements)
-	return &h
+	return slice.NewIter(elements)
 }
 
 // Convert instantiates Iterator that converts elements with a converter and returns them
@@ -60,24 +49,9 @@ func NotNil[T any, I c.Iterator[*T]](elements I) loop.FitIter[*T] {
 	return Filter(elements, check.NotNil[T])
 }
 
-// ToSlice converts an Iterator to a slice
-func ToSlice[T any, I c.Iterator[T]](elements I) []T {
-	return loop.ToSlice(elements.Next)
-}
-
 // Group transforms iterable elements to the MapPipe based on applying key extractor to the elements
 func Group[T any, K comparable, I c.Iterator[T]](elements I, by func(T) K) stream.Iter[K, T, map[K][]T] {
 	return stream.New(loop.NewKeyValuer(elements.Next, by, as.Is[T]).Next, kvloop.Group[K, T])
-}
-
-// ForEach applies the 'walker' function to elements of an Iterator
-func ForEach[T any, I c.Iterator[T]](elements I, walker func(T)) {
-	loop.ForEach(elements.Next, walker)
-}
-
-// ForEachFiltered applies the 'walker' function to elements that satisfy a predicate condition
-func ForEachFiltered[T any, I c.Iterator[T]](elements I, walker func(T), filter func(T) bool) {
-	loop.ForEachFiltered(elements.Next, walker, filter)
 }
 
 // First returns the first element that satisfies requirements of the predicate 'filter'

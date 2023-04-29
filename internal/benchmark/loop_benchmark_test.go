@@ -6,7 +6,6 @@ import (
 	"github.com/m4gshm/gollections/immutable/oset"
 	"github.com/m4gshm/gollections/immutable/set"
 	"github.com/m4gshm/gollections/immutable/vector"
-	"github.com/m4gshm/gollections/iter"
 	"github.com/m4gshm/gollections/map_"
 	moset "github.com/m4gshm/gollections/mutable/oset"
 	mvector "github.com/m4gshm/gollections/mutable/vector"
@@ -194,7 +193,7 @@ func Benchmark_Loop_Slice_Wrap_NextNext(b *testing.B) {
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				next := iter.Wrap(values).Next
+				next := slice.NewIter(values).Next
 				for v, ok := next(); ok; v, ok = next() {
 					casee.load(v)
 				}

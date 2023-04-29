@@ -25,7 +25,7 @@ func Test_FilterAndConvert(t *testing.T) {
 		addTail  = func(s string) string { return s + "_tail" }
 	)
 	items := []int{1, 2, 3, 4, 5}
-	converted := iter.FilterAndConvert(iter.Wrap(items), func(v int) bool { return v%2 == 0 }, convert.And(toString, addTail))
+	converted := iter.FilterAndConvert(slice.NewIter(items), func(v int) bool { return v%2 == 0 }, convert.And(toString, addTail))
 	assert.Equal(t, slice.Of("2_tail", "4_tail"), loop.ToSlice(converted.Next))
 
 	converted2 := sliceIter.FilterAndConvert(items, func(v int) bool { return v%2 == 0 }, convert.And(toString, addTail))
@@ -49,11 +49,11 @@ func Test_FlattSlices(t *testing.T) {
 		multiDimension = [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
 		expected       = slice.Of(1, 3, 5, 7)
 	)
-	f := iter.Filter(iter.Flatt(iter.Flatt(iter.Wrap(multiDimension), convert.To[[][]int]), convert.To[[]int]), odds)
-	a := iter.ToSlice[int](f)
+	f := iter.Filter(iter.Flatt(iter.Flatt(slice.NewIter(multiDimension), convert.To[[][]int]), convert.To[[]int]), odds)
+	a := loop.ToSlice(f.Next)
 	assert.Equal(t, expected, a)
 
-	a = iter.ToSlice[int](iter.Filter(iter.Flatt(sliceIter.Flatt(multiDimension, convert.To[[][]int]), convert.To[[]int]), odds))
+	a = loop.ToSlice(iter.Filter(iter.Flatt(sliceIter.Flatt(multiDimension, convert.To[[][]int]), convert.To[[]int]), odds).Next)
 	assert.Equal(t, expected, a)
 
 	//plain old style
@@ -86,7 +86,7 @@ func Test_ReduceSlices(t *testing.T) {
 
 	e := 1 + 3 + 5 + 7
 
-	oddSum := loop.Reduce(iter.Filter(iter.Flatt(iter.Flatt(iter.Wrap(multiDimension), convert.To[[][]int]), convert.To[[]int]), odds).Next, op.Sum[int])
+	oddSum := loop.Reduce(iter.Filter(iter.Flatt(iter.Flatt(slice.NewIter(multiDimension), convert.To[[][]int]), convert.To[[]int]), odds).Next, op.Sum[int])
 	assert.Equal(t, e, oddSum)
 
 	oddSum = loop.Reduce(iter.Filter(iter.Flatt(sliceIter.Flatt(multiDimension, convert.To[[][]int]), convert.To[[]int]), odds).Next, op.Sum[int])
@@ -132,7 +132,7 @@ func Test_ConvertFlattStructure_Iterable(t *testing.T) {
 
 	items := []*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil, {attributes: []*Attributes{{name: "third"}, nil}}}
 
-	names := loop.ToSlice(iter.Convert(iter.Flatt(iter.Wrap(items), (*Participant).GetAttributes), (*Attributes).GetName).Next)
+	names := loop.ToSlice(iter.Convert(iter.Flatt(slice.NewIter(items), (*Participant).GetAttributes), (*Attributes).GetName).Next)
 	assert.Equal(t, expected, names)
 
 	names = loop.ToSlice(iter.Convert(sliceIter.Flatt(items, (*Participant).GetAttributes), (*Attributes).GetName).Next)
@@ -144,7 +144,7 @@ func Test_ConvertFilterAndFlattStructure_Iterable(t *testing.T) {
 
 	items := []*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil, {attributes: []*Attributes{{name: "third"}, nil}}}
 
-	names := loop.ToSlice(iter.Convert(iter.FilterAndFlatt(iter.Wrap(items), check.NotNil[Participant], (*Participant).GetAttributes), (*Attributes).GetName).Next)
+	names := loop.ToSlice(iter.Convert(iter.FilterAndFlatt(slice.NewIter(items), check.NotNil[Participant], (*Participant).GetAttributes), (*Attributes).GetName).Next)
 	assert.Equal(t, expected, names)
 
 	names = loop.ToSlice(iter.Convert(sliceIter.FilterAndFlatt(items, check.NotNil[Participant], (*Participant).GetAttributes), (*Attributes).GetName).Next)
@@ -158,14 +158,14 @@ func Test_Iterate(t *testing.T) {
 		values[i] = i
 	}
 
-	stream := stream.New(slice.NewIter(values).Next)
+	stream := stream.New(sliceIter.New(values).Next)
 
 	result := make([]int, 0)
 
 	stream.ForEach(func(i int) { result = append(result, i) })
 
 	result = make([]int, 0)
-	iter.ForEach[int](slice.NewIter(values), func(i int) { result = append(result, i) })
+	sliceIter.New(values).ForEach(func(i int) { result = append(result, i) })
 
 	assert.Equal(t, values, result)
 
@@ -187,11 +187,11 @@ func Test_ReduceSum(t *testing.T) {
 
 func Test_First(t *testing.T) {
 	s := iter.Of(1, 3, 5, 7, 9, 11)
-	r, ok := iter.First(s, func(i int) bool { return i > 5 })
+	r, ok := loop.First(s.Next, func(i int) bool { return i > 5 })
 	assert.True(t, ok)
 	assert.Equal(t, 7, r)
 
-	_, nook := iter.First(s, func(i int) bool { return i > 12 })
+	_, nook := loop.First(s.Next, func(i int) bool { return i > 12 })
 	assert.False(t, nook)
 }
 

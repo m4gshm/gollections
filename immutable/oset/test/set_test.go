@@ -31,9 +31,6 @@ func Test_Set_Iterate(t *testing.T) {
 	expected := slice.Of(1, 2, 4, 3)
 	assert.Equal(t, expected, values)
 
-	iterSlice := iter.ToSlice[int](set.Begin())
-	assert.Equal(t, expected, iterSlice)
-
 	loopService := loop.ToSlice(ptr.Of(set.Head()).Next)
 	assert.Equal(t, expected, loopService)
 
@@ -110,7 +107,7 @@ func Test_Set_SortStructByField(t *testing.T) {
 func Test_Set_Convert(t *testing.T) {
 	var (
 		ints     = oset.Of(3, 3, 1, 1, 1, 5, 6, 8, 8, 0, -2, -2)
-		strings  = iter.ToSlice[string](iter.Filter(oset.Convert(ints, strconv.Itoa), func(s string) bool { return len(s) == 1 }))
+		strings  = loop.ToSlice(iter.Filter(oset.Convert(ints, strconv.Itoa), func(s string) bool { return len(s) == 1 }).Next)
 		strings2 = oset.Convert(ints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 }).Slice()
 	)
 	assert.Equal(t, slice.Of("3", "1", "5", "6", "8", "0"), strings)
