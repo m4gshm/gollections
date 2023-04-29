@@ -60,14 +60,14 @@ type Map[K comparable, V any] struct {
 }
 
 var (
-	_ c.Map[int, any]                                     = (*Map[int, any])(nil)
-	_ c.Map[int, any]                                     = Map[int, any]{}
-	_ loop.Looper[int, any, *omap.Iter[int, any]]         = (*Map[int, any])(nil)
-	_ loop.Looper[int, any, *omap.Iter[int, any]]         = Map[int, any]{}
-	_ c.KeyVal[MapKeysIter[int], MapValuesIter[int, any]] = (*Map[int, any])(nil)
-	_ c.KeyVal[MapKeysIter[int], MapValuesIter[int, any]] = Map[int, any]{}
-	_ fmt.Stringer                                        = (*Map[int, any])(nil)
-	_ fmt.Stringer                                        = Map[int, any]{}
+	_ c.Map[int, any]                             = (*Map[int, any])(nil)
+	_ c.Map[int, any]                             = Map[int, any]{}
+	_ loop.Looper[int, any, *omap.Iter[int, any]] = (*Map[int, any])(nil)
+	_ loop.Looper[int, any, *omap.Iter[int, any]] = Map[int, any]{}
+	_ c.KeyVal[MapKeys[int], MapValues[int, any]] = (*Map[int, any])(nil)
+	_ c.KeyVal[MapKeys[int], MapValues[int, any]] = Map[int, any]{}
+	_ fmt.Stringer                                = (*Map[int, any])(nil)
+	_ fmt.Stringer                                = Map[int, any]{}
 )
 
 // Iter creates an iterator
@@ -134,22 +134,12 @@ func (m Map[K, V]) Get(key K) (element V, ok bool) {
 }
 
 // Keys resutrns keys collection
-func (m Map[K, V]) Keys() MapKeysIter[K] {
-	return m.K()
-}
-
-// K resutrns keys collection impl
-func (m Map[K, V]) K() MapKeysIter[K] {
+func (m Map[K, V]) Keys() MapKeys[K] {
 	return WrapKeys(m.order)
 }
 
 // Values resutrns values collection
-func (m Map[K, V]) Values() MapValuesIter[K, V] {
-	return m.V()
-}
-
-// V resutrns values collection impl
-func (m Map[K, V]) V() MapValuesIter[K, V] {
+func (m Map[K, V]) Values() MapValues[K, V] {
 	return WrapVal(m.order, m.elements)
 }
 

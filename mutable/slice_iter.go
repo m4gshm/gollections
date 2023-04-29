@@ -8,7 +8,7 @@ import (
 
 // NewHead instantiates Iter starting at the first element of a slice.
 func NewHead[TS ~[]T, T any](elements *TS, del func(int) bool) SliceIter[T] {
-	return SliceIter[T]{elements: slice.BaseTypeRef(elements), current: slice.IterNoStarted, del: del}
+	return SliceIter[T]{elements: slice.UpcastRef(elements), current: slice.IterNoStarted, del: del}
 }
 
 // NewTail instantiates Iter starting at the last element of a slice.
@@ -16,7 +16,7 @@ func NewTail[TS ~[]T, T any](elements *TS, del func(int) bool) SliceIter[T] {
 	if elements == nil {
 		return SliceIter[T]{}
 	}
-	return SliceIter[T]{elements: slice.BaseTypeRef(elements), current: len(*elements), del: del}
+	return SliceIter[T]{elements: slice.UpcastRef(elements), current: len(*elements), del: del}
 }
 
 // SliceIter is the Iterator implementation for mutable containers.

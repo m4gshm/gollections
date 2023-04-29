@@ -82,6 +82,7 @@ type KVCollection[K comparable, V any, M map[K]V | map[K][]V] interface {
 // SliceFactory collects the elements of the collection into a slice
 type SliceFactory[T any] interface {
 	Slice() []T
+	Append([]T) []T
 }
 
 // MapFactory collects the key/value pairs of the collection into a map

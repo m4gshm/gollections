@@ -106,7 +106,7 @@ func Test_Vector_SortStructByField(t *testing.T) {
 func Test_Vector_Convert(t *testing.T) {
 	var (
 		ints     = vector.Of(3, 1, 5, 6, 8, 0, -2)
-		strings  = loop.ToSlice(iter.Filter(vector.Convert(ints, strconv.Itoa), func(s string) bool { return len(s) == 1 }).Next)
+		strings  = loop.Slice(iter.Filter(vector.Convert(ints, strconv.Itoa), func(s string) bool { return len(s) == 1 }).Next)
 		strings2 = vector.Convert(ints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 }).Slice()
 	)
 	assert.Equal(t, slice.Of("3", "1", "5", "6", "8", "0"), strings)

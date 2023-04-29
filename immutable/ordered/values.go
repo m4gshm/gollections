@@ -7,6 +7,7 @@ import (
 	breakStream "github.com/m4gshm/gollections/break/stream"
 	"github.com/m4gshm/gollections/c"
 	omap "github.com/m4gshm/gollections/immutable/ordered/map_"
+	"github.com/m4gshm/gollections/iterable"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/slice"
@@ -14,35 +15,35 @@ import (
 )
 
 // WrapVal instantiates MapValues using elements as internal storage.
-func WrapVal[K comparable, V any](order []K, elements map[K]V) MapValuesIter[K, V] {
-	return MapValuesIter[K, V]{order, elements}
+func WrapVal[K comparable, V any](order []K, elements map[K]V) MapValues[K, V] {
+	return MapValues[K, V]{order, elements}
 }
 
-// MapValuesIter is the wrapper for Map'm values.
-type MapValuesIter[K comparable, V any] struct {
+// MapValues is the wrapper for Map'm values.
+type MapValues[K comparable, V any] struct {
 	order    []K
 	elements map[K]V
 }
 
 var (
-	_ c.Collection[any]                         = (*MapValuesIter[int, any])(nil)
-	_ loop.Looper[any, *omap.ValIter[int, any]] = (*MapValuesIter[int, any])(nil)
-	_ fmt.Stringer                              = (*MapValuesIter[int, any])(nil)
+	_ c.Collection[any]                         = (*MapValues[int, any])(nil)
+	_ loop.Looper[any, *omap.ValIter[int, any]] = (*MapValues[int, any])(nil)
+	_ fmt.Stringer                              = (*MapValues[int, any])(nil)
 )
 
 // Iter creates an iterator
-func (m MapValuesIter[K, V]) Iter() c.Iterator[V] {
+func (m MapValues[K, V]) Iter() c.Iterator[V] {
 	h := m.Head()
 	return &h
 }
 
-func (m MapValuesIter[K, V]) Loop() *omap.ValIter[K, V] {
+func (m MapValues[K, V]) Loop() *omap.ValIter[K, V] {
 	h := m.Head()
 	return &h
 }
 
 // Head creates an iterator value object
-func (m MapValuesIter[K, V]) Head() omap.ValIter[K, V] {
+func (m MapValues[K, V]) Head() omap.ValIter[K, V] {
 	var (
 		order    []K
 		elements map[K]V
@@ -56,7 +57,7 @@ func (m MapValuesIter[K, V]) Head() omap.ValIter[K, V] {
 
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
-func (m MapValuesIter[K, V]) First() (omap.ValIter[K, V], V, bool) {
+func (m MapValues[K, V]) First() (omap.ValIter[K, V], V, bool) {
 	var (
 		iterator  = m.Head()
 		first, ok = iterator.Next()
@@ -65,37 +66,40 @@ func (m MapValuesIter[K, V]) First() (omap.ValIter[K, V], V, bool) {
 }
 
 // Len returns amount of elements
-func (m MapValuesIter[K, V]) Len() int {
+func (m MapValues[K, V]) Len() int {
 	return len(m.elements)
 }
 
 // IsEmpty returns true if the collection is empty
-func (m MapValuesIter[K, V]) IsEmpty() bool {
+func (m MapValues[K, V]) IsEmpty() bool {
 	return m.Len() == 0
 }
 
 // Slice collects the values to a slice
-func (m MapValuesIter[K, V]) Slice() (values []V) {
-	values = make([]V, len(m.order))
-	for i, key := range m.order {
+func (m MapValues[K, V]) Slice() (values []V) {
+	return m.Append(values)
+}
+
+func (m MapValues[K, V]) Append(out []V) (values []V) {
+	for _, key := range m.order {
 		val := m.elements[key]
-		values[i] = val
+		out = append(out, val)
 	}
-	return values
+	return out
 }
 
 // For applies the 'walker' function for every value. Return the c.ErrBreak to stop.
-func (m MapValuesIter[K, V]) For(walker func(V) error) error {
+func (m MapValues[K, V]) For(walker func(V) error) error {
 	return map_.ForOrderedValues(m.order, m.elements, walker)
 }
 
 // ForEach applies the 'walker' function for every value
-func (m MapValuesIter[K, V]) ForEach(walker func(V)) {
+func (m MapValues[K, V]) ForEach(walker func(V)) {
 	map_.ForEachOrderedValues(m.order, m.elements, walker)
 }
 
 // Get returns an element by the index, otherwise, if the provided index is ouf of the collection len, returns zero T and false in the second result
-func (m MapValuesIter[K, V]) Get(index int) (V, bool) {
+func (m MapValues[K, V]) Get(index int) (V, bool) {
 	keys := m.order
 	if index >= 0 && index < len(keys) {
 		key := keys[index]
@@ -107,31 +111,29 @@ func (m MapValuesIter[K, V]) Get(index int) (V, bool) {
 }
 
 // Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function
-func (m MapValuesIter[K, V]) Filter(filter func(V) bool) stream.Iter[V] {
+func (m MapValues[K, V]) Filter(filter func(V) bool) stream.Iter[V] {
 	h := m.Head()
 	return stream.New(loop.Filter(h.Next, filter).Next)
 }
 
 // Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function
-func (m MapValuesIter[K, V]) Filt(filter func(V) (bool, error)) breakStream.Iter[V] {
+func (m MapValues[K, V]) Filt(filter func(V) (bool, error)) breakStream.Iter[V] {
 	h := m.Head()
 	return breakStream.New(breakLoop.Filt(breakLoop.From(h.Next), filter).Next)
 }
 
 // Convert returns a stream that applies the 'converter' function to the collection elements
-func (m MapValuesIter[K, V]) Convert(converter func(V) V) stream.Iter[V] {
-	h := m.Head()
-	return stream.New(loop.Convert(h.Next, converter).Next)
+func (m MapValues[K, V]) Convert(converter func(V) V) stream.Iter[V] {
+	return iterable.Convert(m, converter)
 }
 
 // Convert returns a stream that applies the 'converter' function to the collection elements
-func (m MapValuesIter[K, V]) Conv(converter func(V) (V, error)) breakStream.Iter[V] {
-	h := m.Head()
-	return breakStream.New(breakLoop.Conv(breakLoop.From(h.Next), converter).Next)
+func (m MapValues[K, V]) Conv(converter func(V) (V, error)) breakStream.Iter[V] {
+	return iterable.Conv(m, converter)
 }
 
 // Reduce reduces the elements into an one using the 'merge' function
-func (m MapValuesIter[K, V]) Reduce(merge func(V, V) V) V {
+func (m MapValues[K, V]) Reduce(merge func(V, V) V) V {
 	_, v := map_.Reduce(m.elements, func(_ K, v1 V, _ K, v2 V) (k K, v V) {
 		return k, merge(v1, v2)
 	})
@@ -139,12 +141,12 @@ func (m MapValuesIter[K, V]) Reduce(merge func(V, V) V) V {
 }
 
 // HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful
-func (m MapValuesIter[K, V]) HasAny(predicate func(V) bool) bool {
+func (m MapValues[K, V]) HasAny(predicate func(V) bool) bool {
 	return map_.HasAny(m.elements, func(_ K, v V) bool {
 		return predicate(v)
 	})
 }
 
-func (m MapValuesIter[K, V]) String() string {
+func (m MapValues[K, V]) String() string {
 	return slice.ToString(m.Slice())
 }

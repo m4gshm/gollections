@@ -146,31 +146,31 @@ func _() {
     var (
         _ *mutable.Vector[int] = vector.Of(1, 2, 3)
         _ *mutable.Vector[int] = new(mutable.Vector[int])
-        _ c.Vector[int]        = vector.NewCap[int](capacity)
+        _ *mutable.Vector[int] = vector.NewCap[int](capacity)
         _ c.Vector[int]        = vector.Empty[int]()
     )
     var (
         _ *mutable.Set[int] = set.Of(1, 2, 3)
         _ *mutable.Set[int] = new(mutable.Set[int])
-        _ c.Set[int]        = set.NewCap[int](capacity)
+        _ *mutable.Set[int] = set.NewCap[int](capacity)
         _ c.Set[int]        = set.Empty[int]()
     )
     var (
         _ *ordered.Set[int] = oset.Of(1, 2, 3)
         _ *ordered.Set[int] = new(ordered.Set[int])
-        _ c.Set[int]        = oset.NewCap[int](capacity)
+        _ *ordered.Set[int] = oset.NewCap[int](capacity)
         _ c.Set[int]        = oset.Empty[int]()
     )
     var (
         _ *mutable.Map[int, string] = map_.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
         _ *mutable.Map[int, string] = new(mutable.Map[int, string])
-        _ c.Map[int, string]        = map_.New[int, string](capacity)
+        _ *mutable.Map[int, string] = map_.New[int, string](capacity)
         _ c.Map[int, string]        = map_.Empty[int, string]()
     )
     var (
         _ *ordered.Map[int, string] = omap.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
         _ *ordered.Map[int, string] = new(ordered.Map[int, string])
-        _ c.Map[int, string]        = omap.New[int, string](capacity)
+        _ *ordered.Map[int, string] = omap.New[int, string](capacity)
         _ c.Map[int, string]        = omap.Empty[int, string]()
     )
 }
@@ -253,7 +253,7 @@ import (
     "github.com/m4gshm/gollections/immutable/oset"
     "github.com/m4gshm/gollections/immutable/set"
     "github.com/m4gshm/gollections/iter"
-    slc "github.com/m4gshm/gollections/iter/slice"
+    sliceIter "github.com/m4gshm/gollections/slice/iter"
     iterableGroup "github.com/m4gshm/gollections/iterable/group"
     "github.com/m4gshm/gollections/loop"
     "github.com/m4gshm/gollections/op"
@@ -324,7 +324,7 @@ func Test_compute_odds_sum(t *testing.T) {
     )
 
     //declarative style
-    oddSum := loop.Reduce(iter.Filter(iter.Flatt(slc.Flatt(multiDimension, as.Is[[][]int]), as.Is[[]int]), odds).Next, op.Sum[int])
+    oddSum := loop.Reduce(iter.Filter(iter.Flatt(sliceIter.Flatt(multiDimension, as.Is[[][]int]), as.Is[[]int]), odds).Next, op.Sum[int])
     assert.Equal(t, expected, oddSum)
 
     //plain old style

@@ -2,9 +2,8 @@
 package oset
 
 import (
-	breakLoop "github.com/m4gshm/gollections/break/loop"
 	breakStream "github.com/m4gshm/gollections/break/stream"
-	"github.com/m4gshm/gollections/loop"
+	"github.com/m4gshm/gollections/iterable"
 	"github.com/m4gshm/gollections/mutable/ordered"
 	"github.com/m4gshm/gollections/stream"
 )
@@ -31,26 +30,20 @@ func NewCap[T comparable](capacity int) *ordered.Set[T] {
 
 // Convert returns a stream that applies the 'converter' function to the collection elements
 func Convert[From, To comparable](collection *ordered.Set[From], converter func(From) To) stream.Iter[To] {
-	h := collection.Head()
-	return stream.New(loop.Convert(h.Next, converter).Next)
+	return iterable.Convert(collection, converter)
 }
 
 // Conv returns a breakable stream that applies the 'converter' function to the collection elements
 func Conv[From, To comparable](collection *ordered.Set[From], converter func(From) (To, error)) breakStream.Iter[To] {
-	h := collection.Head()
-	return breakStream.New(breakLoop.Conv(breakLoop.From(h.Next), converter).Next)
+	return iterable.Conv(collection, converter)
 }
 
 // Flatt returns a stream that converts the collection elements into slices and then flattens them to one level
-func Flatt[From, To comparable](s *ordered.Set[From], flattener func(From) []To) stream.Iter[To] {
-	h := s.Head()
-	f := loop.Flatt(h.Next, flattener)
-	return stream.New(f.Next)
+func Flatt[From, To comparable](collection *ordered.Set[From], flattener func(From) []To) stream.Iter[To] {
+	return iterable.Flatt(collection, flattener)
 }
 
 // Flat returns a breakable stream that converts the collection elements into slices and then flattens them to one level
-func Flat[From, To comparable](s *ordered.Set[From], flattener func(From) ([]To, error)) breakStream.Iter[To] {
-	h := s.Head()
-	f := breakLoop.Flat(breakLoop.From(h.Next), flattener)
-	return breakStream.New(f.Next)
+func Flat[From, To comparable](collection *ordered.Set[From], flattener func(From) ([]To, error)) breakStream.Iter[To] {
+	return iterable.Flat(collection, flattener)
 }

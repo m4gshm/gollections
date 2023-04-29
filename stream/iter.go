@@ -86,7 +86,12 @@ func (t Iter[T]) Loop() Iter[T] {
 
 // Slice collects the elements to a slice
 func (t Iter[T]) Slice() []T {
-	return loop.ToSlice(t.next)
+	return loop.Slice(t.next)
+}
+
+// Append collects the elements retrieved by the 'next' function into the specified 'out' slice
+func (t Iter[T]) Append(out []T) []T {
+	return loop.Append(t.next, out)
 }
 
 // HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful

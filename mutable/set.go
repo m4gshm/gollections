@@ -7,8 +7,8 @@ import (
 	breakLoop "github.com/m4gshm/gollections/break/loop"
 	breakStream "github.com/m4gshm/gollections/break/stream"
 	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/iterable"
 	"github.com/m4gshm/gollections/loop"
-	iter "github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/mutable/ordered"
 	"github.com/m4gshm/gollections/slice"
@@ -57,7 +57,7 @@ var (
 	_ c.Deleteable[int]                   = (*Set[int])(nil)
 	_ c.DeleteableVerify[int]             = (*Set[int])(nil)
 	_ c.Set[int]                          = (*Set[int])(nil)
-	_ iter.Looper[int, *SetIter[int]]     = (*Set[int])(nil)
+	_ loop.Looper[int, *SetIter[int]]     = (*Set[int])(nil)
 	_ fmt.Stringer                        = (*Set[int])(nil)
 )
 
@@ -100,7 +100,18 @@ func (s *Set[T]) First() (SetIter[T], T, bool) {
 // Slice collects the elements to a slice
 func (s *Set[T]) Slice() (out []T) {
 	if s != nil {
-		out = map_.Keys(s.elements)
+		if elements := s.elements; elements != nil {
+			out = map_.Keys(elements)
+		}
+	}
+	return out
+}
+
+func (s *Set[T]) Append(out []T) []T {
+	if s != nil {
+		if elements := s.elements; elements != nil {
+			out = map_.AppendKeys(s.elements, out)
+		}
 	}
 	return out
 }
@@ -253,7 +264,7 @@ func (s *Set[T]) ForEach(walker func(T)) {
 // Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function
 func (s *Set[T]) Filter(predicate func(T) bool) stream.Iter[T] {
 	h := s.Head()
-	return stream.New(iter.Filter(h.Next, predicate).Next)
+	return stream.New(loop.Filter(h.Next, predicate).Next)
 }
 
 // Filt returns a stream consisting of elements that satisfy the condition of the 'predicate' function
@@ -264,14 +275,12 @@ func (s Set[T]) Filt(predicate func(T) (bool, error)) breakStream.Iter[T] {
 
 // Convert returns a stream that applies the 'converter' function to the collection elements
 func (s *Set[T]) Convert(converter func(T) T) stream.Iter[T] {
-	h := s.Head()
-	return stream.New(loop.Convert(h.Next, converter).Next)
+	return iterable.Convert(s, converter)
 }
 
 // Convert returns a stream that applies the 'converter' function to the collection elements
 func (s *Set[T]) Conv(converter func(T) (T, error)) breakStream.Iter[T] {
-	h := s.Head()
-	return breakStream.New(breakLoop.Conv(breakLoop.From(h.Next), converter).Next)
+	return iterable.Conv(s, converter)
 }
 
 // Reduce reduces the elements into an one using the 'merge' function

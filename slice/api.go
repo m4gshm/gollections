@@ -40,7 +40,7 @@ func OfLoop[S, T any](source S, hasNext func(S) bool, getNext func(S) (T, error)
 // Generate builds a slice by an generator function.
 // The generator returns an element, or false if the generation is over, or an error.
 func Generate[T any](next func() (T, bool)) []T {
-	return loop.ToSlice(next)
+	return loop.Slice(next)
 }
 
 // Clone makes new slice instance with copied elements
@@ -553,13 +553,23 @@ func StringsBehaveAs[TS ~[]T, T ~string](elements []string) TS {
 	return s
 }
 
-func BaseType[TS ~[]T, T any](elements TS) []T {
-	return *BaseTypeRef(&elements)
+func Upcast[TS ~[]T, T any](elements TS) []T {
+	return *UpcastRef(&elements)
 }
 
-func BaseTypeRef[TS ~[]T, T any](elements *TS) *[]T {
+func UpcastRef[TS ~[]T, T any](elements *TS) *[]T {
 	ptr := unsafe.Pointer(elements)
 	s := (*[]T)(ptr)
+	return s
+}
+
+func Downcast[TS ~[]T, T any](elements []T) TS {
+	return *DowncastRef[TS](&elements)
+}
+
+func DowncastRef[TS ~[]T, T any](elements *[]T) *TS {
+	ptr := unsafe.Pointer(elements)
+	s := (*TS)(ptr)
 	return s
 }
 

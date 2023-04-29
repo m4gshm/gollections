@@ -11,12 +11,12 @@ import (
 	"github.com/m4gshm/gollections/immutable/oset"
 	"github.com/m4gshm/gollections/immutable/set"
 	"github.com/m4gshm/gollections/iter"
-	sliceIter "github.com/m4gshm/gollections/slice/iter"
 	iterableGroup "github.com/m4gshm/gollections/iterable/group"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/predicate/more"
 	"github.com/m4gshm/gollections/slice"
+	sliceIter "github.com/m4gshm/gollections/slice/iter"
 	"github.com/m4gshm/gollections/walk/group"
 )
 

@@ -89,13 +89,25 @@ func TrackEach[I, T any](next func() (I, T, bool), tracker func(I, T)) {
 	}
 }
 
-// ToSlice collects the elements retrieved by the 'next' function into a slice
-func ToSlice[T any](next func() (T, bool)) []T {
-	var s []T
-	for v, ok := next(); ok; v, ok = next() {
-		s = append(s, v)
+// Slice collects the elements retrieved by the 'next' function into a new slice
+func Slice[T any](next func() (T, bool)) []T {
+	return SliceCap(next, 0)
+}
+
+// SliceCap collects the elements retrieved by the 'next' function into a new slice with predefined capacity
+func SliceCap[T any](next func() (T, bool), cap int) (out []T) {
+	if cap > 0 {
+		out = make([]T, 0, cap)
 	}
-	return s
+	return Append(next, out)
+}
+
+// Append collects the elements retrieved by the 'next' function into the specified 'out' slice
+func Append[T any, TS ~[]T](next func() (T, bool), out TS) TS {
+	for v, ok := next(); ok; v, ok = next() {
+		out = append(out, v)
+	}
+	return out
 }
 
 // Reduce reduces the elements retrieved by the 'next' function into an one using the 'merge' function

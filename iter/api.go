@@ -22,8 +22,8 @@ func Convert[From, To any, I c.Iterator[From]](elements I, converter func(From) 
 }
 
 // FilterAndConvert additionally filters 'From' elements.
-func FilterAndConvert[From, To any, I c.Iterator[From]](elements I, filter func(From) bool, converter func(From) To) loop.ConvertIter[From, To] {
-	return loop.Convert(loop.Filter(elements.Next, filter).Next, converter)
+func FilterAndConvert[From, To any, I c.Iterator[From]](elements I, filter func(From) bool, converter func(From) To) loop.ConvertFitIter[From, To] {
+	return loop.FilterAndConvert(elements.Next, filter, converter)
 }
 
 // Flatt instantiates Iterator that converts the collection elements into slices and then flattens them to one level

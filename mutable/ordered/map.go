@@ -52,14 +52,14 @@ type Map[K comparable, V any] struct {
 }
 
 var (
-	_ c.Settable[int, any]                                                = (*Map[int, any])(nil)
-	_ c.SettableNew[int, any]                                             = (*Map[int, any])(nil)
-	_ c.SettableMap[c.TrackEachLoop[int, any]]                            = (*Map[int, any])(nil)
-	_ c.ImmutableMapConvert[ordered.Map[int, any]]                        = (*Map[int, any])(nil)
-	_ c.Map[int, any]                                                     = (*Map[int, any])(nil)
-	_ loop.Looper[int, any, *omap.Iter[int, any]]                         = (*Map[int, any])(nil)
-	_ c.KeyVal[ordered.MapKeysIter[int], ordered.MapValuesIter[int, any]] = (*Map[int, any])(nil)
-	_ fmt.Stringer                                                        = (*Map[int, any])(nil)
+	_ c.Settable[int, any]                                        = (*Map[int, any])(nil)
+	_ c.SettableNew[int, any]                                     = (*Map[int, any])(nil)
+	_ c.SettableMap[c.TrackEachLoop[int, any]]                    = (*Map[int, any])(nil)
+	_ c.ImmutableMapConvert[ordered.Map[int, any]]                = (*Map[int, any])(nil)
+	_ c.Map[int, any]                                             = (*Map[int, any])(nil)
+	_ loop.Looper[int, any, *omap.Iter[int, any]]                 = (*Map[int, any])(nil)
+	_ c.KeyVal[ordered.MapKeys[int], ordered.MapValues[int, any]] = (*Map[int, any])(nil)
+	_ fmt.Stringer                                                = (*Map[int, any])(nil)
 )
 
 // Iter creates an iterator
@@ -239,12 +239,7 @@ func (m *Map[K, V]) SetNew(key K, value V) bool {
 }
 
 // Keys resutrns keys collection
-func (m *Map[K, V]) Keys() ordered.MapKeysIter[K] {
-	return m.K()
-}
-
-// K resutrns keys collection impl
-func (m *Map[K, V]) K() ordered.MapKeysIter[K] {
+func (m *Map[K, V]) Keys() ordered.MapKeys[K] {
 	var order []K
 	if m != nil {
 		order = m.order
@@ -253,12 +248,7 @@ func (m *Map[K, V]) K() ordered.MapKeysIter[K] {
 }
 
 // Values resutrns values collection
-func (m *Map[K, V]) Values() ordered.MapValuesIter[K, V] {
-	return m.V()
-}
-
-// V resutrns values collection impl
-func (m *Map[K, V]) V() ordered.MapValuesIter[K, V] {
+func (m *Map[K, V]) Values() ordered.MapValues[K, V] {
 	var (
 		order    []K
 		elements map[K]V

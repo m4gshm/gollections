@@ -7,6 +7,7 @@ import (
 	breakLoop "github.com/m4gshm/gollections/break/loop"
 	breakStream "github.com/m4gshm/gollections/break/stream"
 	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/iterable"
 	"github.com/m4gshm/gollections/loop"
 	iter "github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_"
@@ -115,6 +116,15 @@ func (s *Set[T]) Slice() (out []T) {
 	if s != nil {
 		if order := s.order; order != nil {
 			out = slice.Clone(*s.order)
+		}
+	}
+	return out
+}
+
+func (s *Set[T]) Append(out []T) []T {
+	if s != nil {
+		if order := s.order; order != nil {
+			out = append(out, (*s.order)...)
 		}
 	}
 	return out
@@ -292,14 +302,12 @@ func (s *Set[T]) Filt(predicate func(T) (bool, error)) breakStream.Iter[T] {
 
 // Convert returns a stream that applies the 'converter' function to the collection elements
 func (s *Set[T]) Convert(converter func(T) T) stream.Iter[T] {
-	h := s.Head()
-	return stream.New(loop.Convert(h.Next, converter).Next)
+	return iterable.Convert(s, converter)
 }
 
 // Convert returns a stream that applies the 'converter' function to the collection elements
 func (s *Set[T]) Conv(converter func(T) (T, error)) breakStream.Iter[T] {
-	h := s.Head()
-	return breakStream.New(breakLoop.Conv(breakLoop.From(h.Next), converter).Next)
+	return iterable.Conv(s, converter)
 }
 
 // Reduce reduces the elements into an one using the 'merge' function

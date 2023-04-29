@@ -4,8 +4,8 @@ package vector
 import (
 	"golang.org/x/exp/constraints"
 
-	breakLoop "github.com/m4gshm/gollections/break/loop"
 	breakStream "github.com/m4gshm/gollections/break/stream"
+	"github.com/m4gshm/gollections/iterable"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/mutable"
 	"github.com/m4gshm/gollections/stream"
@@ -29,7 +29,7 @@ func NewCap[T any](capacity int) *mutable.Vector[T] {
 // From instantiates a vector with elements retrieved by the 'next' function.
 // The next returns an element with true or zero value with false if there are no more elements.
 func From[T any](next func() (T, bool)) *mutable.Vector[T] {
-	return mutable.WrapVector(loop.ToSlice(next))
+	return mutable.WrapVector(loop.Slice(next))
 }
 
 // Sort sorts the specified vector in-place by a converter that thransforms an element to an Ordered (int, string and so on).
@@ -39,26 +39,20 @@ func Sort[T any, F constraints.Ordered](v *mutable.Vector[T], by func(T) F) *mut
 
 // Convert returns a stream that applies the 'converter' function to the collection elements
 func Convert[From, To any](collection *mutable.Vector[From], converter func(From) To) stream.Iter[To] {
-	h := collection.Head()
-	return stream.New(loop.Convert(h.Next, converter).Next)
+	return iterable.Convert(collection, converter)
 }
 
 // Conv returns a breakable stream that applies the 'converter' function to the collection elements
 func Conv[From, To comparable](collection *mutable.Vector[From], converter func(From) (To, error)) breakStream.Iter[To] {
-	h := collection.Head()
-	return breakStream.New(breakLoop.Conv(breakLoop.From(h.Next), converter).Next)
+	return iterable.Conv(collection, converter)
 }
 
 // Flatt returns a stream that converts the collection elements into slices and then flattens them to one level
 func Flatt[From, To any](collection *mutable.Vector[From], flattener func(From) []To) stream.Iter[To] {
-	h := collection.Head()
-	f := loop.Flatt(h.Next, flattener)
-	return stream.New(f.Next)
+	return iterable.Flatt(collection, flattener)
 }
 
 // Flat returns a breakable stream that converts the collection elements into slices and then flattens them to one level
-func Flat[From, To comparable](s *mutable.Vector[From], flattener func(From) ([]To, error)) breakStream.Iter[To] {
-	h := s.Head()
-	f := breakLoop.Flat(breakLoop.From(h.Next), flattener)
-	return breakStream.New(f.Next)
+func Flat[From, To comparable](collection *mutable.Vector[From], flattener func(From) ([]To, error)) breakStream.Iter[To] {
+	return iterable.Flat(collection, flattener)
 }

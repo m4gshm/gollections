@@ -8,6 +8,7 @@ import (
 	breakStream "github.com/m4gshm/gollections/break/stream"
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/immutable/ordered"
+	"github.com/m4gshm/gollections/iterable"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/slice"
@@ -83,9 +84,12 @@ func (s Set[T]) Slice() []T {
 	return map_.Keys(s.elements)
 }
 
+func (s Set[T]) Append(out []T) []T {
+	return map_.AppendKeys(s.elements, out)
+}
+
 // Len returns amount of elements
 func (s Set[T]) Len() int {
-
 	return len(s.elements)
 }
 
@@ -119,14 +123,12 @@ func (s Set[T]) Filt(predicate func(T) (bool, error)) breakStream.Iter[T] {
 
 // Convert returns a stream that applies the 'converter' function to the collection elements
 func (s Set[T]) Convert(converter func(T) T) stream.Iter[T] {
-	h := s.Head()
-	return stream.New(loop.Convert(h.Next, converter).Next)
+	return iterable.Convert(s, converter)
 }
 
 // Convert returns a stream that applies the 'converter' function to the collection elements
 func (s Set[T]) Conv(converter func(T) (T, error)) breakStream.Iter[T] {
-	h := s.Head()
-	return breakStream.New(breakLoop.Conv(breakLoop.From(h.Next), converter).Next)
+	return iterable.Conv(s, converter)
 }
 
 // Reduce reduces the elements into an one using the 'merge' function
