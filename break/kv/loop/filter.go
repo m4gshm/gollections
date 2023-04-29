@@ -1,8 +1,8 @@
 package loop
 
 import (
+	"github.com/m4gshm/gollections/break/kv"
 	"github.com/m4gshm/gollections/break/loop"
-	"github.com/m4gshm/gollections/c"
 )
 
 // FiltKV is the KVIterator wrapper that provides filtering of key/value elements by a Predicate.
@@ -12,8 +12,8 @@ type FiltKV[K, V any] struct {
 }
 
 var (
-	_ c.KVIteratorBreakable[any, any] = (*FiltKV[any, any])(nil)
-	_ c.KVIteratorBreakable[any, any] = FiltKV[any, any]{}
+	_ kv.Iterator[any, any] = (*FiltKV[any, any])(nil)
+	_ kv.Iterator[any, any] = FiltKV[any, any]{}
 )
 
 // Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak

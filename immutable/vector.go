@@ -31,8 +31,8 @@ type Vector[T any] struct {
 }
 
 var (
-	_ c.Vector[any]                      = (*Vector[any])(nil)
-	_ c.Vector[any]                      = Vector[any]{}
+	_ collection.Vector[any]             = (*Vector[any])(nil)
+	_ collection.Vector[any]             = Vector[any]{}
 	_ loop.Looper[any, *slice.Iter[any]] = (*Vector[any])(nil)
 	_ loop.Looper[any, *slice.Iter[any]] = Vector[any]{}
 	_ fmt.Stringer                       = (*Vector[any])(nil)

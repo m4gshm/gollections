@@ -1,7 +1,7 @@
 package loop
 
 import (
-	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/kv"
 	"github.com/m4gshm/gollections/loop"
 )
 
@@ -12,8 +12,8 @@ type FitKV[K, V any] struct {
 }
 
 var (
-	_ c.KVIterator[any, any] = (*FitKV[any, any])(nil)
-	_ c.KVIterator[any, any] = FitKV[any, any]{}
+	_ kv.KVIterator[any, any] = (*FitKV[any, any])(nil)
+	_ kv.KVIterator[any, any] = FitKV[any, any]{}
 )
 
 // Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak

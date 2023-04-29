@@ -8,7 +8,9 @@ import (
 	breakMapConvert "github.com/m4gshm/gollections/break/map_/convert"
 	breakMapFilter "github.com/m4gshm/gollections/break/map_/filter"
 	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/immutable"
+	"github.com/m4gshm/gollections/kv"
 	"github.com/m4gshm/gollections/kv/loop"
 	"github.com/m4gshm/gollections/kv/stream"
 	"github.com/m4gshm/gollections/map_"
@@ -51,14 +53,14 @@ var (
 	_ c.SettableNew[int, any]                                              = (*Map[int, any])(nil)
 	_ c.SettableMap[c.TrackEachLoop[int, any]]                             = (*Map[int, any])(nil)
 	_ c.ImmutableMapConvert[immutable.Map[int, any]]                       = (*Map[int, any])(nil)
-	_ c.Map[int, any]                                                      = (*Map[int, any])(nil)
+	_ collection.Map[int, any]                                             = (*Map[int, any])(nil)
 	_ loop.Looper[int, any, *map_.Iter[int, any]]                          = (*Map[int, any])(nil)
 	_ c.KeyVal[immutable.MapKeys[int, any], immutable.MapValues[int, any]] = (*Map[int, any])(nil)
 	_ fmt.Stringer                                                         = (*Map[int, any])(nil)
 )
 
 // Iter creates an iterator
-func (m *Map[K, V]) Iter() c.KVIterator[K, V] {
+func (m *Map[K, V]) Iter() kv.KVIterator[K, V] {
 	h := m.Head()
 	return &h
 }

@@ -56,7 +56,7 @@ var (
 	_ c.AddableAllNew[c.ForEachLoop[int]] = (*Set[int])(nil)
 	_ c.Deleteable[int]                   = (*Set[int])(nil)
 	_ c.DeleteableVerify[int]             = (*Set[int])(nil)
-	_ c.Set[int]                          = (*Set[int])(nil)
+	_ collection.Set[int]                 = (*Set[int])(nil)
 	_ loop.Looper[int, *SetIter[int]]     = (*Set[int])(nil)
 	_ fmt.Stringer                        = (*Set[int])(nil)
 )

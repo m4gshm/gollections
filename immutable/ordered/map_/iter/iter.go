@@ -8,33 +8,33 @@ import (
 	"github.com/m4gshm/gollections/slice"
 )
 
-// NewIter is the Iter constructor
-func NewIter[K comparable, V any](uniques map[K]V, elements slice.Iter[K]) Iter[K, V] {
-	return Iter[K, V]{elements: elements, uniques: uniques}
+// NewOrdered is the OrderedKV constructor
+func NewOrdered[K comparable, V any](uniques map[K]V, elements slice.Iter[K]) OrderedMapIter[K, V] {
+	return OrderedMapIter[K, V]{elements: elements, uniques: uniques}
 }
 
-// Iter is the ordered key/value pairs Iterator implementation
-type Iter[K comparable, V any] struct {
+// OrderedMapIter is the ordered key/value pairs Iterator implementation
+type OrderedMapIter[K comparable, V any] struct {
 	elements slice.Iter[K]
 	uniques  map[K]V
 }
 
-var _ kv.KVIterator[string, any] = (*Iter[string, any])(nil)
+var _ kv.KVIterator[string, any] = (*OrderedMapIter[string, any])(nil)
 
 // Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak
-func (i *Iter[K, V]) Track(traker func(key K, value V) error) error {
+func (i *OrderedMapIter[K, V]) Track(traker func(key K, value V) error) error {
 	return loop.Track(i.Next, traker)
 }
 
 // TrackEach takes all key, value pairs retrieved by the iterator
-func (i *Iter[K, V]) TrackEach(traker func(key K, value V)) {
+func (i *OrderedMapIter[K, V]) TrackEach(traker func(key K, value V)) {
 	loop.TrackEach(i.Next, traker)
 }
 
 // Next returns the next key/value pair.
 // The ok result indicates whether the pair was returned by the iterator.
 // If ok == false, then the iteration must be completed.
-func (i *Iter[K, V]) Next() (key K, val V, ok bool) {
+func (i *OrderedMapIter[K, V]) Next() (key K, val V, ok bool) {
 	if i != nil {
 		if key, ok = i.elements.Next(); ok {
 			val = i.uniques[key]
@@ -44,7 +44,7 @@ func (i *Iter[K, V]) Next() (key K, val V, ok bool) {
 }
 
 // Cap returns the iterator capacity
-func (i *Iter[K, V]) Cap() int {
+func (i *OrderedMapIter[K, V]) Cap() int {
 	return i.elements.Cap()
 }
 

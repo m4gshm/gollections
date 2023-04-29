@@ -1,7 +1,7 @@
 package loop
 
 import (
-	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/kv"
 	"github.com/m4gshm/gollections/loop"
 )
 
@@ -12,8 +12,8 @@ type ConvertKVIter[K, V any, K2, V2 any, C func(K, V) (K2, V2)] struct {
 }
 
 var (
-	_ c.KVIterator[any, any] = (*ConvertKVIter[any, any, any, any, func(any, any) (any, any)])(nil)
-	_ c.KVIterator[any, any] = ConvertKVIter[any, any, any, any, func(any, any) (any, any)]{}
+	_ kv.KVIterator[any, any] = (*ConvertKVIter[any, any, any, any, func(any, any) (any, any)])(nil)
+	_ kv.KVIterator[any, any] = ConvertKVIter[any, any, any, any, func(any, any) (any, any)]{}
 )
 
 // Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak

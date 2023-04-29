@@ -1,7 +1,7 @@
 package loop
 
 import (
-	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/break/c"
 )
 
 // FiltIter is the Iterator wrapper that provides filtering of elements by a Predicate.
@@ -11,8 +11,8 @@ type FiltIter[T any] struct {
 }
 
 var (
-	_ c.IteratorBreakable[any] = (*FiltIter[any])(nil)
-	_ c.IteratorBreakable[any] = FiltIter[any]{}
+	_ c.Iterator[any] = (*FiltIter[any])(nil)
+	_ c.Iterator[any] = FiltIter[any]{}
 )
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak

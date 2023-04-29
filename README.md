@@ -94,23 +94,23 @@ import (
 func _() {
     var (
         _ immutable.Vector[int] = vector.Of(1, 2, 3)
-        _ c.Vector[int]         = vector.New([]int{1, 2, 3})
+        _ collection.Vector[int]         = vector.New([]int{1, 2, 3})
     )
     var (
         _ immutable.Set[int] = set.Of(1, 2, 3)
-        _ c.Set[int]         = set.New([]int{1, 2, 3})
+        _ collection.Set[int]         = set.New([]int{1, 2, 3})
     )
     var (
         _ ordered.Set[int] = oset.Of(1, 2, 3)
-        _ c.Set[int]       = oset.New([]int{1, 2, 3})
+        _ collection.Set[int]       = oset.New([]int{1, 2, 3})
     )
     var (
         _ immutable.Map[int, string] = map_.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
-        _ c.Map[int, string]         = map_.New(map[int]string{1: "2", 2: "2", 3: "3"})
+        _ collection.Map[int, string]         = map_.New(map[int]string{1: "2", 2: "2", 3: "3"})
     )
     var (
         _ ordered.Map[int, string] = omap.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
-        _ c.Map[int, string]       = omap.New(
+        _ collection.Map[int, string]       = omap.New(
             /*uniques*/ map[int]string{1: "2", 2: "2", 3: "3"} /*order*/, []int{3, 1, 2},
         )
     )
@@ -147,31 +147,31 @@ func _() {
         _ *mutable.Vector[int] = vector.Of(1, 2, 3)
         _ *mutable.Vector[int] = new(mutable.Vector[int])
         _ *mutable.Vector[int] = vector.NewCap[int](capacity)
-        _ c.Vector[int]        = vector.Empty[int]()
+        _ collection.Vector[int]        = vector.Empty[int]()
     )
     var (
         _ *mutable.Set[int] = set.Of(1, 2, 3)
         _ *mutable.Set[int] = new(mutable.Set[int])
         _ *mutable.Set[int] = set.NewCap[int](capacity)
-        _ c.Set[int]        = set.Empty[int]()
+        _ collection.Set[int]        = set.Empty[int]()
     )
     var (
         _ *ordered.Set[int] = oset.Of(1, 2, 3)
         _ *ordered.Set[int] = new(ordered.Set[int])
         _ *ordered.Set[int] = oset.NewCap[int](capacity)
-        _ c.Set[int]        = oset.Empty[int]()
+        _ collection.Set[int]        = oset.Empty[int]()
     )
     var (
         _ *mutable.Map[int, string] = map_.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
         _ *mutable.Map[int, string] = new(mutable.Map[int, string])
         _ *mutable.Map[int, string] = map_.New[int, string](capacity)
-        _ c.Map[int, string]        = map_.Empty[int, string]()
+        _ collection.Map[int, string]        = map_.Empty[int, string]()
     )
     var (
         _ *ordered.Map[int, string] = omap.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
         _ *ordered.Map[int, string] = new(ordered.Map[int, string])
         _ *ordered.Map[int, string] = omap.New[int, string](capacity)
-        _ c.Map[int, string]        = omap.Empty[int, string]()
+        _ collection.Map[int, string]        = omap.Empty[int, string]()
     )
 }
 ```

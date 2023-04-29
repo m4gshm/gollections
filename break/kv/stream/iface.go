@@ -1,19 +1,19 @@
 package stream
 
-import "github.com/m4gshm/gollections/c"
+import "github.com/m4gshm/gollections/break/kv"
 
 // Stream is map or key/value stream of elements in transformation state.
-type Stream[K comparable, V, I any, Map map[K]V | map[K][]V] interface {
-	c.KVIteratorBreakable[K, V]
-	Iter() I
+type Stream[K comparable, V any, Map map[K]V | map[K][]V] interface {
+	kv.Iterator[K, V]
+	Iter() kv.Iterator[K, V]
 
-	// Filter(predicate func(K, V) bool) KVStreamBreakable[K, V, Map]
-	// FilterKey(predicate func(K) bool) KVStreamBreakable[K, V, Map]
-	// FilterValue(predicate func(V) bool) KVStreamBreakable[K, V, Map]
+	// Filter(predicate func(K, V) bool) Stream[K, V, I, Map]
+	// FilterKey(predicate func(K) bool) Stream[K, V, I, Map]
+	// FilterValue(predicate func(V) bool) Stream[K, V, I, Map]
 
-	// Filt(predicate func(K, V) (bool, error)) KVStreamBreakable[K, V, Map]
-	// FiltKey(predicate func(K) (bool, error)) KVStreamBreakable[K, V, Map]
-	// FiltValue(predicate func(V) (bool, error)) KVStreamBreakable[K, V, Map]
+	// Filt(predicate func(K, V) (bool, error)) Stream[K, V, I, Map]
+	// FiltKey(predicate func(K) (bool, error)) Stream[K, V, I, Map]
+	// FiltValue(predicate func(V) (bool, error)) Stream[K, V, I, Map]
 
 	Map() (Map, error)
 

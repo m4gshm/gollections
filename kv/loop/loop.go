@@ -1,7 +1,7 @@
 package loop
 
 import (
-	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/kv"
 	"github.com/m4gshm/gollections/loop"
 )
 
@@ -21,8 +21,8 @@ type KVIter[S, K, V any] struct {
 }
 
 var (
-	_ c.KVIterator[any, any] = (*KVIter[any, any, any])(nil)
-	_ c.KVIterator[any, any] = (*KVIter[any, any, any])(nil)
+	_ kv.KVIterator[any, any] = (*KVIter[any, any, any])(nil)
+	_ kv.KVIterator[any, any] = (*KVIter[any, any, any])(nil)
 )
 
 // Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak
@@ -35,7 +35,7 @@ func (kv *KVIter[S, K, V]) TrackEach(traker func(key K, value V)) {
 	loop.TrackEach(kv.Next, traker)
 }
 
-// Next implements c.KVIterator
+// Next implements kv.KVIterator
 func (i *KVIter[S, K, V]) Next() (K, V, bool) {
 	if i.abort == nil && i.hasNext(i.source) {
 		k, v, err := i.getNext(i.source)
@@ -49,7 +49,7 @@ func (i *KVIter[S, K, V]) Next() (K, V, bool) {
 	return k, v, false
 }
 
-// Error implements c.KVIteratorBreakable
+// Error implements kv.KVIteratorBreakable
 func (i *KVIter[S, K, V]) Error() error {
 	return i.abort
 }

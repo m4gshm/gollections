@@ -10,38 +10,6 @@ import (
 // ErrBreak is the 'break' statement of the For, Track methods
 var ErrBreak = errors.New("Break")
 
-// Vector - collection interface that provides elements order and access by index to the elements.
-type Vector[T any] interface {
-	Collection[T]
-
-	TrackLoop[int, T]
-	TrackEachLoop[int, T]
-
-	Access[int, T]
-
-	Len() int
-	IsEmpty() bool
-}
-
-// Set - collection interface that ensures the uniqueness of elements (does not insert duplicate values).
-type Set[T comparable] interface {
-	Collection[T]
-	Checkable[T]
-
-	Len() int
-	IsEmpty() bool
-}
-
-// Map - collection interface that stores key/value pairs and provide access to an element by its key
-type Map[K comparable, V any] interface {
-	KVCollection[K, V, map[K]V]
-	Checkable[K]
-	Access[K, V]
-
-	Len() int
-	IsEmpty() bool
-}
-
 type KeyVal[Keys any, Vals any] interface {
 	Keys() Keys
 	Values() Vals
@@ -66,17 +34,6 @@ type Filterable[T, Stream, StreamBreakable any] interface {
 type Convertrable[T, Stream, StreamBreakable any] interface {
 	Convert(converter func(T) T) Stream
 	Conv(converter func(T) (T, error)) StreamBreakable
-}
-
-// KVCollection is the base interface of associative collections
-type KVCollection[K comparable, V any, M map[K]V | map[K][]V] interface {
-	TrackLoop[K, V]
-	TrackEachLoop[K, V]
-	KVIterable[K, V]
-	MapFactory[K, V, M]
-
-	Reduce(merger func(K, V, K, V) (K, V)) (K, V)
-	HasAny(predicate func(K, V) bool) bool
 }
 
 // SliceFactory collects the elements of the collection into a slice
@@ -107,16 +64,6 @@ type Sized interface {
 	Cap() int
 }
 
-// IteratorBreakable provides iterate over elements of a source, where an iteration can be interrupted by an error
-type IteratorBreakable[T any] interface {
-	// Next returns the next element.
-	// The ok result indicates whether the element was returned by the iterator.
-	// If ok == false, then the iteration must be completed.
-	Next() (out T, ok bool, err error)
-
-	ForLoop[T]
-}
-
 // PrevIterator is the Iterator that provides reverse iteration over elements of a collection
 type PrevIterator[T any] interface {
 	Iterator[T]
@@ -130,33 +77,9 @@ type DelIterator[T any] interface {
 	Delete()
 }
 
-// KVIterator provides iterate over key/value pairs
-type KVIterator[K, V any] interface {
-	// Next returns the next key/value pair.
-	// The ok result indicates whether the element was returned by the iterator.
-	// If ok == false, then the iteration must be completed.
-	Next() (key K, value V, ok bool)
-	TrackLoop[K, V]
-	TrackEachLoop[K, V]
-}
-
-// KVIteratorBreakable provides iterate over key/value pairs, where an iteration can be interrupted by an error
-type KVIteratorBreakable[K, V any] interface {
-	// Next returns the next key/value pair.
-	// The ok result indicates whether the element was returned by the iterator.
-	// If ok == false, then the iteration must be completed.
-	Next() (key K, value V, ok bool, err error)
-	TrackLoop[K, V]
-}
-
 // Iterable is an iterator supplier interface
 type Iterable[T any] interface {
 	Iter() Iterator[T]
-}
-
-// KVIterable is an iterator supplier interface
-type KVIterable[K, V any] interface {
-	Iter() KVIterator[K, V]
 }
 
 // ForLoop is the interface of a collection that provides traversing of the elements.
@@ -185,28 +108,6 @@ type TrackEachLoop[P any, T any] interface {
 // Checkable is container with ability to check if an element is present.
 type Checkable[T any] interface {
 	Contains(T) bool
-}
-
-// KVTransformable provides limited kit of map transformation methods.
-// The full kit of transformer functions are in the package 'c/map_'
-type KVTransformable[K, V, KVStream, KVStreamBreakable any] interface {
-	Filter(predicate func(K, V) bool) KVStream
-	Filt(predicate func(K, V) (bool, error)) KVStreamBreakable
-
-	FilterKey(predicate func(K) bool) KVStream
-	FilterValue(predicate func(V) bool) KVStream
-
-	FiltKey(predicate func(K) (bool, error)) KVStreamBreakable
-	FiltValue(predicate func(V) (bool, error)) KVStreamBreakable
-
-	Convert(converter func(K, V) (K, V)) KVStream
-	Conv(converter func(K, V) (K, V, error)) KVStreamBreakable
-
-	ConvertKey(converter func(K) K) KVStream
-	ConvertValue(converter func(V) V) KVStream
-
-	ConvKey(converter func(K) (K, error)) KVStreamBreakable
-	ConvValue(converter func(V) (V, error)) KVStreamBreakable
 }
 
 // Access provides access to an element by its pointer (index, key, coordinate, etc.)

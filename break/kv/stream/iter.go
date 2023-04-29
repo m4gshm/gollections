@@ -1,10 +1,10 @@
 package stream
 
 import (
+	"github.com/m4gshm/gollections/break/kv"
 	"github.com/m4gshm/gollections/break/kv/loop"
 	breakLoop "github.com/m4gshm/gollections/break/loop"
 	breakFilter "github.com/m4gshm/gollections/break/map_/filter"
-	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/map_/filter"
 )
 
@@ -19,16 +19,16 @@ type Iter[K comparable, V any, M map[K]V | map[K][]V] struct {
 }
 
 var (
-	_ c.KVIteratorBreakable[string, any]                                         = (*Iter[string, any, map[string]any])(nil)
-	_ Stream[string, any, Iter[string, any, map[string]any], map[string]any]     = (*Iter[string, any, map[string]any])(nil)
-	_ Stream[string, any, Iter[string, any, map[string][]any], map[string][]any] = (*Iter[string, any, map[string][]any])(nil)
+	_ kv.Iterator[string, any]              = (*Iter[string, any, map[string]any])(nil)
+	_ Stream[string, any, map[string]any]   = (*Iter[string, any, map[string]any])(nil)
+	_ Stream[string, any, map[string][]any] = (*Iter[string, any, map[string][]any])(nil)
 
-	_ c.KVIteratorBreakable[string, any]                                         = Iter[string, any, map[string]any]{}
-	_ Stream[string, any, Iter[string, any, map[string]any], map[string]any]     = Iter[string, any, map[string]any]{}
-	_ Stream[string, any, Iter[string, any, map[string][]any], map[string][]any] = Iter[string, any, map[string][]any]{}
+	_ kv.Iterator[string, any]              = Iter[string, any, map[string]any]{}
+	_ Stream[string, any, map[string]any]   = Iter[string, any, map[string]any]{}
+	_ Stream[string, any, map[string][]any] = Iter[string, any, map[string][]any]{}
 )
 
-// Next implements c.KVIterator
+// Next implements kv.KVIterator
 func (k Iter[K, V, M]) Next() (K, V, bool, error) {
 	return k.next()
 }
@@ -95,7 +95,7 @@ func (k Iter[K, V, M]) HasAny(predicate func(K, V) (bool, error)) (bool, error) 
 }
 
 // Iter creates an iterator
-func (k Iter[K, V, M]) Iter() Iter[K, V, M] {
+func (k Iter[K, V, M]) Iter() kv.Iterator[K, V] {
 	return k
 }
 

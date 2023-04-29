@@ -3,8 +3,8 @@ package iter
 import (
 	"unsafe"
 
+	"github.com/m4gshm/gollections/break/c"
 	"github.com/m4gshm/gollections/break/loop"
-	"github.com/m4gshm/gollections/c"
 )
 
 // FitIter is the array based Iterator implementation that provides filtering of elements by a Predicate.
@@ -15,7 +15,7 @@ type FiltIter[T any] struct {
 	filter   func(T) (bool, error)
 }
 
-var _ c.IteratorBreakable[any] = (*FiltIter[any])(nil)
+var _ c.Iterator[any] = (*FiltIter[any])(nil)
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (f *FiltIter[T]) For(walker func(element T) error) error {

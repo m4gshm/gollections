@@ -1,8 +1,8 @@
 package loop
 
 import (
+	"github.com/m4gshm/gollections/break/kv"
 	"github.com/m4gshm/gollections/break/loop"
-	"github.com/m4gshm/gollections/c"
 )
 
 // ConvertKVIter is the iterator wrapper implementation applying a converter to all iterable key/value elements.
@@ -12,8 +12,8 @@ type ConvertKVIter[K, V any, K2, V2 any] struct {
 }
 
 var (
-	_ c.KVIteratorBreakable[any, any] = (*ConvertKVIter[any, any, any, any])(nil)
-	_ c.KVIteratorBreakable[any, any] = ConvertKVIter[any, any, any, any]{}
+	_ kv.Iterator[any, any] = (*ConvertKVIter[any, any, any, any])(nil)
+	_ kv.Iterator[any, any] = ConvertKVIter[any, any, any, any]{}
 )
 
 // Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak

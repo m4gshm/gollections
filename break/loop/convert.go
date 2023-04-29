@@ -1,7 +1,7 @@
 package loop
 
 import (
-	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/break/c"
 )
 
 // ConvertFitIter iterator implementation that retrieves an element by the 'next' function, converts by the 'converter' and addition checks by the 'filter'.
@@ -14,8 +14,8 @@ type ConvertFitIter[From, To any] struct {
 }
 
 var (
-	_ c.IteratorBreakable[any] = (*ConvertFitIter[any, any])(nil)
-	_ c.IteratorBreakable[any] = ConvertFitIter[any, any]{}
+	_ c.Iterator[any] = (*ConvertFitIter[any, any])(nil)
+	_ c.Iterator[any] = ConvertFitIter[any, any]{}
 )
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
@@ -51,8 +51,8 @@ type ConvertIter[From, To any] struct {
 }
 
 var (
-	_ c.IteratorBreakable[any] = (*ConvertIter[any, any])(nil)
-	_ c.IteratorBreakable[any] = ConvertIter[any, any]{}
+	_ c.Iterator[any] = (*ConvertIter[any, any])(nil)
+	_ c.Iterator[any] = ConvertIter[any, any]{}
 )
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
@@ -81,8 +81,8 @@ type ConvertCheckIter[From, To any] struct {
 }
 
 var (
-	_ c.IteratorBreakable[any] = (*ConvertIter[any, any])(nil)
-	_ c.IteratorBreakable[any] = ConvertIter[any, any]{}
+	_ c.Iterator[any] = (*ConvertIter[any, any])(nil)
+	_ c.Iterator[any] = ConvertIter[any, any]{}
 )
 
 // Next returns the next element.

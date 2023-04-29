@@ -5,6 +5,7 @@ import (
 	"unsafe"
 
 	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/kv"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
 )
@@ -29,7 +30,7 @@ type Iter[K comparable, V any] struct {
 	size     int
 }
 
-var _ c.KVIterator[int, any] = (*Iter[int, any])(nil)
+var _ kv.KVIterator[int, any] = (*Iter[int, any])(nil)
 
 // Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (i *Iter[K, V]) Track(traker func(key K, value V) error) error {

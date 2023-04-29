@@ -3,8 +3,8 @@ package iter
 import (
 	"unsafe"
 
+	"github.com/m4gshm/gollections/break/c"
 	"github.com/m4gshm/gollections/break/loop"
-	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/notsafe"
 )
 
@@ -18,7 +18,7 @@ type ConvFitIter[From, To any] struct {
 	filterTo   func(To) (bool, error)
 }
 
-var _ c.IteratorBreakable[any] = (*ConvFitIter[any, any])(nil)
+var _ c.Iterator[any] = (*ConvFitIter[any, any])(nil)
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (f *ConvFitIter[From, To]) For(walker func(element To) error) error {
@@ -62,7 +62,7 @@ type ConvertIter[From, To any] struct {
 	converter func(From) (To, error)
 }
 
-var _ c.IteratorBreakable[any] = (*ConvertIter[any, any])(nil)
+var _ c.Iterator[any] = (*ConvertIter[any, any])(nil)
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (f *ConvertIter[From, To]) For(walker func(element To) error) error {

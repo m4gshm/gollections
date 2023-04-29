@@ -52,8 +52,8 @@ type Set[T comparable] struct {
 }
 
 var (
-	_ c.Set[int]                         = (*Set[int])(nil)
-	_ c.Set[int]                         = Set[int]{}
+	_ collection.Set[int]                = (*Set[int])(nil)
+	_ collection.Set[int]                = Set[int]{}
 	_ loop.Looper[int, *slice.Iter[int]] = (*Set[int])(nil)
 	_ loop.Looper[int, *slice.Iter[int]] = Set[int]{}
 	_ fmt.Stringer                       = (*Set[int])(nil)

@@ -3,7 +3,7 @@ package loop
 import (
 	"unsafe"
 
-	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/break/c"
 	"github.com/m4gshm/gollections/notsafe"
 )
 
@@ -18,7 +18,7 @@ type FlattenFitIter[From, To any] struct {
 	filterTo      func(To) (bool, error)
 }
 
-var _ c.IteratorBreakable[any] = (*FlattenFitIter[any, any])(nil)
+var _ c.Iterator[any] = (*FlattenFitIter[any, any])(nil)
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (i *FlattenFitIter[From, To]) For(walker func(element To) error) error {
@@ -85,7 +85,7 @@ type FlatIter[From, To any] struct {
 	flattener     func(From) ([]To, error)
 }
 
-var _ c.IteratorBreakable[any] = (*FlatIter[any, any])(nil)
+var _ c.Iterator[any] = (*FlatIter[any, any])(nil)
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (i *FlatIter[From, To]) For(walker func(element To) error) error {
