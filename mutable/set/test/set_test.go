@@ -4,9 +4,9 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/iter"
-	"github.com/m4gshm/gollections/iterable"
-	iterableGroup "github.com/m4gshm/gollections/iterable/group"
+	cGroup "github.com/m4gshm/gollections/collection/group"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/mutable"
 	"github.com/m4gshm/gollections/mutable/set"
@@ -143,7 +143,7 @@ func Test_Set_Group_By_Walker(t *testing.T) {
 }
 
 func Test_Set_Group_By_Iterator(t *testing.T) {
-	groups := iterableGroup.Of(set.Of(0, 1, 1, 2, 4, 3, 1, 6, 7), func(e int) bool { return e%2 == 0 }).Map()
+	groups := cGroup.Of(set.Of(0, 1, 1, 2, 4, 3, 1, 6, 7), func(e int) bool { return e%2 == 0 }).Map()
 
 	assert.Equal(t, len(groups), 2)
 	fg := sort.Of(groups[false])
@@ -167,7 +167,7 @@ func Test_Set_Flatt(t *testing.T) {
 	var (
 		ints        = set.Of(3, 3, 1, 1, 1, 5, 6, 8, 8, 0, -2, -2)
 		fints       = set.Flatt(ints, func(i int) []int { return slice.Of(i) })
-		stringsPipe = iterable.Filter(iterable.Convert(fints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 }), func(s string) bool { return len(s) == 1 })
+		stringsPipe = collection.Filter(collection.Convert(fints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 }), func(s string) bool { return len(s) == 1 })
 	)
 	assert.Equal(t, slice.Of("0", "1", "3", "5", "6", "8"), sort.Of(stringsPipe.Slice()))
 }
@@ -176,7 +176,7 @@ func Test_Set_DoubleConvert(t *testing.T) {
 	var (
 		ints               = set.Of(3, 1, 5, 6, 8, 0, -2)
 		stringsPipe        = set.Convert(ints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 })
-		prefixedStrinsPipe = iterable.Convert(stringsPipe, func(s string) string { return "_" + s })
+		prefixedStrinsPipe = collection.Convert(stringsPipe, func(s string) string { return "_" + s })
 	)
 	s := prefixedStrinsPipe.Slice()
 	assert.Equal(t, slice.Of("_0", "_1", "_3", "_5", "_6", "_8"), sort.Of(s))

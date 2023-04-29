@@ -6,7 +6,7 @@ import (
 	breakLoop "github.com/m4gshm/gollections/break/loop"
 	breakStream "github.com/m4gshm/gollections/break/stream"
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/iterable"
+	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/slice"
@@ -101,12 +101,12 @@ func (m MapKeys[K, V]) Filt(filter func(K) (bool, error)) breakStream.Iter[K] {
 
 // Convert returns a stream that applies the 'converter' function to the collection elements
 func (m MapKeys[K, V]) Convert(converter func(K) K) stream.Iter[K] {
-	return iterable.Convert(m, converter)
+	return collection.Convert(m, converter)
 }
 
 // Convert returns a stream that applies the 'converter' function to the collection elements
 func (m MapKeys[K, V]) Conv(converter func(K) (K, error)) breakStream.Iter[K] {
-	return iterable.Conv(m, converter)
+	return collection.Conv(m, converter)
 }
 
 // Reduce reduces the elements into an one using the 'merge' function

@@ -7,7 +7,7 @@ import (
 	breakLoop "github.com/m4gshm/gollections/break/loop"
 	breakStream "github.com/m4gshm/gollections/break/stream"
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/iterable"
+	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/notsafe"
 	"github.com/m4gshm/gollections/slice"
@@ -145,12 +145,12 @@ func (v Vector[T]) Filt(predicate func(T) (bool, error)) breakStream.Iter[T] {
 
 // Convert returns a stream that applies the 'converter' function to the collection elements
 func (v Vector[T]) Convert(converter func(T) T) stream.Iter[T] {
-	return iterable.Convert(v, converter)
+	return collection.Convert(v, converter)
 }
 
 // Convert returns a stream that applies the 'converter' function to the collection elements
 func (v Vector[T]) Conv(converter func(T) (T, error)) breakStream.Iter[T] {
-	return iterable.Conv(v, converter)
+	return collection.Conv(v, converter)
 }
 
 // Reduce reduces the elements into an one using the 'merge' function

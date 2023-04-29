@@ -3,10 +3,10 @@ package benchmark
 import (
 	"testing"
 
+	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/convert"
 	"github.com/m4gshm/gollections/immutable/vector"
 	"github.com/m4gshm/gollections/iter"
-	"github.com/m4gshm/gollections/iterable"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/mutable"
 	mvector "github.com/m4gshm/gollections/mutable/vector"
@@ -79,7 +79,7 @@ func Benchmark_Convert_ImmutableVector_Iterable(b *testing.B) {
 	var s []string
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		s = iterable.Convert(items, concat).Slice()
+		s = collection.Convert(items, concat).Slice()
 	}
 	_ = s
 
@@ -92,7 +92,7 @@ func Benchmark_Convert_ImmutableVector_Iterable_Append(b *testing.B) {
 	var s []string
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		s = iterable.Convert(items, concat).Append(make([]string, 0, len(values)))
+		s = collection.Convert(items, concat).Append(make([]string, 0, len(values)))
 	}
 	_ = s
 

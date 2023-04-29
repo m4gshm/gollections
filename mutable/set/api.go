@@ -5,7 +5,7 @@ import (
 	"golang.org/x/exp/constraints"
 
 	breakStream "github.com/m4gshm/gollections/break/stream"
-	"github.com/m4gshm/gollections/iterable"
+	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/mutable"
 	"github.com/m4gshm/gollections/mutable/ordered"
 	"github.com/m4gshm/gollections/stream"
@@ -37,21 +37,21 @@ func Sort[T comparable, F constraints.Ordered](s mutable.Set[T], by func(T) F) *
 }
 
 // Convert returns a stream that applies the 'converter' function to the collection elements
-func Convert[From, To comparable](collection *mutable.Set[From], converter func(From) To) stream.Iter[To] {
-	return iterable.Convert(collection, converter)
+func Convert[From, To comparable](set *mutable.Set[From], converter func(From) To) stream.Iter[To] {
+	return collection.Convert(set, converter)
 }
 
 // Conv returns a breakable stream that applies the 'converter' function to the collection elements
-func Conv[From, To comparable](collection *mutable.Set[From], converter func(From) (To, error)) breakStream.Iter[To] {
-	return iterable.Conv(collection, converter)
+func Conv[From, To comparable](set *mutable.Set[From], converter func(From) (To, error)) breakStream.Iter[To] {
+	return collection.Conv(set, converter)
 }
 
 // Flatt returns a stream that converts the collection elements into slices and then flattens them to one level
-func Flatt[From, To comparable](collection *mutable.Set[From], flattener func(From) []To) stream.Iter[To] {
-	return iterable.Flatt(collection, flattener)
+func Flatt[From, To comparable](set *mutable.Set[From], flattener func(From) []To) stream.Iter[To] {
+	return collection.Flatt(set, flattener)
 }
 
 // Flat returns a breakable stream that converts the collection elements into slices and then flattens them to one level
-func Flat[From, To comparable](collection *mutable.Set[From], flattener func(From) ([]To, error)) breakStream.Iter[To] {
-	return iterable.Flat(collection, flattener)
+func Flat[From, To comparable](set *mutable.Set[From], flattener func(From) ([]To, error)) breakStream.Iter[To] {
+	return collection.Flat(set, flattener)
 }

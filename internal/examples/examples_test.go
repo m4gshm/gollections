@@ -11,7 +11,7 @@ import (
 	"github.com/m4gshm/gollections/immutable/oset"
 	"github.com/m4gshm/gollections/immutable/set"
 	"github.com/m4gshm/gollections/iter"
-	iterableGroup "github.com/m4gshm/gollections/iterable/group"
+	iterableGroup "github.com/m4gshm/gollections/collection/group"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/predicate/more"

@@ -3,7 +3,7 @@ package oset
 
 import (
 	breakStream "github.com/m4gshm/gollections/break/stream"
-	"github.com/m4gshm/gollections/iterable"
+	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/mutable/ordered"
 	"github.com/m4gshm/gollections/stream"
 )
@@ -29,21 +29,21 @@ func NewCap[T comparable](capacity int) *ordered.Set[T] {
 }
 
 // Convert returns a stream that applies the 'converter' function to the collection elements
-func Convert[From, To comparable](collection *ordered.Set[From], converter func(From) To) stream.Iter[To] {
-	return iterable.Convert(collection, converter)
+func Convert[From, To comparable](set *ordered.Set[From], converter func(From) To) stream.Iter[To] {
+	return collection.Convert(set, converter)
 }
 
 // Conv returns a breakable stream that applies the 'converter' function to the collection elements
-func Conv[From, To comparable](collection *ordered.Set[From], converter func(From) (To, error)) breakStream.Iter[To] {
-	return iterable.Conv(collection, converter)
+func Conv[From, To comparable](set *ordered.Set[From], converter func(From) (To, error)) breakStream.Iter[To] {
+	return collection.Conv(set, converter)
 }
 
 // Flatt returns a stream that converts the collection elements into slices and then flattens them to one level
-func Flatt[From, To comparable](collection *ordered.Set[From], flattener func(From) []To) stream.Iter[To] {
-	return iterable.Flatt(collection, flattener)
+func Flatt[From, To comparable](set *ordered.Set[From], flattener func(From) []To) stream.Iter[To] {
+	return collection.Flatt(set, flattener)
 }
 
 // Flat returns a breakable stream that converts the collection elements into slices and then flattens them to one level
-func Flat[From, To comparable](collection *ordered.Set[From], flattener func(From) ([]To, error)) breakStream.Iter[To] {
-	return iterable.Flat(collection, flattener)
+func Flat[From, To comparable](set *ordered.Set[From], flattener func(From) ([]To, error)) breakStream.Iter[To] {
+	return collection.Flat(set, flattener)
 }
