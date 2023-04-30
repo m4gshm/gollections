@@ -28,8 +28,6 @@ type Collection[K comparable, V any, M map[K]V | map[K][]V] interface {
 	HasAny(predicate func(K, V) bool) bool
 }
 
-
-
 // Transformable provides limited kit of map transformation methods.
 // The full kit of transformer functions are in the package 'map_'
 type Transformable[K, V, KVStream, KVStreamBreakable any] interface {

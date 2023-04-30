@@ -80,9 +80,9 @@ purposes.
 package examples
 
 import (
-    "github.com/m4gshm/gollections/c"
+    "github.com/m4gshm/gollections/collection"
     "github.com/m4gshm/gollections/immutable"
-    "github.com/m4gshm/gollections/immutable/map_"
+    imap "github.com/m4gshm/gollections/immutable/map_"
     "github.com/m4gshm/gollections/immutable/omap"
     "github.com/m4gshm/gollections/immutable/ordered"
     "github.com/m4gshm/gollections/immutable/oset"
@@ -93,24 +93,24 @@ import (
 
 func _() {
     var (
-        _ immutable.Vector[int] = vector.Of(1, 2, 3)
-        _ collection.Vector[int]         = vector.New([]int{1, 2, 3})
+        _ immutable.Vector[int]  = vector.Of(1, 2, 3)
+        _ collection.Vector[int] = vector.New([]int{1, 2, 3})
     )
     var (
-        _ immutable.Set[int] = set.Of(1, 2, 3)
-        _ collection.Set[int]         = set.New([]int{1, 2, 3})
+        _ immutable.Set[int]  = set.Of(1, 2, 3)
+        _ collection.Set[int] = set.New([]int{1, 2, 3})
     )
     var (
-        _ ordered.Set[int] = oset.Of(1, 2, 3)
-        _ collection.Set[int]       = oset.New([]int{1, 2, 3})
+        _ ordered.Set[int]    = oset.Of(1, 2, 3)
+        _ collection.Set[int] = oset.New([]int{1, 2, 3})
     )
     var (
-        _ immutable.Map[int, string] = map_.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
-        _ collection.Map[int, string]         = map_.New(map[int]string{1: "2", 2: "2", 3: "3"})
+        _ immutable.Map[int, string]  = imap.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
+        _ collection.Map[int, string] = imap.New(map[int]string{1: "2", 2: "2", 3: "3"})
     )
     var (
-        _ ordered.Map[int, string] = omap.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
-        _ collection.Map[int, string]       = omap.New(
+        _ ordered.Map[int, string]    = omap.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
+        _ collection.Map[int, string] = omap.New(
             /*uniques*/ map[int]string{1: "2", 2: "2", 3: "3"} /*order*/, []int{3, 1, 2},
         )
     )
@@ -129,10 +129,10 @@ and [k.V](./k/v.go) is the method V from the package [k](./k/)
 package examples
 
 import (
-    "github.com/m4gshm/gollections/c"
+    "github.com/m4gshm/gollections/collection"
     "github.com/m4gshm/gollections/k"
     "github.com/m4gshm/gollections/mutable"
-    "github.com/m4gshm/gollections/mutable/map_"
+    mmap "github.com/m4gshm/gollections/mutable/map_"
     "github.com/m4gshm/gollections/mutable/omap"
     "github.com/m4gshm/gollections/mutable/ordered"
     "github.com/m4gshm/gollections/mutable/oset"
@@ -144,34 +144,34 @@ func _() {
     capacity := 10
 
     var (
-        _ *mutable.Vector[int] = vector.Of(1, 2, 3)
-        _ *mutable.Vector[int] = new(mutable.Vector[int])
-        _ *mutable.Vector[int] = vector.NewCap[int](capacity)
-        _ collection.Vector[int]        = vector.Empty[int]()
+        _ *mutable.Vector[int]   = vector.Of(1, 2, 3)
+        _ *mutable.Vector[int]   = new(mutable.Vector[int])
+        _ *mutable.Vector[int]   = vector.NewCap[int](capacity)
+        _ collection.Vector[int] = vector.Empty[int]()
     )
     var (
-        _ *mutable.Set[int] = set.Of(1, 2, 3)
-        _ *mutable.Set[int] = new(mutable.Set[int])
-        _ *mutable.Set[int] = set.NewCap[int](capacity)
-        _ collection.Set[int]        = set.Empty[int]()
+        _ *mutable.Set[int]   = set.Of(1, 2, 3)
+        _ *mutable.Set[int]   = new(mutable.Set[int])
+        _ *mutable.Set[int]   = set.NewCap[int](capacity)
+        _ collection.Set[int] = set.Empty[int]()
     )
     var (
-        _ *ordered.Set[int] = oset.Of(1, 2, 3)
-        _ *ordered.Set[int] = new(ordered.Set[int])
-        _ *ordered.Set[int] = oset.NewCap[int](capacity)
-        _ collection.Set[int]        = oset.Empty[int]()
+        _ *ordered.Set[int]   = oset.Of(1, 2, 3)
+        _ *ordered.Set[int]   = new(ordered.Set[int])
+        _ *ordered.Set[int]   = oset.NewCap[int](capacity)
+        _ collection.Set[int] = oset.Empty[int]()
     )
     var (
-        _ *mutable.Map[int, string] = map_.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
-        _ *mutable.Map[int, string] = new(mutable.Map[int, string])
-        _ *mutable.Map[int, string] = map_.New[int, string](capacity)
-        _ collection.Map[int, string]        = map_.Empty[int, string]()
+        _ *mutable.Map[int, string]   = mmap.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
+        _ *mutable.Map[int, string]   = new(mutable.Map[int, string])
+        _ *mutable.Map[int, string]   = mmap.New[int, string](capacity)
+        _ collection.Map[int, string] = mmap.Empty[int, string]()
     )
     var (
-        _ *ordered.Map[int, string] = omap.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
-        _ *ordered.Map[int, string] = new(ordered.Map[int, string])
-        _ *ordered.Map[int, string] = omap.New[int, string](capacity)
-        _ collection.Map[int, string]        = omap.Empty[int, string]()
+        _ *ordered.Map[int, string]   = omap.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
+        _ *ordered.Map[int, string]   = new(ordered.Map[int, string])
+        _ *ordered.Map[int, string]   = omap.New[int, string](capacity)
+        _ collection.Map[int, string] = omap.Empty[int, string]()
     )
 }
 ```
