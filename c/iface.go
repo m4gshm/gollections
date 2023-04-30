@@ -23,7 +23,6 @@ type Collection[T any] interface {
 	SliceFactory[T]
 
 	Reduce(merger func(T, T) T) T
-	HasAny(predicate func(T) bool) bool
 }
 
 type Filterable[T, Stream, StreamBreakable any] interface {

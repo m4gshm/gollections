@@ -1,6 +1,7 @@
 package test
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"strconv"
@@ -10,6 +11,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/m4gshm/gollections/as"
+	_less "github.com/m4gshm/gollections/break/predicate/less"
+	_more "github.com/m4gshm/gollections/break/predicate/more"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/predicate/eq"
 	"github.com/m4gshm/gollections/predicate/more"
@@ -118,6 +121,19 @@ func Test_First(t *testing.T) {
 	assert.False(t, nook)
 }
 
+func Test_Firstt(t *testing.T) {
+	s := slice.Of(1, 3, 5, 7, 9, 11)
+	r, ok, _ := slice.Firstt(s, _more.Than(5))
+	assert.True(t, ok)
+	assert.Equal(t, 7, r)
+
+	_, nook, _ := slice.Firstt(s, _more.Than(12))
+	assert.False(t, nook)
+
+	_, _, err := slice.Firstt(s, func(i int) (bool, error) { return true, errors.New("abort") })
+	assert.Error(t, err)
+}
+
 func Test_Last(t *testing.T) {
 	s := slice.Of(1, 3, 5, 7, 9, 11)
 	r, ok := last.Of(s, func(i int) bool { return i < 9 })
@@ -128,10 +144,31 @@ func Test_Last(t *testing.T) {
 	assert.False(t, nook)
 }
 
+func Test_Lastt(t *testing.T) {
+	s := slice.Of(1, 3, 5, 7, 9, 11)
+	r, ok, _ := slice.Lastt(s, _less.Than(9))
+	assert.True(t, ok)
+	assert.Equal(t, 7, r)
+
+	_, nook, _ := slice.Lastt(s, _less.Than(1))
+	assert.False(t, nook)
+
+	_, _, err := slice.Lastt(s, func(i int) (bool, error) { return true, errors.New("abort") })
+	assert.Error(t, err)
+}
+
 func Test_Convert(t *testing.T) {
 	s := slice.Of(1, 3, 5, 7, 9, 11)
 	r := slice.Convert(s, strconv.Itoa)
 	assert.Equal(t, []string{"1", "3", "5", "7", "9", "11"}, r)
+}
+
+func Test_Conv(t *testing.T) {
+	s := slice.Of("1", "3", "5", "7", "_9", "11")
+	r, err := slice.Conv(s, strconv.Atoi)
+	var expected *strconv.NumError
+	assert.ErrorAs(t, err, &expected)
+	assert.Equal(t, []int{1, 3, 5, 7}, r)
 }
 
 func Test_ConvertWithIndex(t *testing.T) {
@@ -209,6 +246,14 @@ func Test_Flatt(t *testing.T) {
 	assert.Equal(t, e, f)
 }
 
+func Test_Flat(t *testing.T) {
+	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
+	f, err := slice.Flat(md, func(i []int) ([]int, error) { return i, op.IfElse(len(i) == 2, errors.New("abort"), nil) })
+	assert.Error(t, err)
+	e := []int{1, 2, 3, 4}
+	assert.Equal(t, e, f)
+}
+
 func Benchmark_Flatt(b *testing.B) {
 	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
 
@@ -250,6 +295,13 @@ func Test_Filter(t *testing.T) {
 	s := slice.Of(1, 3, 4, 5, 7, 8, 9, 11)
 	r := slice.Filter(s, even)
 	assert.Equal(t, slice.Of(4, 8), r)
+}
+
+func Test_Filt(t *testing.T) {
+	s := slice.Of(1, 3, 4, 5, 7, 8, 9, 11)
+	r, err := slice.Filt(s, func(i int) (bool, error) { return even(i), op.IfElse(i > 7, errors.New("abort"), nil) })
+	assert.Error(t, err)
+	assert.Equal(t, slice.Of(4), r)
 }
 
 func Test_StringRepresentation(t *testing.T) {

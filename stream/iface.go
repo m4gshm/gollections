@@ -6,4 +6,6 @@ import "github.com/m4gshm/gollections/c"
 type Stream[T any] interface {
 	c.Iterator[T]
 	c.Collection[T]
+
+	HasAny(func(T) bool) bool
 }

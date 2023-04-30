@@ -5,26 +5,29 @@ import (
 	"github.com/m4gshm/gollections/kv"
 )
 
+type Collection[T any] interface {
+	c.Collection[T]
+
+	Len() int
+	IsEmpty() bool
+
+	HasAny(func(T) bool) bool
+}
+
 // Vector - collection interface that provides elements order and access by index to the elements.
 type Vector[T any] interface {
-	c.Collection[T]
+	Collection[T]
 
 	c.TrackLoop[int, T]
 	c.TrackEachLoop[int, T]
 
 	c.Access[int, T]
-
-	Len() int
-	IsEmpty() bool
 }
 
 // Set - collection interface that ensures the uniqueness of elements (does not insert duplicate values).
 type Set[T comparable] interface {
-	c.Collection[T]
+	Collection[T]
 	c.Checkable[T]
-
-	Len() int
-	IsEmpty() bool
 }
 
 // Map - collection interface that stores key/value pairs and provide access to an element by its key
@@ -35,4 +38,6 @@ type Map[K comparable, V any] interface {
 
 	Len() int
 	IsEmpty() bool
+
+	HasAny(func(K, V) bool) bool
 }

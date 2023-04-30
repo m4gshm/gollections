@@ -25,7 +25,6 @@ type Collection[K comparable, V any, M map[K]V | map[K][]V] interface {
 	c.MapFactory[K, V, M]
 
 	Reduce(merger func(K, V, K, V) (K, V)) (K, V)
-	HasAny(predicate func(K, V) bool) bool
 }
 
 // Transformable provides limited kit of map transformation methods.

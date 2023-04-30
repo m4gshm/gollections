@@ -39,7 +39,7 @@ func OfLoop[S, T any](source S, hasNext func(S) bool, getNext func(S) (T, error)
 
 // Generate builds a slice by an generator function.
 // The generator returns an element, or false if the generation is over, or an error.
-func Generate[T any](next func() (T, bool)) []T {
+func Generate[T any](next func() (no T, ok bool)) []T {
 	return loop.Slice(next)
 }
 
@@ -164,6 +164,22 @@ func Convert[FS ~[]From, From, To any](elements FS, by func(From) To) []To {
 	return result
 }
 
+// Conv creates a slice consisting of the transformed elements using the converter 'by'
+func Conv[FS ~[]From, From, To any](elements FS, by func(From) (To, error)) ([]To, error) {
+	if elements == nil {
+		return nil, nil
+	}
+	result := make([]To, len(elements))
+	for i, e := range elements {
+		c, err := by(e)
+		if err != nil {
+			return result[:i], err
+		}
+		result[i] = c
+	}
+	return result, nil
+}
+
 // FilterAndConvert additionally filters 'From' elements
 func FilterAndConvert[FS ~[]From, From, To any](elements FS, filter func(From) bool, by func(From) To) []To {
 	if elements == nil {
@@ -275,6 +291,23 @@ func Flatt[FS ~[]From, From, To any](elements FS, flattener func(From) []To) []T
 	return result
 }
 
+// Flat unfolds the n-dimensional slice into a n-1 dimensional slice
+func Flat[FS ~[]From, From, To any](elements FS, flattener func(From) ([]To, error)) ([]To, error) {
+	if elements == nil {
+		return nil, nil
+	}
+	var result = make([]To, 0, int(float32(len(elements))*1.618))
+	for _, e := range elements {
+		f, err := flattener(e)
+		if err != nil {
+			return result, err
+		}
+		result = append(result, f...)
+
+	}
+	return result, nil
+}
+
 // FlattAndConvert unfolds the n-dimensional slice into a n-1 dimensional slice and converts the elements
 func FlattAndConvert[FS ~[]From, From, I, To any](elements FS, flattener func(From) []I, convert func(I) To) []To {
 	if elements == nil {
@@ -356,6 +389,22 @@ func Filter[TS ~[]T, T any](elements TS, filter func(T) bool) []T {
 	return result
 }
 
+// Filt creates a slice containing only the filtered elements
+func Filt[TS ~[]T, T any](elements TS, filter func(T) (bool, error)) ([]T, error) {
+	if elements == nil {
+		return nil, nil
+	}
+	var result = make([]T, 0, len(elements)/2)
+	for _, e := range elements {
+		if ok, err := filter(e); err != nil {
+			return result, err
+		} else if ok {
+			result = append(result, e)
+		}
+	}
+	return result, nil
+}
+
 // Range generates a slice of integers in the range defined by from and to inclusive.
 func Range[T constraints.Integer](from T, to T) []T {
 	if to == from {
@@ -429,30 +478,51 @@ func Sum[T c.Summable, TS ~[]T](elements TS) T {
 	return Reduce(elements, op.Sum[T])
 }
 
-// First returns the first element that satisfies requirements of the predicate 'filter'
-func First[TS ~[]T, T any](elements TS, by func(T) bool) (T, bool) {
+// First returns the first element that satisfies requirements of the predicate 'by'
+func First[TS ~[]T, T any](elements TS, by func(T) bool) (no T, err bool) {
 	for _, e := range elements {
 		if by(e) {
 			return e, true
 		}
 	}
-	var no T
 	return no, false
 }
 
+// Firstt returns the first element that satisfies the condition of the 'by' function
+func Firstt[TS ~[]T, T any](elements TS, by func(T) (bool, error)) (no T, ok bool, err error) {
+	for _, e := range elements {
+		if ok, err = by(e); err != nil || ok {
+			return e, ok, err
+		}
+	}
+	return no, false, nil
+}
+
 // Last returns the latest element that satisfies requirements of the predicate 'filter'
-func Last[TS ~[]T, T any](elements TS, by func(T) bool) (T, bool) {
+func Last[TS ~[]T, T any](elements TS, by func(T) bool) (no T, ok bool) {
 	for i := len(elements) - 1; i >= 0; i-- {
 		e := elements[i]
 		if by(e) {
 			return e, true
 		}
 	}
-	var no T
 	return no, false
 }
 
-// Track applies the 'tracker' function to the elements. Return the c.ErrBreak to stop tracking..
+// Lastt returns the latest element that satisfies requirements of the predicate 'filter'
+func Lastt[TS ~[]T, T any](elements TS, by func(T) (bool, error)) (no T, ok bool, err error) {
+	for i := len(elements) - 1; i >= 0; i-- {
+		e := elements[i]
+		if ok, err = by(e); err != nil {
+			return no, false, err
+		} else if ok {
+			return e, true, nil
+		}
+	}
+	return no, false, nil
+}
+
+// Track applies the 'tracker' function to the elements. Return the c.ErrBreak to stop tracking
 func Track[TS ~[]T, T any](elements TS, tracker func(int, T) error) error {
 	for i, e := range elements {
 		if err := tracker(i, e); err == ErrBreak {
