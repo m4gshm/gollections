@@ -27,18 +27,8 @@ type Collection[K comparable, V any, M map[K]V | map[K][]V] interface {
 	Reduce(merger func(K, V, K, V) (K, V)) (K, V)
 }
 
-// Transformable provides limited kit of map transformation methods.
-// The full kit of transformer functions are in the package 'map_'
-type Transformable[K, V, KVStream, KVStreamBreakable any] interface {
-	Filter(predicate func(K, V) bool) KVStream
-	Filt(predicate func(K, V) (bool, error)) KVStreamBreakable
-
-	FilterKey(predicate func(K) bool) KVStream
-	FilterValue(predicate func(V) bool) KVStream
-
-	FiltKey(predicate func(K) (bool, error)) KVStreamBreakable
-	FiltValue(predicate func(V) (bool, error)) KVStreamBreakable
-
+// Convertable provides limited kit of map transformation methods
+type Convertable[K, V, KVStream, KVStreamBreakable any] interface {
 	Convert(converter func(K, V) (K, V)) KVStream
 	Conv(converter func(K, V) (K, V, error)) KVStreamBreakable
 
@@ -47,4 +37,16 @@ type Transformable[K, V, KVStream, KVStreamBreakable any] interface {
 
 	ConvKey(converter func(K) (K, error)) KVStreamBreakable
 	ConvValue(converter func(V) (V, error)) KVStreamBreakable
+}
+
+// Convertable provides limited kit of map transformation methods
+type Filterable[K, V, KVStream, KVStreamBreakable any] interface {
+	Filter(predicate func(K, V) bool) KVStream
+	Filt(predicate func(K, V) (bool, error)) KVStreamBreakable
+
+	FilterKey(predicate func(K) bool) KVStream
+	FilterValue(predicate func(V) bool) KVStream
+
+	FiltKey(predicate func(K) (bool, error)) KVStreamBreakable
+	FiltValue(predicate func(V) (bool, error)) KVStreamBreakable
 }

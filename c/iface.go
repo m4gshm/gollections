@@ -30,7 +30,7 @@ type Filterable[T, Stream, StreamBreakable any] interface {
 	Filt(predicate func(T) (bool, error)) StreamBreakable
 }
 
-type Convertrable[T, Stream, StreamBreakable any] interface {
+type Convertable[T, Stream, StreamBreakable any] interface {
 	Convert(converter func(T) T) Stream
 	Conv(converter func(T) (T, error)) StreamBreakable
 }
