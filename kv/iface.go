@@ -2,8 +2,8 @@ package kv
 
 import "github.com/m4gshm/gollections/c"
 
-// KVIterator provides iterate over key/value pairs
-type KVIterator[K, V any] interface {
+// Iterator provides iterate over key/value pairs
+type Iterator[K, V any] interface {
 	// Next returns the next key/value pair.
 	// The ok result indicates whether the element was returned by the iterator.
 	// If ok == false, then the iteration must be completed.
@@ -14,7 +14,7 @@ type KVIterator[K, V any] interface {
 
 // Iterable is an iterator supplier interface
 type Iterable[K, V any] interface {
-	Iter() KVIterator[K, V]
+	Iter() Iterator[K, V]
 }
 
 // Collection is the base interface of associative collections
@@ -39,7 +39,7 @@ type Convertable[K, V, KVStream, KVStreamBreakable any] interface {
 	ConvValue(converter func(V) (V, error)) KVStreamBreakable
 }
 
-// Convertable provides limited kit of map transformation methods
+// Filterable provides limited kit of filering methods
 type Filterable[K, V, KVStream, KVStreamBreakable any] interface {
 	Filter(predicate func(K, V) bool) KVStream
 	Filt(predicate func(K, V) (bool, error)) KVStreamBreakable

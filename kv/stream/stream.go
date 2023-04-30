@@ -24,13 +24,13 @@ type Iter[K comparable, V any, M map[K]V | map[K][]V] struct {
 }
 
 var (
-	_ kv.KVIterator[string, any]                                      = (*Iter[string, any, map[string]any])(nil)
+	_ kv.Iterator[string, any]                                        = (*Iter[string, any, map[string]any])(nil)
 	_ Stream[string, any, map[string]any]                             = (*Iter[string, any, map[string]any])(nil)
 	_ Stream[string, any, map[string][]any]                           = (*Iter[string, any, map[string][]any])(nil)
 	_ kvloop.Looper[string, any, Iter[string, any, map[string]any]]   = (*Iter[string, any, map[string]any])(nil)
 	_ kvloop.Looper[string, any, Iter[string, any, map[string][]any]] = (*Iter[string, any, map[string][]any])(nil)
 
-	_ kv.KVIterator[string, any]                                      = Iter[string, any, map[string]any]{}
+	_ kv.Iterator[string, any]                                        = Iter[string, any, map[string]any]{}
 	_ Stream[string, any, map[string]any]                             = Iter[string, any, map[string]any]{}
 	_ Stream[string, any, map[string][]any]                           = Iter[string, any, map[string][]any]{}
 	_ kvloop.Looper[string, any, Iter[string, any, map[string]any]]   = Iter[string, any, map[string]any]{}
@@ -47,7 +47,7 @@ func (k Iter[K, V, M]) FilterKey(predicate func(K) bool) Iter[K, V, M] {
 	return New(kvloop.Filter(k.next, filter.Key[V](predicate)).Next, k.collector)
 }
 
-// FilterKey returns a stream consisting of key/value pairs where the key satisfies the condition of the 'predicate' function
+// FiltKey returns a stream consisting of key/value pairs where the key satisfies the condition of the 'predicate' function
 func (k Iter[K, V, M]) FiltKey(predicate func(K) (bool, error)) stream.Iter[K, V, M] {
 	return stream.New(breakKvLoop.Filt(breakKvLoop.From(k.next), breakFilter.Key[V](predicate)).Next, collect(k.collector))
 }
@@ -57,7 +57,7 @@ func (k Iter[K, V, M]) ConvertKey(by func(K) K) Iter[K, V, M] {
 	return New(kvloop.Convert(k.next, convert.Key[V](by)).Next, k.collector)
 }
 
-// ConvertKey returns a stream that applies the 'converter' function to keys of the map
+// ConvKey returns a stream that applies the 'converter' function to keys of the map
 func (k Iter[K, V, M]) ConvKey(by func(K) (K, error)) stream.Iter[K, V, M] {
 	return stream.New(breakKvLoop.Conv(breakKvLoop.From(k.next), breakMapConvert.Key[V](by)).Next, collect(k.collector))
 }
@@ -67,7 +67,7 @@ func (k Iter[K, V, M]) FilterValue(predicate func(V) bool) Iter[K, V, M] {
 	return New(kvloop.Filter(k.next, filter.Value[K](predicate)).Next, k.collector)
 }
 
-// FilterValue returns a stream consisting of key/value pairs where the value satisfies the condition of the 'predicate' function
+// FiltValue returns a stream consisting of key/value pairs where the value satisfies the condition of the 'predicate' function
 func (k Iter[K, V, M]) FiltValue(predicate func(V) (bool, error)) stream.Iter[K, V, M] {
 	return stream.New(breakKvLoop.Filt(breakKvLoop.From(k.next), breakFilter.Value[K](predicate)).Next, collect(k.collector))
 }
@@ -77,7 +77,7 @@ func (k Iter[K, V, M]) ConvertValue(converter func(V) V) Iter[K, V, M] {
 	return New(kvloop.Convert(k.next, convert.Value[K](converter)).Next, k.collector)
 }
 
-// ConvertValue returns a stream that applies the 'converter' function to values of the map
+// ConvValue returns a stream that applies the 'converter' function to values of the map
 func (k Iter[K, V, M]) ConvValue(converter func(V) (V, error)) stream.Iter[K, V, M] {
 	return stream.New(breakKvLoop.Conv(breakKvLoop.From(k.next), breakMapConvert.Value[K](converter)).Next, collect(k.collector))
 }
@@ -87,7 +87,7 @@ func (k Iter[K, V, M]) Filter(predicate func(K, V) bool) Iter[K, V, M] {
 	return New(kvloop.Filter(k.next, predicate).Next, k.collector)
 }
 
-// Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function
+// Filt returns a breakable stream consisting of elements that satisfy the condition of the 'predicate' function
 func (k Iter[K, V, M]) Filt(predicate func(K, V) (bool, error)) stream.Iter[K, V, M] {
 	return stream.New(breakKvLoop.Filt(breakKvLoop.From(k.next), predicate).Next, collect(k.collector))
 }
@@ -97,7 +97,7 @@ func (k Iter[K, V, M]) Convert(converter func(K, V) (K, V)) Iter[K, V, M] {
 	return New(kvloop.Convert(k.next, converter).Next, k.collector)
 }
 
-// Convert returns a stream that applies the 'converter' function to the collection elements
+// Conv returns a breakable stream that applies the 'converter' function to the collection elements
 func (k Iter[K, V, M]) Conv(converter func(K, V) (K, V, error)) stream.Iter[K, V, M] {
 	return stream.New(breakKvLoop.Conv(breakKvLoop.From(k.next), converter).Next, collect(k.collector))
 }
@@ -123,10 +123,12 @@ func (k Iter[K, V, M]) HasAny(predicate func(K, V) bool) bool {
 	return kvloop.HasAny(next, predicate)
 }
 
-func (k Iter[K, V, M]) Iter() kv.KVIterator[K, V] {
+// Iter creates an iterator and returns as interface
+func (k Iter[K, V, M]) Iter() kv.Iterator[K, V] {
 	return k
 }
 
+// Loop creates an iterator and returns as implementation type reference
 func (k Iter[K, V, M]) Loop() Iter[K, V, M] {
 	return k
 }

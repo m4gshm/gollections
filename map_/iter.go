@@ -1,4 +1,3 @@
-// Package iter provides map based iterator implementations
 package map_
 
 import (
@@ -30,7 +29,7 @@ type Iter[K comparable, V any] struct {
 	size     int
 }
 
-var _ kv.KVIterator[int, any] = (*Iter[int, any])(nil)
+var _ kv.Iterator[int, any] = (*Iter[int, any])(nil)
 
 // Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (i *Iter[K, V]) Track(traker func(key K, value V) error) error {
@@ -151,40 +150,40 @@ func (i KeyIter[K, V]) Cap() int {
 	return i.Iter.Cap()
 }
 
-// NewVal is the Val constructor
-func NewVal[K comparable, V any](uniques map[K]V) NewValIter[K, V] {
-	return NewValIter[K, V]{Iter: NewIter(op.IfElse(uniques != nil, uniques, map[K]V{}))}
+// NewValIter is the main values iterator constructor
+func NewValIter[K comparable, V any](uniques map[K]V) ValIter[K, V] {
+	return ValIter[K, V]{Iter: NewIter(op.IfElse(uniques != nil, uniques, map[K]V{}))}
 }
 
-// NewKeyIter instantiates a map values iterator
-type NewValIter[K comparable, V any] struct {
+// ValIter is a map values iterator
+type ValIter[K comparable, V any] struct {
 	Iter[K, V]
 }
 
 var (
-	_ c.Iterator[any] = (*NewValIter[int, any])(nil)
-	_ c.Iterator[any] = NewValIter[int, any]{}
+	_ c.Iterator[any] = (*ValIter[int, any])(nil)
+	_ c.Iterator[any] = ValIter[int, any]{}
 )
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
-func (f NewValIter[K, V]) For(walker func(element V) error) error {
-	return loop.For(f.Next, walker)
+func (i ValIter[K, V]) For(walker func(element V) error) error {
+	return loop.For(i.Next, walker)
 }
 
 // ForEach FlatIter all elements retrieved by the iterator
-func (f NewValIter[K, V]) ForEach(walker func(element V)) {
-	loop.ForEach(f.Next, walker)
+func (i ValIter[K, V]) ForEach(walker func(element V)) {
+	loop.ForEach(i.Next, walker)
 }
 
 // Next returns the next element.
 // The ok result indicates whether the element was returned by the iterator.
 // If ok == false, then the iteration must be completed.
-func (i NewValIter[K, V]) Next() (V, bool) {
+func (i ValIter[K, V]) Next() (V, bool) {
 	_, val, ok := i.Iter.Next()
 	return val, ok
 }
 
 // Cap returns the size of the map
-func (i NewValIter[K, V]) Cap() int {
+func (i ValIter[K, V]) Cap() int {
 	return i.Iter.Cap()
 }

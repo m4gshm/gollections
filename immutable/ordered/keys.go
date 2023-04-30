@@ -28,13 +28,13 @@ var (
 	_ fmt.Stringer      = MapKeys[int]{}
 )
 
-// Iter creates iterator
+// Iter creates an iterator and returns as interface
 func (m MapKeys[K]) Iter() c.Iterator[K] {
 	h := m.Head()
 	return &h
 }
 
-// Head creates iterator
+// Head creates an iterator and returns as implementation type value
 func (m MapKeys[K]) Head() slice.Iter[K] {
 	return slice.NewHead(m.keys)
 }
@@ -67,6 +67,7 @@ func (m MapKeys[K]) Slice() (out []K) {
 	return out
 }
 
+// Append collects the values to the specified 'out' slice
 func (m MapKeys[K]) Append(out []K) []K {
 	if keys := m.keys; keys != nil {
 		out = append(out, keys...)
@@ -90,9 +91,9 @@ func (m MapKeys[K]) Filter(filter func(K) bool) stream.Iter[K] {
 	return stream.New(f.Next)
 }
 
-// Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function
-func (m MapKeys[K]) Filt(filter func(K) (bool, error)) breakStream.Iter[K] {
-	f := breakIter.Filt(m.keys, filter)
+// Filt returns a breakable stream consisting of elements that satisfy the condition of the 'predicate' function
+func (m MapKeys[K]) Filt(predicate func(K) (bool, error)) breakStream.Iter[K] {
+	f := breakIter.Filt(m.keys, predicate)
 	return breakStream.New(f.Next)
 }
 
@@ -102,7 +103,7 @@ func (m MapKeys[K]) Convert(converter func(K) K) stream.Iter[K] {
 	return stream.New(conv.Next)
 }
 
-// Convert returns a stream that applies the 'converter' function to the collection elements
+// Conv returns a breakable stream that applies the 'converter' function to the collection elements
 func (m MapKeys[K]) Conv(converter func(K) (K, error)) breakStream.Iter[K] {
 	conv := breakIter.Conv(m.keys, converter)
 	return breakStream.New(conv.Next)

@@ -32,18 +32,19 @@ var (
 	_ fmt.Stringer                              = MapKeys[int, any]{}
 )
 
-// Iter creates an iterator
+// Iter creates an iterator and returns as interface
 func (m MapKeys[K, V]) Iter() c.Iterator[K] {
 	h := m.Head()
 	return &h
 }
 
+// Loop creates an iterator and returns as implementation type reference
 func (m MapKeys[K, V]) Loop() *map_.KeyIter[K, V] {
 	h := m.Head()
 	return &h
 }
 
-// Head creates an iterator value object
+// Head creates an iterator and returns as implementation type value
 func (m MapKeys[K, V]) Head() map_.KeyIter[K, V] {
 	return map_.NewKeyIter(m.elements)
 }
@@ -73,6 +74,7 @@ func (m MapKeys[K, V]) Slice() []K {
 	return map_.Keys(m.elements)
 }
 
+// Append collects the values to the specified 'out' slice
 func (m MapKeys[K, V]) Append(out []K) []K {
 	return map_.AppendKeys(m.elements, out)
 }
@@ -93,10 +95,10 @@ func (m MapKeys[K, V]) Filter(filter func(K) bool) stream.Iter[K] {
 	return stream.New(loop.Filter(h.Next, filter).Next)
 }
 
-// Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function
-func (m MapKeys[K, V]) Filt(filter func(K) (bool, error)) breakStream.Iter[K] {
+// Filt returns a breakable stream consisting of elements that satisfy the condition of the 'predicate' function
+func (m MapKeys[K, V]) Filt(predicate func(K) (bool, error)) breakStream.Iter[K] {
 	h := m.Head()
-	return breakStream.New(breakLoop.Filt(breakLoop.From(h.Next), filter).Next)
+	return breakStream.New(breakLoop.Filt(breakLoop.From(h.Next), predicate).Next)
 }
 
 // Convert returns a stream that applies the 'converter' function to the collection elements
@@ -104,7 +106,7 @@ func (m MapKeys[K, V]) Convert(converter func(K) K) stream.Iter[K] {
 	return collection.Convert(m, converter)
 }
 
-// Convert returns a stream that applies the 'converter' function to the collection elements
+// Conv returns a breakable stream that applies the 'converter' function to the collection elements
 func (m MapKeys[K, V]) Conv(converter func(K) (K, error)) breakStream.Iter[K] {
 	return collection.Conv(m, converter)
 }

@@ -1,3 +1,4 @@
+// Package stream provides a stream implementation and helper functions
 package stream
 
 import (
@@ -7,7 +8,7 @@ import (
 	"github.com/m4gshm/gollections/loop"
 )
 
-// / New instantiates Iter
+// New instantiates a stream instance
 func New[T any](next func() (T, bool)) Iter[T] {
 	return Iter[T]{next: next}
 }
@@ -42,7 +43,7 @@ func (t Iter[T]) Filter(predicate func(T) bool) Iter[T] {
 	return New(f.Next)
 }
 
-// Filt returns a stream consisting of elements that satisfy the condition of the 'predicate' function
+// Filt returns a breakable stream consisting of elements that satisfy the condition of the 'predicate' function
 func (t Iter[T]) Filt(predicate func(T) (bool, error)) breakStream.Iter[T] {
 	f := breakLoop.Filt(breakLoop.From(t.next), predicate)
 	return breakStream.New(f.Next)
@@ -54,7 +55,7 @@ func (t Iter[T]) Convert(converter func(T) T) Iter[T] {
 	return New(conv.Next)
 }
 
-// Conv returns a stream that applies the 'converter' function to the collection elements
+// Conv returns a breakable stream that applies the 'converter' function to the collection elements
 func (t Iter[T]) Conv(converter func(T) (T, error)) breakStream.Iter[T] {
 	conv := breakLoop.Conv(breakLoop.From(t.next), converter)
 	return breakStream.New(conv.Next)
@@ -80,11 +81,12 @@ func (t Iter[T]) First(predicate func(T) bool) (T, bool) {
 	return loop.First(t.next, predicate)
 }
 
-// Iter returns as an iterator
+// Iter creates an iterator and returns as interface
 func (t Iter[T]) Iter() c.Iterator[T] {
 	return t
 }
 
+// Loop creates an iterator and returns as implementation type reference
 func (t Iter[T]) Loop() Iter[T] {
 	return t
 }

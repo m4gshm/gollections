@@ -14,6 +14,7 @@ import (
 // ErrBreak is the 'break' statement of the For, Track methods
 var ErrBreak = c.ErrBreak
 
+// Looper provides an iterable loop function
 type Looper[T any, I interface{ Next() (T, bool) }] interface {
 	Loop() I
 }
@@ -144,7 +145,7 @@ func Contains[T comparable](next func() (T, bool), example T) bool {
 	return false
 }
 
-// Convert instantiates Iterator that converts elements with a converter and returns them.
+// Convert instantiates an iterator that converts elements with a converter and returns them.
 func Convert[From, To any](next func() (From, bool), converter func(From) To) ConvertIter[From, To] {
 	return ConvertIter[From, To]{next: next, converter: converter}
 }
@@ -154,7 +155,7 @@ func ConvertCheck[From, To any](next func() (From, bool), converter func(from Fr
 	return ConvertCheckIter[From, To]{next: next, converter: converter}
 }
 
-// FilterAndConvert additionally filters 'From' elements.
+// FilterAndConvert returns a stream that filters source elements and converts them
 func FilterAndConvert[From, To any](next func() (From, bool), filter func(From) bool, converter func(From) To) ConvertFitIter[From, To] {
 	return FilterConvertFilter(next, filter, converter, always.True[To])
 }
@@ -169,7 +170,7 @@ func ConvertAndFilter[From, To any](next func() (From, bool), converter func(Fro
 	return FilterConvertFilter(next, always.True[From], converter, filter)
 }
 
-// Flatt instantiates Iterator that extracts slices of 'To' by a flattener from elements of 'From' and flattens as one iterable collection of 'To' elements.
+// Flatt instantiates an iterator that extracts slices of 'To' by a flattener from elements of 'From' and flattens as one iterable collection of 'To' elements.
 func Flatt[From, To any](next func() (From, bool), flattener func(From) []To) FlatIter[From, To] {
 	return FlatIter[From, To]{next: next, flatt: flattener, elemSizeTo: notsafe.GetTypeSize[To]()}
 }
@@ -189,7 +190,7 @@ func FilterFlattFilter[From, To any](next func() (From, bool), filterFrom func(F
 	return FlattenFitIter[From, To]{next: next, filterFrom: filterFrom, flatt: flattener, filterTo: filterTo, elemSizeTo: notsafe.GetTypeSize[To]()}
 }
 
-// Filter creates an Iterator that checks elements by filters and returns successful ones.
+// Filter creates an Iterator that checks elements by the 'filter' function and returns successful ones.
 func Filter[T any](next func() (T, bool), filter func(T) bool) FitIter[T] {
 	return FitIter[T]{next: next, by: filter}
 }
@@ -308,6 +309,7 @@ func ToMapResolv[T any, K comparable, V, VR any](next func() (T, bool), keyExtra
 	return m
 }
 
+// New is the main loop constructor
 func New[S, T any](source S, hasNext func(S) bool, getNext func(S) T) func() (T, bool) {
 	return func() (out T, ok bool) {
 		if hasNext(source) {

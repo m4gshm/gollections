@@ -7,6 +7,7 @@ import (
 	"github.com/m4gshm/gollections/map_/resolv"
 )
 
+// Looper provides an iterable loop function
 type Looper[K, V any, I interface{ Next() (K, V, bool) }] interface {
 	Loop() I
 }
@@ -40,8 +41,8 @@ func HasAny[K, V any](next func() (K, V, bool), predicate func(K, V) bool) bool 
 }
 
 // Convert creates an Iterator that applies a transformer to iterable key\values.
-func Convert[K, V any, k2, v2 any](next func() (K, V, bool), by func(K, V) (k2, v2)) ConvertKVIter[K, V, k2, v2, func(K, V) (k2, v2)] {
-	return ConvertKVIter[K, V, k2, v2, func(K, V) (k2, v2)]{next: next, by: by}
+func Convert[K, V any, k2, v2 any](next func() (K, V, bool), by func(K, V) (k2, v2)) ConvertIter[K, V, k2, v2, func(K, V) (k2, v2)] {
+	return ConvertIter[K, V, k2, v2, func(K, V) (k2, v2)]{next: next, by: by}
 }
 
 // Filter creates an Iterator that checks elements by a filter and returns successful ones

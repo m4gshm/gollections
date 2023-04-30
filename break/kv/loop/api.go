@@ -15,6 +15,8 @@ func From[K, V any](next func() (K, V, bool)) func() (K, V, bool, error) {
 	}
 }
 
+// To transforms a breakable loop to a simple loop.
+// The errConsumer is a function that is called when an error occurs.
 func To[K, V any](next func() (K, V, bool, error), errConsumer func(error)) func() (K, V, bool) {
 	return func() (K, V, bool) {
 		k, v, ok, err := next()
@@ -33,11 +35,11 @@ func Group[K comparable, V any](next func() (K, V, bool, error)) (map[K][]V, err
 
 // Reduce reduces the key/value pairs retrieved by the 'next' function into an one pair using the 'merge' function
 func Reduce[K, V any](next func() (K, V, bool, error), merge func(K, V, K, V) (K, V, error)) (rk K, rv V, err error) {
-	if k, v, ok, err := next(); err != nil || !ok {
+	k, v, ok, err := next()
+	if err != nil || !ok {
 		return rk, rv, err
-	} else {
-		rk, rv = k, v
 	}
+	rk, rv = k, v
 	for {
 		if k, v, ok, err := next(); err != nil || !ok {
 			return rk, rv, err
@@ -61,13 +63,13 @@ func HasAny[K, V any](next func() (K, V, bool, error), predicate func(K, V) (boo
 }
 
 // Convert creates an Iterator that applies a transformer to iterable key\values.
-func Convert[K, V any, KOUT, VOUT any](next func() (K, V, bool, error), converter func(K, V) (KOUT, VOUT)) ConvertKVIter[K, V, KOUT, VOUT] {
-	return ConvertKVIter[K, V, KOUT, VOUT]{next: next, converter: func(k K, v V) (KOUT, VOUT, error) { ko, vo := converter(k, v); return ko, vo, nil }}
+func Convert[K, V any, KOUT, VOUT any](next func() (K, V, bool, error), converter func(K, V) (KOUT, VOUT)) ConvertIter[K, V, KOUT, VOUT] {
+	return ConvertIter[K, V, KOUT, VOUT]{next: next, converter: func(k K, v V) (KOUT, VOUT, error) { ko, vo := converter(k, v); return ko, vo, nil }}
 }
 
 // Conv creates an Iterator that applies a transformer to iterable key\values.
-func Conv[K, V any, KOUT, VOUT any](next func() (K, V, bool, error), converter func(K, V) (KOUT, VOUT, error)) ConvertKVIter[K, V, KOUT, VOUT] {
-	return ConvertKVIter[K, V, KOUT, VOUT]{next: next, converter: converter}
+func Conv[K, V any, KOUT, VOUT any](next func() (K, V, bool, error), converter func(K, V) (KOUT, VOUT, error)) ConvertIter[K, V, KOUT, VOUT] {
+	return ConvertIter[K, V, KOUT, VOUT]{next: next, converter: converter}
 }
 
 // Filter creates an Iterator that checks elements by a filter and returns successful ones
@@ -84,12 +86,12 @@ func Filt[K, V any](next func() (K, V, bool, error), filter func(K, V) (bool, er
 func ToMapResolv[K comparable, V, VR any](next func() (K, V, bool, error), resolver func(bool, K, VR, V) VR) (map[K]VR, error) {
 	m := map[K]VR{}
 	for {
-		if k, v, ok, err := next(); err != nil || !ok {
+		k, v, ok, err := next()
+		if err != nil || !ok {
 			return m, err
-		} else {
-			exists, ok := m[k]
-			m[k] = resolver(ok, k, exists, v)
 		}
+		exists, ok := m[k]
+		m[k] = resolver(ok, k, exists, v)
 	}
 }
 
@@ -102,14 +104,15 @@ func ToMap[K comparable, V any](next func() (K, V, bool, error)) (map[K]V, error
 func ToSlice[K, V any](next func() (K, V, bool, error)) ([]c.KV[K, V], error) {
 	s := []c.KV[K, V]{}
 	for {
-		if key, val, ok, err := next(); err != nil || !ok {
+		key, val, ok, err := next()
+		if err != nil || !ok {
 			return s, err
-		} else {
-			s = append(s, k.V(key, val))
 		}
+		s = append(s, k.V(key, val))
 	}
 }
 
+// New is the mai breakable key/value loop constructor
 func New[S, K, V any](source S, hasNext func(S) bool, getNext func(S) (K, V, error)) func() (K, V, bool, error) {
 	return func() (k K, v V, ok bool, err error) {
 		if ok := hasNext(source); !ok {

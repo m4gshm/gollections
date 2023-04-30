@@ -75,12 +75,13 @@ var (
 	_ fmt.Stringer                        = (*Set[int])(nil)
 )
 
-// Iter creates an iterator
+// Iter creates an iterator and returns as interface
 func (s *Set[T]) Iter() c.Iterator[T] {
 	h := s.Head()
 	return &h
 }
 
+// Loop creates an iterator and returns as implementation type reference
 func (s *Set[T]) Loop() *SetIter[T] {
 	h := s.Head()
 	return &h
@@ -92,7 +93,7 @@ func (s *Set[T]) IterEdit() c.DelIterator[T] {
 	return &h
 }
 
-// Head creates an iterator value object
+// Head creates an iterator and returns as implementation type value
 func (s *Set[T]) Head() SetIter[T] {
 	var elements *[]T
 	if s != nil {
@@ -121,6 +122,7 @@ func (s *Set[T]) Slice() (out []T) {
 	return out
 }
 
+// Append collects the values to the specified 'out' slice
 func (s *Set[T]) Append(out []T) []T {
 	if s != nil {
 		if order := s.order; order != nil {
@@ -294,7 +296,7 @@ func (s *Set[T]) Filter(predicate func(T) bool) stream.Iter[T] {
 	return stream.New(iter.Filter(h.Next, predicate).Next)
 }
 
-// Filt returns a stream consisting of elements that satisfy the condition of the 'predicate' function
+// Filt returns a breakable stream consisting of elements that satisfy the condition of the 'predicate' function
 func (s *Set[T]) Filt(predicate func(T) (bool, error)) breakStream.Iter[T] {
 	h := s.Head()
 	return breakStream.New(breakLoop.Filt(breakLoop.From(h.Next), predicate).Next)
@@ -305,7 +307,7 @@ func (s *Set[T]) Convert(converter func(T) T) stream.Iter[T] {
 	return collection.Convert(s, converter)
 }
 
-// Convert returns a stream that applies the 'converter' function to the collection elements
+// Conv returns a breakable stream that applies the 'converter' function to the collection elements
 func (s *Set[T]) Conv(converter func(T) (T, error)) breakStream.Iter[T] {
 	return collection.Conv(s, converter)
 }

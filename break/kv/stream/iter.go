@@ -1,3 +1,4 @@
+// Package stream provides a stream implementation and helper functions
 package stream
 
 import (
@@ -8,6 +9,7 @@ import (
 	"github.com/m4gshm/gollections/map_/filter"
 )
 
+// New is the main stream constructor
 func New[K comparable, V any, M map[K]V | map[K][]V](next func() (K, V, bool, error), collector MapCollector[K, V, M]) Iter[K, V, M] {
 	return Iter[K, V, M]{next: next, collector: collector}
 }
@@ -38,7 +40,7 @@ func (k Iter[K, V, M]) FilterKey(predicate func(K) bool) Iter[K, V, M] {
 	return New(loop.Filter(k.next, filter.Key[V](predicate)).Next, k.collector)
 }
 
-// FilterKey returns a stream consisting of key/value pairs where the key satisfies the condition of the 'predicate' function
+// FiltKey returns a stream consisting of key/value pairs where the key satisfies the condition of the 'predicate' function
 func (k Iter[K, V, M]) FiltKey(predicate func(K) (bool, error)) Iter[K, V, M] {
 	return New(loop.Filt(k.next, breakFilter.Key[V](predicate)).Next, k.collector)
 }
@@ -53,7 +55,7 @@ func (k Iter[K, V, M]) FilterValue(predicate func(V) bool) Iter[K, V, M] {
 	return New(loop.Filter(k.next, filter.Value[K](predicate)).Next, k.collector)
 }
 
-// FilterValue returns a stream consisting of key/value pairs where the value satisfies the condition of the 'predicate' function
+// FiltValue returns a stream consisting of key/value pairs where the value satisfies the condition of the 'predicate' function
 func (k Iter[K, V, M]) FiltValue(predicate func(V) (bool, error)) Iter[K, V, M] {
 	return New(loop.Filt(k.next, breakFilter.Value[K](predicate)).Next, k.collector)
 }
@@ -68,7 +70,7 @@ func (k Iter[K, V, M]) Filter(predicate func(K, V) bool) Iter[K, V, M] {
 	return New(loop.Filter(k.next, predicate).Next, k.collector)
 }
 
-// Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function
+// Filt returns a breakable stream consisting of elements that satisfy the condition of the 'predicate' function
 func (k Iter[K, V, M]) Filt(predicate func(K, V) (bool, error)) Iter[K, V, M] {
 	return New(loop.Filt(k.next, predicate).Next, k.collector)
 }
@@ -94,7 +96,7 @@ func (k Iter[K, V, M]) HasAny(predicate func(K, V) (bool, error)) (bool, error) 
 	return loop.HasAny(next, predicate)
 }
 
-// Iter creates an iterator
+// Iter creates an iterator and returns as interface
 func (k Iter[K, V, M]) Iter() kv.Iterator[K, V] {
 	return k
 }

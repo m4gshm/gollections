@@ -25,6 +25,8 @@ func From[T any](next func() (T, bool)) func() (T, bool, error) {
 	}
 }
 
+// To transforms a breakable loop to a simple loop.
+// The errConsumer is a function that is called when an error occurs.
 func To[T any](next func() (T, bool, error), errConsumer func(error)) func() (T, bool) {
 	return func() (T, bool) {
 		e, ok, err := next()
@@ -87,21 +89,21 @@ func Track[I, T any](next func() (I, T, bool, error), tracker func(I, T) error) 
 // ToSlice collects the elements retrieved by the 'next' function into a slice
 func ToSlice[T any](next func() (T, bool, error)) (out []T, err error) {
 	for {
-		if v, ok, err := next(); err != nil || !ok {
+		v, ok, err := next()
+		if err != nil || !ok {
 			return out, err
-		} else {
-			out = append(out, v)
 		}
+		out = append(out, v)
 	}
 }
 
 // Reduce reduces the elements retrieved by the 'next' function into an one using the 'merge' function
 func Reduce[T any](next func() (T, bool, error), merger func(T, T) (T, error)) (out T, e error) {
-	if v, ok, err := next(); err != nil || !ok {
+	v, ok, err := next()
+	if err != nil || !ok {
 		return out, err
-	} else {
-		out = v
 	}
+	out = v
 	for {
 		if v, ok, err := next(); err != nil || !ok {
 			return out, err
@@ -133,12 +135,12 @@ func Contains[T comparable](next func() (T, bool, error), example T) (bool, erro
 	}
 }
 
-// Conv instantiates Iterator that converts elements with a converter and returns them.
+// Conv instantiates an iterator that converts elements with a converter and returns them.
 func Conv[From, To any](next func() (From, bool, error), converter func(From) (To, error)) ConvertIter[From, To] {
 	return ConvertIter[From, To]{next: next, converter: converter}
 }
 
-// Convert instantiates Iterator that converts elements with a converter and returns them.
+// Convert instantiates an iterator that converts elements with a converter and returns them.
 func Convert[From, To any](next func() (From, bool, error), converter func(From) To) ConvertIter[From, To] {
 	return ConvertIter[From, To]{next: next, converter: func(f From) (To, error) { return converter(f), nil }}
 }
@@ -153,12 +155,12 @@ func ConvertCheck[From, To any](next func() (From, bool, error), converter func(
 	return ConvertCheckIter[From, To]{next: next, converter: func(f From) (To, bool, error) { c, ok := converter(f); return c, ok, nil }}
 }
 
-// FitAndConv additionally filters 'From' elements.
+// FitAndConv returns a stream that filters source elements and converts them
 func FitAndConv[From, To any](next func() (From, bool, error), filter func(From) (bool, error), converter func(From) (To, error)) ConvertFitIter[From, To] {
 	return FilterConvertFilter(next, filter, converter, always.True[To])
 }
 
-// FilterAndConvert additionally filters 'From' elements.
+// FilterAndConvert returns a stream that filters source elements and converts them
 func FilterAndConvert[From, To any](next func() (From, bool, error), filter func(From) bool, converter func(From) To) ConvertFitIter[From, To] {
 	return FilterConvertFilter(next, func(f From) (bool, error) { return filter(f), nil }, func(f From) (To, error) { return converter(f), nil }, always.True[To])
 }
@@ -173,12 +175,12 @@ func ConvertAndFilter[From, To any](next func() (From, bool, error), converter f
 	return FilterConvertFilter(next, always.True[From], converter, filter)
 }
 
-// Flat instantiates Iterator that extracts slices of 'To' by a flattener from elements of 'From' and flattens as one iterable collection of 'To' elements.
+// Flat instantiates an iterator that extracts slices of 'To' by a flattener from elements of 'From' and flattens as one iterable collection of 'To' elements.
 func Flat[From, To any](next func() (From, bool, error), flattener func(From) ([]To, error)) FlatIter[From, To] {
 	return FlatIter[From, To]{next: next, flattener: flattener, elemSizeTo: notsafe.GetTypeSize[To]()}
 }
 
-// Flatt instantiates Iterator that extracts slices of 'To' by a flattener from elements of 'From' and flattens as one iterable collection of 'To' elements.
+// Flatt instantiates an iterator that extracts slices of 'To' by a flattener from elements of 'From' and flattens as one iterable collection of 'To' elements.
 func Flatt[From, To any](next func() (From, bool, error), flattener func(From) []To) FlatIter[From, To] {
 	return FlatIter[From, To]{next: next, flattener: func(f From) ([]To, error) { return flattener(f), nil }, elemSizeTo: notsafe.GetTypeSize[To]()}
 }
@@ -219,12 +221,12 @@ func FilterFlattFilter[From, To any](next func() (From, bool, error), filterFrom
 	}
 }
 
-// Filt creates an Iterator that checks elements by filters and returns successful ones.
+// Filt creates an Iterator that checks elements by the 'filter' function and returns successful ones.
 func Filt[T any](next func() (T, bool, error), filter func(T) (bool, error)) FiltIter[T] {
 	return FiltIter[T]{next: next, filter: filter}
 }
 
-// Filter creates an Iterator that checks elements by filters and returns successful ones.
+// Filter creates an Iterator that checks elements by the 'filter' function and returns successful ones.
 func Filter[T any](next func() (T, bool, error), filter func(T) bool) FiltIter[T] {
 	return FiltIter[T]{next: next, filter: func(t T) (bool, error) { return filter(t), nil }}
 }
@@ -358,21 +360,20 @@ func ToMapResolv[T any, K comparable, V, VR any](
 	for {
 		if e, ok, err := next(); err != nil || !ok {
 			return m, err
+		} else if k, err := keyExtractor(e); err != nil {
+			return m, err
+		} else if v, err := valExtractor(e); err != nil {
+			return m, err
 		} else {
-			if k, err := keyExtractor(e); err != nil {
+			exists, ok := m[k]
+			if m[k], err = resolver(ok, k, exists, v); err != nil {
 				return m, err
-			} else if v, err := valExtractor(e); err != nil {
-				return m, err
-			} else {
-				exists, ok := m[k]
-				if m[k], err = resolver(ok, k, exists, v); err != nil {
-					return m, err
-				}
 			}
 		}
 	}
 }
 
+// New is the main breakable loop constructor
 func New[S, T any](source S, hasNext func(S) bool, getNext func(S) (T, error)) func() (T, bool, error) {
 	return func() (out T, ok bool, err error) {
 		if ok := hasNext(source); !ok {

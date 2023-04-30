@@ -21,37 +21,36 @@ type ConvFitIter[From, To any] struct {
 var _ c.Iterator[any] = (*ConvFitIter[any, any])(nil)
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
-func (f *ConvFitIter[From, To]) For(walker func(element To) error) error {
-	return loop.For(f.Next, walker)
+func (i *ConvFitIter[From, To]) For(walker func(element To) error) error {
+	return loop.For(i.Next, walker)
 }
 
 // Next returns the next element.
 // The ok result indicates whether the element was returned by the iterator.
 // If ok == false, then the iteration must be completed.
-func (s *ConvFitIter[From, To]) Next() (t To, ok bool, err error) {
-	if s == nil || s.array == nil {
+func (i *ConvFitIter[From, To]) Next() (t To, ok bool, err error) {
+	if i == nil || i.array == nil {
 		return t, false, nil
 	}
 	next := func() (out From, ok bool, err error) {
-		return nextFiltered(s.array, s.size, s.elemSize, s.filterFrom, &s.i)
+		return nextFiltered(i.array, i.size, i.elemSize, i.filterFrom, &i.i)
 	}
 	for {
 		if v, ok, err := next(); err != nil || !ok {
 			return t, false, err
-		} else if t, err = s.converter(v); err != nil {
+		} else if t, err = i.converter(v); err != nil {
 			return t, false, err
-		} else if ok, err := s.filterTo(t); err != nil {
+		} else if ok, err := i.filterTo(t); err != nil {
 			return t, false, err
 		} else if ok {
 			return t, true, nil
 		}
 	}
-	return t, false, nil
 }
 
 // Cap returns the iterator capacity
-func (s *ConvFitIter[From, To]) Cap() int {
-	return s.size
+func (i *ConvFitIter[From, To]) Cap() int {
+	return i.size
 }
 
 // ConvertIter is the array based Iterator thath provides converting of elements by a ConvertIter.
@@ -65,38 +64,36 @@ type ConvertIter[From, To any] struct {
 var _ c.Iterator[any] = (*ConvertIter[any, any])(nil)
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
-func (f *ConvertIter[From, To]) For(walker func(element To) error) error {
-	return loop.For(f.Next, walker)
+func (i *ConvertIter[From, To]) For(walker func(element To) error) error {
+	return loop.For(i.Next, walker)
 }
 
 // Next returns the next element.
 // The ok result indicates whether the element was returned by the iterator.
 // If ok == false, then the iteration must be completed.
-func (s *ConvertIter[From, To]) Next() (t To, ok bool, err error) {
-	if s.i < s.size {
-		v := *(*From)(notsafe.GetArrayElemRef(s.array, s.i, s.elemSize))
-		s.i++
-		t, err = s.converter(v)
+func (i *ConvertIter[From, To]) Next() (t To, ok bool, err error) {
+	if i.i < i.size {
+		v := *(*From)(notsafe.GetArrayElemRef(i.array, i.i, i.elemSize))
+		i.i++
+		t, err = i.converter(v)
 		return t, err == nil, err
 	}
 	return t, false, nil
 }
 
 // Cap returns the iterator capacity
-func (s *ConvertIter[From, To]) Cap() int {
-	return s.size
+func (i *ConvertIter[From, To]) Cap() int {
+	return i.size
 }
 
-func nextFiltered[T any](array unsafe.Pointer, size int, elemSize uintptr, filter func(T) (bool, error), index *int) (T, bool, error) {
+func nextFiltered[T any](array unsafe.Pointer, size int, elemSize uintptr, filter func(T) (bool, error), index *int) (v T, ok bool, err error) {
 	for i := *index; i < size; i++ {
-		v := *(*T)(notsafe.GetArrayElemRef(array, i, elemSize))
-		if ok, err := filter(v); err != nil || !ok {
+		v = *(*T)(notsafe.GetArrayElemRef(array, i, elemSize))
+		if ok, err = filter(v); err != nil || !ok {
 			return v, false, err
-		} else {
-			*index = i + 1
-			return v, true, nil
 		}
+		*index = i + 1
+		return v, true, nil
 	}
-	var v T
 	return v, false, nil
 }

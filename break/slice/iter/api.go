@@ -11,7 +11,7 @@ import (
 	"github.com/m4gshm/gollections/slice"
 )
 
-// Conv instantiates Iterator that converts elements with a converter and returns them
+// Conv instantiates an iterator that converts elements with a converter and returns them
 func Conv[FS ~[]From, From, To any](elements FS, converter func(From) (To, error)) *ConvertIter[From, To] {
 	var (
 		header   = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
@@ -33,7 +33,7 @@ func FiltAndConv[FS ~[]From, From, To any](elements FS, filter func(From) (bool,
 	return &ConvFitIter[From, To]{array: array, size: size, elemSize: elemSize, converter: converter, filterFrom: filter, filterTo: as.ErrTail(always.True[To])}
 }
 
-// Flatt instantiates Iterator that extracts slices of 'To' by a flattener from elements of 'From' and flattens as one iterable collection of 'To' elements.
+// Flat instantiates an iterator that extracts slices of 'To' by a flattener from elements of 'From' and flattens as one iterable collection of 'To' elements.
 func Flat[FS ~[]From, From, To any](elements FS, flatter func(From) ([]To, error)) *Flatten[From, To] {
 	var (
 		header       = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
@@ -45,7 +45,7 @@ func Flat[FS ~[]From, From, To any](elements FS, flatter func(From) ([]To, error
 	return &Flatten[From, To]{arrayFrom: array, sizeFrom: size, elemSizeFrom: elemSizeFrom, elemSizeTo: elemSizeTo, flatt: flatter}
 }
 
-// FilterAndFlatt additionally filters –'From' elements.
+// FiltAndFlat instantiates an iterator that filters elements by the 'filter' function, flattens elements and returns them.
 func FiltAndFlat[FS ~[]From, From, To any](elements FS, filter func(From) (bool, error), flatt func(From) ([]To, error)) *FlatFiltIter[From, To] {
 	var (
 		header       = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
@@ -57,7 +57,7 @@ func FiltAndFlat[FS ~[]From, From, To any](elements FS, filter func(From) (bool,
 	return &FlatFiltIter[From, To]{arrayFrom: array, sizeFrom: size, elemSizeFrom: elemSizeFrom, elemSizeTo: elemSizeTo, flatt: flatt, filter: filter}
 }
 
-// Filt instantiates Iterator that checks elements by filters and returns successful ones.
+// Filt instantiates an iterator that checks elements by the 'filter' function and returns successful ones.
 func Filt[TS ~[]T, T any](elements TS, filter func(T) (bool, error)) *FiltIter[T] {
 	var (
 		header   = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
@@ -68,7 +68,7 @@ func Filt[TS ~[]T, T any](elements TS, filter func(T) (bool, error)) *FiltIter[T
 	return &FiltIter[T]{array: array, size: size, elemSize: elemSize, filter: filter}
 }
 
-// NotNil instantiates Iterator that filters nullable elements.
+// NotNil instantiates an iterator that filters nullable elements.
 func NotNil[T any, TRS ~[]*T](elements TRS) *FiltIter[*T] {
 	return Filt(elements, as.ErrTail(check.NotNil[T]))
 }

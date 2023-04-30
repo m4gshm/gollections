@@ -45,12 +45,13 @@ var (
 	_ fmt.Stringer                      = (*Vector[any])(nil)
 )
 
-// Iter creates an iterator
+// Iter creates an iterator and returns as interface
 func (v *Vector[T]) Iter() c.Iterator[T] {
 	h := v.Head()
 	return &h
 }
 
+// Loop creates an iterator and returns as implementation type reference
 func (v *Vector[T]) Loop() *SliceIter[T] {
 	h := v.Head()
 	return &h
@@ -62,7 +63,7 @@ func (v *Vector[T]) IterEdit() c.DelIterator[T] {
 	return &h
 }
 
-// Head creates an iterator value object
+// Head creates an iterator and returns as implementation type value
 func (v *Vector[T]) Head() SliceIter[T] {
 	return NewHead(v, v.DeleteActualOne)
 }
@@ -100,6 +101,7 @@ func (v *Vector[T]) Slice() (out []T) {
 	return slice.Clone(*v)
 }
 
+// Append collects the values to the specified 'out' slice
 func (v *Vector[T]) Append(out []T) []T {
 	if v == nil {
 		return out
@@ -294,7 +296,7 @@ func (v *Vector[T]) Filter(filter func(T) bool) stream.Iter[T] {
 	return stream.New(loop.Filter(h.Next, filter).Next)
 }
 
-// Filt returns a stream consisting of elements that satisfy the condition of the 'predicate' function
+// Filt returns a breakable stream consisting of elements that satisfy the condition of the 'predicate' function
 func (v *Vector[T]) Filt(predicate func(T) (bool, error)) breakStream.Iter[T] {
 	h := v.Head()
 	return breakStream.New(breakLoop.Filt(breakLoop.From(h.Next), predicate).Next)
@@ -305,7 +307,7 @@ func (v *Vector[T]) Convert(converter func(T) T) stream.Iter[T] {
 	return collection.Convert(v, converter)
 }
 
-// Convert returns a stream that applies the 'converter' function to the collection elements
+// Conv returns a breakable stream that applies the 'converter' function to the collection elements
 func (v *Vector[T]) Conv(converter func(T) (T, error)) breakStream.Iter[T] {
 	return collection.Conv(v, converter)
 }

@@ -29,11 +29,13 @@ func Or[I, O comparable](first func(I) O, second func(I) O) func(I) O {
 	}
 }
 
+// ToSlice convert an one element to a slice
 func ToSlice[T any](value T) []T { return []T{value} }
 
+// AsSlice convert an one element to a slice
 func AsSlice[T any](value T) []T { return ToSlice(value) }
 
-// ToKVs transforms one element to one key/value pair
+// ToKV transforms one element to one key/value pair
 func ToKV[T, K, V any](element T, keyExtractor func(T) K, valExtractor func(T) V) c.KV[K, V] {
 	return k.V(keyExtractor(element), valExtractor(element))
 }
@@ -65,6 +67,7 @@ func ToKVs[T, K, V any](element T, keysExtractor func(T) []K, valsExtractor func
 	return out
 }
 
+// FlattValues transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
 func FlattValues[T, V any](element T, valsExtractor func(T) []V) (out []c.KV[T, V]) {
 	var (
 		key    = element
@@ -82,6 +85,7 @@ func FlattValues[T, V any](element T, valsExtractor func(T) []V) (out []c.KV[T, 
 	return out
 }
 
+// FlattKeys transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
 func FlattKeys[T, K any](element T, keysExtractor func(T) []K) (out []c.KV[K, T]) {
 	var (
 		keys  = keysExtractor(element)

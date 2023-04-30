@@ -11,11 +11,12 @@ import (
 	"github.com/m4gshm/gollections/slice"
 )
 
+// New is the main slice-based iterator constructor
 func New[TS ~[]T, T any](elements TS) *slice.Iter[T] {
 	return slice.NewIter(elements)
 }
 
-// Convert instantiates Iterator that converts elements with a converter and returns them
+// Convert instantiates an iterator that converts elements with a converter and returns them
 func Convert[FS ~[]From, From, To any](elements FS, by func(From) To) *ConvertIter[From, To] {
 	var (
 		header   = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
@@ -26,18 +27,18 @@ func Convert[FS ~[]From, From, To any](elements FS, by func(From) To) *ConvertIt
 	return &ConvertIter[From, To]{array: array, size: size, elemSize: elemSize, converter: by}
 }
 
-// FilterAndConvert additionally filters 'From' elements.
-func FilterAndConvert[FS ~[]From, From, To any](elements FS, filter func(From) bool, converter func(From) To) *ConvertFit[From, To] {
+// FilterAndConvert returns a stream that filters source elements and converts them
+func FilterAndConvert[FS ~[]From, From, To any](elements FS, filter func(From) bool, converter func(From) To) *ConvertFitIter[From, To] {
 	var (
 		header   = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
 		array    = unsafe.Pointer(header.Data)
 		size     = header.Len
 		elemSize = notsafe.GetTypeSize[From]()
 	)
-	return &ConvertFit[From, To]{array: array, size: size, elemSize: elemSize, converter: converter, filterFrom: filter, filterTo: always.True[To]}
+	return &ConvertFitIter[From, To]{array: array, size: size, elemSize: elemSize, converter: converter, filterFrom: filter, filterTo: always.True[To]}
 }
 
-// Flatt instantiates Iterator that extracts slices of 'To' by a flattener from elements of 'From' and flattens as one iterable collection of 'To' elements.
+// Flatt instantiates an iterator that extracts slices of 'To' by a flattener from elements of 'From' and flattens as one iterable collection of 'To' elements.
 func Flatt[FS ~[]From, From, To any](elements FS, by func(From) []To) *FlatIter[From, To] {
 	var (
 		header       = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
@@ -49,8 +50,8 @@ func Flatt[FS ~[]From, From, To any](elements FS, by func(From) []To) *FlatIter[
 	return &FlatIter[From, To]{arrayFrom: array, sizeFrom: size, elemSizeFrom: elemSizeFrom, elemSizeTo: elemSizeTo, flattener: by}
 }
 
-// FilterAndFlatt additionally filters –'From' elements.
-func FilterAndFlatt[FS ~[]From, From, To any](elements FS, filter func(From) bool, flatt func(From) []To) *FlattenFitIter[From, To] {
+// FilterAndFlatt filters source elements and extracts slices of 'To' by the 'flattener' function
+func FilterAndFlatt[FS ~[]From, From, To any](elements FS, filter func(From) bool, flattener func(From) []To) *FlattenFitIter[From, To] {
 	var (
 		header       = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
 		array        = unsafe.Pointer(header.Data)
@@ -58,10 +59,10 @@ func FilterAndFlatt[FS ~[]From, From, To any](elements FS, filter func(From) boo
 		elemSizeFrom = notsafe.GetTypeSize[From]()
 		elemSizeTo   = notsafe.GetTypeSize[To]()
 	)
-	return &FlattenFitIter[From, To]{arrayFrom: array, sizeFrom: size, elemSizeFrom: elemSizeFrom, elemSizeTo: elemSizeTo, flatt: flatt, filter: filter}
+	return &FlattenFitIter[From, To]{arrayFrom: array, sizeFrom: size, elemSizeFrom: elemSizeFrom, elemSizeTo: elemSizeTo, flatt: flattener, filter: filter}
 }
 
-// Filter instantiates Iterator that checks elements by filters and returns successful ones.
+// Filter instantiates an iterator that checks elements by the 'filter' function and returns successful ones
 func Filter[TS ~[]T, T any](elements TS, filter func(T) bool) *FilterIter[T] {
 	var (
 		header   = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
@@ -72,7 +73,7 @@ func Filter[TS ~[]T, T any](elements TS, filter func(T) bool) *FilterIter[T] {
 	return &FilterIter[T]{array: array, size: size, elemSize: elemSize, filter: filter}
 }
 
-// NotNil instantiates Iterator that filters nullable elements.
+// NotNil instantiates an iterator that filters nullable elements
 func NotNil[T any, TRS ~[]*T](elements TRS) *FilterIter[*T] {
 	return Filter(elements, check.NotNil[T])
 }

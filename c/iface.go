@@ -10,6 +10,7 @@ import (
 // ErrBreak is the 'break' statement of the For, Track methods
 var ErrBreak = errors.New("Break")
 
+// KeyVal provides extracing of a keys or values collection from key/value pairs
 type KeyVal[Keys any, Vals any] interface {
 	Keys() Keys
 	Values() Vals
@@ -25,11 +26,13 @@ type Collection[T any] interface {
 	Reduce(merger func(T, T) T) T
 }
 
+// Filterable provides filtering content functionality
 type Filterable[T, Stream, StreamBreakable any] interface {
 	Filter(predicate func(T) bool) Stream
 	Filt(predicate func(T) (bool, error)) StreamBreakable
 }
 
+// Convertable provides converaton of collection elements functionality
 type Convertable[T, Stream, StreamBreakable any] interface {
 	Convert(converter func(T) T) Stream
 	Conv(converter func(T) (T, error)) StreamBreakable

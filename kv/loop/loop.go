@@ -5,15 +5,15 @@ import (
 	"github.com/m4gshm/gollections/loop"
 )
 
-// NewIter creates an KVIter instance that loops over key\value elements of a source.
+// NewIter creates an Iter instance that loops over key\value elements of a source.
 // The hasNext specifies a predicate that tests existing of a next element in the source.
 // The getNext extracts the one.
-func NewIter[S, K, V any](source S, hasNext func(S) bool, getNext func(S) (K, V, error)) KVIter[S, K, V] {
-	return KVIter[S, K, V]{source: source, hasNext: hasNext, getNext: getNext}
+func NewIter[S, K, V any](source S, hasNext func(S) bool, getNext func(S) (K, V, error)) Iter[S, K, V] {
+	return Iter[S, K, V]{source: source, hasNext: hasNext, getNext: getNext}
 }
 
-// KVIter - universal key\value iterator implementation
-type KVIter[S, K, V any] struct {
+// Iter - universal key\value iterator implementation
+type Iter[S, K, V any] struct {
 	source  S
 	hasNext func(S) bool
 	getNext func(S) (K, V, error)
@@ -21,22 +21,22 @@ type KVIter[S, K, V any] struct {
 }
 
 var (
-	_ kv.KVIterator[any, any] = (*KVIter[any, any, any])(nil)
-	_ kv.KVIterator[any, any] = (*KVIter[any, any, any])(nil)
+	_ kv.Iterator[any, any] = (*Iter[any, any, any])(nil)
+	_ kv.Iterator[any, any] = (*Iter[any, any, any])(nil)
 )
 
 // Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak
-func (kv *KVIter[S, K, V]) Track(traker func(key K, value V) error) error {
-	return loop.Track(kv.Next, traker)
+func (i *Iter[S, K, V]) Track(traker func(key K, value V) error) error {
+	return loop.Track(i.Next, traker)
 }
 
 // TrackEach takes all key, value pairs retrieved by the iterator
-func (kv *KVIter[S, K, V]) TrackEach(traker func(key K, value V)) {
-	loop.TrackEach(kv.Next, traker)
+func (i *Iter[S, K, V]) TrackEach(traker func(key K, value V)) {
+	loop.TrackEach(i.Next, traker)
 }
 
 // Next implements kv.KVIterator
-func (i *KVIter[S, K, V]) Next() (K, V, bool) {
+func (i *Iter[S, K, V]) Next() (K, V, bool) {
 	if i.abort == nil && i.hasNext(i.source) {
 		k, v, err := i.getNext(i.source)
 		if err == nil {
@@ -50,6 +50,6 @@ func (i *KVIter[S, K, V]) Next() (K, V, bool) {
 }
 
 // Error implements kv.KVIteratorBreakable
-func (i *KVIter[S, K, V]) Error() error {
+func (i *Iter[S, K, V]) Error() error {
 	return i.abort
 }

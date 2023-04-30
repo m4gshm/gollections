@@ -19,7 +19,7 @@ type OrderedMapIter[K comparable, V any] struct {
 	uniques  map[K]V
 }
 
-var _ kv.KVIterator[string, any] = (*OrderedMapIter[string, any])(nil)
+var _ kv.Iterator[string, any] = (*OrderedMapIter[string, any])(nil)
 
 // Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (i *OrderedMapIter[K, V]) Track(traker func(key K, value V) error) error {

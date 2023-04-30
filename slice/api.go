@@ -180,7 +180,7 @@ func Conv[FS ~[]From, From, To any](elements FS, by func(From) (To, error)) ([]T
 	return result, nil
 }
 
-// FilterAndConvert additionally filters 'From' elements
+// FilterAndConvert returns a stream that filters source elements and converts them
 func FilterAndConvert[FS ~[]From, From, To any](elements FS, filter func(From) bool, by func(From) To) []To {
 	if elements == nil {
 		return nil
@@ -322,7 +322,7 @@ func FlattAndConvert[FS ~[]From, From, I, To any](elements FS, flattener func(Fr
 	return result
 }
 
-// FilterAndFlatt additionally filters 'From' elements.
+// FilterAndFlatt filters source elements and extracts slices of 'To' by the 'flattener' function
 func FilterAndFlatt[FS ~[]From, From, To any](elements FS, filter func(From) bool, flattener func(From) []To) []To {
 	if elements == nil {
 		return nil
@@ -623,20 +623,24 @@ func StringsBehaveAs[TS ~[]T, T ~string](elements []string) TS {
 	return s
 }
 
+// Upcast transforms a user-defined type slice to a underlying slice type
 func Upcast[TS ~[]T, T any](elements TS) []T {
 	return *UpcastRef(&elements)
 }
 
+// UpcastRef transforms a user-defined reference type slice to a underlying slice reference type
 func UpcastRef[TS ~[]T, T any](elements *TS) *[]T {
 	ptr := unsafe.Pointer(elements)
 	s := (*[]T)(ptr)
 	return s
 }
 
+// Downcast transforms a slice type to an user-defined type slice based on that type
 func Downcast[TS ~[]T, T any](elements []T) TS {
 	return *DowncastRef[TS](&elements)
 }
 
+// DowncastRef  transforms a slice typeref to an user-defined type ref slice based on that type
 func DowncastRef[TS ~[]T, T any](elements *[]T) *TS {
 	ptr := unsafe.Pointer(elements)
 	s := (*TS)(ptr)
@@ -693,10 +697,12 @@ func ToKVs[TS ~[]T, T, K, V any](elements TS, keysExtractor func(T) []K, valsExt
 	return Flatt(elements, func(e T) []c.KV[K, V] { return convert.ToKVs(e, keysExtractor, valsExtractor) })
 }
 
+// FlattValues transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
 func FlattValues[TS ~[]T, T, V any](elements TS, valsExtractor func(T) []V) []c.KV[T, V] {
 	return Flatt(elements, func(e T) []c.KV[T, V] { return convert.FlattValues(e, valsExtractor) })
 }
 
+// FlattKeys transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
 func FlattKeys[TS ~[]T, T, K any](elements TS, keysExtractor func(T) []K) []c.KV[K, T] {
 	return Flatt(elements, func(e T) []c.KV[K, T] { return convert.FlattKeys(e, keysExtractor) })
 }

@@ -7,7 +7,7 @@ import (
 	"github.com/m4gshm/gollections/break/loop"
 )
 
-// FitIter is the array based Iterator implementation that provides filtering of elements by a Predicate.
+// FiltIter is the array based Iterator implementation that provides filtering of elements by a Predicate.
 type FiltIter[T any] struct {
 	array    unsafe.Pointer
 	elemSize uintptr

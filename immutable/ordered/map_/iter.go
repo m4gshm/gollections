@@ -19,7 +19,7 @@ type Iter[K comparable, V any] struct {
 	uniques  map[K]V
 }
 
-var _ kv.KVIterator[string, any] = (*Iter[string, any])(nil)
+var _ kv.Iterator[string, any] = (*Iter[string, any])(nil)
 
 // Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (i *Iter[K, V]) Track(traker func(key K, value V) error) error {

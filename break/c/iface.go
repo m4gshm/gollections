@@ -1,3 +1,4 @@
+// Package c provides common types and functions
 package c
 
 import "github.com/m4gshm/gollections/c"

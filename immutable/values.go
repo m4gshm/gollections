@@ -25,33 +25,34 @@ type MapValues[K comparable, V any] struct {
 }
 
 var (
-	_ c.Collection[any]                            = (*MapValues[int, any])(nil)
-	_ c.Collection[any]                            = MapValues[int, any]{}
-	_ loop.Looper[any, *map_.NewValIter[int, any]] = (*MapValues[int, any])(nil)
-	_ loop.Looper[any, *map_.NewValIter[int, any]] = MapValues[int, any]{}
-	_ fmt.Stringer                                 = (*MapValues[int, any])(nil)
-	_ fmt.Stringer                                 = MapValues[int, any]{}
+	_ c.Collection[any]                         = (*MapValues[int, any])(nil)
+	_ c.Collection[any]                         = MapValues[int, any]{}
+	_ loop.Looper[any, *map_.ValIter[int, any]] = (*MapValues[int, any])(nil)
+	_ loop.Looper[any, *map_.ValIter[int, any]] = MapValues[int, any]{}
+	_ fmt.Stringer                              = (*MapValues[int, any])(nil)
+	_ fmt.Stringer                              = MapValues[int, any]{}
 )
 
-// Iter creates an iterator
+// Iter creates an iterator and returns as interface
 func (m MapValues[K, V]) Iter() c.Iterator[V] {
 	h := m.Head()
 	return &h
 }
 
-func (m MapValues[K, V]) Loop() *map_.NewValIter[K, V] {
+// Loop creates an iterator and returns as implementation type reference
+func (m MapValues[K, V]) Loop() *map_.ValIter[K, V] {
 	h := m.Head()
 	return &h
 }
 
-// Head creates an iterator value object
-func (m MapValues[K, V]) Head() map_.NewValIter[K, V] {
-	return map_.NewVal(m.elements)
+// Head creates an iterator and returns as implementation type value
+func (m MapValues[K, V]) Head() map_.ValIter[K, V] {
+	return map_.NewValIter(m.elements)
 }
 
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
-func (m MapValues[K, V]) First() (map_.NewValIter[K, V], V, bool) {
+func (m MapValues[K, V]) First() (map_.ValIter[K, V], V, bool) {
 	var (
 		iterator  = m.Head()
 		first, ok = iterator.Next()
@@ -74,6 +75,7 @@ func (m MapValues[K, V]) Slice() []V {
 	return map_.Values(m.elements)
 }
 
+// Append collects the values to the specified 'out' slice
 func (m MapValues[K, V]) Append(out []V) []V {
 	return map_.AppendValues(m.elements, out)
 }
@@ -94,10 +96,10 @@ func (m MapValues[K, V]) Filter(filter func(V) bool) stream.Iter[V] {
 	return stream.New(loop.Filter(h.Next, filter).Next)
 }
 
-// Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function
-func (m MapValues[K, V]) Filt(filter func(V) (bool, error)) breakStream.Iter[V] {
+// Filt returns a breakable stream consisting of elements that satisfy the condition of the 'predicate' function
+func (m MapValues[K, V]) Filt(predicate func(V) (bool, error)) breakStream.Iter[V] {
 	h := m.Head()
-	return breakStream.New(breakLoop.Filt(breakLoop.From(h.Next), filter).Next)
+	return breakStream.New(breakLoop.Filt(breakLoop.From(h.Next), predicate).Next)
 }
 
 // Convert returns a stream that applies the 'converter' function to the collection elements
@@ -105,7 +107,7 @@ func (m MapValues[K, V]) Convert(converter func(V) V) stream.Iter[V] {
 	return collection.Convert(m, converter)
 }
 
-// Convert returns a stream that applies the 'converter' function to the collection elements
+// Conv returns a breakable stream that applies the 'converter' function to the collection elements
 func (m MapValues[K, V]) Conv(converter func(V) (V, error)) breakStream.Iter[V] {
 	return collection.Conv(m, converter)
 }

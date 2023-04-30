@@ -25,7 +25,7 @@ func Conv[From, To any, I c.Iterable[From]](collection I, converter func(From) (
 	return breakStream.New(breakLoop.Conv(breakLoop.From(b.Next), converter).Next)
 }
 
-// FilterAndConvert additionally filters 'From' elements
+// FilterAndConvert returns a stream that filters source elements and converts them
 func FilterAndConvert[From, To any, I c.Iterable[From]](collection I, filter func(From) bool, converter func(From) To) stream.Iter[To] {
 	b := collection.Iter()
 	f := loop.FilterAndConvert(b.Next, filter, converter)
@@ -46,21 +46,21 @@ func Flat[From, To comparable, I c.Iterable[From]](collection I, flattener func(
 	return breakStream.New(f.Next)
 }
 
-// FilterAndFlatt additionally filters 'From' elements
-func FilterAndFlatt[From, To any, I c.Iterable[From]](collection I, filter func(From) bool, flatt func(From) []To) stream.Iter[To] {
+// FilterAndFlatt filters source elements and extracts slices of 'To' by the 'flattener' function
+func FilterAndFlatt[From, To any, I c.Iterable[From]](collection I, filter func(From) bool, flattener func(From) []To) stream.Iter[To] {
 	b := collection.Iter()
-	f := loop.FilterAndFlatt(b.Next, filter, flatt)
+	f := loop.FilterAndFlatt(b.Next, filter, flattener)
 	return stream.New(f.Next)
 }
 
-// Filter instantiates Iterator that checks elements by filters and returns successful ones
+// Filter instantiates an iterator that checks elements by the 'filter' function and returns successful ones
 func Filter[T any, I c.Iterable[T]](collection I, filter func(T) bool) stream.Iter[T] {
 	b := collection.Iter()
 	f := loop.Filter(b.Next, filter)
 	return stream.New(f.Next)
 }
 
-// NotNil instantiates Iterator that filters nullable elements
+// NotNil instantiates an iterator that filters nullable elements
 func NotNil[T any, I c.Iterable[*T]](collection I) stream.Iter[*T] {
 	return Filter(collection, check.NotNil[T])
 }

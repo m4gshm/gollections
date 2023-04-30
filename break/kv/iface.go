@@ -1,3 +1,4 @@
+// Package kv provides key/value types, functions
 package kv
 
 import "github.com/m4gshm/gollections/c"

@@ -9,6 +9,7 @@ import (
 	"github.com/m4gshm/gollections/stream"
 )
 
+// Collection is the base interface for the Vector and the Set impelementations
 type Collection[T any] interface {
 	c.Collection[T]
 	c.Filterable[T, stream.Iter[T], breakStream.Iter[T]]

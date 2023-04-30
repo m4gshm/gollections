@@ -12,8 +12,8 @@ type FitKV[K, V any] struct {
 }
 
 var (
-	_ kv.KVIterator[any, any] = (*FitKV[any, any])(nil)
-	_ kv.KVIterator[any, any] = FitKV[any, any]{}
+	_ kv.Iterator[any, any] = (*FitKV[any, any])(nil)
+	_ kv.Iterator[any, any] = FitKV[any, any]{}
 )
 
 // Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak

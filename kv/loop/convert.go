@@ -5,34 +5,34 @@ import (
 	"github.com/m4gshm/gollections/loop"
 )
 
-// ConvertKVIter is the iterator wrapper implementation applying a converter to all iterable key/value elements.
-type ConvertKVIter[K, V any, K2, V2 any, C func(K, V) (K2, V2)] struct {
+// ConvertIter is the iterator wrapper implementation applying a converter to all iterable key/value elements.
+type ConvertIter[K, V any, K2, V2 any, C func(K, V) (K2, V2)] struct {
 	next func() (K, V, bool)
 	by   C
 }
 
 var (
-	_ kv.KVIterator[any, any] = (*ConvertKVIter[any, any, any, any, func(any, any) (any, any)])(nil)
-	_ kv.KVIterator[any, any] = ConvertKVIter[any, any, any, any, func(any, any) (any, any)]{}
+	_ kv.Iterator[any, any] = (*ConvertIter[any, any, any, any, func(any, any) (any, any)])(nil)
+	_ kv.Iterator[any, any] = ConvertIter[any, any, any, any, func(any, any) (any, any)]{}
 )
 
 // Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak
-func (f ConvertKVIter[K, V, K2, V2, C]) Track(traker func(key K2, value V2) error) error {
-	return loop.Track(f.Next, traker)
+func (i ConvertIter[K, V, K2, V2, C]) Track(traker func(key K2, value V2) error) error {
+	return loop.Track(i.Next, traker)
 }
 
 // TrackEach takes all key, value pairs retrieved by the iterator
-func (f ConvertKVIter[K, V, K2, V2, C]) TrackEach(traker func(key K2, value V2)) {
-	loop.TrackEach(f.Next, traker)
+func (i ConvertIter[K, V, K2, V2, C]) TrackEach(traker func(key K2, value V2)) {
+	loop.TrackEach(i.Next, traker)
 }
 
 // Next returns the next key/value pair.
 // The ok result indicates whether an pair was returned by the iterator.
 // If ok == false, then the iteration must be completed.
-func (c ConvertKVIter[K, V, K2, V2, C]) Next() (k2 K2, v2 V2, ok bool) {
-	if next := c.next; next != nil {
+func (i ConvertIter[K, V, K2, V2, C]) Next() (k2 K2, v2 V2, ok bool) {
+	if next := i.next; next != nil {
 		if K, V, ok := next(); ok {
-			k2, v2 = c.by(K, V)
+			k2, v2 = i.by(K, V)
 			return k2, v2, true
 		}
 	}

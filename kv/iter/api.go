@@ -34,31 +34,31 @@ func FromIter[T, K, V any, I c.Iterator[T]](elements I, keyExtractor func(T) K, 
 }
 
 // Group collects sets of values grouped by keys obtained by passing a key/value iterator
-func Group[K comparable, V any, I kv.KVIterator[K, V]](elements I) map[K][]V {
+func Group[K comparable, V any, I kv.Iterator[K, V]](elements I) map[K][]V {
 	return group.Of(elements.Next)
 }
 
 // Map instantiates key/value iterator that converts elements with a converter and returns them
-func Map[K comparable, V any, KOUT comparable, VOUT any, I kv.KVIterator[K, V]](elements I, by func(K, V) (KOUT, VOUT)) stream.Iter[KOUT, VOUT, map[KOUT]VOUT] {
+func Map[K comparable, V any, KOUT comparable, VOUT any, I kv.Iterator[K, V]](elements I, by func(K, V) (KOUT, VOUT)) stream.Iter[KOUT, VOUT, map[KOUT]VOUT] {
 	return stream.New(kvLoop.Convert(elements.Next, by).Next, kvLoop.ToMap[KOUT, VOUT])
 }
 
 // Filter instantiates key/value iterator that iterates only over filtered elements
-func Filter[K comparable, V any, I kv.KVIterator[K, V]](elements I, filter func(K, V) bool) stream.Iter[K, V, map[K]V] {
+func Filter[K comparable, V any, I kv.Iterator[K, V]](elements I, filter func(K, V) bool) stream.Iter[K, V, map[K]V] {
 	return stream.New(kvLoop.Filter(elements.Next, filter).Next, kvLoop.ToMap[K, V])
 }
 
 // FilterKey instantiates key/value iterator that iterates only over elements that filtered by the key
-func FilterKey[K comparable, V any, I kv.KVIterator[K, V]](elements I, fit func(K) bool) stream.Iter[K, V, map[K]V] {
+func FilterKey[K comparable, V any, I kv.Iterator[K, V]](elements I, fit func(K) bool) stream.Iter[K, V, map[K]V] {
 	return Filter(elements, filter.Key[V](fit))
 }
 
 // FilterValue instantiates key/value iterator that iterates only over elements that filtered by the value
-func FilterValue[K comparable, V any, I kv.KVIterator[K, V]](elements I, fit func(V) bool) stream.Iter[K, V, map[K]V] {
+func FilterValue[K comparable, V any, I kv.Iterator[K, V]](elements I, fit func(V) bool) stream.Iter[K, V, map[K]V] {
 	return Filter(elements, filter.Value[K](fit))
 }
 
 // Reduce reduces keys/value pairs to an one pair
-func Reduce[K comparable, V any, I kv.KVIterator[K, V]](elements I, by c.Quaternary[K, V]) (K, V) {
+func Reduce[K comparable, V any, I kv.Iterator[K, V]](elements I, by c.Quaternary[K, V]) (K, V) {
 	return kvLoop.Reduce(elements.Next, by)
 }

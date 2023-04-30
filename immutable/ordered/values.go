@@ -31,18 +31,19 @@ var (
 	_ fmt.Stringer                              = (*MapValues[int, any])(nil)
 )
 
-// Iter creates an iterator
+// Iter creates an iterator and returns as interface
 func (m MapValues[K, V]) Iter() c.Iterator[V] {
 	h := m.Head()
 	return &h
 }
 
+// Loop creates an iterator and returns as implementation type reference
 func (m MapValues[K, V]) Loop() *omap.ValIter[K, V] {
 	h := m.Head()
 	return &h
 }
 
-// Head creates an iterator value object
+// Head creates an iterator and returns as implementation type value
 func (m MapValues[K, V]) Head() omap.ValIter[K, V] {
 	var (
 		order    []K
@@ -80,6 +81,7 @@ func (m MapValues[K, V]) Slice() (values []V) {
 	return m.Append(values)
 }
 
+// Append collects the values to the specified 'out' slice
 func (m MapValues[K, V]) Append(out []V) (values []V) {
 	for _, key := range m.order {
 		val := m.elements[key]
@@ -116,7 +118,7 @@ func (m MapValues[K, V]) Filter(filter func(V) bool) stream.Iter[V] {
 	return stream.New(loop.Filter(h.Next, filter).Next)
 }
 
-// Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function
+// Filt returns a breakable stream consisting of elements that satisfy the condition of the 'predicate' function
 func (m MapValues[K, V]) Filt(filter func(V) (bool, error)) breakStream.Iter[V] {
 	h := m.Head()
 	return breakStream.New(breakLoop.Filt(breakLoop.From(h.Next), filter).Next)
@@ -127,7 +129,7 @@ func (m MapValues[K, V]) Convert(converter func(V) V) stream.Iter[V] {
 	return collection.Convert(m, converter)
 }
 
-// Convert returns a stream that applies the 'converter' function to the collection elements
+// Conv returns a breakable stream that applies the 'converter' function to the collection elements
 func (m MapValues[K, V]) Conv(converter func(V) (V, error)) breakStream.Iter[V] {
 	return collection.Conv(m, converter)
 }

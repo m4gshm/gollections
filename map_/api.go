@@ -100,7 +100,7 @@ func ConvertValues[V, Vto any, K comparable, M ~map[K]V](elements M, by func(V) 
 	return converted
 }
 
-// Keys makes a slice of map keys
+// Keys returns keys of the 'elements' map as a slice
 func Keys[K comparable, V any, M ~map[K]V](elements M) []K {
 	if elements == nil {
 		return nil
@@ -108,6 +108,7 @@ func Keys[K comparable, V any, M ~map[K]V](elements M) []K {
 	return AppendKeys(elements, make([]K, 0, len(elements)))
 }
 
+// AppendKeys collects keys of the specified 'elements' map into the specified 'out' slice
 func AppendKeys[K comparable, V any, M ~map[K]V](elements M, out []K) []K {
 	for key := range elements {
 		out = append(out, key)
@@ -115,7 +116,7 @@ func AppendKeys[K comparable, V any, M ~map[K]V](elements M, out []K) []K {
 	return out
 }
 
-// Values makes a slice of map values
+// Values returns values of the 'elements' map as a slice
 func Values[V any, K comparable, M ~map[K]V](elements M) []V {
 	if elements == nil {
 		return nil
@@ -123,6 +124,7 @@ func Values[V any, K comparable, M ~map[K]V](elements M) []V {
 	return AppendValues(elements, make([]V, 0, len(elements)))
 }
 
+// AppendValues collects values of the specified 'elements' map into the specified 'out' slice
 func AppendValues[V any, K comparable, M ~map[K]V](elements M, out []V) []V {
 	for _, val := range elements {
 		out = append(out, val)
