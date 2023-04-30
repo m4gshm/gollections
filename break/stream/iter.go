@@ -63,6 +63,11 @@ func (t Iter[T]) Reduce(merger func(T, T) (T, error)) (T, error) {
 	return loop.Reduce(t.next, merger)
 }
 
+// First returns the first element that satisfies the condition of the 'predicate' function
+func (t Iter[T]) First(predicate func(T) (bool, error)) (T, bool, error) {
+	return loop.First(t.next, predicate)
+}
+
 // Iter creates an iterator
 func (t Iter[T]) Iter() Iter[T] {
 	return t

@@ -75,6 +75,11 @@ func (t Iter[T]) Reduce(by func(T, T) T) T {
 	return loop.Reduce(t.next, by)
 }
 
+// First returns the first element that satisfies the condition of the 'predicate' function
+func (t Iter[T]) First(predicate func(T) bool) (T, bool) {
+	return loop.First(t.next, predicate)
+}
+
 // Iter returns as an iterator
 func (t Iter[T]) Iter() c.Iterator[T] {
 	return t
