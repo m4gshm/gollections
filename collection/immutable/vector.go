@@ -14,11 +14,6 @@ import (
 	"github.com/m4gshm/gollections/stream"
 )
 
-// NewVector instantiates Vector and copies elements to it.
-func NewVector[T any](elements []T) Vector[T] {
-	return WrapVector(slice.Clone(elements))
-}
-
 // WrapVector instantiates Vector using a slise as internal storage.
 func WrapVector[T any](elements []T) Vector[T] {
 	return Vector[T]{elements: elements, esize: notsafe.GetTypeSize[T]()}

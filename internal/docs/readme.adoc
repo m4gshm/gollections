@@ -2,15 +2,27 @@
 
 == Gollections
 
-Golang generic containers and functions.
-The main goals are to reduce boilerplate code that uses link:./slice/api.go[slices], link:./map_/api.go[maps],
-and extend functionality with new collection implementations such as an ordered link:./collection/mutable/omap/api.go[ordered map] or link:./collection/mutable/oset/api.go[set].
+This is a development kit aimed at reducing boilerplate code when using link:./slice/api.go[slices], link:./map_/api.go[maps] and 
+extending functionality by new collection implementations such as link:./collection/collection/mutable/omap/api.go[ordered map] or link:./collection/collection/mutable/oset/api.go[set].
 
-Supports Go version 1.20 or higher.
+Supports Go version 1.20.
 
+For example, you want to group some users by their role names converted to lowercase:
 [source,go]
 ----
-include::../examples/boilerplate/slice.go[lines=3..-1]
+include::../examples/boilerplate/user_data.go[lines=3..-1]
+----
+
+You can write code like this:
+[source,go]
+----
+include::../examples/boilerplate/slice_namesbyRole_new.go[lines=13..21]
+----
+
+Or you can make clearer code, more extensive, but without dependencies:
+[source,go]
+----
+include::../examples/boilerplate/slice_namesbyRole_old.go[lines=11..33]
 ----
 
 === Installation
@@ -29,49 +41,71 @@ go get -u github.com/m4gshm/gollections@HEAD
 
 === Main packages
 
-==== Slices - link:./slice/api.go[github.com/m4gshm/gollections/slice]
+==== link:./slice/api.go[slice]
 
 The package provides helper subpackages and functions for using with slices. +
 Most helpers organized as pair of a main function and short aliases in a subpackage. For example the function link:./slice/api.go#L247[slice.SortByOrdered] has aliases link:./slice/sort/api.go#L12[sort.By] and link:./slice/sort/api.go#L23[sort.Of].
 
 Usage examples link:./internal/examples/sliceexamples/slice_examples_test.go[here].
 
-==== Maps - link:./map_/api.go[github.com/m4gshm/gollections/map_]
+==== link:./map_/api.go[map_]
 
 The package provides helper subpackages and functions for using with maps. +
 
 Usage examples link:./internal/examples/mapexamples/map_examples_test.go[here].
 
-==== Loops - link:./loop/api.go[loop], link:./kv/loop/api.go[kv/loop]
+==== link:./loop/api.go[loop], link:./kv/loop/api.go[kv/loop] and breakable versions link:./break/loop/api.go[break/loop], link:./break/kv/loop/api.go[break/kv/loop]
 
 TODO
 
-==== Mutable containers
+==== link:./collection/mutable/api.go[mutable] and link:./collection/immutable/api.go[immutable] collections
+
+TODO
+
+TODO
+
+==== link:./predicate/api.go[predicate] and breakable link:./predicate/api.go[break/predicate]
+
+TODO
+
+==== Short aliases for collection constructors
+
+TODO
+
+==== Mutable collections
 
 Supports write operations (append, delete, replace).
 
-  * link:./mutable/vector/api.go[Vector] - the simplest based on built-in slice collection.
-  * link:./mutable/set/api.go[Set] - collection of unique items, prevents duplicates.
-  * link:./mutable/map_/api.go[Map] - built-in map wrapper that supports link:#container-functions[container functions].
-  * link:./mutable/oset/api.go[OrderedSet] - collection of unique items, prevents duplicates, provides iteration in order of addition.
-  * link:./mutable/omap/api.go[OrderedMap] - same as the link:./mutable/map_/api.go[Map], but supports iteration in the order in which elements are added.
-  * link:./mutable/sync/map.go[sync.Map] - generic wrapper of built-in embedded sync.Map.
+  * link:./collection/mutable/vector/api.go[Vector] - the simplest based on built-in slice collection.
+[source,go]
+----
+include::../examples/collection/mutable/vector.go[lines=10..11]
+----
+  * link:./collection/mutable/set/api.go[Set] - collection of unique items, prevents duplicates.
+[source,go]
+----
+include::../examples/collection/mutable/set.go[lines=10..11]
+----
+  * link:./collection/mutable/map_/api.go[Map] - built-in map wrapper that supports link:#container-functions[container functions].
+[source,go]
+----
+include::../examples/collection/mutable/map.go[lines=11..12]
+----
+  * link:./collection/mutable/oset/api.go[OrderedSet] - collection of unique items, prevents duplicates, provides iteration in order of addition.
+[source,go]
+----
+include::../examples/collection/mutable/oset.go[lines=10..11]
+----
+  * link:./collection/mutable/omap/api.go[OrderedMap] - same as the link:./collection/mutable/map_/api.go[Map], but supports iteration in the order in which elements are added.
+----
+include::../examples/collection/mutable/omap.go[lines=11..12]
+----
 
 ==== Immutable containers
 
 The same interfaces as in the mutable package but for read-only purposes.
 
 ==== Containers creating
-
-===== Immutable
-
-[source,go]
-----
-include::../examples/constructors.go[]
-----
-
-where link:./immutable/vector/api.go[vector], link:./immutable/set/api.go[set], link:./immutable/oset/api.go[oset], link:./immutable/map_/api.go[map_], link:./immutable/omap/api.go[omap] are packages from link:./immutable/[github.com/m4gshm/gollections/collection/immutable] and link:./k/v.go[k.V] is the method V from the package link:./k/[k]
-
 ===== Mutable
 
 [source,go]
@@ -79,13 +113,13 @@ where link:./immutable/vector/api.go[vector], link:./immutable/set/api.go[set], 
 include::../examples/constructors_mutable.go[]
 ----
 
-where link:./mutable/vector/api.go[vector], link:./mutable/set/api.go[set], link:./mutable/oset/api.go[oset], link:./mutable/map_/api.go[map_], link:./mutable/omap/api.go[omap] are packages from link:./mutable/[github.com/m4gshm/gollections/collection/mutable] and link:./k/v.go[k.V] is the method V from the package link:./k/[k]
+where link:./collection/mutable/vector/api.go[vector], link:./collection/mutable/set/api.go[set], link:./collection/mutable/oset/api.go[oset], link:./collection/mutable/map_/api.go[map_], link:./collection/mutable/omap/api.go[omap] are packages from link:./collection/mutable/[github.com/m4gshm/gollections/collection/mutable] and link:./k/v.go[k.V] is the method V from the package link:./k/[k]
 
 === Stream functions
 
 There are three groups of operations:
 
-* Immediate - retrieves the result in place (link:./immutable/vector.go#L112[Sort], link:./immutable/vector.go#L107[Reduce] (of containers), link:./immutable/vector.go#L81[Track], link:./immutable/ordered/map.go#L136[TrackEach], link:./immutable/vector.go#L89[For], link:./immutable/ordered/map.go#L144[ForEach])
+* Immediate - retrieves the result in place (link:./collection/immutable/vector.go#L112[Sort], link:./collection/immutable/vector.go#L107[Reduce] (of containers), link:./collection/immutable/vector.go#L81[Track], link:./collection/immutable/ordered/map.go#L136[TrackEach], link:./collection/immutable/vector.go#L89[For], link:./collection/immutable/ordered/map.go#L144[ForEach])
 * Intermediate - only defines a computation (link:./it/api.go#L17[Wrap], link:./c/op/api.go#L11[Map], link:./c/op/api.go#L21[Flatt], link:./c/op/api.go#L33[Filter], link:./c/op/api.go#L53[Group]).
 * Final - applies intermediates and retrieves a result (link:./it/api.go#L75[ForEach], link:./it/api.go#L65[Slice], link:./it/api.go#L55[Reduce] (of iterators))
 

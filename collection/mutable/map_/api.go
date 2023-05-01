@@ -19,7 +19,7 @@ func Empty[K comparable, V any]() *mutable.Map[K, V] {
 
 // New instantiates a Map with a predefined capacity.
 func New[K comparable, V any](capacity int) *mutable.Map[K, V] {
-	return mutable.NewMap[K, V](capacity)
+	return mutable.NewMapCap[K, V](capacity)
 }
 
 // From instantiates a map with elements obtained by passing the 'loop' function

@@ -15,24 +15,6 @@ import (
 	"github.com/m4gshm/gollections/stream"
 )
 
-// NewSet instantiates Set and copies elements to it.
-func NewSet[T comparable](elements []T) *Set[T] {
-	var (
-		l       = len(elements)
-		uniques = make(map[T]int, l)
-		order   = make([]T, 0, l)
-	)
-	pos := 0
-	for _, e := range elements {
-		if _, ok := uniques[e]; !ok {
-			order = append(order, e)
-			uniques[e] = pos
-			pos++
-		}
-	}
-	return WrapSet(order, uniques)
-}
-
 // SetFromLoop creates a set with elements retrieved converter the 'next' function.
 // The next returns an element with true or zero value with false if there are no more elements.
 func SetFromLoop[T comparable](next func() (T, bool)) *Set[T] {

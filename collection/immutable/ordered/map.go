@@ -19,7 +19,6 @@ import (
 	"github.com/m4gshm/gollections/map_/filter"
 	"github.com/m4gshm/gollections/notsafe"
 	"github.com/m4gshm/gollections/slice"
-	"github.com/m4gshm/gollections/slice/clone"
 )
 
 // NewMapKV converts a slice of key/value pairs to the Map.
@@ -38,15 +37,6 @@ func NewMapKV[K comparable, V any](elements []c.KV[K, V]) Map[K, V] {
 		}
 	}
 	return WrapMap(order, uniques)
-}
-
-// NewMap instantiates Map populated by the 'elements' map key/values
-func NewMap[K comparable, V any](order []K, elements map[K]V) Map[K, V] {
-	uniques := make(map[K]V, len(elements))
-	for _, key := range order {
-		uniques[key] = elements[key]
-	}
-	return WrapMap(clone.Of(order), uniques)
 }
 
 // WrapMap instantiates ordered Map using a map and an order slice as internal storage.

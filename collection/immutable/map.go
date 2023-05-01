@@ -20,24 +20,6 @@ import (
 	"github.com/m4gshm/gollections/slice"
 )
 
-// ConvertKVsToMap converts a slice of key/value pairs to the Map.
-func ConvertKVsToMap[K comparable, V any](elements []c.KV[K, V]) Map[K, V] {
-	uniques := make(map[K]V, len(elements))
-	for _, kv := range elements {
-		uniques[kv.Key()] = kv.Value()
-	}
-	return WrapMap(uniques)
-}
-
-// NewMap instantiates Map populated by the 'elements' map key/values
-func NewMap[K comparable, V any](elements map[K]V) Map[K, V] {
-	uniques := make(map[K]V, len(elements))
-	for key, val := range elements {
-		uniques[key] = val
-	}
-	return WrapMap(uniques)
-}
-
 // WrapMap instantiates Map using a map as internal storage.
 func WrapMap[K comparable, V any](elements map[K]V) Map[K, V] {
 	return Map[K, V]{elements: elements}

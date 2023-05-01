@@ -14,6 +14,7 @@ import (
 	"github.com/m4gshm/gollections/slice/convert"
 	"github.com/m4gshm/gollections/slice/group"
 	sliceIter "github.com/m4gshm/gollections/slice/iter"
+	"github.com/m4gshm/gollections/slice/stream"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -85,25 +86,25 @@ func Test_GroupBySeveralKeysAndConvertMapValues(t *testing.T) {
 }
 
 func Test_FindFirsManager(t *testing.T) {
-	// hasManager:=stream.Convert[User](Role.Name).HasAny(eq.To("Manager"))
-	//new
 	alice, ok := slice.First(users, func(user User) bool {
-		// return hasManager(user.Roles())
-		return set.Convert(set.New(user.Roles()), Role.Name).HasAny(eq.To("Manager"))
+		return stream.Convert(user.Roles(), Role.Name).HasAny(eq.To("Manager"))
 	})
 
 	assert.True(t, ok)
 	assert.Equal(t, "Alice", alice.Name())
 
 	//plain old
-	legacyAlice := User{}
-	for _, u := range users {
+	var legacyAlice *User
+	userLoop: for _, u := range users {
 		for _, r := range u.Roles() {
 			if r.Name() == "Manager" {
-				legacyAlice = u
+				legacyAlice = &u
+				break userLoop
 			}
 		}
 	}
+	ok = legacyAlice != nil
+	assert.True(t, ok)
 	assert.Equal(t, "Alice", legacyAlice.Name())
 }
 

@@ -18,25 +18,6 @@ import (
 	"github.com/m4gshm/gollections/map_/filter"
 )
 
-// NewMap instantiates Map with a predefined capacity.
-func NewMap[K comparable, V any](capacity int) *Map[K, V] {
-	return WrapMap(make(map[K]V, capacity))
-}
-
-// NewMapKV converts a slice of key/value pairs into a Map instance.
-func NewMapKV[K comparable, V any](elements []c.KV[K, V]) *Map[K, V] {
-	return WrapMap(map_.Of(elements...))
-}
-
-// ToMap instantiates Map and copies elements to it.
-func ToMap[K comparable, V any](elements map[K]V) *Map[K, V] {
-	uniques := make(map[K]V, len(elements))
-	for key, val := range elements {
-		uniques[key] = val
-	}
-	return WrapMap(uniques)
-}
-
 // WrapMap instantiates Map using a map as internal storage.
 func WrapMap[K comparable, V any](elements map[K]V) *Map[K, V] {
 	m := Map[K, V](elements)

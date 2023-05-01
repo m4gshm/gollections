@@ -14,18 +14,6 @@ import (
 	"github.com/m4gshm/gollections/stream"
 )
 
-// NewSet instantiates Set and copies elements to it.
-func NewSet[T comparable](elements []T) Set[T] {
-	var (
-		uniques = map[T]struct{}{}
-		order   []T
-	)
-	for _, e := range elements {
-		order = add(e, uniques, order)
-	}
-	return WrapSet(order, uniques)
-}
-
 // WrapSet creates a set using a map and an order slice as the internal storage.
 func WrapSet[T comparable](order []T, elements map[T]struct{}) Set[T] {
 	return Set[T]{order: order, elements: elements, esize: notsafe.GetTypeSize[T]()}

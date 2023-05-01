@@ -14,16 +14,6 @@ import (
 	"github.com/m4gshm/gollections/stream"
 )
 
-// NewVectorCap instantiates Vector with a predefined capacity
-func NewVectorCap[T any](capacity int) *Vector[T] {
-	return WrapVector(make([]T, 0, capacity))
-}
-
-// NewVector instantiates Vector based on copy of elements slice
-func NewVector[T any](elements []T) *Vector[T] {
-	return WrapVector(slice.Clone(elements))
-}
-
 // WrapVector instantiates Vector using a slise as internal storage
 func WrapVector[T any](elements []T) *Vector[T] {
 	v := Vector[T](elements)

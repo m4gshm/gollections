@@ -9,7 +9,7 @@ import (
 
 // Of instantiates a ap from the specified key/value pairs
 func Of[K comparable, V any](elements ...c.KV[K, V]) immutable.Map[K, V] {
-	return immutable.ConvertKVsToMap(elements)
+	return immutable.NewMapKV(elements)
 }
 
 // New instantiates Map and copies elements to it

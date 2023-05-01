@@ -1,15 +1,60 @@
 # Gollections
 
-Golang generic containers and functions. The main goals are to reduce
-boilerplate code that uses [slices](./slice/api.go),
-[maps](./map_/api.go), and extend functionality with new collection
-implementations such as an ordered [ordered
-map](./collection/mutable/omap/api.go) or
-[set](./collection/mutable/oset/api.go).
+This is a development kit aimed at reducing boilerplate code when using
+[slices](./slice/api.go), [maps](./map_/api.go) and extending
+functionality by new collection implementations such as [ordered
+map](./collection/collection/mutable/omap/api.go) or
+[set](./collection/collection/mutable/oset/api.go).
 
-Supports Go version 1.20 or higher.
+Supports Go version 1.20.
+
+For example, you want to group some users by their role names converted
+to lowercase:
 
 ``` go
+var users = []User{
+    {name: "Bob", age: 26, roles: []Role{{"Admin"}, {"manager"}}},
+    {name: "Alice", age: 35, roles: []Role{{"Manager"}}},
+    {name: "Tom", age: 18},
+}
+```
+
+You can write code like this:
+
+``` go
+   var namesByRole = group.ByMultipleKeys(users, func(u User) []string {
+        return convert.AndConvert(u.Roles(), Role.Name, strings.ToLower)
+    }, User.Name)
+
+    assert.Equal(t, namesByRole[""], []string{"Tom"})
+    assert.Equal(t, namesByRole["manager"], []string{"Bob", "Alice"})
+    assert.Equal(t, namesByRole["admin"], []string{"Bob"})
+```
+
+Or you can make clearer code, more extensive, but without dependencies:
+
+``` go
+   namesByRole := map[string][]string{}
+    for _, u := range users {
+        roles := u.Roles()
+        if len(roles) == 0 {
+            lr := ""
+            names := namesByRole[lr]
+            names = append(names, u.Name())
+            namesByRole[lr] = names
+        } else {
+            for _, r := range roles {
+                lr := strings.ToLower(r.Name())
+                names := namesByRole[lr]
+                names = append(names, u.Name())
+                namesByRole[lr] = names
+            }
+        }
+    }
+
+    assert.Equal(t, namesByRole[""], []string{"Tom"})
+    assert.Equal(t, namesByRole["manager"], []string{"Bob", "Alice"})
+    assert.Equal(t, namesByRole["admin"], []string{"Bob"})
 ```
 
 ## Installation
@@ -26,7 +71,7 @@ go get -u github.com/m4gshm/gollections@HEAD
 
 ## Main packages
 
-### Slices - [github.com/m4gshm/gollections/slice](./slice/api.go)
+### [slice](./slice/api.go)
 
 The package provides helper subpackages and functions for using with
 slices.  
@@ -39,7 +84,7 @@ subpackage. For example the function
 Usage examples
 [here](./internal/examples/sliceexamples/slice_examples_test.go).
 
-### Maps - [github.com/m4gshm/gollections/map\_](./map_/api.go)
+### [map\_](./map_/api.go)
 
 The package provides helper subpackages and functions for using with
 maps.  
@@ -47,32 +92,68 @@ maps.
 Usage examples
 [here](./internal/examples/mapexamples/map_examples_test.go).
 
-### Loops - [loop](./loop/api.go), [kv/loop](./kv/loop/api.go)
+### [loop](./loop/api.go), [kv/loop](./kv/loop/api.go) and breakable versions [break/loop](./break/loop/api.go), [break/kv/loop](./break/kv/loop/api.go)
 
 TODO
 
-### Mutable containers
+### [mutable](./collection/mutable/api.go) and [immutable](./collection/immutable/api.go) collections
+
+TODO
+
+TODO
+
+### [predicate](./predicate/api.go) and breakable [break/predicate](./predicate/api.go)
+
+TODO
+
+### Short aliases for collection constructors
+
+TODO
+
+### Mutable collections
 
 Supports write operations (append, delete, replace).
 
-- [Vector](./mutable/vector/api.go) - the simplest based on built-in
-  slice collection.
+- [Vector](./collection/mutable/vector/api.go) - the simplest based on
+  built-in slice collection.
 
-- [Set](./mutable/set/api.go) - collection of unique items, prevents
-  duplicates.
+<!-- -->
 
-- [Map](./mutable/map_/api.go) - built-in map wrapper that supports
-  [container functions](#container-functions).
+        _ immutable.Vector[int]  = vector.Of(1, 2, 3)
+        _ collection.Vector[int] = immutable.NewVector([]int{1, 2, 3})
 
-- [OrderedSet](./mutable/oset/api.go) - collection of unique items,
-  prevents duplicates, provides iteration in order of addition.
+- [Set](./collection/mutable/set/api.go) - collection of unique items,
+  prevents duplicates.
 
-- [OrderedMap](./mutable/omap/api.go) - same as the
-  [Map](./mutable/map_/api.go), but supports iteration in the order in
-  which elements are added.
+<!-- -->
 
-- [sync.Map](./mutable/sync/map.go) - generic wrapper of built-in
-  embedded sync.Map.
+        _ immutable.Set[int]  = set.Of(1, 2, 3)
+        _ collection.Set[int] = immutable.NewSet([]int{1, 2, 3})
+
+- [Map](./collection/mutable/map_/api.go) - built-in map wrapper that
+  supports [container functions](#container-functions).
+
+<!-- -->
+
+        _ immutable.Map[int, string]  = map_.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
+        _ collection.Map[int, string] = immutable.NewMap(map[int]string{1: "2", 2: "2", 3: "3"})
+
+- [OrderedSet](./collection/mutable/oset/api.go) - collection of unique
+  items, prevents duplicates, provides iteration in order of addition.
+
+<!-- -->
+
+        _ ordered.Set[int]    = oset.Of(1, 2, 3)
+        _ collection.Set[int] = ordered.NewSet([]int{1, 2, 3})
+
+- [OrderedMap](./collection/mutable/omap/api.go) - same as the
+  [Map](./collection/mutable/map_/api.go), but supports iteration in the
+  order in which elements are added.
+
+<!-- -->
+
+        _ *ordered.Map[int, string]    = omap.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
+        _ collection.Map[int, string] = ordered.NewMap(
 
 ### Immutable containers
 
@@ -80,57 +161,6 @@ The same interfaces as in the mutable package but for read-only
 purposes.
 
 ### Containers creating
-
-#### Immutable
-
-``` go
-// Package examples of collection constructors
-package examples
-
-import (
-    "github.com/m4gshm/gollections/collection"
-    "github.com/m4gshm/gollections/collection/immutable"
-    imap "github.com/m4gshm/gollections/collection/immutable/map_"
-    "github.com/m4gshm/gollections/collection/immutable/omap"
-    "github.com/m4gshm/gollections/collection/immutable/ordered"
-    "github.com/m4gshm/gollections/collection/immutable/oset"
-    "github.com/m4gshm/gollections/collection/immutable/set"
-    "github.com/m4gshm/gollections/collection/immutable/vector"
-    "github.com/m4gshm/gollections/k"
-)
-
-func _() {
-    var (
-        _ immutable.Vector[int]  = vector.Of(1, 2, 3)
-        _ collection.Vector[int] = vector.New([]int{1, 2, 3})
-    )
-    var (
-        _ immutable.Set[int]  = set.Of(1, 2, 3)
-        _ collection.Set[int] = set.New([]int{1, 2, 3})
-    )
-    var (
-        _ ordered.Set[int]    = oset.Of(1, 2, 3)
-        _ collection.Set[int] = oset.New([]int{1, 2, 3})
-    )
-    var (
-        _ immutable.Map[int, string]  = imap.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
-        _ collection.Map[int, string] = imap.New(map[int]string{1: "2", 2: "2", 3: "3"})
-    )
-    var (
-        _ ordered.Map[int, string]    = omap.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
-        _ collection.Map[int, string] = omap.New(
-            /*uniques*/ map[int]string{1: "2", 2: "2", 3: "3"} /*order*/, []int{3, 1, 2},
-        )
-    )
-}
-```
-
-where [vector](./immutable/vector/api.go),
-[set](./immutable/set/api.go), [oset](./immutable/oset/api.go),
-[map\_](./immutable/map_/api.go), [omap](./immutable/omap/api.go) are
-packages from
-[github.com/m4gshm/gollections/collection/immutable](./immutable/) and
-[k.V](./k/v.go) is the method V from the package [k](./k/)
 
 #### Mutable
 
@@ -185,23 +215,25 @@ func _() {
 }
 ```
 
-where [vector](./mutable/vector/api.go), [set](./mutable/set/api.go),
-[oset](./mutable/oset/api.go), [map\_](./mutable/map_/api.go),
-[omap](./mutable/omap/api.go) are packages from
-[github.com/m4gshm/gollections/collection/mutable](./mutable/) and
-[k.V](./k/v.go) is the method V from the package [k](./k/)
+where [vector](./collection/mutable/vector/api.go),
+[set](./collection/mutable/set/api.go),
+[oset](./collection/mutable/oset/api.go),
+[map\_](./collection/mutable/map_/api.go),
+[omap](./collection/mutable/omap/api.go) are packages from
+[github.com/m4gshm/gollections/collection/mutable](./collection/mutable/)
+and [k.V](./k/v.go) is the method V from the package [k](./k/)
 
 ## Stream functions
 
 There are three groups of operations:
 
 - Immediate - retrieves the result in place
-  ([Sort](./immutable/vector.go#L112),
-  [Reduce](./immutable/vector.go#L107) (of containers),
-  [Track](./immutable/vector.go#L81),
-  [TrackEach](./immutable/ordered/map.go#L136),
-  [For](./immutable/vector.go#L89),
-  [ForEach](./immutable/ordered/map.go#L144))
+  ([Sort](./collection/immutable/vector.go#L112),
+  [Reduce](./collection/immutable/vector.go#L107) (of containers),
+  [Track](./collection/immutable/vector.go#L81),
+  [TrackEach](./collection/immutable/ordered/map.go#L136),
+  [For](./collection/immutable/vector.go#L89),
+  [ForEach](./collection/immutable/ordered/map.go#L144))
 
 - Intermediate - only defines a computation ([Wrap](./it/api.go#L17),
   [Map](./c/op/api.go#L11), [Flatt](./c/op/api.go#L21),
