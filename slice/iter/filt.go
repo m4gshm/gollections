@@ -26,7 +26,7 @@ func (f *FiltIter[T]) For(walker func(element T) error) error {
 // The ok result indicates whether the element was returned by the iterator.
 // If ok == false, then the iteration must be completed.
 func (f *FiltIter[T]) Next() (T, bool, error) {
-	return nextFiltered(f.array, f.size, f.elemSize, f.filter, &f.i)
+	return nextFilt(f.array, f.size, f.elemSize, f.filter, &f.i)
 }
 
 // Cap returns the iterator capacity

@@ -95,7 +95,8 @@ func Test_FindFirsManager(t *testing.T) {
 
 	//plain old
 	var legacyAlice *User
-	userLoop: for _, u := range users {
+userLoop:
+	for _, u := range users {
 		for _, r := range u.Roles() {
 			if r.Name() == "Manager" {
 				legacyAlice = &u

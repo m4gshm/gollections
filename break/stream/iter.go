@@ -77,7 +77,7 @@ func (t Iter[T]) Iter() Iter[T] {
 
 // Slice collects the elements to a slice
 func (t Iter[T]) Slice() ([]T, error) {
-	return loop.ToSlice(t.next)
+	return loop.Slice(t.next)
 }
 
 // HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful

@@ -6,24 +6,24 @@ import (
 	"github.com/m4gshm/gollections/slice"
 )
 
-// KeyValuer is the Iterator wrapper that converts an element to a key\value pair and iterates over these pairs
-type KeyValuer[T, K, V any] struct {
+// KeyValIter is the Iterator wrapper that converts an element to a key\value pair and iterates over these pairs
+type KeyValIter[T, K, V any] struct {
 	iter         slice.Iter[T]
 	keyExtractor func(T) (K, error)
 	valExtractor func(T) (V, error)
 }
 
-var _ kv.Iterator[int, string] = (*KeyValuer[any, int, string])(nil)
+var _ kv.Iterator[int, string] = (*KeyValIter[any, int, string])(nil)
 
 // Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak
-func (kv KeyValuer[T, K, V]) Track(traker func(key K, value V) error) error {
+func (kv KeyValIter[T, K, V]) Track(traker func(key K, value V) error) error {
 	return loop.Track(kv.Next, traker)
 }
 
 // Next returns the next element.
 // The ok result indicates whether the element was returned by the iterator.
 // If ok == false, then the iteration must be completed.
-func (kv *KeyValuer[T, K, V]) Next() (key K, value V, ok bool, err error) {
+func (kv *KeyValIter[T, K, V]) Next() (key K, value V, ok bool, err error) {
 	next := kv.iter.Next
 	if elem, nextOk := next(); nextOk {
 		key, err = kv.keyExtractor(elem)
@@ -35,8 +35,8 @@ func (kv *KeyValuer[T, K, V]) Next() (key K, value V, ok bool, err error) {
 	return key, value, ok, err
 }
 
-// MultipleKeyValuer is the Iterator wrapper that converts an element to a key\value pair and iterates over these pairs
-type MultipleKeyValuer[T, K, V any] struct {
+// MultipleKeyValIter is the Iterator wrapper that converts an element to a key\value pair and iterates over these pairs
+type MultipleKeyValIter[T, K, V any] struct {
 	iter          slice.Iter[T]
 	keysExtractor func(T) ([]K, error)
 	valsExtractor func(T) ([]V, error)
@@ -45,17 +45,17 @@ type MultipleKeyValuer[T, K, V any] struct {
 	ki, vi        int
 }
 
-var _ kv.Iterator[int, string] = (*MultipleKeyValuer[any, int, string])(nil)
+var _ kv.Iterator[int, string] = (*MultipleKeyValIter[any, int, string])(nil)
 
 // Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak
-func (kv *MultipleKeyValuer[T, K, V]) Track(traker func(key K, value V) error) error {
+func (kv *MultipleKeyValIter[T, K, V]) Track(traker func(key K, value V) error) error {
 	return loop.Track(kv.Next, traker)
 }
 
 // Next returns the next element.
 // The ok result indicates whether the element was returned by the iterator.
 // If ok == false, then the iteration must be completed.
-func (kv *MultipleKeyValuer[T, K, V]) Next() (key K, value V, ok bool, err error) {
+func (kv *MultipleKeyValIter[T, K, V]) Next() (key K, value V, ok bool, err error) {
 	if kv != nil {
 		next := kv.iter.Next
 		for !ok {

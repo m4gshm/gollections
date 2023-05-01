@@ -88,15 +88,23 @@ Usage examples
 [here](./internal/examples/sliceexamples/slice_examples_test.go) and
 [here](./internal/examples/mapexamples/map_examples_test.go).
 
+### [mutable](./collection/mutable/api.go) and [immutable](./collection/immutable/api.go) collections
+
+Provides implelentations of [Vector](./collection/iface.go#L25),
+[Set](./collection/iface.go#L35) and [Map](./collection/iface.go#L41).
+
+Mutables support content appending, updating and deleting (the ordered
+map implementation is not supported delete operations). Immutables are
+read-only datasets.
+
+Detailed description of implementations below.
+
 ### [predicate](./predicate/api.go) and breakable [break/predicate](./predicate/api.go)
 
-TODO
+Provides predicate builder api that used for filtering collection
+elements.
 
 ### [loop](./loop/api.go), [kv/loop](./kv/loop/api.go) and breakable versions [break/loop](./break/loop/api.go), [break/kv/loop](./break/kv/loop/api.go)
-
-TODO
-
-### [mutable](./collection/mutable/api.go) and [immutable](./collection/immutable/api.go) collections
 
 TODO
 

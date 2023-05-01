@@ -42,7 +42,7 @@ func Test_Sum(t *testing.T) {
 func Test_Convert(t *testing.T) {
 	s := loop.Of(1, 3, 5, 7, 9, 11)
 	r := breakLoop.Convert(breakLoop.From(s), strconv.Itoa)
-	o, _ := breakLoop.ToSlice(r.Next)
+	o, _ := breakLoop.Slice(r.Next)
 	assert.Equal(t, []string{"1", "3", "5", "7", "9", "11"}, o)
 }
 
@@ -87,14 +87,14 @@ var even = func(v int) bool { return v%2 == 0 }
 func Test_ConvertFiltered(t *testing.T) {
 	s := loop.Of(1, 3, 4, 5, 7, 8, 9, 11)
 	r := breakLoop.FilterAndConvert(breakLoop.From(s), even, strconv.Itoa)
-	o, _ := breakLoop.ToSlice(r.Next)
+	o, _ := breakLoop.Slice(r.Next)
 	assert.Equal(t, []string{"4", "8"}, o)
 }
 
 func Test_ConvertFilteredInplace(t *testing.T) {
 	s := loop.Of(1, 3, 4, 5, 7, 8, 9, 11)
 	r := breakLoop.ConvCheck(breakLoop.From(s), func(i int) (string, bool, error) { return strconv.Itoa(i), even(i), nil })
-	o, _ := breakLoop.ToSlice(r.Next)
+	o, _ := breakLoop.Slice(r.Next)
 	assert.Equal(t, []string{"4", "8"}, o)
 }
 
@@ -102,7 +102,7 @@ func Test_Flatt(t *testing.T) {
 	md := loop.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...)
 	f := breakLoop.Flatt(breakLoop.From(md), as.Is[[]int])
 	e := []int{1, 2, 3, 4, 5, 6}
-	o, _ := breakLoop.ToSlice(f.Next)
+	o, _ := breakLoop.Slice(f.Next)
 	assert.Equal(t, e, o)
 }
 
@@ -110,7 +110,7 @@ func Test_FlattFilter(t *testing.T) {
 	md := loop.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...)
 	f := breakLoop.FilterAndFlatt(breakLoop.From(md), func(from []int) bool { return len(from) > 1 }, as.Is[[]int])
 	e := []int{1, 2, 3, 5, 6}
-	o, _ := breakLoop.ToSlice(f.Next)
+	o, _ := breakLoop.Slice(f.Next)
 	assert.Equal(t, e, o)
 }
 
@@ -118,7 +118,7 @@ func Test_FlattElemFilter(t *testing.T) {
 	md := loop.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...)
 	f := breakLoop.FlattAndFilter(breakLoop.From(md), as.Is[[]int], even)
 	e := []int{2, 4, 6}
-	o, _ := breakLoop.ToSlice(f.Next)
+	o, _ := breakLoop.Slice(f.Next)
 	assert.Equal(t, e, o)
 }
 
@@ -126,7 +126,7 @@ func Test_FilterAndFlattFit(t *testing.T) {
 	md := loop.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...)
 	f := breakLoop.FilterFlattFilter(breakLoop.From(md), func(from []int) bool { return len(from) > 1 }, as.Is[[]int], even)
 	e := []int{2, 6}
-	o, _ := breakLoop.ToSlice(f.Next)
+	o, _ := breakLoop.Slice(f.Next)
 	assert.Equal(t, e, o)
 }
 
@@ -134,13 +134,13 @@ func Test_Filter(t *testing.T) {
 	s := loop.Of(1, 3, 4, 5, 7, 8, 9, 11)
 	f := breakLoop.Filter(breakLoop.From(s), even)
 	e := []int{4, 8}
-	o, _ := breakLoop.ToSlice(f.Next)
+	o, _ := breakLoop.Slice(f.Next)
 	assert.Equal(t, e, o)
 }
 
 func Test_Filtering(t *testing.T) {
 	r := breakLoop.Filt(breakLoop.From(loop.Of(1, 2, 3, 4, 5, 6)), func(i int) (bool, error) { return i%2 == 0, nil })
-	o, _ := breakLoop.ToSlice(r.Next)
+	o, _ := breakLoop.Slice(r.Next)
 	assert.Equal(t, []int{2, 4, 6}, o)
 }
 

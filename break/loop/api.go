@@ -86,8 +86,8 @@ func Track[I, T any](next func() (I, T, bool, error), tracker func(I, T) error) 
 	}
 }
 
-// ToSlice collects the elements retrieved by the 'next' function into a slice
-func ToSlice[T any](next func() (T, bool, error)) (out []T, err error) {
+// Slice collects the elements retrieved by the 'next' function into a slice
+func Slice[T any](next func() (T, bool, error)) (out []T, err error) {
 	for {
 		v, ok, err := next()
 		if err != nil || !ok {

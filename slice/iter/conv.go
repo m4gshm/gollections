@@ -33,7 +33,7 @@ func (i *ConvFitIter[From, To]) Next() (t To, ok bool, err error) {
 		return t, false, nil
 	}
 	next := func() (out From, ok bool, err error) {
-		return nextFiltered(i.array, i.size, i.elemSize, i.filterFrom, &i.i)
+		return nextFilt(i.array, i.size, i.elemSize, i.filterFrom, &i.i)
 	}
 	for {
 		if v, ok, err := next(); err != nil || !ok {
@@ -53,25 +53,25 @@ func (i *ConvFitIter[From, To]) Cap() int {
 	return i.size
 }
 
-// ConvertIter is the array based Iterator thath provides converting of elements by a ConvertIter.
-type ConvertIter[From, To any] struct {
+// ConvIter is the array based Iterator thath provides converting of elements by a ConvIter.
+type ConvIter[From, To any] struct {
 	array     unsafe.Pointer
 	elemSize  uintptr
 	size, i   int
 	converter func(From) (To, error)
 }
 
-var _ c.Iterator[any] = (*ConvertIter[any, any])(nil)
+var _ c.Iterator[any] = (*ConvIter[any, any])(nil)
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
-func (i *ConvertIter[From, To]) For(walker func(element To) error) error {
+func (i *ConvIter[From, To]) For(walker func(element To) error) error {
 	return loop.For(i.Next, walker)
 }
 
 // Next returns the next element.
 // The ok result indicates whether the element was returned by the iterator.
 // If ok == false, then the iteration must be completed.
-func (i *ConvertIter[From, To]) Next() (t To, ok bool, err error) {
+func (i *ConvIter[From, To]) Next() (t To, ok bool, err error) {
 	if i.i < i.size {
 		v := *(*From)(notsafe.GetArrayElemRef(i.array, i.i, i.elemSize))
 		i.i++
@@ -82,11 +82,11 @@ func (i *ConvertIter[From, To]) Next() (t To, ok bool, err error) {
 }
 
 // Cap returns the iterator capacity
-func (i *ConvertIter[From, To]) Cap() int {
+func (i *ConvIter[From, To]) Cap() int {
 	return i.size
 }
 
-func nextFiltered[T any](array unsafe.Pointer, size int, elemSize uintptr, filter func(T) (bool, error), index *int) (v T, ok bool, err error) {
+func nextFilt[T any](array unsafe.Pointer, size int, elemSize uintptr, filter func(T) (bool, error), index *int) (v T, ok bool, err error) {
 	for i := *index; i < size; i++ {
 		v = *(*T)(notsafe.GetArrayElemRef(array, i, elemSize))
 		if ok, err = filter(v); err != nil || !ok {

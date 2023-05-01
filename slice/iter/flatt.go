@@ -65,9 +65,9 @@ func (f *FlattenFitIter[From, To]) Cap() int {
 	return f.cap
 }
 
-// FlatIter is the array based Iterator impelementation that converts an element to a slice and iterates over the elements of that slice.
-// For example, FlatIter can be used to iterate over all the elements of a multi-dimensional array as if it were a one-dimensional array ([][]int -> []int).
-type FlatIter[From, To any] struct {
+// FlattIter is the array based Iterator impelementation that converts an element to a slice and iterates over the elements of that slice.
+// For example, FlattIter can be used to iterate over all the elements of a multi-dimensional array as if it were a one-dimensional array ([][]int -> []int).
+type FlattIter[From, To any] struct {
 	arrayFrom, arrayTo       unsafe.Pointer
 	elemSizeFrom, elemSizeTo uintptr
 	sizeFrom, sizeTo         int
@@ -75,22 +75,22 @@ type FlatIter[From, To any] struct {
 	flattener                func(From) []To
 }
 
-var _ c.Iterator[any] = (*FlatIter[any, any])(nil)
+var _ c.Iterator[any] = (*FlattIter[any, any])(nil)
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
-func (f *FlatIter[From, To]) For(walker func(element To) error) error {
+func (f *FlattIter[From, To]) For(walker func(element To) error) error {
 	return loop.For(f.Next, walker)
 }
 
 // ForEach FlatIter all elements retrieved by the iterator
-func (f *FlatIter[From, To]) ForEach(walker func(element To)) {
+func (f *FlattIter[From, To]) ForEach(walker func(element To)) {
 	loop.ForEach(f.Next, walker)
 }
 
 // Next returns the next element.
 // The ok result indicates whether the element was returned by the iterator.
 // If ok == false, then the iteration must be completed.
-func (f *FlatIter[From, To]) Next() (To, bool) {
+func (f *FlattIter[From, To]) Next() (To, bool) {
 	sizeTo := f.sizeTo
 	if sizeTo > 0 {
 		if indTo := f.indTo; indTo < sizeTo {
@@ -116,6 +116,6 @@ func (f *FlatIter[From, To]) Next() (To, bool) {
 }
 
 // Cap returns the iterator capacity
-func (f *FlatIter[From, To]) Cap() int {
+func (f *FlattIter[From, To]) Cap() int {
 	return f.sizeFrom
 }

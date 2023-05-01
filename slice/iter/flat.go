@@ -64,9 +64,9 @@ func (f *FlatFiltIter[From, To]) Cap() int {
 	return f.cap
 }
 
-// Flatten is the array based Iterator impelementation that converts an element to a slice and iterates over the elements of that slice.
-// For example, Flatten can be used to iterate over all the elements of a multi-dimensional array as if it were a one-dimensional array ([][]int -> []int).
-type Flatten[From, To any] struct {
+// FlatIter is the array based Iterator impelementation that converts an element to a slice and iterates over the elements of that slice.
+// For example, FlatIter can be used to iterate over all the elements of a multi-dimensional array as if it were a one-dimensional array ([][]int -> []int).
+type FlatIter[From, To any] struct {
 	arrayFrom, arrayTo       unsafe.Pointer
 	elemSizeFrom, elemSizeTo uintptr
 	sizeFrom, sizeTo         int
@@ -74,17 +74,17 @@ type Flatten[From, To any] struct {
 	flatt                    func(From) ([]To, error)
 }
 
-var _ c.Iterator[any] = (*Flatten[any, any])(nil)
+var _ c.Iterator[any] = (*FlatIter[any, any])(nil)
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
-func (f *Flatten[From, To]) For(walker func(element To) error) error {
+func (f *FlatIter[From, To]) For(walker func(element To) error) error {
 	return loop.For(f.Next, walker)
 }
 
 // Next returns the next element.
 // The ok result indicates whether the element was returned by the iterator.
 // If ok == false, then the iteration must be completed.
-func (f *Flatten[From, To]) Next() (t To, ok bool, err error) {
+func (f *FlatIter[From, To]) Next() (t To, ok bool, err error) {
 	sizeTo := f.sizeTo
 	if sizeTo > 0 {
 		if indTo := f.indTo; indTo < sizeTo {
@@ -112,6 +112,6 @@ func (f *Flatten[From, To]) Next() (t To, ok bool, err error) {
 }
 
 // Cap returns the iterator capacity
-func (f *Flatten[From, To]) Cap() int {
+func (f *FlatIter[From, To]) Cap() int {
 	return f.sizeFrom
 }

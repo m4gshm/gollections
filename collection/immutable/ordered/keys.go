@@ -3,7 +3,6 @@ package ordered
 import (
 	"fmt"
 
-	breakIter "github.com/m4gshm/gollections/break/slice/iter"
 	breakStream "github.com/m4gshm/gollections/break/stream"
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/slice"
@@ -93,7 +92,7 @@ func (m MapKeys[K]) Filter(filter func(K) bool) stream.Iter[K] {
 
 // Filt returns a breakable stream consisting of elements that satisfy the condition of the 'predicate' function
 func (m MapKeys[K]) Filt(predicate func(K) (bool, error)) breakStream.Iter[K] {
-	f := breakIter.Filt(m.keys, predicate)
+	f := iter.Filt(m.keys, predicate)
 	return breakStream.New(f.Next)
 }
 
@@ -105,7 +104,7 @@ func (m MapKeys[K]) Convert(converter func(K) K) stream.Iter[K] {
 
 // Conv returns a breakable stream that applies the 'converter' function to the collection elements
 func (m MapKeys[K]) Conv(converter func(K) (K, error)) breakStream.Iter[K] {
-	conv := breakIter.Conv(m.keys, converter)
+	conv := iter.Conv(m.keys, converter)
 	return breakStream.New(conv.Next)
 }
 

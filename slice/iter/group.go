@@ -6,29 +6,29 @@ import (
 	"github.com/m4gshm/gollections/slice"
 )
 
-// KeyValuer is the Iterator wrapper that converts an element to a key\value pair and iterates over these pairs
-type KeyValuer[T, K, V any] struct {
+// KeyValuerIter is the Iterator wrapper that converts an element to a key\value pair and iterates over these pairs
+type KeyValuerIter[T, K, V any] struct {
 	iter         slice.Iter[T]
 	keyExtractor func(T) K
 	valExtractor func(T) V
 }
 
-var _ kv.Iterator[int, string] = (*KeyValuer[any, int, string])(nil)
+var _ kv.Iterator[int, string] = (*KeyValuerIter[any, int, string])(nil)
 
 // Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak
-func (kv KeyValuer[T, K, V]) Track(traker func(key K, value V) error) error {
+func (kv KeyValuerIter[T, K, V]) Track(traker func(key K, value V) error) error {
 	return loop.Track(kv.Next, traker)
 }
 
 // TrackEach takes all key, value pairs retrieved by the iterator
-func (kv *KeyValuer[T, K, V]) TrackEach(traker func(key K, value V)) {
+func (kv *KeyValuerIter[T, K, V]) TrackEach(traker func(key K, value V)) {
 	loop.TrackEach(kv.Next, traker)
 }
 
 // Next returns the next element.
 // The ok result indicates whether the element was returned by the iterator.
 // If ok == false, then the iteration must be completed.
-func (kv *KeyValuer[T, K, V]) Next() (key K, value V, ok bool) {
+func (kv *KeyValuerIter[T, K, V]) Next() (key K, value V, ok bool) {
 	next := kv.iter.Next
 	if elem, nextOk := next(); nextOk {
 		key = kv.keyExtractor(elem)

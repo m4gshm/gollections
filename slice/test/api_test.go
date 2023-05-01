@@ -3,7 +3,10 @@ package test
 import (
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
 	"reflect"
+	"runtime"
 	"strconv"
 	"testing"
 	"unsafe"
@@ -155,6 +158,21 @@ func Test_Lastt(t *testing.T) {
 
 	_, _, err := slice.Lastt(s, func(i int) (bool, error) { return true, errors.New("abort") })
 	assert.Error(t, err)
+}
+
+var absPath = op.IfElse(runtime.GOOS == "windows", "c:\\home\\user", "/home/user")
+var absPath2 = op.IfElse(runtime.GOOS == "windows", "c:\\usr\\bin", "/usr/bin")
+
+func TestConv(t *testing.T) {
+	if homeDir, err := os.UserHomeDir(); err != nil {
+		t.Error(err)
+	} else if err := os.Chdir(homeDir); err != nil {
+		t.Error(err)
+	} else if abs, err := slice.Conv(slice.Of(absPath, "././inTemp"), filepath.Abs); err != nil {
+		t.Error(err)
+	} else {
+		assert.Equal(t, slice.Of(absPath, filepath.Join(homeDir, "inTemp")), abs)
+	}
 }
 
 func Test_Convert(t *testing.T) {

@@ -52,17 +52,23 @@ Contains utility functions of link:./slice/api.go#L156[converting],  link:./slic
 
 Usage examples link:./internal/examples/sliceexamples/slice_examples_test.go[here] and link:./internal/examples/mapexamples/map_examples_test.go[here].
 
+==== link:./collection/mutable/api.go[mutable] and link:./collection/immutable/api.go[immutable] collections
+
+Provides implelentations of link:./collection/iface.go#L25[Vector], link:./collection/iface.go#L35[Set] and link:./collection/iface.go#L41[Map].
+
+Mutables support content appending, updating and deleting (the ordered map implementation is not supported delete operations).
+Immutables are read-only datasets.
+
+Detailed description of implementations below.
+
 ==== link:./predicate/api.go[predicate] and breakable link:./predicate/api.go[break/predicate]
 
-TODO
+Provides predicate builder api that used for filtering collection elements.
 
 ==== link:./loop/api.go[loop], link:./kv/loop/api.go[kv/loop] and breakable versions link:./break/loop/api.go[break/loop], link:./break/kv/loop/api.go[break/kv/loop]
 
 TODO
 
-==== link:./collection/mutable/api.go[mutable] and link:./collection/immutable/api.go[immutable] collections
-
-TODO
 
 ==== Short aliases for collection constructors
 

@@ -217,14 +217,14 @@ func (r *rows[T]) next() (T, error) {
 func Test_OfLoop(t *testing.T) {
 	stream := &rows[int]{slice.Of(1, 2, 3), 0}
 	iter := breakLoop.New(stream, (*rows[int]).hasNext, (*rows[int]).next)
-	s, err := breakLoop.ToSlice(iter)
+	s, err := breakLoop.Slice(iter)
 
 	assert.Equal(t, slice.Of(1, 2, 3), s)
 	assert.Nil(t, err)
 
 	streamWithError := &rows[int]{slice.Of(1, 2, 3, 4), 0}
 	iterWithError := breakLoop.New(streamWithError, (*rows[int]).hasNext, (*rows[int]).next)
-	s2, err2 := breakLoop.ToSlice(iterWithError)
+	s2, err2 := breakLoop.Slice(iterWithError)
 
 	assert.Equal(t, slice.Of(1, 2, 3), s2)
 	assert.Equal(t, "next error", err2.Error())

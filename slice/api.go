@@ -39,7 +39,7 @@ func OfLoop[S, T any](source S, hasNext func(S) bool, getNext func(S) (T, error)
 
 // Generate builds a slice by an generator function.
 // The generator returns an element, or false if the generation is over, or an error.
-func Generate[T any](next func() (no T, ok bool)) []T {
+func Generate[T any](next func() (T, bool)) []T {
 	return loop.Slice(next)
 }
 
@@ -76,10 +76,10 @@ func Group[TS ~[]T, T any, K comparable, V any](elements TS, keyExtractor func(T
 	return ToMapResolv(elements, keyExtractor, valExtractor, resolv.Append[K, V])
 }
 
-// GroupByMultiple converts the 'elements' slice into a map, extracting multiple keys, values per each element applying the 'keysExtractor' and 'valsExtractor' functions.
+// GroupInMultiple converts the 'elements' slice into a map, extracting multiple keys, values per each element applying the 'keysExtractor' and 'valsExtractor' functions.
 // The keysExtractor retrieves one or more keys per element.
 // The valsExtractor retrieves one or more values per element.
-func GroupByMultiple[TS ~[]T, T any, K comparable, V any](elements TS, keysExtractor func(T) []K, valsExtractor func(T) []V) map[K][]V {
+func GroupInMultiple[TS ~[]T, T any, K comparable, V any](elements TS, keysExtractor func(T) []K, valsExtractor func(T) []V) map[K][]V {
 	if elements == nil {
 		return nil
 	}
@@ -106,10 +106,10 @@ func GroupByMultiple[TS ~[]T, T any, K comparable, V any](elements TS, keysExtra
 	return groups
 }
 
-// GroupByMultipleKeys converts the 'elements' slice into a map, extracting multiple keys, one value per each element applying the 'keysExtractor' and 'valExtractor' functions.
+// GroupInMultipleKeys converts the 'elements' slice into a map, extracting multiple keys, one value per each element applying the 'keysExtractor' and 'valExtractor' functions.
 // The keysExtractor retrieves one or more keys per element.
 // The valExtractor converts an element to a value.
-func GroupByMultipleKeys[TS ~[]T, T any, K comparable, V any](elements TS, keysExtractor func(T) []K, valExtractor func(T) V) map[K][]V {
+func GroupInMultipleKeys[TS ~[]T, T any, K comparable, V any](elements TS, keysExtractor func(T) []K, valExtractor func(T) V) map[K][]V {
 	if elements == nil {
 		return nil
 	}
@@ -127,10 +127,10 @@ func GroupByMultipleKeys[TS ~[]T, T any, K comparable, V any](elements TS, keysE
 	return groups
 }
 
-// GroupByMultipleValues converts the 'elements' slice into a map, extracting one key, multiple values per each element applying the 'keyExtractor' and 'valsExtractor' functions.
+// GroupInMultipleValues converts the 'elements' slice into a map, extracting one key, multiple values per each element applying the 'keyExtractor' and 'valsExtractor' functions.
 // The keyExtractor converts an element to a key.
 // The valsExtractor retrieves one or more values per element.
-func GroupByMultipleValues[TS ~[]T, T any, K comparable, V any](elements TS, keyExtractor func(T) K, valsExtractor func(T) []V) map[K][]V {
+func GroupInMultipleValues[TS ~[]T, T any, K comparable, V any](elements TS, keyExtractor func(T) K, valsExtractor func(T) []V) map[K][]V {
 	if elements == nil {
 		return nil
 	}
@@ -479,7 +479,7 @@ func Sum[T c.Summable, TS ~[]T](elements TS) T {
 }
 
 // First returns the first element that satisfies requirements of the predicate 'by'
-func First[TS ~[]T, T any](elements TS, by func(T) bool) (no T, err bool) {
+func First[TS ~[]T, T any](elements TS, by func(T) bool) (no T, ok bool) {
 	for _, e := range elements {
 		if by(e) {
 			return e, true
@@ -678,7 +678,7 @@ func Contains[TS ~[]T, T comparable](elements TS, example T) bool {
 
 // ToMapResolv collects key\value elements to a map by iterating over the elements with resolving of duplicated key values
 func ToMapResolv[TS ~[]T, T any, K comparable, V, VR any](elements TS, keyExtractor func(T) K, valExtractor func(T) V, resolver func(bool, K, VR, V) VR) map[K]VR {
-	m := map[K]VR{}
+	m := make(map[K]VR, len(elements))
 	for _, e := range elements {
 		k, v := keyExtractor(e), valExtractor(e)
 		exists, ok := m[k]

@@ -59,6 +59,6 @@ func FilterValue[K comparable, V any, I kv.Iterator[K, V]](elements I, fit func(
 }
 
 // Reduce reduces keys/value pairs to an one pair
-func Reduce[K comparable, V any, I kv.Iterator[K, V]](elements I, by c.Quaternary[K, V]) (K, V) {
-	return kvLoop.Reduce(elements.Next, by)
+func Reduce[K comparable, V any, I kv.Iterator[K, V]](elements I, merge func(K, V, K, V) (K, V)) (K, V) {
+	return kvLoop.Reduce(elements.Next, merge)
 }
