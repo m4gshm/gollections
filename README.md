@@ -1,8 +1,16 @@
 # Gollections
 
-Golang generic containers and functions.
+Golang generic containers and functions. The main goals are to reduce
+boilerplate code that uses [slices](./slice/api.go),
+[maps](./map_/api.go), and extend functionality with new collection
+implementations such as an ordered [ordered
+map](./collection/mutable/omap/api.go) or
+[set](./collection/mutable/oset/api.go).
 
 Supports Go version 1.20 or higher.
+
+``` go
+```
 
 ## Installation
 
@@ -31,10 +39,6 @@ subpackage. For example the function
 Usage examples
 [here](./internal/examples/sliceexamples/slice_examples_test.go).
 
-### Loops - [loop](./loop/api.go), [kv/loop](./kv/loop/api.go)
-
-TODO
-
 ### Maps - [github.com/m4gshm/gollections/map\_](./map_/api.go)
 
 The package provides helper subpackages and functions for using with
@@ -42,6 +46,10 @@ maps.
 
 Usage examples
 [here](./internal/examples/mapexamples/map_examples_test.go).
+
+### Loops - [loop](./loop/api.go), [kv/loop](./kv/loop/api.go)
+
+TODO
 
 ### Mutable containers
 
@@ -120,8 +128,9 @@ func _() {
 where [vector](./immutable/vector/api.go),
 [set](./immutable/set/api.go), [oset](./immutable/oset/api.go),
 [map\_](./immutable/map_/api.go), [omap](./immutable/omap/api.go) are
-packages from [github.com/m4gshm/gollections/collection/immutable](./immutable/)
-and [k.V](./k/v.go) is the method V from the package [k](./k/)
+packages from
+[github.com/m4gshm/gollections/collection/immutable](./immutable/) and
+[k.V](./k/v.go) is the method V from the package [k](./k/)
 
 #### Mutable
 
@@ -130,7 +139,6 @@ package examples
 
 import (
     "github.com/m4gshm/gollections/collection"
-    "github.com/m4gshm/gollections/k"
     "github.com/m4gshm/gollections/collection/mutable"
     mmap "github.com/m4gshm/gollections/collection/mutable/map_"
     "github.com/m4gshm/gollections/collection/mutable/omap"
@@ -138,6 +146,7 @@ import (
     "github.com/m4gshm/gollections/collection/mutable/oset"
     "github.com/m4gshm/gollections/collection/mutable/set"
     "github.com/m4gshm/gollections/collection/mutable/vector"
+    "github.com/m4gshm/gollections/k"
 )
 
 func _() {
@@ -179,8 +188,8 @@ func _() {
 where [vector](./mutable/vector/api.go), [set](./mutable/set/api.go),
 [oset](./mutable/oset/api.go), [map\_](./mutable/map_/api.go),
 [omap](./mutable/omap/api.go) are packages from
-[github.com/m4gshm/gollections/collection/mutable](./mutable/) and [k.V](./k/v.go)
-is the method V from the package [k](./k/)
+[github.com/m4gshm/gollections/collection/mutable](./mutable/) and
+[k.V](./k/v.go) is the method V from the package [k](./k/)
 
 ## Stream functions
 
@@ -248,11 +257,11 @@ import (
 
     "github.com/stretchr/testify/assert"
 
-    "github.com/m4gshm/gollections/convert/as"
     cGroup "github.com/m4gshm/gollections/collection/group"
     "github.com/m4gshm/gollections/collection/immutable"
     "github.com/m4gshm/gollections/collection/immutable/oset"
     "github.com/m4gshm/gollections/collection/immutable/set"
+    "github.com/m4gshm/gollections/convert/as"
     "github.com/m4gshm/gollections/iter"
     "github.com/m4gshm/gollections/op"
     "github.com/m4gshm/gollections/predicate/more"

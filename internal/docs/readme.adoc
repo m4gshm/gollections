@@ -3,8 +3,15 @@
 == Gollections
 
 Golang generic containers and functions.
+The main goals are to reduce boilerplate code that uses link:./slice/api.go[slices], link:./map_/api.go[maps],
+and extend functionality with new collection implementations such as an ordered link:./collection/mutable/omap/api.go[ordered map] or link:./collection/mutable/oset/api.go[set].
 
 Supports Go version 1.20 or higher.
+
+[source,go]
+----
+include::../examples/boilerplate/slice.go[lines=3..-1]
+----
 
 === Installation
 
@@ -29,16 +36,15 @@ Most helpers organized as pair of a main function and short aliases in a subpack
 
 Usage examples link:./internal/examples/sliceexamples/slice_examples_test.go[here].
 
-
-==== Loops - link:./loop/api.go[loop], link:./kv/loop/api.go[kv/loop]
-
-TODO
-
 ==== Maps - link:./map_/api.go[github.com/m4gshm/gollections/map_]
 
 The package provides helper subpackages and functions for using with maps. +
 
 Usage examples link:./internal/examples/mapexamples/map_examples_test.go[here].
+
+==== Loops - link:./loop/api.go[loop], link:./kv/loop/api.go[kv/loop]
+
+TODO
 
 ==== Mutable containers
 
