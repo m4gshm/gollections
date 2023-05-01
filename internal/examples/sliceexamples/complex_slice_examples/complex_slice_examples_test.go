@@ -8,6 +8,7 @@ import (
 	"github.com/m4gshm/gollections/iter"
 	"github.com/m4gshm/gollections/loop"
 	loopConv "github.com/m4gshm/gollections/loop/convert"
+	"github.com/m4gshm/gollections/predicate"
 	"github.com/m4gshm/gollections/predicate/eq"
 	"github.com/m4gshm/gollections/predicate/not"
 	"github.com/m4gshm/gollections/slice"
@@ -86,9 +87,7 @@ func Test_GroupBySeveralKeysAndConvertMapValues(t *testing.T) {
 }
 
 func Test_FindFirsManager(t *testing.T) {
-	alice, ok := slice.First(users, func(user User) bool {
-		return stream.Convert(user.Roles(), Role.Name).HasAny(eq.To("Manager"))
-	})
+	alice, ok := slice.First(users, predicate.ContainsConverted(User.Roles, Role.Name, "Manager"))
 
 	assert.True(t, ok)
 	assert.Equal(t, "Alice", alice.Name())
@@ -109,8 +108,30 @@ userLoop:
 	assert.Equal(t, "Alice", legacyAlice.Name())
 }
 
+func Benchmark_FindFirsManager_Predicate_ContainsConverted(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		alice, ok := slice.First(users, predicate.ContainsConverted(User.Roles, Role.Name, "Manager"))
+		_, _ = alice, ok
+	}
+}
+
+func Benchmark_FindFirsManager_Predicate_HasAnyConverted(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		alice, ok := slice.First(users, predicate.HasAnyConverted(User.Roles, Role.Name, eq.To("Manager")))
+		_, _ = alice, ok
+	}
+}
+
+func Benchmark_FindFirsManager_Stream(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		alice, ok := slice.First(users, func(user User) bool {
+			return stream.Convert(user.Roles(), Role.Name).HasAny(eq.To("Manager"))
+		})
+		_, _ = alice, ok
+	}
+}
+
 func Benchmark_FindFirsManager_Set(b *testing.B) {
-	//new
 	for i := 0; i < b.N; i++ {
 		alice, ok := slice.First(users, func(user User) bool {
 			return set.Convert(set.New(user.Roles()), Role.Name).HasAny(eq.To("Manager"))

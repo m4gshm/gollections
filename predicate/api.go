@@ -57,3 +57,26 @@ func Union[T any](predicates ...Predicate[T]) Predicate[T] {
 		return true
 	}
 }
+
+func HasAnyConverted[From, I, To any](flatter func(From) []I, convert func(I) To, predicate Predicate[To]) Predicate[From] {
+	return func(from From) bool {
+		for _, f := range flatter(from) {
+			if c := convert(f); predicate(c) {
+				return true
+			}
+		}
+		return false
+	}
+}
+
+func ContainsConverted[From, I any, To comparable](flatter func(From) []I, convert func(I) To, expected To) Predicate[From] {
+	return func(from From) bool {
+		ff := flatter(from)
+		for _, f := range ff {
+			if c := convert(f); c == expected {
+				return true
+			}
+		}
+		return false
+	}
+}
