@@ -3,7 +3,7 @@ package test
 import (
 	"testing"
 
-	"github.com/m4gshm/gollections/immutable/vector"
+	"github.com/m4gshm/gollections/collection/immutable/vector"
 	"github.com/m4gshm/gollections/walk/group"
 
 	"github.com/stretchr/testify/assert"

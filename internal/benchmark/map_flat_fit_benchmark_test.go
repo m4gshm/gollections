@@ -7,9 +7,7 @@ import (
 
 	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/convert"
-	"github.com/m4gshm/gollections/first"
 	"github.com/m4gshm/gollections/iter"
-	"github.com/m4gshm/gollections/last"
 	"github.com/m4gshm/gollections/loop"
 	sop "github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
@@ -50,18 +48,6 @@ func Benchmark_First_Slice(b *testing.B) {
 	assert.Equal(b, threshhold+1, f)
 }
 
-func Benchmark_First_OfBy(b *testing.B) {
-	op := func(i int) bool { return i > threshhold }
-	var f int
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		f, _ = first.Of(values...).By(op)
-	}
-
-	b.StopTimer()
-	assert.Equal(b, threshhold+1, f)
-}
-
 func Benchmark_First_Iterator(b *testing.B) {
 	op := func(i int) bool { return i > threshhold }
 	var f int
@@ -84,17 +70,6 @@ func Benchmark_Last_Slice(b *testing.B) {
 	assert.Equal(b, threshhold-1, f)
 }
 
-func Benchmark_Last_OfBy(b *testing.B) {
-	op := func(i int) bool { return i < threshhold }
-	var f int
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		f, _ = last.Of(values...).By(op)
-	}
-	b.StopTimer()
-	assert.Equal(b, threshhold-1, f)
-}
-
 func Benchmark_ConvertAndFilter_Iterable(b *testing.B) {
 	var (
 		toString = func(i int) string { return fmt.Sprintf("%d", i) }
@@ -105,7 +80,7 @@ func Benchmark_ConvertAndFilter_Iterable(b *testing.B) {
 	var s []string
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		s = loop.Slice[string](iter.Convert(iter.Filter(slice.NewIter(items), even), convert.And(toString, addTail)).Next)
+		s = loop.Slice(iter.Convert(iter.Filter(slice.NewIter(items), even), convert.And(toString, addTail)).Next)
 	}
 	_ = s
 

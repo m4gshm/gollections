@@ -3,12 +3,12 @@ package benchmark
 import (
 	"testing"
 
-	"github.com/m4gshm/gollections/immutable/oset"
-	"github.com/m4gshm/gollections/immutable/set"
-	"github.com/m4gshm/gollections/immutable/vector"
+	"github.com/m4gshm/gollections/collection/immutable/oset"
+	"github.com/m4gshm/gollections/collection/immutable/set"
+	"github.com/m4gshm/gollections/collection/immutable/vector"
+	moset "github.com/m4gshm/gollections/collection/mutable/oset"
+	mvector "github.com/m4gshm/gollections/collection/mutable/vector"
 	"github.com/m4gshm/gollections/map_"
-	moset "github.com/m4gshm/gollections/mutable/oset"
-	mvector "github.com/m4gshm/gollections/mutable/vector"
 	"github.com/m4gshm/gollections/ptr"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/range_"

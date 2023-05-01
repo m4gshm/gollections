@@ -2,14 +2,14 @@ package examples
 
 import (
 	"github.com/m4gshm/gollections/collection"
+	"github.com/m4gshm/gollections/collection/mutable"
+	mmap "github.com/m4gshm/gollections/collection/mutable/map_"
+	"github.com/m4gshm/gollections/collection/mutable/omap"
+	"github.com/m4gshm/gollections/collection/mutable/ordered"
+	"github.com/m4gshm/gollections/collection/mutable/oset"
+	"github.com/m4gshm/gollections/collection/mutable/set"
+	"github.com/m4gshm/gollections/collection/mutable/vector"
 	"github.com/m4gshm/gollections/k"
-	"github.com/m4gshm/gollections/mutable"
-	mmap "github.com/m4gshm/gollections/mutable/map_"
-	"github.com/m4gshm/gollections/mutable/omap"
-	"github.com/m4gshm/gollections/mutable/ordered"
-	"github.com/m4gshm/gollections/mutable/oset"
-	"github.com/m4gshm/gollections/mutable/set"
-	"github.com/m4gshm/gollections/mutable/vector"
 )
 
 func _() {

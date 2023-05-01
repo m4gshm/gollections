@@ -2,8 +2,8 @@
 package convert
 
 import (
+	"github.com/m4gshm/gollections/check/not"
 	"github.com/m4gshm/gollections/loop"
-	"github.com/m4gshm/gollections/not"
 )
 
 // AndConvert - convert.AndConvert makes double converts From->Intermediate->To of the elements

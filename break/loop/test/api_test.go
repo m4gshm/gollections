@@ -7,12 +7,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/m4gshm/gollections/as"
 	breakKvLoop "github.com/m4gshm/gollections/break/kv/loop"
 	breakLoop "github.com/m4gshm/gollections/break/loop"
 	"github.com/m4gshm/gollections/break/op"
 	"github.com/m4gshm/gollections/break/predicate/eq"
 	"github.com/m4gshm/gollections/break/predicate/more"
+	"github.com/m4gshm/gollections/convert/as"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/slice"
 )

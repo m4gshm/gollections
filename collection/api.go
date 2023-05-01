@@ -2,11 +2,11 @@
 package collection
 
 import (
-	"github.com/m4gshm/gollections/as"
 	breakLoop "github.com/m4gshm/gollections/break/loop"
 	breakStream "github.com/m4gshm/gollections/break/stream"
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/check"
+	"github.com/m4gshm/gollections/convert/as"
 	kvloop "github.com/m4gshm/gollections/kv/loop"
 	kvstream "github.com/m4gshm/gollections/kv/stream"
 	"github.com/m4gshm/gollections/loop"

@@ -64,7 +64,7 @@ The same interfaces as in the mutable package but for read-only purposes.
 include::../examples/constructors.go[]
 ----
 
-where link:./immutable/vector/api.go[vector], link:./immutable/set/api.go[set], link:./immutable/oset/api.go[oset], link:./immutable/map_/api.go[map_], link:./immutable/omap/api.go[omap] are packages from link:./immutable/[github.com/m4gshm/gollections/immutable] and link:./k/v.go[k.V] is the method V from the package link:./k/[k]
+where link:./immutable/vector/api.go[vector], link:./immutable/set/api.go[set], link:./immutable/oset/api.go[oset], link:./immutable/map_/api.go[map_], link:./immutable/omap/api.go[omap] are packages from link:./immutable/[github.com/m4gshm/gollections/collection/immutable] and link:./k/v.go[k.V] is the method V from the package link:./k/[k]
 
 ===== Mutable
 
@@ -73,7 +73,7 @@ where link:./immutable/vector/api.go[vector], link:./immutable/set/api.go[set], 
 include::../examples/constructors_mutable.go[]
 ----
 
-where link:./mutable/vector/api.go[vector], link:./mutable/set/api.go[set], link:./mutable/oset/api.go[oset], link:./mutable/map_/api.go[map_], link:./mutable/omap/api.go[omap] are packages from link:./mutable/[github.com/m4gshm/gollections/mutable] and link:./k/v.go[k.V] is the method V from the package link:./k/[k]
+where link:./mutable/vector/api.go[vector], link:./mutable/set/api.go[set], link:./mutable/oset/api.go[oset], link:./mutable/map_/api.go[map_], link:./mutable/omap/api.go[omap] are packages from link:./mutable/[github.com/m4gshm/gollections/collection/mutable] and link:./k/v.go[k.V] is the method V from the package link:./k/[k]
 
 === Stream functions
 

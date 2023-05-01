@@ -6,11 +6,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/m4gshm/gollections/as"
 	cGroup "github.com/m4gshm/gollections/collection/group"
-	"github.com/m4gshm/gollections/immutable"
-	"github.com/m4gshm/gollections/immutable/oset"
-	"github.com/m4gshm/gollections/immutable/set"
+	"github.com/m4gshm/gollections/collection/immutable"
+	"github.com/m4gshm/gollections/collection/immutable/oset"
+	"github.com/m4gshm/gollections/collection/immutable/set"
+	"github.com/m4gshm/gollections/convert/as"
 	"github.com/m4gshm/gollections/iter"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/predicate/more"

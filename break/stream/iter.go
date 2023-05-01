@@ -2,9 +2,9 @@
 package stream
 
 import (
-	"github.com/m4gshm/gollections/as"
 	"github.com/m4gshm/gollections/break/loop"
 	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/convert/as"
 )
 
 // New instantiates a stream instance

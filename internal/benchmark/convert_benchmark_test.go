@@ -4,12 +4,12 @@ import (
 	"testing"
 
 	"github.com/m4gshm/gollections/collection"
+	"github.com/m4gshm/gollections/collection/immutable/vector"
+	"github.com/m4gshm/gollections/collection/mutable"
+	mvector "github.com/m4gshm/gollections/collection/mutable/vector"
 	"github.com/m4gshm/gollections/convert"
-	"github.com/m4gshm/gollections/immutable/vector"
 	"github.com/m4gshm/gollections/iter"
 	"github.com/m4gshm/gollections/loop"
-	"github.com/m4gshm/gollections/mutable"
-	mvector "github.com/m4gshm/gollections/mutable/vector"
 	"github.com/m4gshm/gollections/slice"
 	sliceIter "github.com/m4gshm/gollections/slice/iter"
 )

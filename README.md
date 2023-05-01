@@ -81,13 +81,13 @@ package examples
 
 import (
     "github.com/m4gshm/gollections/collection"
-    "github.com/m4gshm/gollections/immutable"
-    imap "github.com/m4gshm/gollections/immutable/map_"
-    "github.com/m4gshm/gollections/immutable/omap"
-    "github.com/m4gshm/gollections/immutable/ordered"
-    "github.com/m4gshm/gollections/immutable/oset"
-    "github.com/m4gshm/gollections/immutable/set"
-    "github.com/m4gshm/gollections/immutable/vector"
+    "github.com/m4gshm/gollections/collection/immutable"
+    imap "github.com/m4gshm/gollections/collection/immutable/map_"
+    "github.com/m4gshm/gollections/collection/immutable/omap"
+    "github.com/m4gshm/gollections/collection/immutable/ordered"
+    "github.com/m4gshm/gollections/collection/immutable/oset"
+    "github.com/m4gshm/gollections/collection/immutable/set"
+    "github.com/m4gshm/gollections/collection/immutable/vector"
     "github.com/m4gshm/gollections/k"
 )
 
@@ -120,7 +120,7 @@ func _() {
 where [vector](./immutable/vector/api.go),
 [set](./immutable/set/api.go), [oset](./immutable/oset/api.go),
 [map\_](./immutable/map_/api.go), [omap](./immutable/omap/api.go) are
-packages from [github.com/m4gshm/gollections/immutable](./immutable/)
+packages from [github.com/m4gshm/gollections/collection/immutable](./immutable/)
 and [k.V](./k/v.go) is the method V from the package [k](./k/)
 
 #### Mutable
@@ -131,13 +131,13 @@ package examples
 import (
     "github.com/m4gshm/gollections/collection"
     "github.com/m4gshm/gollections/k"
-    "github.com/m4gshm/gollections/mutable"
-    mmap "github.com/m4gshm/gollections/mutable/map_"
-    "github.com/m4gshm/gollections/mutable/omap"
-    "github.com/m4gshm/gollections/mutable/ordered"
-    "github.com/m4gshm/gollections/mutable/oset"
-    "github.com/m4gshm/gollections/mutable/set"
-    "github.com/m4gshm/gollections/mutable/vector"
+    "github.com/m4gshm/gollections/collection/mutable"
+    mmap "github.com/m4gshm/gollections/collection/mutable/map_"
+    "github.com/m4gshm/gollections/collection/mutable/omap"
+    "github.com/m4gshm/gollections/collection/mutable/ordered"
+    "github.com/m4gshm/gollections/collection/mutable/oset"
+    "github.com/m4gshm/gollections/collection/mutable/set"
+    "github.com/m4gshm/gollections/collection/mutable/vector"
 )
 
 func _() {
@@ -179,7 +179,7 @@ func _() {
 where [vector](./mutable/vector/api.go), [set](./mutable/set/api.go),
 [oset](./mutable/oset/api.go), [map\_](./mutable/map_/api.go),
 [omap](./mutable/omap/api.go) are packages from
-[github.com/m4gshm/gollections/mutable](./mutable/) and [k.V](./k/v.go)
+[github.com/m4gshm/gollections/collection/mutable](./mutable/) and [k.V](./k/v.go)
 is the method V from the package [k](./k/)
 
 ## Stream functions
@@ -248,11 +248,11 @@ import (
 
     "github.com/stretchr/testify/assert"
 
-    "github.com/m4gshm/gollections/as"
+    "github.com/m4gshm/gollections/convert/as"
     cGroup "github.com/m4gshm/gollections/collection/group"
-    "github.com/m4gshm/gollections/immutable"
-    "github.com/m4gshm/gollections/immutable/oset"
-    "github.com/m4gshm/gollections/immutable/set"
+    "github.com/m4gshm/gollections/collection/immutable"
+    "github.com/m4gshm/gollections/collection/immutable/oset"
+    "github.com/m4gshm/gollections/collection/immutable/set"
     "github.com/m4gshm/gollections/iter"
     "github.com/m4gshm/gollections/op"
     "github.com/m4gshm/gollections/predicate/more"

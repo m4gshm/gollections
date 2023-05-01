@@ -3,7 +3,7 @@ package test
 import (
 	"testing"
 
-	"github.com/m4gshm/gollections/as"
+	"github.com/m4gshm/gollections/convert/as"
 	"github.com/m4gshm/gollections/kv/group"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/stretchr/testify/assert"

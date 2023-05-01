@@ -3,7 +3,7 @@ package test
 import (
 	"testing"
 
-	omap "github.com/m4gshm/gollections/immutable/ordered/map_"
+	omap "github.com/m4gshm/gollections/collection/immutable/ordered/map_"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/stretchr/testify/assert"
 )

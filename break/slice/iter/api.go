@@ -4,8 +4,8 @@ package iter
 import (
 	"unsafe"
 
-	"github.com/m4gshm/gollections/as"
 	"github.com/m4gshm/gollections/check"
+	"github.com/m4gshm/gollections/convert/as"
 	"github.com/m4gshm/gollections/notsafe"
 	"github.com/m4gshm/gollections/predicate/always"
 	"github.com/m4gshm/gollections/slice"

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/m4gshm/gollections/as"
 	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/convert/as"
 	"github.com/m4gshm/gollections/kv"
 	"github.com/m4gshm/gollections/map_/resolv"
 )

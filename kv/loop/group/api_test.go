@@ -3,7 +3,7 @@ package group
 import (
 	"testing"
 
-	"github.com/m4gshm/gollections/as"
+	"github.com/m4gshm/gollections/convert/as"
 	"github.com/m4gshm/gollections/loop"
 
 	"github.com/stretchr/testify/assert"

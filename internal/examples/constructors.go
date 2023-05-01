@@ -3,13 +3,13 @@ package examples
 
 import (
 	"github.com/m4gshm/gollections/collection"
-	"github.com/m4gshm/gollections/immutable"
-	imap "github.com/m4gshm/gollections/immutable/map_"
-	"github.com/m4gshm/gollections/immutable/omap"
-	"github.com/m4gshm/gollections/immutable/ordered"
-	"github.com/m4gshm/gollections/immutable/oset"
-	"github.com/m4gshm/gollections/immutable/set"
-	"github.com/m4gshm/gollections/immutable/vector"
+	"github.com/m4gshm/gollections/collection/immutable"
+	imap "github.com/m4gshm/gollections/collection/immutable/map_"
+	"github.com/m4gshm/gollections/collection/immutable/omap"
+	"github.com/m4gshm/gollections/collection/immutable/ordered"
+	"github.com/m4gshm/gollections/collection/immutable/oset"
+	"github.com/m4gshm/gollections/collection/immutable/set"
+	"github.com/m4gshm/gollections/collection/immutable/vector"
 	"github.com/m4gshm/gollections/k"
 )
 

@@ -4,8 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/m4gshm/gollections/first"
-	"github.com/m4gshm/gollections/immutable/set"
+	"github.com/m4gshm/gollections/collection/immutable/set"
 	"github.com/m4gshm/gollections/iter"
 	"github.com/m4gshm/gollections/loop"
 	loopConv "github.com/m4gshm/gollections/loop/convert"
@@ -88,7 +87,7 @@ func Test_GroupBySeveralKeysAndConvertMapValues(t *testing.T) {
 func Test_FindFirsManager(t *testing.T) {
 	// hasManager:=stream.Convert[User](Role.Name).HasAny(eq.To("Manager"))
 	//new
-	alice, ok := first.Of(users...).By(func(user User) bool {
+	alice, ok := slice.First(users, func(user User) bool {
 		// return hasManager(user.Roles())
 		return set.Convert(set.New(user.Roles()), Role.Name).HasAny(eq.To("Manager"))
 	})
@@ -111,7 +110,7 @@ func Test_FindFirsManager(t *testing.T) {
 func Benchmark_FindFirsManager_Set(b *testing.B) {
 	//new
 	for i := 0; i < b.N; i++ {
-		alice, ok := first.Of(users...).By(func(user User) bool {
+		alice, ok := slice.First(users, func(user User) bool {
 			return set.Convert(set.New(user.Roles()), Role.Name).HasAny(eq.To("Manager"))
 		})
 		_, _ = alice, ok
@@ -129,7 +128,7 @@ func Benchmark_FindFirsManager_Slice(b *testing.B) {
 
 func Benchmark_FindFirsManager_Loop_SliceIter(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		alice, ok := first.Of(users...).By(func(user User) bool {
+		alice, ok := slice.First(users, func(user User) bool {
 			return loop.Contains(sliceIter.Convert(user.Roles(), Role.Name).Next, "Manager")
 		})
 		_, _ = alice, ok

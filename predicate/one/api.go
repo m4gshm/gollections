@@ -2,7 +2,7 @@
 package one
 
 import (
-	"github.com/m4gshm/gollections/immutable/set"
+	"github.com/m4gshm/gollections/collection/immutable/set"
 	"github.com/m4gshm/gollections/predicate"
 )
 

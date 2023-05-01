@@ -3,8 +3,8 @@ package convert
 
 import (
 	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/check/not"
 	"github.com/m4gshm/gollections/collection"
-	"github.com/m4gshm/gollections/not"
 	"github.com/m4gshm/gollections/stream"
 )
 

@@ -7,10 +7,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/m4gshm/gollections/as"
-	"github.com/m4gshm/gollections/first"
-	"github.com/m4gshm/gollections/last"
+	"github.com/m4gshm/gollections/convert/as"
 	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/op/first"
+	"github.com/m4gshm/gollections/op/last"
+	"github.com/m4gshm/gollections/op/sum"
 	"github.com/m4gshm/gollections/predicate/exclude"
 	"github.com/m4gshm/gollections/predicate/less"
 	"github.com/m4gshm/gollections/predicate/more"
@@ -25,7 +26,6 @@ import (
 	"github.com/m4gshm/gollections/slice/group"
 	"github.com/m4gshm/gollections/slice/range_"
 	"github.com/m4gshm/gollections/slice/reverse"
-	"github.com/m4gshm/gollections/sum"
 )
 
 type User struct {

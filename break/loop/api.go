@@ -4,12 +4,12 @@ package loop
 import (
 	"errors"
 
-	"github.com/m4gshm/gollections/as"
 	"github.com/m4gshm/gollections/break/op"
 	"github.com/m4gshm/gollections/break/predicate/always"
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/convert"
+	"github.com/m4gshm/gollections/convert/as"
 	"github.com/m4gshm/gollections/map_/resolv"
 	"github.com/m4gshm/gollections/notsafe"
 )
