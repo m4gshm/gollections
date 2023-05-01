@@ -45,7 +45,7 @@ You can make clear code, extensive, but without dependencies:
     assert.Equal(t, namesByRole["admin"], []string{"Bob"})
 ```
 
-Or using the devkit can write more compact code like this:
+Or using the devkit you can write more compact code like this:
 
 ``` go
    var namesByRole = group.ByMultipleKeys(users, func(u User) []string {
@@ -79,8 +79,10 @@ aimed to make short aliases of that functions. For example the function
 
 ### [slice](./slice/api.go) and [map\_](./map_/api.go)
 
-Contains utility functions of converting, filtering (searching),
-reducing elements of embedded slices and maps.
+Contains utility functions of [converting](./slice/api.go#L156),
+[filtering](./slice/api.go#L379) (searching),
+[reducing](./slice/api.go#L464), [cloning](./map_/api.go#L90) elements
+of embedded slices and maps.
 
 Usage examples
 [here](./internal/examples/sliceexamples/slice_examples_test.go) and

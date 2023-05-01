@@ -20,7 +20,7 @@ include::../examples/boilerplate/slice_namesbyRole_old.go[lines=11..33]
 ----
 
 
-Or using the devkit can write more compact code like this:
+Or using the devkit you can write more compact code like this:
 [source,go]
 ----
 include::../examples/boilerplate/slice_namesbyRole_new.go[lines=13..21]
@@ -48,7 +48,7 @@ For example the function link:./slice/api.go#L459[slice.SortByOrdered] has alias
 
 ==== link:./slice/api.go[slice] and link:./map_/api.go[map_]
 
-Contains utility functions of converting, filtering (searching), reducing elements of embedded slices and maps.
+Contains utility functions of link:./slice/api.go#L156[converting],  link:./slice/api.go#L379[filtering] (searching), link:./slice/api.go#L464[reducing], link:./map_/api.go#L90[cloning] elements of embedded slices and maps.
 
 Usage examples link:./internal/examples/sliceexamples/slice_examples_test.go[here] and link:./internal/examples/mapexamples/map_examples_test.go[here].
 
