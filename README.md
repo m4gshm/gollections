@@ -19,19 +19,7 @@ var users = []User{
 }
 ```
 
-You can write code like this:
-
-``` go
-   var namesByRole = group.ByMultipleKeys(users, func(u User) []string {
-        return convert.AndConvert(u.Roles(), Role.Name, strings.ToLower)
-    }, User.Name)
-
-    assert.Equal(t, namesByRole[""], []string{"Tom"})
-    assert.Equal(t, namesByRole["manager"], []string{"Bob", "Alice"})
-    assert.Equal(t, namesByRole["admin"], []string{"Bob"})
-```
-
-Or you can make clearer code, more extensive, but without dependencies:
+You can make clear code, extensive, but without dependencies:
 
 ``` go
    namesByRole := map[string][]string{}
@@ -57,6 +45,18 @@ Or you can make clearer code, more extensive, but without dependencies:
     assert.Equal(t, namesByRole["admin"], []string{"Bob"})
 ```
 
+Or using the devkit can write more compact code like this:
+
+``` go
+   var namesByRole = group.ByMultipleKeys(users, func(u User) []string {
+        return convert.AndConvert(u.Roles(), Role.Name, strings.ToLower)
+    }, User.Name)
+
+    assert.Equal(t, namesByRole[""], []string{"Tom"})
+    assert.Equal(t, namesByRole["manager"], []string{"Bob", "Alice"})
+    assert.Equal(t, namesByRole["admin"], []string{"Bob"})
+```
+
 ## Installation
 
 ``` console
@@ -71,38 +71,30 @@ go get -u github.com/m4gshm/gollections@HEAD
 
 ## Main packages
 
-### [slice](./slice/api.go)
-
-The package provides helper subpackages and functions for using with
-slices.  
-Most helpers organized as pair of a main function and short aliases in a
-subpackage. For example the function
-[slice.SortByOrdered](./slice/api.go#L247) has aliases
+All packages consists of functions placed in the package and subpackages
+aimed to make short aliases of that functions. For example the function
+[slice.SortByOrdered](./slice/api.go#L459) has aliases
 [sort.By](./slice/sort/api.go#L12) and
 [sort.Of](./slice/sort/api.go#L23).
 
-Usage examples
-[here](./internal/examples/sliceexamples/slice_examples_test.go).
+### [slice](./slice/api.go) and [map\_](./map_/api.go)
 
-### [map\_](./map_/api.go)
-
-The package provides helper subpackages and functions for using with
-maps.  
+Contains utility functions of converting, filtering (searching),
+reducing elements of embedded slices and maps.
 
 Usage examples
+[here](./internal/examples/sliceexamples/slice_examples_test.go) and
 [here](./internal/examples/mapexamples/map_examples_test.go).
+
+### [predicate](./predicate/api.go) and breakable [break/predicate](./predicate/api.go)
+
+TODO
 
 ### [loop](./loop/api.go), [kv/loop](./kv/loop/api.go) and breakable versions [break/loop](./break/loop/api.go), [break/kv/loop](./break/kv/loop/api.go)
 
 TODO
 
 ### [mutable](./collection/mutable/api.go) and [immutable](./collection/immutable/api.go) collections
-
-TODO
-
-TODO
-
-### [predicate](./predicate/api.go) and breakable [break/predicate](./predicate/api.go)
 
 TODO
 
@@ -247,138 +239,5 @@ Intermediates should wrap one by one to make a lazy computation chain
 that can be applied to the latest final operation.
 
 ``` go
-//Example 'filter', 'map', 'reduce' for an iterative container of 'items'
-
-var items immutable.Vector[Item]
-
-var (
-    condition = func(item Item) bool { ... }
-    max       = func(attribute1 Attribute, attribute2 Attribute) Attribute { ... }
-)
-
-maxItemAttribute := it.Reduce(it.Convert(c.Filer(items, condition), Item.GetAttribute), max)
-```
-
-Functions grouped into packages by applicable type
-([container](./c/api.go), [map](./c/map_/api.go),
-[iterator](./it/api.go), [slice](slice/api.go))
-
-## Additional packages
-
-### [Common interfaces](./c/iface.go)
-
-Iterator, Iterable, Container, Vector, Map, Set and so on.
-
-### [Iterable container API](./c/op/api.go)
-
-Declarative style API over 'Iterable' interface. Based on 'Iterator API'
-(see below).
-
-### [Iterator API](./it/api.go)
-
-Declarative style API over 'Iterator' interface.
-
-## Examples
-
-``` go
-package examples
-
-import (
-    "fmt"
-    "testing"
-
-    "github.com/stretchr/testify/assert"
-
-    cGroup "github.com/m4gshm/gollections/collection/group"
-    "github.com/m4gshm/gollections/collection/immutable"
-    "github.com/m4gshm/gollections/collection/immutable/oset"
-    "github.com/m4gshm/gollections/collection/immutable/set"
-    "github.com/m4gshm/gollections/convert/as"
-    "github.com/m4gshm/gollections/iter"
-    "github.com/m4gshm/gollections/op"
-    "github.com/m4gshm/gollections/predicate/more"
-    "github.com/m4gshm/gollections/slice"
-    sliceIter "github.com/m4gshm/gollections/slice/iter"
-    "github.com/m4gshm/gollections/walk/group"
-)
-
-func Test_Set(t *testing.T) {
-    var (
-        s      immutable.Set[int] = set.Of(1, 1, 2, 4, 3, 1)
-        values []int              = s.Slice()
-    )
-
-    assert.Equal(t, 4, s.Len())
-    assert.Equal(t, 4, len(values))
-
-    assert.True(t, s.Contains(1))
-    assert.True(t, s.Contains(2))
-    assert.True(t, s.Contains(3))
-    assert.True(t, s.Contains(4))
-    assert.False(t, s.Contains(5))
-}
-
-func Test_OrderedSet(t *testing.T) {
-    s := oset.Of(1, 1, 2, 4, 3, 1)
-    values := s.Slice()
-    fmt.Println(s) //[1, 2, 4, 3]
-
-    assert.Equal(t, slice.Of(1, 2, 4, 3), values)
-}
-
-func Test_group_orderset_odd_even(t *testing.T) {
-    var (
-        even   = func(v int) bool { return v%2 == 0 }
-        groups = group.Of(oset.Of(1, 1, 2, 4, 3, 1), even)
-    )
-    fmt.Println(groups) //map[false:[1 3] true:[2 4]]
-    assert.Equal(t, map[bool][]int{false: {1, 3}, true: {2, 4}}, groups)
-}
-
-func Test_group_orderset_with_filtering_by_stirng_len(t *testing.T) {
-    var groups = cGroup.Of(oset.Of(
-        "seventh", "seventh", //duplicated
-        "first", "second", "third", "fourth",
-        "fifth", "sixth", "eighth",
-        "ninth", "tenth", "one", "two", "three", "1",
-        "second", //duplicate
-    ), func(v string) int { return len(v) },
-    ).FilterKey(
-        more.Than(3),
-    ).ConvertValue(
-        func(v string) string { return v + "_" },
-    ).Map()
-
-    assert.Equal(t, map[int][]string{
-        5: {"first_", "third_", "fifth_", "sixth_", "ninth_", "tenth_", "three_"},
-        6: {"second_", "fourth_", "eighth_"},
-        7: {"seventh_"},
-    }, groups)
-}
-
-func Test_compute_odds_sum(t *testing.T) {
-    var (
-        odds           = func(v int) bool { return v%2 != 0 }
-        multiDimension = [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
-        expected       = 1 + 3 + 5 + 7
-    )
-
-    //declarative style
-    oddSum := iter.Reduce(iter.Filter(iter.Flatt(sliceIter.Flatt(multiDimension, as.Is[[][]int]), as.Is[[]int]), odds), op.Sum[int])
-    assert.Equal(t, expected, oddSum)
-
-    //plain old style
-    oddSum = 0
-    for _, i := range multiDimension {
-        for _, ii := range i {
-            for _, iii := range ii {
-                if odds(iii) {
-                    oddSum += iii
-                }
-            }
-        }
-    }
-
-    assert.Equal(t, expected, oddSum)
-}
+//TODO
 ```

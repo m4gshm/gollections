@@ -13,16 +13,17 @@ For example, you want to group some users by their role names converted to lower
 include::../examples/boilerplate/user_data.go[lines=3..-1]
 ----
 
-You can write code like this:
-[source,go]
-----
-include::../examples/boilerplate/slice_namesbyRole_new.go[lines=13..21]
-----
-
-Or you can make clearer code, more extensive, but without dependencies:
+You can make clear code, extensive, but without dependencies:
 [source,go]
 ----
 include::../examples/boilerplate/slice_namesbyRole_old.go[lines=11..33]
+----
+
+
+Or using the devkit can write more compact code like this:
+[source,go]
+----
+include::../examples/boilerplate/slice_namesbyRole_new.go[lines=13..21]
 ----
 
 === Installation
@@ -41,30 +42,25 @@ go get -u github.com/m4gshm/gollections@HEAD
 
 === Main packages
 
-==== link:./slice/api.go[slice]
+All packages consists of functions placed in the package and subpackages aimed to make short aliases of that functions.
+For example the function link:./slice/api.go#L459[slice.SortByOrdered] has aliases link:./slice/sort/api.go#L12[sort.By] and link:./slice/sort/api.go#L23[sort.Of].
 
-The package provides helper subpackages and functions for using with slices. +
-Most helpers organized as pair of a main function and short aliases in a subpackage. For example the function link:./slice/api.go#L247[slice.SortByOrdered] has aliases link:./slice/sort/api.go#L12[sort.By] and link:./slice/sort/api.go#L23[sort.Of].
 
-Usage examples link:./internal/examples/sliceexamples/slice_examples_test.go[here].
+==== link:./slice/api.go[slice] and link:./map_/api.go[map_]
 
-==== link:./map_/api.go[map_]
+Contains utility functions of converting, filtering (searching), reducing elements of embedded slices and maps.
 
-The package provides helper subpackages and functions for using with maps. +
+Usage examples link:./internal/examples/sliceexamples/slice_examples_test.go[here] and link:./internal/examples/mapexamples/map_examples_test.go[here].
 
-Usage examples link:./internal/examples/mapexamples/map_examples_test.go[here].
+==== link:./predicate/api.go[predicate] and breakable link:./predicate/api.go[break/predicate]
+
+TODO
 
 ==== link:./loop/api.go[loop], link:./kv/loop/api.go[kv/loop] and breakable versions link:./break/loop/api.go[break/loop], link:./break/kv/loop/api.go[break/kv/loop]
 
 TODO
 
 ==== link:./collection/mutable/api.go[mutable] and link:./collection/immutable/api.go[immutable] collections
-
-TODO
-
-TODO
-
-==== link:./predicate/api.go[predicate] and breakable link:./predicate/api.go[break/predicate]
 
 TODO
 
@@ -127,35 +123,5 @@ Intermediates should wrap one by one to make a lazy computation chain that can b
 
 [source,go]
 ----
-//Example 'filter', 'map', 'reduce' for an iterative container of 'items'
-
-var items immutable.Vector[Item]
-
-var (
-    condition = func(item Item) bool { ... }
-    max       = func(attribute1 Attribute, attribute2 Attribute) Attribute { ... }
-) 
-
-maxItemAttribute := it.Reduce(it.Convert(c.Filer(items, condition), Item.GetAttribute), max)
-----
-
-Functions grouped into packages by applicable type (link:./c/api.go[container], link:./c/map_/api.go[map], link:./it/api.go[iterator], link:slice/api.go[slice])
-
-=== Additional packages
-
-==== link:./c/iface.go[Common interfaces]
-
-Iterator, Iterable, Container, Vector, Map, Set and so on.
-
-==== link:./c/op/api.go[Iterable container API]
-Declarative style API over 'Iterable' interface. Based on 'Iterator API' (see below).
-
-==== link:./it/api.go[Iterator API]
-Declarative style API over 'Iterator' interface. 
-
-=== Examples
-
-[source,go]
-----
-include::../examples/examples_test.go[]
+//TODO
 ----
