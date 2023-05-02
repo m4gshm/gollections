@@ -106,16 +106,6 @@ include::../examples/collection/mutable/omap.go[lines=11..12,indent=0]
 
 The same interfaces as in the mutable package but for read-only purposes.
 
-==== Containers creating
-===== Mutable
-
-[source,go]
-----
-include::../examples/constructors_mutable.go[]
-----
-
-where link:./collection/mutable/vector/api.go[vector], link:./collection/mutable/set/api.go[set], link:./collection/mutable/oset/api.go[oset], link:./collection/mutable/map_/api.go[map_], link:./collection/mutable/omap/api.go[omap] are packages from link:./collection/mutable/[github.com/m4gshm/gollections/collection/mutable] and link:./k/v.go[k.V] is the method V from the package link:./k/[k]
-
 === Stream functions
 
 There are three groups of operations:
