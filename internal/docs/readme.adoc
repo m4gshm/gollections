@@ -56,10 +56,10 @@ Usage examples link:./internal/examples/sliceexamples/slice_examples_test.go[her
 
 Provides implelentations of link:./collection/iface.go#L25[Vector], link:./collection/iface.go#L35[Set] and link:./collection/iface.go#L41[Map].
 
-Mutables support content appending, updating and deleting (the ordered map implementation is not supported delete operations).
+Mutables support content appending, updating and deleting (the ordered map implementation is not supported delete operations). +
 Immutables are read-only datasets.
 
-Detailed description of implementations below.
+Detailed description of implementations xref:mutable-collections[below].
 
 ==== link:./predicate/api.go[predicate] and breakable link:./predicate/api.go[break/predicate]
 

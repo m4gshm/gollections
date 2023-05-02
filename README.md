@@ -94,10 +94,10 @@ Provides implelentations of [Vector](./collection/iface.go#L25),
 [Set](./collection/iface.go#L35) and [Map](./collection/iface.go#L41).
 
 Mutables support content appending, updating and deleting (the ordered
-map implementation is not supported delete operations). Immutables are
-read-only datasets.
+map implementation is not supported delete operations).  
+Immutables are read-only datasets.
 
-Detailed description of implementations below.
+Detailed description of implementations [below](#mutable-collections).
 
 ### [predicate](./predicate/api.go) and breakable [break/predicate](./predicate/api.go)
 
