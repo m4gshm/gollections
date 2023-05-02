@@ -87,7 +87,7 @@ include::../examples/collection/mutable/vector.go[lines=10..11,indent=0]
 ----
 include::../examples/collection/mutable/set.go[lines=10..11,indent=0]
 ----
-  * link:./collection/mutable/map_/api.go[Map] - built-in map wrapper that supports link:#container-functions[container functions].
+  * link:./collection/mutable/map_/api.go[Map] - built-in map wrapper that supports xref:stream-functions[stream functions].
 [source,go]
 ----
 include::../examples/collection/mutable/map.go[lines=11..12,indent=0]

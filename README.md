@@ -133,7 +133,7 @@ Supports write operations (append, delete, replace).
     _ collection.Set[int] = immutable.NewSet([]int{1, 2, 3})
 
 - [Map](./collection/mutable/map_/api.go) - built-in map wrapper that
-  supports [container functions](#container-functions).
+  supports [stream functions](#stream-functions).
 
 <!-- -->
 
