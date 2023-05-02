@@ -22,39 +22,39 @@ var users = []User{
 You can make clear code, extensive, but without dependencies:
 
 ``` go
-   namesByRole := map[string][]string{}
-    for _, u := range users {
-        roles := u.Roles()
-        if len(roles) == 0 {
-            lr := ""
+namesByRole := map[string][]string{}
+for _, u := range users {
+    roles := u.Roles()
+    if len(roles) == 0 {
+        lr := ""
+        names := namesByRole[lr]
+        names = append(names, u.Name())
+        namesByRole[lr] = names
+    } else {
+        for _, r := range roles {
+            lr := strings.ToLower(r.Name())
             names := namesByRole[lr]
             names = append(names, u.Name())
             namesByRole[lr] = names
-        } else {
-            for _, r := range roles {
-                lr := strings.ToLower(r.Name())
-                names := namesByRole[lr]
-                names = append(names, u.Name())
-                namesByRole[lr] = names
-            }
         }
     }
+}
 
-    assert.Equal(t, namesByRole[""], []string{"Tom"})
-    assert.Equal(t, namesByRole["manager"], []string{"Bob", "Alice"})
-    assert.Equal(t, namesByRole["admin"], []string{"Bob"})
+assert.Equal(t, namesByRole[""], []string{"Tom"})
+assert.Equal(t, namesByRole["manager"], []string{"Bob", "Alice"})
+assert.Equal(t, namesByRole["admin"], []string{"Bob"})
 ```
 
 Or using the devkit you can write more compact code like this:
 
 ``` go
-   var namesByRole = group.ByMultipleKeys(users, func(u User) []string {
-        return convert.AndConvert(u.Roles(), Role.Name, strings.ToLower)
-    }, User.Name)
+var namesByRole = group.ByMultipleKeys(users, func(u User) []string {
+    return convert.AndConvert(u.Roles(), Role.Name, strings.ToLower)
+}, User.Name)
 
-    assert.Equal(t, namesByRole[""], []string{"Tom"})
-    assert.Equal(t, namesByRole["manager"], []string{"Bob", "Alice"})
-    assert.Equal(t, namesByRole["admin"], []string{"Bob"})
+assert.Equal(t, namesByRole[""], []string{"Tom"})
+assert.Equal(t, namesByRole["manager"], []string{"Bob", "Alice"})
+assert.Equal(t, namesByRole["admin"], []string{"Bob"})
 ```
 
 ## Installation
@@ -121,32 +121,32 @@ Supports write operations (append, delete, replace).
 
 <!-- -->
 
-        _ immutable.Vector[int]  = vector.Of(1, 2, 3)
-        _ collection.Vector[int] = immutable.NewVector([]int{1, 2, 3})
+    _ immutable.Vector[int]  = vector.Of(1, 2, 3)
+    _ collection.Vector[int] = immutable.NewVector([]int{1, 2, 3})
 
 - [Set](./collection/mutable/set/api.go) - collection of unique items,
   prevents duplicates.
 
 <!-- -->
 
-        _ immutable.Set[int]  = set.Of(1, 2, 3)
-        _ collection.Set[int] = immutable.NewSet([]int{1, 2, 3})
+    _ immutable.Set[int]  = set.Of(1, 2, 3)
+    _ collection.Set[int] = immutable.NewSet([]int{1, 2, 3})
 
 - [Map](./collection/mutable/map_/api.go) - built-in map wrapper that
   supports [container functions](#container-functions).
 
 <!-- -->
 
-        _ immutable.Map[int, string]  = map_.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
-        _ collection.Map[int, string] = immutable.NewMap(map[int]string{1: "2", 2: "2", 3: "3"})
+    _ immutable.Map[int, string]  = map_.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
+    _ collection.Map[int, string] = immutable.NewMap(map[int]string{1: "2", 2: "2", 3: "3"})
 
 - [OrderedSet](./collection/mutable/oset/api.go) - collection of unique
   items, prevents duplicates, provides iteration in order of addition.
 
 <!-- -->
 
-        _ ordered.Set[int]    = oset.Of(1, 2, 3)
-        _ collection.Set[int] = ordered.NewSet([]int{1, 2, 3})
+    _ ordered.Set[int]    = oset.Of(1, 2, 3)
+    _ collection.Set[int] = ordered.NewSet([]int{1, 2, 3})
 
 - [OrderedMap](./collection/mutable/omap/api.go) - same as the
   [Map](./collection/mutable/map_/api.go), but supports iteration in the
@@ -154,8 +154,8 @@ Supports write operations (append, delete, replace).
 
 <!-- -->
 
-        _ *ordered.Map[int, string]    = omap.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
-        _ collection.Map[int, string] = ordered.NewMap(
+    _ *ordered.Map[int, string]    = omap.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
+    _ collection.Map[int, string] = ordered.NewMap(
 
 ### Immutable containers
 

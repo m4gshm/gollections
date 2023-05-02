@@ -16,14 +16,14 @@ include::../examples/boilerplate/user_data.go[lines=3..-1]
 You can make clear code, extensive, but without dependencies:
 [source,go]
 ----
-include::../examples/boilerplate/slice_namesbyRole_old.go[lines=11..33]
+include::../examples/boilerplate/slice_namesbyRole_old.go[lines=11..33,indent=0]
 ----
 
 
 Or using the devkit you can write more compact code like this:
 [source,go]
 ----
-include::../examples/boilerplate/slice_namesbyRole_new.go[lines=13..21]
+include::../examples/boilerplate/slice_namesbyRole_new.go[lines=13..21,indent=0]
 ----
 
 === Installation
@@ -69,7 +69,6 @@ Provides predicate builder api that used for filtering collection elements.
 
 TODO
 
-
 ==== Short aliases for collection constructors
 
 TODO
@@ -81,26 +80,26 @@ Supports write operations (append, delete, replace).
   * link:./collection/mutable/vector/api.go[Vector] - the simplest based on built-in slice collection.
 [source,go]
 ----
-include::../examples/collection/mutable/vector.go[lines=10..11]
+include::../examples/collection/mutable/vector.go[lines=10..11,indent=0]
 ----
   * link:./collection/mutable/set/api.go[Set] - collection of unique items, prevents duplicates.
 [source,go]
 ----
-include::../examples/collection/mutable/set.go[lines=10..11]
+include::../examples/collection/mutable/set.go[lines=10..11,indent=0]
 ----
   * link:./collection/mutable/map_/api.go[Map] - built-in map wrapper that supports link:#container-functions[container functions].
 [source,go]
 ----
-include::../examples/collection/mutable/map.go[lines=11..12]
+include::../examples/collection/mutable/map.go[lines=11..12,indent=0]
 ----
   * link:./collection/mutable/oset/api.go[OrderedSet] - collection of unique items, prevents duplicates, provides iteration in order of addition.
 [source,go]
 ----
-include::../examples/collection/mutable/oset.go[lines=10..11]
+include::../examples/collection/mutable/oset.go[lines=10..11,indent=0]
 ----
   * link:./collection/mutable/omap/api.go[OrderedMap] - same as the link:./collection/mutable/map_/api.go[Map], but supports iteration in the order in which elements are added.
 ----
-include::../examples/collection/mutable/omap.go[lines=11..12]
+include::../examples/collection/mutable/omap.go[lines=11..12,indent=0]
 ----
 
 ==== Immutable containers
