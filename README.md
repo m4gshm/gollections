@@ -22,7 +22,7 @@ var users = []User{
 You can make clear code, extensive, but without dependencies:
 
 ``` go
-namesByRole := map[string][]string{}
+var namesByRole = map[string][]string{}
 for _, u := range users {
     roles := u.Roles()
     if len(roles) == 0 {

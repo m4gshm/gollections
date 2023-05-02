@@ -9,7 +9,7 @@ import (
 
 func _(t *testing.T) {
 
-	namesByRole := map[string][]string{}
+	var namesByRole = map[string][]string{}
 	for _, u := range users {
 		roles := u.Roles()
 		if len(roles) == 0 {
