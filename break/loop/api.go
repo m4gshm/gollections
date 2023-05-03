@@ -10,12 +10,22 @@ import (
 	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/convert"
 	"github.com/m4gshm/gollections/convert/as"
+	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_/resolv"
 	"github.com/m4gshm/gollections/notsafe"
 )
 
 // ErrBreak is the 'break' statement of the For, Track methods
 var ErrBreak = c.ErrBreak
+
+// Of wrap the elements by loop function
+func Of[T any](elements ...T) func() (e T, ok bool, err error) {
+	next := loop.Of(elements...)
+	return func() (e T, ok bool, err error) {
+		e, ok = next()
+		return e, ok, nil
+	}
+}
 
 // From wrap the next loop to a breakable loop
 func From[T any](next func() (T, bool)) func() (T, bool, error) {

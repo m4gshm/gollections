@@ -129,24 +129,45 @@ assert.Equal(t, "Bob", bob.Name())
 Low level iteration api based on `next` function.
 
 ``` go
-type next[T any] func() (element T, ok bool)
+type (
+    next[T any]      func() (element T, ok bool)
+    kvNext[K, V any] func() (key K, value V, ok bool)
+)
 ```
 
 The function retrieves a next element from a dataset and returns
-ok==true if successful. API in most cases is similar to the
-[slice](./slice/api.go) api but with delayed computation.
+ok==true if successful.  
+The API in most cases is similar to the [slice](./slice/api.go) API but
+with delayed computation which means that the methods don’t compute a
+result but only return a loop provider. The loop provider is type with a
+`Next` method that returns a next processed element.
 
 ``` go
-even := func(i int) bool { return i%2 == 0 }
+   loopStream := loop.Convert(loop.Filter(loop.Of(1, 2, 3, 4), even).Next, strconv.Itoa)
 
-loopStream := loop.Convert(loop.Filter(loop.Of(1, 2, 3, 4), even).Next, strconv.Itoa)
+    assert.Equal(t, []string{"2", "4"}, loop.Slice(loopStream.Next))
 
-assert.Equal(t, []string{"2", "4"}, loop.Slice(loopStream.Next))
+}
 ```
 
-### Short aliases for collection constructors
+Breakable loops additionaly have error returned value.
 
-TODO
+``` go
+type (
+    next[T any]      func() (element T, ok bool, err error)
+    kvNext[K, V any] func() (key K, value V, ok bool, err error)
+)
+```
+
+It is used for computations where an error may occur.
+
+``` go
+iter := loop.Conv(loop.Of("1", "2", "3", "ddd4", "5"), strconv.Atoi)
+result, err := loop.Slice(iter.Next)
+
+assert.Equal(t, []int{1, 2, 3}, result)
+assert.ErrorContains(t, err, "invalid syntax")
+```
 
 ## Mutable collections
 

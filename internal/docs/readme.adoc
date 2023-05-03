@@ -45,7 +45,6 @@ go get -u github.com/m4gshm/gollections@HEAD
 All packages consists of functions placed in the package and subpackages aimed to make short aliases of that functions.
 For example the function link:./slice/api.go#L459[slice.SortByOrdered] has aliases link:./slice/sort/api.go#L12[sort.By] and link:./slice/sort/api.go#L23[sort.Of].
 
-
 ==== link:./slice/api.go[slice] and link:./map_/api.go[map_]
 
 Contains utility functions of link:./slice/api.go#L156[converting],  link:./slice/api.go#L379[filtering] (searching), link:./slice/api.go#L464[reducing], link:./map_/api.go#L90[cloning] elements of embedded slices and maps.
@@ -82,20 +81,30 @@ Low level iteration api based on ```next``` function.
 
 [source,go]
 ----
-include::../examples/loop/loop_filter_convert_reduce_test.go[lines=10..12,indent=0]
+include::../examples/loop/loop_filter_convert_reduce_test.go[lines=10..15,indent=0]
 ----
 
-The function retrieves a next element from a dataset and returns ok==true if successful.
-API in most cases is similar to the link:./slice/api.go[slice] api but with delayed computation.
+The function retrieves a next element from a dataset and returns ok==true if successful. +
+The API in most cases is similar to the link:./slice/api.go[slice] API but with delayed computation which means that the methods don't compute a result but only return a loop provider. The loop provider is type with a ``Next`` method that returns a next processed element.
 
 [source,go]
 ----
-include::../examples/loop/loop_filter_convert_reduce_test.go[lines=14..20,indent=0]
+include::../examples/loop/loop_filter_convert_reduce_test.go[lines=17..23,indent=0]
 ----
 
-==== Short aliases for collection constructors
+Breakable loops additionaly have error returned value.
 
-TODO
+[source,go]
+----
+include::../examples/loop/breakloop/loop_filter_convert_reduce_test.go[lines=10..15,indent=0]
+----
+
+It is used for computations where an error may occur.
+
+[source,go]
+----
+include::../examples/loop/breakloop/loop_filter_convert_reduce_test.go[lines=17..23,indent=0]
+----
 
 === Mutable collections
 

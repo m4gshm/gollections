@@ -8,11 +8,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type next[T any] func() (element T, ok bool)
+type (
+	next[T any]      func() (element T, ok bool)
+	kvNext[K, V any] func() (key K, value V, ok bool)
+)
 
 func Test_Slice_Vs_Loop(t *testing.T) {
-
-	even := func(i int) bool { return i%2 == 0 }
 
 	loopStream := loop.Convert(loop.Filter(loop.Of(1, 2, 3, 4), even).Next, strconv.Itoa)
 
