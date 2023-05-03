@@ -11,10 +11,7 @@ func Eq[T comparable](v T) predicate.Predicate[T] {
 	return predicate.Not(eq.To(v))
 }
 
-func Empty[From, To any](flattener func(From) []To) predicate.Predicate[From] {
-	return predicate.Not(predicate.Empty(flattener))
+// Match - not.Match alias of predicate.Not
+func Match[From, To any](getter func(From) To, condition predicate.Predicate[To]) predicate.Predicate[From] {
+	return predicate.Not(predicate.Match(getter, condition))
 }
-
-// func Empty2[ T string ](flattener func(From) []To) predicate.Predicate[From] {
-// 	return predicate.Not(predicate.Empty(flattener))
-// }

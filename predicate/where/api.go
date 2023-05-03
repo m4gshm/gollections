@@ -1,3 +1,4 @@
+// Package where provides short predicate constructors
 package where
 
 import (
@@ -5,18 +6,22 @@ import (
 	"github.com/m4gshm/gollections/predicate/eq"
 )
 
-func Match[From, To any](structGetter func(From) To, matcher predicate.Predicate[To]) predicate.Predicate[From] {
-	return predicate.Match(structGetter, matcher)
+// Match - where.Match alias for the predicate.Match
+func Match[From, To any](getter func(From) To, condition predicate.Predicate[To]) predicate.Predicate[From] {
+	return predicate.Match(getter, condition)
 }
 
-func Any[From, To any](structGetter func(From) []To, matcher predicate.Predicate[To]) predicate.Predicate[From] {
-	return predicate.MatchAny(structGetter, matcher)
+// Any - where.Any alias for the predicate.MatchAny
+func Any[From, To any](getter func(From) []To, condition predicate.Predicate[To]) predicate.Predicate[From] {
+	return predicate.MatchAny(getter, condition)
 }
 
-func Eq[From any, To comparable](structGetter func(From) To, example To) predicate.Predicate[From] {
-	return Match(structGetter, eq.To(example))
+// Eq creates predicate thet checks equality of a strcut property value to the specified example
+func Eq[From any, To comparable](getter func(From) To, example To) predicate.Predicate[From] {
+	return Match(getter, eq.To(example))
 }
 
-func Not[From, To any](structGetter func(From) To, matcher predicate.Predicate[To]) predicate.Predicate[From] {
-	return predicate.Not(Match(structGetter, matcher))
+// Not creates negate condition for a  a strcut property
+func Not[From, To any](getter func(From) To, condition predicate.Predicate[To]) predicate.Predicate[From] {
+	return predicate.Not(Match(getter, condition))
 }

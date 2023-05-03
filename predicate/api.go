@@ -22,7 +22,7 @@ func Eq[T comparable](v T) Predicate[T] {
 	return func(c T) bool { return v == c }
 }
 
-// Not inverts a predicate
+// Not negates the 'p' predicate
 func Not[T any](p Predicate[T]) Predicate[T] {
 	return func(v T) bool { return !p(v) }
 }
@@ -62,59 +62,15 @@ func Union[T any](predicates ...Predicate[T]) Predicate[T] {
 	}
 }
 
-func Match[From, To any](convert func(From) To, predicate Predicate[To]) Predicate[From] {
-	return func(from From) bool { return predicate(convert(from)) }
+// Match creates a predicate that tests whether a value of a structure property matches a specified condition
+func Match[Entity, Property any](getter func(Entity) Property, condition Predicate[Property]) Predicate[Entity] {
+	return func(entity Entity) bool { return condition(getter(entity)) }
 }
 
-func MatchAny[From, To any](flatter func(From) []To, predicate Predicate[To]) Predicate[From] {
-	return func(from From) bool {
-		return slice.Has(flatter(from), predicate)
+// MatchAny creates a predicate that tests whether any value of a structure property matches a specified condition
+// The property has a slice type.
+func MatchAny[Entity, Property any](getter func(Entity) []Property, condition Predicate[Property]) Predicate[Entity] {
+	return func(entity Entity) bool {
+		return slice.Has(getter(entity), condition)
 	}
-}
-
-func HasConverted[From, I, To any](flatter func(From) []I, convert func([]I) To, predicate Predicate[To]) Predicate[From] {
-	return func(from From) bool {
-		return predicate(convert(flatter(from)))
-	}
-}
-
-func HasAnyConverted[From, I, To any](flatter func(From) []I, convert func(I) To, predicate Predicate[To]) Predicate[From] {
-	return func(from From) bool {
-		for _, f := range flatter(from) {
-			if c := convert(f); predicate(c) {
-				return true
-			}
-		}
-		return false
-	}
-}
-
-func ContainsConverted[From, I any, To comparable](flatter func(From) []I, convert func(I) To, expected To) Predicate[From] {
-	return func(from From) bool {
-		ff := flatter(from)
-		for _, f := range ff {
-			if c := convert(f); c == expected {
-				return true
-			}
-		}
-		return false
-	}
-}
-
-func Contains[From any, To comparable](flatter func(From) []To, expected To) Predicate[From] {
-	return func(from From) bool {
-		return slice.Contains(flatter(from), expected)
-	}
-}
-
-func Len[TS ~[]T, T any](predicate Predicate[int]) Predicate[TS] {
-	return Match(slice.Len[TS], predicate)
-}
-
-func Any[TS ~[]T, T, C any](convert func(TS) C, predicate Predicate[C]) Predicate[TS] {
-	return Match(convert, predicate)
-}
-
-func Empty[From, To any](flattener func(From) []To) Predicate[From] {
-	return func(f From) bool { return slice.Empty(flattener(f)) }
 }

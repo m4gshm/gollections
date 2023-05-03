@@ -22,6 +22,7 @@ var ErrBreak = loop.ErrBreak
 // Of is generic slice constructor
 func Of[T any](elements ...T) []T { return elements }
 
+// Len return the length of the 'elements' slice
 func Len[TS ~[]T, T any](elements TS) int {
 	return len(elements)
 }
@@ -680,9 +681,10 @@ func Contains[TS ~[]T, T comparable](elements TS, example T) bool {
 	return false
 }
 
-func Has[TS ~[]T, T any](elements TS, predicate func(T) bool) bool {
+// Has checks is the 'elements' slice contains a value that satisfies the specified condition
+func Has[TS ~[]T, T any](elements TS, condition func(T) bool) bool {
 	for _, e := range elements {
-		if predicate(e) {
+		if condition(e) {
 			return true
 		}
 	}

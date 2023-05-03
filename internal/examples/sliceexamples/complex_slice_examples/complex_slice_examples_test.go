@@ -8,9 +8,10 @@ import (
 	"github.com/m4gshm/gollections/iter"
 	"github.com/m4gshm/gollections/loop"
 	loopConv "github.com/m4gshm/gollections/loop/convert"
-	"github.com/m4gshm/gollections/predicate"
 	"github.com/m4gshm/gollections/predicate/eq"
+	"github.com/m4gshm/gollections/predicate/match"
 	"github.com/m4gshm/gollections/predicate/not"
+	"github.com/m4gshm/gollections/predicate/where"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/convert"
 	"github.com/m4gshm/gollections/slice/group"
@@ -87,7 +88,7 @@ func Test_GroupBySeveralKeysAndConvertMapValues(t *testing.T) {
 }
 
 func Test_FindFirsManager(t *testing.T) {
-	alice, ok := slice.First(users, predicate.ContainsConverted(User.Roles, Role.Name, "Manager"))
+	alice, ok := slice.First(users, match.Any(User.Roles, where.Eq(Role.Name, "Manager")))
 
 	assert.True(t, ok)
 	assert.Equal(t, "Alice", alice.Name())
@@ -110,14 +111,14 @@ userLoop:
 
 func Benchmark_FindFirsManager_Predicate_ContainsConverted(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		alice, ok := slice.First(users, predicate.ContainsConverted(User.Roles, Role.Name, "Manager"))
+		alice, ok := slice.First(users, where.Any(User.Roles, where.Eq(Role.Name, "Manager")))
 		_, _ = alice, ok
 	}
 }
 
 func Benchmark_FindFirsManager_Predicate_HasAnyConverted(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		alice, ok := slice.First(users, predicate.HasAnyConverted(User.Roles, Role.Name, eq.To("Manager")))
+		alice, ok := slice.First(users, match.Any(User.Roles, match.To(Role.Name, func(name string) bool { return name == "manager" })))
 		_, _ = alice, ok
 	}
 }

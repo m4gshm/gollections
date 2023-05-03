@@ -144,7 +144,7 @@ There are three groups of operations:
 
 * Immediate - retrieves the result in place (link:./collection/mutable/vector.go#L322[Sort], link:./collection/immutable/vector.go#L154[Reduce], link:./collection/immutable/vector.go#L111[Track], link:./collection/mutable/ordered/map.go#L182[TrackEach], link:./collection/immutable/vector.go#L122[For], link:./collection/immutable/ordered/map.go#L175[ForEach])
 * Intermediate - only defines a computation (link:./collection/api.go#L17[Convert], link:./collection/immutable/ordered/set.go#L124[Filter], link:./collection/api.go#L36[Flatt], link:./collection/api.go#L69[Group]).
-* Final - applies intermediates and retrieves a result (link:./collection/api.go#L75[First], link:./collection/immutable/ordered/set.go#L94[Slice], link:./collection/immutable/ordered/set.go#L146[Reduce] (of iterators))
+* Final - applies intermediates and retrieves a result (link:./collection/api.go#L75[First], link:./collection/immutable/ordered/set.go#L94[Slice], link:./collection/immutable/ordered/set.go#L146[Reduce])
 
 Intermediates should wrap one by one to make a lazy computation chain that can be applied to the latest final operation.
 

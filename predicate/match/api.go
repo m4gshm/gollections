@@ -1,11 +1,14 @@
+// Package match provides short predicate constructors
 package match
 
 import "github.com/m4gshm/gollections/predicate"
 
-func To[From, To any](convert func(From) To, matcher predicate.Predicate[To]) predicate.Predicate[From] {
-	return predicate.Match(convert, matcher)
+// To - match.To alias for the predicate.Match
+func To[From, To any](getter func(From) To, condition predicate.Predicate[To]) predicate.Predicate[From] {
+	return predicate.Match(getter, condition)
 }
 
-func Any[From, To any](flatter func(From) []To, matcher predicate.Predicate[To]) predicate.Predicate[From] {
-	return predicate.MatchAny(flatter, matcher)
+// Any - match.Any alias for the predicate.MatchAny
+func Any[From, To any](getter func(From) []To, condition predicate.Predicate[To]) predicate.Predicate[From] {
+	return predicate.MatchAny(getter, condition)
 }

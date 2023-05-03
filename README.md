@@ -20,6 +20,8 @@ var users = []User{
 }
 ```
 
+type is [here](./internal/examples/boilerplate/user_type.go)
+
 You can make clear code, extensive, but without dependencies:
 
 ``` go
@@ -238,7 +240,7 @@ There are three groups of operations:
 - Final - applies intermediates and retrieves a result
   ([First](./collection/api.go#L75),
   [Slice](./collection/immutable/ordered/set.go#L94),
-  [Reduce](./collection/immutable/ordered/set.go#L146) (of iterators))
+  [Reduce](./collection/immutable/ordered/set.go#L146))
 
 Intermediates should wrap one by one to make a lazy computation chain
 that can be applied to the latest final operation.
