@@ -87,7 +87,13 @@ of embedded slices and maps.
 
 ``` go
 even := func(i int) bool { return i%2 == 0 }
-result := slice.Reduce(slice.Convert(slice.Filter(slice.Of(1, 2, 3, 4), even), strconv.Itoa), op.Sum[string])
+result := slice.Reduce(
+    slice.Convert(
+        slice.Filter(slice.Of(1, 2, 3, 4), even),
+        strconv.Itoa,
+    ),
+    op.Sum[string],
+)
 
 assert.Equal(t, "24", result)
 ```
@@ -124,8 +130,6 @@ Low level iteration api based on `next` function.
 
 ``` go
 type next[T any] func() (element T, ok bool)
-
-func Test_Slice_Vs_Loop(t *testing.T) {
 ```
 
 The function retrieves a next element from a dataset and returns

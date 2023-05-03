@@ -53,7 +53,7 @@ Contains utility functions of link:./slice/api.go#L156[converting],  link:./slic
 
 [source,go]
 ----
-include::../examples/boilerplate/slice_filter_convert_reduce_test.go[lines=13..18,indent=0]
+include::../examples/boilerplate/slice_filter_convert_reduce_test.go[lines=13..24,indent=0]
 ----
 
 More examples link:./internal/examples/sliceexamples/slice_examples_test.go[here] and link:./internal/examples/mapexamples/map_examples_test.go[here].
@@ -82,7 +82,7 @@ Low level iteration api based on ```next``` function.
 
 [source,go]
 ----
-include::../examples/loop/loop_filter_convert_reduce_test.go[lines=11..13,indent=0]
+include::../examples/loop/loop_filter_convert_reduce_test.go[lines=10..12,indent=0]
 ----
 
 The function retrieves a next element from a dataset and returns ok==true if successful.
