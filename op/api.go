@@ -1,3 +1,4 @@
+// Package op provides generic operations that can be used for converting or reducing collections, loops, slices
 package op
 
 import (

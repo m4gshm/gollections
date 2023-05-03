@@ -1,3 +1,4 @@
+// Package notsafe provides unsafe helper functions
 package notsafe
 
 import (

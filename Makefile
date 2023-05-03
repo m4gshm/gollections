@@ -1,17 +1,21 @@
 
 .PHONY: all
-all: build test bench readme
+all: clean build test readme lint bench
 
 .PHONY: test
 test:
 	$(info #Running tests...)
-	go clean -testcache
 	go test ./...
+
+.PHONY: clean
+clean:
+	$(info #Building...)
+	go clean -cache
+	go clean -testcache
 
 .PHONY: build
 build:
 	$(info #Building...)
-	go clean -cache
 	go build ./...
 
 .PHONY: builda
@@ -40,16 +44,16 @@ lint:
 	# go install github.com/tetafro/godot/cmd/godot@latest
 	# godot ./:
 	go install github.com/kisielk/errcheck@latest
-	errcheck ./...
-	go install github.com/alexkohler/nakedret@latest
+	errcheck -ignoretests ./...
+	go install github.com/alexkohler/nakedret/cmd/nakedret@latest
 	nakedret ./...
-	go install golang.org/x/lint/golint@latest
-	golint ./...
+	# go install golang.org/x/lint/golint@latest
+	# golint ./...
 	go install github.com/mgechev/revive@latest
 	revive ./...
 
 .PHONY: readme
 readme:
 	$(info #README.md...)
-	asciidoctor -b docbook docs/readme.adoc 
-	pandoc -f docbook -t gfm docs/readme.xml -o README.md	
+	asciidoctor -b docbook internal/docs/readme.adoc 
+	pandoc -f docbook -t gfm internal/docs/readme.xml -o README.md	

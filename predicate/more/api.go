@@ -1,3 +1,4 @@
+// Package more provides predicate builders
 package more
 
 import (
@@ -5,10 +6,12 @@ import (
 	"golang.org/x/exp/constraints"
 )
 
-func Than[T constraints.Ordered](min T) predicate.Predicate[T] {
-	return func(v T) bool { return v > min }
+// Than - more.Than creates a predicate that can be used to test if a value is greater than the expected
+func Than[T constraints.Ordered](expected T) predicate.Predicate[T] {
+	return func(v T) bool { return v > expected }
 }
 
-func OrEq[T constraints.Ordered](min T) predicate.Predicate[T] {
-	return func(v T) bool { return v >= min }
+// OrEq - more.OrEq creates a predicate that can be used to test if a value is greater than or equal to the expected
+func OrEq[T constraints.Ordered](expected T) predicate.Predicate[T] {
+	return func(v T) bool { return v >= expected }
 }

@@ -1,3 +1,4 @@
+// Package range_ provides alias for the slice.Range function
 package range_
 
 import (
@@ -6,7 +7,7 @@ import (
 	"github.com/m4gshm/gollections/slice"
 )
 
-// Of - range_.Of replacer of the slice.Range
+// Of - range_.Of short alias of the slice.Range
 func Of[T constraints.Integer](from T, to T) []T {
 	return slice.Range(from, to)
 }

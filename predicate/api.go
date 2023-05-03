@@ -1,13 +1,28 @@
+// Package predicate provides predicate builders
 package predicate
+
+import (
+	"github.com/m4gshm/gollections/slice"
+)
 
 // Predicate tests value (converts to true or false).
 type Predicate[T any] func(T) bool
 
+// Or makes disjunction
 func (p Predicate[T]) Or(or Predicate[T]) Predicate[T] { return Or(p, or) }
-func (p Predicate[T]) And(and Predicate[T]) Predicate[T] { return And(p, and) }
-func (p Predicate[T]) Xor(and Predicate[T]) Predicate[T] { return Xor(p, and) }
 
-// Not inverts a predicate.
+// And makes conjunction
+func (p Predicate[T]) And(and Predicate[T]) Predicate[T] { return And(p, and) }
+
+// Xor makes exclusive OR
+func (p Predicate[T]) Xor(xor Predicate[T]) Predicate[T] { return Xor(p, xor) }
+
+// Eq creates a predicate to test for equality
+func Eq[T comparable](v T) Predicate[T] {
+	return func(c T) bool { return v == c }
+}
+
+// Not negates the 'p' predicate
 func Not[T any](p Predicate[T]) Predicate[T] {
 	return func(v T) bool { return !p(v) }
 }
@@ -47,15 +62,15 @@ func Union[T any](predicates ...Predicate[T]) Predicate[T] {
 	}
 }
 
-// Always returns v every time
-func Always[T any](v bool) Predicate[T] {
-	return func(_ T) bool { return v }
+// Match creates a predicate that tests whether a value of a structure property matches a specified condition
+func Match[Entity, Property any](getter func(Entity) Property, condition Predicate[Property]) Predicate[Entity] {
+	return func(entity Entity) bool { return condition(getter(entity)) }
 }
 
-// Never returns the negative of v every time
-func Never[T any](v bool) Predicate[T] {
-	return func(_ T) bool { return !v }
+// MatchAny creates a predicate that tests whether any value of a structure property matches a specified condition
+// The property has a slice type.
+func MatchAny[Entity, Property any](getter func(Entity) []Property, condition Predicate[Property]) Predicate[Entity] {
+	return func(entity Entity) bool {
+		return slice.Has(getter(entity), condition)
+	}
 }
-
-// BiPredicate tests values pair (converts to true or false).
-type BiPredicate[v1, v2 any] func(v1, v2) bool

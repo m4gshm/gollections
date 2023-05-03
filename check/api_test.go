@@ -9,22 +9,22 @@ import (
 func Test_ValueTypeAlwaysNotNil(t *testing.T) {
 	emptyString := ""
 	ref := &emptyString
-	assert.Equal(t, false, Nil(ref))
+	assert.False(t, Nil(ref))
 	ref = nil
-	assert.Equal(t, true, Nil(ref))
+	assert.True(t, Nil(ref))
 }
 
 func Test_NilIsNil(t *testing.T) {
-	assert.Equal(t, false, NotNil[interface{}](nil))
-	assert.Equal(t, true, Nil[interface{}](nil))
+	assert.False(t, NotNil[interface{}](nil))
+	assert.True(t, Nil[interface{}](nil))
 }
 
 func Test_RealNil(t *testing.T) {
-	assert.Equal(t, true, Nil[*string]((nil)))
-	assert.Equal(t, true, Nil((*string)(nil)))
-	assert.Equal(t, true, Nil((*int)(nil)))
-	assert.Equal(t, true, Nil[*int](nil))
-	assert.Equal(t, false, NotNil[*int](nil))
+	assert.True(t, Nil[*string]((nil)))
+	assert.True(t, Nil((*string)(nil)))
+	assert.True(t, Nil((*int)(nil)))
+	assert.True(t, Nil[*int](nil))
+	assert.False(t, NotNil[*int](nil))
 }
 
 func Test_NilStruct(t *testing.T) {
@@ -35,21 +35,12 @@ func Test_NilStruct(t *testing.T) {
 
 	r := &v
 
-	assert.Equal(t, false, Nil(&v))
-	assert.Equal(t, true, NotNil(r))
+	assert.False(t, Nil(&v))
+	assert.True(t, NotNil(r))
 	r = nil
-	assert.Equal(t, true, Nil(r))
-	assert.Equal(t, true, Nil[*someStruct](nil))
+	assert.True(t, Nil(r))
+	assert.True(t, Nil[*someStruct](nil))
 
 	var i interface{}
-	assert.Equal(t, false, Nil(&i))
-}
-
-func Test_Empty(t *testing.T) {
-	s := ""
-	assert.Equal(t, true, Empty(s))
-
-	i := []int{}
-	assert.Equal(t, true, Empty(i))
-
+	assert.False(t, Nil(&i))
 }

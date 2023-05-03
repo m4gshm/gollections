@@ -1,3 +1,4 @@
+// Package reverse provides shor aliases for cloning slices with the elements in reverse order
 package reverse
 
 import (

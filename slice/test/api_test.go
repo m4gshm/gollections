@@ -1,20 +1,30 @@
 package test
 
 import (
+	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
 	"reflect"
+	"runtime"
 	"strconv"
 	"testing"
 	"unsafe"
 
 	"github.com/stretchr/testify/assert"
 
+	_less "github.com/m4gshm/gollections/break/predicate/less"
+	_more "github.com/m4gshm/gollections/break/predicate/more"
+	"github.com/m4gshm/gollections/convert/as"
 	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/predicate/eq"
+	"github.com/m4gshm/gollections/predicate/more"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/clone"
 	"github.com/m4gshm/gollections/slice/clone/reverse"
 	csort "github.com/m4gshm/gollections/slice/clone/sort"
 	cstablesort "github.com/m4gshm/gollections/slice/clone/stablesort"
+	"github.com/m4gshm/gollections/slice/convert"
 	"github.com/m4gshm/gollections/slice/first"
 	"github.com/m4gshm/gollections/slice/last"
 	"github.com/m4gshm/gollections/slice/range_"
@@ -50,14 +60,14 @@ func Test_Clone(t *testing.T) {
 		third  = entity{"third"}
 
 		entities = []*entity{&first, &second, &third}
-		copy     = clone.Of(entities)
+		c        = clone.Of(entities)
 	)
 
-	assert.Equal(t, entities, copy)
-	assert.NotSame(t, entities, copy)
+	assert.Equal(t, entities, c)
+	assert.NotSame(t, entities, c)
 
 	for i := range entities {
-		assert.Same(t, entities[i], copy[i])
+		assert.Same(t, entities[i], c[i])
 	}
 }
 
@@ -69,15 +79,15 @@ func Test_DeepClone(t *testing.T) {
 		third  = entity{"third"}
 
 		entities = []*entity{&first, &second, &third}
-		copy     = clone.Deep(entities, clone.Ptr[entity])
+		c        = clone.Deep(entities, clone.Ptr[entity])
 	)
 
-	assert.Equal(t, entities, copy)
-	assert.NotSame(t, entities, copy)
+	assert.Equal(t, entities, c)
+	assert.NotSame(t, entities, c)
 
 	for i := range entities {
-		assert.Equal(t, entities[i], copy[i])
-		assert.NotSame(t, entities[i], copy[i])
+		assert.Equal(t, entities[i], c[i])
+		assert.NotSame(t, entities[i], c[i])
 	}
 }
 
@@ -114,6 +124,19 @@ func Test_First(t *testing.T) {
 	assert.False(t, nook)
 }
 
+func Test_Firstt(t *testing.T) {
+	s := slice.Of(1, 3, 5, 7, 9, 11)
+	r, ok, _ := slice.Firstt(s, _more.Than(5))
+	assert.True(t, ok)
+	assert.Equal(t, 7, r)
+
+	_, nook, _ := slice.Firstt(s, _more.Than(12))
+	assert.False(t, nook)
+
+	_, _, err := slice.Firstt(s, func(i int) (bool, error) { return true, errors.New("abort") })
+	assert.Error(t, err)
+}
+
 func Test_Last(t *testing.T) {
 	s := slice.Of(1, 3, 5, 7, 9, 11)
 	r, ok := last.Of(s, func(i int) bool { return i < 9 })
@@ -124,10 +147,46 @@ func Test_Last(t *testing.T) {
 	assert.False(t, nook)
 }
 
+func Test_Lastt(t *testing.T) {
+	s := slice.Of(1, 3, 5, 7, 9, 11)
+	r, ok, _ := slice.Lastt(s, _less.Than(9))
+	assert.True(t, ok)
+	assert.Equal(t, 7, r)
+
+	_, nook, _ := slice.Lastt(s, _less.Than(1))
+	assert.False(t, nook)
+
+	_, _, err := slice.Lastt(s, func(i int) (bool, error) { return true, errors.New("abort") })
+	assert.Error(t, err)
+}
+
+var absPath = op.IfElse(runtime.GOOS == "windows", "c:\\home\\user", "/home/user")
+var absPath2 = op.IfElse(runtime.GOOS == "windows", "c:\\usr\\bin", "/usr/bin")
+
+func TestConv(t *testing.T) {
+	if homeDir, err := os.UserHomeDir(); err != nil {
+		t.Error(err)
+	} else if err := os.Chdir(homeDir); err != nil {
+		t.Error(err)
+	} else if abs, err := slice.Conv(slice.Of(absPath, "././inTemp"), filepath.Abs); err != nil {
+		t.Error(err)
+	} else {
+		assert.Equal(t, slice.Of(absPath, filepath.Join(homeDir, "inTemp")), abs)
+	}
+}
+
 func Test_Convert(t *testing.T) {
 	s := slice.Of(1, 3, 5, 7, 9, 11)
 	r := slice.Convert(s, strconv.Itoa)
 	assert.Equal(t, []string{"1", "3", "5", "7", "9", "11"}, r)
+}
+
+func Test_Conv(t *testing.T) {
+	s := slice.Of("1", "3", "5", "7", "_9", "11")
+	r, err := slice.Conv(s, strconv.Atoi)
+	var expected *strconv.NumError
+	assert.ErrorAs(t, err, &expected)
+	assert.Equal(t, []int{1, 3, 5, 7}, r)
 }
 
 func Test_ConvertWithIndex(t *testing.T) {
@@ -136,17 +195,53 @@ func Test_ConvertWithIndex(t *testing.T) {
 	assert.Equal(t, slice.Of(1, 1+3, 2+5, 3+7, 4+9, 5+11), r)
 }
 
+func Test_ConvertNotNil(t *testing.T) {
+	type entity struct{ val string }
+	var (
+		source   = []*entity{{"first"}, nil, {"third"}, nil, {"fifth"}}
+		result   = convert.NotNil(source, func(e *entity) string { return e.val })
+		expected = []string{"first", "third", "fifth"}
+	)
+	assert.Equal(t, expected, result)
+}
+
+func Test_ConvertToNotNil(t *testing.T) {
+	type entity struct{ val *string }
+	var (
+		first    = "first"
+		third    = "third"
+		fifth    = "fifth"
+		source   = []entity{{&first}, {}, {&third}, {}, {&fifth}}
+		result   = convert.ToNotNil(source, func(e entity) *string { return e.val })
+		expected = []*string{&first, &third, &fifth}
+	)
+	assert.Equal(t, expected, result)
+}
+
+func Test_ConvertNilSafe(t *testing.T) {
+	type entity struct{ val *string }
+	var (
+		first    = "first"
+		third    = "third"
+		fifth    = "fifth"
+		source   = []*entity{{&first}, {}, {&third}, nil, {&fifth}}
+		result   = convert.NilSafe(source, func(e *entity) *string { return e.val })
+		expected = []*string{&first, &third, &fifth}
+	)
+	assert.Equal(t, expected, result)
+}
+
 var even = func(v int) bool { return v%2 == 0 }
 
 func Test_ConvertFiltered(t *testing.T) {
 	s := slice.Of(1, 3, 4, 5, 7, 8, 9, 11)
-	r := slice.ConvertFit(s, even, strconv.Itoa)
+	r := slice.FilterAndConvert(s, even, strconv.Itoa)
 	assert.Equal(t, []string{"4", "8"}, r)
 }
 
 func Test_ConvertFilteredWithIndex(t *testing.T) {
 	s := slice.Of(1, 3, 4, 5, 7, 8, 9, 11)
-	r := slice.ConvertFitIndexed(s, func(_ int, elem int) bool { return even(elem) }, func(index int, elem int) string { return strconv.Itoa(index + elem) })
+	r := slice.FilterAndConvertIndexed(s, func(_ int, elem int) bool { return even(elem) }, func(index int, elem int) string { return strconv.Itoa(index + elem) })
 	assert.Equal(t, []string{"6", "13"}, r)
 }
 
@@ -169,23 +264,47 @@ func Test_Flatt(t *testing.T) {
 	assert.Equal(t, e, f)
 }
 
+func Test_Flat(t *testing.T) {
+	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
+	f, err := slice.Flat(md, func(i []int) ([]int, error) { return i, op.IfElse(len(i) == 2, errors.New("abort"), nil) })
+	assert.Error(t, err)
+	e := []int{1, 2, 3, 4}
+	assert.Equal(t, e, f)
+}
+
+func Benchmark_Flatt(b *testing.B) {
+	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
+
+	for i := 0; i < b.N; i++ {
+		_ = slice.Flatt(md, func(i []int) []int { return i })
+	}
+}
+
+func Benchmark_Flatt_Convert_AsIs(b *testing.B) {
+	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
+
+	for i := 0; i < b.N; i++ {
+		_ = slice.FlattAndConvert(md, func(i []int) []int { return i }, as.Is[int])
+	}
+}
+
 func Test_FlattFilter(t *testing.T) {
 	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
-	f := slice.FlattFit(md, func(from []int) bool { return len(from) > 1 }, func(i []int) []int { return i })
+	f := slice.FilterAndFlatt(md, func(from []int) bool { return len(from) > 1 }, func(i []int) []int { return i })
 	e := []int{1, 2, 3, 5, 6}
 	assert.Equal(t, e, f)
 }
 
 func Test_FlattElemFilter(t *testing.T) {
 	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
-	f := slice.FlattElemFit(md, func(i []int) []int { return i }, even)
+	f := slice.FlattAndFiler(md, func(i []int) []int { return i }, even)
 	e := []int{2, 4, 6}
 	assert.Equal(t, e, f)
 }
 
-func Test_FlattFitFit(t *testing.T) {
+func Test_FilterAndFlattFit(t *testing.T) {
 	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
-	f := slice.FlattFitFit(md, func(from []int) bool { return len(from) > 1 }, func(i []int) []int { return i }, even)
+	f := slice.FilterFlattFilter(md, func(from []int) bool { return len(from) > 1 }, func(i []int) []int { return i }, even)
 	e := []int{2, 6}
 	assert.Equal(t, e, f)
 }
@@ -194,6 +313,13 @@ func Test_Filter(t *testing.T) {
 	s := slice.Of(1, 3, 4, 5, 7, 8, 9, 11)
 	r := slice.Filter(s, even)
 	assert.Equal(t, slice.Of(4, 8), r)
+}
+
+func Test_Filt(t *testing.T) {
+	s := slice.Of(1, 3, 4, 5, 7, 8, 9, 11)
+	r, err := slice.Filt(s, func(i int) (bool, error) { return even(i), op.IfElse(i > 7, errors.New("abort"), nil) })
+	assert.Error(t, err)
+	assert.Equal(t, slice.Of(4), r)
 }
 
 func Test_StringRepresentation(t *testing.T) {
@@ -273,7 +399,7 @@ func Test_OfLoop(t *testing.T) {
 
 func Test_Generate(t *testing.T) {
 	counter := 0
-	result, _ := slice.Generate(func() (int, bool, error) { counter++; return counter, counter < 4, nil })
+	result := slice.Generate(func() (int, bool) { counter++; return counter, counter < 4 })
 
 	assert.Equal(t, slice.Of(1, 2, 3), result)
 }
@@ -304,4 +430,20 @@ func Test_StableSortCloned(t *testing.T) {
 	sorted := cstablesort.Of(src)
 	assert.Equal(t, slice.Of(-1, 0, 1, 2, 3), sorted)
 	assert.NotEqual(t, (*reflect.SliceHeader)(unsafe.Pointer(&src)).Data, (*reflect.SliceHeader)(unsafe.Pointer(&sorted)).Data)
+}
+
+func Test_MatchAny(t *testing.T) {
+	elements := slice.Of(1, 2, 3, 4)
+
+	ok := slice.HasAny(elements, eq.To(4))
+	assert.True(t, ok)
+
+	noOk := slice.HasAny(elements, more.Than(5))
+	assert.False(t, noOk)
+}
+
+func Test_Empty(t *testing.T) {
+	assert.False(t, slice.Empty(slice.Of(1)))
+	assert.True(t, slice.Empty(slice.Of[int]()))
+	assert.True(t, slice.Empty[[]int](nil))
 }

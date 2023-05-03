@@ -1,3 +1,4 @@
+// Package group provides short aliases for functions used to group collection elements
 package group
 
 import (
@@ -6,6 +7,6 @@ import (
 )
 
 // Of - group.Of synonym of the walk.Group.
-func Of[T any, K comparable, W c.WalkEach[T]](elements W, by c.Converter[T, K]) map[K][]T {
+func Of[T any, K comparable, W c.ForEachLoop[T]](elements W, by func(T) K) map[K][]T {
 	return walk.Group(elements, by)
 }
