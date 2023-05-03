@@ -8,8 +8,9 @@ map](./collection/collection/mutable/omap/api.go) or
 
 Supports Go version 1.20.
 
-For example, you want to group some users by their role names converted
-to lowercase:
+For example, you want to group some
+[users](./internal/examples/boilerplate/user_type.go) by their role
+names converted to lowercase:
 
 ``` go
 var users = []User{
@@ -84,7 +85,14 @@ Contains utility functions of [converting](./slice/api.go#L156),
 [reducing](./slice/api.go#L464), [cloning](./map_/api.go#L90) elements
 of embedded slices and maps.
 
-Usage examples
+``` go
+even := func(i int) bool { return i%2 == 0 }
+result := slice.Reduce(slice.Convert(slice.Filter(slice.Of(1, 2, 3, 4), even), strconv.Itoa), op.Sum[string])
+
+assert.Equal(t, "24", result)
+```
+
+More examples
 [here](./internal/examples/sliceexamples/slice_examples_test.go) and
 [here](./internal/examples/mapexamples/map_examples_test.go).
 
@@ -104,9 +112,33 @@ Detailed description of implementations [below](#mutable-collections).
 Provides predicate builder api that used for filtering collection
 elements.
 
+``` go
+bob, _ := slice.First(users, where.Eq(User.Name, "Bob"))
+
+assert.Equal(t, "Bob", bob.Name())
+```
+
 ### [loop](./loop/api.go), [kv/loop](./kv/loop/api.go) and breakable versions [break/loop](./break/loop/api.go), [break/kv/loop](./break/kv/loop/api.go)
 
-TODO
+Low level iteration api based on `next` function.
+
+``` go
+type next[T any] func() (element T, ok bool)
+
+func Test_Slice_Vs_Loop(t *testing.T) {
+```
+
+The function retrieves a next element from a dataset and returns
+ok==true if successful. API in most cases is similar to the
+[slice](./slice/api.go) api but with delayed computation.
+
+``` go
+even := func(i int) bool { return i%2 == 0 }
+
+loopStream := loop.Convert(loop.Filter(loop.Of(1, 2, 3, 4), even).Next, strconv.Itoa)
+
+assert.Equal(t, []string{"2", "4"}, loop.Slice(loopStream.Next))
+```
 
 ### Short aliases for collection constructors
 

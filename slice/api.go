@@ -22,6 +22,10 @@ var ErrBreak = loop.ErrBreak
 // Of is generic slice constructor
 func Of[T any](elements ...T) []T { return elements }
 
+func Len[TS ~[]T, T any](elements TS) int {
+	return len(elements)
+}
+
 // OfLoop builds a slice by iterating elements of a source.
 // The hasNext specifies a predicate that tests existing of a next element in the source.
 // The getNext extracts the element.
@@ -474,7 +478,7 @@ func Reduce[TS ~[]T, T any](elements TS, merge func(T, T) T) T {
 }
 
 // Sum returns the sum of all elements
-func Sum[T c.Summable, TS ~[]T](elements TS) T {
+func Sum[TS ~[]T, T c.Summable](elements TS) T {
 	return Reduce(elements, op.Sum[T])
 }
 
@@ -647,17 +651,17 @@ func DowncastRef[TS ~[]T, T any](elements *[]T) *TS {
 	return s
 }
 
-// NoEmpty returns the 'notEmpty' if the 'elements' slise is empty
-func NoEmpty[TS ~[]T, T any](elements TS, notEmpty []T) TS {
-	if len(elements) > 0 {
+// Filled returns the 'ifEmpty' if the 'elements' slise is empty
+func Filled[TS ~[]T, T any](elements TS, ifEmpty []T) TS {
+	if Empty(elements) {
 		return elements
 	}
-	return notEmpty
+	return ifEmpty
 }
 
-// GetNoEmpty returns the 'notEmpty' if the 'elementsFactory' return an empty slice
-func GetNoEmpty[TS ~[]T, T any](elementsFactory func() TS, notEmpty []T) TS {
-	return NoEmpty(elementsFactory(), notEmpty)
+// GetFilled returns the 'notEmpty' if the 'elementsFactory' return an empty slice
+func GetFilled[TS ~[]T, T any](elementsFactory func() TS, ifEmpty []T) TS {
+	return Filled(elementsFactory(), ifEmpty)
 }
 
 // HasAny tests if the 'elements' slice contains an element that satisfies the "predicate" condition
@@ -674,6 +678,25 @@ func Contains[TS ~[]T, T comparable](elements TS, example T) bool {
 		}
 	}
 	return false
+}
+
+func Has[TS ~[]T, T any](elements TS, predicate func(T) bool) bool {
+	for _, e := range elements {
+		if predicate(e) {
+			return true
+		}
+	}
+	return false
+}
+
+// Empty checks whether the specified slice is empty
+func Empty[TS ~[]T, T any](elements TS) bool {
+	return len(elements) == 0
+}
+
+// NotEmpty checks whether the specified slice is not empty
+func NotEmpty[TS ~[]T, T any](elements TS) bool {
+	return !Empty(elements)
 }
 
 // ToMapResolv collects key\value elements to a map by iterating over the elements with resolving of duplicated key values

@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func _(t *testing.T) {
+func Test_NamesByRole_Old(t *testing.T) {
 
 	var namesByRole = map[string][]string{}
 	for _, u := range users {

@@ -182,7 +182,7 @@ type Removable[P any, V any] interface {
 
 // Summable is a type that supports the operator +
 type Summable interface {
-	constraints.Ordered | constraints.Complex
+	constraints.Ordered | constraints.Complex | string
 }
 
 // Number is a type that supports the operators +, -, /, *

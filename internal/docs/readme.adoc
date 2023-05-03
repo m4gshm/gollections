@@ -7,7 +7,7 @@ extending functionality by new collection implementations such as link:./collect
 
 Supports Go version 1.20.
 
-For example, you want to group some users by their role names converted to lowercase:
+For example, you want to group some link:./internal/examples/boilerplate/user_type.go[users] by their role names converted to lowercase:
 [source,go]
 ----
 include::../examples/boilerplate/user_data.go[lines=3..-1]
@@ -16,14 +16,14 @@ include::../examples/boilerplate/user_data.go[lines=3..-1]
 You can make clear code, extensive, but without dependencies:
 [source,go]
 ----
-include::../examples/boilerplate/slice_namesbyRole_old.go[lines=11..33,indent=0]
+include::../examples/boilerplate/slice_namesbyRole_old_test.go[lines=11..33,indent=0]
 ----
 
 
 Or using the devkit you can write more compact code like this:
 [source,go]
 ----
-include::../examples/boilerplate/slice_namesbyRole_new.go[lines=13..21,indent=0]
+include::../examples/boilerplate/slice_namesbyRole_new_test.go[lines=13..21,indent=0]
 ----
 
 === Installation
@@ -50,7 +50,13 @@ For example the function link:./slice/api.go#L459[slice.SortByOrdered] has alias
 
 Contains utility functions of link:./slice/api.go#L156[converting],  link:./slice/api.go#L379[filtering] (searching), link:./slice/api.go#L464[reducing], link:./map_/api.go#L90[cloning] elements of embedded slices and maps.
 
-Usage examples link:./internal/examples/sliceexamples/slice_examples_test.go[here] and link:./internal/examples/mapexamples/map_examples_test.go[here].
+
+[source,go]
+----
+include::../examples/boilerplate/slice_filter_convert_reduce_test.go[lines=13..18,indent=0]
+----
+
+More examples link:./internal/examples/sliceexamples/slice_examples_test.go[here] and link:./internal/examples/mapexamples/map_examples_test.go[here].
 
 ==== link:./collection/mutable/api.go[mutable] and link:./collection/immutable/api.go[immutable] collections
 
@@ -65,9 +71,27 @@ Detailed description of implementations xref:mutable-collections[below].
 
 Provides predicate builder api that used for filtering collection elements.
 
+[source,go]
+----
+include::../examples/boilerplate/predicate_test.go[lines=17..20,indent=0]
+----
+
 ==== link:./loop/api.go[loop], link:./kv/loop/api.go[kv/loop] and breakable versions link:./break/loop/api.go[break/loop], link:./break/kv/loop/api.go[break/kv/loop]
 
-TODO
+Low level iteration api based on ```next``` function.
+
+[source,go]
+----
+include::../examples/loop/loop_filter_convert_reduce_test.go[lines=11..13,indent=0]
+----
+
+The function retrieves a next element from a dataset and returns ok==true if successful.
+API in most cases is similar to the link:./slice/api.go[slice] api but with delayed computation.
+
+[source,go]
+----
+include::../examples/loop/loop_filter_convert_reduce_test.go[lines=14..20,indent=0]
+----
 
 ==== Short aliases for collection constructors
 

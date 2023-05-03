@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func _(t *testing.T) {
+func Test_NamesByRole_New(t *testing.T) {
 
 	var namesByRole = group.ByMultipleKeys(users, func(u User) []string {
 		return convert.AndConvert(u.Roles(), Role.Name, strings.ToLower)

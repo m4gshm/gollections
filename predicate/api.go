@@ -1,6 +1,10 @@
 // Package predicate provides predicate builders
 package predicate
 
+import (
+	"github.com/m4gshm/gollections/slice"
+)
+
 // Predicate tests value (converts to true or false).
 type Predicate[T any] func(T) bool
 
@@ -58,6 +62,22 @@ func Union[T any](predicates ...Predicate[T]) Predicate[T] {
 	}
 }
 
+func Match[From, To any](convert func(From) To, predicate Predicate[To]) Predicate[From] {
+	return func(from From) bool { return predicate(convert(from)) }
+}
+
+func MatchAny[From, To any](flatter func(From) []To, predicate Predicate[To]) Predicate[From] {
+	return func(from From) bool {
+		return slice.Has(flatter(from), predicate)
+	}
+}
+
+func HasConverted[From, I, To any](flatter func(From) []I, convert func([]I) To, predicate Predicate[To]) Predicate[From] {
+	return func(from From) bool {
+		return predicate(convert(flatter(from)))
+	}
+}
+
 func HasAnyConverted[From, I, To any](flatter func(From) []I, convert func(I) To, predicate Predicate[To]) Predicate[From] {
 	return func(from From) bool {
 		for _, f := range flatter(from) {
@@ -79,4 +99,22 @@ func ContainsConverted[From, I any, To comparable](flatter func(From) []I, conve
 		}
 		return false
 	}
+}
+
+func Contains[From any, To comparable](flatter func(From) []To, expected To) Predicate[From] {
+	return func(from From) bool {
+		return slice.Contains(flatter(from), expected)
+	}
+}
+
+func Len[TS ~[]T, T any](predicate Predicate[int]) Predicate[TS] {
+	return Match(slice.Len[TS], predicate)
+}
+
+func Any[TS ~[]T, T, C any](convert func(TS) C, predicate Predicate[C]) Predicate[TS] {
+	return Match(convert, predicate)
+}
+
+func Empty[From, To any](flattener func(From) []To) Predicate[From] {
+	return func(f From) bool { return slice.Empty(flattener(f)) }
 }

@@ -441,3 +441,9 @@ func Test_MatchAny(t *testing.T) {
 	noOk := slice.HasAny(elements, more.Than(5))
 	assert.False(t, noOk)
 }
+
+func Test_Empty(t *testing.T) {
+	assert.False(t, slice.Empty(slice.Of(1)))
+	assert.True(t, slice.Empty(slice.Of[int]()))
+	assert.True(t, slice.Empty[[]int](nil))
+}
