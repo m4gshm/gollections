@@ -15,8 +15,6 @@ func Empty[From, To any](flattener func(From) []To) predicate.Predicate[From] {
 	return predicate.Not(predicate.Empty(flattener))
 }
 
-
-
 // func Empty2[ T string ](flattener func(From) []To) predicate.Predicate[From] {
 // 	return predicate.Not(predicate.Empty(flattener))
 // }

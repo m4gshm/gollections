@@ -17,7 +17,7 @@ import (
 )
 
 func Test_Set_From(t *testing.T) {
-	set := oset.From(iter.Of(1, 1, 2, 2, 3, 4, 3, 2, 1).Next)
+	set := oset.From(loop.Of(1, 1, 2, 2, 3, 4, 3, 2, 1))
 	assert.Equal(t, slice.Of(1, 2, 3, 4), set.Slice())
 }
 
@@ -74,7 +74,7 @@ func Test_Set_Group_By_Walker(t *testing.T) {
 }
 
 func Test_Set_Group_By_Iterator(t *testing.T) {
-	groups := iter.Group[int, bool](oset.Of(0, 1, 1, 2, 4, 3, 1, 6, 7).Iter(), func(e int) bool { return e%2 == 0 }).Map()
+	groups := iter.Group(oset.Of(0, 1, 1, 2, 4, 3, 1, 6, 7).Iter(), func(e int) bool { return e%2 == 0 }).Map()
 
 	assert.Equal(t, len(groups), 2)
 	assert.Equal(t, []int{1, 3, 7}, groups[false])

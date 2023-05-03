@@ -83,7 +83,9 @@ aimed to make short aliases of that functions. For example the function
 Contains utility functions of [converting](./slice/api.go#L156),
 [filtering](./slice/api.go#L379) (searching),
 [reducing](./slice/api.go#L464), [cloning](./map_/api.go#L90) elements
-of embedded slices and maps.
+of embedded slices and maps. The functions compute result in-place. For
+delayed computations see loops or [collection
+functions](#collection-functions).
 
 ``` go
 even := func(i int) bool { return i%2 == 0 }
@@ -136,18 +138,17 @@ type (
 ```
 
 The function retrieves a next element from a dataset and returns
-ok==true if successful.  
+`ok==true` if successful.  
 The API in most cases is similar to the [slice](./slice/api.go) API but
 with delayed computation which means that the methods don’t compute a
 result but only return a loop provider. The loop provider is type with a
 `Next` method that returns a next processed element.
 
 ``` go
-   loopStream := loop.Convert(loop.Filter(loop.Of(1, 2, 3, 4), even).Next, strconv.Itoa)
+even := func(i int) bool { return i%2 == 0 }
+loopStream := loop.Convert(loop.Filter(loop.Of(1, 2, 3, 4), even).Next, strconv.Itoa)
 
-    assert.Equal(t, []string{"2", "4"}, loop.Slice(loopStream.Next))
-
-}
+assert.Equal(t, []string{"2", "4"}, loop.Slice(loopStream.Next))
 ```
 
 Breakable loops additionaly have error returned value.
@@ -205,43 +206,60 @@ Supports write operations (append, delete, replace).
     _ ordered.Set[int]    = oset.Of(1, 2, 3)
     _ collection.Set[int] = ordered.NewSet([]int{1, 2, 3})
 
-- [OrderedMap](./collection/mutable/omap/api.go) - same as the
-  [Map](./collection/mutable/map_/api.go), but supports iteration in the
-  order in which elements are added.
+- [OrderedMap](./collection/mutable/omap/api.go) - same as the Map, but
+  supports iteration in the order in which elements are added.
 
 <!-- -->
 
-    _ *ordered.Map[int, string]    = omap.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
+    _ *ordered.Map[int, string]   = omap.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
     _ collection.Map[int, string] = ordered.NewMap(
 
 ### Immutable containers
 
-The same interfaces as in the mutable package but for read-only
-purposes.
+The same underlying interfaces but for read-only use cases.
 
-## Stream functions
+## Collection functions
 
 There are three groups of operations:
 
 - Immediate - retrieves the result in place
-  ([Sort](./collection/immutable/vector.go#L112),
-  [Reduce](./collection/immutable/vector.go#L107) (of containers),
-  [Track](./collection/immutable/vector.go#L81),
-  [TrackEach](./collection/immutable/ordered/map.go#L136),
-  [For](./collection/immutable/vector.go#L89),
-  [ForEach](./collection/immutable/ordered/map.go#L144))
+  ([Sort](./collection/mutable/vector.go#L322),
+  [Reduce](./collection/immutable/vector.go#L154),
+  [Track](./collection/immutable/vector.go#L111),
+  [TrackEach](./collection/mutable/ordered/map.go#L182),
+  [For](./collection/immutable/vector.go#L122),
+  [ForEach](./collection/immutable/ordered/map.go#L175))
 
-- Intermediate - only defines a computation ([Wrap](./it/api.go#L17),
-  [Map](./c/op/api.go#L11), [Flatt](./c/op/api.go#L21),
-  [Filter](./c/op/api.go#L33), [Group](./c/op/api.go#L53)).
+- Intermediate - only defines a computation
+  ([Convert](./collection/api.go#L17),
+  [Filter](./collection/immutable/ordered/set.go#L124),
+  [Flatt](./collection/api.go#L36), [Group](./collection/api.go#L69)).
 
 - Final - applies intermediates and retrieves a result
-  ([ForEach](./it/api.go#L75), [Slice](./it/api.go#L65),
-  [Reduce](./it/api.go#L55) (of iterators))
+  ([First](./collection/api.go#L75),
+  [Slice](./collection/immutable/ordered/set.go#L94),
+  [Reduce](./collection/immutable/ordered/set.go#L146) (of iterators))
 
 Intermediates should wrap one by one to make a lazy computation chain
 that can be applied to the latest final operation.
 
 ``` go
-//TODO
+var groupedByLength = group.Of(oset.Of(
+    "seventh", "seventh", //duplicate
+    "first", "second", "third", "fourth",
+    "fifth", "sixth", "eighth",
+    "ninth", "tenth", "one", "two", "three", "1",
+    "second", //duplicate
+), func(v string) int { return len(v) },
+).FilterKey(
+    more.Than(3),
+).ConvertValue(
+    func(v string) string { return v + "_" },
+).Map()
+
+assert.Equal(t, map[int][]string{
+    5: {"first_", "third_", "fifth_", "sixth_", "ninth_", "tenth_", "three_"},
+    6: {"second_", "fourth_", "eighth_"},
+    7: {"seventh_"},
+}, groupedByLength)
 ```

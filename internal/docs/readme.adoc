@@ -47,8 +47,7 @@ For example the function link:./slice/api.go#L459[slice.SortByOrdered] has alias
 
 ==== link:./slice/api.go[slice] and link:./map_/api.go[map_]
 
-Contains utility functions of link:./slice/api.go#L156[converting],  link:./slice/api.go#L379[filtering] (searching), link:./slice/api.go#L464[reducing], link:./map_/api.go#L90[cloning] elements of embedded slices and maps.
-
+Contains utility functions of link:./slice/api.go#L156[converting],  link:./slice/api.go#L379[filtering] (searching), link:./slice/api.go#L464[reducing], link:./map_/api.go#L90[cloning] elements of embedded slices and maps. The functions compute result in-place. For delayed computations see loops or xref:collection-functions[collection functions]. 
 
 [source,go]
 ----
@@ -74,22 +73,22 @@ Provides predicate builder api that used for filtering collection elements.
 ----
 include::../examples/boilerplate/predicate_test.go[lines=17..20,indent=0]
 ----
-
+[#loop]
 ==== link:./loop/api.go[loop], link:./kv/loop/api.go[kv/loop] and breakable versions link:./break/loop/api.go[break/loop], link:./break/kv/loop/api.go[break/kv/loop]
 
-Low level iteration api based on ```next``` function.
+Low level iteration api based on ``next`` function.
 
 [source,go]
 ----
 include::../examples/loop/loop_filter_convert_reduce_test.go[lines=10..15,indent=0]
 ----
 
-The function retrieves a next element from a dataset and returns ok==true if successful. +
+The function retrieves a next element from a dataset and returns ``ok==true`` if successful. +
 The API in most cases is similar to the link:./slice/api.go[slice] API but with delayed computation which means that the methods don't compute a result but only return a loop provider. The loop provider is type with a ``Next`` method that returns a next processed element.
 
 [source,go]
 ----
-include::../examples/loop/loop_filter_convert_reduce_test.go[lines=17..23,indent=0]
+include::../examples/loop/loop_filter_convert_reduce_test.go[lines=17..22,indent=0]
 ----
 
 Breakable loops additionaly have error returned value.
@@ -103,7 +102,7 @@ It is used for computations where an error may occur.
 
 [source,go]
 ----
-include::../examples/loop/breakloop/loop_filter_convert_reduce_test.go[lines=17..23,indent=0]
+include::../examples/loop/breakloop/loop_filter_convert_reduce_test.go[lines=17..22,indent=0]
 ----
 
 === Mutable collections
@@ -130,26 +129,26 @@ include::../examples/collection/mutable/map.go[lines=11..12,indent=0]
 ----
 include::../examples/collection/mutable/oset.go[lines=10..11,indent=0]
 ----
-  * link:./collection/mutable/omap/api.go[OrderedMap] - same as the link:./collection/mutable/map_/api.go[Map], but supports iteration in the order in which elements are added.
+  * link:./collection/mutable/omap/api.go[OrderedMap] - same as the Map, but supports iteration in the order in which elements are added.
 ----
 include::../examples/collection/mutable/omap.go[lines=11..12,indent=0]
 ----
 
 ==== Immutable containers
 
-The same interfaces as in the mutable package but for read-only purposes.
+The same underlying interfaces but for read-only use cases.
 
-=== Stream functions
+=== Collection functions
 
 There are three groups of operations:
 
-* Immediate - retrieves the result in place (link:./collection/immutable/vector.go#L112[Sort], link:./collection/immutable/vector.go#L107[Reduce] (of containers), link:./collection/immutable/vector.go#L81[Track], link:./collection/immutable/ordered/map.go#L136[TrackEach], link:./collection/immutable/vector.go#L89[For], link:./collection/immutable/ordered/map.go#L144[ForEach])
-* Intermediate - only defines a computation (link:./it/api.go#L17[Wrap], link:./c/op/api.go#L11[Map], link:./c/op/api.go#L21[Flatt], link:./c/op/api.go#L33[Filter], link:./c/op/api.go#L53[Group]).
-* Final - applies intermediates and retrieves a result (link:./it/api.go#L75[ForEach], link:./it/api.go#L65[Slice], link:./it/api.go#L55[Reduce] (of iterators))
+* Immediate - retrieves the result in place (link:./collection/mutable/vector.go#L322[Sort], link:./collection/immutable/vector.go#L154[Reduce], link:./collection/immutable/vector.go#L111[Track], link:./collection/mutable/ordered/map.go#L182[TrackEach], link:./collection/immutable/vector.go#L122[For], link:./collection/immutable/ordered/map.go#L175[ForEach])
+* Intermediate - only defines a computation (link:./collection/api.go#L17[Convert], link:./collection/immutable/ordered/set.go#L124[Filter], link:./collection/api.go#L36[Flatt], link:./collection/api.go#L69[Group]).
+* Final - applies intermediates and retrieves a result (link:./collection/api.go#L75[First], link:./collection/immutable/ordered/set.go#L94[Slice], link:./collection/immutable/ordered/set.go#L146[Reduce] (of iterators))
 
 Intermediates should wrap one by one to make a lazy computation chain that can be applied to the latest final operation.
 
 [source,go]
 ----
-//TODO
+include::../examples/collection/functions/collection_functions_test.go[lines=14..33,indent=0]
 ----

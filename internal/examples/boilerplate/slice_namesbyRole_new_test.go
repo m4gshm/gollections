@@ -18,5 +18,5 @@ func Test_NamesByRole_New(t *testing.T) {
 	assert.Equal(t, namesByRole[""], []string{"Tom"})
 	assert.Equal(t, namesByRole["manager"], []string{"Bob", "Alice"})
 	assert.Equal(t, namesByRole["admin"], []string{"Bob"})
-	
+
 }

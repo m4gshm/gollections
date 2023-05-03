@@ -34,4 +34,3 @@ func NewSet[T comparable](elements []T) Set[T] {
 func NewVector[T any](elements []T) Vector[T] {
 	return WrapVector(slice.Clone(elements))
 }
-

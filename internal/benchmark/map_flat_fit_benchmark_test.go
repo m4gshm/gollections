@@ -116,7 +116,7 @@ func Benchmark_ConvertAndFilter_Slice_Iterated(b *testing.B) {
 	var s []string
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		s = loop.Slice[string](iter.Convert(sliceIter.Filter(items, even), convert.And(toString, addTail)).Next)
+		s = loop.Slice(iter.Convert(sliceIter.Filter(items, even), convert.And(toString, addTail)).Next)
 	}
 	_ = s
 
