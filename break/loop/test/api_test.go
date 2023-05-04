@@ -37,6 +37,39 @@ func Test_Convert(t *testing.T) {
 	assert.Equal(t, []string{"1", "3", "5", "7", "9", "11"}, o)
 }
 
+func Test_NotNil(t *testing.T) {
+	type entity struct{ val string }
+	var (
+		source   = breakLoop.Of([]*entity{{"first"}, nil, {"third"}, nil, {"fifth"}}...)
+		result   = breakLoop.NotNil(source)
+		expected = []*entity{{"first"}, {"third"}, {"fifth"}}
+	)
+	o, _ := breakLoop.Slice(result.Next)
+	assert.Equal(t, expected, o)
+}
+
+func Test_ConvertPointersToValues(t *testing.T) {
+	type entity struct{ val string }
+	var (
+		source   = breakLoop.Of([]*entity{{"first"}, nil, {"third"}, nil, {"fifth"}}...)
+		result   = breakLoop.ToValues(source)
+		expected = []entity{{"first"}, {}, {"third"}, {}, {"fifth"}}
+	)
+	o, _ := breakLoop.Slice(result.Next)
+	assert.Equal(t, expected, o)
+}
+
+func Test_ConvertNotnilPointersToValues(t *testing.T) {
+	type entity struct{ val string }
+	var (
+		source   = breakLoop.Of([]*entity{{"first"}, nil, {"third"}, nil, {"fifth"}}...)
+		result   = breakLoop.GetValues(source)
+		expected = []entity{{"first"}, {"third"}, {"fifth"}}
+	)
+	o, _ := breakLoop.Slice(result.Next)
+	assert.Equal(t, expected, o)
+}
+
 func Test_ConvertNotNil(t *testing.T) {
 	type entity struct{ val string }
 	var (

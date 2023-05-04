@@ -246,6 +246,18 @@ func NotNil[T any](next func() (*T, bool, error)) FiltIter[*T] {
 	return Filt(next, as.ErrTail(check.NotNil[T]))
 }
 
+// ToValues creates an iterator that transform pointers to the values referenced referenced by those pointers.
+// Nil pointers are transformet to zero values.
+func ToValues[T any](next func() (*T, bool, error)) ConvertIter[*T, T] {
+	return Convert(next, convert.ToValue[T])
+}
+
+// GetValues creates an iterator that transform only not nil pointers to the values referenced referenced by those pointers.
+// Nil pointers are ignored.
+func GetValues[T any](next func() (*T, bool, error)) ConvertCheckIter[*T, T] {
+	return ConvertCheck(next, convert.GetValue[T])
+}
+
 // ToKV transforms iterable elements to key/value iterator based on applying key, value extractors to the elements
 func ToKV[T any, K comparable, V any](next func() (T, bool, error), keyExtractor func(T) (K, error), valExtractor func(T) (V, error)) KeyValuer[T, K, V] {
 	kv := NewKeyValuer(next, keyExtractor, valExtractor)
