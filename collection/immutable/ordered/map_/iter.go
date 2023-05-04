@@ -1,5 +1,5 @@
-// Package iter provides ordered map iterator implementations
-package iter
+// Package map_ provides ordered map iterator implementations
+package map_
 
 import (
 	"github.com/m4gshm/gollections/c"
