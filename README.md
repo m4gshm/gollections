@@ -204,7 +204,7 @@ Supports write operations (append, delete, replace).
 
 <!-- -->
 
-    _ ordered.Set[int]    = oset.Of(1, 2, 3)
+    _ ordered.Set[int]    = set.Of(1, 2, 3)
     _ collection.Set[int] = ordered.NewSet([]int{1, 2, 3})
 
 - [OrderedMap](./collection/mutable/omap/api.go) - same as the Map, but
@@ -212,7 +212,7 @@ Supports write operations (append, delete, replace).
 
 <!-- -->
 
-    _ *ordered.Map[int, string]   = omap.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
+    _ *ordered.Map[int, string]   = map_.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
     _ collection.Map[int, string] = ordered.NewMap(
 
 ### Immutable containers
@@ -245,7 +245,7 @@ Intermediates should wrap one by one to make a lazy computation chain
 that can be applied to the latest final operation.
 
 ``` go
-var groupedByLength = group.Of(oset.Of(
+var groupedByLength = group.Of(set.Of(
     "seventh", "seventh", //duplicate
     "first", "second", "third", "fourth",
     "fifth", "sixth", "eighth",

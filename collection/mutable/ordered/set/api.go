@@ -1,5 +1,5 @@
-// Package oset provides mutable ordered.Set constructors and helpers
-package oset
+// Package set provides mutable ordered.Set constructors and helpers
+package set
 
 import (
 	breakStream "github.com/m4gshm/gollections/break/stream"

@@ -3,15 +3,15 @@ package test
 import (
 	"testing"
 
-	"github.com/m4gshm/gollections/collection/immutable/omap"
 	"github.com/m4gshm/gollections/collection/immutable/ordered"
+	"github.com/m4gshm/gollections/collection/immutable/ordered/map_"
 	"github.com/m4gshm/gollections/k"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/stretchr/testify/assert"
 )
 
 func Test_Map_Iterate(t *testing.T) {
-	ordered := omap.Of(k.V(1, "1"), k.V(1, "1"), k.V(2, "2"), k.V(4, "4"), k.V(3, "3"), k.V(1, "1"))
+	ordered := map_.Of(k.V(1, "1"), k.V(1, "1"), k.V(2, "2"), k.V(4, "4"), k.V(3, "3"), k.V(1, "1"))
 	assert.Equal(t, 4, len(ordered.Map()))
 
 	expectedK := slice.Of(1, 2, 4, 3)
@@ -31,7 +31,7 @@ func Test_Map_Iterate(t *testing.T) {
 }
 
 func Test_Map_Iterate_Keys(t *testing.T) {
-	ordered := omap.Of(k.V(1, "1"), k.V(1, "1"), k.V(2, "2"), k.V(4, "4"), k.V(3, "3"), k.V(1, "1"))
+	ordered := map_.Of(k.V(1, "1"), k.V(1, "1"), k.V(2, "2"), k.V(4, "4"), k.V(3, "3"), k.V(1, "1"))
 	assert.Equal(t, 4, len(ordered.Map()))
 
 	expectedK := slice.Of(1, 2, 4, 3)
@@ -45,7 +45,7 @@ func Test_Map_Iterate_Keys(t *testing.T) {
 }
 
 func Test_Map_Iterate_Values(t *testing.T) {
-	ordered := omap.Of(k.V(1, "1"), k.V(1, "1"), k.V(2, "2"), k.V(4, "4"), k.V(3, "3"), k.V(1, "1"))
+	ordered := map_.Of(k.V(1, "1"), k.V(1, "1"), k.V(2, "2"), k.V(4, "4"), k.V(3, "3"), k.V(1, "1"))
 	assert.Equal(t, 4, len(ordered.Map()))
 
 	expectedV := slice.Of("1", "2", "4", "3")

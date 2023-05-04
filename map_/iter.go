@@ -9,7 +9,7 @@ import (
 	"github.com/m4gshm/gollections/op"
 )
 
-// NewIter returns the MapIter based on map elements
+// NewIter returns the Iter based on map elements
 func NewIter[K comparable, V any](elements map[K]V) Iter[K, V] {
 	hmap := *(*unsafe.Pointer)(unsafe.Pointer(&elements))
 	i := any(elements)

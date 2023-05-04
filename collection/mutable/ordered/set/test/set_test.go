@@ -8,7 +8,7 @@ import (
 
 	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/collection/mutable/ordered"
-	"github.com/m4gshm/gollections/collection/mutable/oset"
+	"github.com/m4gshm/gollections/collection/mutable/ordered/set"
 	"github.com/m4gshm/gollections/collection/mutable/vector"
 	"github.com/m4gshm/gollections/convert/ptr"
 	"github.com/m4gshm/gollections/iter"
@@ -20,12 +20,12 @@ import (
 )
 
 func Test_Set_From(t *testing.T) {
-	set := oset.From(iter.Of(1, 1, 2, 2, 3, 4, 3, 2, 1).Next)
+	set := set.From(iter.Of(1, 1, 2, 2, 3, 4, 3, 2, 1).Next)
 	assert.Equal(t, slice.Of(1, 2, 3, 4), set.Slice())
 }
 
 func Test_Set_Iterate(t *testing.T) {
-	set := oset.Of(1, 1, 2, 4, 3, 1)
+	set := set.Of(1, 1, 2, 4, 3, 1)
 	values := set.Slice()
 
 	assert.Equal(t, 4, len(values))
@@ -51,7 +51,7 @@ func Test_Set_Iterate(t *testing.T) {
 }
 
 func Test_Set_AddVerify(t *testing.T) {
-	set := oset.NewCap[int](0)
+	set := set.NewCap[int](0)
 	added := set.AddNew(1, 2, 4, 3)
 	assert.Equal(t, added, true)
 	added = set.AddOneNew(1)
@@ -63,7 +63,7 @@ func Test_Set_AddVerify(t *testing.T) {
 }
 
 func Test_Set_AddAll(t *testing.T) {
-	set := oset.NewCap[int](0)
+	set := set.NewCap[int](0)
 	set.AddAll(vector.Of(1, 2))
 	set.AddAll(vector.Of(4, 3))
 
@@ -73,7 +73,7 @@ func Test_Set_AddAll(t *testing.T) {
 }
 
 func Test_Set_AddAllNew(t *testing.T) {
-	set := oset.NewCap[int](0)
+	set := set.NewCap[int](0)
 	added := set.AddAllNew(vector.Of(1, 2))
 	assert.True(t, added)
 	//4, 3 are new
@@ -87,7 +87,7 @@ func Test_Set_AddAllNew(t *testing.T) {
 }
 
 func Test_Set_Delete(t *testing.T) {
-	set := oset.Of(1, 1, 2, 4, 3, 1)
+	set := set.Of(1, 1, 2, 4, 3, 1)
 	values := set.Slice()
 
 	for _, v := range values {
@@ -98,7 +98,7 @@ func Test_Set_Delete(t *testing.T) {
 }
 
 func Test_Set_DeleteByIterator(t *testing.T) {
-	set := oset.Of(1, 1, 2, 4, 3, 1)
+	set := set.Of(1, 1, 2, 4, 3, 1)
 	iterator := set.IterEdit()
 
 	i := 0
@@ -112,12 +112,12 @@ func Test_Set_DeleteByIterator(t *testing.T) {
 }
 
 func Test_Set_FilterMapReduce(t *testing.T) {
-	s := oset.Of(1, 1, 2, 4, 3, 1).Filter(func(i int) bool { return i%2 == 0 }).Convert(func(i int) int { return i * 2 }).Reduce(op.Sum[int])
+	s := set.Of(1, 1, 2, 4, 3, 1).Filter(func(i int) bool { return i%2 == 0 }).Convert(func(i int) int { return i * 2 }).Reduce(op.Sum[int])
 	assert.Equal(t, 12, s)
 }
 
 func Test_Set_Group(t *testing.T) {
-	groups := group.Of(oset.Of(0, 1, 1, 2, 4, 3, 1, 6, 7), func(e int) bool { return e%2 == 0 })
+	groups := group.Of(set.Of(0, 1, 1, 2, 4, 3, 1, 6, 7), func(e int) bool { return e%2 == 0 })
 
 	assert.Equal(t, len(groups), 2)
 	assert.Equal(t, []int{1, 3, 7}, groups[false])
@@ -126,9 +126,9 @@ func Test_Set_Group(t *testing.T) {
 
 func Test_Set_Convert(t *testing.T) {
 	var (
-		ints     = oset.Of(3, 3, 1, 1, 1, 5, 6, 8, 8, 0, -2, -2)
-		strings  = loop.Slice[string](iter.Filter(oset.Convert(ints, strconv.Itoa), func(s string) bool { return len(s) == 1 }).Next)
-		strings2 = oset.Convert(ints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 }).Slice()
+		ints     = set.Of(3, 3, 1, 1, 1, 5, 6, 8, 8, 0, -2, -2)
+		strings  = loop.Slice[string](iter.Filter(set.Convert(ints, strconv.Itoa), func(s string) bool { return len(s) == 1 }).Next)
+		strings2 = set.Convert(ints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 }).Slice()
 	)
 	assert.Equal(t, slice.Of("3", "1", "5", "6", "8", "0"), strings)
 	assert.Equal(t, strings, strings2)
@@ -136,8 +136,8 @@ func Test_Set_Convert(t *testing.T) {
 
 func Test_Set_Flatt(t *testing.T) {
 	var (
-		ints        = oset.Of(3, 3, 1, 1, 1, 5, 6, 8, 8, 0, -2, -2)
-		fints       = oset.Flatt(ints, func(i int) []int { return slice.Of(i) })
+		ints        = set.Of(3, 3, 1, 1, 1, 5, 6, 8, 8, 0, -2, -2)
+		fints       = set.Flatt(ints, func(i int) []int { return slice.Of(i) })
 		stringsPipe = collection.Filter(collection.Convert(fints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 }), func(s string) bool { return len(s) == 1 })
 	)
 	assert.Equal(t, slice.Of("3", "1", "5", "6", "8", "0"), stringsPipe.Slice())
@@ -145,8 +145,8 @@ func Test_Set_Flatt(t *testing.T) {
 
 func Test_Set_DoubleConvert(t *testing.T) {
 	var (
-		ints               = oset.Of(3, 1, 5, 6, 8, 0, -2)
-		stringsPipe        = oset.Convert(ints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 })
+		ints               = set.Of(3, 1, 5, 6, 8, 0, -2)
+		stringsPipe        = set.Convert(ints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 })
 		prefixedStrinsPipe = collection.Convert(stringsPipe, func(s string) string { return "_" + s })
 	)
 	assert.Equal(t, slice.Of("_3", "_1", "_5", "_6", "_8", "_0"), prefixedStrinsPipe.Slice())
@@ -238,7 +238,7 @@ func Test_Set_new(t *testing.T) {
 }
 
 func Test_Set_CopyByValue(t *testing.T) {
-	set := oset.Of[int]()
+	set := set.Of[int]()
 
 	set.Add(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
 

@@ -6,13 +6,13 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/m4gshm/gollections/collection/group"
-	"github.com/m4gshm/gollections/collection/immutable/oset"
+	"github.com/m4gshm/gollections/collection/immutable/ordered/set"
 	"github.com/m4gshm/gollections/predicate/more"
 )
 
 func Test_group_orderset_with_filtering_by_string_len(t *testing.T) {
 
-	var groupedByLength = group.Of(oset.Of(
+	var groupedByLength = group.Of(set.Of(
 		"seventh", "seventh", //duplicate
 		"first", "second", "third", "fourth",
 		"fifth", "sixth", "eighth",

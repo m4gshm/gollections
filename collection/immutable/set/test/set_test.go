@@ -8,7 +8,7 @@ import (
 
 	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/collection/immutable"
-	"github.com/m4gshm/gollections/collection/immutable/oset"
+	oset "github.com/m4gshm/gollections/collection/immutable/ordered/set"
 	"github.com/m4gshm/gollections/collection/immutable/set"
 	"github.com/m4gshm/gollections/convert/as"
 	"github.com/m4gshm/gollections/convert/ptr"

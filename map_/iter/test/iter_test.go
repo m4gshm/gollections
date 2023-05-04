@@ -3,7 +3,6 @@ package test
 import (
 	"testing"
 
-	omap "github.com/m4gshm/gollections/collection/immutable/ordered/map_"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/stretchr/testify/assert"
 )
@@ -18,7 +17,7 @@ func Test_Key_Zero_Safety(t *testing.T) {
 }
 
 func Test_OrderedMapIter_Safety(t *testing.T) {
-	var it omap.Iter[int, string]
+	var it map_.Iter[int, string]
 
 	_, _, ok := it.Next()
 	assert.False(t, ok)

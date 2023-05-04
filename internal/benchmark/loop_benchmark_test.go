@@ -3,10 +3,10 @@ package benchmark
 import (
 	"testing"
 
-	"github.com/m4gshm/gollections/collection/immutable/oset"
+	oset "github.com/m4gshm/gollections/collection/immutable/ordered/set"
 	"github.com/m4gshm/gollections/collection/immutable/set"
 	"github.com/m4gshm/gollections/collection/immutable/vector"
-	moset "github.com/m4gshm/gollections/collection/mutable/oset"
+	moset "github.com/m4gshm/gollections/collection/mutable/ordered/set"
 	mvector "github.com/m4gshm/gollections/collection/mutable/vector"
 	"github.com/m4gshm/gollections/convert/ptr"
 	"github.com/m4gshm/gollections/map_"

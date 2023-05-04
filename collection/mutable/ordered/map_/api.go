@@ -1,5 +1,5 @@
-// Package omap provides mutable ordered.Map constructors
-package omap
+// Package map_ provides mutable ordered.Map constructors
+package map_
 
 import (
 	"github.com/m4gshm/gollections/c"

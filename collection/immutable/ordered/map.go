@@ -10,7 +10,6 @@ import (
 	breakMapFilter "github.com/m4gshm/gollections/break/map_/filter"
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/collection"
-	omap "github.com/m4gshm/gollections/collection/immutable/ordered/map_"
 	"github.com/m4gshm/gollections/kv"
 	"github.com/m4gshm/gollections/kv/loop"
 	"github.com/m4gshm/gollections/kv/stream"
@@ -54,8 +53,8 @@ type Map[K comparable, V any] struct {
 var (
 	_ collection.Map[int, any]                    = (*Map[int, any])(nil)
 	_ collection.Map[int, any]                    = Map[int, any]{}
-	_ loop.Looper[int, any, *omap.Iter[int, any]] = (*Map[int, any])(nil)
-	_ loop.Looper[int, any, *omap.Iter[int, any]] = Map[int, any]{}
+	_ loop.Looper[int, any, *MapIter[int, any]]   = (*Map[int, any])(nil)
+	_ loop.Looper[int, any, *MapIter[int, any]]   = Map[int, any]{}
 	_ c.KeyVal[MapKeys[int], MapValues[int, any]] = (*Map[int, any])(nil)
 	_ c.KeyVal[MapKeys[int], MapValues[int, any]] = Map[int, any]{}
 	_ fmt.Stringer                                = (*Map[int, any])(nil)
@@ -69,19 +68,19 @@ func (m Map[K, V]) Iter() kv.Iterator[K, V] {
 }
 
 // Loop creates an iterator and returns as implementation type reference
-func (m Map[K, V]) Loop() *omap.Iter[K, V] {
+func (m Map[K, V]) Loop() *MapIter[K, V] {
 	h := m.Head()
 	return &h
 }
 
 // Head creates an iterator and returns as implementation type value
-func (m Map[K, V]) Head() omap.Iter[K, V] {
-	return omap.NewIter(m.elements, slice.NewHeadS(m.order, m.ksize))
+func (m Map[K, V]) Head() MapIter[K, V] {
+	return NewMapIter(m.elements, slice.NewHeadS(m.order, m.ksize))
 }
 
 // First returns the first key/value pair of the map, an iterator to iterate over the remaining pair, and true\false marker of availability next pairs.
 // If no more then ok==false.
-func (m Map[K, V]) First() (omap.Iter[K, V], K, V, bool) {
+func (m Map[K, V]) First() (MapIter[K, V], K, V, bool) {
 	var (
 		iterator           = m.Head()
 		firstK, firstV, ok = iterator.Next()
@@ -90,8 +89,8 @@ func (m Map[K, V]) First() (omap.Iter[K, V], K, V, bool) {
 }
 
 // Tail creates an iterator pointing to the end of the map
-func (m Map[K, V]) Tail() omap.Iter[K, V] {
-	return omap.NewIter(m.elements, slice.NewTailS(m.order, m.ksize))
+func (m Map[K, V]) Tail() MapIter[K, V] {
+	return NewMapIter(m.elements, slice.NewTailS(m.order, m.ksize))
 }
 
 // Map collects the key/value pairs to a map

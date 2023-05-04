@@ -1,5 +1,5 @@
-// Package map_ provides ordered map iterator implementations
-package map_
+// Package ordered provides ordered map iterator implementations
+package ordered
 
 import (
 	"github.com/m4gshm/gollections/c"
@@ -8,33 +8,33 @@ import (
 	"github.com/m4gshm/gollections/slice"
 )
 
-// NewIter is the Iter constructor
-func NewIter[K comparable, V any](uniques map[K]V, elements slice.Iter[K]) Iter[K, V] {
-	return Iter[K, V]{elements: elements, uniques: uniques}
+// NewMapIter is the Iter constructor
+func NewMapIter[K comparable, V any](uniques map[K]V, elements slice.Iter[K]) MapIter[K, V] {
+	return MapIter[K, V]{elements: elements, uniques: uniques}
 }
 
-// Iter is the ordered key/value pairs Iterator implementation
-type Iter[K comparable, V any] struct {
+// MapIter is the ordered key/value pairs Iterator implementation
+type MapIter[K comparable, V any] struct {
 	elements slice.Iter[K]
 	uniques  map[K]V
 }
 
-var _ kv.Iterator[string, any] = (*Iter[string, any])(nil)
+var _ kv.Iterator[string, any] = (*MapIter[string, any])(nil)
 
 // Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak
-func (i *Iter[K, V]) Track(traker func(key K, value V) error) error {
+func (i *MapIter[K, V]) Track(traker func(key K, value V) error) error {
 	return loop.Track(i.Next, traker)
 }
 
 // TrackEach takes all key, value pairs retrieved by the iterator
-func (i *Iter[K, V]) TrackEach(traker func(key K, value V)) {
+func (i *MapIter[K, V]) TrackEach(traker func(key K, value V)) {
 	loop.TrackEach(i.Next, traker)
 }
 
 // Next returns the next key/value pair.
 // The ok result indicates whether the pair was returned by the iterator.
 // If ok == false, then the iteration must be completed.
-func (i *Iter[K, V]) Next() (key K, val V, ok bool) {
+func (i *MapIter[K, V]) Next() (key K, val V, ok bool) {
 	if i != nil {
 		if key, ok = i.elements.Next(); ok {
 			val = i.uniques[key]
@@ -44,7 +44,7 @@ func (i *Iter[K, V]) Next() (key K, val V, ok bool) {
 }
 
 // Cap returns the iterator capacity
-func (i *Iter[K, V]) Cap() int {
+func (i *MapIter[K, V]) Cap() int {
 	return i.elements.Cap()
 }
 

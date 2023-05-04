@@ -5,8 +5,8 @@ import (
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/collection/mutable/map_"
-	"github.com/m4gshm/gollections/collection/mutable/omap"
 	"github.com/m4gshm/gollections/collection/mutable/ordered"
+	omap "github.com/m4gshm/gollections/collection/mutable/ordered/map_"
 	"github.com/m4gshm/gollections/k"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/stretchr/testify/assert"

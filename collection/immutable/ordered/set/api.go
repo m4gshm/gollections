@@ -1,5 +1,5 @@
-// Package oset provides ordered.Set constructors and helpers
-package oset
+// Package set provides ordered.Set constructors and helpers
+package set
 
 import (
 	"golang.org/x/exp/constraints"
