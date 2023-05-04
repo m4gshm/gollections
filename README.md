@@ -20,8 +20,6 @@ var users = []User{
 }
 ```
 
-type is [here](./internal/examples/boilerplate/user_type.go)
-
 You can make clear code, extensive, but without dependencies:
 
 ``` go
