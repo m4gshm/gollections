@@ -380,6 +380,18 @@ func NotNil[TS ~[]*T, T any](elements TS) TS {
 	return Filter(elements, check.NotNil[T])
 }
 
+// ToValues returns values referenced by the pointers.
+// If a pointer is nil then it is replaced by the zero value.
+func ToValues[TS ~[]*T, T any](pointers TS) []T {
+	return Convert(pointers, convert.ToValue[T])
+}
+
+// GetValues returns values referenced by the pointers.
+// All nil pointers are excluded from the final result.
+func GetValues[TS ~[]*T, T any](elements TS) []T {
+	return ConvertCheck(elements, convert.GetValue[T])
+}
+
 // Filter creates a slice containing only the filtered elements
 func Filter[TS ~[]T, T any](elements TS, filter func(T) bool) []T {
 	if elements == nil {

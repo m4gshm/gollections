@@ -6,10 +6,10 @@ import (
 
 	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/collection/immutable/oset"
+	"github.com/m4gshm/gollections/convert/ptr"
 	"github.com/m4gshm/gollections/iter"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
-	"github.com/m4gshm/gollections/ptr"
 	"github.com/m4gshm/gollections/slice"
 
 	"github.com/m4gshm/gollections/walk/group"

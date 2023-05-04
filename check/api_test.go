@@ -44,3 +44,11 @@ func Test_NilStruct(t *testing.T) {
 	var i interface{}
 	assert.False(t, Nil(&i))
 }
+
+func Test_ZeroStruct(t *testing.T) {
+	type someStruct struct{ somField []string }
+
+	var v someStruct
+	assert.True(t, Zero(v))
+
+}

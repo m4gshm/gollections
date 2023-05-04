@@ -40,12 +40,12 @@ func HasAny[K, V any](next func() (K, V, bool), predicate func(K, V) bool) bool 
 	return false
 }
 
-// Convert creates an Iterator that applies a transformer to iterable key\values.
+// Convert creates an iterator that applies a transformer to iterable key\values.
 func Convert[K, V any, k2, v2 any](next func() (K, V, bool), by func(K, V) (k2, v2)) ConvertIter[K, V, k2, v2, func(K, V) (k2, v2)] {
 	return ConvertIter[K, V, k2, v2, func(K, V) (k2, v2)]{next: next, by: by}
 }
 
-// Filter creates an Iterator that checks elements by a filter and returns successful ones
+// Filter creates an iterator that checks elements by a filter and returns successful ones
 func Filter[K, V any](next func() (K, V, bool), filter func(K, V) bool) FitKV[K, V] {
 	return FitKV[K, V]{next: next, filter: filter}
 }

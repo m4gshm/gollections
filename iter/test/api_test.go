@@ -10,6 +10,7 @@ import (
 	breakLoop "github.com/m4gshm/gollections/break/loop"
 	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/convert"
+	"github.com/m4gshm/gollections/convert/as"
 	"github.com/m4gshm/gollections/iter"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
@@ -49,11 +50,11 @@ func Test_FlattSlices(t *testing.T) {
 		multiDimension = [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
 		expected       = slice.Of(1, 3, 5, 7)
 	)
-	f := iter.Filter(iter.Flatt(iter.Flatt(slice.NewIter(multiDimension), convert.To[[][]int]), convert.To[[]int]), odds)
+	f := iter.Filter(iter.Flatt(iter.Flatt(slice.NewIter(multiDimension), as.Is[[][]int]), as.Is[[]int]), odds)
 	a := loop.Slice(f.Next)
 	assert.Equal(t, expected, a)
 
-	a = loop.Slice(iter.Filter(iter.Flatt(sliceIter.Flatt(multiDimension, convert.To[[][]int]), convert.To[[]int]), odds).Next)
+	a = loop.Slice(iter.Filter(iter.Flatt(sliceIter.Flatt(multiDimension, as.Is[[][]int]), as.Is[[]int]), odds).Next)
 	assert.Equal(t, expected, a)
 
 	//plain old style
@@ -86,10 +87,10 @@ func Test_ReduceSlices(t *testing.T) {
 
 	e := 1 + 3 + 5 + 7
 
-	oddSum := loop.Reduce(iter.Filter(iter.Flatt(iter.Flatt(slice.NewIter(multiDimension), convert.To[[][]int]), convert.To[[]int]), odds).Next, op.Sum[int])
+	oddSum := loop.Reduce(iter.Filter(iter.Flatt(iter.Flatt(slice.NewIter(multiDimension), as.Is[[][]int]), as.Is[[]int]), odds).Next, op.Sum[int])
 	assert.Equal(t, e, oddSum)
 
-	oddSum = loop.Reduce(iter.Filter(iter.Flatt(sliceIter.Flatt(multiDimension, convert.To[[][]int]), convert.To[[]int]), odds).Next, op.Sum[int])
+	oddSum = loop.Reduce(iter.Filter(iter.Flatt(sliceIter.Flatt(multiDimension, as.Is[[][]int]), as.Is[[]int]), odds).Next, op.Sum[int])
 	assert.Equal(t, e, oddSum)
 
 	//plain old style

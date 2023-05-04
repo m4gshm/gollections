@@ -53,16 +53,40 @@ func FilterAndFlatt[From, To any, I c.Iterable[From]](collection I, filter func(
 	return stream.New(f.Next)
 }
 
-// Filter instantiates an iterator that checks elements by the 'filter' function and returns successful ones
+// Filter instantiates a stream that checks elements by the 'filter' function and returns successful ones
 func Filter[T any, I c.Iterable[T]](collection I, filter func(T) bool) stream.Iter[T] {
 	b := collection.Iter()
 	f := loop.Filter(b.Next, filter)
 	return stream.New(f.Next)
 }
 
-// NotNil instantiates an iterator that filters nullable elements
+// NotNil instantiates a stream that filters nullable elements
 func NotNil[T any, I c.Iterable[*T]](collection I) stream.Iter[*T] {
 	return Filter(collection, check.NotNil[T])
+}
+
+// ToValues creates a stream that transform pointers to the values referenced referenced by those pointers.
+// Nil pointers are transformet to zero values.
+func ToValues[T any, I c.Iterable[*T]](collection I) stream.Iter[T] {
+	return stream.New(loop.ToValues(collection.Iter().Next).Next)
+}
+
+// GetValues creates a stream that transform only not nil pointers to the values referenced referenced by those pointers.
+// Nil pointers are ignored.
+func GetValues[T any, I c.Iterable[*T]](collection I) stream.Iter[T] {
+	return stream.New(loop.GetValues(collection.Iter().Next).Next)
+}
+
+// NilSafe - convert.NilSafe filters not nil next, converts that ones, filters not nils after converting and returns them
+func NilSafe[From, To any](next func() (*From, bool), converter func(*From) *To) stream.Iter[*To] {
+	return stream.New(loop.ConvertCheck(next, func(f *From) (*To, bool) {
+		if f != nil {
+			if t := converter(f); t != nil {
+				return t, true
+			}
+		}
+		return nil, false
+	}).Next)
 }
 
 // Group groups elements to slices by a converter and returns a map

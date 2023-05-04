@@ -3,12 +3,12 @@ package test
 import (
 	"testing"
 
+	"github.com/m4gshm/gollections/convert/ptr"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/map_/clone"
 	"github.com/m4gshm/gollections/map_/group"
 	"github.com/m4gshm/gollections/map_/resolv"
 	"github.com/m4gshm/gollections/op"
-	"github.com/m4gshm/gollections/ptr"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/clone/sort"
 	"github.com/stretchr/testify/assert"

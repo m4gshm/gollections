@@ -231,17 +231,17 @@ func FilterFlattFilter[From, To any](next func() (From, bool, error), filterFrom
 	}
 }
 
-// Filt creates an Iterator that checks elements by the 'filter' function and returns successful ones.
+// Filt creates an iterator that checks elements by the 'filter' function and returns successful ones.
 func Filt[T any](next func() (T, bool, error), filter func(T) (bool, error)) FiltIter[T] {
 	return FiltIter[T]{next: next, filter: filter}
 }
 
-// Filter creates an Iterator that checks elements by the 'filter' function and returns successful ones.
+// Filter creates an iterator that checks elements by the 'filter' function and returns successful ones.
 func Filter[T any](next func() (T, bool, error), filter func(T) bool) FiltIter[T] {
 	return FiltIter[T]{next: next, filter: func(t T) (bool, error) { return filter(t), nil }}
 }
 
-// NotNil creates an Iterator that filters nullable elements.
+// NotNil creates an iterator that filters nullable elements.
 func NotNil[T any](next func() (*T, bool, error)) FiltIter[*T] {
 	return Filt(next, as.ErrTail(check.NotNil[T]))
 }

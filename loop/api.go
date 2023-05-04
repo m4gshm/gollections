@@ -190,14 +190,26 @@ func FilterFlattFilter[From, To any](next func() (From, bool), filterFrom func(F
 	return FlattenFitIter[From, To]{next: next, filterFrom: filterFrom, flatt: flattener, filterTo: filterTo, elemSizeTo: notsafe.GetTypeSize[To]()}
 }
 
-// Filter creates an Iterator that checks elements by the 'filter' function and returns successful ones.
+// Filter creates an iterator that checks elements by the 'filter' function and returns successful ones.
 func Filter[T any](next func() (T, bool), filter func(T) bool) FitIter[T] {
 	return FitIter[T]{next: next, by: filter}
 }
 
-// NotNil creates an Iterator that filters nullable elements.
+// NotNil creates an iterator that filters nullable elements
 func NotNil[T any](next func() (*T, bool)) FitIter[*T] {
 	return Filter(next, check.NotNil[T])
+}
+
+// ToValues creates an iterator that transform pointers to the values referenced referenced by those pointers.
+// Nil pointers are transformet to zero values.
+func ToValues[T any](next func() (*T, bool)) ConvertIter[*T, T] {
+	return Convert(next, convert.ToValue[T])
+}
+
+// GetValues creates an iterator that transform only not nil pointers to the values referenced referenced by those pointers.
+// Nil pointers are ignored.
+func GetValues[T any](next func() (*T, bool)) ConvertCheckIter[*T, T] {
+	return ConvertCheck(next, convert.GetValue[T])
 }
 
 // ToKV transforms iterable elements to key/value iterator based on applying key, value extractors to the elements

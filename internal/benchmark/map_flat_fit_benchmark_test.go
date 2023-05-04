@@ -7,6 +7,7 @@ import (
 
 	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/convert"
+	"github.com/m4gshm/gollections/convert/as"
 	"github.com/m4gshm/gollections/iter"
 	"github.com/m4gshm/gollections/loop"
 	sop "github.com/m4gshm/gollections/op"
@@ -257,7 +258,7 @@ func Benchmark_Flatt_Iterable(b *testing.B) {
 	multiDimension := [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		oneDimension := loop.Slice[int](iter.Filter(iter.Flatt(iter.Flatt(slice.NewIter(multiDimension), convert.To[[][]int]), convert.To[[]int]), odds).Next)
+		oneDimension := loop.Slice[int](iter.Filter(iter.Flatt(iter.Flatt(slice.NewIter(multiDimension), as.Is[[][]int]), as.Is[[]int]), odds).Next)
 		_ = oneDimension
 	}
 	b.StopTimer()
@@ -269,8 +270,8 @@ func Benchmark_Flatt_Loop(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		next := loop.Of(multiDimension...)
-		twoD := loop.Flatt(next, convert.To[[][]int])
-		oneD := loop.Flatt(twoD.Next, convert.To[[]int])
+		twoD := loop.Flatt(next, as.Is[[][]int])
+		oneD := loop.Flatt(twoD.Next, as.Is[[]int])
 		f := loop.Filter(oneD.Next, odds)
 		oneDimension := loop.Slice(f.Next)
 		_ = oneDimension
@@ -283,7 +284,7 @@ func Benchmark_Flatt_Slice_Iterated(b *testing.B) {
 	multiDimension := [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		oneDimension := loop.Slice[int](iter.Filter(iter.Flatt(sliceIter.Flatt(multiDimension, convert.To[[][]int]), convert.To[[]int]), odds).Next)
+		oneDimension := loop.Slice[int](iter.Filter(iter.Flatt(sliceIter.Flatt(multiDimension, as.Is[[][]int]), as.Is[[]int]), odds).Next)
 		_ = oneDimension
 	}
 	b.StopTimer()
@@ -294,8 +295,8 @@ func Benchmark_Flatt_Slice_Looped(b *testing.B) {
 	multiDimension := [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		sf := sliceIter.Flatt(multiDimension, convert.To[[][]int])
-		oneD := loop.Flatt(sf.Next, convert.To[[]int])
+		sf := sliceIter.Flatt(multiDimension, as.Is[[][]int])
+		oneD := loop.Flatt(sf.Next, as.Is[[]int])
 		f := loop.Filter(oneD.Next, odds)
 		oneDimension := loop.Slice(f.Next)
 		_ = oneDimension
@@ -328,7 +329,7 @@ func Benchmark_ReduceSum_Iterable(b *testing.B) {
 	b.ResetTimer()
 	result := 0
 	for i := 0; i < b.N; i++ {
-		result = loop.Reduce(iter.Filter(iter.Flatt(iter.Flatt(slice.NewIter(multiDimension), convert.To[[][]int]), convert.To[[]int]), odds).Next, sop.Sum[int])
+		result = loop.Reduce(iter.Filter(iter.Flatt(iter.Flatt(slice.NewIter(multiDimension), as.Is[[][]int]), as.Is[[]int]), odds).Next, sop.Sum[int])
 	}
 	b.StopTimer()
 	if result != expected {
@@ -344,8 +345,8 @@ func Benchmark_ReduceSum_Loop(b *testing.B) {
 	result := 0
 	for i := 0; i < b.N; i++ {
 		next := loop.Of(multiDimension...)
-		f1 := loop.Flatt(next, convert.To[[][]int])
-		f2 := loop.Flatt(f1.Next, convert.To[[]int])
+		f1 := loop.Flatt(next, as.Is[[][]int])
+		f2 := loop.Flatt(f1.Next, as.Is[[]int])
 		f3 := loop.Filter(f2.Next, odds)
 		result = loop.Reduce(f3.Next, sop.Sum[int])
 	}
@@ -362,7 +363,7 @@ func Benchmark_ReduceSum_Slice(b *testing.B) {
 	b.ResetTimer()
 	result := 0
 	for i := 0; i < b.N; i++ {
-		result = loop.Reduce(iter.Filter(iter.Flatt(sliceIter.Flatt(multiDimension, convert.To[[][]int]), convert.To[[]int]), odds).Next, sop.Sum[int])
+		result = loop.Reduce(iter.Filter(iter.Flatt(sliceIter.Flatt(multiDimension, as.Is[[][]int]), as.Is[[]int]), odds).Next, sop.Sum[int])
 	}
 	b.StopTimer()
 	if result != expected {
@@ -380,8 +381,8 @@ func Benchmark_ReduceSum_Slice_Looped(b *testing.B) {
 	b.ResetTimer()
 	result := 0
 	for i := 0; i < b.N; i++ {
-		f1 := sliceIter.Flatt(multiDimension, convert.To[[][]int])
-		f2 := loop.Flatt(f1.Next, convert.To[[]int])
+		f1 := sliceIter.Flatt(multiDimension, as.Is[[][]int])
+		f2 := loop.Flatt(f1.Next, as.Is[[]int])
 		f3 := loop.Filter(f2.Next, odds)
 		result = loop.Reduce(f3.Next, sop.Sum[int])
 	}

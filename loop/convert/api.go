@@ -3,6 +3,7 @@ package convert
 
 import (
 	"github.com/m4gshm/gollections/check/not"
+	"github.com/m4gshm/gollections/convert/as"
 	"github.com/m4gshm/gollections/loop"
 )
 
@@ -14,6 +15,11 @@ func AndConvert[From, I, To any](next func() (From, bool), firsConverter func(Fr
 // AndFilter - convert.AndFilter converts only filtered elements and returns them
 func AndFilter[From, To any](next func() (From, bool), converter func(From) To, filter func(To) bool) loop.ConvertFitIter[From, To] {
 	return loop.ConvertAndFilter(next, converter, filter)
+}
+
+// ToVals converts pointers to values except nils
+func ToVals[T any](next func() (*T, bool)) loop.ConvertFitIter[*T, T] {
+	return loop.FilterAndConvert(next, not.Nil[T], as.Val[T])
 }
 
 // NotNil - convert.NotNil converts only not nil elements and returns them

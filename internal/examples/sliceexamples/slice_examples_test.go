@@ -250,6 +250,26 @@ func Test_FilterNotNil(t *testing.T) {
 	assert.Equal(t, expected, result)
 }
 
+func Test_ConvertPointersToValues(t *testing.T) {
+	type entity struct{ val string }
+	var (
+		source   = []*entity{{"first"}, nil, {"third"}, nil, {"fifth"}}
+		result   = slice.ToValues(source)
+		expected = []entity{{"first"}, {}, {"third"}, {}, {"fifth"}}
+	)
+	assert.Equal(t, expected, result)
+}
+
+func Test_ConvertNotnilPointersToValues(t *testing.T) {
+	type entity struct{ val string }
+	var (
+		source   = []*entity{{"first"}, nil, {"third"}, nil, {"fifth"}}
+		result   = slice.GetValues(source)
+		expected = []entity{{"first"}, {"third"}, {"fifth"}}
+	)
+	assert.Equal(t, expected, result)
+}
+
 func Test_Flatt(t *testing.T) {
 	var (
 		source   = [][]int{{1, 2, 3}, {4}, {5, 6}}

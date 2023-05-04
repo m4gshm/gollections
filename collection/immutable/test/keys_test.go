@@ -5,7 +5,7 @@ import (
 
 	"github.com/m4gshm/gollections/collection/immutable"
 	"github.com/m4gshm/gollections/collection/immutable/ordered"
-	"github.com/m4gshm/gollections/ptr"
+	"github.com/m4gshm/gollections/convert/ptr"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -3,7 +3,6 @@ package as
 
 import (
 	"github.com/m4gshm/gollections/convert"
-	// "github.com/m4gshm/gollections/slice/iter"
 )
 
 // Is an alias of the convert.AsIs
@@ -16,3 +15,9 @@ func Slice[T any](value T) []T { return convert.AsSlice(value) }
 func ErrTail[I, O any](f func(I) O) func(I) (O, error) {
 	return func(in I) (O, error) { return f(in), nil }
 }
+
+// Ptr converts a value to the value pointer
+func Ptr[T any](value T) *T { return convert.ToPointer(value) }
+
+// Val returns a value referenced by the pointer or the zero value if the pointer is nil
+func Val[T any](pointer *T) T { return convert.ToValue(pointer) }

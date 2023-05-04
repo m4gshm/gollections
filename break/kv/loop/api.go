@@ -62,22 +62,22 @@ func HasAny[K, V any](next func() (K, V, bool, error), predicate func(K, V) (boo
 	}
 }
 
-// Convert creates an Iterator that applies a transformer to iterable key\values.
+// Convert creates an iterator that applies a transformer to iterable key\values.
 func Convert[K, V any, KOUT, VOUT any](next func() (K, V, bool, error), converter func(K, V) (KOUT, VOUT)) ConvertIter[K, V, KOUT, VOUT] {
 	return ConvertIter[K, V, KOUT, VOUT]{next: next, converter: func(k K, v V) (KOUT, VOUT, error) { ko, vo := converter(k, v); return ko, vo, nil }}
 }
 
-// Conv creates an Iterator that applies a transformer to iterable key\values.
+// Conv creates an iterator that applies a transformer to iterable key\values.
 func Conv[K, V any, KOUT, VOUT any](next func() (K, V, bool, error), converter func(K, V) (KOUT, VOUT, error)) ConvertIter[K, V, KOUT, VOUT] {
 	return ConvertIter[K, V, KOUT, VOUT]{next: next, converter: converter}
 }
 
-// Filter creates an Iterator that checks elements by a filter and returns successful ones
+// Filter creates an iterator that checks elements by a filter and returns successful ones
 func Filter[K, V any](next func() (K, V, bool, error), filter func(K, V) bool) FiltKV[K, V] {
 	return FiltKV[K, V]{next: next, filter: func(k K, v V) (bool, error) { return filter(k, v), nil }}
 }
 
-// Filt creates an Iterator that checks elements by a filter and returns successful ones
+// Filt creates an iterator that checks elements by a filter and returns successful ones
 func Filt[K, V any](next func() (K, V, bool, error), filter func(K, V) (bool, error)) FiltKV[K, V] {
 	return FiltKV[K, V]{next: next, filter: filter}
 }

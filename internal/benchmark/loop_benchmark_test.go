@@ -8,8 +8,8 @@ import (
 	"github.com/m4gshm/gollections/collection/immutable/vector"
 	moset "github.com/m4gshm/gollections/collection/mutable/oset"
 	mvector "github.com/m4gshm/gollections/collection/mutable/vector"
+	"github.com/m4gshm/gollections/convert/ptr"
 	"github.com/m4gshm/gollections/map_"
-	"github.com/m4gshm/gollections/ptr"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/range_"
 )

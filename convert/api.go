@@ -6,9 +6,6 @@ import (
 	"github.com/m4gshm/gollections/k"
 )
 
-// To helper for Map, Flatt
-func To[T any](value T) T { return value }
-
 // AsIs helper for Map, Flatt
 func AsIs[T any](value T) T { return value }
 
@@ -100,4 +97,25 @@ func FlattKeys[T, K any](element T, keysExtractor func(T) []K) (out []c.KV[K, T]
 		}
 	}
 	return out
+}
+
+// ToPointer converts a value to the value pointer
+func ToPointer[T any](value T) *T {
+	return &value
+}
+
+// ToValue returns a value referenced by the pointer or the zero value if the pointer is nil
+func ToValue[T any](pointer *T) (t T) {
+	if pointer != nil {
+		t = *pointer
+	}
+	return t
+}
+
+// GetValue returns a value referenced by the pointer or ok==false if the pointer is nil
+func GetValue[T any](pointer *T) (t T, ok bool) {
+	if pointer != nil {
+		return *pointer, true
+	}
+	return t, false
 }

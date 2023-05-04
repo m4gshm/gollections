@@ -14,6 +14,7 @@ import (
 	"github.com/m4gshm/gollections/break/predicate/more"
 	"github.com/m4gshm/gollections/convert/as"
 	"github.com/m4gshm/gollections/loop"
+	"github.com/m4gshm/gollections/loop/convert"
 	"github.com/m4gshm/gollections/slice"
 )
 
@@ -29,16 +30,6 @@ func Test_Sum(t *testing.T) {
 	assert.Equal(t, 1+3+5+7+9+11, r)
 }
 
-// func Test_First(t *testing.T) {
-// 	s := loop.Of(1, 3, 5, 7, 9, 11)
-// 	r, ok := first.Of(s, func(i int) bool { return i > 5 })
-// 	assert.True(t, ok)
-// 	assert.Equal(t, 7, r)
-
-// 	_, nook := loop.First(s, func(i int) bool { return i > 12 })
-// 	assert.False(t, nook)
-// }
-
 func Test_Convert(t *testing.T) {
 	s := loop.Of(1, 3, 5, 7, 9, 11)
 	r := breakLoop.Convert(breakLoop.From(s), strconv.Itoa)
@@ -46,41 +37,41 @@ func Test_Convert(t *testing.T) {
 	assert.Equal(t, []string{"1", "3", "5", "7", "9", "11"}, o)
 }
 
-// func Test_ConvertNotNil(t *testing.T) {
-// 	type entity struct{ val string }
-// 	var (
-// 		source   = loop.Of([]*entity{{"first"}, nil, {"third"}, nil, {"fifth"}}...)
-// 		result   = convert.NotNil(source, func(e *entity) string { return e.val })
-// 		expected = []string{"first", "third", "fifth"}
-// 	)
-// 	assert.Equal(t, expected, slice.Generate(result.Next))
-// }
+func Test_ConvertNotNil(t *testing.T) {
+	type entity struct{ val string }
+	var (
+		source   = loop.Of([]*entity{{"first"}, nil, {"third"}, nil, {"fifth"}}...)
+		result   = convert.NotNil(source, func(e *entity) string { return e.val })
+		expected = []string{"first", "third", "fifth"}
+	)
+	assert.Equal(t, expected, slice.Generate(result.Next))
+}
 
-// func Test_ConvertToNotNil(t *testing.T) {
-// 	type entity struct{ val *string }
-// 	var (
-// 		first    = "first"
-// 		third    = "third"
-// 		fifth    = "fifth"
-// 		source   = loop.Of([]entity{{&first}, {}, {&third}, {}, {&fifth}}...)
-// 		result   = convert.ToNotNil(source, func(e entity) *string { return e.val })
-// 		expected = []*string{&first, &third, &fifth}
-// 	)
-// 	assert.Equal(t, expected, slice.Generate(result.Next))
-// }
+func Test_ConvertToNotNil(t *testing.T) {
+	type entity struct{ val *string }
+	var (
+		first    = "first"
+		third    = "third"
+		fifth    = "fifth"
+		source   = loop.Of([]entity{{&first}, {}, {&third}, {}, {&fifth}}...)
+		result   = convert.ToNotNil(source, func(e entity) *string { return e.val })
+		expected = []*string{&first, &third, &fifth}
+	)
+	assert.Equal(t, expected, slice.Generate(result.Next))
+}
 
-// func Test_ConvertNilSafe(t *testing.T) {
-// 	type entity struct{ val *string }
-// 	var (
-// 		first    = "first"
-// 		third    = "third"
-// 		fifth    = "fifth"
-// 		source   = loop.Of([]*entity{{&first}, {}, {&third}, nil, {&fifth}}...)
-// 		result   = convert.NilSafe(source, func(e *entity) *string { return e.val })
-// 		expected = []*string{&first, &third, &fifth}
-// 	)
-// 	assert.Equal(t, expected, slice.Generate(result.Next))
-// }
+func Test_ConvertNilSafe(t *testing.T) {
+	type entity struct{ val *string }
+	var (
+		first    = "first"
+		third    = "third"
+		fifth    = "fifth"
+		source   = loop.Of([]*entity{{&first}, {}, {&third}, nil, {&fifth}}...)
+		result   = convert.NilSafe(source, func(e *entity) *string { return e.val })
+		expected = []*string{&first, &third, &fifth}
+	)
+	assert.Equal(t, expected, slice.Generate(result.Next))
+}
 
 var even = func(v int) bool { return v%2 == 0 }
 

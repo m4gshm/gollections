@@ -39,6 +39,36 @@ func Test_First(t *testing.T) {
 	assert.False(t, nook)
 }
 
+func Test_NotNil(t *testing.T) {
+	type entity struct{ val string }
+	var (
+		source   = loop.Of([]*entity{{"first"}, nil, {"third"}, nil, {"fifth"}}...)
+		result   = loop.NotNil(source)
+		expected = []*entity{{"first"}, {"third"}, {"fifth"}}
+	)
+	assert.Equal(t, expected, slice.Generate(result.Next))
+}
+
+func Test_ConvertPointersToValues(t *testing.T) {
+	type entity struct{ val string }
+	var (
+		source   = loop.Of([]*entity{{"first"}, nil, {"third"}, nil, {"fifth"}}...)
+		result   = loop.ToValues(source)
+		expected = []entity{{"first"}, {}, {"third"}, {}, {"fifth"}}
+	)
+	assert.Equal(t, expected, slice.Generate(result.Next))
+}
+
+func Test_ConvertNotnilPointersToValues(t *testing.T) {
+	type entity struct{ val string }
+	var (
+		source   = loop.Of([]*entity{{"first"}, nil, {"third"}, nil, {"fifth"}}...)
+		result   = loop.GetValues(source)
+		expected = []entity{{"first"}, {"third"}, {"fifth"}}
+	)
+	assert.Equal(t, expected, slice.Generate(result.Next))
+}
+
 func Test_Convert(t *testing.T) {
 	s := loop.Of(1, 3, 5, 7, 9, 11)
 	r := loop.Convert(s, strconv.Itoa)
