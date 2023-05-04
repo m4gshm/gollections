@@ -47,7 +47,7 @@ For example the function link:./slice/api.go#L459[slice.SortByOrdered] has alias
 
 ==== link:./slice/api.go[slice] and link:./map_/api.go[map_]
 
-Contains utility functions of link:./slice/api.go#L156[converting],  link:./slice/api.go#L379[filtering] (searching), link:./slice/api.go#L464[reducing], link:./map_/api.go#L90[cloning] elements of embedded slices and maps. The functions compute result in-place. For delayed computations see loops or xref:collection-functions[collection functions]. 
+Contains utility functions of link:./slice/api.go#L156[converting],  link:./slice/api.go#L379[filtering] (searching), link:./slice/api.go#L464[reducing], link:./map_/api.go#L90[cloning] elements of embedded slices and maps. The functions compute result in-place. For delayed computations see xref:loop-kvloop-and-breakable-versions-breakloop-breakkvloop[loops] or xref:collection-functions[collection functions]. 
 
 [source,go]
 ----

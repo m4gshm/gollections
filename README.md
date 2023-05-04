@@ -84,8 +84,9 @@ Contains utility functions of [converting](./slice/api.go#L156),
 [filtering](./slice/api.go#L379) (searching),
 [reducing](./slice/api.go#L464), [cloning](./map_/api.go#L90) elements
 of embedded slices and maps. The functions compute result in-place. For
-delayed computations see loops or [collection
-functions](#collection-functions).
+delayed computations see
+[loops](#loop-kvloop-and-breakable-versions-breakloop-breakkvloop) or
+[collection functions](#collection-functions).
 
 ``` go
 even := func(i int) bool { return i%2 == 0 }
