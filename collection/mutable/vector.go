@@ -20,7 +20,7 @@ func WrapVector[T any](elements []T) *Vector[T] {
 	return &v
 }
 
-// Vector is the Collection implementation that provides elements order and index access
+// Vector is a collection implementation that provides elements order and index access
 type Vector[T any] []T
 
 var (

@@ -39,7 +39,7 @@ func WrapSet[T comparable](elements []T, uniques map[T]int) *Set[T] {
 	return &Set[T]{order: &elements, elements: uniques}
 }
 
-// Set is the Collection implementation that provides element uniqueness and access order. Elements must be comparable.
+// Set is a collection implementation that provides element uniqueness and access order. Elements must be comparable.
 type Set[T comparable] struct {
 	order    *[]T
 	elements map[T]int

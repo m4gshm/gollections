@@ -19,7 +19,7 @@ func WrapVector[T any](elements []T) Vector[T] {
 	return Vector[T]{elements: elements, esize: notsafe.GetTypeSize[T]()}
 }
 
-// Vector is the Collection implementation that provides elements order and index access.
+// Vector is a collection implementation that provides elements order and index access.
 type Vector[T any] struct {
 	elements []T
 	esize    uintptr

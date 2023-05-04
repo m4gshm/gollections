@@ -25,7 +25,7 @@ func WrapMap[K comparable, V any](elements map[K]V) Map[K, V] {
 	return Map[K, V]{elements: elements}
 }
 
-// Map is a collection that provides elements access by an unique key.
+// Map is a collection implementation that provides elements access by an unique key
 type Map[K comparable, V any] struct {
 	elements map[K]V
 }

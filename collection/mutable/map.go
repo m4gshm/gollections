@@ -24,7 +24,7 @@ func WrapMap[K comparable, V any](elements map[K]V) *Map[K, V] {
 	return &m
 }
 
-// Map is the Collection implementation based on the embedded map.
+// Map is a collection implementation that provides elements access by an unique key.
 type Map[K comparable, V any] map[K]V
 
 var (

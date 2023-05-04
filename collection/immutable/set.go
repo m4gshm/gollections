@@ -30,7 +30,7 @@ func SetFromLoop[T comparable](next func() (T, bool)) Set[T] {
 	return WrapSet(internal)
 }
 
-// Set is a collection that provides storage for unique elements, prevents duplication. The elements must be comparable.
+// Set is a collection implementation that provides storage for unique elements, prevents duplication. The elements must be comparable.
 type Set[T comparable] struct {
 	elements map[T]struct{}
 }
