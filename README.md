@@ -196,8 +196,8 @@ Supports write operations (append, delete, replace).
 
 <!-- -->
 
-    _ immutable.Map[int, string]  = map_.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
-    _ collection.Map[int, string] = immutable.NewMapOf(map[int]string{1: "2", 2: "2", 3: "3"})
+    _ *mutable.Map[int, string]   = map_.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
+    _ collection.Map[int, string] = mutable.NewMapOf(map[int]string{1: "2", 2: "2", 3: "3"})
 
 - [OrderedSet](./collection/mutable/oset/api.go) - collection of unique
   items, prevents duplicates, provides iteration in order of addition.
@@ -214,6 +214,9 @@ Supports write operations (append, delete, replace).
 
     _ *ordered.Map[int, string]   = map_.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
     _ collection.Map[int, string] = ordered.NewMapOf(
+        /*order  */ []int{3, 1, 2},
+        /*uniques*/ map[int]string{1: "2", 2: "2", 3: "3"},
+    )
 
 ### Immutable containers
 

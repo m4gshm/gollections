@@ -131,7 +131,7 @@ include::../examples/collection/mutable/oset.go[lines=10..11,indent=0]
 ----
   * link:./collection/mutable/omap/api.go[OrderedMap] - same as the Map, but supports iteration in the order in which elements are added.
 ----
-include::../examples/collection/mutable/omap.go[lines=11..12,indent=0]
+include::../examples/collection/mutable/omap.go[lines=11..17,indent=0]
 ----
 
 ==== Immutable containers
