@@ -19,8 +19,7 @@ You can make clear code, extensive, but without dependencies:
 include::../examples/boilerplate/slice_namesbyRole_old_test.go[lines=11..33,indent=0]
 ----
 
-
-Or using the devkit you can write more compact code like this:
+Or you can write more compact code using the collections API, like so:
 [source,go]
 ----
 include::../examples/boilerplate/slice_namesbyRole_new_test.go[lines=13..21,indent=0]

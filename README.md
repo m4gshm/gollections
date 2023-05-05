@@ -46,7 +46,7 @@ assert.Equal(t, namesByRole["manager"], []string{"Bob", "Alice"})
 assert.Equal(t, namesByRole["admin"], []string{"Bob"})
 ```
 
-Or using the devkit you can write more compact code like this:
+Or you can write more compact code using the collections API, like so:
 
 ``` go
 var namesByRole = group.ByMultipleKeys(users, func(u User) []string {
