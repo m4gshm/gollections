@@ -2,7 +2,7 @@
 
 == Gollections
 
-This is a development kit aimed at reducing boilerplate code when using link:./slice/api.go[slices], link:./map_/api.go[maps] and 
+This is a set of utilities aimed at reducing boilerplate code when using link:./slice/api.go[slices], link:./map_/api.go[maps] and 
 extending functionality by new collection implementations such as link:./collection/collection/mutable/omap/api.go[ordered map] or link:./collection/collection/mutable/oset/api.go[set].
 
 Supports Go version 1.20.

@@ -1,6 +1,6 @@
 # Gollections
 
-This is a development kit aimed at reducing boilerplate code when using
+This is a set of utilities aimed at reducing boilerplate code when using
 [slices](./slice/api.go), [maps](./map_/api.go) and extending
 functionality by new collection implementations such as [ordered
 map](./collection/collection/mutable/omap/api.go) or
