@@ -110,28 +110,38 @@ include::../examples/loop/breakloop/loop_filter_convert_reduce_test.go[lines=17.
 Supports write operations (append, delete, replace).
 
   * link:./collection/mutable/vector/api.go[Vector] - the simplest based on built-in slice collection.
+
 [source,go]
 ----
 include::../examples/collection/mutable/vector.go[lines=10..11,indent=0]
 ----
+
   * link:./collection/mutable/set/api.go[Set] - collection of unique items, prevents duplicates.
+
 [source,go]
 ----
 include::../examples/collection/mutable/set.go[lines=10..11,indent=0]
 ----
+
   * link:./collection/mutable/map_/api.go[Map] - built-in map wrapper that supports xref:stream-functions[stream functions].
+
 [source,go]
 ----
 include::../examples/collection/mutable/map.go[lines=11..12,indent=0]
 ----
+
   * link:./collection/mutable/oset/api.go[OrderedSet] - collection of unique items, prevents duplicates, provides iteration in order of addition.
+
 [source,go]
 ----
 include::../examples/collection/mutable/oset.go[lines=10..11,indent=0]
 ----
+
   * link:./collection/mutable/omap/api.go[OrderedMap] - same as the Map, but supports iteration in the order in which elements are added.
+
+[source,go]
 ----
-include::../examples/collection/mutable/omap.go[lines=11..17,indent=0]
+include::../examples/collection/mutable/omap.go[lines=11..15,indent=0]
 ----
 
 ==== Immutable containers

@@ -172,6 +172,7 @@ func Test_Set_Zero(t *testing.T) {
 
 	_, _, ok = set.First()
 	assert.False(t, ok)
+
 }
 
 type user struct {

@@ -178,45 +178,45 @@ Supports write operations (append, delete, replace).
 - [Vector](./collection/mutable/vector/api.go) - the simplest based on
   built-in slice collection.
 
-<!-- -->
-
-    _ *mutable.Vector[int]   = vector.Of(1, 2, 3)
-    _ collection.Vector[int] = &mutable.Vector[int]{}
+``` go
+_ *mutable.Vector[int]   = vector.Of(1, 2, 3)
+_ collection.Vector[int] = &mutable.Vector[int]{}
+```
 
 - [Set](./collection/mutable/set/api.go) - collection of unique items,
   prevents duplicates.
 
-<!-- -->
-
-    _ *mutable.Set[int]   = set.Of(1, 2, 3)
-    _ collection.Set[int] = &mutable.Set[int]{}
+``` go
+_ *mutable.Set[int]   = set.Of(1, 2, 3)
+_ collection.Set[int] = &mutable.Set[int]{}
+```
 
 - [Map](./collection/mutable/map_/api.go) - built-in map wrapper that
   supports [stream functions](#stream-functions).
 
-<!-- -->
-
-    _ *mutable.Map[int, string]   = map_.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
-    _ collection.Map[int, string] = mutable.NewMapOf(map[int]string{1: "2", 2: "2", 3: "3"})
+``` go
+_ *mutable.Map[int, string]   = map_.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
+_ collection.Map[int, string] = mutable.NewMapOf(map[int]string{1: "2", 2: "2", 3: "3"})
+```
 
 - [OrderedSet](./collection/mutable/oset/api.go) - collection of unique
   items, prevents duplicates, provides iteration in order of addition.
 
-<!-- -->
-
-    _ *ordered.Set[int]   = set.Of(1, 2, 3)
-    _ collection.Set[int] = &ordered.Set[int]{}
+``` go
+_ *ordered.Set[int]   = set.Of(1, 2, 3)
+_ collection.Set[int] = &ordered.Set[int]{}
+```
 
 - [OrderedMap](./collection/mutable/omap/api.go) - same as the Map, but
   supports iteration in the order in which elements are added.
 
-<!-- -->
-
-    _ *ordered.Map[int, string]   = map_.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
-    _ collection.Map[int, string] = ordered.NewMapOf(
-        /*order  */ []int{3, 1, 2},
-        /*uniques*/ map[int]string{1: "2", 2: "2", 3: "3"},
-    )
+``` go
+_ *ordered.Map[int, string]   = map_.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
+_ collection.Map[int, string] = ordered.NewMapOf(
+    /*order  */ []int{3, 1, 2},
+    /*uniques*/ map[int]string{1: "2", 2: "2", 3: "3"},
+)
+```
 
 ### Immutable containers
 
