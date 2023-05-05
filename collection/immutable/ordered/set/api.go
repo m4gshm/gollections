@@ -12,12 +12,12 @@ import (
 
 // Of instantiates Set with predefined elements.
 func Of[T comparable](elements ...T) ordered.Set[T] {
-	return ordered.NewSet(elements)
+	return ordered.NewSet(elements...)
 }
 
 // New instantiates Set and copies elements to it.
 func New[T comparable](elements []T) ordered.Set[T] {
-	return ordered.NewSet(elements)
+	return ordered.NewSet(elements...)
 }
 
 // From instantiates a set with elements retrieved by the 'next' function

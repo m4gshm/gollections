@@ -10,7 +10,7 @@ import (
 
 // Of instantiates Set with predefined elements.
 func Of[T comparable](elements ...T) *ordered.Set[T] {
-	return ordered.NewSet(elements)
+	return ordered.NewSet(elements...)
 }
 
 // From instantiates a set with elements retrieved by the 'next' function

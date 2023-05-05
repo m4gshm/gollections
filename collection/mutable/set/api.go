@@ -13,7 +13,7 @@ import (
 
 // Of instantiates Set with predefined elements.
 func Of[T comparable](elements ...T) *mutable.Set[T] {
-	return mutable.NewSet(elements)
+	return mutable.NewSet(elements...)
 }
 
 // From instantiates a set with elements retrieved by the 'next' function

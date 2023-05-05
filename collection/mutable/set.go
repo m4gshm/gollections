@@ -297,7 +297,7 @@ func (s *Set[T]) sortBy(sorter slice.Sorter, less slice.Less[T]) *ordered.Set[T]
 		sortedElements = slice.Clone(s.Slice())
 		slice.Sort(sortedElements, sorter, less)
 	}
-	return ordered.NewSet(sortedElements)
+	return ordered.NewSet(sortedElements...)
 }
 
 func (s *Set[T]) String() string {

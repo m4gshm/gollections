@@ -15,25 +15,6 @@ import (
 	"github.com/m4gshm/gollections/stream"
 )
 
-// SetFromLoop creates a set with elements retrieved converter the 'next' function.
-// The next returns an element with true or zero value with false if there are no more elements.
-func SetFromLoop[T comparable](next func() (T, bool)) *Set[T] {
-	var (
-		uniques = map[T]int{}
-		order   []T
-		pos     = 0
-	)
-	for e, ok := next(); ok; e, ok = next() {
-		order, pos = add(e, uniques, order, pos)
-	}
-	return WrapSet(order, uniques)
-}
-
-// NewSetCap creates a set with a predefined capacity.
-func NewSetCap[T comparable](capacity int) *Set[T] {
-	return WrapSet(make([]T, 0, capacity), make(map[T]int, capacity))
-}
-
 // WrapSet creates a set using a map and an order slice as the internal storage.
 func WrapSet[T comparable](elements []T, uniques map[T]int) *Set[T] {
 	return &Set[T]{order: &elements, elements: uniques}
@@ -343,7 +324,7 @@ func (s *Set[T]) String() string {
 	return slice.ToString(elements)
 }
 
-func add[T comparable](e T, uniques map[T]int, order []T, pos int) ([]T, int) {
+func addToSet[T comparable](e T, uniques map[T]int, order []T, pos int) ([]T, int) {
 	if _, ok := uniques[e]; !ok {
 		order = append(order, e)
 		uniques[e] = pos

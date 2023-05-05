@@ -180,16 +180,16 @@ Supports write operations (append, delete, replace).
 
 <!-- -->
 
-    _ immutable.Vector[int]  = vector.Of(1, 2, 3)
-    _ collection.Vector[int] = immutable.NewVector([]int{1, 2, 3})
+    _ *mutable.Vector[int]   = vector.Of(1, 2, 3)
+    _ collection.Vector[int] = &mutable.Vector[int]{}
 
 - [Set](./collection/mutable/set/api.go) - collection of unique items,
   prevents duplicates.
 
 <!-- -->
 
-    _ immutable.Set[int]  = set.Of(1, 2, 3)
-    _ collection.Set[int] = immutable.NewSet([]int{1, 2, 3})
+    _ *mutable.Set[int]   = set.Of(1, 2, 3)
+    _ collection.Set[int] = &mutable.Set[int]{}
 
 - [Map](./collection/mutable/map_/api.go) - built-in map wrapper that
   supports [stream functions](#stream-functions).
@@ -197,15 +197,15 @@ Supports write operations (append, delete, replace).
 <!-- -->
 
     _ immutable.Map[int, string]  = map_.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
-    _ collection.Map[int, string] = immutable.NewMap(map[int]string{1: "2", 2: "2", 3: "3"})
+    _ collection.Map[int, string] = immutable.NewMapOf(map[int]string{1: "2", 2: "2", 3: "3"})
 
 - [OrderedSet](./collection/mutable/oset/api.go) - collection of unique
   items, prevents duplicates, provides iteration in order of addition.
 
 <!-- -->
 
-    _ ordered.Set[int]    = set.Of(1, 2, 3)
-    _ collection.Set[int] = ordered.NewSet([]int{1, 2, 3})
+    _ *ordered.Set[int]   = set.Of(1, 2, 3)
+    _ collection.Set[int] = &ordered.Set[int]{}
 
 - [OrderedMap](./collection/mutable/omap/api.go) - same as the Map, but
   supports iteration in the order in which elements are added.
@@ -213,7 +213,7 @@ Supports write operations (append, delete, replace).
 <!-- -->
 
     _ *ordered.Map[int, string]   = map_.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
-    _ collection.Map[int, string] = ordered.NewMap(
+    _ collection.Map[int, string] = ordered.NewMapOf(
 
 ### Immutable containers
 

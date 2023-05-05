@@ -2,11 +2,11 @@ package mutable
 
 import (
 	"github.com/m4gshm/gollections/collection"
-	"github.com/m4gshm/gollections/collection/immutable"
-	"github.com/m4gshm/gollections/collection/immutable/set"
+	"github.com/m4gshm/gollections/collection/mutable"
+	"github.com/m4gshm/gollections/collection/mutable/set"
 )
 
 var (
-	_ immutable.Set[int]  = set.Of(1, 2, 3)
-	_ collection.Set[int] = immutable.NewSet([]int{1, 2, 3})
+	_ *mutable.Set[int]   = set.Of(1, 2, 3)
+	_ collection.Set[int] = &mutable.Set[int]{}
 )

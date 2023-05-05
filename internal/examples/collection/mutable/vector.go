@@ -2,11 +2,11 @@ package mutable
 
 import (
 	"github.com/m4gshm/gollections/collection"
-	"github.com/m4gshm/gollections/collection/immutable"
-	"github.com/m4gshm/gollections/collection/immutable/vector"
+	"github.com/m4gshm/gollections/collection/mutable"
+	"github.com/m4gshm/gollections/collection/mutable/vector"
 )
 
 var (
-	_ immutable.Vector[int]  = vector.Of(1, 2, 3)
-	_ collection.Vector[int] = immutable.NewVector([]int{1, 2, 3})
+	_ *mutable.Vector[int]   = vector.Of(1, 2, 3)
+	_ collection.Vector[int] = &mutable.Vector[int]{}
 )

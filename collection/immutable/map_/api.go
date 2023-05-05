@@ -9,12 +9,12 @@ import (
 
 // Of instantiates a ap from the specified key/value pairs
 func Of[K comparable, V any](elements ...c.KV[K, V]) immutable.Map[K, V] {
-	return immutable.NewMapKV(elements)
+	return immutable.NewMap(elements...)
 }
 
 // New instantiates Map and copies elements to it
 func New[K comparable, V any](elements map[K]V) immutable.Map[K, V] {
-	return immutable.NewMap(elements)
+	return immutable.NewMapOf(elements)
 }
 
 // From instantiates a map with key/values retrieved by the 'next' function.

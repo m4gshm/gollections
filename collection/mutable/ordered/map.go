@@ -21,24 +21,6 @@ import (
 	"github.com/m4gshm/gollections/slice"
 )
 
-// NewMapKV instantiates an ortered Map using a key/value slice
-func NewMapKV[K comparable, V any](elements []c.KV[K, V]) *Map[K, V] {
-	var (
-		l       = len(elements)
-		uniques = make(map[K]V, l)
-		order   = make([]K, 0, l)
-	)
-	for _, kv := range elements {
-		key := kv.Key()
-		val := kv.Value()
-		if _, ok := uniques[key]; !ok {
-			order = append(order, key)
-			uniques[key] = val
-		}
-	}
-	return WrapMap(order, uniques)
-}
-
 // WrapMap instantiates an ordered Map using a map and an order slice as internal storage
 func WrapMap[K comparable, V any](order []K, elements map[K]V) *Map[K, V] {
 	return &Map[K, V]{order: order, elements: elements, ksize: notsafe.GetTypeSize[K]()}
@@ -375,4 +357,12 @@ func (m *Map[K, V]) SetMap(kvs c.TrackEachLoop[K, V]) {
 		return
 	}
 	kvs.TrackEach(func(key K, value V) { m.Set(key, value) })
+}
+
+func addToMap[K comparable, V any](key K, val V, order []K, uniques map[K]V) []K {
+	if _, ok := uniques[key]; !ok {
+		order = append(order, key)
+		uniques[key] = val
+	}
+	return order
 }

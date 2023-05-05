@@ -4,12 +4,11 @@ package map_
 import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/collection/mutable/ordered"
-	"github.com/m4gshm/gollections/kv/loop"
 )
 
 // Of instantiates a ap from the specified key/value pairs
 func Of[K comparable, V any](pairs ...c.KV[K, V]) *ordered.Map[K, V] {
-	return ordered.NewMapKV(pairs)
+	return ordered.NewMap(pairs...)
 }
 
 // Empty instantiates a map with zero capacity
@@ -24,5 +23,5 @@ func New[K comparable, V any](capacity int) *ordered.Map[K, V] {
 
 // From instantiates a map with elements obtained by passing the 'loop' function
 func From[K comparable, V any](next func() (K, V, bool)) *ordered.Map[K, V] {
-	return ordered.NewMapKV(loop.ToSlice(next))
+	return ordered.MapFromLoop(next)
 }

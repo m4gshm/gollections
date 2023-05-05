@@ -19,19 +19,6 @@ func WrapSet[T comparable](order []T, elements map[T]struct{}) Set[T] {
 	return Set[T]{order: order, elements: elements, esize: notsafe.GetTypeSize[T]()}
 }
 
-// SetFromLoop creates a set with elements retrieved converter the 'next' function.
-// The next returns an element with true or zero value with false if there are no more elements.
-func SetFromLoop[T comparable](next func() (T, bool)) Set[T] {
-	var (
-		uniques = map[T]struct{}{}
-		order   []T
-	)
-	for e, ok := next(); ok; e, ok = next() {
-		order = add(e, uniques, order)
-	}
-	return WrapSet(order, uniques)
-}
-
 // Set is a collection implementation that provides storage for unique elements, prevents duplication, and guarantees access order. The elements must be comparable.
 type Set[T comparable] struct {
 	order    []T
@@ -180,7 +167,7 @@ func (s Set[T]) String() string {
 	return slice.ToString(s.order)
 }
 
-func add[T comparable](e T, uniques map[T]struct{}, order []T) []T {
+func addToSet[T comparable](e T, uniques map[T]struct{}, order []T) []T {
 	if _, ok := uniques[e]; !ok {
 		order = append(order, e)
 		uniques[e] = struct{}{}

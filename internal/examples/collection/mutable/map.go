@@ -9,5 +9,5 @@ import (
 
 var (
 	_ immutable.Map[int, string]  = map_.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
-	_ collection.Map[int, string] = immutable.NewMap(map[int]string{1: "2", 2: "2", 3: "3"})
+	_ collection.Map[int, string] = immutable.NewMapOf(map[int]string{1: "2", 2: "2", 3: "3"})
 )

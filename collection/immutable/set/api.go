@@ -13,12 +13,12 @@ import (
 
 // Of instantiates Set with predefined elements.
 func Of[T comparable](elements ...T) immutable.Set[T] {
-	return immutable.NewSet(elements)
+	return immutable.NewSet(elements...)
 }
 
 // New instantiates Set and copies elements to it.
 func New[T comparable](elements []T) immutable.Set[T] {
-	return immutable.NewSet(elements)
+	return immutable.NewSet(elements...)
 }
 
 // From instantiates a map with key/values retrieved by the 'next' function.

@@ -13,7 +13,7 @@ import (
 
 // Of instantiates a vector with the specified elements
 func Of[T any](elements ...T) *mutable.Vector[T] {
-	return mutable.NewVector(elements)
+	return mutable.NewVector(elements...)
 }
 
 // Empty instantiates Vector with zero capacity.

@@ -7,24 +7,23 @@ import (
 	breakStream "github.com/m4gshm/gollections/break/stream"
 	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/collection/immutable"
-	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/stream"
 )
 
 // Of instantiates a vector with the specified elements
 func Of[T any](elements ...T) immutable.Vector[T] {
-	return immutable.NewVector(elements)
+	return immutable.NewVector(elements...)
 }
 
 // New instantiates a vector with the specified elements
 func New[T any](elements []T) immutable.Vector[T] {
-	return immutable.NewVector(elements)
+	return immutable.NewVector(elements...)
 }
 
 // From instantiates a vector with elements retrieved by the 'next' function.
 // The next returns an element with true or zero value with false if there are no more elements.
 func From[T any](next func() (T, bool)) immutable.Vector[T] {
-	return immutable.WrapVector(loop.Slice(next))
+	return immutable.VectorFromLoop(next)
 }
 
 // Sort copy the specified vector with sorted elements

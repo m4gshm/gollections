@@ -20,16 +20,6 @@ func WrapSet[T comparable](elements map[T]struct{}) Set[T] {
 	return Set[T]{elements: elements}
 }
 
-// SetFromLoop creates a set with elements retrieved by the 'next' function.
-// The next returns an element with true or zero value with false if there are no more elements.
-func SetFromLoop[T comparable](next func() (T, bool)) Set[T] {
-	internal := map[T]struct{}{}
-	for e, ok := next(); ok; e, ok = next() {
-		internal[e] = struct{}{}
-	}
-	return WrapSet(internal)
-}
-
 // Set is a collection implementation that provides storage for unique elements, prevents duplication. The elements must be comparable.
 type Set[T comparable] struct {
 	elements map[T]struct{}
