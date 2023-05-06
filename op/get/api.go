@@ -1,75 +1,48 @@
+// Package get provides conditional expression builders
 package get
 
-import "github.com/m4gshm/gollections/op"
-
-// If builds get.If(tr, condition).Else(fals) expression builder
-func If[T any](tru func() T, condition bool) If_[T] {
-	return If_[T]{tru, condition}
+// If builds get.If(condition, tru).Else(fals) expression builder
+func If[T any](condition bool, tru func() T) When[T] {
+	return When[T]{condition, tru}
 }
 
-func IfCalc[T any](tru func() T, condition func() bool) IfCalc_[T] {
-	return IfCalc_[T]{tru, condition}
+// If builds get.One(tru).If(condition).Else(fals) expression builder
+func One[T any](one func() T) ThisOne[T] {
+	return This(one)
 }
 
-// If builds use.One(tr).If(condition).Else(fals) expression builder
-func One[T any](one func() T) One_[T] {
-	return One_[T]{one}
+// If builds get.This(tru).If(condition).Else(fals) expression builder
+func This[T any](one func() T) ThisOne[T] {
+	return ThisOne[T]{one}
 }
 
-// If_ is if...else expression builder
-type If_[T any] struct {
-	Then      func() T
+// When is if...else expression builder
+type When[T any] struct {
 	Condition bool
-}
-
-// OrElse returns the tru or the fals according to the condition
-func (u If_[T]) OrElse(fals func() T) T {
-	return op.IfDoElse(u.Condition, u.Then, fals)
-}
-
-// Else returns the tru or the fals according to the condition
-func (u If_[T]) Else(fals T) T {
-	return op.IfDoElse(u.Condition, u.Then, func() T { return fals })
-}
-
-// ElseGet returns the tru or executes the fals according to the condition
-func (u If_[T]) ElseGet(fals func() T) T {
-	return op.IfDoElse(u.Condition, u.Then, fals)
-}
-
-// If_ is if...else expression builder
-type IfCalc_[T any] struct {
 	Then      func() T
-	Condition func() bool
-}
-
-// OrElse returns the tru or the fals according to the condition
-func (u IfCalc_[T]) OrElse(fals func() T) T {
-	return op.IfDoElse(u.Condition(), u.Then, fals)
 }
 
 // Else returns the tru or the fals according to the condition
-func (u IfCalc_[T]) Else(fals T) T {
-	if u.Condition() {
+func (u When[T]) Else(fals T) T {
+	if u.Condition {
 		return u.Then()
 	}
 	return fals
 }
 
 // ElseGet returns the tru or executes the fals according to the condition
-func (u IfCalc_[T]) ElseGet(fals func() T) T {
-	return op.IfDoElse(u.Condition(), u.Then, fals)
+func (u When[T]) ElseGet(fals func() T) T {
+	if u.Condition {
+		return u.Then()
+	}
+	return fals()
 }
 
-// One_ is if...else expression builder
-type One_[T any] struct {
-	Getter func() T
+// ThisOne is if...else expression builder
+type ThisOne[T any] struct {
+	Value func() T
 }
 
-func (u One_[T]) If(condition bool) If_[T] {
-	return If(u.Getter, condition)
-}
-
-func (u One_[T]) If_(condition func() bool) IfCalc_[T] {
-	return IfCalc(u.Getter, condition)
+func (u ThisOne[T]) If(condition bool) When[T] {
+	return If(condition, u.Value)
 }

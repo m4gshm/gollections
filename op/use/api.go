@@ -1,44 +1,48 @@
 // Package use provides conditional expression builders
 package use
 
-import "github.com/m4gshm/gollections/op"
-
-// If builds useIf(tr, condition).Else(fals) expression builder
-func If[T any](tru T, condition bool) If_[T] {
-	return If_[T]{tru, condition}
+// If builds use.If(condition, tru).Else(fals) expression builder
+func If[T any](condition bool, tru T) When[T] {
+	return When[T]{condition, tru}
 }
 
-// If builds use.One(tr).If(condition).Else(fals) expression builder
-func One[T any](one T) One_[T] {
-	return One_[T]{one}
+// If builds use.One(tru).If(condition).Else(fals) expression builder
+func One[T any](one T) ThisOne[T] {
+	return This(one)
 }
 
-// If_ is if...else expression builder
-type If_[T any] struct {
-	Then      T
+// If builds use.This(tru).If(condition).Else(fals) expression builder
+func This[T any](one T) ThisOne[T] {
+	return ThisOne[T]{one}
+}
+
+// When is if...else expression builder
+type When[T any] struct {
 	Condition bool
-}
-
-// OrElse returns the tru or the fals according to the condition
-func (u If_[T]) OrElse(fals T) T {
-	return op.IfElse(u.Condition, u.Then, fals)
+	Then      T
 }
 
 // Else returns the tru or the fals according to the condition
-func (u If_[T]) Else(fals T) T {
-	return op.IfElse(u.Condition, u.Then, fals)
+func (u When[T]) Else(fals T) T {
+	if u.Condition {
+		return u.Then
+	}
+	return fals
 }
 
 // ElseGet returns the tru or executes the fals according to the condition
-func (u If_[T]) ElseGet(fals func() T) T {
-	return op.IfDoElse(u.Condition, func() T { return u.Then }, fals)
+func (u When[T]) ElseGet(fals func() T) T {
+	if u.Condition {
+		return u.Then
+	}
+	return fals()
 }
 
-// One_ is if...else expression builder
-type One_[T any] struct {
+// ThisOne is if...else expression builder
+type ThisOne[T any] struct {
 	Value T
 }
 
-func (u One_[T]) If(condition bool) If_[T] {
-	return If(u.Value, condition)
+func (u ThisOne[T]) If(condition bool) When[T] {
+	return If(condition, u.Value)
 }
