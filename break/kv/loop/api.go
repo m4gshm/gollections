@@ -2,8 +2,6 @@
 package loop
 
 import (
-	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/k"
 	"github.com/m4gshm/gollections/map_/resolv"
 )
 
@@ -101,14 +99,14 @@ func ToMap[K comparable, V any](next func() (K, V, bool, error)) (map[K]V, error
 }
 
 // ToSlice collects key\value elements to a slice by iterating over the elements
-func ToSlice[K, V any](next func() (K, V, bool, error)) ([]c.KV[K, V], error) {
-	s := []c.KV[K, V]{}
+func ToSlice[K, V, T any](next func() (K, V, bool, error), converter func(K, V) T) ([]T, error) {
+	s := []T{}
 	for {
 		key, val, ok, err := next()
 		if err != nil || !ok {
 			return s, err
 		}
-		s = append(s, k.V(key, val))
+		s = append(s, converter(key, val))
 	}
 }
 

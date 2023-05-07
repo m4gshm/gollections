@@ -339,3 +339,23 @@ func HasAny[M ~map[K]V, K comparable, V any](elements M, predicate func(K, V) bo
 	}
 	return false
 }
+
+func ToSlice[M ~map[K]V, K comparable, V any, T any](elements M, converter func(key K, val V) T) []T {
+	out := make([]T, 0, len(elements))
+	for key, val := range elements {
+		out = append(out, converter(key, val))
+	}
+	return out
+}
+
+func ToSlicee[M ~map[K]V, K comparable, V any, T any](elements M, converter func(key K, val V) (T, error)) ([]T, error) {
+	out := make([]T, 0, len(elements))
+	for key, val := range elements {
+		t, err := converter(key, val)
+		if err != nil {
+			return out, err
+		}
+		out = append(out, t)
+	}
+	return out, nil
+}

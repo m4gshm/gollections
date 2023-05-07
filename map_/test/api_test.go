@@ -1,6 +1,7 @@
 package test
 
 import (
+	"strconv"
 	"testing"
 
 	"github.com/m4gshm/gollections/convert/ptr"
@@ -163,4 +164,17 @@ func Test_MatchAny(t *testing.T) {
 	})
 
 	assert.False(t, noOk)
+}
+
+func Test_ToSlice(t *testing.T) {
+	result := map_.ToSlice(entities, func(key int, val *entity) string { return strconv.Itoa(key) + ":" + val.val })
+	assert.Equal(t, slice.Of("1:1_first", "2:2_second", "3:3_third"), sort.Of(result))
+}
+
+func Test_ToSliceErrorable(t *testing.T) {
+	result, _ := map_.ToSlicee(entities, func(key int, val *entity) (int, error) {
+		v, err := strconv.Atoi(string(val.val[0]))
+		return v + key, err
+	})
+	assert.Equal(t, slice.Of(2, 4, 6), sort.Of(result))
 }

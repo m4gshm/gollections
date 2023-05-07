@@ -5,11 +5,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/m4gshm/gollections/check/strings"
 	"github.com/m4gshm/gollections/predicate/less"
 	"github.com/m4gshm/gollections/predicate/match"
 	"github.com/m4gshm/gollections/predicate/where"
 	"github.com/m4gshm/gollections/slice"
-	"github.com/m4gshm/gollections/strings"
 )
 
 func Test_Predicate(t *testing.T) {
