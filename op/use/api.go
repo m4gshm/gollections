@@ -6,12 +6,12 @@ func If[T any](condition bool, tru T) When[T] {
 	return When[T]{condition, tru}
 }
 
-// If builds use.One(tru).If(condition).Else(fals) expression builder
+// One builds use.One(tru).If(condition).Else(fals) expression builder
 func One[T any](one T) ThisOne[T] {
 	return This(one)
 }
 
-// If builds use.This(tru).If(condition).Else(fals) expression builder
+// This builds use.This(tru).If(condition).Else(fals) expression builder
 func This[T any](one T) ThisOne[T] {
 	return ThisOne[T]{one}
 }
@@ -43,6 +43,7 @@ type ThisOne[T any] struct {
 	Value T
 }
 
+// If is condition part of use.One(condition).If(tru).Else(fals) expression builder
 func (u ThisOne[T]) If(condition bool) When[T] {
 	return If(condition, u.Value)
 }
