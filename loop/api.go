@@ -2,6 +2,8 @@
 package loop
 
 import (
+	"github.com/m4gshm/gollections/break/loop"
+	breakAlways "github.com/m4gshm/gollections/break/predicate/always"
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/convert"
@@ -145,14 +147,29 @@ func Contains[T comparable](next func() (T, bool), example T) bool {
 	return false
 }
 
+// Conv instantiates an iterator that converts elements with a converter and returns them.
+func Conv[From, To any](next func() (From, bool), converter func(From) (To, error)) loop.ConvertIter[From, To] {
+	return loop.Conv(loop.From(next), converter)
+}
+
 // Convert instantiates an iterator that converts elements with a converter and returns them.
 func Convert[From, To any](next func() (From, bool), converter func(From) To) ConvertIter[From, To] {
 	return ConvertIter[From, To]{next: next, converter: converter}
 }
 
+// ConvCheck is similar to ConvertFit, but it checks and transforms elements together
+func ConvCheck[From, To any](next func() (From, bool), converter func(from From) (To, bool, error)) loop.ConvertCheckIter[From, To] {
+	return loop.ConvCheck(loop.From(next), converter)
+}
+
 // ConvertCheck is similar to ConvertFit, but it checks and transforms elements together
 func ConvertCheck[From, To any](next func() (From, bool), converter func(from From) (To, bool)) ConvertCheckIter[From, To] {
 	return ConvertCheckIter[From, To]{next: next, converter: converter}
+}
+
+// FitAndConv returns a stream that filters source elements and converts them
+func FitAndConv[From, To any](next func() (From, bool), filter func(From) (bool, error), converter func(From) (To, error)) loop.ConvertFitIter[From, To] {
+	return loop.FitAndConv(loop.From(next), filter, converter)
 }
 
 // FilterAndConvert returns a stream that filters source elements and converts them
@@ -170,9 +187,19 @@ func ConvertAndFilter[From, To any](next func() (From, bool), converter func(Fro
 	return FilterConvertFilter(next, always.True[From], converter, filter)
 }
 
+// Flat instantiates an iterator that extracts slices of 'To' by a flattener from elements of 'From' and flattens as one iterable collection of 'To' elements.
+func Flat[From, To any](next func() (From, bool), flattener func(From) ([]To, error)) loop.FlatIter[From, To] {
+	return loop.Flat(loop.From(next), flattener)
+}
+
 // Flatt instantiates an iterator that extracts slices of 'To' by a flattener from elements of 'From' and flattens as one iterable collection of 'To' elements.
 func Flatt[From, To any](next func() (From, bool), flattener func(From) []To) FlatIter[From, To] {
 	return FlatIter[From, To]{next: next, flatt: flattener, elemSizeTo: notsafe.GetTypeSize[To]()}
+}
+
+// FitAndFlat filters source elements and extracts slices of 'To' by the 'flattener' function
+func FitAndFlat[From, To any](next func() (From, bool), filter func(From) (bool, error), flattener func(From) ([]To, error)) loop.FlattenFitIter[From, To] {
+	return loop.FitFlatFit(loop.From(next), filter, flattener, breakAlways.True[To])
 }
 
 // FilterAndFlatt filters source elements and extracts slices of 'To' by the 'flattener' function
@@ -180,14 +207,29 @@ func FilterAndFlatt[From, To any](next func() (From, bool), filter func(From) bo
 	return FilterFlattFilter(next, filter, flattener, always.True[To])
 }
 
+// FlatAndFit extracts slices of 'To' by the 'flattener' function and filters extracted elements
+func FlatAndFit[From, To any](next func() (From, bool, error), flattener func(From) ([]To, error), filterTo func(To) (bool, error)) loop.FlattenFitIter[From, To] {
+	return loop.FitFlatFit(next, breakAlways.True[From], flattener, filterTo)
+}
+
 // FlattAndFilter extracts slices of 'To' by the 'flattener' function and filters extracted elements
 func FlattAndFilter[From, To any](next func() (From, bool), flattener func(From) []To, filterTo func(To) bool) FlattenFitIter[From, To] {
 	return FilterFlattFilter(next, always.True[From], flattener, filterTo)
 }
 
+// FitFlatFit filters source elements, extracts slices of 'To' by the 'flattener' function and filters extracted elements
+func FitFlatFit[From, To any](next func() (From, bool), filterFrom func(From) (bool, error), flattener func(From) ([]To, error), filterTo func(To) (bool, error)) loop.FlattenFitIter[From, To] {
+	return loop.FitFlatFit(loop.From(next), filterFrom, flattener, filterTo)
+}
+
 // FilterFlattFilter filters source elements, extracts slices of 'To' by the 'flattener' function and filters extracted elements
 func FilterFlattFilter[From, To any](next func() (From, bool), filterFrom func(From) bool, flattener func(From) []To, filterTo func(To) bool) FlattenFitIter[From, To] {
 	return FlattenFitIter[From, To]{next: next, filterFrom: filterFrom, flatt: flattener, filterTo: filterTo, elemSizeTo: notsafe.GetTypeSize[To]()}
+}
+
+// Filt creates an iterator that checks elements by the 'filter' function and returns successful ones.
+func Filt[T any](next func() (T, bool), filter func(T) (bool, error)) loop.FiltIter[T] {
+	return loop.Filt(loop.From(next), filter)
 }
 
 // Filter creates an iterator that checks elements by the 'filter' function and returns successful ones.
@@ -230,10 +272,20 @@ func FlattKeys[T, K, V any](next func() (T, bool), keysExtractor func(T) []K, va
 	return &kv
 }
 
+// FlatKeys transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
+func FlatKeys[T, K, V any](next func() (T, bool), keysExtractor func(T) ([]K, error), valExtractor func(T) (V, error)) *loop.MultipleKeyValuer[T, K, V] {
+	return loop.FlatKeys(loop.From(next), keysExtractor, valExtractor)
+}
+
 // FlattValues transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
 func FlattValues[T, K, V any](next func() (T, bool), keyExtractor func(T) K, valsExtractor func(T) []V) *MultipleKeyValuer[T, K, V] {
 	kv := NewMultipleKeyValuer(next, func(t T) []K { return convert.AsSlice(keyExtractor(t)) }, valsExtractor)
 	return &kv
+}
+
+// FlatValues transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
+func FlatValues[T, K, V any](next func() (T, bool), keyExtractor func(T) (K, error), valsExtractor func(T) ([]V, error)) *loop.MultipleKeyValuer[T, K, V] {
+	return loop.FlatValues(loop.From(next), keyExtractor, valsExtractor)
 }
 
 // Group converts elements retrieved by the 'next' function into a map, extracting a key for each element applying the converter 'keyExtractor'.

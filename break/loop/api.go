@@ -10,7 +10,6 @@ import (
 	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/convert"
 	"github.com/m4gshm/gollections/convert/as"
-	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_/resolv"
 	"github.com/m4gshm/gollections/notsafe"
 )
@@ -18,11 +17,23 @@ import (
 // ErrBreak is the 'break' statement of the For, Track methods
 var ErrBreak = c.ErrBreak
 
+// Looper provides an iterable loop function
+type Looper[T any, I interface{ Next() (T, bool, error) }] interface {
+	Loop() I
+}
+
 // Of wrap the elements by loop function
 func Of[T any](elements ...T) func() (e T, ok bool, err error) {
-	next := loop.Of(elements...)
+	l := len(elements)
+	i := 0
+	if l == 0 || i < 0 || i >= l {
+		return func() (e T, ok bool, err error) { return e, false, nil }
+	}
 	return func() (e T, ok bool, err error) {
-		e, ok = next()
+		if i < l {
+			e, ok = elements[i], true
+			i++
+		}
 		return e, ok, nil
 	}
 }
@@ -105,6 +116,25 @@ func Slice[T any](next func() (T, bool, error)) (out []T, err error) {
 		}
 		out = append(out, v)
 	}
+}
+
+// SliceCap collects the elements retrieved by the 'next' function into a new slice with predefined capacity
+func SliceCap[T any](next func() (T, bool, error), cap int) (out []T, err error) {
+	if cap > 0 {
+		out = make([]T, 0, cap)
+	}
+	return Append(next, out)
+}
+
+// Append collects the elements retrieved by the 'next' function into the specified 'out' slice
+func Append[T any, TS ~[]T](next func() (T, bool, error), out TS) (TS, error) {
+	for v, ok, err := next(); ok; v, ok, err = next() {
+		if err != nil {
+			return out, err
+		}
+		out = append(out, v)
+	}
+	return out, nil
 }
 
 // Reduce reduces the elements retrieved by the 'next' function into an one using the 'merge' function
