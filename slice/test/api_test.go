@@ -29,6 +29,7 @@ import (
 	"github.com/m4gshm/gollections/slice/last"
 	"github.com/m4gshm/gollections/slice/range_"
 	"github.com/m4gshm/gollections/slice/sort"
+	"github.com/m4gshm/gollections/slice/split"
 	"github.com/m4gshm/gollections/slice/stablesort"
 )
 
@@ -456,4 +457,11 @@ func Test_Empty(t *testing.T) {
 	assert.False(t, slice.Empty(slice.Of(1)))
 	assert.True(t, slice.Empty(slice.Of[int]()))
 	assert.True(t, slice.Empty[[]int](nil))
+}
+
+func Test_SplitTwo(t *testing.T) {
+	first, second := split.Of(slice.Of("1a", "2b", "3c"), func(s string) (string, string) { return string(s[0]), string(s[1]) })
+
+	assert.Equal(t, slice.Of("1", "2", "3"), first)
+	assert.Equal(t, slice.Of("a", "b", "c"), second)
 }

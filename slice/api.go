@@ -743,3 +743,28 @@ func FlattValues[TS ~[]T, T, V any](elements TS, valsExtractor func(T) []V) []c.
 func FlattKeys[TS ~[]T, T, K any](elements TS, keysExtractor func(T) []K) []c.KV[K, T] {
 	return Flatt(elements, func(e T) []c.KV[K, T] { return convert.FlattKeys(e, keysExtractor) })
 }
+
+func SplitTwo[TS ~[]T, T, F, S any](elements TS, splitter func(T) (F, S)) ([]F, []S) {
+	var (
+		l      = len(elements)
+		first  = make([]F, l)
+		second = make([]S, l)
+	)
+	for i, e := range elements {
+		first[i], second[i] = splitter(e)
+	}
+	return first, second
+}
+
+func SplitThree[TS ~[]T, T, F, S, TH any](elements TS, splitter func(T) (F, S, TH)) ([]F, []S, []TH) {
+	var (
+		l      = len(elements)
+		first  = make([]F, l)
+		second = make([]S, l)
+		third  = make([]TH, l)
+	)
+	for i, e := range elements {
+		first[i], second[i], third[i] = splitter(e)
+	}
+	return first, second, third
+}
