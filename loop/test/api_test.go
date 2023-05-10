@@ -11,6 +11,7 @@ import (
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/loop/convert"
 	"github.com/m4gshm/gollections/loop/first"
+	"github.com/m4gshm/gollections/loop/range_"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/predicate/eq"
 	"github.com/m4gshm/gollections/predicate/more"
@@ -216,5 +217,10 @@ func Test_MultipleKeyValuer(t *testing.T) {
 	assert.Equal(t, m["admin"], slice.Of("Bob", "bob"))
 	assert.Equal(t, m["manager"], slice.Of("Bob", "bob", "Alice", "alice"))
 	assert.Equal(t, m[""], slice.Of("Tom", "tom", "", ""))
+}
 
+func Test_Range(t *testing.T) {
+	assert.Equal(t, slice.Of(-1, 0, 1, 2, 3), loop.Slice(range_.Of(-1, 3)))
+	assert.Equal(t, slice.Of(3, 2, 1, 0, -1), loop.Slice(range_.Of(3, -1)))
+	assert.Equal(t, slice.Of(1), loop.Slice(range_.Of(1, 1)))
 }

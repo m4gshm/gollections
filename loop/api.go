@@ -11,6 +11,7 @@ import (
 	"github.com/m4gshm/gollections/notsafe"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/predicate/always"
+	"golang.org/x/exp/constraints"
 )
 
 // ErrBreak is the 'break' statement of the For, Track methods
@@ -378,6 +379,27 @@ func New[S, T any](source S, hasNext func(S) bool, getNext func(S) T) func() (T,
 	return func() (out T, ok bool) {
 		if hasNext(source) {
 			out, ok = getNext(source), true
+		}
+		return out, ok
+	}
+}
+
+// Range creates a loop that generates integers in the range defined by from and to inclusive
+func Range[T constraints.Integer](from T, to T) func() (T, bool) {
+	amount := to - from
+	delta := 1
+	if amount < 0 {
+		amount = -amount
+		delta = -1
+	}
+	nextElement := from
+	i := 0
+	amount = amount + 1
+	return func() (out T, ok bool) {
+		if ok = i < int(amount); ok {
+			out = nextElement
+			i++
+			nextElement = nextElement + T(delta)
 		}
 		return out, ok
 	}
