@@ -315,9 +315,11 @@ func Test_Slice_Flatt(t *testing.T) {
 }
 
 func Test_Range(t *testing.T) {
-	assert.Equal(t, []int{-1, 0, 1, 2, 3}, range_.Of(-1, 3))
-	assert.Equal(t, []int{3, 2, 1, 0, -1}, range_.Of(3, -1))
-	assert.Equal(t, []int{1}, range_.Of(1, 1))
+	assert.Equal(t, []int{-1, 0, 1, 2}, range_.Of(-1, 3))
+	assert.Equal(t, []int{-1, 0, 1, 2, 3}, range_.Closed(-1, 3))
+	assert.Equal(t, []int{3, 2, 1, 0, -1}, range_.Closed(3, -1))
+	assert.Nil(t, range_.Of(1, 1))
+	assert.Equal(t, []int{1}, range_.Closed(1, 1))
 }
 
 func Test_First(t *testing.T) {

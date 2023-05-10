@@ -9,7 +9,7 @@ import (
 
 var (
 	max    = 100000
-	values = range_.Of(1, max)
+	values = range_.Closed(1, max)
 )
 
 func Benchmark_Vector_Add(b *testing.B) {

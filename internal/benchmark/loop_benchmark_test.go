@@ -16,7 +16,7 @@ import (
 
 var (
 	max        = 100000
-	values     = range_.Of(1, max)
+	values     = range_.Closed(1, max)
 	ResultInt  = 0
 	threshhold = max / 2
 )

@@ -254,7 +254,7 @@ func (u *user) Age() int     { return u.age }
 
 func Test_Vector_AddAndDelete(t *testing.T) {
 	vec := vector.NewCap[int](0)
-	vec.Add(range_.Of(0, 1000)...)
+	vec.Add(range_.Closed(0, 1000)...)
 	deleted := false
 	for i := vec.Head(); i.HasNext(); {
 		deleted = i.DeleteNext()
@@ -262,7 +262,7 @@ func Test_Vector_AddAndDelete(t *testing.T) {
 	assert.Equal(t, deleted, true)
 	assert.True(t, vec.IsEmpty())
 
-	vec.Add(range_.Of(0, 10000)...)
+	vec.Add(range_.Closed(0, 10000)...)
 	for i := vec.Tail(); i.HasPrev(); {
 		deleted = i.DeletePrev()
 	}

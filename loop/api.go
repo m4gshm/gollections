@@ -384,9 +384,9 @@ func New[S, T any](source S, hasNext func(S) bool, getNext func(S) T) func() (T,
 	}
 }
 
-// Range creates a loop that generates integers in the range defined by from and to inclusive
-func Range[T constraints.Integer](from T, to T) func() (T, bool) {
-	amount := to - from
+// Range creates a loop that generates integers in the range defined by from and to exclusive
+func Range[T constraints.Integer](from T, toExclusive T) func() (T, bool) {
+	amount := toExclusive - from
 	delta := 1
 	if amount < 0 {
 		amount = -amount
@@ -394,7 +394,6 @@ func Range[T constraints.Integer](from T, to T) func() (T, bool) {
 	}
 	nextElement := from
 	i := 0
-	amount = amount + 1
 	return func() (out T, ok bool) {
 		if ok = i < int(amount); ok {
 			out = nextElement

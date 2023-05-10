@@ -422,18 +422,39 @@ func Filt[TS ~[]T, T any](elements TS, filter func(T) (bool, error)) ([]T, error
 	return result, nil
 }
 
-// Range generates a slice of integers in the range defined by from and to inclusive.
-func Range[T constraints.Integer](from T, to T) []T {
-	if to == from {
-		return []T{to}
+// RangeClosed generates a slice of integers in the range defined by from and to inclusive
+func RangeClosed[T constraints.Integer](from T, toInclusive T) []T {
+	if toInclusive == from {
+		return []T{from}
 	}
-	amount := to - from
+	amount := toInclusive - from
 	delta := 1
 	if amount < 0 {
 		amount = -amount
 		delta = -1
 	}
-	amount = amount + 1
+	amount++
+
+	elements := make([]T, amount)
+	e := from
+	for i := 0; i < int(amount); i++ {
+		elements[i] = e
+		e = e + T(delta)
+	}
+	return elements
+}
+
+// Range generates a slice of integers in the range defined by from and to exclusive
+func Range[T constraints.Integer](from T, toExclusive T) []T {
+	if toExclusive == from {
+		return nil
+	}
+	amount := toExclusive - from
+	delta := 1
+	if amount < 0 {
+		amount = -amount
+		delta = -1
+	}
 	elements := make([]T, amount)
 	e := from
 	for i := 0; i < int(amount); i++ {
