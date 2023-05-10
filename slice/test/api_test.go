@@ -17,6 +17,8 @@ import (
 	_more "github.com/m4gshm/gollections/break/predicate/more"
 	"github.com/m4gshm/gollections/convert/as"
 	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/op/delay/chain"
+	"github.com/m4gshm/gollections/op/delay/string_/wrap"
 	"github.com/m4gshm/gollections/predicate/eq"
 	"github.com/m4gshm/gollections/predicate/more"
 	"github.com/m4gshm/gollections/slice"
@@ -460,8 +462,26 @@ func Test_Empty(t *testing.T) {
 }
 
 func Test_SplitTwo(t *testing.T) {
-	first, second := split.Of(slice.Of("1a", "2b", "3c"), func(s string) (string, string) { return string(s[0]), string(s[1]) })
+	first, second := slice.SplitTwo(slice.Of("1a", "2b", "3c"), func(s string) (string, string) { return string(s[0]), string(s[1]) })
 
 	assert.Equal(t, slice.Of("1", "2", "3"), first)
 	assert.Equal(t, slice.Of("a", "b", "c"), second)
+}
+
+func Test_SplitTwo2(t *testing.T) {
+	byIndex := func(i int) func(string) string { return func(s string) string { return string(s[i]) } }
+
+	first, second := split.Of(slice.Of("1a", "2b", "3c"), byIndex(0), byIndex(1))
+
+	assert.Equal(t, slice.Of("1", "2", "3"), first)
+	assert.Equal(t, slice.Of("a", "b", "c"), second)
+}
+
+func Test_SplitAndReduce(t *testing.T) {
+	byIndex := func(i int) func(string) string { return func(s string) string { return string(s[i]) } }
+
+	first, second := split.AndReduce(slice.Of("1a", "2b", "3c"), byIndex(0), chain.Of(byIndex(1), wrap.By("{", "}")), op.Sum[string], op.Sum[string])
+
+	assert.Equal(t, "123", first)
+	assert.Equal(t, "{a}{b}{c}", second)
 }

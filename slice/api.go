@@ -768,3 +768,20 @@ func SplitThree[TS ~[]T, T, F, S, TH any](elements TS, splitter func(T) (F, S, T
 	}
 	return first, second, third
 }
+
+func SplitAndReduceTwo[TS ~[]T, T, F, S any](elements TS, splitter func(T) (F, S), firstMerge func(F, F) F, secondMerger func(S, S) S) (F, S) {
+	var (
+		first  F
+		second S
+	)
+	for i, e := range elements {
+		f, s := splitter(e)
+		if i == 0 {
+			first, second = f, s
+		} else {
+			first = firstMerge(first, f)
+			second = secondMerger(second, s)
+		}
+	}
+	return first, second
+}
