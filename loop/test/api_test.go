@@ -7,8 +7,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	breakLoop "github.com/m4gshm/gollections/break/loop"
 	kvloop "github.com/m4gshm/gollections/kv/loop"
 	"github.com/m4gshm/gollections/loop"
+	"github.com/m4gshm/gollections/loop/conv"
 	"github.com/m4gshm/gollections/loop/convert"
 	"github.com/m4gshm/gollections/loop/first"
 	"github.com/m4gshm/gollections/loop/range_"
@@ -235,4 +237,17 @@ func Test_OfIndexed(t *testing.T) {
 	indexed := slice.Of("0", "1", "2", "3", "4")
 	result := loop.Slice(loop.OfIndexed(len(indexed), func(i int) string { return indexed[i] }))
 	assert.Equal(t, indexed, result)
+}
+
+func Test_ConvertIndexed(t *testing.T) {
+	indexed := slice.Of(10, 11, 12, 13, 14)
+	result := loop.Slice(convert.FromIndexed(len(indexed), func(i int) int { return indexed[i] }, strconv.Itoa).Next)
+	assert.Equal(t, slice.Of("10", "11", "12", "13", "14"), result)
+}
+
+func Test_ConvIndexed(t *testing.T) {
+	indexed := slice.Of("10", "11", "12", "13", "14")
+	result, err := breakLoop.Slice(conv.FromIndexed(len(indexed), func(i int) string { return indexed[i] }, strconv.Atoi).Next)
+	assert.NoError(t, err)
+	assert.Equal(t, slice.Of(10, 11, 12, 13, 14), result)
 }

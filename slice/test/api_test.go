@@ -486,8 +486,8 @@ func Test_SplitAndReduce(t *testing.T) {
 	assert.Equal(t, "{a}{b}{c}", second)
 }
 
-func Test_FromIndexed(t *testing.T) {
+func Test_OfIndexed(t *testing.T) {
 	indexed := slice.Of("0", "1", "2", "3", "4")
-	result := slice.OfIndexedLoop(len(indexed), func(i int) string { return indexed[i] })
+	result := slice.OfIndexed(len(indexed), func(i int) string { return indexed[i] })
 	assert.Equal(t, indexed, result)
 }

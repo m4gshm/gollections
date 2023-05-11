@@ -48,6 +48,6 @@ func Check[From, To any](next func() (From, bool), converter func(from From) (To
 	return loop.ConvertCheck(next, converter)
 }
 
-func Indexed[From, To any](len int, next func(int) From, converter func(from From) To) loop.ConvertIter[From, To] {
+func FromIndexed[From, To any](len int, next func(int) From, converter func(from From) To) loop.ConvertIter[From, To] {
 	return loop.Convert(loop.OfIndexed(len, next), converter)
 }

@@ -42,10 +42,10 @@ func OfLoop[S, T any](source S, hasNext func(S) bool, getNext func(S) (T, error)
 	return r, nil
 }
 
-func OfIndexedLoop[T any](len int, next func(int) T) []T {
+func OfIndexed[T any](len int, getAt func(int) T) []T {
 	var r []T = make([]T, len)
 	for i := 0; i < len; i++ {
-		r[i] = next(i)
+		r[i] = getAt(i)
 	}
 	return r
 }
