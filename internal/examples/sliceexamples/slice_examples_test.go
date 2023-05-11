@@ -381,14 +381,3 @@ func Test_OfLoop(t *testing.T) {
 	assert.Equal(t, expected, result)
 }
 
-func Test_Generate(t *testing.T) {
-	var (
-		counter = 0
-		result  = slice.Generate(func() (int, bool) {
-			counter++
-			return counter, counter < 4
-		})
-		expected = slice.Of(1, 2, 3)
-	)
-	assert.Equal(t, expected, result)
-}

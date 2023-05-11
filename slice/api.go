@@ -42,10 +42,12 @@ func OfLoop[S, T any](source S, hasNext func(S) bool, getNext func(S) (T, error)
 	return r, nil
 }
 
-// Generate builds a slice by an generator function.
-// The generator returns an element, or false if the generation is over, or an error.
-func Generate[T any](next func() (T, bool)) []T {
-	return loop.Slice(next)
+func OfIndexedLoop[T any](len int, next func(int) T) []T {
+	var r []T = make([]T, len)
+	for i := 0; i < len; i++ {
+		r[i] = next(i)
+	}
+	return r
 }
 
 // Clone makes new slice instance with copied elements
@@ -450,16 +452,16 @@ func Range[T constraints.Integer](from T, toExclusive T) []T {
 		return nil
 	}
 	amount := toExclusive - from
-	delta := 1
+	delta := T(1)
 	if amount < 0 {
 		amount = -amount
-		delta = -1
+		delta = -delta
 	}
 	elements := make([]T, amount)
 	e := from
-	for i := 0; i < int(amount); i++ {
+	for i := T(0); i < T(amount); i++ {
 		elements[i] = e
-		e = e + T(delta)
+		e = e + delta
 	}
 	return elements
 }

@@ -77,7 +77,7 @@ func Test_ConvertNotNil(t *testing.T) {
 		result   = convert.NotNil(source, func(e *entity) string { return e.val })
 		expected = []string{"first", "third", "fifth"}
 	)
-	assert.Equal(t, expected, slice.Generate(result.Next))
+	assert.Equal(t, expected, loop.Slice(result.Next))
 }
 
 func Test_ConvertToNotNil(t *testing.T) {
@@ -90,7 +90,7 @@ func Test_ConvertToNotNil(t *testing.T) {
 		result   = convert.ToNotNil(source, func(e entity) *string { return e.val })
 		expected = []*string{&first, &third, &fifth}
 	)
-	assert.Equal(t, expected, slice.Generate(result.Next))
+	assert.Equal(t, expected, loop.Slice(result.Next))
 }
 
 func Test_ConvertNilSafe(t *testing.T) {
@@ -103,7 +103,7 @@ func Test_ConvertNilSafe(t *testing.T) {
 		result   = convert.NilSafe(source, func(e *entity) *string { return e.val })
 		expected = []*string{&first, &third, &fifth}
 	)
-	assert.Equal(t, expected, slice.Generate(result.Next))
+	assert.Equal(t, expected, loop.Slice(result.Next))
 }
 
 var even = func(v int) bool { return v%2 == 0 }

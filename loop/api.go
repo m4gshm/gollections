@@ -384,21 +384,53 @@ func New[S, T any](source S, hasNext func(S) bool, getNext func(S) T) func() (T,
 	}
 }
 
+// RangeClosed creates a loop that generates integers in the range defined by from and to inclusive
+func RangeClosed[T constraints.Integer](from T, toInclusive T) func() (T, bool) {
+	amount := toInclusive - from
+	delta := T(1)
+	if amount < 0 {
+		amount = -amount
+		delta = -delta
+	}
+	amount++
+	nextElement := from
+	i := T(0)
+	return func() (out T, ok bool) {
+		if ok = i < amount; ok {
+			out = nextElement
+			i++
+			nextElement = nextElement + delta
+		}
+		return out, ok
+	}
+}
+
 // Range creates a loop that generates integers in the range defined by from and to exclusive
 func Range[T constraints.Integer](from T, toExclusive T) func() (T, bool) {
 	amount := toExclusive - from
-	delta := 1
+	delta := T(1)
 	if amount < 0 {
 		amount = -amount
-		delta = -1
+		delta = -delta
 	}
 	nextElement := from
-	i := 0
+	i := T(0)
 	return func() (out T, ok bool) {
-		if ok = i < int(amount); ok {
+		if ok = i < amount; ok {
 			out = nextElement
 			i++
-			nextElement = nextElement + T(delta)
+			nextElement = nextElement + delta
+		}
+		return out, ok
+	}
+}
+
+func OfIndexed[T any](len int, next func(int) T) func() (T, bool) {
+	i := 0
+	return func() (out T, ok bool) {
+		if ok = i < len; ok {
+			out = next(i)
+			i++
 		}
 		return out, ok
 	}

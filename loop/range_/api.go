@@ -11,3 +11,8 @@ import (
 func Of[T constraints.Integer](from T, to T) func() (T, bool) {
 	return loop.Range(from, to)
 }
+
+// Closed - range_.Closed short alias of the loop.RangeClosed
+func Closed[T constraints.Integer](from T, to T) func() (T, bool) {
+	return loop.RangeClosed(from, to)
+}
