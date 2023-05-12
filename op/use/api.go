@@ -1,6 +1,8 @@
 // Package use provides conditional expression builders
 package use
 
+import "github.com/m4gshm/gollections/op/get"
+
 // If builds use.If(condition, tru).Else(fals) expression builder
 func If[T any](condition bool, tru T) When[T] {
 	return When[T]{condition, tru}
@@ -78,3 +80,16 @@ func (w When[T]) ElseIf(condition bool, tru T) When[T] {
 	return If(condition, tru)
 }
 
+func (w When[T]) ElseIfGet(condition bool, tru func() T) get.When[T] {
+	if w.Condition {
+		return get.If(true, func() T { return w.Then })
+	}
+	return get.If(condition, tru)
+}
+
+func (w When[T]) ElsIfGet(condition func() bool, tru func() T) get.When[T] {
+	if w.Condition {
+		return get.If(true, func() T { return w.Then })
+	}
+	return get.If(condition(), tru)
+}

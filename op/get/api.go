@@ -46,7 +46,6 @@ func (w When[T]) ElseGetErr(err func() error) (T, error) {
 	return fals, err()
 }
 
-
 func (w When[T]) ElseOptErr(fals func() (T, error)) (T, error) {
 	if w.Condition {
 		return w.Then(), nil
@@ -70,4 +69,25 @@ type ThisOne[T any] struct {
 // If is condition part of get.One(condition).If(tru).Else(fals) expression builder
 func (t ThisOne[T]) If(condition bool) When[T] {
 	return If(condition, t.Value)
+}
+
+func (w When[T]) ElseIf(condition bool, tru T) When[T] {
+	if w.Condition {
+		return w
+	}
+	return If(condition, func() T { return tru })
+}
+
+func (w When[T]) ElseIfGet(condition bool, tru func() T) When[T] {
+	if w.Condition {
+		return w
+	}
+	return If(condition, tru)
+}
+
+func (w When[T]) ElsIfGet(condition func() bool, tru func() T) When[T] {
+	if w.Condition {
+		return w
+	}
+	return If(condition(), tru)
 }
