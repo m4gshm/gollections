@@ -9,3 +9,10 @@ import (
 func Of[TS ~[]T, T any](elements TS, filter func(T) bool) (T, bool) {
 	return slice.First(elements, filter)
 }
+
+func Converted[FS ~[]From, From, To any](elements FS, filter func(From) bool, converter func(From) To) (out To, ok bool) {
+	if f, ok := slice.First(elements, filter); ok {
+		return converter(f), true
+	}
+	return out, false
+}
