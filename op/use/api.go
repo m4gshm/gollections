@@ -70,3 +70,11 @@ type ThisOne[T any] struct {
 func (t ThisOne[T]) If(condition bool) When[T] {
 	return If(condition, t.Value)
 }
+
+func (w When[T]) ElseIf(condition bool, tru T) When[T] {
+	if w.Condition {
+		return w
+	}
+	return If(condition, tru)
+}
+
