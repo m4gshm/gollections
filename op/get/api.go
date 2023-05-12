@@ -23,17 +23,33 @@ type When[T any] struct {
 }
 
 // Else returns the tru or the fals according to the condition
-func (u When[T]) Else(fals T) T {
-	if u.Condition {
-		return u.Then()
+func (w When[T]) Else(fals T) T {
+	if w.Condition {
+		return w.Then()
 	}
 	return fals
 }
 
+func (w When[T]) ElseErr(err error) (T, error) {
+	if w.Condition {
+		return w.Then(), nil
+	}
+	var fals T
+	return fals, err
+}
+
+func (w When[T]) ElseGetErr(err func() error) (T, error) {
+	if w.Condition {
+		return w.Then(), nil
+	}
+	var fals T
+	return fals, err()
+}
+
 // ElseGet returns the tru or executes the fals according to the condition
-func (u When[T]) ElseGet(fals func() T) T {
-	if u.Condition {
-		return u.Then()
+func (w When[T]) ElseGet(fals func() T) T {
+	if w.Condition {
+		return w.Then()
 	}
 	return fals()
 }
@@ -44,6 +60,6 @@ type ThisOne[T any] struct {
 }
 
 // If is condition part of get.One(condition).If(tru).Else(fals) expression builder
-func (u ThisOne[T]) If(condition bool) When[T] {
-	return If(condition, u.Value)
+func (t ThisOne[T]) If(condition bool) When[T] {
+	return If(condition, t.Value)
 }
