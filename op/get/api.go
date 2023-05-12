@@ -46,6 +46,14 @@ func (w When[T]) ElseGetErr(err func() error) (T, error) {
 	return fals, err()
 }
 
+
+func (w When[T]) ElseOptErr(fals func() (T, error)) (T, error) {
+	if w.Condition {
+		return w.Then(), nil
+	}
+	return fals()
+}
+
 // ElseGet returns the tru or executes the fals according to the condition
 func (w When[T]) ElseGet(fals func() T) T {
 	if w.Condition {
