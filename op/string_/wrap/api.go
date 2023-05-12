@@ -3,7 +3,7 @@ package wrap
 
 import "github.com/m4gshm/gollections/op/string_"
 
-// NoEmpty - wrap.NoEmpty wraps the target string only if it is non-empty
-func NoEmpty(pref, target, post string) string {
-	return string_.WrapNoEmpty(pref, target, post)
+// NonEmpty - wrap.NonEmpty wraps the target string only if it is non-empty
+func NonEmpty(pref, target, post string) string {
+	return string_.WrapNonEmpty(pref, target, post)
 }

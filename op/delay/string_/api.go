@@ -17,15 +17,15 @@ func Wrap(pref, post string) func(target string) string {
 	return func(s string) string { return pref + s + post }
 }
 
-// WrapNoEmpty returns wrapped string builder
-func WrapNoEmpty(pref, post string) func(target string) string {
+// WrapNonEmpty returns wrapped string builder
+func WrapNonEmpty(pref, post string) func(target string) string {
 	return func(target string) string {
-		return string_.WrapNoEmpty(pref, target, post)
+		return string_.WrapNonEmpty(pref, target, post)
 	}
 }
 
-func JoinNoEmpty(joiner string) func (first, second string) string {
+func JoinNonEmpty(joiner string) func(first, second string) string {
 	return func(first, second string) string {
-		return string_.JoinNoEmpty(first, joiner, second)
+		return string_.JoinNonEmpty(first, joiner, second)
 	}
 }
