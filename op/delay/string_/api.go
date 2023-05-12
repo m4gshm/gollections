@@ -23,3 +23,9 @@ func WrapNoEmpty(pref, post string) func(target string) string {
 		return string_.WrapNoEmpty(pref, target, post)
 	}
 }
+
+func JoinNoEmpty(joiner string) func (first, second string) string {
+	return func(first, second string) string {
+		return string_.JoinNoEmpty(first, joiner, second)
+	}
+}

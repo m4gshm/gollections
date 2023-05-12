@@ -8,3 +8,10 @@ func WrapNoEmpty(pref, target, post string) string {
 	}
 	return pref + target + post
 }
+
+func JoinNoEmpty(first, joiner, second string) string {
+	if len(first) == 0 || len(second) == 0 {
+		return first + second
+	}
+	return first + joiner + second
+}
