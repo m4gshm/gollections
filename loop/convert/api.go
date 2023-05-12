@@ -48,6 +48,7 @@ func Check[From, To any](next func() (From, bool), converter func(from From) (To
 	return loop.ConvertCheck(next, converter)
 }
 
+// FromIndexed - convert.FromIndexed retrieves elements from a indexed source and converts them
 func FromIndexed[From, To any](len int, next func(int) From, converter func(from From) To) loop.ConvertIter[From, To] {
 	return loop.Convert(loop.OfIndexed(len, next), converter)
 }

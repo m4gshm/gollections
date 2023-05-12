@@ -42,8 +42,11 @@ func OfLoop[S, T any](source S, hasNext func(S) bool, getNext func(S) (T, error)
 	return r, nil
 }
 
+// OfIndexed builds a slice by extracting elements from an indexed soruce.
+// the len is length ot the source.
+// the getAt retrieves an element by its index from the source.
 func OfIndexed[T any](len int, getAt func(int) T) []T {
-	var r []T = make([]T, len)
+	r := make([]T, len)
 	for i := 0; i < len; i++ {
 		r[i] = getAt(i)
 	}
@@ -767,6 +770,7 @@ func FlattKeys[TS ~[]T, T, K any](elements TS, keysExtractor func(T) []K) []c.KV
 	return Flatt(elements, func(e T) []c.KV[K, T] { return convert.FlattKeys(e, keysExtractor) })
 }
 
+// SplitTwo splits the elements into two slices
 func SplitTwo[TS ~[]T, T, F, S any](elements TS, splitter func(T) (F, S)) ([]F, []S) {
 	var (
 		l      = len(elements)
@@ -779,6 +783,7 @@ func SplitTwo[TS ~[]T, T, F, S any](elements TS, splitter func(T) (F, S)) ([]F, 
 	return first, second
 }
 
+// SplitThree splits the elements into three slices
 func SplitThree[TS ~[]T, T, F, S, TH any](elements TS, splitter func(T) (F, S, TH)) ([]F, []S, []TH) {
 	var (
 		l      = len(elements)
@@ -792,6 +797,7 @@ func SplitThree[TS ~[]T, T, F, S, TH any](elements TS, splitter func(T) (F, S, T
 	return first, second, third
 }
 
+// SplitAndReduceTwo splits each element of the specified slice into two values and then reduces that ones
 func SplitAndReduceTwo[TS ~[]T, T, F, S any](elements TS, splitter func(T) (F, S), firstMerge func(F, F) F, secondMerger func(S, S) S) (F, S) {
 	var (
 		first  F

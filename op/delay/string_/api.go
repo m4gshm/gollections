@@ -1,3 +1,4 @@
+// Package string_ provides string builders
 package string_
 
 import (

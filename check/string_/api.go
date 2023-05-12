@@ -1,4 +1,5 @@
-package strings
+// Package string_ provides string chek utils
+package string_
 
 // Empty checks whether the specified string is empty
 func Empty(s string) bool {

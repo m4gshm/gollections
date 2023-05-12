@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/m4gshm/gollections/check/strings"
+	"github.com/m4gshm/gollections/check/string_"
 	"github.com/m4gshm/gollections/predicate/less"
 	"github.com/m4gshm/gollections/predicate/match"
 	"github.com/m4gshm/gollections/predicate/where"
@@ -27,7 +27,7 @@ func Test_ExtendedPredicate(t *testing.T) {
 	assert.Equal(t, "Bob", userWithRoles[0].Name())
 	assert.Equal(t, "Alice", userWithRoles[1].Name())
 
-	userWithNamedRoles := slice.Filter(users, where.Any(User.Roles, match.To(Role.Name, strings.NotEmpty)))
+	userWithNamedRoles := slice.Filter(users, where.Any(User.Roles, match.To(Role.Name, string_.NotEmpty)))
 
 	assert.Equal(t, "Bob", userWithNamedRoles[0].Name())
 	assert.Equal(t, "Alice", userWithNamedRoles[1].Name())

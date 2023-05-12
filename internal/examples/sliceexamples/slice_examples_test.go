@@ -380,4 +380,3 @@ func Test_OfLoop(t *testing.T) {
 	)
 	assert.Equal(t, expected, result)
 }
-

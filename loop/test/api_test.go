@@ -42,6 +42,13 @@ func Test_First(t *testing.T) {
 	assert.False(t, nook)
 }
 
+func Test_FirstConverted(t *testing.T) {
+	s := loop.Of(1, 3, 5, 7, 9, 11)
+	r, ok := first.Converted(s, func(i int) bool { return i > 5 }, strconv.Itoa)
+	assert.True(t, ok)
+	assert.Equal(t, "7", r)
+}
+
 func Test_NotNil(t *testing.T) {
 	type entity struct{ val string }
 	var (

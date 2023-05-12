@@ -425,6 +425,9 @@ func Range[T constraints.Integer](from T, toExclusive T) func() (T, bool) {
 	}
 }
 
+// OfIndexed builds a loop by extracting elements from an indexed soruce.
+// the len is length ot the source.
+// the getAt retrieves an element by its index from the source.
 func OfIndexed[T any](len int, next func(int) T) func() (T, bool) {
 	i := 0
 	return func() (out T, ok bool) {
