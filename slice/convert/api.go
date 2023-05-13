@@ -57,3 +57,8 @@ func CheckIndexed[FS ~[]From, From, To any](elements FS, by func(index int, from
 func Indexed[FS ~[]From, From, To any](elements FS, by func(index int, from From) To) []To {
 	return slice.ConvertIndexed(elements, by)
 }
+
+// AndReduce - convert.AndReduce converts elements and merge them into one
+func AndReduce[FS ~[]From, From, To any](elements FS, converter func(From) To, merge func(To, To) To) (out To) {
+	return slice.ConvertAndReduce(elements, converter, merge)
+}

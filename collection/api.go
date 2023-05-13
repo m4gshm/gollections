@@ -104,5 +104,5 @@ func First[T any, I c.Iterable[T]](collection I, predicate func(T) bool) (v T, o
 // Firstt returns the first element that satisfies the condition of the 'predicate' function
 func Firstt[T any, I c.Iterable[T]](collection I, predicate func(T) (bool, error)) (v T, ok bool, err error) {
 	i := collection.Iter()
-	return breakLoop.First(breakLoop.From(i.Next), predicate)
+	return breakLoop.Firstt(breakLoop.From(i.Next), predicate)
 }

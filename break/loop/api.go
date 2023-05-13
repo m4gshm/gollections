@@ -4,7 +4,6 @@ package loop
 import (
 	"errors"
 
-	"github.com/m4gshm/gollections/break/op"
 	"github.com/m4gshm/gollections/break/predicate/always"
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/check"
@@ -12,6 +11,7 @@ import (
 	"github.com/m4gshm/gollections/convert/as"
 	"github.com/m4gshm/gollections/map_/resolv"
 	"github.com/m4gshm/gollections/notsafe"
+	"github.com/m4gshm/gollections/op"
 )
 
 // ErrBreak is the 'break' statement of the For, Track methods
@@ -71,13 +71,11 @@ func For[T any](next func() (T, bool, error), walker func(T) error) error {
 }
 
 // ForFiltered applies the 'walker' function to the elements retrieved by the 'next' function that satisfy the 'predicate' function condition
-func ForFiltered[T any](next func() (T, bool, error), walker func(T) error, predicate func(T) (bool, error)) error {
+func ForFiltered[T any](next func() (T, bool, error), walker func(T) error, predicate func(T) bool) error {
 	for {
 		if v, ok, err := next(); err != nil || !ok {
 			return err
-		} else if ok, err := predicate(v); err != nil {
-			return err
-		} else if ok {
+		} else if ok := predicate(v); ok {
 			if err := walker(v); err != nil {
 				return brk(err)
 			}
@@ -86,7 +84,18 @@ func ForFiltered[T any](next func() (T, bool, error), walker func(T) error, pred
 }
 
 // First returns the first element that satisfies the condition of the 'predicate' function
-func First[T any](next func() (T, bool, error), predicate func(T) (bool, error)) (T, bool, error) {
+func First[T any](next func() (T, bool, error), predicate func(T) bool) (T, bool, error) {
+	for {
+		if out, ok, err := next(); err != nil || !ok {
+			return out, false, err
+		} else if ok := predicate(out); ok {
+			return out, true, nil
+		}
+	}
+}
+
+// Firstt returns the first element that satisfies the condition of the 'predicate' function
+func Firstt[T any](next func() (T, bool, error), predicate func(T) (bool, error)) (T, bool, error) {
 	for {
 		if out, ok, err := next(); err != nil || !ok {
 			return out, false, err
@@ -138,7 +147,23 @@ func Append[T any, TS ~[]T](next func() (T, bool, error), out TS) (TS, error) {
 }
 
 // Reduce reduces the elements retrieved by the 'next' function into an one using the 'merge' function
-func Reduce[T any](next func() (T, bool, error), merger func(T, T) (T, error)) (out T, e error) {
+func Reduce[T any](next func() (T, bool, error), merger func(T, T) T) (out T, e error) {
+	v, ok, err := next()
+	if err != nil || !ok {
+		return out, err
+	}
+	out = v
+	for {
+		if v, ok, err := next(); err != nil || !ok {
+			return out, err
+		} else {
+			out = merger(out, v)
+		}
+	}
+}
+
+// Reducee reduces the elements retrieved by the 'next' function into an one using the 'merge' function
+func Reducee[T any](next func() (T, bool, error), merger func(T, T) (T, error)) (out T, e error) {
 	v, ok, err := next()
 	if err != nil || !ok {
 		return out, err
@@ -159,8 +184,14 @@ func Sum[T c.Summable](next func() (T, bool, error)) (T, error) {
 }
 
 // HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful
-func HasAny[T any](next func() (T, bool, error), predicate func(T) (bool, error)) (bool, error) {
+func HasAny[T any](next func() (T, bool, error), predicate func(T) bool) (bool, error) {
 	_, ok, err := First(next, predicate)
+	return ok, err
+}
+
+// HasAnyy finds the first element that satisfies the 'predicate' function condition and returns true if successful
+func HasAnyy[T any](next func() (T, bool, error), predicate func(T) (bool, error)) (bool, error) {
+	_, ok, err := Firstt(next, predicate)
 	return ok, err
 }
 
@@ -436,6 +467,16 @@ func New[S, T any](source S, hasNext func(S) bool, getNext func(S) (T, error)) f
 			return n, true, nil
 		}
 	}
+}
+
+// ConvertAndReduce converts each elements and merges them into one
+func ConvertAndReduce[From, To any](next func() (From, bool, error), converter func(From) To, merger func(To, To) To) (out To, err error) {
+	return Reduce(Convert(next, converter).Next, merger)
+}
+
+// ConvAndReduce converts each elements and merges them into one
+func ConvAndReduce[From, To any](next func() (From, bool, error), converter func(From) (To, error), merger func(To, To) To) (out To, err error) {
+	return Reduce(Conv(next, converter).Next, merger)
 }
 
 func brk(err error) error {

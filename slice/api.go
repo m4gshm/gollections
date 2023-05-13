@@ -504,16 +504,17 @@ func SortByOrdered[T any, o constraints.Ordered, TS ~[]T](elements TS, sorter So
 }
 
 // Reduce reduces the elements into an one using the 'merge' function
-func Reduce[TS ~[]T, T any](elements TS, merge func(T, T) T) T {
-	var result T
-	for i, v := range elements {
-		if i == 0 {
-			result = v
-		} else {
-			result = merge(result, v)
+func Reduce[TS ~[]T, T any](elements TS, merge func(T, T) T) (out T) {
+	l := len(elements)
+	if l >= 1 {
+		out = elements[0]
+	}
+	if l > 1 {
+		for _, v := range elements[1:] {
+			out = merge(out, v)
 		}
 	}
-	return result
+	return out
 }
 
 // Sum returns the sum of all elements
@@ -798,19 +799,51 @@ func SplitThree[TS ~[]T, T, F, S, TH any](elements TS, splitter func(T) (F, S, T
 }
 
 // SplitAndReduceTwo splits each element of the specified slice into two values and then reduces that ones
-func SplitAndReduceTwo[TS ~[]T, T, F, S any](elements TS, splitter func(T) (F, S), firstMerge func(F, F) F, secondMerger func(S, S) S) (F, S) {
-	var (
-		first  F
-		second S
-	)
-	for i, e := range elements {
-		f, s := splitter(e)
-		if i == 0 {
-			first, second = f, s
-		} else {
+func SplitAndReduceTwo[TS ~[]T, T, F, S any](elements TS, splitter func(T) (F, S), firstMerge func(F, F) F, secondMerger func(S, S) S) (first F, second S) {
+	l := len(elements)
+	if l >= 1 {
+		first, second = splitter(elements[0])
+	}
+	if l > 1 {
+		for _, e := range elements[1:] {
+			f, s := splitter(e)
 			first = firstMerge(first, f)
 			second = secondMerger(second, s)
 		}
 	}
 	return first, second
+}
+
+// ConvertAndReduce converts each elements and merges them into one
+func ConvertAndReduce[FS ~[]From, From, To any](elements FS, converter func(From) To, merger func(To, To) To) (out To) {
+	l := len(elements)
+	if l >= 1 {
+		out = converter(elements[0])
+	}
+	if l > 1 {
+		for _, e := range elements[1:] {
+			out = merger(out, converter(e))
+		}
+	}
+	return out
+}
+
+// ConvAndReduce converts each elements and merges them into one
+func ConvAndReduce[FS ~[]From, From, To any](elements FS, converter func(From) (To, error), merger func(To, To) To) (out To, err error) {
+	l := len(elements)
+	if l >= 1 {
+		if out, err = converter(elements[0]); err != nil {
+			return out, err
+		}
+	}
+	if l > 1 {
+		for _, e := range elements[1:] {
+			c, err := converter(e)
+			if err != nil {
+				return out, err
+			}
+			out = merger(out, c)
+		}
+	}
+	return out, nil
 }

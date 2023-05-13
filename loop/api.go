@@ -114,7 +114,7 @@ func Append[T any, TS ~[]T](next func() (T, bool), out TS) TS {
 	return out
 }
 
-// Reduce reduces the elements retrieved by the 'next' function into an one using the 'merge' function
+// Reduce reduces the elements retrieved by the 'next' function into an one using the 'merger' function
 func Reduce[T any](next func() (T, bool), merger func(T, T) T) (result T) {
 	if v, ok := next(); ok {
 		result = v
@@ -437,4 +437,37 @@ func OfIndexed[T any](len int, next func(int) T) func() (T, bool) {
 		}
 		return out, ok
 	}
+}
+
+// ConvertAndReduce converts each elements and merges them into one
+func ConvertAndReduce[From, To any](next func() (From, bool), converter func(From) To, merger func(To, To) To) (out To) {
+	if v, ok := next(); ok {
+		out = converter(v)
+	} else {
+		return out
+	}
+	for v, ok := next(); ok; v, ok = next() {
+		out = merger(out, converter(v))
+	}
+	return out
+}
+
+// ConvAndReduce converts each elements and merges them into one
+func ConvAndReduce[From, To any](next func() (From, bool), converter func(From) (To, error), merger func(To, To) To) (out To, err error) {
+	if v, ok := next(); ok {
+		out, err = converter(v)
+		if err != nil {
+			return out, err
+		}
+	} else {
+		return out, nil
+	}
+	for v, ok := next(); ok; v, ok = next() {
+		c, err := converter(v)
+		if err != nil {
+			return out, err
+		}
+		out = merger(out, c)
+	}
+	return out, nil
 }

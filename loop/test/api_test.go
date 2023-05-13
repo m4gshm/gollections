@@ -26,6 +26,19 @@ func Test_ReduceSum(t *testing.T) {
 	assert.Equal(t, 1+3+5+7+9+11, r)
 }
 
+func Test_ConvertAndReduce(t *testing.T) {
+	s := loop.Of(1, 3, 5, 7, 9, 11)
+	r := convert.AndReduce(s, func(i int) int { return i * i }, op.Sum[int])
+	assert.Equal(t, 1+3*3+5*5+7*7+9*9+11*11, r)
+}
+
+func Test_ConvAndReduce(t *testing.T) {
+	s := loop.Of("1", "3", "5", "7", "9", "11")
+	r, err := conv.AndReduce(s, strconv.Atoi, op.Sum[int])
+	assert.NoError(t, err)
+	assert.Equal(t, 1+3+5+7+9+11, r)
+}
+
 func Test_Sum(t *testing.T) {
 	s := loop.Of(1, 3, 5, 7, 9, 11)
 	r := loop.Sum(s)

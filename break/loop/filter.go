@@ -31,5 +31,5 @@ func (f FiltIter[T]) Next() (element T, ok bool, err error) {
 }
 
 func nextFiltered[T any](next func() (T, bool, error), filter func(T) (bool, error)) (v T, ok bool, err error) {
-	return First(next, filter)
+	return Firstt(next, filter)
 }

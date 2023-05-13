@@ -52,3 +52,8 @@ func Check[From, To any](next func() (From, bool), converter func(from From) (To
 func FromIndexed[From, To any](len int, next func(int) From, converter func(from From) To) loop.ConvertIter[From, To] {
 	return loop.Convert(loop.OfIndexed(len, next), converter)
 }
+
+// AndReduce - convert.AndReduce converts elements and merge them into one
+func AndReduce[From, To any](next func() (From, bool), converter func(From) To, merge func(To, To) To) (out To) {
+	return loop.ConvertAndReduce(next, converter, merge)
+}
