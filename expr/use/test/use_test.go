@@ -56,9 +56,6 @@ func Test_UseIfElseErr(t *testing.T) {
 	assert.NoError(t, e)
 	assert.Equal(t, 1, result)
 
-	result = use.When[int]{Condition: false, Then: 1}.Else(2)
-	assert.Equal(t, 2, result)
-
 	result = use.If(true, 1).If(true, 2).Else(3)
 	assert.Equal(t, 1, result)
 }

@@ -13,6 +13,7 @@ func Of[T c.Summable](elements ...T) func() T {
 	return func() T { return sum.Of(elements) }
 }
 
+// Over returns a sum builder function
 func Over[T c.Summable](getters ...func() T) func() T {
 	return func() T { return loop.Sum(iter.Convert(getters, func(e func() T) T { return e() }).Next) }
 }

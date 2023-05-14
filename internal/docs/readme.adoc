@@ -111,14 +111,14 @@ As example:
 
 [source,go]
 ----
-include::../examples/boilerplate/expr_use_test.go[lines=13..20,indent=0]
+include::../examples/boilerplate/expr_use_test.go[lines=14..21,indent=0]
 ----
 
 instead of:
 
 [source,go]
 ----
-include::../examples/boilerplate/expr_use_test.go[lines=24..37,indent=0]
+include::../examples/boilerplate/expr_use_test.go[lines=25..38,indent=0]
 ----
 
 

@@ -1,25 +1,23 @@
 package use
 
-import "github.com/m4gshm/gollections/expr/get"
-
 // When is if...else expression builder
 type When[T any] struct {
-	Condition bool
-	Then      T
+	condition bool
+	then      T
 }
 
 // Else returns result according to the condition
 func (w When[T]) Else(fals T) T {
-	if w.Condition {
-		return w.Then
+	if w.condition {
+		return w.then
 	}
 	return fals
 }
 
 // ElseErr returns the success result or error according to the condition
 func (w When[T]) ElseErr(err error) (T, error) {
-	if w.Condition {
-		return w.Then, nil
+	if w.condition {
+		return w.then, nil
 	}
 	var fals T
 	return fals, err
@@ -27,16 +25,16 @@ func (w When[T]) ElseErr(err error) (T, error) {
 
 // ElseGetErr returns the success result or a result of the fals function according to the condition
 func (w When[T]) ElseGetErr(fals func() (T, error)) (T, error) {
-	if w.Condition {
-		return w.Then, nil
+	if w.condition {
+		return w.then, nil
 	}
 	return fals()
 }
 
 // ElseGet returns the tru or a return of the fals function according to the condition
 func (w When[T]) ElseGet(fals func() T) T {
-	if w.Condition {
-		return w.Then
+	if w.condition {
+		return w.then
 	}
 	return fals()
 }
@@ -44,7 +42,7 @@ func (w When[T]) ElseGet(fals func() T) T {
 // If creates new condition branch in the expression.
 // Looks like value := use.If(condition1, variant1).If(condition2, variant2).Else(defaultVariant) .
 func (w When[T]) If(condition bool, tru T) When[T] {
-	if w.Condition {
+	if w.condition {
 		return w
 	}
 	return If(condition, tru)
@@ -52,35 +50,68 @@ func (w When[T]) If(condition bool, tru T) When[T] {
 
 // IfGet creates new condition branch for a getter function.
 // Looks like value := use.If(condition1, variant1).IfGet(condition2, getterFunction1).Else(defaultVariant) .
-func (w When[T]) IfGet(condition bool, tru func() T) get.When[T] {
-	if w.Condition {
-		return get.If(true, func() T { return w.Then })
+func (w When[T]) IfGet(condition bool, tru func() T) When[T] {
+	if w.condition {
+		return w
 	}
-	return get.If(condition, tru)
+	var otherTru T
+	if condition {
+		otherTru = tru()
+	}
+	return If(condition, otherTru)
 }
 
 // IfGetErr creates new condition branch for an error return getter function
-func (w When[T]) IfGetErr(condition bool, tru func() (T, error)) get.WhenErr[T] {
-	if w.Condition {
-		return get.If_(true, func() (T, error) { return w.Then, nil })
+func (w When[T]) IfGetErr(condition bool, tru func() (T, error)) WhenErr[T] {
+	if w.condition {
+		return ifErrEvaluated(w.condition, w.then, nil)
 	}
-	return get.If_(condition, tru)
+	var (
+		otherTru T
+		otherErr error
+	)
+	if condition {
+		otherTru, otherErr = tru()
+	}
+	return ifErrEvaluated(condition, otherTru, otherErr)
 }
 
 // Other creates new condition branch for a getter function.
-// Other creates new condition branch for a getter function.
-func (w When[T]) Other(condition func() bool, tru func() T) get.When[T] {
-	if w.Condition {
-		return get.If(true, func() T { return w.Then })
+// The condition function is called only if the current condition is false.
+func (w When[T]) Other(condition func() bool, tru func() T) When[T] {
+	if w.condition {
+		return w
 	}
-	return get.If(condition(), tru)
+	var (
+		otherCondition = condition()
+		otherTru       T
+	)
+	if otherCondition {
+		otherTru = tru()
+	}
+	return If(otherCondition, otherTru)
 }
 
 // OtherErr creates new condition branch for an error return getter function.
 // The condition function is called only if the current condition is false.
-func (w When[T]) OtherErr(condition func() bool, tru func() (T, error)) get.WhenErr[T] {
-	if w.Condition {
-		return get.If_(true, func() (T, error) { return w.Then, nil })
+func (w When[T]) OtherErr(condition func() bool, tru func() (T, error)) WhenErr[T] {
+	if w.condition {
+		return ifErrEvaluated(w.condition, w.then, nil)
 	}
-	return get.If_(condition(), tru)
+	var (
+		otherCondition = condition()
+		otherTru       T
+		otherErr       error
+	)
+	if otherCondition {
+		otherTru, otherErr = tru()
+	}
+	return ifErrEvaluated(otherCondition, otherTru, otherErr)
+}
+
+func (w When[T]) EvalIf(condition func() bool, tru T) When[T] {
+	if w.condition {
+		return w
+	}
+	return If(condition(), tru)
 }

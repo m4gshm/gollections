@@ -3,11 +3,12 @@ package boilerplate
 import (
 	"testing"
 
-	"github.com/m4gshm/gollections/check/delay/is"
 	"github.com/m4gshm/gollections/expr/use"
 	"github.com/m4gshm/gollections/op/delay/sum"
 	"github.com/stretchr/testify/assert"
 )
+
+var isEmpty = func(s string) func() bool { return func() bool { return len(s) == 0 } }
 
 func Test_UseSimple(t *testing.T) {
 
@@ -23,7 +24,7 @@ func Test_UseSimple(t *testing.T) {
 func Test_UseSimpleOld(t *testing.T) {
 
 	user := User{name: "Bob", surname: "Smith"}
-	
+
 	fullName := ""
 	if len(user.surname) == 0 {
 		fullName = user.name
@@ -70,7 +71,7 @@ func Benchmark_UseOtherElseGet(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		fullName = use.
 			If(len(user.surname) == 0, user.name).
-			Other(is.Empty(user.name), user.Surname).
+			Other(isEmpty(user.name), user.Surname).
 			ElseGet(sum.Of(user.name, " ", user.surname))
 	}
 
