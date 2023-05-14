@@ -9,6 +9,7 @@ func WrapNonEmpty(pref, target, post string) string {
 	return pref + target + post
 }
 
+// JoinNonEmpty returns concatenated string
 func JoinNonEmpty(first, joiner, second string) string {
 	if len(first) == 0 || len(second) == 0 {
 		return first + second

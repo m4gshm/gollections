@@ -24,6 +24,7 @@ func WrapNonEmpty(pref, post string) func(target string) string {
 	}
 }
 
+// JoinNonEmpty returns concatenated string builder
 func JoinNonEmpty(joiner string) func(first, second string) string {
 	return func(first, second string) string {
 		return string_.JoinNonEmpty(first, joiner, second)

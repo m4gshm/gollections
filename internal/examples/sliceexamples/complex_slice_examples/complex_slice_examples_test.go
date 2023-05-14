@@ -162,14 +162,17 @@ func Benchmark_FindFirsManager_Loop_SliceIter(b *testing.B) {
 func Benchmark_FindFirsManager_Old(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		legacyAlice := User{}
-		for _, u := range users {
+		ok := false
+		loopUsers: for _, u := range users {
 			for _, r := range u.Roles() {
 				if r.Name() == "Manager" {
 					legacyAlice = u
+					ok = true
+					break loopUsers
 				}
 			}
 		}
-		_ = legacyAlice
+		_, _ = legacyAlice, ok
 	}
 }
 

@@ -1,4 +1,4 @@
-// Package splitprovides utils for splitting slices
+// Package split provides utils for splitting slices
 package split
 
 import "github.com/m4gshm/gollections/slice"

@@ -154,11 +154,11 @@ func Reduce[T any](next func() (T, bool, error), merger func(T, T) T) (out T, e 
 	}
 	out = v
 	for {
-		if v, ok, err := next(); err != nil || !ok {
+		v, ok, err := next()
+		if err != nil || !ok {
 			return out, err
-		} else {
-			out = merger(out, v)
 		}
+		out = merger(out, v)
 	}
 }
 
