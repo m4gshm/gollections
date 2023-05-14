@@ -163,7 +163,8 @@ func Benchmark_FindFirsManager_Old(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		legacyAlice := User{}
 		ok := false
-		loopUsers: for _, u := range users {
+	loopUsers:
+		for _, u := range users {
 			for _, r := range u.Roles() {
 				if r.Name() == "Manager" {
 					legacyAlice = u

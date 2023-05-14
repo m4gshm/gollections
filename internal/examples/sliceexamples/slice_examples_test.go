@@ -8,9 +8,9 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/m4gshm/gollections/convert/as"
+	"github.com/m4gshm/gollections/expr/first"
+	"github.com/m4gshm/gollections/expr/last"
 	"github.com/m4gshm/gollections/op"
-	"github.com/m4gshm/gollections/op/first"
-	"github.com/m4gshm/gollections/op/last"
 	"github.com/m4gshm/gollections/op/sum"
 	"github.com/m4gshm/gollections/predicate/exclude"
 	"github.com/m4gshm/gollections/predicate/less"

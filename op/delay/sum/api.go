@@ -3,10 +3,16 @@ package sum
 
 import (
 	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/loop"
+	"github.com/m4gshm/gollections/slice/iter"
 	"github.com/m4gshm/gollections/slice/sum"
 )
 
 // Of returns a sum builder function
 func Of[T c.Summable](elements ...T) func() T {
 	return func() T { return sum.Of(elements) }
+}
+
+func Over[T c.Summable](getters ...func() T) func() T {
+	return func() T { return loop.Sum(iter.Convert(getters, func(e func() T) T { return e() }).Next) }
 }

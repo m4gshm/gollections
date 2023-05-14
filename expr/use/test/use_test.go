@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/m4gshm/gollections/op/use"
+	"github.com/m4gshm/gollections/expr/use"
 	"github.com/stretchr/testify/assert"
 )
 

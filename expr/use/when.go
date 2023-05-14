@@ -1,6 +1,6 @@
 package use
 
-import "github.com/m4gshm/gollections/op/get"
+import "github.com/m4gshm/gollections/expr/get"
 
 // When is if...else expression builder
 type When[T any] struct {

@@ -104,6 +104,24 @@ It is used for computations where an error may occur.
 include::../examples/loop/breakloop/loop_filter_convert_reduce_test.go[lines=17..22,indent=0]
 ----
 
+=== Expressions: link:./expr/use/api.go[use], link:./expr/get/api.go[get], link:./expr/first/api.go[first], link:./expr/last/api.go[last]
+
+Aimed to evaluate a value using conditions. May cause to make code shorter by not in all cases. +
+As example:
+
+[source,go]
+----
+include::../examples/boilerplate/expr_use_test.go[lines=13..20,indent=0]
+----
+
+instead of:
+
+[source,go]
+----
+include::../examples/boilerplate/expr_use_test.go[lines=24..37,indent=0]
+----
+
+
 === Mutable collections
 
 Supports write operations (append, delete, replace).
