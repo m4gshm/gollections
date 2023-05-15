@@ -25,9 +25,7 @@ You can make clear code, extensive, but without dependencies:
 ``` go
 var namesByRole = map[string][]string{}
 add := func(role string, u User) {
-    names := namesByRole[role]
-    names = append(names, u.Name())
-    namesByRole[role] = names
+    namesByRole[role] = append(namesByRole[role], u.Name())
 }
 for _, u := range users {
     roles := u.Roles()
