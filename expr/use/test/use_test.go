@@ -54,7 +54,6 @@ func Test_UseElseZero(t *testing.T) {
 	assert.Equal(t, 0, result)
 }
 
-
 func Test_UseIfIfElse(t *testing.T) {
 	result := use.If(true, 1).If(true, 2).Else(3)
 	assert.Equal(t, 1, result)

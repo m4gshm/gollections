@@ -10,19 +10,18 @@ import (
 func Test_NamesByRole_Old(t *testing.T) {
 
 	var namesByRole = map[string][]string{}
+	add := func(role string, u User) {
+		names := namesByRole[role]
+		names = append(names, u.Name())
+		namesByRole[role] = names
+	}
 	for _, u := range users {
 		roles := u.Roles()
 		if len(roles) == 0 {
-			lr := ""
-			names := namesByRole[lr]
-			names = append(names, u.Name())
-			namesByRole[lr] = names
+			add("", u)
 		} else {
 			for _, r := range roles {
-				lr := strings.ToLower(r.Name())
-				names := namesByRole[lr]
-				names = append(names, u.Name())
-				namesByRole[lr] = names
+				add(strings.ToLower(r.Name()), u)
 			}
 		}
 	}

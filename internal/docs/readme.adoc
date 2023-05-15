@@ -16,7 +16,7 @@ include::../examples/boilerplate/user_data.go[lines=3..-1]
 You can make clear code, extensive, but without dependencies:
 [source,go]
 ----
-include::../examples/boilerplate/slice_namesbyRole_old_test.go[lines=11..33,indent=0]
+include::../examples/boilerplate/slice_namesbyRole_old_test.go[lines=11..32,indent=0]
 ----
 
 Or you can write more compact code using the collections API, like so:
@@ -118,7 +118,7 @@ instead of:
 
 [source,go]
 ----
-include::../examples/boilerplate/expr_use_test.go[lines=25..38,indent=0]
+include::../examples/boilerplate/expr_use_test.go[lines=27..38,indent=0]
 ----
 
 

@@ -24,19 +24,18 @@ You can make clear code, extensive, but without dependencies:
 
 ``` go
 var namesByRole = map[string][]string{}
+add := func(role string, u User) {
+    names := namesByRole[role]
+    names = append(names, u.Name())
+    namesByRole[role] = names
+}
 for _, u := range users {
     roles := u.Roles()
     if len(roles) == 0 {
-        lr := ""
-        names := namesByRole[lr]
-        names = append(names, u.Name())
-        namesByRole[lr] = names
+        add("", u)
     } else {
         for _, r := range roles {
-            lr := strings.ToLower(r.Name())
-            names := namesByRole[lr]
-            names = append(names, u.Name())
-            namesByRole[lr] = names
+            add(strings.ToLower(r.Name()), u)
         }
     }
 }
@@ -189,8 +188,6 @@ assert.Equal(t, "Bob Smith", fullName)
 instead of:
 
 ``` go
-user := User{name: "Bob", surname: "Smith"}
-
 fullName := ""
 if len(user.surname) == 0 {
     fullName = user.name
