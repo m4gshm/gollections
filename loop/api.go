@@ -5,11 +5,11 @@ import (
 	"github.com/m4gshm/gollections/break/loop"
 	breakAlways "github.com/m4gshm/gollections/break/predicate/always"
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/convert"
 	"github.com/m4gshm/gollections/map_/resolv"
 	"github.com/m4gshm/gollections/notsafe"
 	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/op/check/not"
 	"github.com/m4gshm/gollections/predicate/always"
 	"golang.org/x/exp/constraints"
 )
@@ -240,7 +240,7 @@ func Filter[T any](next func() (T, bool), filter func(T) bool) FitIter[T] {
 
 // NotNil creates an iterator that filters nullable elements
 func NotNil[T any](next func() (*T, bool)) FitIter[*T] {
-	return Filter(next, check.NotNil[T])
+	return Filter(next, not.Nil[T])
 }
 
 // ToValues creates an iterator that transform pointers to the values referenced referenced by those pointers.

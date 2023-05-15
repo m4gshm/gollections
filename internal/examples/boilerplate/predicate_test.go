@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/m4gshm/gollections/check/string_"
+	"github.com/m4gshm/gollections/op/string_"
 	"github.com/m4gshm/gollections/predicate/less"
 	"github.com/m4gshm/gollections/predicate/match"
 	"github.com/m4gshm/gollections/predicate/where"

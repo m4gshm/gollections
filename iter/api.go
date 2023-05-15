@@ -3,11 +3,11 @@ package iter
 
 import (
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/convert/as"
 	kvloop "github.com/m4gshm/gollections/kv/loop"
 	"github.com/m4gshm/gollections/kv/stream"
 	"github.com/m4gshm/gollections/loop"
+	"github.com/m4gshm/gollections/op/check/not"
 	"github.com/m4gshm/gollections/slice"
 )
 
@@ -46,7 +46,7 @@ func Filter[T any, I c.Iterator[T]](elements I, filter func(T) bool) loop.FitIte
 
 // NotNil instantiates an iterator that filters nullable elements
 func NotNil[T any, I c.Iterator[*T]](elements I) loop.FitIter[*T] {
-	return Filter(elements, check.NotNil[T])
+	return Filter(elements, not.Nil[T])
 }
 
 // Reduce reduces elements to an one

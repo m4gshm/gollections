@@ -9,11 +9,11 @@ import (
 	"golang.org/x/exp/constraints"
 
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/convert"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_/resolv"
 	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/op/check/not"
 )
 
 // ErrBreak is the 'break' statement of the For, Track methods
@@ -382,7 +382,7 @@ func FilterFlattFilter[FS ~[]From, From, To any](elements FS, filterFrom func(Fr
 
 // NotNil returns only not nil elements
 func NotNil[TS ~[]*T, T any](elements TS) TS {
-	return Filter(elements, check.NotNil[T])
+	return Filter(elements, not.Nil[T])
 }
 
 // ToValues returns values referenced by the pointers.

@@ -6,12 +6,12 @@ import (
 
 	"github.com/m4gshm/gollections/break/predicate/always"
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/convert"
 	"github.com/m4gshm/gollections/convert/as"
 	"github.com/m4gshm/gollections/map_/resolv"
 	"github.com/m4gshm/gollections/notsafe"
 	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/op/check/not"
 )
 
 // ErrBreak is the 'break' statement of the For, Track methods
@@ -304,7 +304,7 @@ func Filter[T any](next func() (T, bool, error), filter func(T) bool) FiltIter[T
 
 // NotNil creates an iterator that filters nullable elements.
 func NotNil[T any](next func() (*T, bool, error)) FiltIter[*T] {
-	return Filt(next, as.ErrTail(check.NotNil[T]))
+	return Filt(next, as.ErrTail(not.Nil[T]))
 }
 
 // ToValues creates an iterator that transform pointers to the values referenced referenced by those pointers.

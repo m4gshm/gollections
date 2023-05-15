@@ -2,7 +2,7 @@
 package convert
 
 import (
-	"github.com/m4gshm/gollections/check/not"
+	"github.com/m4gshm/gollections/op/check/not"
 	"github.com/m4gshm/gollections/slice"
 )
 

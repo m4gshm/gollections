@@ -361,3 +361,13 @@ func ToSlicee[M ~map[K]V, K comparable, V any, T any](elements M, converter func
 	}
 	return out, nil
 }
+
+// Empty checks the val map is empty
+func Empty[K comparable, V any](val map[K]V) bool {
+	return len(val) == 0
+}
+
+// NotEmpty checks the val map is not empty
+func NotEmpty[K comparable, V any](val map[K]V) bool {
+	return !Empty(val)
+}

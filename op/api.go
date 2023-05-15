@@ -59,33 +59,3 @@ func IfGetElseGetErr[T any](ok bool, tru func() T, fal func() error) (T, error) 
 	var no T
 	return no, fal()
 }
-
-// Empty checks the val is empty
-func Empty[T Slice | []any](val T) bool {
-	return len(val) == 0
-}
-
-// NotEmpty checks the val is not empty
-func NotEmpty[C []T, T any](val C) bool {
-	return len(val) > 0
-}
-
-// EmptyMap checks the val map is empty
-func EmptyMap[K comparable, V any](val map[K]V) bool {
-	return len(val) == 0
-}
-
-// NotEmptyMap checks the val map is not empty
-func NotEmptyMap[K comparable, V any](val map[K]V) bool {
-	return len(val) > 0
-}
-
-// Slice is the constraint included all slice types
-type Slice interface {
-	~[]any | ~[]uintptr |
-		~[]int | ~[]int8 | []int16 | []int32 | []int64 |
-		~[]uint | ~[]uint8 | ~[]uint16 | ~[]uint32 | ~[]uint64 |
-		~[]float32 | ~[]float64 |
-		~[]complex64 | ~[]complex128 |
-		~[]string | ~string
-}

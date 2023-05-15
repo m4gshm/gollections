@@ -5,11 +5,11 @@ import (
 	breakLoop "github.com/m4gshm/gollections/break/loop"
 	breakStream "github.com/m4gshm/gollections/break/stream"
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/convert/as"
 	kvloop "github.com/m4gshm/gollections/kv/loop"
 	kvstream "github.com/m4gshm/gollections/kv/stream"
 	"github.com/m4gshm/gollections/loop"
+	"github.com/m4gshm/gollections/op/check/not"
 	"github.com/m4gshm/gollections/stream"
 )
 
@@ -62,7 +62,7 @@ func Filter[T any, I c.Iterable[T]](collection I, filter func(T) bool) stream.It
 
 // NotNil instantiates a stream that filters nullable elements
 func NotNil[T any, I c.Iterable[*T]](collection I) stream.Iter[*T] {
-	return Filter(collection, check.NotNil[T])
+	return Filter(collection, not.Nil[T])
 }
 
 // ToValues creates a stream that transform pointers to the values referenced referenced by those pointers.

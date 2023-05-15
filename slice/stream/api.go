@@ -2,7 +2,7 @@
 package stream
 
 import (
-	"github.com/m4gshm/gollections/check"
+	"github.com/m4gshm/gollections/op/check/not"
 	"github.com/m4gshm/gollections/slice/iter"
 	"github.com/m4gshm/gollections/stream"
 )
@@ -39,5 +39,5 @@ func Filter[TS ~[]T, T any](elements TS, filter func(T) bool) stream.Iter[T] {
 
 // NotNil instantiates a stream that filters nullable elements
 func NotNil[T any, TRS ~[]*T](elements TRS) stream.Iter[*T] {
-	return Filter(elements, check.NotNil[T])
+	return Filter(elements, not.Nil[T])
 }
