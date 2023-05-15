@@ -1,6 +1,7 @@
 package boilerplate
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/m4gshm/gollections/expr/use"

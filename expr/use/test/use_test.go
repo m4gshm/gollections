@@ -29,6 +29,32 @@ func Test_UseIfElse(t *testing.T) {
 	assert.Equal(t, 2, result)
 }
 
+func Test_UseEval(t *testing.T) {
+	result, ok := use.If(true, 1).If(true, 2).Eval()
+	assert.True(t, ok)
+	assert.Equal(t, 1, result)
+
+	result, ok = use.If(false, 1).If(true, 2).Eval()
+	assert.True(t, ok)
+	assert.Equal(t, 2, result)
+
+	result, ok = use.If(false, 1).If(false, 2).Eval()
+	assert.False(t, ok)
+	assert.Equal(t, 0, result)
+}
+
+func Test_UseElseZero(t *testing.T) {
+	result := use.If(true, 1).If(true, 2).ElseZero()
+	assert.Equal(t, 1, result)
+
+	result = use.If(false, 1).If(true, 2).ElseZero()
+	assert.Equal(t, 2, result)
+
+	result = use.If(false, 1).If(false, 2).ElseZero()
+	assert.Equal(t, 0, result)
+}
+
+
 func Test_UseIfIfElse(t *testing.T) {
 	result := use.If(true, 1).If(true, 2).Else(3)
 	assert.Equal(t, 1, result)

@@ -6,6 +6,20 @@ type When[T any] struct {
 	then      T
 }
 
+func (w When[T]) Eval() (out T, ok bool) {
+	if w.condition {
+		return w.then, true
+	}
+	return out, false
+}
+
+func (w When[T]) ElseZero() (out T) {
+	if w.condition {
+		return w.then
+	}
+	return out
+}
+
 // Else returns result according to the condition
 func (w When[T]) Else(fals T) T {
 	if w.condition {
