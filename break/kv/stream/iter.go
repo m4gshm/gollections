@@ -86,14 +86,14 @@ func (k Iter[K, V, M]) Track(tracker func(K, V) error) error {
 }
 
 // Reduce reduces the key/value pairs into an one pair using the 'merge' function
-func (k Iter[K, V, M]) Reduce(by func(K, V, K, V) (K, V, error)) (K, V, error) {
-	return loop.Reduce(k.next, by)
+func (k Iter[K, V, M]) Reduce(by func(K, K, V, V) (K, V, error)) (K, V, error) {
+	return loop.Reducee(k.next, by)
 }
 
 // HasAny finds the first key/value pari that satisfies the 'predicate' function condition and returns true if successful
 func (k Iter[K, V, M]) HasAny(predicate func(K, V) (bool, error)) (bool, error) {
 	next := k.next
-	return loop.HasAny(next, predicate)
+	return loop.HasAnyy(next, predicate)
 }
 
 // Iter creates an iterator and returns as interface

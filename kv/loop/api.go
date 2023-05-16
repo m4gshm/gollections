@@ -2,6 +2,7 @@
 package loop
 
 import (
+	"github.com/m4gshm/gollections/break/kv/loop"
 	"github.com/m4gshm/gollections/map_/resolv"
 )
 
@@ -16,36 +17,88 @@ func Group[K comparable, V any](next func() (K, V, bool)) map[K][]V {
 }
 
 // Reduce reduces the key/value pairs retrieved by the 'next' function into an one pair using the 'merge' function
-func Reduce[K, V any](next func() (K, V, bool), merge func(K, V, K, V) (K, V)) (rk K, rv V) {
+func Reduce[K, V any](next func() (K, V, bool), merge func(K, K, V, V) (K, V)) (rk K, rv V) {
 	if k, v, ok := next(); ok {
 		rk, rv = k, v
 	} else {
 		return rk, rv
 	}
 	for k, v, ok := next(); ok; k, v, ok = next() {
-		rk, rv = merge(rk, rv, k, v)
+		rk, rv = merge(rk, k, rv, v)
 	}
 	return rk, rv
 }
 
-// HasAny finds the first key/value pair that satisfies the 'predicate' function condition and returns true if successful
-func HasAny[K, V any](next func() (K, V, bool), predicate func(K, V) bool) bool {
-	for k, v, ok := next(); ok; k, v, ok = next() {
-		if predicate(k, v) {
-			return true
+// Reducee reduces the key/value pairs retrieved by the 'next' function into an one pair using the 'merge' function
+func Reducee[K, V any](next func() (K, V, bool), merge func(K, K, V, V) (K, V, error)) (rk K, rv V, err error) {
+	k, v, ok := next()
+	if !ok {
+		return rk, rv, nil
+	}
+	rk, rv = k, v
+	for {
+		if k, v, ok := next(); !ok {
+			return rk, rv, nil
+		} else if rk, rv, err = merge(rk, k, rv, v); err != nil {
+			return rk, rv, err
 		}
 	}
-	return false
+}
+
+// HasAny finds the first key/value pair that satisfies the 'predicate' function condition and returns true if successful
+func HasAny[K, V any](next func() (K, V, bool), predicate func(K, V) bool) bool {
+	_, _, ok := First(next, predicate)
+	return ok
+}
+
+// HasAnyy finds the first key/value pair that satisfies the 'predicate' function condition and returns true if successful
+func HasAnyy[K, V any](next func() (K, V, bool), predicate func(K, V) (bool, error)) (bool, error) {
+	_, _, ok, err := Firstt(next, predicate)
+	return ok, err
+}
+
+// First returns the first key/value pair that satisfies the condition of the 'predicate' function
+func First[K, V any](next func() (K, V, bool), predicate func(K, V) bool) (K, V, bool) {
+	for {
+		if k, v, ok := next(); !ok {
+			return k, v, false
+		} else if ok := predicate(k, v); ok {
+			return k, v, true
+		}
+	}
+}
+
+// Firstt returns the first key/value pair that satisfies the condition of the 'predicate' function
+func Firstt[K, V any](next func() (K, V, bool), predicate func(K, V) (bool, error)) (K, V, bool, error) {
+	for {
+		if k, v, ok := next(); !ok {
+			return k, v, false, nil
+		} else if ok, err := predicate(k, v); err != nil {
+			return k, v, false, err
+		} else if ok {
+			return k, v, true, nil
+		}
+	}
 }
 
 // Convert creates an iterator that applies a transformer to iterable key\values.
-func Convert[K, V any, k2, v2 any](next func() (K, V, bool), by func(K, V) (k2, v2)) ConvertIter[K, V, k2, v2, func(K, V) (k2, v2)] {
-	return ConvertIter[K, V, k2, v2, func(K, V) (k2, v2)]{next: next, by: by}
+func Convert[K, V any, k2, v2 any](next func() (K, V, bool), converter func(K, V) (k2, v2)) ConvertIter[K, V, k2, v2, func(K, V) (k2, v2)] {
+	return ConvertIter[K, V, k2, v2, func(K, V) (k2, v2)]{next: next, converter: converter}
+}
+
+// Conv creates an iterator that applies a transformer to iterable key\values.
+func Conv[K, V any, KOUT, VOUT any](next func() (K, V, bool), converter func(K, V) (KOUT, VOUT, error)) loop.ConvertIter[K, V, KOUT, VOUT] {
+	return loop.Conv(loop.From(next), converter)
 }
 
 // Filter creates an iterator that checks elements by a filter and returns successful ones
 func Filter[K, V any](next func() (K, V, bool), filter func(K, V) bool) FitKV[K, V] {
 	return FitKV[K, V]{next: next, filter: filter}
+}
+
+// Filt creates an iterator that checks elements by a filter and returns successful ones
+func Filt[K, V any](next func() (K, V, bool), filter func(K, V) (bool, error)) loop.FiltKV[K, V] {
+	return loop.Filt(loop.From(next), filter)
 }
 
 // ToMapResolv collects key\value elements to a map by iterating over the elements with resolving of duplicated key values

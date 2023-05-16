@@ -5,6 +5,11 @@ import (
 	"github.com/m4gshm/gollections/map_/resolv"
 )
 
+// Looper provides an iterable loop function
+type Looper[K, V any, I interface{ Next() (K, V, bool, error) }] interface {
+	Loop() I
+}
+
 // From wrap the next loop to a breakable loop
 func From[K, V any](next func() (K, V, bool)) func() (K, V, bool, error) {
 	return func() (K, V, bool, error) {
@@ -32,7 +37,7 @@ func Group[K comparable, V any](next func() (K, V, bool, error)) (map[K][]V, err
 }
 
 // Reduce reduces the key/value pairs retrieved by the 'next' function into an one pair using the 'merge' function
-func Reduce[K, V any](next func() (K, V, bool, error), merge func(K, V, K, V) (K, V, error)) (rk K, rv V, err error) {
+func Reduce[K, V any](next func() (K, V, bool, error), merge func(K, K, V, V) (K, V)) (rk K, rv V, err error) {
 	k, v, ok, err := next()
 	if err != nil || !ok {
 		return rk, rv, err
@@ -41,21 +46,60 @@ func Reduce[K, V any](next func() (K, V, bool, error), merge func(K, V, K, V) (K
 	for {
 		if k, v, ok, err := next(); err != nil || !ok {
 			return rk, rv, err
-		} else if rk, rv, err = merge(rk, rv, k, v); err != nil {
+		} else {
+			rk, rv = merge(rk, k, rv, v)		
+		}
+	}
+}
+
+// Reducee reduces the key/value pairs retrieved by the 'next' function into an one pair using the 'merge' function
+func Reducee[K, V any](next func() (K, V, bool, error), merge func(K, K, V, V) (K, V, error)) (rk K, rv V, err error) {
+	k, v, ok, err := next()
+	if err != nil || !ok {
+		return rk, rv, err
+	}
+	rk, rv = k, v
+	for {
+		if k, v, ok, err := next(); err != nil || !ok {
+			return rk, rv, err
+		} else if rk, rv, err = merge(rk, k, rv, v); err != nil {
 			return rk, rv, err
 		}
 	}
 }
 
 // HasAny finds the first key/value pair that satisfies the 'predicate' function condition and returns true if successful
-func HasAny[K, V any](next func() (K, V, bool, error), predicate func(K, V) (bool, error)) (bool, error) {
+func HasAny[K, V any](next func() (K, V, bool, error), predicate func(K, V) bool) (bool, error) {
+	_, _, ok, err := First(next, predicate)
+	return ok, err
+}
+
+// HasAnyy finds the first key/value pair that satisfies the 'predicate' function condition and returns true if successful
+func HasAnyy[K, V any](next func() (K, V, bool, error), predicate func(K, V) (bool, error)) (bool, error) {
+	_, _, ok, err := Firstt(next, predicate)
+	return ok, err
+}
+
+// First returns the first key/value pair that satisfies the condition of the 'predicate' function
+func First[K, V any](next func() (K, V, bool, error), predicate func(K, V) bool) (K, V, bool, error) {
 	for {
 		if k, v, ok, err := next(); err != nil || !ok {
-			return false, err
+			return k, v, false, err
+		} else if ok := predicate(k, v); ok {
+			return k, v, true, nil
+		}
+	}
+}
+
+// Firstt returns the first key/value pair that satisfies the condition of the 'predicate' function
+func Firstt[K, V any](next func() (K, V, bool, error), predicate func(K, V) (bool, error)) (K, V, bool, error) {
+	for {
+		if k, v, ok, err := next(); err != nil || !ok {
+			return k, v, false, err
 		} else if ok, err := predicate(k, v); err != nil {
-			return false, err
+			return k, v, false, err
 		} else if ok {
-			return true, nil
+			return k, v, true, nil
 		}
 	}
 }

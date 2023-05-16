@@ -328,7 +328,7 @@ func (m *Map[K, V]) Conv(converter func(K, V) (K, V, error)) breakKvStream.Iter[
 }
 
 // Reduce reduces the key/value pairs of the map into an one pair using the 'merge' function
-func (m *Map[K, V]) Reduce(merge func(K, V, K, V) (K, V)) (k K, v V) {
+func (m *Map[K, V]) Reduce(merge func(K, K, V, V) (K, V)) (k K, v V) {
 	if m != nil {
 		k, v = map_.Reduce(m.elements, merge)
 	}

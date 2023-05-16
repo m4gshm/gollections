@@ -31,7 +31,7 @@ func Test_Map_Zero(t *testing.T) {
 	collection.Convert(func(i int, s string) (int, string) { return 0, "" })
 	collection.Filter(func(i int, s string) bool { return true })
 	collection.Map()
-	collection.Reduce(func(i1 int, s1 string, i2 int, s2 string) (int, string) { return 0, "" })
+	collection.Reduce(func(i1, i2 int, s1, s2 string) (int, string) { return 0, "" })
 	s := collection.String()
 	assert.Equal(t, "[]", s)
 

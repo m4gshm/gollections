@@ -113,7 +113,7 @@ func (k Iter[K, V, M]) TrackEach(tracker func(K, V)) {
 }
 
 // Reduce reduces the key/value pairs into an one pair using the 'merge' function
-func (k Iter[K, V, M]) Reduce(by func(K, V, K, V) (K, V)) (K, V) {
+func (k Iter[K, V, M]) Reduce(by func(K, K, V, V) (K, V)) (K, V) {
 	return kvloop.Reduce(k.next, by)
 }
 

@@ -24,7 +24,7 @@ type Collection[K comparable, V any, M map[K]V | map[K][]V] interface {
 	Iterable[K, V]
 	c.MapFactory[K, V, M]
 
-	Reduce(merger func(K, V, K, V) (K, V)) (K, V)
+	Reduce(merger func(K, K, V, V) (K, V)) (K, V)
 }
 
 // Convertable provides limited kit of map transformation methods

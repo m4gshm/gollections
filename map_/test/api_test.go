@@ -144,7 +144,7 @@ func Test_StringRepresentation(t *testing.T) {
 
 func Test_Reduce(t *testing.T) {
 	elements := map[int]string{4: "4", 2: "2", 1: "1", 3: "3"}
-	k, _ := map_.Reduce(elements, func(k int, v string, k2 int, v2 string) (int, string) {
+	k, _ := map_.Reduce(elements, func(k, k2 int, v, v2 string) (int, string) {
 		return k + k2, ""
 	})
 
