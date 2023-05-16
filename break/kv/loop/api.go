@@ -44,11 +44,11 @@ func Reduce[K, V any](next func() (K, V, bool, error), merge func(K, K, V, V) (K
 	}
 	rk, rv = k, v
 	for {
-		if k, v, ok, err := next(); err != nil || !ok {
+		k, v, ok, err := next()
+		if err != nil || !ok {
 			return rk, rv, err
-		} else {
-			rk, rv = merge(rk, k, rv, v)		
 		}
+		rk, rv = merge(rk, k, rv, v)
 	}
 }
 
