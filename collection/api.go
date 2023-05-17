@@ -10,7 +10,9 @@ import (
 	kvstream "github.com/m4gshm/gollections/kv/stream"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op/check/not"
+	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/stream"
+	"golang.org/x/exp/constraints"
 )
 
 // Convert returns a stream that applies the 'converter' function to the collection elements
@@ -105,4 +107,9 @@ func First[T any, I c.Iterable[T]](collection I, predicate func(T) bool) (v T, o
 func Firstt[T any, I c.Iterable[T]](collection I, predicate func(T) (bool, error)) (v T, ok bool, err error) {
 	i := collection.Iter()
 	return breakLoop.Firstt(breakLoop.From(i.Next), predicate)
+}
+
+// Sort sorts the specified sortable collection that contains orderable elements
+func Sort[O any, S interface{ Sort(less slice.Less[T]) O }, T any, f constraints.Ordered](collection S, by func(T) f) O {
+	return collection.Sort(func(e1, e2 T) bool { return by(e1) < by(e2) })
 }

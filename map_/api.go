@@ -110,7 +110,7 @@ func Convert[K, Kto comparable, V, Vto any, M ~map[K]V](elements M, keyConverter
 	return converted
 }
 
-// Convert creates a map with converted keys and values
+// Conv creates a map with converted keys and values
 func Conv[K, Kto comparable, V, Vto any, M ~map[K]V](elements M, keyConverter func(K) (Kto, error), valConverter func(V) (Vto, error)) (map[Kto]Vto, error) {
 	converted := make(map[Kto]Vto, len(elements))
 	for key, val := range elements {
