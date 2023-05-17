@@ -4,25 +4,36 @@ package loop
 import (
 	"errors"
 
-	"github.com/m4gshm/gollections/break/op"
 	"github.com/m4gshm/gollections/break/predicate/always"
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/convert"
 	"github.com/m4gshm/gollections/convert/as"
-	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_/resolv"
 	"github.com/m4gshm/gollections/notsafe"
+	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/op/check/not"
 )
 
 // ErrBreak is the 'break' statement of the For, Track methods
 var ErrBreak = c.ErrBreak
 
+// Looper provides an iterable loop function
+type Looper[T any, I interface{ Next() (T, bool, error) }] interface {
+	Loop() I
+}
+
 // Of wrap the elements by loop function
 func Of[T any](elements ...T) func() (e T, ok bool, err error) {
-	next := loop.Of(elements...)
+	l := len(elements)
+	i := 0
+	if l == 0 || i < 0 || i >= l {
+		return func() (e T, ok bool, err error) { return e, false, nil }
+	}
 	return func() (e T, ok bool, err error) {
-		e, ok = next()
+		if i < l {
+			e, ok = elements[i], true
+			i++
+		}
 		return e, ok, nil
 	}
 }
@@ -60,13 +71,11 @@ func For[T any](next func() (T, bool, error), walker func(T) error) error {
 }
 
 // ForFiltered applies the 'walker' function to the elements retrieved by the 'next' function that satisfy the 'predicate' function condition
-func ForFiltered[T any](next func() (T, bool, error), walker func(T) error, predicate func(T) (bool, error)) error {
+func ForFiltered[T any](next func() (T, bool, error), walker func(T) error, predicate func(T) bool) error {
 	for {
 		if v, ok, err := next(); err != nil || !ok {
 			return err
-		} else if ok, err := predicate(v); err != nil {
-			return err
-		} else if ok {
+		} else if ok := predicate(v); ok {
 			if err := walker(v); err != nil {
 				return brk(err)
 			}
@@ -75,7 +84,18 @@ func ForFiltered[T any](next func() (T, bool, error), walker func(T) error, pred
 }
 
 // First returns the first element that satisfies the condition of the 'predicate' function
-func First[T any](next func() (T, bool, error), predicate func(T) (bool, error)) (T, bool, error) {
+func First[T any](next func() (T, bool, error), predicate func(T) bool) (T, bool, error) {
+	for {
+		if out, ok, err := next(); err != nil || !ok {
+			return out, false, err
+		} else if ok := predicate(out); ok {
+			return out, true, nil
+		}
+	}
+}
+
+// Firstt returns the first element that satisfies the condition of the 'predicate' function
+func Firstt[T any](next func() (T, bool, error), predicate func(T) (bool, error)) (T, bool, error) {
 	for {
 		if out, ok, err := next(); err != nil || !ok {
 			return out, false, err
@@ -107,8 +127,43 @@ func Slice[T any](next func() (T, bool, error)) (out []T, err error) {
 	}
 }
 
+// SliceCap collects the elements retrieved by the 'next' function into a new slice with predefined capacity
+func SliceCap[T any](next func() (T, bool, error), cap int) (out []T, err error) {
+	if cap > 0 {
+		out = make([]T, 0, cap)
+	}
+	return Append(next, out)
+}
+
+// Append collects the elements retrieved by the 'next' function into the specified 'out' slice
+func Append[T any, TS ~[]T](next func() (T, bool, error), out TS) (TS, error) {
+	for v, ok, err := next(); ok; v, ok, err = next() {
+		if err != nil {
+			return out, err
+		}
+		out = append(out, v)
+	}
+	return out, nil
+}
+
 // Reduce reduces the elements retrieved by the 'next' function into an one using the 'merge' function
-func Reduce[T any](next func() (T, bool, error), merger func(T, T) (T, error)) (out T, e error) {
+func Reduce[T any](next func() (T, bool, error), merger func(T, T) T) (out T, e error) {
+	v, ok, err := next()
+	if err != nil || !ok {
+		return out, err
+	}
+	out = v
+	for {
+		v, ok, err := next()
+		if err != nil || !ok {
+			return out, err
+		}
+		out = merger(out, v)
+	}
+}
+
+// Reducee reduces the elements retrieved by the 'next' function into an one using the 'merge' function
+func Reducee[T any](next func() (T, bool, error), merger func(T, T) (T, error)) (out T, e error) {
 	v, ok, err := next()
 	if err != nil || !ok {
 		return out, err
@@ -129,8 +184,14 @@ func Sum[T c.Summable](next func() (T, bool, error)) (T, error) {
 }
 
 // HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful
-func HasAny[T any](next func() (T, bool, error), predicate func(T) (bool, error)) (bool, error) {
+func HasAny[T any](next func() (T, bool, error), predicate func(T) bool) (bool, error) {
 	_, ok, err := First(next, predicate)
+	return ok, err
+}
+
+// HasAnyy finds the first element that satisfies the 'predicate' function condition and returns true if successful
+func HasAnyy[T any](next func() (T, bool, error), predicate func(T) (bool, error)) (bool, error) {
+	_, ok, err := Firstt(next, predicate)
 	return ok, err
 }
 
@@ -243,7 +304,7 @@ func Filter[T any](next func() (T, bool, error), filter func(T) bool) FiltIter[T
 
 // NotNil creates an iterator that filters nullable elements.
 func NotNil[T any](next func() (*T, bool, error)) FiltIter[*T] {
-	return Filt(next, as.ErrTail(check.NotNil[T]))
+	return Filt(next, as.ErrTail(not.Nil[T]))
 }
 
 // ToValues creates an iterator that transform pointers to the values referenced referenced by those pointers.
@@ -406,6 +467,16 @@ func New[S, T any](source S, hasNext func(S) bool, getNext func(S) (T, error)) f
 			return n, true, nil
 		}
 	}
+}
+
+// ConvertAndReduce converts each elements and merges them into one
+func ConvertAndReduce[From, To any](next func() (From, bool, error), converter func(From) To, merger func(To, To) To) (out To, err error) {
+	return Reduce(Convert(next, converter).Next, merger)
+}
+
+// ConvAndReduce converts each elements and merges them into one
+func ConvAndReduce[From, To any](next func() (From, bool, error), converter func(From) (To, error), merger func(To, To) To) (out To, err error) {
+	return Reduce(Conv(next, converter).Next, merger)
 }
 
 func brk(err error) error {

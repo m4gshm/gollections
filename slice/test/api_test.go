@@ -17,6 +17,8 @@ import (
 	_more "github.com/m4gshm/gollections/break/predicate/more"
 	"github.com/m4gshm/gollections/convert/as"
 	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/op/delay/chain"
+	"github.com/m4gshm/gollections/op/delay/string_/wrap"
 	"github.com/m4gshm/gollections/predicate/eq"
 	"github.com/m4gshm/gollections/predicate/more"
 	"github.com/m4gshm/gollections/slice"
@@ -24,29 +26,38 @@ import (
 	"github.com/m4gshm/gollections/slice/clone/reverse"
 	csort "github.com/m4gshm/gollections/slice/clone/sort"
 	cstablesort "github.com/m4gshm/gollections/slice/clone/stablesort"
+	"github.com/m4gshm/gollections/slice/conv"
 	"github.com/m4gshm/gollections/slice/convert"
 	"github.com/m4gshm/gollections/slice/first"
 	"github.com/m4gshm/gollections/slice/last"
 	"github.com/m4gshm/gollections/slice/range_"
 	"github.com/m4gshm/gollections/slice/sort"
+	"github.com/m4gshm/gollections/slice/split"
 	"github.com/m4gshm/gollections/slice/stablesort"
 )
 
 func Test_Range(t *testing.T) {
-	assert.Equal(t, slice.Of(-1, 0, 1, 2, 3), range_.Of(-1, 3))
-	assert.Equal(t, slice.Of(3, 2, 1, 0, -1), range_.Of(3, -1))
-	assert.Equal(t, slice.Of(1), range_.Of(1, 1))
+	assert.Equal(t, slice.Of(-1, 0, 1, 2), range_.Of(-1, 3))
+	assert.Equal(t, slice.Of(3, 2, 1, 0, -1), range_.Of(3, -2))
+	assert.Equal(t, slice.Of(1), range_.Of(1, 2))
+	assert.Nil(t, range_.Of(1, 1))
+}
+
+func Test_RangeClose(t *testing.T) {
+	assert.Equal(t, slice.Of(-1, 0, 1, 2, 3), range_.Closed(-1, 3))
+	assert.Equal(t, slice.Of(3, 2, 1, 0, -1), range_.Closed(3, -1))
+	assert.Equal(t, slice.Of(1), range_.Closed(1, 1))
 }
 
 func Test_Reverse(t *testing.T) {
-	src := range_.Of(3, -1)
+	src := range_.Closed(3, -1)
 	reversed := slice.Reverse(src)
 	assert.Equal(t, slice.Of(-1, 0, 1, 2, 3), reversed)
 	assert.Equal(t, (*reflect.SliceHeader)(unsafe.Pointer(&src)).Data, (*reflect.SliceHeader)(unsafe.Pointer(&reversed)).Data)
 }
 
 func Test_ReverseCloned(t *testing.T) {
-	src := range_.Of(3, -1)
+	src := range_.Closed(3, -1)
 	reversed := reverse.Of(src)
 	assert.Equal(t, slice.Of(-1, 0, 1, 2, 3), reversed)
 	assert.NotEqual(t, (*reflect.SliceHeader)(unsafe.Pointer(&src)).Data, (*reflect.SliceHeader)(unsafe.Pointer(&reversed)).Data)
@@ -105,6 +116,19 @@ func Test_PointerClone(t *testing.T) {
 func Test_ReduceSum(t *testing.T) {
 	s := slice.Of(1, 3, 5, 7, 9, 11)
 	r := slice.Reduce(s, op.Sum[int])
+	assert.Equal(t, 1+3+5+7+9+11, r)
+}
+
+func Test_ConvertAndReduce(t *testing.T) {
+	s := slice.Of(1, 3, 5, 7, 9, 11)
+	r := convert.AndReduce(s, func(i int) int { return i * i }, op.Sum[int])
+	assert.Equal(t, 1+3*3+5*5+7*7+9*9+11*11, r)
+}
+
+func Test_ConvAndReduce(t *testing.T) {
+	s := slice.Of("1", "3", "5", "7", "9", "11")
+	r, err := conv.AndReduce(s, strconv.Atoi, op.Sum[int])
+	assert.NoError(t, err)
 	assert.Equal(t, 1+3+5+7+9+11, r)
 }
 
@@ -407,36 +431,29 @@ func Test_OfLoop(t *testing.T) {
 	assert.Equal(t, slice.Of(1, 2, 3), result)
 }
 
-func Test_Generate(t *testing.T) {
-	counter := 0
-	result := slice.Generate(func() (int, bool) { counter++; return counter, counter < 4 })
-
-	assert.Equal(t, slice.Of(1, 2, 3), result)
-}
-
 func Test_Sort(t *testing.T) {
-	src := range_.Of(3, -1)
+	src := range_.Closed(3, -1)
 	sorted := sort.Of(src)
 	assert.Equal(t, slice.Of(-1, 0, 1, 2, 3), sorted)
 	assert.Equal(t, (*reflect.SliceHeader)(unsafe.Pointer(&src)).Data, (*reflect.SliceHeader)(unsafe.Pointer(&sorted)).Data)
 }
 
 func Test_SortCloned(t *testing.T) {
-	src := range_.Of(3, -1)
+	src := range_.Closed(3, -1)
 	sorted := csort.Of(src)
 	assert.Equal(t, slice.Of(-1, 0, 1, 2, 3), sorted)
 	assert.NotEqual(t, (*reflect.SliceHeader)(unsafe.Pointer(&src)).Data, (*reflect.SliceHeader)(unsafe.Pointer(&sorted)).Data)
 }
 
 func Test_StableSort(t *testing.T) {
-	src := range_.Of(3, -1)
+	src := range_.Closed(3, -1)
 	sorted := stablesort.Of(src)
 	assert.Equal(t, slice.Of(-1, 0, 1, 2, 3), sorted)
 	assert.Equal(t, (*reflect.SliceHeader)(unsafe.Pointer(&src)).Data, (*reflect.SliceHeader)(unsafe.Pointer(&sorted)).Data)
 }
 
 func Test_StableSortCloned(t *testing.T) {
-	src := range_.Of(3, -1)
+	src := range_.Closed(3, -1)
 	sorted := cstablesort.Of(src)
 	assert.Equal(t, slice.Of(-1, 0, 1, 2, 3), sorted)
 	assert.NotEqual(t, (*reflect.SliceHeader)(unsafe.Pointer(&src)).Data, (*reflect.SliceHeader)(unsafe.Pointer(&sorted)).Data)
@@ -456,4 +473,35 @@ func Test_Empty(t *testing.T) {
 	assert.False(t, slice.Empty(slice.Of(1)))
 	assert.True(t, slice.Empty(slice.Of[int]()))
 	assert.True(t, slice.Empty[[]int](nil))
+}
+
+func Test_SplitTwo(t *testing.T) {
+	first, second := slice.SplitTwo(slice.Of("1a", "2b", "3c"), func(s string) (string, string) { return string(s[0]), string(s[1]) })
+
+	assert.Equal(t, slice.Of("1", "2", "3"), first)
+	assert.Equal(t, slice.Of("a", "b", "c"), second)
+}
+
+func Test_SplitTwo2(t *testing.T) {
+	byIndex := func(i int) func(string) string { return func(s string) string { return string(s[i]) } }
+
+	first, second := split.Of(slice.Of("1a", "2b", "3c"), byIndex(0), byIndex(1))
+
+	assert.Equal(t, slice.Of("1", "2", "3"), first)
+	assert.Equal(t, slice.Of("a", "b", "c"), second)
+}
+
+func Test_SplitAndReduce(t *testing.T) {
+	byIndex := func(i int) func(string) string { return func(s string) string { return string(s[i]) } }
+
+	first, second := split.AndReduce(slice.Of("1a", "2b", "3c"), byIndex(0), chain.Of(byIndex(1), wrap.By("{", "}")), op.Sum[string], op.Sum[string])
+
+	assert.Equal(t, "123", first)
+	assert.Equal(t, "{a}{b}{c}", second)
+}
+
+func Test_OfIndexed(t *testing.T) {
+	indexed := slice.Of("0", "1", "2", "3", "4")
+	result := slice.OfIndexed(len(indexed), func(i int) string { return indexed[i] })
+	assert.Equal(t, indexed, result)
 }

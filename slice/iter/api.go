@@ -4,10 +4,10 @@ package iter
 import (
 	"unsafe"
 
-	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/convert"
 	"github.com/m4gshm/gollections/convert/as"
 	"github.com/m4gshm/gollections/notsafe"
+	"github.com/m4gshm/gollections/op/check/not"
 	"github.com/m4gshm/gollections/predicate/always"
 	"github.com/m4gshm/gollections/slice"
 )
@@ -133,7 +133,7 @@ func Filt[TS ~[]T, T any](elements TS, filter func(T) (bool, error)) *FiltIter[T
 
 // NotNil instantiates an iterator that filters nullable elements
 func NotNil[T any, TRS ~[]*T](elements TRS) *FilterIter[*T] {
-	return Filter(elements, check.NotNil[T])
+	return Filter(elements, not.Nil[T])
 }
 
 // NewKeyValuer creates instance of the KeyValuer

@@ -17,6 +17,6 @@ type Stream[K comparable, V any, Map map[K]V | map[K][]V] interface {
 
 	Map() (Map, error)
 
-	Reduce(merger func(K, V, K, V) (K, V, error)) (K, V, error)
+	Reduce(merger func(K, K, V, V) (K, V, error)) (K, V, error)
 	HasAny(predicate func(K, V) (bool, error)) (bool, error)
 }

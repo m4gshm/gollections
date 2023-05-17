@@ -27,8 +27,8 @@ func From[T any](next func() (T, bool)) immutable.Vector[T] {
 }
 
 // Sort copy the specified vector with sorted elements
-func Sort[t any, f constraints.Ordered](v immutable.Vector[t], by func(t) f) immutable.Vector[t] {
-	return v.Sort(func(e1, e2 t) bool { return by(e1) < by(e2) })
+func Sort[T any, F constraints.Ordered](v immutable.Vector[T], by func(T) F) immutable.Vector[T] {
+	return collection.Sort[immutable.Vector[T]](v, by)
 }
 
 // Convert returns a stream that applies the 'converter' function to the collection elements

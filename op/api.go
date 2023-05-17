@@ -34,10 +34,28 @@ func IfElse[T any](ok bool, tru, fal T) T {
 	return fal
 }
 
-// IfDoElse exececutes the tru func if ok, otherwise exec the fal function and returns it result
-func IfDoElse[T any](ok bool, tru, fal func() T) T {
+// IfElseErr returns the tru value if ok, otherwise return the specified error
+func IfElseErr[T any](ok bool, tru T, err error) (T, error) {
+	if ok {
+		return tru, nil
+	}
+	var fal T
+	return fal, err
+}
+
+// IfGetElse exececutes the tru func if ok, otherwise exec the fal function and returns it result
+func IfGetElse[T any](ok bool, tru, fal func() T) T {
 	if ok {
 		return tru()
 	}
 	return fal()
+}
+
+// IfGetElseGetErr exececutes the tru func if ok, otherwise exec the fal function and returns its error
+func IfGetElseGetErr[T any](ok bool, tru func() T, fal func() error) (T, error) {
+	if ok {
+		return tru(), nil
+	}
+	var no T
+	return no, fal()
 }

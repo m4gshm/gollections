@@ -34,7 +34,7 @@ func From[T any](next func() (T, bool)) *mutable.Vector[T] {
 
 // Sort sorts the specified vector in-place by a converter that thransforms an element to an Ordered (int, string and so on).
 func Sort[T any, F constraints.Ordered](v *mutable.Vector[T], by func(T) F) *mutable.Vector[T] {
-	return v.Sort(func(e1, e2 T) bool { return by(e1) < by(e2) })
+	return collection.Sort[*mutable.Vector[T]](v, by)
 }
 
 // Convert returns a stream that applies the 'converter' function to the collection elements

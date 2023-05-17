@@ -2,7 +2,7 @@
 package convert
 
 import (
-	"github.com/m4gshm/gollections/check/not"
+	"github.com/m4gshm/gollections/op/check/not"
 	"github.com/m4gshm/gollections/slice"
 )
 
@@ -56,4 +56,9 @@ func CheckIndexed[FS ~[]From, From, To any](elements FS, by func(index int, from
 // Indexed - convert.Indexed is a short alias of slice.ConvertIndexed
 func Indexed[FS ~[]From, From, To any](elements FS, by func(index int, from From) To) []To {
 	return slice.ConvertIndexed(elements, by)
+}
+
+// AndReduce - convert.AndReduce converts elements and merge them into one
+func AndReduce[FS ~[]From, From, To any](elements FS, converter func(From) To, merge func(To, To) To) (out To) {
+	return slice.ConvertAndReduce(elements, converter, merge)
 }

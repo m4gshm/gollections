@@ -6,6 +6,7 @@ import (
 	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/collection/mutable/ordered"
 	"github.com/m4gshm/gollections/stream"
+	"golang.org/x/exp/constraints"
 )
 
 // Of instantiates Set with predefined elements.
@@ -26,6 +27,11 @@ func Empty[T comparable]() *ordered.Set[T] {
 // NewCap instantiates Set with a predefined capacity.
 func NewCap[T comparable](capacity int) *ordered.Set[T] {
 	return ordered.NewSetCap[T](capacity)
+}
+
+// Sort copy the specified set with sorted elements
+func Sort[T comparable, f constraints.Ordered](s *ordered.Set[T], by func(T) f) *ordered.Set[T] {
+	return collection.Sort[*ordered.Set[T]](s, by)
 }
 
 // Convert returns a stream that applies the 'converter' function to the collection elements

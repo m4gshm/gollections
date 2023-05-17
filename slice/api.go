@@ -9,11 +9,11 @@ import (
 	"golang.org/x/exp/constraints"
 
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/convert"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_/resolv"
 	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/op/check/not"
 )
 
 // ErrBreak is the 'break' statement of the For, Track methods
@@ -42,10 +42,15 @@ func OfLoop[S, T any](source S, hasNext func(S) bool, getNext func(S) (T, error)
 	return r, nil
 }
 
-// Generate builds a slice by an generator function.
-// The generator returns an element, or false if the generation is over, or an error.
-func Generate[T any](next func() (T, bool)) []T {
-	return loop.Slice(next)
+// OfIndexed builds a slice by extracting elements from an indexed soruce.
+// the len is length ot the source.
+// the getAt retrieves an element by its index from the source.
+func OfIndexed[T any](len int, getAt func(int) T) []T {
+	r := make([]T, len)
+	for i := 0; i < len; i++ {
+		r[i] = getAt(i)
+	}
+	return r
 }
 
 // Clone makes new slice instance with copied elements
@@ -377,7 +382,7 @@ func FilterFlattFilter[FS ~[]From, From, To any](elements FS, filterFrom func(Fr
 
 // NotNil returns only not nil elements
 func NotNil[TS ~[]*T, T any](elements TS) TS {
-	return Filter(elements, check.NotNil[T])
+	return Filter(elements, not.Nil[T])
 }
 
 // ToValues returns values referenced by the pointers.
@@ -422,23 +427,44 @@ func Filt[TS ~[]T, T any](elements TS, filter func(T) (bool, error)) ([]T, error
 	return result, nil
 }
 
-// Range generates a slice of integers in the range defined by from and to inclusive.
-func Range[T constraints.Integer](from T, to T) []T {
-	if to == from {
-		return []T{to}
+// RangeClosed generates a slice of integers in the range defined by from and to inclusive
+func RangeClosed[T constraints.Integer](from T, toInclusive T) []T {
+	if toInclusive == from {
+		return []T{from}
 	}
-	amount := to - from
+	amount := toInclusive - from
 	delta := 1
 	if amount < 0 {
 		amount = -amount
 		delta = -1
 	}
-	amount = amount + 1
+	amount++
+
 	elements := make([]T, amount)
 	e := from
 	for i := 0; i < int(amount); i++ {
 		elements[i] = e
 		e = e + T(delta)
+	}
+	return elements
+}
+
+// Range generates a slice of integers in the range defined by from and to exclusive
+func Range[T constraints.Integer](from T, toExclusive T) []T {
+	if toExclusive == from {
+		return nil
+	}
+	amount := toExclusive - from
+	delta := T(1)
+	if amount < 0 {
+		amount = -amount
+		delta = -delta
+	}
+	elements := make([]T, amount)
+	e := from
+	for i := T(0); i < T(amount); i++ {
+		elements[i] = e
+		e = e + delta
 	}
 	return elements
 }
@@ -478,16 +504,17 @@ func SortByOrdered[T any, o constraints.Ordered, TS ~[]T](elements TS, sorter So
 }
 
 // Reduce reduces the elements into an one using the 'merge' function
-func Reduce[TS ~[]T, T any](elements TS, merge func(T, T) T) T {
-	var result T
-	for i, v := range elements {
-		if i == 0 {
-			result = v
-		} else {
-			result = merge(result, v)
+func Reduce[TS ~[]T, T any](elements TS, merge func(T, T) T) (out T) {
+	l := len(elements)
+	if l >= 1 {
+		out = elements[0]
+	}
+	if l > 1 {
+		for _, v := range elements[1:] {
+			out = merge(out, v)
 		}
 	}
-	return result
+	return out
 }
 
 // Sum returns the sum of all elements
@@ -742,4 +769,81 @@ func FlattValues[TS ~[]T, T, V any](elements TS, valsExtractor func(T) []V) []c.
 // FlattKeys transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
 func FlattKeys[TS ~[]T, T, K any](elements TS, keysExtractor func(T) []K) []c.KV[K, T] {
 	return Flatt(elements, func(e T) []c.KV[K, T] { return convert.FlattKeys(e, keysExtractor) })
+}
+
+// SplitTwo splits the elements into two slices
+func SplitTwo[TS ~[]T, T, F, S any](elements TS, splitter func(T) (F, S)) ([]F, []S) {
+	var (
+		l      = len(elements)
+		first  = make([]F, l)
+		second = make([]S, l)
+	)
+	for i, e := range elements {
+		first[i], second[i] = splitter(e)
+	}
+	return first, second
+}
+
+// SplitThree splits the elements into three slices
+func SplitThree[TS ~[]T, T, F, S, TH any](elements TS, splitter func(T) (F, S, TH)) ([]F, []S, []TH) {
+	var (
+		l      = len(elements)
+		first  = make([]F, l)
+		second = make([]S, l)
+		third  = make([]TH, l)
+	)
+	for i, e := range elements {
+		first[i], second[i], third[i] = splitter(e)
+	}
+	return first, second, third
+}
+
+// SplitAndReduceTwo splits each element of the specified slice into two values and then reduces that ones
+func SplitAndReduceTwo[TS ~[]T, T, F, S any](elements TS, splitter func(T) (F, S), firstMerge func(F, F) F, secondMerger func(S, S) S) (first F, second S) {
+	l := len(elements)
+	if l >= 1 {
+		first, second = splitter(elements[0])
+	}
+	if l > 1 {
+		for _, e := range elements[1:] {
+			f, s := splitter(e)
+			first = firstMerge(first, f)
+			second = secondMerger(second, s)
+		}
+	}
+	return first, second
+}
+
+// ConvertAndReduce converts each elements and merges them into one
+func ConvertAndReduce[FS ~[]From, From, To any](elements FS, converter func(From) To, merger func(To, To) To) (out To) {
+	l := len(elements)
+	if l >= 1 {
+		out = converter(elements[0])
+	}
+	if l > 1 {
+		for _, e := range elements[1:] {
+			out = merger(out, converter(e))
+		}
+	}
+	return out
+}
+
+// ConvAndReduce converts each elements and merges them into one
+func ConvAndReduce[FS ~[]From, From, To any](elements FS, converter func(From) (To, error), merger func(To, To) To) (out To, err error) {
+	l := len(elements)
+	if l >= 1 {
+		if out, err = converter(elements[0]); err != nil {
+			return out, err
+		}
+	}
+	if l > 1 {
+		for _, e := range elements[1:] {
+			c, err := converter(e)
+			if err != nil {
+				return out, err
+			}
+			out = merger(out, c)
+		}
+	}
+	return out, nil
 }

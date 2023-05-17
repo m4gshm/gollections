@@ -9,12 +9,12 @@ import (
 
 	breakKvLoop "github.com/m4gshm/gollections/break/kv/loop"
 	breakLoop "github.com/m4gshm/gollections/break/loop"
-	"github.com/m4gshm/gollections/break/op"
-	"github.com/m4gshm/gollections/break/predicate/eq"
-	"github.com/m4gshm/gollections/break/predicate/more"
 	"github.com/m4gshm/gollections/convert/as"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/loop/convert"
+	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/predicate/eq"
+	"github.com/m4gshm/gollections/predicate/more"
 	"github.com/m4gshm/gollections/slice"
 )
 
@@ -77,7 +77,7 @@ func Test_ConvertNotNil(t *testing.T) {
 		result   = convert.NotNil(source, func(e *entity) string { return e.val })
 		expected = []string{"first", "third", "fifth"}
 	)
-	assert.Equal(t, expected, slice.Generate(result.Next))
+	assert.Equal(t, expected, loop.Slice(result.Next))
 }
 
 func Test_ConvertToNotNil(t *testing.T) {
@@ -90,7 +90,7 @@ func Test_ConvertToNotNil(t *testing.T) {
 		result   = convert.ToNotNil(source, func(e entity) *string { return e.val })
 		expected = []*string{&first, &third, &fifth}
 	)
-	assert.Equal(t, expected, slice.Generate(result.Next))
+	assert.Equal(t, expected, loop.Slice(result.Next))
 }
 
 func Test_ConvertNilSafe(t *testing.T) {
@@ -103,7 +103,7 @@ func Test_ConvertNilSafe(t *testing.T) {
 		result   = convert.NilSafe(source, func(e *entity) *string { return e.val })
 		expected = []*string{&first, &third, &fifth}
 	)
-	assert.Equal(t, expected, slice.Generate(result.Next))
+	assert.Equal(t, expected, loop.Slice(result.Next))
 }
 
 var even = func(v int) bool { return v%2 == 0 }

@@ -8,12 +8,12 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	breakLoop "github.com/m4gshm/gollections/break/loop"
-	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/convert"
 	"github.com/m4gshm/gollections/convert/as"
 	"github.com/m4gshm/gollections/iter"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/op/check/not"
 	"github.com/m4gshm/gollections/slice"
 	sliceIter "github.com/m4gshm/gollections/slice/iter"
 	"github.com/m4gshm/gollections/stream"
@@ -145,10 +145,10 @@ func Test_ConvertFilterAndFlattStructure_Iterable(t *testing.T) {
 
 	items := []*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil, {attributes: []*Attributes{{name: "third"}, nil}}}
 
-	names := loop.Slice(iter.Convert(iter.FilterAndFlatt(slice.NewIter(items), check.NotNil[Participant], (*Participant).GetAttributes), (*Attributes).GetName).Next)
+	names := loop.Slice(iter.Convert(iter.FilterAndFlatt(slice.NewIter(items), not.Nil[Participant], (*Participant).GetAttributes), (*Attributes).GetName).Next)
 	assert.Equal(t, expected, names)
 
-	names = loop.Slice(iter.Convert(sliceIter.FilterAndFlatt(items, check.NotNil[Participant], (*Participant).GetAttributes), (*Attributes).GetName).Next)
+	names = loop.Slice(iter.Convert(sliceIter.FilterAndFlatt(items, not.Nil[Participant], (*Participant).GetAttributes), (*Attributes).GetName).Next)
 	assert.Equal(t, expected, names)
 }
 

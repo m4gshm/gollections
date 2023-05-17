@@ -19,11 +19,6 @@ func NewSet[T comparable](elements ...T) Set[T] {
 	return WrapSet(order, uniques)
 }
 
-// NewSetCap creates a set with a predefined capacity
-func NewSetCap[T comparable](capacity int) Set[T] {
-	return WrapSet(make([]T, 0, capacity), make(map[T]struct{}, capacity))
-}
-
 // SetFromLoop creates a set with elements retrieved by the 'next' function.
 // The next returns an element with true or zero value with false if there are no more elements.
 func SetFromLoop[T comparable](next func() (T, bool)) Set[T] {

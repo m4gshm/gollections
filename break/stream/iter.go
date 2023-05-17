@@ -62,12 +62,12 @@ func (t Iter[T]) For(walker func(T) error) error {
 
 // Reduce reduces the elements into an one using the 'merge' function
 func (t Iter[T]) Reduce(merger func(T, T) (T, error)) (T, error) {
-	return loop.Reduce(t.next, merger)
+	return loop.Reducee(t.next, merger)
 }
 
 // First returns the first element that satisfies the condition of the 'predicate' function
 func (t Iter[T]) First(predicate func(T) (bool, error)) (T, bool, error) {
-	return loop.First(t.next, predicate)
+	return loop.Firstt(t.next, predicate)
 }
 
 // Iter creates an iterator and returns as interface
@@ -82,5 +82,5 @@ func (t Iter[T]) Slice() ([]T, error) {
 
 // HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful
 func (t Iter[T]) HasAny(predicate func(T) (bool, error)) (bool, error) {
-	return loop.HasAny(t.next, predicate)
+	return loop.HasAnyy(t.next, predicate)
 }

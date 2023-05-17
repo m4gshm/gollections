@@ -93,11 +93,38 @@ func DeepClone[M ~map[K]V, K comparable, V any](elements M, copier func(V) V) M 
 
 // ConvertValues creates a map with converted values
 func ConvertValues[V, Vto any, K comparable, M ~map[K]V](elements M, by func(V) Vto) map[K]Vto {
-	converted := make(map[K]Vto, len(elements))
+	return Convert(elements, as.Is[K], by)
+}
+
+// ConvertKeys creates a map with converted keys
+func ConvertKeys[K, Kto comparable, V, M ~map[K]V](elements M, by func(K) Kto) map[Kto]V {
+	return Convert(elements, by, as.Is[V])
+}
+
+// Convert creates a map with converted keys and values
+func Convert[K, Kto comparable, V, Vto any, M ~map[K]V](elements M, keyConverter func(K) Kto, valConverter func(V) Vto) map[Kto]Vto {
+	converted := make(map[Kto]Vto, len(elements))
 	for key, val := range elements {
-		converted[key] = by(val)
+		converted[keyConverter(key)] = valConverter(val)
 	}
 	return converted
+}
+
+// Conv creates a map with converted keys and values
+func Conv[K, Kto comparable, V, Vto any, M ~map[K]V](elements M, keyConverter func(K) (Kto, error), valConverter func(V) (Vto, error)) (map[Kto]Vto, error) {
+	converted := make(map[Kto]Vto, len(elements))
+	for key, val := range elements {
+		kto, err := keyConverter(key)
+		if err != nil {
+			return converted, err
+		}
+		vto, err := valConverter(val)
+		if err != nil {
+			return converted, err
+		}
+		converted[kto] = vto
+	}
+	return converted, nil
 }
 
 // Keys returns keys of the 'elements' map as a slice
@@ -317,14 +344,14 @@ func ToStringf[M ~map[K]V, K comparable, V any](elements M, kvFormat, delim stri
 }
 
 // Reduce reduces the key/value pairs by the 'next' function into an one pair using the 'merge' function
-func Reduce[M ~map[K]V, K comparable, V any](elements M, merge func(K, V, K, V) (K, V)) (rk K, rv V) {
+func Reduce[M ~map[K]V, K comparable, V any](elements M, merge func(K, K, V, V) (K, V)) (rk K, rv V) {
 	first := true
 	for k, v := range elements {
 		if first {
 			rk, rv = k, v
 			first = false
 		} else {
-			rk, rv = merge(rk, rv, k, v)
+			rk, rv = merge(rk, k, rv, v)
 		}
 	}
 	return rk, rv
@@ -338,4 +365,36 @@ func HasAny[M ~map[K]V, K comparable, V any](elements M, predicate func(K, V) bo
 		}
 	}
 	return false
+}
+
+// ToSlice collects key\value elements to a slice by applying the specified converter to evety element
+func ToSlice[M ~map[K]V, K comparable, V any, T any](elements M, converter func(key K, val V) T) []T {
+	out := make([]T, 0, len(elements))
+	for key, val := range elements {
+		out = append(out, converter(key, val))
+	}
+	return out
+}
+
+// ToSlicee collects key\value elements to a slice by applying the specified erroreable converter to evety element
+func ToSlicee[M ~map[K]V, K comparable, V any, T any](elements M, converter func(key K, val V) (T, error)) ([]T, error) {
+	out := make([]T, 0, len(elements))
+	for key, val := range elements {
+		t, err := converter(key, val)
+		if err != nil {
+			return out, err
+		}
+		out = append(out, t)
+	}
+	return out, nil
+}
+
+// Empty checks the val map is empty
+func Empty[K comparable, V any](val map[K]V) bool {
+	return len(val) == 0
+}
+
+// NotEmpty checks the val map is not empty
+func NotEmpty[K comparable, V any](val map[K]V) bool {
+	return !Empty(val)
 }

@@ -116,7 +116,7 @@ func (s Set[T]) Conv(converter func(T) (T, error)) breakStream.Iter[T] {
 
 // Reduce reduces the elements into an one using the 'merge' function
 func (s Set[T]) Reduce(merge func(T, T) T) T {
-	t, _ := map_.Reduce(s.elements, func(t1 T, _ struct{}, t2 T, _ struct{}) (t T, out struct{}) {
+	t, _ := map_.Reduce(s.elements, func(t1, t2 T, _, _ struct{}) (t T, out struct{}) {
 		return merge(t1, t2), out
 	})
 	return t

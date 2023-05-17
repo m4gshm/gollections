@@ -16,7 +16,7 @@ include::../examples/boilerplate/user_data.go[lines=3..-1]
 You can make clear code, extensive, but without dependencies:
 [source,go]
 ----
-include::../examples/boilerplate/slice_namesbyRole_old_test.go[lines=11..33,indent=0]
+include::../examples/boilerplate/slice_namesbyRole_old_test.go[lines=11..30,indent=0]
 ----
 
 Or you can write more compact code using the collections API, like so:
@@ -103,6 +103,24 @@ It is used for computations where an error may occur.
 ----
 include::../examples/loop/breakloop/loop_filter_convert_reduce_test.go[lines=17..22,indent=0]
 ----
+
+=== Expressions: link:./expr/use/api.go[use], link:./expr/get/api.go[get], link:./expr/first/api.go[first], link:./expr/last/api.go[last]
+
+Aimed to evaluate a value using conditions. May cause to make code shorter by not in all cases. +
+As example:
+
+[source,go]
+----
+include::../examples/boilerplate/expr_use_test.go[lines=14..21,indent=0]
+----
+
+instead of:
+
+[source,go]
+----
+include::../examples/boilerplate/expr_use_test.go[lines=27..38,indent=0]
+----
+
 
 === Mutable collections
 

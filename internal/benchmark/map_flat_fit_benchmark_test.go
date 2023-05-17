@@ -5,12 +5,12 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/convert"
 	"github.com/m4gshm/gollections/convert/as"
 	"github.com/m4gshm/gollections/iter"
 	"github.com/m4gshm/gollections/loop"
 	sop "github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/op/check/not"
 	"github.com/m4gshm/gollections/slice"
 	sliceIter "github.com/m4gshm/gollections/slice/iter"
 	"github.com/stretchr/testify/assert"
@@ -481,7 +481,7 @@ func Benchmark_ConvertFlattStructure_IterableFit(b *testing.B) {
 	result := []string{}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		result = loop.Slice(iter.FilterAndConvert(iter.FilterAndFlatt(slice.NewIter(items), check.NotNil[Participant], (*Participant).GetAttributes), check.NotNil[Attributes], (*Attributes).GetName).Next)
+		result = loop.Slice(iter.FilterAndConvert(iter.FilterAndFlatt(slice.NewIter(items), not.Nil[Participant], (*Participant).GetAttributes), not.Nil[Attributes], (*Attributes).GetName).Next)
 	}
 	if !reflect.DeepEqual(expected, result) {
 		b.Fatalf("must be %v, but %v", expected, result)
@@ -494,8 +494,8 @@ func Benchmark_ConvertFlattStructure_Loop(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		next := loop.Of(items...)
-		attr := loop.FilterAndFlatt(next, check.NotNil[Participant], (*Participant).GetAttributes)
-		f := loop.FilterAndConvert(attr.Next, check.NotNil[Attributes], (*Attributes).GetName)
+		attr := loop.FilterAndFlatt(next, not.Nil[Participant], (*Participant).GetAttributes)
+		f := loop.FilterAndConvert(attr.Next, not.Nil[Attributes], (*Attributes).GetName)
 		_ = loop.Slice(f.Next)
 	}
 	b.StopTimer()
@@ -505,8 +505,8 @@ func Benchmark_ConvertFlattStructure_SliceFit(b *testing.B) {
 	items := []*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		att := sliceIter.FilterAndFlatt(items, check.NotNil[Participant], (*Participant).GetAttributes)
-		_ = loop.Slice(iter.FilterAndConvert(att, check.NotNil[Attributes], (*Attributes).GetName).Next)
+		att := sliceIter.FilterAndFlatt(items, not.Nil[Participant], (*Participant).GetAttributes)
+		_ = loop.Slice(iter.FilterAndConvert(att, not.Nil[Attributes], (*Attributes).GetName).Next)
 	}
 	b.StopTimer()
 }
@@ -515,8 +515,8 @@ func Benchmark_ConvertFlattStructure_SliceFit_Looped(b *testing.B) {
 	items := []*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		att := sliceIter.FilterAndFlatt(items, check.NotNil[Participant], (*Participant).GetAttributes)
-		_ = loop.Slice(loop.FilterAndConvert(att.Next, check.NotNil[Attributes], (*Attributes).GetName).Next)
+		att := sliceIter.FilterAndFlatt(items, not.Nil[Participant], (*Participant).GetAttributes)
+		_ = loop.Slice(loop.FilterAndConvert(att.Next, not.Nil[Attributes], (*Attributes).GetName).Next)
 	}
 	b.StopTimer()
 }
@@ -527,9 +527,9 @@ func Benchmark_ConvertFlattStructure_Slice_PlainOld(b *testing.B) {
 	flatt := func(items []*Participant) []string {
 		names := make([]string, 0)
 		for _, i := range items {
-			if check.NotNil(i) {
+			if not.Nil(i) {
 				for _, a := range i.GetAttributes() {
-					if check.NotNil(a) {
+					if not.Nil(a) {
 						names = append(names, a.GetName())
 					}
 				}

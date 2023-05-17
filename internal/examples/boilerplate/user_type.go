@@ -1,9 +1,9 @@
 package boilerplate
 
 type User struct {
-	name  string
-	age   int
-	roles []Role
+	name, surname string
+	age           int
+	roles         []Role
 }
 
 type Role struct {
@@ -16,6 +16,10 @@ func (r Role) Name() string {
 
 func (u User) Name() string {
 	return u.name
+}
+
+func (u User) Surname() string {
+	return u.surname
 }
 
 func (u User) Age() int {

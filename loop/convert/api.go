@@ -2,8 +2,8 @@
 package convert
 
 import (
-	"github.com/m4gshm/gollections/check/not"
 	"github.com/m4gshm/gollections/loop"
+	"github.com/m4gshm/gollections/op/check/not"
 )
 
 // AndConvert - convert.AndConvert makes double converts From->Intermediate->To of the elements
@@ -46,4 +46,14 @@ func NilSafe[From, To any](next func() (*From, bool), converter func(*From) *To)
 // Check - convert.Check is a short alias of loop.ConvertCheck
 func Check[From, To any](next func() (From, bool), converter func(from From) (To, bool)) loop.ConvertCheckIter[From, To] {
 	return loop.ConvertCheck(next, converter)
+}
+
+// FromIndexed - convert.FromIndexed retrieves elements from a indexed source and converts them
+func FromIndexed[From, To any](len int, next func(int) From, converter func(from From) To) loop.ConvertIter[From, To] {
+	return loop.Convert(loop.OfIndexed(len, next), converter)
+}
+
+// AndReduce - convert.AndReduce converts elements and merge them into one
+func AndReduce[From, To any](next func() (From, bool), converter func(From) To, merge func(To, To) To) (out To) {
+	return loop.ConvertAndReduce(next, converter, merge)
 }

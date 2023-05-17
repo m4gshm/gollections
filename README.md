@@ -24,19 +24,16 @@ You can make clear code, extensive, but without dependencies:
 
 ``` go
 var namesByRole = map[string][]string{}
+add := func(role string, u User) {
+    namesByRole[role] = append(namesByRole[role], u.Name())
+}
 for _, u := range users {
     roles := u.Roles()
     if len(roles) == 0 {
-        lr := ""
-        names := namesByRole[lr]
-        names = append(names, u.Name())
-        namesByRole[lr] = names
+        add("", u)
     } else {
         for _, r := range roles {
-            lr := strings.ToLower(r.Name())
-            names := namesByRole[lr]
-            names = append(names, u.Name())
-            namesByRole[lr] = names
+            add(strings.ToLower(r.Name()), u)
         }
     }
 }
@@ -169,6 +166,36 @@ result, err := loop.Slice(iter.Next)
 
 assert.Equal(t, []int{1, 2, 3}, result)
 assert.ErrorContains(t, err, "invalid syntax")
+```
+
+## Expressions: [use](./expr/use/api.go), [get](./expr/get/api.go), [first](./expr/first/api.go), [last](./expr/last/api.go)
+
+Aimed to evaluate a value using conditions. May cause to make code
+shorter by not in all cases.  
+As example:
+
+``` go
+user := User{name: "Bob", surname: "Smith"}
+
+fullName := use.If(len(user.surname) == 0, user.name).If(len(user.name) == 0, user.surname).
+    ElseGet(func() string { return user.name + " " + user.surname })
+
+assert.Equal(t, "Bob Smith", fullName)
+```
+
+instead of:
+
+``` go
+fullName := ""
+if len(user.surname) == 0 {
+    fullName = user.name
+} else if len(user.name) == 0 {
+    fullName = user.surname
+} else {
+    fullName = user.name + " " + user.surname
+}
+
+assert.Equal(t, "Bob Smith", fullName)
 ```
 
 ## Mutable collections

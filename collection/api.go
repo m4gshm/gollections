@@ -5,12 +5,14 @@ import (
 	breakLoop "github.com/m4gshm/gollections/break/loop"
 	breakStream "github.com/m4gshm/gollections/break/stream"
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/check"
 	"github.com/m4gshm/gollections/convert/as"
 	kvloop "github.com/m4gshm/gollections/kv/loop"
 	kvstream "github.com/m4gshm/gollections/kv/stream"
 	"github.com/m4gshm/gollections/loop"
+	"github.com/m4gshm/gollections/op/check/not"
+	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/stream"
+	"golang.org/x/exp/constraints"
 )
 
 // Convert returns a stream that applies the 'converter' function to the collection elements
@@ -62,7 +64,7 @@ func Filter[T any, I c.Iterable[T]](collection I, filter func(T) bool) stream.It
 
 // NotNil instantiates a stream that filters nullable elements
 func NotNil[T any, I c.Iterable[*T]](collection I) stream.Iter[*T] {
-	return Filter(collection, check.NotNil[T])
+	return Filter(collection, not.Nil[T])
 }
 
 // ToValues creates a stream that transform pointers to the values referenced referenced by those pointers.
@@ -104,5 +106,10 @@ func First[T any, I c.Iterable[T]](collection I, predicate func(T) bool) (v T, o
 // Firstt returns the first element that satisfies the condition of the 'predicate' function
 func Firstt[T any, I c.Iterable[T]](collection I, predicate func(T) (bool, error)) (v T, ok bool, err error) {
 	i := collection.Iter()
-	return breakLoop.First(breakLoop.From(i.Next), predicate)
+	return breakLoop.Firstt(breakLoop.From(i.Next), predicate)
+}
+
+// Sort sorts the specified sortable collection that contains orderable elements
+func Sort[O any, S interface{ Sort(less slice.Less[T]) O }, T any, f constraints.Ordered](collection S, by func(T) f) O {
+	return collection.Sort(func(e1, e2 T) bool { return by(e1) < by(e2) })
 }

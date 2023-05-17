@@ -8,9 +8,9 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/m4gshm/gollections/convert/as"
+	"github.com/m4gshm/gollections/expr/first"
+	"github.com/m4gshm/gollections/expr/last"
 	"github.com/m4gshm/gollections/op"
-	"github.com/m4gshm/gollections/op/first"
-	"github.com/m4gshm/gollections/op/last"
 	"github.com/m4gshm/gollections/op/sum"
 	"github.com/m4gshm/gollections/predicate/exclude"
 	"github.com/m4gshm/gollections/predicate/less"
@@ -315,9 +315,11 @@ func Test_Slice_Flatt(t *testing.T) {
 }
 
 func Test_Range(t *testing.T) {
-	assert.Equal(t, []int{-1, 0, 1, 2, 3}, range_.Of(-1, 3))
-	assert.Equal(t, []int{3, 2, 1, 0, -1}, range_.Of(3, -1))
-	assert.Equal(t, []int{1}, range_.Of(1, 1))
+	assert.Equal(t, []int{-1, 0, 1, 2}, range_.Of(-1, 3))
+	assert.Equal(t, []int{-1, 0, 1, 2, 3}, range_.Closed(-1, 3))
+	assert.Equal(t, []int{3, 2, 1, 0, -1}, range_.Closed(3, -1))
+	assert.Nil(t, range_.Of(1, 1))
+	assert.Equal(t, []int{1}, range_.Closed(1, 1))
 }
 
 func Test_First(t *testing.T) {
@@ -375,18 +377,6 @@ func Test_OfLoop(t *testing.T) {
 		stream    = &rows[int]{slice.Of(1, 2, 3), 0}
 		result, _ = slice.OfLoop(stream, (*rows[int]).hasNext, (*rows[int]).next)
 		expected  = slice.Of(1, 2, 3)
-	)
-	assert.Equal(t, expected, result)
-}
-
-func Test_Generate(t *testing.T) {
-	var (
-		counter = 0
-		result  = slice.Generate(func() (int, bool) {
-			counter++
-			return counter, counter < 4
-		})
-		expected = slice.Of(1, 2, 3)
 	)
 	assert.Equal(t, expected, result)
 }

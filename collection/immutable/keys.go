@@ -113,7 +113,7 @@ func (m MapKeys[K, V]) Conv(converter func(K) (K, error)) breakStream.Iter[K] {
 
 // Reduce reduces the elements into an one using the 'merge' function
 func (m MapKeys[K, V]) Reduce(merge func(K, K) K) K {
-	k, _ := map_.Reduce(m.elements, func(k1 K, _ V, k2 K, _ V) (rk K, rv V) {
+	k, _ := map_.Reduce(m.elements, func(k1, k2 K, _, _ V) (rk K, rv V) {
 		return merge(k1, k2), rv
 	})
 	return k

@@ -29,7 +29,7 @@ func From[T comparable](next func() (T, bool)) immutable.Set[T] {
 
 // Sort instantiates Set and puts sorted elements to it.
 func Sort[T comparable, f constraints.Ordered](s immutable.Set[T], by func(T) f) ordered.Set[T] {
-	return s.Sort(func(e1, e2 T) bool { return by(e1) < by(e2) })
+	return collection.Sort[ordered.Set[T]](s, by)
 }
 
 // Convert returns a stream that applies the 'converter' function to the collection elements
