@@ -93,11 +93,38 @@ func DeepClone[M ~map[K]V, K comparable, V any](elements M, copier func(V) V) M 
 
 // ConvertValues creates a map with converted values
 func ConvertValues[V, Vto any, K comparable, M ~map[K]V](elements M, by func(V) Vto) map[K]Vto {
-	converted := make(map[K]Vto, len(elements))
+	return Convert(elements, as.Is[K], by)
+}
+
+// ConvertKeys creates a map with converted keys
+func ConvertKeys[K, Kto comparable, V, M ~map[K]V](elements M, by func(K) Kto) map[Kto]V {
+	return Convert(elements, by, as.Is[V])
+}
+
+// Convert creates a map with converted keys and values
+func Convert[K, Kto comparable, V, Vto any, M ~map[K]V](elements M, keyConverter func(K) Kto, valConverter func(V) Vto) map[Kto]Vto {
+	converted := make(map[Kto]Vto, len(elements))
 	for key, val := range elements {
-		converted[key] = by(val)
+		converted[keyConverter(key)] = valConverter(val)
 	}
 	return converted
+}
+
+// Convert creates a map with converted keys and values
+func Conv[K, Kto comparable, V, Vto any, M ~map[K]V](elements M, keyConverter func(K) (Kto, error), valConverter func(V) (Vto, error)) (map[Kto]Vto, error) {
+	converted := make(map[Kto]Vto, len(elements))
+	for key, val := range elements {
+		kto, err := keyConverter(key)
+		if err != nil {
+			return converted, err
+		}
+		vto, err := valConverter(val)
+		if err != nil {
+			return converted, err
+		}
+		converted[kto] = vto
+	}
+	return converted, nil
 }
 
 // Keys returns keys of the 'elements' map as a slice
