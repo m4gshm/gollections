@@ -115,6 +115,31 @@ func Test_UseIfIfGetErrElseGetErr(t *testing.T) {
 	assert.Equal(t, 1, result)
 }
 
+func Test_UseIfIfGetErrElseZero(t *testing.T) {
+	result, _ := use.If(true, 1).IfGetErr(true, getTwoErr).ElseZero()
+	assert.Equal(t, 1, result)
+
+	result, _ = use.If(false, 1).IfGetErr(true, getTwoErr).ElseZero()
+	assert.Equal(t, 2, result)
+
+	result, _ = use.If(false, 1).IfGetErr(false, getTwoErr).ElseZero()
+	assert.Equal(t, 0, result)
+}
+
+func Test_UseIfIfGetErrEval(t *testing.T) {
+	result, ok, _ := use.If(true, 1).IfGetErr(true, getTwoErr).Eval()
+	assert.True(t, ok)
+	assert.Equal(t, 1, result)
+
+	result, ok, _ = use.If(false, 1).IfGetErr(true, getTwoErr).Eval()
+	assert.True(t, ok)
+	assert.Equal(t, 2, result)
+
+	result, ok, _ = use.If(false, 1).IfGetErr(false, getTwoErr).Eval()
+	assert.False(t, ok)
+	assert.Equal(t, 0, result)
+}
+
 func Test_UseIfOtherElseGet(t *testing.T) {
 	result := use.If(false, 1).Other(getFalse, getTwo).ElseGet(getThree)
 	assert.Equal(t, 3, result)

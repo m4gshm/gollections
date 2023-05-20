@@ -2,23 +2,31 @@ package use
 
 // WhenErr if..else expression builder
 type WhenErr[T any] struct {
-	Condition bool
-	Then      T
-	Err       error
+	condition bool
+	then      T
+	err       error
 }
 
-// Else returns result according to the condition
+// Else evaluates expression and returns result
 func (w WhenErr[T]) Else(fals T) (T, error) {
-	if w.Condition {
-		return w.Then, w.Err
+	if w.condition {
+		return w.then, w.err
 	}
 	return fals, nil
 }
 
+// ElseZero evaluates expression and returns zero value as default
+func (w WhenErr[T]) ElseZero() (out T, err error) {
+	if w.condition {
+		return w.then, w.err
+	}
+	return out, nil
+}
+
 // ElseErr returns the success result or error according to the condition
 func (w WhenErr[T]) ElseErr(err error) (T, error) {
-	if w.Condition {
-		return w.Then, w.Err
+	if w.condition {
+		return w.then, w.err
 	}
 	var fals T
 	return fals, err
@@ -26,44 +34,39 @@ func (w WhenErr[T]) ElseErr(err error) (T, error) {
 
 // ElseGetErr returns the success result or a result of the fals function according to the condition
 func (w WhenErr[T]) ElseGetErr(fals func() (T, error)) (T, error) {
-	if w.Condition {
-		return w.Then, w.Err
+	if w.condition {
+		return w.then, w.err
 	}
 	return fals()
 }
 
 // ElseGet returns the tru or a return of the fals function according to the condition
 func (w WhenErr[T]) ElseGet(fals func() T) (T, error) {
-	if w.Condition {
-		return w.Then, w.Err
+	if w.condition {
+		return w.then, w.err
 	}
 	return fals(), nil
 }
 
 // If creates new condition branch in the expression
 func (w WhenErr[T]) If(condition bool, tru T) WhenErr[T] {
-	if w.Condition {
+	if w.condition {
 		return w
 	}
-	return ifErrEvaluated(condition, tru, nil)
+	return newWhenErr(condition, tru, nil)
 }
 
 // IfGet creates new condition branch for a getter function
 func (w WhenErr[T]) IfGet(condition bool, tru func() T) WhenErr[T] {
-	if w.Condition {
+	if w.condition {
 		return w
 	}
-
-	var other T
-	if condition {
-		other = tru()
-	}
-	return ifErrEvaluated(condition, other, nil)
+	return newWhenErr(condition, evaluate(condition, tru), nil)
 }
 
 // IfGetErr creates new condition branch for an error return getter function
 func (w WhenErr[T]) IfGetErr(condition bool, tru func() (T, error)) WhenErr[T] {
-	if w.Condition {
+	if w.condition {
 		return w
 	}
 	return If_(condition, tru)
@@ -72,37 +75,38 @@ func (w WhenErr[T]) IfGetErr(condition bool, tru func() (T, error)) WhenErr[T] {
 // Other creates new condition branch for a getter function.
 // The condition function is called only if the current condition is false.
 func (w WhenErr[T]) Other(condition func() bool, tru func() T) WhenErr[T] {
-	if w.Condition {
+	if w.condition {
 		return w
 	}
 
-	var (
-		otherCondition = condition()
-		other          T
-	)
-	if otherCondition {
-		other = tru()
-	}
-	return ifErrEvaluated(otherCondition, other, nil)
+	c := condition()
+	return newWhenErr(c, evaluate(c, tru), nil)
 }
 
 // OtherErr creates new condition branch for an error return getter function.
 // The condition function is called only if the current condition is false.
 func (w WhenErr[T]) OtherErr(condition func() bool, tru func() (T, error)) WhenErr[T] {
-	if w.Condition {
+	if w.condition {
 		return w
 	}
 	return If_(condition(), tru)
 }
 
-func ifErrEvaluated[T any](condition bool, tru T, err error) WhenErr[T] {
-	var (
-		then    T
-		thenErr error
-	)
-	if condition {
-		then, thenErr = tru, err
-
+// Eval evaluates the expression and returns ok==false if there is no satisfied condition
+func (w WhenErr[T]) Eval() (out T, ok bool, err error) {
+	if w.condition {
+		return w.then, true, w.err
 	}
-	return WhenErr[T]{condition, then, thenErr}
+	return out, false, nil
+}
+
+func newWhenErr[T any](condition bool, then T, err error) WhenErr[T] {
+	return WhenErr[T]{condition, then, err}
+}
+
+func evaluateErr[T any](condition bool, tru func() (T, error)) (out T, err error) {
+	if condition {
+		out, err = tru()
+	}
+	return out, err
 }

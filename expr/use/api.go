@@ -11,28 +11,18 @@ package use
 //		val = defaltVal
 //	}
 func If[T any](condition bool, tru T) When[T] {
-	return When[T]{condition, tru}
+	return newWhen(condition, tru)
 }
 
 // IfGet is like If but aimed to use an getter function
 func IfGet[T any](condition bool, then func() T) When[T] {
-	var v T
-	if condition {
-		v = then()
-	}
-	return If(condition, v)
+	return If(condition, evaluate(condition, then))
 }
 
 // IfGetErr is like If but aimed to use an error return function
 func IfGetErr[T any](condition bool, tru func() (T, error)) WhenErr[T] {
-	var (
-		then T
-		err  error
-	)
-	if condition {
-		then, err = tru()
-	}
-	return ifErrEvaluated(condition, then, err)
+	then, err := evaluateErr(condition, tru)
+	return newWhenErr(condition, then, err)
 }
 
 // If_ is alias of IfErr
