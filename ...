@@ -1,0 +1,18 @@
+mode: set
+github.com/m4gshm/gollections/internal/examples/boilerplate/user_type.go:13.29,15.2 1 1
+github.com/m4gshm/gollections/internal/examples/boilerplate/user_type.go:17.29,19.2 1 1
+github.com/m4gshm/gollections/internal/examples/boilerplate/user_type.go:21.32,23.2 1 0
+github.com/m4gshm/gollections/internal/examples/boilerplate/user_type.go:25.25,27.2 1 1
+github.com/m4gshm/gollections/internal/examples/boilerplate/user_type.go:29.30,31.2 1 1
+github.com/m4gshm/gollections/kv/loop/group/api.go:9.66,11.2 1 1
+github.com/m4gshm/gollections/loop/group/api.go:9.118,11.2 1 1
+github.com/m4gshm/gollections/loop/group/api.go:14.132,16.2 1 0
+github.com/m4gshm/gollections/loop/group/api.go:19.133,21.2 1 0
+github.com/m4gshm/gollections/loop/group/api.go:24.135,26.2 1 0
+github.com/m4gshm/gollections/op/check/api.go:9.30,11.2 1 1
+github.com/m4gshm/gollections/op/check/api.go:14.33,16.2 1 1
+github.com/m4gshm/gollections/op/check/api.go:19.32,21.2 1 1
+github.com/m4gshm/gollections/slice/group/api.go:9.117,11.2 1 1
+github.com/m4gshm/gollections/slice/group/api.go:14.131,16.2 1 0
+github.com/m4gshm/gollections/slice/group/api.go:19.132,21.2 1 0
+github.com/m4gshm/gollections/slice/group/api.go:24.134,26.2 1 0

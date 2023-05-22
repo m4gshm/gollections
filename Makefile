@@ -7,6 +7,18 @@ test:
 	$(info #Running tests...)
 	go test ./...
 
+.PHONY: cover
+cover:
+	$(info #Running cover tests...)
+	go test -coverprofile=coverage.out -coverpkg=github.com/m4gshm/gollections/...  ./...
+	go tool cover -html=coverage.out
+
+.PHONY: cover-console-out
+cover-console-out:
+	$(info #Running cover tests...)
+	go test -coverprofile=coverage.out -coverpkg=github.com/m4gshm/gollections/...  ./...
+	go tool cover -func=coverage.out
+
 .PHONY: clean
 clean:
 	$(info #Building...)

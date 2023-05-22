@@ -27,5 +27,5 @@ jobs:
       - name: run tests
         uses: docker://golang:1.20-bullseye
         with:
-          args: make build lint bench
+          args: make build lint bench cover-console-out
 

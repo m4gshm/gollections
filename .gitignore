@@ -2,3 +2,4 @@
 docker/go/
 internal/docs/readme.xml
 .DS_Store
+coverage.out

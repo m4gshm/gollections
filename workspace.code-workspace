@@ -2,17 +2,19 @@
 	"folders": [
 		{
 			"path": "."
-		},
-		{
-			"path": "../../golang/go"
 		}
 	],
 	"settings": {
-		"terminal.integrated.env.osx": {
-			// "GOROOT": "/Users/ruaabks/go/src/github/golang/go"
-		},
-		"terminal.integrated.env.windows": {
-			// "GOROOT": "C:\\Users\\mfour\\go\\src\\github.com\\golang\\go"
+		"go.coverOnSave": true,
+		"go.coverOnSingleTest": true,
+		"go.coverOnSingleTestFile": true,
+		"go.coverShowCounts": true,
+		"go.coverageDecorator": {
+			"type": "gutter",
+			"coveredHighlightColor": "rgba(64,128,128,0.5)",
+			"uncoveredHighlightColor": "rgba(128,64,64,0.25)",
+			"coveredGutterStyle": "blockgreen",
+			"uncoveredGutterStyle": "blockred"
 		},
 	}
 }
