@@ -1,6 +1,7 @@
 package test
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -10,6 +11,7 @@ import (
 	"github.com/m4gshm/gollections/k"
 	kvloop "github.com/m4gshm/gollections/kv/loop"
 	"github.com/m4gshm/gollections/loop"
+	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
 )
 
@@ -87,6 +89,18 @@ func Test_Filt(t *testing.T) {
 	out, _ := breakkvloop.ToSlice(breakkvloop.Filt(kvl, func(key int, val string) (bool, error) { return key != 2, nil }).Next, k.V[int, string])
 
 	assert.Equal(t, slice.Of(k.V(1, "1"), k.V(3, "3")), out)
+}
+
+func Test_Filt2(t *testing.T) {
+	kvl := breakkvloop.From(loop.ToKV(slice.NewIter(slice.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))).Next, c.KV[int, string].Key, c.KV[int, string].Value).Next)
+
+	out, err := breakkvloop.ToSlice(breakkvloop.Filt(kvl, func(key int, val string) (bool, error) {
+		ok := key <= 2
+		return ok, op.IfElse(key == 2, errors.New("abort"), nil)
+	}).Next, k.V[int, string])
+
+	assert.Error(t, err)
+	assert.Equal(t, slice.Of(k.V(1, "1"), k.V(2, "2")), out)
 }
 
 func Test_To(t *testing.T) {
