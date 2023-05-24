@@ -157,14 +157,14 @@ func Test_ConvertFilteredInplace(t *testing.T) {
 
 func Test_Flatt(t *testing.T) {
 	md := loop.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...)
-	f := loop.Flatt(md, func(i []int) []int { return i })
+	f := loop.Flat(md, func(i []int) []int { return i })
 	e := []int{1, 2, 3, 4, 5, 6}
 	assert.Equal(t, e, loop.Slice(f.Next))
 }
 
 func Test_FlattFilter(t *testing.T) {
 	md := loop.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...)
-	f := loop.FilterAndFlatt(md, func(from []int) bool { return len(from) > 1 }, func(i []int) []int { return i })
+	f := loop.FilterAndFlat(md, func(from []int) bool { return len(from) > 1 }, func(i []int) []int { return i })
 	e := []int{1, 2, 3, 5, 6}
 	assert.Equal(t, e, loop.Slice(f.Next))
 }
@@ -176,9 +176,9 @@ func Test_FlattElemFilter(t *testing.T) {
 	assert.Equal(t, e, loop.Slice(f.Next))
 }
 
-func Test_FilterAndFlattFit(t *testing.T) {
+func Test_FilterAndFlattFilt(t *testing.T) {
 	md := loop.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...)
-	f := loop.FilterFlattFilter(md, func(from []int) bool { return len(from) > 1 }, func(i []int) []int { return i }, even)
+	f := loop.FilterFlatFilter(md, func(from []int) bool { return len(from) > 1 }, func(i []int) []int { return i }, even)
 	e := []int{2, 6}
 	assert.Equal(t, e, loop.Slice(f.Next))
 }

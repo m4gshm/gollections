@@ -40,29 +40,29 @@ func Conv[FS ~[]From, From, To any](elements FS, converter func(From) (To, error
 }
 
 // FilterAndConvert returns a stream that filters source elements and converts them
-func FilterAndConvert[FS ~[]From, From, To any](elements FS, filter func(From) bool, converter func(From) To) *ConvertFitIter[From, To] {
+func FilterAndConvert[FS ~[]From, From, To any](elements FS, filter func(From) bool, converter func(From) To) *ConvertFiltIter[From, To] {
 	var (
 		header   = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
 		array    = unsafe.Pointer(header.Data)
 		size     = header.Len
 		elemSize = notsafe.GetTypeSize[From]()
 	)
-	return &ConvertFitIter[From, To]{array: array, size: size, elemSize: elemSize, converter: converter, filterFrom: filter, filterTo: always.True[To]}
+	return &ConvertFiltIter[From, To]{array: array, size: size, elemSize: elemSize, converter: converter, filterFrom: filter, filterTo: always.True[To]}
 }
 
 // FiltAndConv additionally filters 'From' elements.
-func FiltAndConv[FS ~[]From, From, To any](elements FS, filter func(From) (bool, error), converter func(From) (To, error)) *ConvFitIter[From, To] {
+func FiltAndConv[FS ~[]From, From, To any](elements FS, filter func(From) (bool, error), converter func(From) (To, error)) *ConvFiltIter[From, To] {
 	var (
 		header   = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
 		array    = unsafe.Pointer(header.Data)
 		size     = header.Len
 		elemSize = notsafe.GetTypeSize[From]()
 	)
-	return &ConvFitIter[From, To]{array: array, size: size, elemSize: elemSize, converter: converter, filterFrom: filter, filterTo: as.ErrTail(always.True[To])}
+	return &ConvFiltIter[From, To]{array: array, size: size, elemSize: elemSize, converter: converter, filterFrom: filter, filterTo: as.ErrTail(always.True[To])}
 }
 
-// Flatt instantiates an iterator that extracts slices of 'To' by a flattener from elements of 'From' and flattens as one iterable collection of 'To' elements.
-func Flatt[FS ~[]From, From, To any](elements FS, by func(From) []To) *FlattIter[From, To] {
+// Flat instantiates an iterator that extracts slices of 'To' by a flattener from elements of 'From' and flattens as one iterable collection of 'To' elements.
+func Flat[FS ~[]From, From, To any](elements FS, by func(From) []To) *FlattIter[From, To] {
 	var (
 		header       = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
 		array        = unsafe.Pointer(header.Data)
@@ -73,8 +73,8 @@ func Flatt[FS ~[]From, From, To any](elements FS, by func(From) []To) *FlattIter
 	return &FlattIter[From, To]{arrayFrom: array, sizeFrom: size, elemSizeFrom: elemSizeFrom, elemSizeTo: elemSizeTo, flattener: by}
 }
 
-// Flat instantiates an iterator that extracts slices of 'To' by a flattener from elements of 'From' and flattens as one iterable collection of 'To' elements.
-func Flat[FS ~[]From, From, To any](elements FS, flatter func(From) ([]To, error)) *FlatIter[From, To] {
+// Flatt instantiates an iterator that extracts slices of 'To' by a flattener from elements of 'From' and flattens as one iterable collection of 'To' elements.
+func Flatt[FS ~[]From, From, To any](elements FS, flatter func(From) ([]To, error)) *FlatIter[From, To] {
 	var (
 		header       = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
 		array        = unsafe.Pointer(header.Data)
@@ -82,11 +82,11 @@ func Flat[FS ~[]From, From, To any](elements FS, flatter func(From) ([]To, error
 		elemSizeFrom = notsafe.GetTypeSize[From]()
 		elemSizeTo   = notsafe.GetTypeSize[To]()
 	)
-	return &FlatIter[From, To]{arrayFrom: array, sizeFrom: size, elemSizeFrom: elemSizeFrom, elemSizeTo: elemSizeTo, flatt: flatter}
+	return &FlatIter[From, To]{arrayFrom: array, sizeFrom: size, elemSizeFrom: elemSizeFrom, elemSizeTo: elemSizeTo, flattener: flatter}
 }
 
-// FilterAndFlatt filters source elements and extracts slices of 'To' by the 'flattener' function
-func FilterAndFlatt[FS ~[]From, From, To any](elements FS, filter func(From) bool, flattener func(From) []To) *FlattenFitIter[From, To] {
+// FilterAndFlat filters source elements and extracts slices of 'To' by the 'flattener' function
+func FilterAndFlat[FS ~[]From, From, To any](elements FS, filter func(From) bool, flattener func(From) []To) *FlattenFiltIter[From, To] {
 	var (
 		header       = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
 		array        = unsafe.Pointer(header.Data)
@@ -94,11 +94,11 @@ func FilterAndFlatt[FS ~[]From, From, To any](elements FS, filter func(From) boo
 		elemSizeFrom = notsafe.GetTypeSize[From]()
 		elemSizeTo   = notsafe.GetTypeSize[To]()
 	)
-	return &FlattenFitIter[From, To]{arrayFrom: array, sizeFrom: size, elemSizeFrom: elemSizeFrom, elemSizeTo: elemSizeTo, flatt: flattener, filter: filter}
+	return &FlattenFiltIter[From, To]{arrayFrom: array, sizeFrom: size, elemSizeFrom: elemSizeFrom, elemSizeTo: elemSizeTo, flattener: flattener, filter: filter}
 }
 
 // FiltAndFlat instantiates an iterator that filters elements by the 'filter' function, flattens elements and returns them.
-func FiltAndFlat[FS ~[]From, From, To any](elements FS, filter func(From) (bool, error), flatt func(From) ([]To, error)) *FlatFiltIter[From, To] {
+func FiltAndFlat[FS ~[]From, From, To any](elements FS, filter func(From) (bool, error), flattener func(From) ([]To, error)) *FlatFiltIter[From, To] {
 	var (
 		header       = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
 		array        = unsafe.Pointer(header.Data)
@@ -106,7 +106,7 @@ func FiltAndFlat[FS ~[]From, From, To any](elements FS, filter func(From) (bool,
 		elemSizeFrom = notsafe.GetTypeSize[From]()
 		elemSizeTo   = notsafe.GetTypeSize[To]()
 	)
-	return &FlatFiltIter[From, To]{arrayFrom: array, sizeFrom: size, elemSizeFrom: elemSizeFrom, elemSizeTo: elemSizeTo, flatt: flatt, filter: filter}
+	return &FlatFiltIter[From, To]{arrayFrom: array, sizeFrom: size, elemSizeFrom: elemSizeFrom, elemSizeTo: elemSizeTo, flattener: flattener, filter: filter}
 }
 
 // Filter instantiates an iterator that checks elements by the 'filter' function and returns successful ones

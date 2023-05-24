@@ -51,11 +51,11 @@ func Test_FlattSlices(t *testing.T) {
 		multiDimension = [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
 		expected       = slice.Of(1, 3, 5, 7)
 	)
-	f := iter.Filter(iter.Flatt(iter.Flatt(slice.NewIter(multiDimension), as.Is[[][]int]), as.Is[[]int]), odds)
+	f := iter.Filter(iter.Flat(iter.Flat(slice.NewIter(multiDimension), as.Is[[][]int]), as.Is[[]int]), odds)
 	a := loop.Slice(f.Next)
 	assert.Equal(t, expected, a)
 
-	a = loop.Slice(iter.Filter(iter.Flatt(sliceIter.Flatt(multiDimension, as.Is[[][]int]), as.Is[[]int]), odds).Next)
+	a = loop.Slice(iter.Filter(iter.Flat(sliceIter.Flat(multiDimension, as.Is[[][]int]), as.Is[[]int]), odds).Next)
 	assert.Equal(t, expected, a)
 
 	//plain old style
@@ -88,10 +88,10 @@ func Test_ReduceSlices(t *testing.T) {
 
 	e := 1 + 3 + 5 + 7
 
-	oddSum := loop.Reduce(iter.Filter(iter.Flatt(iter.Flatt(slice.NewIter(multiDimension), as.Is[[][]int]), as.Is[[]int]), odds).Next, op.Sum[int])
+	oddSum := loop.Reduce(iter.Filter(iter.Flat(iter.Flat(slice.NewIter(multiDimension), as.Is[[][]int]), as.Is[[]int]), odds).Next, op.Sum[int])
 	assert.Equal(t, e, oddSum)
 
-	oddSum = loop.Reduce(iter.Filter(iter.Flatt(sliceIter.Flatt(multiDimension, as.Is[[][]int]), as.Is[[]int]), odds).Next, op.Sum[int])
+	oddSum = loop.Reduce(iter.Filter(iter.Flat(sliceIter.Flat(multiDimension, as.Is[[][]int]), as.Is[[]int]), odds).Next, op.Sum[int])
 	assert.Equal(t, e, oddSum)
 
 	//plain old style
@@ -134,10 +134,10 @@ func Test_ConvertFlattStructure_Iterable(t *testing.T) {
 
 	items := []*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil, {attributes: []*Attributes{{name: "third"}, nil}}}
 
-	names := loop.Slice(iter.Convert(iter.Flatt(slice.NewIter(items), (*Participant).GetAttributes), (*Attributes).GetName).Next)
+	names := loop.Slice(iter.Convert(iter.Flat(slice.NewIter(items), (*Participant).GetAttributes), (*Attributes).GetName).Next)
 	assert.Equal(t, expected, names)
 
-	names = loop.Slice(iter.Convert(sliceIter.Flatt(items, (*Participant).GetAttributes), (*Attributes).GetName).Next)
+	names = loop.Slice(iter.Convert(sliceIter.Flat(items, (*Participant).GetAttributes), (*Attributes).GetName).Next)
 	assert.Equal(t, expected, names)
 }
 
@@ -146,7 +146,7 @@ func Test_ConvertFlatStructure_Iterable(t *testing.T) {
 
 	items := []*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil, {attributes: []*Attributes{{name: "third"}, nil}}}
 
-	names, _ := breakLoop.Slice(breakLoop.Convert(sliceIter.Flat(items, wrapGet((*Participant).GetAttributes)).Next, (*Attributes).GetName).Next)
+	names, _ := breakLoop.Slice(breakLoop.Convert(sliceIter.Flatt(items, wrapGet((*Participant).GetAttributes)).Next, (*Attributes).GetName).Next)
 	assert.Equal(t, expected, names)
 }
 
@@ -155,10 +155,10 @@ func Test_ConvertFilterAndFlattStructure_Iterable(t *testing.T) {
 
 	items := []*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil, {attributes: []*Attributes{{name: "third"}, nil}}}
 
-	names := loop.Slice(iter.Convert(iter.FilterAndFlatt(slice.NewIter(items), not.Nil[Participant], (*Participant).GetAttributes), (*Attributes).GetName).Next)
+	names := loop.Slice(iter.Convert(iter.FilterAndFlat(slice.NewIter(items), not.Nil[Participant], (*Participant).GetAttributes), (*Attributes).GetName).Next)
 	assert.Equal(t, expected, names)
 
-	names = loop.Slice(iter.Convert(sliceIter.FilterAndFlatt(items, not.Nil[Participant], (*Participant).GetAttributes), (*Attributes).GetName).Next)
+	names = loop.Slice(iter.Convert(sliceIter.FilterAndFlat(items, not.Nil[Participant], (*Participant).GetAttributes), (*Attributes).GetName).Next)
 	assert.Equal(t, expected, names)
 }
 

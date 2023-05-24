@@ -6,11 +6,11 @@ import (
 )
 
 // AndConvert filters the 'From' elements, and then converts them to 'To'
-func AndConvert[From, To any](next func() (From, bool), filter func(From) bool, converter func(From) To) loop.ConvertFitIter[From, To] {
+func AndConvert[From, To any](next func() (From, bool), filter func(From) bool, converter func(From) To) loop.ConvertFiltIter[From, To] {
 	return loop.FilterAndConvert(next, filter, converter)
 }
 
 // ConvertFilter filters the 'From' elements, then converts them to 'To', and then filters that ones
-func ConvertFilter[From, To any](next func() (From, bool), filter func(From) bool, converter func(From) To, filterTo func(To) bool) loop.ConvertFitIter[From, To] {
+func ConvertFilter[From, To any](next func() (From, bool), filter func(From) bool, converter func(From) To, filterTo func(To) bool) loop.ConvertFiltIter[From, To] {
 	return loop.FilterConvertFilter(next, filter, converter, filterTo)
 }

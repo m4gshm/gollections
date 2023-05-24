@@ -12,12 +12,12 @@ func AndConvert[From, I, To any](next func() (From, bool), firsConverter func(Fr
 }
 
 // AndFilter - convert.AndFilter converts only filtered elements and returns them
-func AndFilter[From, To any](next func() (From, bool), converter func(From) To, filter func(To) bool) loop.ConvertFitIter[From, To] {
+func AndFilter[From, To any](next func() (From, bool), converter func(From) To, filter func(To) bool) loop.ConvertFiltIter[From, To] {
 	return loop.ConvertAndFilter(next, converter, filter)
 }
 
 // NotNil - convert.NotNil converts only not nil elements and returns them
-func NotNil[From, To any](next func() (*From, bool), converter func(*From) To) loop.ConvertFitIter[*From, To] {
+func NotNil[From, To any](next func() (*From, bool), converter func(*From) To) loop.ConvertFiltIter[*From, To] {
 	return loop.FilterAndConvert(next, not.Nil[From], converter)
 }
 

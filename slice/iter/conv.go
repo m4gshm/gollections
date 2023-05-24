@@ -8,8 +8,8 @@ import (
 	"github.com/m4gshm/gollections/notsafe"
 )
 
-// ConvFitIter is the array based Iterator thath provides converting of elements by a Converter with addition filtering of the elements by a Predicate.
-type ConvFitIter[From, To any] struct {
+// ConvFiltIter is the array based Iterator thath provides converting of elements by a Converter with addition filtering of the elements by a Predicate.
+type ConvFiltIter[From, To any] struct {
 	array      unsafe.Pointer
 	elemSize   uintptr
 	size, i    int
@@ -18,17 +18,17 @@ type ConvFitIter[From, To any] struct {
 	filterTo   func(To) (bool, error)
 }
 
-var _ c.Iterator[any] = (*ConvFitIter[any, any])(nil)
+var _ c.Iterator[any] = (*ConvFiltIter[any, any])(nil)
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
-func (i *ConvFitIter[From, To]) For(walker func(element To) error) error {
+func (i *ConvFiltIter[From, To]) For(walker func(element To) error) error {
 	return loop.For(i.Next, walker)
 }
 
 // Next returns the next element.
 // The ok result indicates whether the element was returned by the iterator.
 // If ok == false, then the iteration must be completed.
-func (i *ConvFitIter[From, To]) Next() (t To, ok bool, err error) {
+func (i *ConvFiltIter[From, To]) Next() (t To, ok bool, err error) {
 	if i == nil || i.array == nil {
 		return t, false, nil
 	}
@@ -49,7 +49,7 @@ func (i *ConvFitIter[From, To]) Next() (t To, ok bool, err error) {
 }
 
 // Cap returns the iterator capacity
-func (i *ConvFitIter[From, To]) Cap() int {
+func (i *ConvFiltIter[From, To]) Cap() int {
 	return i.size
 }
 

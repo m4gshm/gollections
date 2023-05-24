@@ -4,9 +4,9 @@ import (
 	"github.com/m4gshm/gollections/break/c"
 )
 
-// ConvertFitIter iterator implementation that retrieves an element by the 'next' function, converts by the 'converter' and addition checks by the 'filter'.
+// ConvertFiltIter iterator implementation that retrieves an element by the 'next' function, converts by the 'converter' and addition checks by the 'filter'.
 // If the filter returns true then the converted element is returned as next.
-type ConvertFitIter[From, To any] struct {
+type ConvertFiltIter[From, To any] struct {
 	next       func() (From, bool, error)
 	converter  func(From) (To, error)
 	filterFrom func(From) (bool, error)
@@ -14,19 +14,19 @@ type ConvertFitIter[From, To any] struct {
 }
 
 var (
-	_ c.Iterator[any] = (*ConvertFitIter[any, any])(nil)
-	_ c.Iterator[any] = ConvertFitIter[any, any]{}
+	_ c.Iterator[any] = (*ConvertFiltIter[any, any])(nil)
+	_ c.Iterator[any] = ConvertFiltIter[any, any]{}
 )
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
-func (c ConvertFitIter[From, To]) For(walker func(element To) error) error {
+func (c ConvertFiltIter[From, To]) For(walker func(element To) error) error {
 	return For(c.Next, walker)
 }
 
 // Next returns the next element.
 // The ok result indicates whether the element was returned by the iterator.
 // If ok == false, then the iteration must be completed.
-func (c ConvertFitIter[From, To]) Next() (t To, ok bool, err error) {
+func (c ConvertFiltIter[From, To]) Next() (t To, ok bool, err error) {
 	next, filterFrom, filterTo := c.next, c.filterFrom, c.filterTo
 	if next == nil || filterFrom == nil || filterTo == nil {
 		return t, false, nil

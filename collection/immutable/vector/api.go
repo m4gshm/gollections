@@ -41,12 +41,12 @@ func Conv[From, To comparable](vector immutable.Vector[From], converter func(Fro
 	return collection.Conv(vector, converter)
 }
 
-// Flatt returns a stream that converts the collection elements into slices and then flattens them to one level
-func Flatt[From any, To any](vector immutable.Vector[From], flattener func(From) []To) stream.Iter[To] {
-	return collection.Flatt(vector, flattener)
+// Flat returns a stream that converts the collection elements into slices and then flattens them to one level
+func Flat[From any, To any](vector immutable.Vector[From], flattener func(From) []To) stream.Iter[To] {
+	return collection.Flat(vector, flattener)
 }
 
-// Flat returns a breakable stream that converts the collection elements into slices and then flattens them to one level
-func Flat[From, To comparable](vector immutable.Vector[From], flattener func(From) ([]To, error)) breakStream.Iter[To] {
-	return collection.Flat(vector, flattener)
+// Flatt returns a breakable stream that converts the collection elements into slices and then flattens them to one level
+func Flatt[From, To comparable](vector immutable.Vector[From], flattener func(From) ([]To, error)) breakStream.Iter[To] {
+	return collection.Flatt(vector, flattener)
 }

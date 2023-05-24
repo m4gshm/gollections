@@ -92,12 +92,12 @@ func Conv[K, V any, KOUT, VOUT any](next func() (K, V, bool), converter func(K, 
 }
 
 // Filter creates an iterator that checks elements by a filter and returns successful ones
-func Filter[K, V any](next func() (K, V, bool), filter func(K, V) bool) FitKV[K, V] {
-	return FitKV[K, V]{next: next, filter: filter}
+func Filter[K, V any](next func() (K, V, bool), filter func(K, V) bool) FilterKVIter[K, V] {
+	return FilterKVIter[K, V]{next: next, filter: filter}
 }
 
 // Filt creates an iterator that checks elements by a filter and returns successful ones
-func Filt[K, V any](next func() (K, V, bool), filter func(K, V) (bool, error)) loop.FiltKV[K, V] {
+func Filt[K, V any](next func() (K, V, bool), filter func(K, V) (bool, error)) loop.FiltKVIter[K, V] {
 	return loop.Filt(loop.From(next), filter)
 }
 

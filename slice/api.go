@@ -260,7 +260,7 @@ func FilterAndConvertIndexed[FS ~[]From, From, To any](elements FS, filter func(
 	return result
 }
 
-// ConvertCheck is similar to ConvertFit, but it checks and transforms elements together
+// ConvertCheck is similar to ConvertFilt, but it checks and transforms elements together
 func ConvertCheck[FS ~[]From, From, To any](elements FS, by func(from From) (To, bool)) []To {
 	if elements == nil {
 		return nil
@@ -288,8 +288,8 @@ func ConvertCheckIndexed[FS ~[]From, From, To any](elements FS, by func(index in
 	return result
 }
 
-// Flatt unfolds the n-dimensional slice into a n-1 dimensional slice
-func Flatt[FS ~[]From, From, To any](elements FS, flattener func(From) []To) []To {
+// Flat unfolds the n-dimensional slice into a n-1 dimensional slice
+func Flat[FS ~[]From, From, To any](elements FS, flattener func(From) []To) []To {
 	if elements == nil {
 		return nil
 	}
@@ -301,8 +301,8 @@ func Flatt[FS ~[]From, From, To any](elements FS, flattener func(From) []To) []T
 	return result
 }
 
-// Flat unfolds the n-dimensional slice into a n-1 dimensional slice
-func Flat[FS ~[]From, From, To any](elements FS, flattener func(From) ([]To, error)) ([]To, error) {
+// Flatt unfolds the n-dimensional slice into a n-1 dimensional slice
+func Flatt[FS ~[]From, From, To any](elements FS, flattener func(From) ([]To, error)) ([]To, error) {
 	if elements == nil {
 		return nil, nil
 	}
@@ -332,8 +332,8 @@ func FlattAndConvert[FS ~[]From, From, I, To any](elements FS, flattener func(Fr
 	return result
 }
 
-// FilterAndFlatt filters source elements and extracts slices of 'To' by the 'flattener' function
-func FilterAndFlatt[FS ~[]From, From, To any](elements FS, filter func(From) bool, flattener func(From) []To) []To {
+// FilterAndFlat filters source elements and extracts slices of 'To' by the 'flattener' function
+func FilterAndFlat[FS ~[]From, From, To any](elements FS, filter func(From) bool, flattener func(From) []To) []To {
 	if elements == nil {
 		return nil
 	}
@@ -346,8 +346,8 @@ func FilterAndFlatt[FS ~[]From, From, To any](elements FS, filter func(From) boo
 	return result
 }
 
-// FlattAndFiler unfolds the n-dimensional slice into a n-1 dimensional slice with additinal filtering of 'To' elements.
-func FlattAndFiler[FS ~[]From, From, To any](elements FS, by func(From) []To, filter func(To) bool) []To {
+// FlatAndFiler unfolds the n-dimensional slice into a n-1 dimensional slice with additinal filtering of 'To' elements.
+func FlatAndFiler[FS ~[]From, From, To any](elements FS, by func(From) []To, filter func(To) bool) []To {
 	if elements == nil {
 		return nil
 	}
@@ -362,8 +362,8 @@ func FlattAndFiler[FS ~[]From, From, To any](elements FS, by func(From) []To, fi
 	return result
 }
 
-// FilterFlattFilter unfolds the n-dimensional slice 'elements' into a n-1 dimensional slice with additinal filtering of 'From' and 'To' elements.
-func FilterFlattFilter[FS ~[]From, From, To any](elements FS, filterFrom func(From) bool, by func(From) []To, filterTo func(To) bool) []To {
+// FilterFlatFilter unfolds the n-dimensional slice 'elements' into a n-1 dimensional slice with additinal filtering of 'From' and 'To' elements.
+func FilterFlatFilter[FS ~[]From, From, To any](elements FS, filterFrom func(From) bool, by func(From) []To, filterTo func(To) bool) []To {
 	if elements == nil {
 		return nil
 	}
@@ -758,17 +758,17 @@ func ToKV[TS ~[]T, T, K, V any](elements TS, keyExtractor func(T) K, valExtracto
 
 // ToKVs transforms slice elements to key/value pairs slice. Multiple pairs per one element
 func ToKVs[TS ~[]T, T, K, V any](elements TS, keysExtractor func(T) []K, valsExtractor func(T) []V) []c.KV[K, V] {
-	return Flatt(elements, func(e T) []c.KV[K, V] { return convert.ToKVs(e, keysExtractor, valsExtractor) })
+	return Flat(elements, func(e T) []c.KV[K, V] { return convert.ToKVs(e, keysExtractor, valsExtractor) })
 }
 
 // FlattValues transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
 func FlattValues[TS ~[]T, T, V any](elements TS, valsExtractor func(T) []V) []c.KV[T, V] {
-	return Flatt(elements, func(e T) []c.KV[T, V] { return convert.FlattValues(e, valsExtractor) })
+	return Flat(elements, func(e T) []c.KV[T, V] { return convert.FlattValues(e, valsExtractor) })
 }
 
 // FlattKeys transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
 func FlattKeys[TS ~[]T, T, K any](elements TS, keysExtractor func(T) []K) []c.KV[K, T] {
-	return Flatt(elements, func(e T) []c.KV[K, T] { return convert.FlattKeys(e, keysExtractor) })
+	return Flat(elements, func(e T) []c.KV[K, T] { return convert.FlattKeys(e, keysExtractor) })
 }
 
 // SplitTwo splits the elements into two slices

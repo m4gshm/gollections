@@ -7,33 +7,33 @@ import (
 	"github.com/m4gshm/gollections/notsafe"
 )
 
-// FlattenFitIter is the Iterator wrapper that converts an element to a slice with addition filtering of the element by a Predicate and iterates over the slice.
-type FlattenFitIter[From, To any] struct {
+// FlatFilterIter is the Iterator wrapper that converts an element to a slice with addition filtering of the element by a Predicate and iterates over the slice.
+type FlatFilterIter[From, To any] struct {
 	arrayTo       unsafe.Pointer
 	elemSizeTo    uintptr
 	indTo, sizeTo int
 	next          func() (From, bool)
-	flatt         func(From) []To
+	flattener     func(From) []To
 	filterFrom    func(From) bool
 	filterTo      func(To) bool
 }
 
-var _ c.Iterator[any] = (*FlattenFitIter[any, any])(nil)
+var _ c.Iterator[any] = (*FlatFilterIter[any, any])(nil)
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
-func (i *FlattenFitIter[From, To]) For(walker func(element To) error) error {
+func (i *FlatFilterIter[From, To]) For(walker func(element To) error) error {
 	return For(i.Next, walker)
 }
 
 // ForEach FlatIter all elements retrieved by the iterator
-func (i *FlattenFitIter[From, To]) ForEach(walker func(element To)) {
+func (i *FlatFilterIter[From, To]) ForEach(walker func(element To)) {
 	ForEach(i.Next, walker)
 }
 
 // Next returns the next element.
 // The ok result indicates whether the element was returned by the iterator.
 // If ok == false, then the iteration must be completed.
-func (i *FlattenFitIter[From, To]) Next() (t To, ok bool) {
+func (i *FlatFilterIter[From, To]) Next() (t To, ok bool) {
 	if i == nil {
 		return t, ok
 	}
@@ -60,7 +60,7 @@ func (i *FlattenFitIter[From, To]) Next() (t To, ok bool) {
 		if v, ok := next(); !ok {
 			return t, false
 		} else if i.filterFrom(v) {
-			if elementsTo := i.flatt(v); len(elementsTo) > 0 {
+			if elementsTo := i.flattener(v); len(elementsTo) > 0 {
 				i.indTo = 1
 				header := notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elementsTo))
 				i.arrayTo = unsafe.Pointer(header.Data)
@@ -81,7 +81,7 @@ type FlatIter[From, To any] struct {
 	elemSizeTo    uintptr
 	indTo, sizeTo int
 	next          func() (From, bool)
-	flatt         func(From) []To
+	flattener     func(From) []To
 }
 
 var _ c.Iterator[any] = (*FlatIter[any, any])(nil)
@@ -115,7 +115,7 @@ func (i *FlatIter[From, To]) Next() (To, bool) {
 		if v, ok := i.next(); !ok {
 			var no To
 			return no, false
-		} else if elementsTo := i.flatt(v); len(elementsTo) > 0 {
+		} else if elementsTo := i.flattener(v); len(elementsTo) > 0 {
 			i.indTo = 1
 			header := notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elementsTo))
 			i.arrayTo = unsafe.Pointer(header.Data)

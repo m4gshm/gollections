@@ -293,14 +293,14 @@ func Test_ConvertFilteredWithIndexInPlace(t *testing.T) {
 
 func Test_Flatt(t *testing.T) {
 	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
-	f := slice.Flatt(md, func(i []int) []int { return i })
+	f := slice.Flat(md, func(i []int) []int { return i })
 	e := []int{1, 2, 3, 4, 5, 6}
 	assert.Equal(t, e, f)
 }
 
 func Test_Flat(t *testing.T) {
 	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
-	f, err := slice.Flat(md, func(i []int) ([]int, error) { return i, op.IfElse(len(i) == 2, errors.New("abort"), nil) })
+	f, err := slice.Flatt(md, func(i []int) ([]int, error) { return i, op.IfElse(len(i) == 2, errors.New("abort"), nil) })
 	assert.Error(t, err)
 	e := []int{1, 2, 3, 4}
 	assert.Equal(t, e, f)
@@ -310,7 +310,7 @@ func Benchmark_Flatt(b *testing.B) {
 	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
 
 	for i := 0; i < b.N; i++ {
-		_ = slice.Flatt(md, func(i []int) []int { return i })
+		_ = slice.Flat(md, func(i []int) []int { return i })
 	}
 }
 
@@ -324,21 +324,21 @@ func Benchmark_Flatt_Convert_AsIs(b *testing.B) {
 
 func Test_FlattFilter(t *testing.T) {
 	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
-	f := slice.FilterAndFlatt(md, func(from []int) bool { return len(from) > 1 }, func(i []int) []int { return i })
+	f := slice.FilterAndFlat(md, func(from []int) bool { return len(from) > 1 }, func(i []int) []int { return i })
 	e := []int{1, 2, 3, 5, 6}
 	assert.Equal(t, e, f)
 }
 
 func Test_FlattElemFilter(t *testing.T) {
 	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
-	f := slice.FlattAndFiler(md, func(i []int) []int { return i }, even)
+	f := slice.FlatAndFiler(md, func(i []int) []int { return i }, even)
 	e := []int{2, 4, 6}
 	assert.Equal(t, e, f)
 }
 
-func Test_FilterAndFlattFit(t *testing.T) {
+func Test_FilterAndFlattFilt(t *testing.T) {
 	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
-	f := slice.FilterFlattFilter(md, func(from []int) bool { return len(from) > 1 }, func(i []int) []int { return i }, even)
+	f := slice.FilterFlatFilter(md, func(from []int) bool { return len(from) > 1 }, func(i []int) []int { return i }, even)
 	e := []int{2, 6}
 	assert.Equal(t, e, f)
 }

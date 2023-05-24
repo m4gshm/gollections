@@ -166,7 +166,7 @@ func Test_Set_Convert(t *testing.T) {
 func Test_Set_Flatt(t *testing.T) {
 	var (
 		ints        = set.Of(3, 3, 1, 1, 1, 5, 6, 8, 8, 0, -2, -2)
-		fints       = set.Flatt(ints, func(i int) []int { return slice.Of(i) })
+		fints       = set.Flat(ints, func(i int) []int { return slice.Of(i) })
 		stringsPipe = collection.Filter(collection.Convert(fints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 }), func(s string) bool { return len(s) == 1 })
 	)
 	assert.Equal(t, slice.Of("0", "1", "3", "5", "6", "8"), sort.Of(stringsPipe.Slice()))

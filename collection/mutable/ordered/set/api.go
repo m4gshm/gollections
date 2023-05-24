@@ -2,11 +2,12 @@
 package set
 
 import (
+	"golang.org/x/exp/constraints"
+
 	breakStream "github.com/m4gshm/gollections/break/stream"
 	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/collection/mutable/ordered"
 	"github.com/m4gshm/gollections/stream"
-	"golang.org/x/exp/constraints"
 )
 
 // Of instantiates Set with predefined elements.
@@ -44,12 +45,12 @@ func Conv[From, To comparable](set *ordered.Set[From], converter func(From) (To,
 	return collection.Conv(set, converter)
 }
 
-// Flatt returns a stream that converts the collection elements into slices and then flattens them to one level
-func Flatt[From, To comparable](set *ordered.Set[From], flattener func(From) []To) stream.Iter[To] {
-	return collection.Flatt(set, flattener)
+// Flat returns a stream that converts the collection elements into slices and then flattens them to one level
+func Flat[From, To comparable](set *ordered.Set[From], flattener func(From) []To) stream.Iter[To] {
+	return collection.Flat(set, flattener)
 }
 
-// Flat returns a breakable stream that converts the collection elements into slices and then flattens them to one level
-func Flat[From, To comparable](set *ordered.Set[From], flattener func(From) ([]To, error)) breakStream.Iter[To] {
-	return collection.Flat(set, flattener)
+// Flatt returns a breakable stream that converts the collection elements into slices and then flattens them to one level
+func Flatt[From, To comparable](set *ordered.Set[From], flattener func(From) ([]To, error)) breakStream.Iter[To] {
+	return collection.Flatt(set, flattener)
 }
