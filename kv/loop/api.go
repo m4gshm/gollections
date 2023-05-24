@@ -95,7 +95,7 @@ func Filter[K, V any](next func() (K, V, bool), filter func(K, V) bool) FilterKV
 }
 
 // Filt creates an iterator that checks elements by a filter and returns successful ones
-func Filt[K, V any](next func() (K, V, bool), filter func(K, V) (bool, error)) loop.FiltKVIter[K, V] {
+func Filt[K, V any](next func() (K, V, bool), filter func(K, V) (bool, error)) loop.FiltIter[K, V] {
 	return loop.Filt(loop.From(next), filter)
 }
 

@@ -172,7 +172,7 @@ func ConvertCheck[From, To any](next func() (From, bool), converter func(from Fr
 }
 
 // FiltAndConv returns a stream that filters source elements and converts them
-func FiltAndConv[From, To any](next func() (From, bool), filter func(From) (bool, error), converter func(From) (To, error)) loop.ConvertFiltIter[From, To] {
+func FiltAndConv[From, To any](next func() (From, bool), filter func(From) (bool, error), converter func(From) (To, error)) loop.ConvFiltIter[From, To] {
 	return loop.FiltAndConv(loop.From(next), filter, converter)
 }
 

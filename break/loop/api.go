@@ -229,22 +229,22 @@ func ConvertCheck[From, To any](next func() (From, bool, error), converter func(
 }
 
 // FiltAndConv returns a stream that filters source elements and converts them
-func FiltAndConv[From, To any](next func() (From, bool, error), filter func(From) (bool, error), converter func(From) (To, error)) ConvertFiltIter[From, To] {
+func FiltAndConv[From, To any](next func() (From, bool, error), filter func(From) (bool, error), converter func(From) (To, error)) ConvFiltIter[From, To] {
 	return FilterConvertFilter(next, filter, converter, always.True[To])
 }
 
 // FilterAndConvert returns a stream that filters source elements and converts them
-func FilterAndConvert[From, To any](next func() (From, bool, error), filter func(From) bool, converter func(From) To) ConvertFiltIter[From, To] {
+func FilterAndConvert[From, To any](next func() (From, bool, error), filter func(From) bool, converter func(From) To) ConvFiltIter[From, To] {
 	return FilterConvertFilter(next, func(f From) (bool, error) { return filter(f), nil }, func(f From) (To, error) { return converter(f), nil }, always.True[To])
 }
 
 // FilterConvertFilter filters source, converts, and filters converted elements
-func FilterConvertFilter[From, To any](next func() (From, bool, error), filter func(From) (bool, error), converter func(From) (To, error), filterTo func(To) (bool, error)) ConvertFiltIter[From, To] {
-	return ConvertFiltIter[From, To]{next: next, converter: converter, filterFrom: filter, filterTo: filterTo}
+func FilterConvertFilter[From, To any](next func() (From, bool, error), filter func(From) (bool, error), converter func(From) (To, error), filterTo func(To) (bool, error)) ConvFiltIter[From, To] {
+	return ConvFiltIter[From, To]{next: next, converter: converter, filterFrom: filter, filterTo: filterTo}
 }
 
 // ConvertAndFilter additionally filters 'To' elements
-func ConvertAndFilter[From, To any](next func() (From, bool, error), converter func(From) (To, error), filter func(To) (bool, error)) ConvertFiltIter[From, To] {
+func ConvertAndFilter[From, To any](next func() (From, bool, error), converter func(From) (To, error), filter func(To) (bool, error)) ConvFiltIter[From, To] {
 	return FilterConvertFilter(next, always.True[From], converter, filter)
 }
 
