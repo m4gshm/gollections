@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	breakLoop "github.com/m4gshm/gollections/break/loop"
+	"github.com/m4gshm/gollections/break/predicate"
 	"github.com/m4gshm/gollections/convert"
 	"github.com/m4gshm/gollections/convert/as"
 	"github.com/m4gshm/gollections/iter"
@@ -140,6 +141,15 @@ func Test_ConvertFlattStructure_Iterable(t *testing.T) {
 	assert.Equal(t, expected, names)
 }
 
+func Test_ConvertFlatStructure_Iterable(t *testing.T) {
+	expected := slice.Of("first", "second", "", "third", "")
+
+	items := []*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil, {attributes: []*Attributes{{name: "third"}, nil}}}
+
+	names, _ := breakLoop.Slice(breakLoop.Convert(sliceIter.Flat(items, wrapGet((*Participant).GetAttributes)).Next, (*Attributes).GetName).Next)
+	assert.Equal(t, expected, names)
+}
+
 func Test_ConvertFilterAndFlattStructure_Iterable(t *testing.T) {
 	expected := slice.Of("first", "second", "", "third", "")
 
@@ -150,6 +160,20 @@ func Test_ConvertFilterAndFlattStructure_Iterable(t *testing.T) {
 
 	names = loop.Slice(iter.Convert(sliceIter.FilterAndFlatt(items, not.Nil[Participant], (*Participant).GetAttributes), (*Attributes).GetName).Next)
 	assert.Equal(t, expected, names)
+}
+
+func Test_ConvertFiltAndFlattStructure_Iterable(t *testing.T) {
+	expected := slice.Of("first", "second", "", "third", "")
+
+	items := []*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil, {attributes: []*Attributes{{name: "third"}, nil}}}
+	names, _ := breakLoop.Slice(breakLoop.Convert(sliceIter.FiltAndFlat(items, predicate.Wrap(not.Nil[Participant]), wrapGet((*Participant).GetAttributes)).Next, (*Attributes).GetName).Next)
+	assert.Equal(t, expected, names)
+}
+
+func wrapGet[S, V any](getter func(S) V) func(S) (V, error) {
+	return func(s S) (V, error) {
+		return getter(s), nil
+	}
 }
 
 func Test_Iterate(t *testing.T) {

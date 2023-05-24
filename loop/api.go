@@ -2,6 +2,8 @@
 package loop
 
 import (
+	"golang.org/x/exp/constraints"
+
 	"github.com/m4gshm/gollections/break/loop"
 	breakAlways "github.com/m4gshm/gollections/break/predicate/always"
 	"github.com/m4gshm/gollections/c"
@@ -11,7 +13,6 @@ import (
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/op/check/not"
 	"github.com/m4gshm/gollections/predicate/always"
-	"golang.org/x/exp/constraints"
 )
 
 // ErrBreak is the 'break' statement of the For, Track methods
@@ -58,9 +59,11 @@ func ForEach[T any](next func() (T, bool), walker func(T)) {
 }
 
 // ForEachFiltered applies the 'walker' function to the elements retrieved by the 'next' function that satisfy the 'predicate' function condition
-func ForEachFiltered[T any](next func() (T, bool), walker func(T), predicate func(T) bool) {
-	for v, ok := next(); ok && predicate(v); v, ok = next() {
-		walker(v)
+func ForEachFiltered[T any](next func() (T, bool), predicate func(T) bool, walker func(T)) {
+	for v, ok := next(); ok; v, ok = next() {
+		if predicate(v) {
+			walker(v)
+		}
 	}
 }
 
@@ -374,7 +377,7 @@ func ToMapResolv[T any, K comparable, V, VR any](next func() (T, bool), keyExtra
 	return m
 }
 
-// New is the main loop constructor
+// New makes a loop from an abstract source
 func New[S, T any](source S, hasNext func(S) bool, getNext func(S) T) func() (T, bool) {
 	return func() (out T, ok bool) {
 		if hasNext(source) {

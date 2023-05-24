@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	breakLoop "github.com/m4gshm/gollections/break/loop"
+	"github.com/m4gshm/gollections/c"
 	kvloop "github.com/m4gshm/gollections/kv/loop"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/loop/conv"
@@ -24,6 +25,12 @@ func Test_ReduceSum(t *testing.T) {
 	s := loop.Of(1, 3, 5, 7, 9, 11)
 	r := loop.Reduce(s, op.Sum[int])
 	assert.Equal(t, 1+3+5+7+9+11, r)
+}
+
+func Test_EmptyLoop(t *testing.T) {
+	s := loop.Of[int]()
+	r := loop.Reduce(s, op.Sum[int])
+	assert.Equal(t, 0, r)
 }
 
 func Test_ConvertAndReduce(t *testing.T) {
@@ -270,4 +277,36 @@ func Test_ConvIndexed(t *testing.T) {
 	result, err := breakLoop.Slice(conv.FromIndexed(len(indexed), func(i int) string { return indexed[i] }, strconv.Atoi).Next)
 	assert.NoError(t, err)
 	assert.Equal(t, slice.Of(10, 11, 12, 13, 14), result)
+}
+
+func Test_Containt(t *testing.T) {
+	assert.True(t, loop.Contains(loop.Of(1, 2, 3), 3))
+	assert.False(t, loop.Contains(loop.Of(1, 2, 3), 0))
+}
+
+func Test_New(t *testing.T) {
+	source := []string{"one", "two", "three"}
+	i := 0
+	l := loop.New(source, func(s []string) bool { return i < len(s) }, func(s []string) string { o := s[i]; i++; return o })
+
+	assert.Equal(t, source, loop.Slice(l))
+}
+
+func Test_For(t *testing.T) {
+	var out []int
+	err := loop.For(loop.Of(1, 2, 3, 4), func(i int) error {
+		if i == 3 {
+			return c.ErrBreak
+		}
+		out = append(out, i)
+		return nil
+	})
+	assert.NoError(t, err)
+	assert.Equal(t, slice.Of(1, 2), out)
+}
+
+func Test_ForEachFiltered(t *testing.T) {
+	var out []int
+	loop.ForEachFiltered(loop.Of(1, 2, 3, 4), even, func(i int) { out = append(out, i) })
+	assert.Equal(t, slice.Of(2, 4), out)
 }

@@ -5,13 +5,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/m4gshm/gollections/c"
-
 	breakkvloop "github.com/m4gshm/gollections/break/kv/loop"
+	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/k"
 	kvloop "github.com/m4gshm/gollections/kv/loop"
 	"github.com/m4gshm/gollections/loop"
-
 	"github.com/m4gshm/gollections/slice"
 )
 
