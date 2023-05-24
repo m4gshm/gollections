@@ -86,10 +86,10 @@ func Group[TS ~[]T, T any, K comparable, V any](elements TS, keyExtractor func(T
 	return ToMapResolv(elements, keyExtractor, valExtractor, resolv.Append[K, V])
 }
 
-// GroupInMultiple converts the 'elements' slice into a map, extracting multiple keys, values per each element applying the 'keysExtractor' and 'valsExtractor' functions.
+// GroupByMultiple converts the 'elements' slice into a map, extracting multiple keys, values per each element applying the 'keysExtractor' and 'valsExtractor' functions.
 // The keysExtractor retrieves one or more keys per element.
 // The valsExtractor retrieves one or more values per element.
-func GroupInMultiple[TS ~[]T, T any, K comparable, V any](elements TS, keysExtractor func(T) []K, valsExtractor func(T) []V) map[K][]V {
+func GroupByMultiple[TS ~[]T, T any, K comparable, V any](elements TS, keysExtractor func(T) []K, valsExtractor func(T) []V) map[K][]V {
 	if elements == nil {
 		return nil
 	}
@@ -116,10 +116,10 @@ func GroupInMultiple[TS ~[]T, T any, K comparable, V any](elements TS, keysExtra
 	return groups
 }
 
-// GroupInMultipleKeys converts the 'elements' slice into a map, extracting multiple keys, one value per each element applying the 'keysExtractor' and 'valExtractor' functions.
+// GroupByMultipleKeys converts the 'elements' slice into a map, extracting multiple keys, one value per each element applying the 'keysExtractor' and 'valExtractor' functions.
 // The keysExtractor retrieves one or more keys per element.
 // The valExtractor converts an element to a value.
-func GroupInMultipleKeys[TS ~[]T, T any, K comparable, V any](elements TS, keysExtractor func(T) []K, valExtractor func(T) V) map[K][]V {
+func GroupByMultipleKeys[TS ~[]T, T any, K comparable, V any](elements TS, keysExtractor func(T) []K, valExtractor func(T) V) map[K][]V {
 	if elements == nil {
 		return nil
 	}
@@ -137,10 +137,10 @@ func GroupInMultipleKeys[TS ~[]T, T any, K comparable, V any](elements TS, keysE
 	return groups
 }
 
-// GroupInMultipleValues converts the 'elements' slice into a map, extracting one key, multiple values per each element applying the 'keyExtractor' and 'valsExtractor' functions.
+// GroupByMultipleValues converts the 'elements' slice into a map, extracting one key, multiple values per each element applying the 'keyExtractor' and 'valsExtractor' functions.
 // The keyExtractor converts an element to a key.
 // The valsExtractor retrieves one or more values per element.
-func GroupInMultipleValues[TS ~[]T, T any, K comparable, V any](elements TS, keyExtractor func(T) K, valsExtractor func(T) []V) map[K][]V {
+func GroupByMultipleValues[TS ~[]T, T any, K comparable, V any](elements TS, keyExtractor func(T) K, valsExtractor func(T) []V) map[K][]V {
 	if elements == nil {
 		return nil
 	}
@@ -763,12 +763,12 @@ func ToKVs[TS ~[]T, T, K, V any](elements TS, keysExtractor func(T) []K, valsExt
 
 // FlattValues transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
 func FlattValues[TS ~[]T, T, V any](elements TS, valsExtractor func(T) []V) []c.KV[T, V] {
-	return Flat(elements, func(e T) []c.KV[T, V] { return convert.FlattValues(e, valsExtractor) })
+	return Flat(elements, func(e T) []c.KV[T, V] { return convert.FlatValues(e, valsExtractor) })
 }
 
 // FlattKeys transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
 func FlattKeys[TS ~[]T, T, K any](elements TS, keysExtractor func(T) []K) []c.KV[K, T] {
-	return Flat(elements, func(e T) []c.KV[K, T] { return convert.FlattKeys(e, keysExtractor) })
+	return Flat(elements, func(e T) []c.KV[K, T] { return convert.FlatKeys(e, keysExtractor) })
 }
 
 // SplitTwo splits the elements into two slices

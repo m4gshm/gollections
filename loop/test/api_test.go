@@ -13,6 +13,7 @@ import (
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/loop/conv"
 	"github.com/m4gshm/gollections/loop/convert"
+	"github.com/m4gshm/gollections/loop/filter"
 	"github.com/m4gshm/gollections/loop/first"
 	"github.com/m4gshm/gollections/loop/range_"
 	"github.com/m4gshm/gollections/op"
@@ -187,6 +188,12 @@ func Test_Filter(t *testing.T) {
 	s := loop.Of(1, 3, 4, 5, 7, 8, 9, 11)
 	r := loop.Filter(s, even)
 	assert.Equal(t, slice.Of(4, 8), loop.Slice(r.Next))
+}
+
+func Test_FilterConvertFilter(t *testing.T) {
+	s := loop.Of(1, 3, 4, 5, 7, 8, 9, 11)
+	r := filter.ConvertFilter(s, even, func(i int) int { return i * 2 }, even)
+	assert.Equal(t, slice.Of(8, 16), loop.Slice(r.Next))
 }
 
 func Test_Filtering(t *testing.T) {

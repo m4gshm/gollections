@@ -278,7 +278,7 @@ func FlattKeys[T, K, V any](next func() (T, bool), keysExtractor func(T) []K, va
 
 // FlatKeys transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
 func FlatKeys[T, K, V any](next func() (T, bool), keysExtractor func(T) ([]K, error), valExtractor func(T) (V, error)) *loop.MultipleKeyValuer[T, K, V] {
-	return loop.FlatKeys(loop.From(next), keysExtractor, valExtractor)
+	return loop.FlattKeys(loop.From(next), keysExtractor, valExtractor)
 }
 
 // FlattValues transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
@@ -289,7 +289,7 @@ func FlattValues[T, K, V any](next func() (T, bool), keyExtractor func(T) K, val
 
 // FlatValues transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
 func FlatValues[T, K, V any](next func() (T, bool), keyExtractor func(T) (K, error), valsExtractor func(T) ([]V, error)) *loop.MultipleKeyValuer[T, K, V] {
-	return loop.FlatValues(loop.From(next), keyExtractor, valsExtractor)
+	return loop.FlattValues(loop.From(next), keyExtractor, valsExtractor)
 }
 
 // Group converts elements retrieved by the 'next' function into a map, extracting a key for each element applying the converter 'keyExtractor'.

@@ -28,6 +28,7 @@ import (
 	cstablesort "github.com/m4gshm/gollections/slice/clone/stablesort"
 	"github.com/m4gshm/gollections/slice/conv"
 	"github.com/m4gshm/gollections/slice/convert"
+	"github.com/m4gshm/gollections/slice/filter"
 	"github.com/m4gshm/gollections/slice/first"
 	"github.com/m4gshm/gollections/slice/last"
 	"github.com/m4gshm/gollections/slice/range_"
@@ -347,6 +348,12 @@ func Test_Filter(t *testing.T) {
 	s := slice.Of(1, 3, 4, 5, 7, 8, 9, 11)
 	r := slice.Filter(s, even)
 	assert.Equal(t, slice.Of(4, 8), r)
+}
+
+func Test_FilterConvertFilter(t *testing.T) {
+	s := slice.Of(1, 3, 4, 5, 7, 8, 9, 11)
+	r := filter.ConvertFilter(s, even, func(i int) int { return i * 2 }, even)
+	assert.Equal(t, slice.Of(8, 16), r)
 }
 
 func Test_Filt(t *testing.T) {

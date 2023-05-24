@@ -158,14 +158,14 @@ func ToKVs[TS ~[]T, T, K, V any](elements TS, keysExtractor func(T) []K, valsExt
 	return kv
 }
 
-// FlattKeys transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
-func FlattKeys[TS ~[]T, T, K any](elements TS, keysExtractor func(T) []K) *MultipleKeyValuer[T, K, T] {
+// FlatKeys transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
+func FlatKeys[TS ~[]T, T, K any](elements TS, keysExtractor func(T) []K) *MultipleKeyValuer[T, K, T] {
 	kv := NewMultipleKeyValuer(elements, keysExtractor, convert.AsSlice[T])
 	return kv
 }
 
-// FlattValues transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
-func FlattValues[TS ~[]T, T, V any](elements TS, valsExtractor func(T) []V) *MultipleKeyValuer[T, T, V] {
+// FlatValues transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
+func FlatValues[TS ~[]T, T, V any](elements TS, valsExtractor func(T) []V) *MultipleKeyValuer[T, T, V] {
 	kv := NewMultipleKeyValuer(elements, convert.AsSlice[T], valsExtractor)
 	return kv
 }

@@ -64,8 +64,8 @@ func ToKVs[T, K, V any](element T, keysExtractor func(T) []K, valsExtractor func
 	return out
 }
 
-// FlattValues transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
-func FlattValues[T, V any](element T, valsExtractor func(T) []V) (out []c.KV[T, V]) {
+// FlatValues transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
+func FlatValues[T, V any](element T, valsExtractor func(T) []V) (out []c.KV[T, V]) {
 	var (
 		key    = element
 		values = valsExtractor(element)
@@ -82,8 +82,8 @@ func FlattValues[T, V any](element T, valsExtractor func(T) []V) (out []c.KV[T, 
 	return out
 }
 
-// FlattKeys transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
-func FlattKeys[T, K any](element T, keysExtractor func(T) []K) (out []c.KV[K, T]) {
+// FlatKeys transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
+func FlatKeys[T, K any](element T, keysExtractor func(T) []K) (out []c.KV[K, T]) {
 	var (
 		keys  = keysExtractor(element)
 		value = element
