@@ -42,7 +42,22 @@ func Test_FilterAndConvert(t *testing.T) {
 	}
 
 	assert.Equal(t, slice.Of("2_tail", "4_tail"), convertedOld)
+}
 
+func Test_FiltAndConv(t *testing.T) {
+	var (
+		toString = func(i int) string { return fmt.Sprintf("%d", i) }
+		addTail  = func(s string) string { return s + "_tail" }
+	)
+	items := []int{1, 2, 3, 4, 5}
+
+	converted := sliceIter.FiltAndConv(items, func(v int) (bool, error) { return v%2 == 0, nil }, wrap(convert.And(toString, addTail)))
+	s, _ := breakLoop.Slice(converted.Next)
+	assert.Equal(t, slice.Of("2_tail", "4_tail"), s)
+}
+
+func wrap[F, T any](f func(F) T) func(F) (T, error) {
+	return func(i F) (T, error) { return f(i), nil }
 }
 
 func Test_FlattSlices(t *testing.T) {

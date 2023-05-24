@@ -174,3 +174,8 @@ func FlatValues[TS ~[]T, T, V any](elements TS, valsExtractor func(T) []V) *Mult
 func NewKeyVal[TS ~[]T, T any, K, V any](elements TS, keyExtractor func(T) (K, error), valsExtractor func(T) (V, error)) *KeyValIter[T, K, V] {
 	return &KeyValIter[T, K, V]{iter: slice.NewHead(elements), keyExtractor: keyExtractor, valExtractor: valsExtractor}
 }
+
+// NewMultipleKeyVal creates instance of the KeyValuer
+func NewMultipleKeyVal[TS ~[]T, T any, K, V any](elements TS, keysExtractor func(T) ([]K, error), valsExtractor func(T) ([]V, error)) *MultipleKeyValIter[T, K, V] {
+	return &MultipleKeyValIter[T, K, V]{iter: slice.NewHead(elements), keysExtractor: keysExtractor, valsExtractor: valsExtractor}
+}

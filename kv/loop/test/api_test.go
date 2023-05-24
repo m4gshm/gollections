@@ -94,3 +94,17 @@ func Test_Filt2(t *testing.T) {
 	assert.Error(t, err)
 	assert.Equal(t, slice.Of(k.V(1, "1"), k.V(2, "2")), out)
 }
+
+func Test_NewIter(t *testing.T) {
+	s := slice.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
+	i := 0
+	it := kvloop.NewIter(s, func(s []c.KV[int, string]) bool { return i < len(s) }, func(s []c.KV[int, string]) (int, string, error) {
+		n := s[i]
+		i++
+		return n.K, n.V, nil
+	})
+
+	out := kvloop.ToSlice(it.Next, k.V[int, string])
+	assert.NoError(t, it.Error())
+	assert.Equal(t, slice.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3")), out)
+}

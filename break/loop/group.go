@@ -40,7 +40,7 @@ func (kv KeyValuer[T, K, V]) Next() (key K, value V, ok bool, err error) {
 			value, err = kv.valExtractor(elem)
 		}
 	}
-	return key, value, ok, err
+	return key, value, true, err
 }
 
 // MultipleKeyValuer is the Iterator wrapper that converts an element to a key\value pair and iterates over these pairs

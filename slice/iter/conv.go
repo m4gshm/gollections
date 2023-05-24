@@ -87,13 +87,14 @@ func (i *ConvIter[From, To]) Cap() int {
 }
 
 func nextFilt[T any](array unsafe.Pointer, size int, elemSize uintptr, filter func(T) (bool, error), index *int) (v T, ok bool, err error) {
-	for i := *index; i < size; i++ {
+	i := *index
+	for ; i < size; i++ {
 		v = *(*T)(notsafe.GetArrayElemRef(array, i, elemSize))
-		if ok, err = filter(v); err != nil || !ok {
-			return v, false, err
+		if ok, err = filter(v); err != nil || ok {
+			*index = i + 1
+			return v, ok, err
 		}
-		*index = i + 1
-		return v, true, nil
 	}
+	*index = i + 1
 	return v, false, nil
 }

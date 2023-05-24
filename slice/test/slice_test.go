@@ -3,10 +3,11 @@ package test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/m4gshm/gollections/convert/as"
 	"github.com/m4gshm/gollections/kv/group"
 	"github.com/m4gshm/gollections/slice"
-	"github.com/stretchr/testify/assert"
 )
 
 func Test_PointerBasedIter(t *testing.T) {
@@ -287,10 +288,19 @@ func Test_ForLoop(t *testing.T) {
 	assert.Equal(t, expected, actual2)
 }
 
-func Test_group_odd_even(t *testing.T) {
+func Test_group_odd_even2(t *testing.T) {
 	var (
 		even   = func(v int) bool { return v%2 == 0 }
 		it     = slice.ToKV(slice.Of(1, 1, 2, 4, 3, 1), even, as.Is[int])
+		groups = group.Of(it)
+	)
+	assert.Equal(t, map[bool][]int{false: {1, 1, 3, 1}, true: {2, 4}}, groups)
+}
+
+func Test_group_odd_even3(t *testing.T) {
+	var (
+		even   = func(v int) bool { return v%2 == 0 }
+		it     = slice.ToKVs(slice.Of(1, 1, 2, 4, 3, 1), func(i int) []bool { return slice.Of(even(i)) }, func(i int) []int { return slice.Of(i) })
 		groups = group.Of(it)
 	)
 	assert.Equal(t, map[bool][]int{false: {1, 1, 3, 1}, true: {2, 4}}, groups)
