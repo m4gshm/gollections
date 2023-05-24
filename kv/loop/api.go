@@ -73,10 +73,8 @@ func Firstt[K, V any](next func() (K, V, bool), predicate func(K, V) (bool, erro
 	for {
 		if k, v, ok := next(); !ok {
 			return k, v, false, nil
-		} else if ok, err := predicate(k, v); err != nil {
-			return k, v, false, err
-		} else if ok {
-			return k, v, true, nil
+		} else if ok, err := predicate(k, v); err != nil || ok {
+			return k, v, ok, err
 		}
 	}
 }

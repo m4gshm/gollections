@@ -96,10 +96,8 @@ func Firstt[K, V any](next func() (K, V, bool, error), predicate func(K, V) (boo
 	for {
 		if k, v, ok, err := next(); err != nil || !ok {
 			return k, v, false, err
-		} else if ok, err := predicate(k, v); err != nil {
-			return k, v, false, err
-		} else if ok {
-			return k, v, true, nil
+		} else if ok, err := predicate(k, v); err != nil || ok  {
+			return k, v, ok, err
 		}
 	}
 }
@@ -147,10 +145,12 @@ func ToSlice[K, V, T any](next func() (K, V, bool, error), converter func(K, V) 
 	s := []T{}
 	for {
 		key, val, ok, err := next()
-		if err != nil || !ok {
+		if ok {
+			s = append(s, converter(key, val))
+		}
+		if !ok || err != nil {
 			return s, err
 		}
-		s = append(s, converter(key, val))
 	}
 }
 

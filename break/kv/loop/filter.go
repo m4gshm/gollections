@@ -26,19 +26,11 @@ func (f FiltKVIter[K, V]) Track(traker func(key K, value V) error) error {
 // If ok == false, then the iteration must be completed.
 func (f FiltKVIter[K, V]) Next() (key K, value V, ok bool, err error) {
 	if !(f.next == nil || f.filter == nil) {
-		key, value, ok, err = nextFilteredKV(f.next, f.filter)
+		key, value, ok, err = nextFiltered(f.next, f.filter)
 	}
 	return key, value, ok, err
 }
 
-func nextFilteredKV[K any, V any](next func() (K, V, bool, error), filter func(K, V) (bool, error)) (key K, val V, filtered bool, err error) {
-	for {
-		if key, val, ok, err := next(); err != nil || !ok {
-			return key, val, false, err
-		} else if ok, err := filter(key, val); err != nil {
-			return key, val, false, err
-		} else if ok {
-			return key, val, true, nil
-		}
-	}
+func nextFiltered[K any, V any](next func() (K, V, bool, error), filter func(K, V) (bool, error)) (key K, val V, filtered bool, err error) {
+	return Firstt(next, filter)
 }

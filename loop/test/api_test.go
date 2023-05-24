@@ -1,6 +1,7 @@
 package test
 
 import (
+	"errors"
 	"strconv"
 	"strings"
 	"testing"
@@ -194,6 +195,32 @@ func Test_FilterConvertFilter(t *testing.T) {
 	s := loop.Of(1, 3, 4, 5, 7, 8, 9, 11)
 	r := filter.ConvertFilter(s, even, func(i int) int { return i * 2 }, even)
 	assert.Equal(t, slice.Of(8, 16), loop.Slice(r.Next))
+}
+
+func Test_Filt(t *testing.T) {
+	s := loop.Of(1, 3, 4, 5, 7, 8, 9, 11)
+	l := loop.Filt(s, func(i int) (bool, error) { return even(i), op.IfElse(i > 7, errors.New("abort"), nil) })
+	r, err := breakLoop.Slice(l.Next)
+	assert.Error(t, err)
+	assert.Equal(t, slice.Of(4, 8), r)
+}
+
+func Test_Filt2(t *testing.T) {
+	s := loop.Of(1, 3, 4, 5, 7, 8, 9, 11)
+	l := loop.Filt(s, func(i int) (bool, error) {
+		ok := i <= 7
+		return ok && even(i), op.IfElse(ok, nil, errors.New("abort"))
+	})
+	r, err := breakLoop.Slice(l.Next)
+	assert.Error(t, err)
+	assert.Equal(t, slice.Of(4), r)
+}
+
+func Test_FiltAndConv(t *testing.T) {
+	s := loop.Of(1, 3, 4, 5, 7, 8, 9, 11)
+	r := loop.FiltAndConv(s, func(v int) (bool, error) { return v%2 == 0, nil }, func(i int) (int, error) { return i * 2, nil })
+	o, _ := breakLoop.Slice(r.Next)
+	assert.Equal(t, slice.Of(8, 16), o)
 }
 
 func Test_Filtering(t *testing.T) {

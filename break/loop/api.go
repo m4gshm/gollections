@@ -120,10 +120,12 @@ func Track[I, T any](next func() (I, T, bool, error), tracker func(I, T) error) 
 func Slice[T any](next func() (T, bool, error)) (out []T, err error) {
 	for {
 		v, ok, err := next()
-		if err != nil || !ok {
+		if ok {
+			out = append(out, v)
+		}
+		if !ok || err != nil {
 			return out, err
 		}
-		out = append(out, v)
 	}
 }
 

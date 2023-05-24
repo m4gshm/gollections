@@ -27,7 +27,7 @@ func (f FiltIter[T]) Next() (element T, ok bool, err error) {
 	if next, by := f.next, f.filter; next != nil && by != nil {
 		element, ok, err = nextFiltered(next, by)
 	}
-	return element, ok, nil
+	return element, ok, err
 }
 
 func nextFiltered[T any](next func() (T, bool, error), filter func(T) (bool, error)) (v T, ok bool, err error) {

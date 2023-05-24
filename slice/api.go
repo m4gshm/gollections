@@ -204,6 +204,26 @@ func FilterAndConvert[FS ~[]From, From, To any](elements FS, filter func(From) b
 	return result
 }
 
+// FiltAndConv returns a stream that filters source elements and converts them
+func FiltAndConv[FS ~[]From, From, To any](elements FS, filter func(From) (bool, error), by func(From) (To, error)) ([]To, error) {
+	if elements == nil {
+		return nil, nil
+	}
+	var result = make([]To, 0, len(elements)/2)
+	for _, e := range elements {
+		if ok, err := filter(e); err != nil {
+			return result, err
+		} else if ok {
+			c, err := by(e)
+			if err != nil {
+				return result, err
+			}
+			result = append(result, c)
+		}
+	}
+	return result, nil
+}
+
 // ConvertAndFilter additionally filters 'To' elements
 func ConvertAndFilter[FS ~[]From, From, To any](elements FS, by func(From) To, filter func(To) bool) []To {
 	if elements == nil {
@@ -418,10 +438,12 @@ func Filt[TS ~[]T, T any](elements TS, filter func(T) (bool, error)) ([]T, error
 	}
 	var result = make([]T, 0, len(elements)/2)
 	for _, e := range elements {
-		if ok, err := filter(e); err != nil {
-			return result, err
-		} else if ok {
+		ok, err := filter(e)
+		if ok {
 			result = append(result, e)
+		}
+		if err != nil {
+			return result, err
 		}
 	}
 	return result, nil

@@ -31,16 +31,11 @@ func (f FilterKVIter[K, V]) TrackEach(traker func(key K, value V)) {
 // If ok == false, then the iteration must be completed.
 func (f FilterKVIter[K, V]) Next() (key K, value V, ok bool) {
 	if !(f.next == nil || f.filter == nil) {
-		key, value, ok = nextFilteredKV(f.next, f.filter)
+		key, value, ok = nextFiltered(f.next, f.filter)
 	}
 	return key, value, ok
 }
 
-func nextFilteredKV[K any, V any](next func() (K, V, bool), filter func(K, V) bool) (key K, val V, filtered bool) {
-	for key, val, ok := next(); ok; key, val, ok = next() {
-		if filter(key, val) {
-			return key, val, true
-		}
-	}
-	return key, val, false
+func nextFiltered[K any, V any](next func() (K, V, bool), filter func(K, V) bool) (key K, val V, filtered bool) {
+	return First(next, filter)
 }

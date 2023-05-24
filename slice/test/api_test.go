@@ -360,7 +360,24 @@ func Test_Filt(t *testing.T) {
 	s := slice.Of(1, 3, 4, 5, 7, 8, 9, 11)
 	r, err := slice.Filt(s, func(i int) (bool, error) { return even(i), op.IfElse(i > 7, errors.New("abort"), nil) })
 	assert.Error(t, err)
+	assert.Equal(t, slice.Of(4, 8), r)
+}
+
+func Test_Filt2(t *testing.T) {
+	s := slice.Of(1, 3, 4, 5, 7, 8, 9, 11)
+	r, err := slice.Filt(s, func(i int) (bool, error) {
+		ok := i <= 7
+		return ok && even(i), op.IfElse(ok, nil, errors.New("abort"))
+
+	})
+	assert.Error(t, err)
 	assert.Equal(t, slice.Of(4), r)
+}
+
+func Test_FiltAndConv(t *testing.T) {
+	s := slice.Of(1, 3, 4, 5, 7, 8, 9, 11)
+	r, _ := slice.FiltAndConv(s, func(v int) (bool, error) { return v%2 == 0, nil }, func(i int) (int, error) { return i * 2, nil })
+	assert.Equal(t, slice.Of(8, 16), r)
 }
 
 func Test_StringRepresentation(t *testing.T) {
