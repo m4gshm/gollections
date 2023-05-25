@@ -11,6 +11,7 @@ import (
 	breakLoop "github.com/m4gshm/gollections/break/loop"
 	"github.com/m4gshm/gollections/c"
 	kvloop "github.com/m4gshm/gollections/kv/loop"
+	kvloopgroup "github.com/m4gshm/gollections/kv/loop/group"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/loop/conv"
 	"github.com/m4gshm/gollections/loop/convert"
@@ -253,23 +254,23 @@ func Test_MatchAny(t *testing.T) {
 	assert.False(t, noOk)
 }
 
+type Role struct {
+	name string
+}
+
+type User struct {
+	name  string
+	age   int
+	roles []Role
+}
+
+var users = []User{
+	{name: "Bob", age: 26, roles: []Role{{"Admin"}, {"manager"}}},
+	{name: "Alice", age: 35, roles: []Role{{"Manager"}}},
+	{name: "Tom", age: 18}, {},
+}
+
 func Test_MultipleKeyValuer(t *testing.T) {
-	type Role struct {
-		name string
-	}
-
-	type User struct {
-		name  string
-		age   int
-		roles []Role
-	}
-
-	var users = []User{
-		{name: "Bob", age: 26, roles: []Role{{"Admin"}, {"manager"}}},
-		{name: "Alice", age: 35, roles: []Role{{"Manager"}}},
-		{name: "Tom", age: 18}, {},
-	}
-
 	m := kvloop.Group(loop.ToKVs(loop.Of(users...),
 		func(u User) []string {
 			return slice.Convert(u.roles, func(r Role) string { return strings.ToLower(r.name) })
@@ -343,4 +344,15 @@ func Test_ForEachFiltered(t *testing.T) {
 	var out []int
 	loop.ForEachFiltered(loop.Of(1, 2, 3, 4), even, func(i int) { out = append(out, i) })
 	assert.Equal(t, slice.Of(2, 4), out)
+}
+
+func Test_FlatValues(t *testing.T) {
+	g := kvloopgroup.Of(loop.FlatValues(loop.Of(users...), func(u User) string { return u.name }, func(u User) []int { return slice.Of(u.age) }).Next)
+
+	assert.Equal(t, g["Bob"], slice.Of(26))
+}
+
+func Test_FlatKeys(t *testing.T) {
+	g := kvloopgroup.Of(loop.FlatKeys(loop.Of(users...), func(u User) []string { return slice.Of(u.name) }, func(u User) int { return u.age }).Next)
+	assert.Equal(t, g["Alice"], slice.Of(35))
 }
