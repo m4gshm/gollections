@@ -2,9 +2,10 @@
 package op
 
 import (
+	"golang.org/x/exp/constraints"
+
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/op"
-	"golang.org/x/exp/constraints"
 )
 
 // Sum returns the sum of two operands

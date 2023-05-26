@@ -19,15 +19,15 @@ func FilterAndConvert[FS ~[]From, From, To any](elements FS, filter func(From) b
 	return stream.New(f.Next)
 }
 
-// Flatt returns a stream that converts the collection elements into slices and then flattens them to one level
-func Flatt[FS ~[]From, From, To any](elements FS, by func(From) []To) stream.Iter[To] {
-	f := iter.Flatt(elements, by)
+// Flat returns a stream that converts the collection elements into slices and then flattens them to one level
+func Flat[FS ~[]From, From, To any](elements FS, by func(From) []To) stream.Iter[To] {
+	f := iter.Flat(elements, by)
 	return stream.New(f.Next)
 }
 
-// FilterAndFlatt filters source elements and extracts slices of 'To' by the 'flattener' function
-func FilterAndFlatt[FS ~[]From, From, To any](elements FS, filter func(From) bool, flattener func(From) []To) stream.Iter[To] {
-	f := iter.FilterAndFlatt(elements, filter, flattener)
+// FilterAndFlat filters source elements and extracts slices of 'To' by the 'flattener' function
+func FilterAndFlat[FS ~[]From, From, To any](elements FS, filter func(From) bool, flattener func(From) []To) stream.Iter[To] {
+	f := iter.FilterAndFlat(elements, filter, flattener)
 	return stream.New(f.Next)
 }
 

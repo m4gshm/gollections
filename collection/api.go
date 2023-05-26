@@ -2,6 +2,8 @@
 package collection
 
 import (
+	"golang.org/x/exp/constraints"
+
 	breakLoop "github.com/m4gshm/gollections/break/loop"
 	breakStream "github.com/m4gshm/gollections/break/stream"
 	"github.com/m4gshm/gollections/c"
@@ -12,7 +14,6 @@ import (
 	"github.com/m4gshm/gollections/op/check/not"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/stream"
-	"golang.org/x/exp/constraints"
 )
 
 // Convert returns a stream that applies the 'converter' function to the collection elements
@@ -34,24 +35,24 @@ func FilterAndConvert[From, To any, I c.Iterable[From]](collection I, filter fun
 	return stream.New(f.Next)
 }
 
-// Flatt returns a stream that converts the collection elements into slices and then flattens them to one level
-func Flatt[From, To any, I c.Iterable[From]](collection I, by func(From) []To) stream.Iter[To] {
+// Flat returns a stream that converts the collection elements into slices and then flattens them to one level
+func Flat[From, To any, I c.Iterable[From]](collection I, by func(From) []To) stream.Iter[To] {
 	b := collection.Iter()
-	f := loop.Flatt(b.Next, by)
+	f := loop.Flat(b.Next, by)
 	return stream.New(f.Next)
 }
 
-// Flat returns a breakable stream that converts the collection elements into slices and then flattens them to one level
-func Flat[From, To comparable, I c.Iterable[From]](collection I, flattener func(From) ([]To, error)) breakStream.Iter[To] {
+// Flatt returns a breakable stream that converts the collection elements into slices and then flattens them to one level
+func Flatt[From, To comparable, I c.Iterable[From]](collection I, flattener func(From) ([]To, error)) breakStream.Iter[To] {
 	h := collection.Iter()
-	f := breakLoop.Flat(breakLoop.From(h.Next), flattener)
+	f := breakLoop.Flatt(breakLoop.From(h.Next), flattener)
 	return breakStream.New(f.Next)
 }
 
-// FilterAndFlatt filters source elements and extracts slices of 'To' by the 'flattener' function
-func FilterAndFlatt[From, To any, I c.Iterable[From]](collection I, filter func(From) bool, flattener func(From) []To) stream.Iter[To] {
+// FilterAndFlat filters source elements and extracts slices of 'To' by the 'flattener' function
+func FilterAndFlat[From, To any, I c.Iterable[From]](collection I, filter func(From) bool, flattener func(From) []To) stream.Iter[To] {
 	b := collection.Iter()
-	f := loop.FilterAndFlatt(b.Next, filter, flattener)
+	f := loop.FilterAndFlat(b.Next, filter, flattener)
 	return stream.New(f.Next)
 }
 

@@ -28,6 +28,7 @@ import (
 	cstablesort "github.com/m4gshm/gollections/slice/clone/stablesort"
 	"github.com/m4gshm/gollections/slice/conv"
 	"github.com/m4gshm/gollections/slice/convert"
+	"github.com/m4gshm/gollections/slice/filter"
 	"github.com/m4gshm/gollections/slice/first"
 	"github.com/m4gshm/gollections/slice/last"
 	"github.com/m4gshm/gollections/slice/range_"
@@ -293,14 +294,14 @@ func Test_ConvertFilteredWithIndexInPlace(t *testing.T) {
 
 func Test_Flatt(t *testing.T) {
 	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
-	f := slice.Flatt(md, func(i []int) []int { return i })
+	f := slice.Flat(md, func(i []int) []int { return i })
 	e := []int{1, 2, 3, 4, 5, 6}
 	assert.Equal(t, e, f)
 }
 
 func Test_Flat(t *testing.T) {
 	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
-	f, err := slice.Flat(md, func(i []int) ([]int, error) { return i, op.IfElse(len(i) == 2, errors.New("abort"), nil) })
+	f, err := slice.Flatt(md, func(i []int) ([]int, error) { return i, op.IfElse(len(i) == 2, errors.New("abort"), nil) })
 	assert.Error(t, err)
 	e := []int{1, 2, 3, 4}
 	assert.Equal(t, e, f)
@@ -310,7 +311,7 @@ func Benchmark_Flatt(b *testing.B) {
 	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
 
 	for i := 0; i < b.N; i++ {
-		_ = slice.Flatt(md, func(i []int) []int { return i })
+		_ = slice.Flat(md, func(i []int) []int { return i })
 	}
 }
 
@@ -324,21 +325,21 @@ func Benchmark_Flatt_Convert_AsIs(b *testing.B) {
 
 func Test_FlattFilter(t *testing.T) {
 	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
-	f := slice.FilterAndFlatt(md, func(from []int) bool { return len(from) > 1 }, func(i []int) []int { return i })
+	f := slice.FilterAndFlat(md, func(from []int) bool { return len(from) > 1 }, func(i []int) []int { return i })
 	e := []int{1, 2, 3, 5, 6}
 	assert.Equal(t, e, f)
 }
 
 func Test_FlattElemFilter(t *testing.T) {
 	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
-	f := slice.FlattAndFiler(md, func(i []int) []int { return i }, even)
+	f := slice.FlatAndFiler(md, func(i []int) []int { return i }, even)
 	e := []int{2, 4, 6}
 	assert.Equal(t, e, f)
 }
 
-func Test_FilterAndFlattFit(t *testing.T) {
+func Test_FilterAndFlattFilt(t *testing.T) {
 	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
-	f := slice.FilterFlattFilter(md, func(from []int) bool { return len(from) > 1 }, func(i []int) []int { return i }, even)
+	f := slice.FilterFlatFilter(md, func(from []int) bool { return len(from) > 1 }, func(i []int) []int { return i }, even)
 	e := []int{2, 6}
 	assert.Equal(t, e, f)
 }
@@ -349,11 +350,34 @@ func Test_Filter(t *testing.T) {
 	assert.Equal(t, slice.Of(4, 8), r)
 }
 
+func Test_FilterConvertFilter(t *testing.T) {
+	s := slice.Of(1, 3, 4, 5, 7, 8, 9, 11)
+	r := filter.ConvertFilter(s, even, func(i int) int { return i * 2 }, even)
+	assert.Equal(t, slice.Of(8, 16), r)
+}
+
 func Test_Filt(t *testing.T) {
 	s := slice.Of(1, 3, 4, 5, 7, 8, 9, 11)
 	r, err := slice.Filt(s, func(i int) (bool, error) { return even(i), op.IfElse(i > 7, errors.New("abort"), nil) })
 	assert.Error(t, err)
+	assert.Equal(t, slice.Of(4, 8), r)
+}
+
+func Test_Filt2(t *testing.T) {
+	s := slice.Of(1, 3, 4, 5, 7, 8, 9, 11)
+	r, err := slice.Filt(s, func(i int) (bool, error) {
+		ok := i <= 7
+		return ok && even(i), op.IfElse(ok, nil, errors.New("abort"))
+
+	})
+	assert.Error(t, err)
 	assert.Equal(t, slice.Of(4), r)
+}
+
+func Test_FiltAndConv(t *testing.T) {
+	s := slice.Of(1, 3, 4, 5, 7, 8, 9, 11)
+	r, _ := slice.FiltAndConv(s, func(v int) (bool, error) { return v%2 == 0, nil }, func(i int) (int, error) { return i * 2, nil })
+	assert.Equal(t, slice.Of(8, 16), r)
 }
 
 func Test_StringRepresentation(t *testing.T) {

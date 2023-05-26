@@ -22,7 +22,7 @@ import (
 	"github.com/m4gshm/gollections/slice/clone/sort"
 	"github.com/m4gshm/gollections/slice/convert"
 	"github.com/m4gshm/gollections/slice/filter"
-	"github.com/m4gshm/gollections/slice/flatt"
+	"github.com/m4gshm/gollections/slice/flat"
 	"github.com/m4gshm/gollections/slice/group"
 	"github.com/m4gshm/gollections/slice/range_"
 	"github.com/m4gshm/gollections/slice/reverse"
@@ -80,7 +80,7 @@ func Test_FindFirsManager(t *testing.T) {
 }
 
 func Test_AggregateFilteredRoles(t *testing.T) {
-	roles := flatt.AndConvert(users, User.Roles, Role.Name)
+	roles := flat.AndConvert(users, User.Roles, Role.Name)
 	roleNamesExceptManager := slice.Filter(roles, not.Eq("Manager"))
 
 	assert.Equal(t, slice.Of("Admin", "manager"), roleNamesExceptManager)
@@ -273,7 +273,7 @@ func Test_ConvertNotnilPointersToValues(t *testing.T) {
 func Test_Flatt(t *testing.T) {
 	var (
 		source   = [][]int{{1, 2, 3}, {4}, {5, 6}}
-		result   = slice.Flatt(source, as.Is[[]int])
+		result   = slice.Flat(source, as.Is[[]int])
 		expected = []int{1, 2, 3, 4, 5, 6}
 	)
 	assert.Equal(t, expected, result)
@@ -308,7 +308,7 @@ func Test_Slice_Sum(t *testing.T) {
 func Test_Slice_Flatt(t *testing.T) {
 	var (
 		source   = [][]int{{1, 2, 3}, {4}, {5, 6}}
-		result   = slice.Flatt(source, as.Is[[]int])
+		result   = slice.Flat(source, as.Is[[]int])
 		expected = []int{1, 2, 3, 4, 5, 6}
 	)
 	assert.Equal(t, expected, result)

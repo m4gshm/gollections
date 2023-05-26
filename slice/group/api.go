@@ -12,15 +12,15 @@ func Of[TS ~[]T, T any, K comparable, V any](elements TS, keyExtractor func(T) K
 
 // ByMultiple is a short alias for slice.GroupByMultiple
 func ByMultiple[TS ~[]T, T any, K comparable, V any](elements TS, keysExtractor func(T) []K, valsExtractor func(T) []V) map[K][]V {
-	return slice.GroupInMultiple(elements, keysExtractor, valsExtractor)
+	return slice.GroupByMultiple(elements, keysExtractor, valsExtractor)
 }
 
 // ByMultipleKeys is a short alias for slice.GroupByMultipleKeys
 func ByMultipleKeys[TS ~[]T, T any, K comparable, V any](elements TS, keysExtractor func(T) []K, valExtractor func(T) V) map[K][]V {
-	return slice.GroupInMultipleKeys(elements, keysExtractor, valExtractor)
+	return slice.GroupByMultipleKeys(elements, keysExtractor, valExtractor)
 }
 
 // ByMultipleValues is a short alias for slice.GroupByMultipleVals
 func ByMultipleValues[TS ~[]T, T any, K comparable, V any](elements TS, keyExtractor func(T) K, valsExtractor func(T) []V) map[K][]V {
-	return slice.GroupInMultipleValues(elements, keyExtractor, valsExtractor)
+	return slice.GroupByMultipleValues(elements, keyExtractor, valsExtractor)
 }

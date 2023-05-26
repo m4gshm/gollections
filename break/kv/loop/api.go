@@ -96,10 +96,8 @@ func Firstt[K, V any](next func() (K, V, bool, error), predicate func(K, V) (boo
 	for {
 		if k, v, ok, err := next(); err != nil || !ok {
 			return k, v, false, err
-		} else if ok, err := predicate(k, v); err != nil {
-			return k, v, false, err
-		} else if ok {
-			return k, v, true, nil
+		} else if ok, err := predicate(k, v); err != nil || ok {
+			return k, v, ok, err
 		}
 	}
 }
@@ -115,13 +113,13 @@ func Conv[K, V any, KOUT, VOUT any](next func() (K, V, bool, error), converter f
 }
 
 // Filter creates an iterator that checks elements by a filter and returns successful ones
-func Filter[K, V any](next func() (K, V, bool, error), filter func(K, V) bool) FiltKV[K, V] {
-	return FiltKV[K, V]{next: next, filter: func(k K, v V) (bool, error) { return filter(k, v), nil }}
+func Filter[K, V any](next func() (K, V, bool, error), filter func(K, V) bool) FiltIter[K, V] {
+	return FiltIter[K, V]{next: next, filter: func(k K, v V) (bool, error) { return filter(k, v), nil }}
 }
 
 // Filt creates an iterator that checks elements by a filter and returns successful ones
-func Filt[K, V any](next func() (K, V, bool, error), filter func(K, V) (bool, error)) FiltKV[K, V] {
-	return FiltKV[K, V]{next: next, filter: filter}
+func Filt[K, V any](next func() (K, V, bool, error), filter func(K, V) (bool, error)) FiltIter[K, V] {
+	return FiltIter[K, V]{next: next, filter: filter}
 }
 
 // ToMapResolv collects key\value elements to a map by iterating over the elements with resolving of duplicated key values
@@ -147,10 +145,12 @@ func ToSlice[K, V, T any](next func() (K, V, bool, error), converter func(K, V) 
 	s := []T{}
 	for {
 		key, val, ok, err := next()
-		if err != nil || !ok {
+		if ok {
+			s = append(s, converter(key, val))
+		}
+		if !ok || err != nil {
 			return s, err
 		}
-		s = append(s, converter(key, val))
 	}
 }
 

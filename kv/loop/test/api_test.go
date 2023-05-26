@@ -1,17 +1,17 @@
 package test
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/m4gshm/gollections/c"
-
 	breakkvloop "github.com/m4gshm/gollections/break/kv/loop"
+	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/k"
 	kvloop "github.com/m4gshm/gollections/kv/loop"
 	"github.com/m4gshm/gollections/loop"
-
+	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
 )
 
@@ -81,4 +81,30 @@ func Test_Filt(t *testing.T) {
 	out, _ := breakkvloop.ToSlice(kvloop.Filt(kvl, func(key int, val string) (bool, error) { return key != 2, nil }).Next, k.V[int, string])
 
 	assert.Equal(t, slice.Of(k.V(1, "1"), k.V(3, "3")), out)
+}
+
+func Test_Filt2(t *testing.T) {
+	kvl := loop.ToKV(slice.NewIter(slice.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))).Next, c.KV[int, string].Key, c.KV[int, string].Value).Next
+
+	out, err := breakkvloop.ToSlice(kvloop.Filt(kvl, func(key int, val string) (bool, error) {
+		ok := key <= 2
+		return ok, op.IfElse(key == 2, errors.New("abort"), nil)
+	}).Next, k.V[int, string])
+
+	assert.Error(t, err)
+	assert.Equal(t, slice.Of(k.V(1, "1"), k.V(2, "2")), out)
+}
+
+func Test_NewIter(t *testing.T) {
+	s := slice.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
+	i := 0
+	it := kvloop.NewIter(s, func(s []c.KV[int, string]) bool { return i < len(s) }, func(s []c.KV[int, string]) (int, string, error) {
+		n := s[i]
+		i++
+		return n.K, n.V, nil
+	})
+
+	out := kvloop.ToSlice(it.Next, k.V[int, string])
+	assert.NoError(t, it.Error())
+	assert.Equal(t, slice.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3")), out)
 }

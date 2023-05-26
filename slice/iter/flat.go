@@ -14,7 +14,7 @@ type FlatFiltIter[From, To any] struct {
 	elemSizeFrom, elemSizeTo uintptr
 	sizeFrom, sizeTo         int
 	indFrom, indTo, cap      int
-	flatt                    func(From) ([]To, error)
+	flattener                func(From) ([]To, error)
 	filter                   func(From) (bool, error)
 }
 
@@ -44,7 +44,7 @@ func (f *FlatFiltIter[From, To]) Next() (t To, ok bool, err error) {
 		if ok, err := f.filter(v); err != nil {
 			return t, false, err
 		} else if ok {
-			if elementsTo, err := f.flatt(v); err != nil {
+			if elementsTo, err := f.flattener(v); err != nil {
 				return t, false, err
 			} else if len(elementsTo) > 0 {
 				f.indFrom = indFrom + 1
@@ -71,7 +71,7 @@ type FlatIter[From, To any] struct {
 	elemSizeFrom, elemSizeTo uintptr
 	sizeFrom, sizeTo         int
 	indFrom, indTo           int
-	flatt                    func(From) ([]To, error)
+	flattener                func(From) ([]To, error)
 }
 
 var _ c.Iterator[any] = (*FlatIter[any, any])(nil)
@@ -97,7 +97,7 @@ func (f *FlatIter[From, To]) Next() (t To, ok bool, err error) {
 	}
 	for indFrom := f.indFrom; indFrom < f.sizeFrom; indFrom++ {
 		vf := *(*From)(notsafe.GetArrayElemRef(f.arrayFrom, indFrom, f.elemSizeFrom))
-		if elementsTo, err := f.flatt(vf); err != nil {
+		if elementsTo, err := f.flattener(vf); err != nil {
 			return t, false, err
 		} else if len(elementsTo) > 0 {
 			f.indFrom = indFrom + 1

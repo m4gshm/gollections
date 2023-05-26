@@ -22,30 +22,30 @@ func Convert[From, To any, I c.Iterator[From]](elements I, converter func(From) 
 }
 
 // FilterAndConvert returns a stream that filters source elements and converts them
-func FilterAndConvert[From, To any, I c.Iterator[From]](elements I, filter func(From) bool, converter func(From) To) loop.ConvertFitIter[From, To] {
+func FilterAndConvert[From, To any, I c.Iterator[From]](elements I, filter func(From) bool, converter func(From) To) loop.ConvertFiltIter[From, To] {
 	return loop.FilterAndConvert(elements.Next, filter, converter)
 }
 
-// Flatt instantiates an iterator that converts the collection elements into slices and then flattens them to one level
-func Flatt[From, To any, I c.Iterator[From]](elements I, flatt func(From) []To) *loop.FlatIter[From, To] {
-	f := loop.Flatt(elements.Next, flatt)
+// Flat instantiates an iterator that converts the collection elements into slices and then flattens them to one level
+func Flat[From, To any, I c.Iterator[From]](elements I, flattener func(From) []To) *loop.FlatIter[From, To] {
+	f := loop.Flat(elements.Next, flattener)
 	return &f
 }
 
-// FilterAndFlatt filters source elements and extracts slices of 'To' by the 'flattener' function
-func FilterAndFlatt[From, To any, I c.Iterator[From]](elements I, filter func(From) bool, flattener func(From) []To) *loop.FlattenFitIter[From, To] {
-	f := loop.FilterAndFlatt(elements.Next, filter, flattener)
+// FilterAndFlat filters source elements and extracts slices of 'To' by the 'flattener' function
+func FilterAndFlat[From, To any, I c.Iterator[From]](elements I, filter func(From) bool, flattener func(From) []To) *loop.FlatFilterIter[From, To] {
+	f := loop.FilterAndFlat(elements.Next, filter, flattener)
 	return &f
 }
 
 // Filter instantiates an iterator that checks elements by a filter and returns successful ones
-func Filter[T any, I c.Iterator[T]](elements I, filter func(T) bool) loop.FitIter[T] {
+func Filter[T any, I c.Iterator[T]](elements I, filter func(T) bool) loop.FiltIter[T] {
 	f := loop.Filter(elements.Next, filter)
 	return f
 }
 
 // NotNil instantiates an iterator that filters nullable elements
-func NotNil[T any, I c.Iterator[*T]](elements I) loop.FitIter[*T] {
+func NotNil[T any, I c.Iterator[*T]](elements I) loop.FiltIter[*T] {
 	return Filter(elements, not.Nil[T])
 }
 

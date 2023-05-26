@@ -1,6 +1,7 @@
 package test
 
 import (
+	"errors"
 	"strconv"
 	"strings"
 	"testing"
@@ -8,10 +9,13 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	breakLoop "github.com/m4gshm/gollections/break/loop"
+	"github.com/m4gshm/gollections/c"
 	kvloop "github.com/m4gshm/gollections/kv/loop"
+	kvloopgroup "github.com/m4gshm/gollections/kv/loop/group"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/loop/conv"
 	"github.com/m4gshm/gollections/loop/convert"
+	"github.com/m4gshm/gollections/loop/filter"
 	"github.com/m4gshm/gollections/loop/first"
 	"github.com/m4gshm/gollections/loop/range_"
 	"github.com/m4gshm/gollections/op"
@@ -24,6 +28,12 @@ func Test_ReduceSum(t *testing.T) {
 	s := loop.Of(1, 3, 5, 7, 9, 11)
 	r := loop.Reduce(s, op.Sum[int])
 	assert.Equal(t, 1+3+5+7+9+11, r)
+}
+
+func Test_EmptyLoop(t *testing.T) {
+	s := loop.Of[int]()
+	r := loop.Reduce(s, op.Sum[int])
+	assert.Equal(t, 0, r)
 }
 
 func Test_ConvertAndReduce(t *testing.T) {
@@ -150,14 +160,14 @@ func Test_ConvertFilteredInplace(t *testing.T) {
 
 func Test_Flatt(t *testing.T) {
 	md := loop.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...)
-	f := loop.Flatt(md, func(i []int) []int { return i })
+	f := loop.Flat(md, func(i []int) []int { return i })
 	e := []int{1, 2, 3, 4, 5, 6}
 	assert.Equal(t, e, loop.Slice(f.Next))
 }
 
 func Test_FlattFilter(t *testing.T) {
 	md := loop.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...)
-	f := loop.FilterAndFlatt(md, func(from []int) bool { return len(from) > 1 }, func(i []int) []int { return i })
+	f := loop.FilterAndFlat(md, func(from []int) bool { return len(from) > 1 }, func(i []int) []int { return i })
 	e := []int{1, 2, 3, 5, 6}
 	assert.Equal(t, e, loop.Slice(f.Next))
 }
@@ -169,9 +179,9 @@ func Test_FlattElemFilter(t *testing.T) {
 	assert.Equal(t, e, loop.Slice(f.Next))
 }
 
-func Test_FilterAndFlattFit(t *testing.T) {
+func Test_FilterAndFlattFilt(t *testing.T) {
 	md := loop.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...)
-	f := loop.FilterFlattFilter(md, func(from []int) bool { return len(from) > 1 }, func(i []int) []int { return i }, even)
+	f := loop.FilterFlatFilter(md, func(from []int) bool { return len(from) > 1 }, func(i []int) []int { return i }, even)
 	e := []int{2, 6}
 	assert.Equal(t, e, loop.Slice(f.Next))
 }
@@ -180,6 +190,38 @@ func Test_Filter(t *testing.T) {
 	s := loop.Of(1, 3, 4, 5, 7, 8, 9, 11)
 	r := loop.Filter(s, even)
 	assert.Equal(t, slice.Of(4, 8), loop.Slice(r.Next))
+}
+
+func Test_FilterConvertFilter(t *testing.T) {
+	s := loop.Of(1, 3, 4, 5, 7, 8, 9, 11)
+	r := filter.ConvertFilter(s, even, func(i int) int { return i * 2 }, even)
+	assert.Equal(t, slice.Of(8, 16), loop.Slice(r.Next))
+}
+
+func Test_Filt(t *testing.T) {
+	s := loop.Of(1, 3, 4, 5, 7, 8, 9, 11)
+	l := loop.Filt(s, func(i int) (bool, error) { return even(i), op.IfElse(i > 7, errors.New("abort"), nil) })
+	r, err := breakLoop.Slice(l.Next)
+	assert.Error(t, err)
+	assert.Equal(t, slice.Of(4, 8), r)
+}
+
+func Test_Filt2(t *testing.T) {
+	s := loop.Of(1, 3, 4, 5, 7, 8, 9, 11)
+	l := loop.Filt(s, func(i int) (bool, error) {
+		ok := i <= 7
+		return ok && even(i), op.IfElse(ok, nil, errors.New("abort"))
+	})
+	r, err := breakLoop.Slice(l.Next)
+	assert.Error(t, err)
+	assert.Equal(t, slice.Of(4), r)
+}
+
+func Test_FiltAndConv(t *testing.T) {
+	s := loop.Of(1, 3, 4, 5, 7, 8, 9, 11)
+	r := loop.FiltAndConv(s, func(v int) (bool, error) { return v%2 == 0, nil }, func(i int) (int, error) { return i * 2, nil })
+	o, _ := breakLoop.Slice(r.Next)
+	assert.Equal(t, slice.Of(8, 16), o)
 }
 
 func Test_Filtering(t *testing.T) {
@@ -212,23 +254,23 @@ func Test_MatchAny(t *testing.T) {
 	assert.False(t, noOk)
 }
 
+type Role struct {
+	name string
+}
+
+type User struct {
+	name  string
+	age   int
+	roles []Role
+}
+
+var users = []User{
+	{name: "Bob", age: 26, roles: []Role{{"Admin"}, {"manager"}}},
+	{name: "Alice", age: 35, roles: []Role{{"Manager"}}},
+	{name: "Tom", age: 18}, {},
+}
+
 func Test_MultipleKeyValuer(t *testing.T) {
-	type Role struct {
-		name string
-	}
-
-	type User struct {
-		name  string
-		age   int
-		roles []Role
-	}
-
-	var users = []User{
-		{name: "Bob", age: 26, roles: []Role{{"Admin"}, {"manager"}}},
-		{name: "Alice", age: 35, roles: []Role{{"Manager"}}},
-		{name: "Tom", age: 18}, {},
-	}
-
 	m := kvloop.Group(loop.ToKVs(loop.Of(users...),
 		func(u User) []string {
 			return slice.Convert(u.roles, func(r Role) string { return strings.ToLower(r.name) })
@@ -270,4 +312,47 @@ func Test_ConvIndexed(t *testing.T) {
 	result, err := breakLoop.Slice(conv.FromIndexed(len(indexed), func(i int) string { return indexed[i] }, strconv.Atoi).Next)
 	assert.NoError(t, err)
 	assert.Equal(t, slice.Of(10, 11, 12, 13, 14), result)
+}
+
+func Test_Containt(t *testing.T) {
+	assert.True(t, loop.Contains(loop.Of(1, 2, 3), 3))
+	assert.False(t, loop.Contains(loop.Of(1, 2, 3), 0))
+}
+
+func Test_New(t *testing.T) {
+	source := []string{"one", "two", "three"}
+	i := 0
+	l := loop.New(source, func(s []string) bool { return i < len(s) }, func(s []string) string { o := s[i]; i++; return o })
+
+	assert.Equal(t, source, loop.Slice(l))
+}
+
+func Test_For(t *testing.T) {
+	var out []int
+	err := loop.For(loop.Of(1, 2, 3, 4), func(i int) error {
+		if i == 3 {
+			return c.ErrBreak
+		}
+		out = append(out, i)
+		return nil
+	})
+	assert.NoError(t, err)
+	assert.Equal(t, slice.Of(1, 2), out)
+}
+
+func Test_ForEachFiltered(t *testing.T) {
+	var out []int
+	loop.ForEachFiltered(loop.Of(1, 2, 3, 4), even, func(i int) { out = append(out, i) })
+	assert.Equal(t, slice.Of(2, 4), out)
+}
+
+func Test_FlatValues(t *testing.T) {
+	g := kvloopgroup.Of(loop.FlatValues(loop.Of(users...), func(u User) string { return u.name }, func(u User) []int { return slice.Of(u.age) }).Next)
+
+	assert.Equal(t, g["Bob"], slice.Of(26))
+}
+
+func Test_FlatKeys(t *testing.T) {
+	g := kvloopgroup.Of(loop.FlatKeys(loop.Of(users...), func(u User) []string { return slice.Of(u.name) }, func(u User) int { return u.age }).Next)
+	assert.Equal(t, g["Alice"], slice.Of(35))
 }
