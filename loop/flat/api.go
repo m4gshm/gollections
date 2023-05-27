@@ -1,4 +1,4 @@
-// Package flattener provides short aliases for loop functions
+// Package flat provides short aliases for loop functions
 package flat
 
 import "github.com/m4gshm/gollections/loop"
