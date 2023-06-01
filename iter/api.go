@@ -28,20 +28,17 @@ func FilterAndConvert[From, To any, I c.Iterator[From]](elements I, filter func(
 
 // Flat instantiates an iterator that converts the collection elements into slices and then flattens them to one level
 func Flat[From, To any, I c.Iterator[From]](elements I, flattener func(From) []To) *loop.FlatIter[From, To] {
-	f := loop.Flat(elements.Next, flattener)
-	return &f
+	return loop.Flat(elements.Next, flattener)
 }
 
 // FilterAndFlat filters source elements and extracts slices of 'To' by the 'flattener' function
 func FilterAndFlat[From, To any, I c.Iterator[From]](elements I, filter func(From) bool, flattener func(From) []To) *loop.FlatFilterIter[From, To] {
-	f := loop.FilterAndFlat(elements.Next, filter, flattener)
-	return &f
+	return loop.FilterAndFlat(elements.Next, filter, flattener)
 }
 
 // Filter instantiates an iterator that checks elements by a filter and returns successful ones
 func Filter[T any, I c.Iterator[T]](elements I, filter func(T) bool) loop.FiltIter[T] {
-	f := loop.Filter(elements.Next, filter)
-	return f
+	return loop.Filter(elements.Next, filter)
 }
 
 // NotNil instantiates an iterator that filters nullable elements

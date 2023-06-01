@@ -192,43 +192,43 @@ func ConvertAndFilter[From, To any](next func() (From, bool), converter func(Fro
 }
 
 // Flatt instantiates an iterator that extracts slices of 'To' by a flattener from elements of 'From' and flattens as one iterable collection of 'To' elements.
-func Flatt[From, To any](next func() (From, bool), flattener func(From) ([]To, error)) loop.FlatIter[From, To] {
+func Flatt[From, To any](next func() (From, bool), flattener func(From) ([]To, error)) *loop.FlatIter[From, To] {
 	return loop.Flatt(loop.From(next), flattener)
 }
 
 // Flat instantiates an iterator that extracts slices of 'To' by a flattener from elements of 'From' and flattens as one iterable collection of 'To' elements.
-func Flat[From, To any](next func() (From, bool), flattener func(From) []To) FlatIter[From, To] {
-	return FlatIter[From, To]{next: next, flattener: flattener, elemSizeTo: notsafe.GetTypeSize[To]()}
+func Flat[From, To any](next func() (From, bool), flattener func(From) []To) *FlatIter[From, To] {
+	return &FlatIter[From, To]{next: next, flattener: flattener, elemSizeTo: notsafe.GetTypeSize[To]()}
 }
 
 // FiltAndFlat filters source elements and extracts slices of 'To' by the 'flattener' function
-func FiltAndFlat[From, To any](next func() (From, bool), filter func(From) (bool, error), flattener func(From) ([]To, error)) loop.FlattFiltIter[From, To] {
+func FiltAndFlat[From, To any](next func() (From, bool), filter func(From) (bool, error), flattener func(From) ([]To, error)) *loop.FlattFiltIter[From, To] {
 	return loop.FiltFlattFilt(loop.From(next), filter, flattener, breakAlways.True[To])
 }
 
 // FilterAndFlat filters source elements and extracts slices of 'To' by the 'flattener' function
-func FilterAndFlat[From, To any](next func() (From, bool), filter func(From) bool, flattener func(From) []To) FlatFilterIter[From, To] {
+func FilterAndFlat[From, To any](next func() (From, bool), filter func(From) bool, flattener func(From) []To) *FlatFilterIter[From, To] {
 	return FilterFlatFilter(next, filter, flattener, always.True[To])
 }
 
 // FlatAndFilt extracts slices of 'To' by the 'flattener' function and filters extracted elements
-func FlatAndFilt[From, To any](next func() (From, bool, error), flattener func(From) ([]To, error), filterTo func(To) (bool, error)) loop.FlattFiltIter[From, To] {
+func FlatAndFilt[From, To any](next func() (From, bool, error), flattener func(From) ([]To, error), filterTo func(To) (bool, error)) *loop.FlattFiltIter[From, To] {
 	return loop.FiltFlattFilt(next, breakAlways.True[From], flattener, filterTo)
 }
 
 // FlattAndFilter extracts slices of 'To' by the 'flattener' function and filters extracted elements
-func FlattAndFilter[From, To any](next func() (From, bool), flattener func(From) []To, filterTo func(To) bool) FlatFilterIter[From, To] {
+func FlattAndFilter[From, To any](next func() (From, bool), flattener func(From) []To, filterTo func(To) bool) *FlatFilterIter[From, To] {
 	return FilterFlatFilter(next, always.True[From], flattener, filterTo)
 }
 
 // FiltFlattFilt filters source elements, extracts slices of 'To' by the 'flattener' function and filters extracted elements
-func FiltFlattFilt[From, To any](next func() (From, bool), filterFrom func(From) (bool, error), flattener func(From) ([]To, error), filterTo func(To) (bool, error)) loop.FlattFiltIter[From, To] {
+func FiltFlattFilt[From, To any](next func() (From, bool), filterFrom func(From) (bool, error), flattener func(From) ([]To, error), filterTo func(To) (bool, error)) *loop.FlattFiltIter[From, To] {
 	return loop.FiltFlattFilt(loop.From(next), filterFrom, flattener, filterTo)
 }
 
 // FilterFlatFilter filters source elements, extracts slices of 'To' by the 'flattener' function and filters extracted elements
-func FilterFlatFilter[From, To any](next func() (From, bool), filterFrom func(From) bool, flattener func(From) []To, filterTo func(To) bool) FlatFilterIter[From, To] {
-	return FlatFilterIter[From, To]{next: next, filterFrom: filterFrom, flattener: flattener, filterTo: filterTo, elemSizeTo: notsafe.GetTypeSize[To]()}
+func FilterFlatFilter[From, To any](next func() (From, bool), filterFrom func(From) bool, flattener func(From) []To, filterTo func(To) bool) *FlatFilterIter[From, To] {
+	return &FlatFilterIter[From, To]{next: next, filterFrom: filterFrom, flattener: flattener, filterTo: filterTo, elemSizeTo: notsafe.GetTypeSize[To]()}
 }
 
 // Filt creates an iterator that checks elements by the 'filter' function and returns successful ones.
@@ -266,8 +266,7 @@ func ToKV[T any, K comparable, V any](next func() (T, bool), keyExtractor func(T
 
 // ToKVs transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
 func ToKVs[T, K, V any](next func() (T, bool), keysExtractor func(T) []K, valsExtractor func(T) []V) *MultipleKeyValuer[T, K, V] {
-	kv := NewMultipleKeyValuer(next, keysExtractor, valsExtractor)
-	return &kv
+	return NewMultipleKeyValuer(next, keysExtractor, valsExtractor)
 }
 
 // FlatKeys transforms iterable elements to key/value iterator based on applying key, value extractor to the elements

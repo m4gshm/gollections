@@ -17,6 +17,7 @@ import (
 	"github.com/m4gshm/gollections/loop/convert"
 	"github.com/m4gshm/gollections/loop/filter"
 	"github.com/m4gshm/gollections/loop/first"
+	"github.com/m4gshm/gollections/loop/flat"
 	"github.com/m4gshm/gollections/loop/range_"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/predicate/eq"
@@ -158,14 +159,21 @@ func Test_ConvertFilteredInplace(t *testing.T) {
 	assert.Equal(t, []string{"4", "8"}, loop.Slice(r.Next))
 }
 
-func Test_Flatt(t *testing.T) {
+func Test_Flat(t *testing.T) {
 	md := loop.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...)
 	f := loop.Flat(md, func(i []int) []int { return i })
 	e := []int{1, 2, 3, 4, 5, 6}
 	assert.Equal(t, e, loop.Slice(f.Next))
 }
 
-func Test_FlattFilter(t *testing.T) {
+func Test_FlatAndConvert(t *testing.T) {
+	md := loop.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...)
+	f := flat.AndConvert(md, func(i []int) []int { return i }, strconv.Itoa)
+	e := []string{"1", "2", "3", "4", "5", "6"}
+	assert.Equal(t, e, loop.Slice(f.Next))
+}
+
+func Test_FlatFilter(t *testing.T) {
 	md := loop.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...)
 	f := loop.FilterAndFlat(md, func(from []int) bool { return len(from) > 1 }, func(i []int) []int { return i })
 	e := []int{1, 2, 3, 5, 6}

@@ -10,8 +10,8 @@ func NewKeyValuer[T any, K, V any](next func() (T, bool, error), keyExtractor fu
 }
 
 // NewMultipleKeyValuer creates instance of the MultipleKeyValuer
-func NewMultipleKeyValuer[T any, K, V any](next func() (T, bool, error), keysExtractor func(T) ([]K, error), valsExtractor func(T) ([]V, error)) MultipleKeyValuer[T, K, V] {
-	return MultipleKeyValuer[T, K, V]{next: next, keysExtractor: keysExtractor, valsExtractor: valsExtractor}
+func NewMultipleKeyValuer[T any, K, V any](next func() (T, bool, error), keysExtractor func(T) ([]K, error), valsExtractor func(T) ([]V, error)) *MultipleKeyValuer[T, K, V] {
+	return &MultipleKeyValuer[T, K, V]{next: next, keysExtractor: keysExtractor, valsExtractor: valsExtractor}
 }
 
 // KeyValuer is the Iterator wrapper that converts an element to a key\value pair and iterates over these pairs
