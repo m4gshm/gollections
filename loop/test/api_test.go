@@ -355,12 +355,12 @@ func Test_ForEachFiltered(t *testing.T) {
 }
 
 func Test_FlatValues(t *testing.T) {
-	g := kvloopgroup.Of(loop.FlatValues(loop.Of(users...), func(u User) string { return u.name }, func(u User) []int { return slice.Of(u.age) }).Next)
+	g := kvloopgroup.Of(loop.ExtractKeyValues(loop.Of(users...), func(u User) string { return u.name }, func(u User) []int { return slice.Of(u.age) }).Next)
 
 	assert.Equal(t, g["Bob"], slice.Of(26))
 }
 
 func Test_FlatKeys(t *testing.T) {
-	g := kvloopgroup.Of(loop.FlatKeys(loop.Of(users...), func(u User) []string { return slice.Of(u.name) }, func(u User) int { return u.age }).Next)
+	g := kvloopgroup.Of(loop.ExtractKeysValue(loop.Of(users...), func(u User) []string { return slice.Of(u.name) }, func(u User) int { return u.age }).Next)
 	assert.Equal(t, g["Alice"], slice.Of(35))
 }

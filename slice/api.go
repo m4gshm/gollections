@@ -785,12 +785,12 @@ func ToKVs[TS ~[]T, T, K, V any](elements TS, keysExtractor func(T) []K, valsExt
 
 // FlattValues transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
 func FlattValues[TS ~[]T, T, V any](elements TS, valsExtractor func(T) []V) []c.KV[T, V] {
-	return Flat(elements, func(e T) []c.KV[T, V] { return convert.FlatValues(e, valsExtractor) })
+	return Flat(elements, func(e T) []c.KV[T, V] { return convert.ExtractValues(e, valsExtractor) })
 }
 
 // FlattKeys transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
 func FlattKeys[TS ~[]T, T, K any](elements TS, keysExtractor func(T) []K) []c.KV[K, T] {
-	return Flat(elements, func(e T) []c.KV[K, T] { return convert.FlatKeys(e, keysExtractor) })
+	return Flat(elements, func(e T) []c.KV[K, T] { return convert.ExtractKeys(e, keysExtractor) })
 }
 
 // SplitTwo splits the elements into two slices

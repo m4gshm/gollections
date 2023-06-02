@@ -8,6 +8,7 @@ import (
 	breakAlways "github.com/m4gshm/gollections/break/predicate/always"
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/convert"
+	"github.com/m4gshm/gollections/convert/as"
 	"github.com/m4gshm/gollections/map_/resolv"
 	"github.com/m4gshm/gollections/notsafe"
 	"github.com/m4gshm/gollections/op"
@@ -269,24 +270,34 @@ func ToKVs[T, K, V any](next func() (T, bool), keysExtractor func(T) []K, valsEx
 	return NewMultipleKeyValuer(next, keysExtractor, valsExtractor)
 }
 
-// FlatKeys transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
-func FlatKeys[T, K, V any](next func() (T, bool), keysExtractor func(T) []K, valExtractor func(T) V) *MultipleKeyValuer[T, K, V] {
+// ExtractKeysValue transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
+func ExtractKeysValue[T, K, V any](next func() (T, bool), keysExtractor func(T) []K, valExtractor func(T) V) *MultipleKeyValuer[T, K, V] {
 	return ToKVs(next, keysExtractor, func(t T) []V { return convert.AsSlice(valExtractor(t)) })
 }
 
-// FlattKeys transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
-func FlattKeys[T, K, V any](next func() (T, bool), keysExtractor func(T) ([]K, error), valExtractor func(T) (V, error)) *loop.MultipleKeyValuer[T, K, V] {
-	return loop.FlatKeys(loop.From(next), keysExtractor, valExtractor)
+// ExtracttKeysValue transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
+func ExtracttKeysValue[T, K, V any](next func() (T, bool), keysExtractor func(T) ([]K, error), valExtractor func(T) (V, error)) *loop.MultipleKeyValuer[T, K, V] {
+	return loop.ExtractKeysValue(loop.From(next), keysExtractor, valExtractor)
 }
 
-// FlatValues transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
-func FlatValues[T, K, V any](next func() (T, bool), keyExtractor func(T) K, valsExtractor func(T) []V) *MultipleKeyValuer[T, K, V] {
+// ExtractKeyValues transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
+func ExtractKeyValues[T, K, V any](next func() (T, bool), keyExtractor func(T) K, valsExtractor func(T) []V) *MultipleKeyValuer[T, K, V] {
 	return ToKVs(next, func(t T) []K { return convert.AsSlice(keyExtractor(t)) }, valsExtractor)
 }
 
-// FlattValues transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
-func FlattValues[T, K, V any](next func() (T, bool), keyExtractor func(T) (K, error), valsExtractor func(T) ([]V, error)) *loop.MultipleKeyValuer[T, K, V] {
-	return loop.FlatValues(loop.From(next), keyExtractor, valsExtractor)
+// ExtracttKeyValues transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
+func ExtracttKeyValues[T, K, V any](next func() (T, bool), keyExtractor func(T) (K, error), valsExtractor func(T) ([]V, error)) *loop.MultipleKeyValuer[T, K, V] {
+	return loop.ExtractKeyValues(loop.From(next), keyExtractor, valsExtractor)
+}
+
+// ExtractValues transforms iterable elements to key/value iterator based on applying value extractor to the elements
+func ExtractValues[T, V any](next func() (T, bool), valsExtractor func(T) []V) *MultipleKeyValuer[T, T, V] {
+	return ExtractKeyValues(next, as.Is[T], valsExtractor)
+}
+
+// ExtractKeys transforms iterable elements to key/value iterator based on applying key extractor to the elements
+func ExtractKeys[T, K any](next func() (T, bool), keysExtractor func(T) []K) *MultipleKeyValuer[T, K, T] {
+	return ExtractKeysValue(next, keysExtractor, as.Is[T])
 }
 
 // Group converts elements retrieved by the 'next' function into a map, extracting a key for each element applying the converter 'keyExtractor'.

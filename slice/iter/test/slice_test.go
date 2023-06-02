@@ -383,13 +383,13 @@ var users = []User{
 }
 
 func Test_FlatValues(t *testing.T) {
-	g := group.Of(iter.FlatValues(users, func(u User) string { return u.name }, func(u User) []int { return slice.Of(u.age) }).Next)
+	g := group.Of(iter.ExtractValues(users, func(u User) string { return u.name }, func(u User) []int { return slice.Of(u.age) }).Next)
 
 	assert.Equal(t, g["Bob"], slice.Of(26))
 }
 
 func Test_FlatKeys(t *testing.T) {
-	g := group.Of(iter.FlatKeys(users, func(u User) []string { return slice.Of(u.name) }, func(u User) int { return u.age }).Next)
+	g := group.Of(iter.ExtractKeys(users, func(u User) []string { return slice.Of(u.name) }, func(u User) int { return u.age }).Next)
 
 	assert.Equal(t, g["Bob"], slice.Of(26))
 }
