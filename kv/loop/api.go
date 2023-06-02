@@ -122,3 +122,8 @@ func ToSlice[K, V, T any](next func() (K, V, bool), converter func(K, V) T) []T 
 	}
 	return s
 }
+
+func Firs[K, V any](next func() (K, V, bool)) (func() (K, V, bool), K, V, bool) {
+	k, v, ok := next()
+	return next, k, v, ok
+}
