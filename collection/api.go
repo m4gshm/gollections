@@ -68,16 +68,16 @@ func NotNil[T any, I c.Iterable[*T]](collection I) stream.Iter[*T] {
 	return Filter(collection, not.Nil[T])
 }
 
-// ToValues creates a stream that transform pointers to the values referenced referenced by those pointers.
+// PtrVal creates a stream that transform pointers to the values referenced referenced by those pointers.
 // Nil pointers are transformet to zero values.
-func ToValues[T any, I c.Iterable[*T]](collection I) stream.Iter[T] {
-	return stream.New(loop.ToValues(collection.Iter().Next).Next)
+func PtrVal[T any, I c.Iterable[*T]](collection I) stream.Iter[T] {
+	return stream.New(loop.PtrVal(collection.Iter().Next).Next)
 }
 
-// GetValues creates a stream that transform only not nil pointers to the values referenced referenced by those pointers.
+// NoNilPtrVal creates a stream that transform only not nil pointers to the values referenced referenced by those pointers.
 // Nil pointers are ignored.
-func GetValues[T any, I c.Iterable[*T]](collection I) stream.Iter[T] {
-	return stream.New(loop.GetValues(collection.Iter().Next).Next)
+func NoNilPtrVal[T any, I c.Iterable[*T]](collection I) stream.Iter[T] {
+	return stream.New(loop.NoNilPtrVal(collection.Iter().Next).Next)
 }
 
 // NilSafe - convert.NilSafe filters not nil next, converts that ones, filters not nils after converting and returns them

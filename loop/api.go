@@ -247,67 +247,91 @@ func NotNil[T any](next func() (*T, bool)) FiltIter[*T] {
 	return Filter(next, not.Nil[T])
 }
 
-// ToValues creates an iterator that transform pointers to the values referenced referenced by those pointers.
+// PtrVal creates an iterator that transform pointers to the values referenced by those pointers.
 // Nil pointers are transformet to zero values.
-func ToValues[T any](next func() (*T, bool)) ConvertIter[*T, T] {
+func PtrVal[T any](next func() (*T, bool)) ConvertIter[*T, T] {
 	return Convert(next, convert.ToValue[T])
 }
 
-// GetValues creates an iterator that transform only not nil pointers to the values referenced referenced by those pointers.
+// NoNilPtrVal creates an iterator that transform only not nil pointers to the values referenced referenced by those pointers.
 // Nil pointers are ignored.
-func GetValues[T any](next func() (*T, bool)) ConvertCheckIter[*T, T] {
+func NoNilPtrVal[T any](next func() (*T, bool)) ConvertCheckIter[*T, T] {
 	return ConvertCheck(next, convert.GetValue[T])
 }
 
-// ToKV transforms iterable elements to key/value iterator based on applying key, value extractors to the elements
-func ToKV[T any, K comparable, V any](next func() (T, bool), keyExtractor func(T) K, valExtractor func(T) V) KeyValuer[T, K, V] {
-	kv := NewKeyValuer(next, keyExtractor, valExtractor)
-	return kv
+// KeyValue transforms iterable elements to key/value iterator based on applying key, value extractors to the elements
+func KeyValue[T any, K, V any](next func() (T, bool), keyExtractor func(T) K, valExtractor func(T) V) KeyValuer[T, K, V] {
+	return NewKeyValuer(next, keyExtractor, valExtractor)
 }
 
-// ToKVs transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
-func ToKVs[T, K, V any](next func() (T, bool), keysExtractor func(T) []K, valsExtractor func(T) []V) *MultipleKeyValuer[T, K, V] {
+// KeyValuee transforms iterable elements to key/value iterator based on applying key, value extractors to the elements
+func KeyValuee[T any, K, V any](next func() (T, bool), keyExtractor func(T) (K, error), valExtractor func(T) (V, error)) loop.KeyValuer[T, K, V] {
+	return loop.KeyValuee(loop.From(next), keyExtractor, valExtractor)
+}
+
+// KeysValues transforms iterable elements to key/value iterator based on applying multiple keys, values extractor to the elements
+func KeysValues[T, K, V any](next func() (T, bool), keysExtractor func(T) []K, valsExtractor func(T) []V) *MultipleKeyValuer[T, K, V] {
 	return NewMultipleKeyValuer(next, keysExtractor, valsExtractor)
 }
 
-// ExtractKeysValue transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
-func ExtractKeysValue[T, K, V any](next func() (T, bool), keysExtractor func(T) []K, valExtractor func(T) V) *MultipleKeyValuer[T, K, V] {
-	return ToKVs(next, keysExtractor, func(t T) []V { return convert.AsSlice(valExtractor(t)) })
+// KeysValue transforms iterable elements to key/value iterator based on applying keys, value extractor to the elements
+func KeysValue[T, K, V any](next func() (T, bool), keysExtractor func(T) []K, valExtractor func(T) V) *MultipleKeyValuer[T, K, V] {
+	return KeysValues(next, keysExtractor, func(t T) []V { return convert.AsSlice(valExtractor(t)) })
 }
 
-// ExtracttKeysValue transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
-func ExtracttKeysValue[T, K, V any](next func() (T, bool), keysExtractor func(T) ([]K, error), valExtractor func(T) (V, error)) *loop.MultipleKeyValuer[T, K, V] {
-	return loop.ExtracttKeysValue(loop.From(next), keysExtractor, valExtractor)
+// KeysValuee transforms iterable elements to key/value iterator based on applying keys, value extractor to the elements
+func KeysValuee[T, K, V any](next func() (T, bool), keysExtractor func(T) ([]K, error), valExtractor func(T) (V, error)) *loop.MultipleKeyValuer[T, K, V] {
+	return loop.KeysValuee(loop.From(next), keysExtractor, valExtractor)
 }
 
-// ExtractKeyValues transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
-func ExtractKeyValues[T, K, V any](next func() (T, bool), keyExtractor func(T) K, valsExtractor func(T) []V) *MultipleKeyValuer[T, K, V] {
-	return ToKVs(next, func(t T) []K { return convert.AsSlice(keyExtractor(t)) }, valsExtractor)
+// KeyValues transforms iterable elements to key/value iterator based on applying key, values extractor to the elements
+func KeyValues[T, K, V any](next func() (T, bool), keyExtractor func(T) K, valsExtractor func(T) []V) *MultipleKeyValuer[T, K, V] {
+	return KeysValues(next, func(t T) []K { return convert.AsSlice(keyExtractor(t)) }, valsExtractor)
 }
 
-// ExtracttKeyValues transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
-func ExtracttKeyValues[T, K, V any](next func() (T, bool), keyExtractor func(T) (K, error), valsExtractor func(T) ([]V, error)) *loop.MultipleKeyValuer[T, K, V] {
-	return loop.ExtracttKeyValues(loop.From(next), keyExtractor, valsExtractor)
+// KeyValuess transforms iterable elements to key/value iterator based on applying key, values extractor to the elements
+func KeyValuess[T, K, V any](next func() (T, bool), keyExtractor func(T) (K, error), valsExtractor func(T) ([]V, error)) *loop.MultipleKeyValuer[T, K, V] {
+	return loop.KeyValuess(loop.From(next), keyExtractor, valsExtractor)
 }
 
-// ExtractValues transforms iterable elements to key/value iterator based on applying value extractor to the elements
-func ExtractValues[T, V any](next func() (T, bool), valsExtractor func(T) []V) *MultipleKeyValuer[T, T, V] {
-	return ExtractKeyValues(next, as.Is[T], valsExtractor)
+// ExtraValues transforms iterable elements to key/value iterator based on applying values extractor to the elements
+func ExtraValues[T, V any](next func() (T, bool), valsExtractor func(T) []V) *MultipleKeyValuer[T, T, V] {
+	return KeyValues(next, as.Is[T], valsExtractor)
 }
 
-// ExtractValues transforms iterable elements to key/value iterator based on applying value extractor to the elements
-func ExtracttValues[T, V any](next func() (T, bool), valsExtractor func(T) ([]V, error)) *loop.MultipleKeyValuer[T, T, V] {
-	return ExtracttKeyValues(next, func(t T) (T, error) { return t, nil }, valsExtractor)
+// ExtractValues transforms iterable elements to key/value iterator based on applying values extractor to the elements
+func ExtraValuess[T, V any](next func() (T, bool), valsExtractor func(T) ([]V, error)) *loop.MultipleKeyValuer[T, T, V] {
+	return KeyValuess(next, as.ErrTail(as.Is[T]), valsExtractor)
 }
 
-// ExtractKeys transforms iterable elements to key/value iterator based on applying key extractor to the elements
-func ExtractKeys[T, K any](next func() (T, bool), keysExtractor func(T) []K) *MultipleKeyValuer[T, K, T] {
-	return ExtractKeysValue(next, keysExtractor, as.Is[T])
+// ExtraKeys transforms iterable elements to key/value iterator based on applying key extractor to the elements
+func ExtraKeys[T, K any](next func() (T, bool), keysExtractor func(T) []K) *MultipleKeyValuer[T, K, T] {
+	return KeysValue(next, keysExtractor, as.Is[T])
 }
 
-// ExtracttKeys transforms iterable elements to key/value iterator based on applying key extractor to the elements
-func ExtracttKeys[T, K any](next func() (T, bool), keyExtractor func(T) (K, error)) *loop.MultipleKeyValuer[T, K, T] {
-	return ExtracttKeyValues(next, keyExtractor, func(t T) ([]T, error) { return convert.AsSlice(t), nil })
+// ExtraKeyss transforms iterable elements to key/value iterator based on applying key extractor to the elements
+func ExtraKeyss[T, K any](next func() (T, bool), keyExtractor func(T) (K, error)) *loop.MultipleKeyValuer[T, K, T] {
+	return KeyValuess(next, keyExtractor, as.ErrTail(convert.AsSlice[T]))
+}
+
+// ExtraKey transforms iterable elements to key/value iterator based on applying key extractor to the elements
+func ExtraKey[T, K any](next func() (T, bool), keysExtractor func(T) K) KeyValuer[T, K, T] {
+	return KeyValue(next, keysExtractor, as.Is[T])
+}
+
+// ExtraKeyy transforms iterable elements to key/value iterator based on applying key extractor to the elements
+func ExtraKeyy[T, K any](next func() (T, bool), keyExtractor func(T) (K, error)) loop.KeyValuer[T, K, T] {
+	return loop.KeyValuee[T, K](loop.From(next), keyExtractor, as.ErrTail(as.Is[T]))
+}
+
+// ExtraValue transforms iterable elements to key/value iterator based on applying value extractor to the elements
+func ExtraValue[T, V any](next func() (T, bool), valueExtractor func(T) V) KeyValuer[T, T, V] {
+	return KeyValue(next, as.Is[T], valueExtractor)
+}
+
+// ExtraValue transforms iterable elements to key/value iterator based on applying value extractor to the elements
+func ExtraValuee[T, V any](next func() (T, bool), valExtractor func(T) (V, error)) loop.KeyValuer[T, T, V] {
+	return loop.KeyValuee[T, T, V](loop.From(next), as.ErrTail(as.Is[T]), valExtractor)
 }
 
 // Group converts elements retrieved by the 'next' function into a map, extracting a key for each element applying the converter 'keyExtractor'.
@@ -315,6 +339,13 @@ func ExtracttKeys[T, K any](next func() (T, bool), keyExtractor func(T) (K, erro
 // The valExtractor converts an element to an value.
 func Group[T any, K comparable, V any](next func() (T, bool), keyExtractor func(T) K, valExtractor func(T) V) map[K][]V {
 	return ToMapResolv(next, keyExtractor, valExtractor, resolv.Append[K, V])
+}
+
+// Groupp converts elements retrieved by the 'next' function into a map, extracting a key for each element applying the converter 'keyExtractor'.
+// The keyExtractor converts an element to a key.
+// The valExtractor converts an element to an value.
+func Groupp[T any, K comparable, V any](next func() (T, bool), keyExtractor func(T) (K, error), valExtractor func(T) (V, error)) (map[K][]V, error) {
+	return loop.Groupp(loop.From(next), keyExtractor, valExtractor)
 }
 
 // GroupByMultiple converts elements retrieved by the 'next' function into a map, extracting multiple keys, values per each element applying the 'keysExtractor' and 'valsExtractor' functions.

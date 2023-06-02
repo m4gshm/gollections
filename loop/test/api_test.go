@@ -10,6 +10,7 @@ import (
 
 	breakLoop "github.com/m4gshm/gollections/break/loop"
 	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/convert/as"
 	kvloop "github.com/m4gshm/gollections/kv/loop"
 	kvloopgroup "github.com/m4gshm/gollections/kv/loop/group"
 	"github.com/m4gshm/gollections/loop"
@@ -87,7 +88,7 @@ func Test_ConvertPointersToValues(t *testing.T) {
 	type entity struct{ val string }
 	var (
 		source   = loop.Of([]*entity{{"first"}, nil, {"third"}, nil, {"fifth"}}...)
-		result   = loop.ToValues(source)
+		result   = loop.PtrVal(source)
 		expected = []entity{{"first"}, {}, {"third"}, {}, {"fifth"}}
 	)
 	assert.Equal(t, expected, loop.Slice(result.Next))
@@ -97,7 +98,7 @@ func Test_ConvertNotnilPointersToValues(t *testing.T) {
 	type entity struct{ val string }
 	var (
 		source   = loop.Of([]*entity{{"first"}, nil, {"third"}, nil, {"fifth"}}...)
-		result   = loop.GetValues(source)
+		result   = loop.NoNilPtrVal(source)
 		expected = []entity{{"first"}, {"third"}, {"fifth"}}
 	)
 	assert.Equal(t, expected, loop.Slice(result.Next))
@@ -272,14 +273,58 @@ type User struct {
 	roles []Role
 }
 
+func (u User) Name() string  { return u.name }
+func (u User) Age() int      { return u.age }
+func (u User) Roles() []Role { return u.roles }
+
 var users = []User{
 	{name: "Bob", age: 26, roles: []Role{{"Admin"}, {"manager"}}},
 	{name: "Alice", age: 35, roles: []Role{{"Manager"}}},
 	{name: "Tom", age: 18}, {},
 }
 
+func Test_KeyValuer(t *testing.T) {
+	m := kvloop.Group(loop.KeyValue(loop.Of(users...), User.Name, User.Age).Next)
+
+	assert.Equal(t, m["Alice"], slice.Of(35))
+	assert.Equal(t, m["Bob"], slice.Of(26))
+	assert.Equal(t, m["Tom"], slice.Of(18))
+
+	g := loop.Group(loop.Of(users...), User.Name, User.Age)
+	assert.Equal(t, m, g)
+}
+
+func Test_Keyer(t *testing.T) {
+	m := kvloop.Group(loop.ExtraKey(loop.Of(users...), User.Name).Next)
+
+	assert.Equal(t, m["Alice"], slice.Of(users[1]))
+	assert.Equal(t, m["Bob"], slice.Of(users[0]))
+	assert.Equal(t, m["Tom"], slice.Of(users[2]))
+
+	g := loop.Group(loop.Of(users...), User.Name, as.Is[User])
+	assert.Equal(t, m, g)
+}
+
+func Test_Valuer(t *testing.T) {
+	bob, bobRoles, _ := loop.ExtraValue(loop.Of(users...), User.Roles).Next()
+
+	assert.Equal(t, bob, users[0])
+	assert.Equal(t, bobRoles, users[0].roles)
+}
+
+func Test_MultiValuer(t *testing.T) {
+	l := loop.ExtraValues(loop.Of(users...), User.Roles)
+	bob, bobRole, _ := l.Next()
+	bob2, bobRole2, _ := l.Next()
+
+	assert.Equal(t, bob, users[0])
+	assert.Equal(t, bob2, users[0])
+	assert.Equal(t, bobRole, users[0].roles[0])
+	assert.Equal(t, bobRole2, users[0].roles[1])
+}
+
 func Test_MultipleKeyValuer(t *testing.T) {
-	m := kvloop.Group(loop.ToKVs(loop.Of(users...),
+	m := kvloop.Group(loop.KeysValues(loop.Of(users...),
 		func(u User) []string {
 			return slice.Convert(u.roles, func(r Role) string { return strings.ToLower(r.name) })
 		},
@@ -355,12 +400,12 @@ func Test_ForEachFiltered(t *testing.T) {
 }
 
 func Test_FlatValues(t *testing.T) {
-	g := kvloopgroup.Of(loop.ExtractKeyValues(loop.Of(users...), func(u User) string { return u.name }, func(u User) []int { return slice.Of(u.age) }).Next)
+	g := kvloopgroup.Of(loop.KeyValues(loop.Of(users...), func(u User) string { return u.name }, func(u User) []int { return slice.Of(u.age) }).Next)
 
 	assert.Equal(t, g["Bob"], slice.Of(26))
 }
 
 func Test_FlatKeys(t *testing.T) {
-	g := kvloopgroup.Of(loop.ExtractKeysValue(loop.Of(users...), func(u User) []string { return slice.Of(u.name) }, func(u User) int { return u.age }).Next)
+	g := kvloopgroup.Of(loop.KeysValue(loop.Of(users...), func(u User) []string { return slice.Of(u.name) }, func(u User) int { return u.age }).Next)
 	assert.Equal(t, g["Alice"], slice.Of(35))
 }

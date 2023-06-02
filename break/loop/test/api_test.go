@@ -58,7 +58,7 @@ func Test_ConvertPointersToValues(t *testing.T) {
 	type entity struct{ val string }
 	var (
 		source   = breakLoop.Of([]*entity{{"first"}, nil, {"third"}, nil, {"fifth"}}...)
-		result   = breakLoop.ToValues(source)
+		result   = breakLoop.PtrVal(source)
 		expected = []entity{{"first"}, {}, {"third"}, {}, {"fifth"}}
 	)
 	o, _ := breakLoop.Slice(result.Next)
@@ -69,7 +69,7 @@ func Test_ConvertNotnilPointersToValues(t *testing.T) {
 	type entity struct{ val string }
 	var (
 		source   = breakLoop.Of([]*entity{{"first"}, nil, {"third"}, nil, {"fifth"}}...)
-		result   = breakLoop.GetValues(source)
+		result   = breakLoop.NoNilPtrVal(source)
 		expected = []entity{{"first"}, {"third"}, {"fifth"}}
 	)
 	o, _ := breakLoop.Slice(result.Next)
@@ -184,24 +184,68 @@ func Test_MatchAny(t *testing.T) {
 	assert.False(t, noOk)
 }
 
+type Role struct {
+	name string
+}
+
+type User struct {
+	name  string
+	age   int
+	roles []Role
+}
+
+func (u User) Name() string  { return u.name }
+func (u User) Age() int      { return u.age }
+func (u User) Roles() []Role { return u.roles }
+
+var users = []User{
+	{name: "Bob", age: 26, roles: []Role{{"Admin"}, {"manager"}}},
+	{name: "Alice", age: 35, roles: []Role{{"Manager"}}},
+	{name: "Tom", age: 18}, {},
+}
+
+func Test_KeyValuer(t *testing.T) {
+	m, _ := breakKvLoop.Group(breakLoop.KeyValue(breakLoop.From(loop.Of(users...)), User.Name, User.Age).Next)
+
+	assert.Equal(t, m["Alice"], slice.Of(35))
+	assert.Equal(t, m["Bob"], slice.Of(26))
+	assert.Equal(t, m["Tom"], slice.Of(18))
+
+	g, _ := breakLoop.Group(breakLoop.From(loop.Of(users...)), User.Name, User.Age)
+	assert.Equal(t, m, g)
+}
+
+func Test_Keyer(t *testing.T) {
+	m, _ := breakKvLoop.Group(breakLoop.ExtraKey(breakLoop.From(loop.Of(users...)), User.Name).Next)
+
+	assert.Equal(t, m["Alice"], slice.Of(users[1]))
+	assert.Equal(t, m["Bob"], slice.Of(users[0]))
+	assert.Equal(t, m["Tom"], slice.Of(users[2]))
+
+	g := loop.Group(loop.Of(users...), User.Name, as.Is[User])
+	assert.Equal(t, m, g)
+}
+
+func Test_Valuer(t *testing.T) {
+	bob, bobRoles, _, _ := breakLoop.ExtraValue(breakLoop.From(loop.Of(users...)), User.Roles).Next()
+
+	assert.Equal(t, bob, users[0])
+	assert.Equal(t, bobRoles, users[0].roles)
+}
+
+func Test_MultiValuer(t *testing.T) {
+	l := breakLoop.ExtraValues(breakLoop.From(loop.Of(users...)), User.Roles)
+	bob, bobRole, _, _ := l.Next()
+	bob2, bobRole2, _, _ := l.Next()
+
+	assert.Equal(t, bob, users[0])
+	assert.Equal(t, bob2, users[0])
+	assert.Equal(t, bobRole, users[0].roles[0])
+	assert.Equal(t, bobRole2, users[0].roles[1])
+}
+
 func Test_MultipleKeyValuer(t *testing.T) {
-	type Role struct {
-		name string
-	}
-
-	type User struct {
-		name  string
-		age   int
-		roles []Role
-	}
-
-	var users = []User{
-		{name: "Bob", age: 26, roles: []Role{{"Admin"}, {"manager"}}},
-		{name: "Alice", age: 35, roles: []Role{{"Manager"}}},
-		{name: "Tom", age: 18}, {},
-	}
-
-	m, _ := breakKvLoop.Group(breakLoop.ToKVs(breakLoop.From(loop.Of(users...)),
+	m, _ := breakKvLoop.Group(breakLoop.KeysValues(breakLoop.From(loop.Of(users...)),
 		func(u User) ([]string, error) {
 			return slice.Convert(u.roles, func(r Role) string { return strings.ToLower(r.name) }), nil
 		},
@@ -211,5 +255,4 @@ func Test_MultipleKeyValuer(t *testing.T) {
 	assert.Equal(t, m["admin"], slice.Of("Bob", "bob"))
 	assert.Equal(t, m["manager"], slice.Of("Bob", "bob", "Alice", "alice"))
 	assert.Equal(t, m[""], slice.Of("Tom", "tom", "", ""))
-
 }
