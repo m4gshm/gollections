@@ -523,3 +523,8 @@ func ConvAndReduce[From, To any](next func() (From, bool), converter func(From) 
 	}
 	return out, nil
 }
+
+func Firs[T any](next func() (T, bool)) (func() (T, bool), T, bool) {
+	element, ok := next()
+	return next, element, ok
+}
