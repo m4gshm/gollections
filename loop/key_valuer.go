@@ -108,3 +108,8 @@ func (kv *MultipleKeyValuer[T, K, V]) Next() (key K, value V, ok bool) {
 	}
 	return key, value, ok
 }
+
+func (kv *MultipleKeyValuer[T, K, V]) First() (*MultipleKeyValuer[T, K, V], K, V, bool) {
+	k, v, ok := kv.Next()
+	return kv, k, v, ok
+}
