@@ -59,3 +59,7 @@ func IfGetElseGetErr[T any](ok bool, tru func() T, fal func() error) (T, error) 
 	var no T
 	return no, fal()
 }
+
+func Get[T any](getter func() T) T {
+	return getter()
+}
