@@ -435,7 +435,7 @@ func initGroup[T any, K comparable, TS ~[]T](key K, e T, groups map[K]TS) {
 
 // ToMap collects key\value elements to a map by iterating over the elements
 func ToMap[T any, K comparable, V any](next func() (T, bool), keyExtractor func(T) K, valExtractor func(T) V) map[K]V {
-	return ToMapResolv(next, keyExtractor, valExtractor, resolv.FirstVal[K, V])
+	return ToMapResolv(next, keyExtractor, valExtractor, resolv.First[K, V])
 }
 
 // ToMapResolv collects key\value elements to a map by iterating over the elements with resolving of duplicated key values

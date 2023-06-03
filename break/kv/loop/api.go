@@ -137,7 +137,7 @@ func ToMapResolv[K comparable, V, VR any](next func() (K, V, bool, error), resol
 
 // ToMap collects key\value elements to a map by iterating over the elements
 func ToMap[K comparable, V any](next func() (K, V, bool, error)) (map[K]V, error) {
-	return ToMapResolv(next, resolv.FirstVal[K, V])
+	return ToMapResolv(next, resolv.First[K, V])
 }
 
 // ToSlice collects key\value elements to a slice by iterating over the elements
