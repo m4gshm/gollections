@@ -65,6 +65,10 @@ func (f *FlattenFiltIter[From, To]) Cap() int {
 	return f.cap
 }
 
+func (i *FlattenFiltIter[From, To]) First() (*FlattenFiltIter[From, To], To, bool) {
+	return startIt[To](i)
+}
+
 // FlattIter is the array based Iterator impelementation that converts an element to a slice and iterates over the elements of that slice.
 // For example, FlattIter can be used to iterate over all the elements of a multi-dimensional array as if it were a one-dimensional array ([][]int -> []int).
 type FlattIter[From, To any] struct {
@@ -118,4 +122,8 @@ func (f *FlattIter[From, To]) Next() (To, bool) {
 // Cap returns the iterator capacity
 func (f *FlattIter[From, To]) Cap() int {
 	return f.sizeFrom
+}
+
+func (i *FlattIter[From, To]) First() (*FlattIter[From, To], To, bool) {
+	return startIt[To](i)
 }

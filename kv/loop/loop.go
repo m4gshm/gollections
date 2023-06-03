@@ -22,7 +22,6 @@ type Iter[S, K, V any] struct {
 
 var (
 	_ kv.Iterator[any, any] = (*Iter[any, any, any])(nil)
-	_ kv.Iterator[any, any] = (*Iter[any, any, any])(nil)
 )
 
 // Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak
@@ -52,4 +51,8 @@ func (i *Iter[S, K, V]) Next() (K, V, bool) {
 // Error implements kv.KVIteratorBreakable
 func (i *Iter[S, K, V]) Error() error {
 	return i.abort
+}
+
+func (i *Iter[S, K, V]) Start() (*Iter[S, K, V], K, V, bool) {
+	return startKvIt[K, V](i)
 }

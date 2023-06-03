@@ -250,13 +250,13 @@ func NotNil[T any](next func() (*T, bool)) FiltIter[*T] {
 // PtrVal creates an iterator that transform pointers to the values referenced by those pointers.
 // Nil pointers are transformet to zero values.
 func PtrVal[T any](next func() (*T, bool)) ConvertIter[*T, T] {
-	return Convert(next, convert.ToValue[T])
+	return Convert(next, convert.PtrVal[T])
 }
 
 // NoNilPtrVal creates an iterator that transform only not nil pointers to the values referenced referenced by those pointers.
 // Nil pointers are ignored.
 func NoNilPtrVal[T any](next func() (*T, bool)) ConvertCheckIter[*T, T] {
-	return ConvertCheck(next, convert.GetValue[T])
+	return ConvertCheck(next, convert.NoNilPtrVal[T])
 }
 
 // KeyValue transforms iterable elements to key/value iterator based on applying key, value extractors to the elements
@@ -524,7 +524,7 @@ func ConvAndReduce[From, To any](next func() (From, bool), converter func(From) 
 	return out, nil
 }
 
-func Firs[T any](next func() (T, bool)) (func() (T, bool), T, bool) {
+func Start[T any](next func() (T, bool)) (func() (T, bool), T, bool) {
 	element, ok := next()
 	return next, element, ok
 }

@@ -44,6 +44,10 @@ func (c ConvertFiltIter[From, To]) Next() (t To, ok bool) {
 	return t, false
 }
 
+func (c ConvertFiltIter[From, To]) Start() (ConvertFiltIter[From, To], To, bool) {
+	return startIt[To](c)
+}
+
 // ConvertIter iterator implementation that retrieves an element by the 'next' function and converts by the 'converter'
 type ConvertIter[From, To any] struct {
 	next      func() (From, bool)

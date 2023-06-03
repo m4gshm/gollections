@@ -74,6 +74,10 @@ func (i *FlatFilterIter[From, To]) Next() (t To, ok bool) {
 	}
 }
 
+func (i *FlatFilterIter[From, To]) Start() (*FlatFilterIter[From, To], To, bool) {
+	return startIt[To](i)
+}
+
 // FlatIter is the Iterator wrapper that converts an element to a slice and iterates over the elements of that slice.
 // For example, FlatIter can be used to iterate over all the elements of a multi-dimensional array as if it were a one-dimensional array ([][]int -> []int).
 type FlatIter[From, To any] struct {
@@ -123,4 +127,8 @@ func (i *FlatIter[From, To]) Next() (To, bool) {
 			return *(*To)(notsafe.GetArrayElemRef(i.arrayTo, 0, i.elemSizeTo)), true
 		}
 	}
+}
+
+func (i *FlatIter[From, To]) Start() (*FlatIter[From, To], To, bool) {
+	return startIt[To](i)
 }

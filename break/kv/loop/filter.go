@@ -31,6 +31,10 @@ func (f FiltIter[K, V]) Next() (key K, value V, ok bool, err error) {
 	return key, value, ok, err
 }
 
+func (i FiltIter[K, V]) Start() (FiltIter[K, V], K, V, bool, error) {
+	return startKvIt[K, V](i)
+}
+
 func nextFiltered[K any, V any](next func() (K, V, bool, error), filter func(K, V) (bool, error)) (key K, val V, filtered bool, err error) {
 	return Firstt(next, filter)
 }

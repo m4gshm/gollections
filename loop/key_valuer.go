@@ -46,6 +46,10 @@ func (kv KeyValuer[T, K, V]) Next() (key K, value V, ok bool) {
 	return key, value, ok
 }
 
+func (kv *KeyValuer[T, K, V]) Start() (*KeyValuer[T, K, V], K, V, bool) {
+	return startKvIt[K, V](kv)
+}
+
 // MultipleKeyValuer is the Iterator wrapper that converts an element to a key\value pair and iterates over these pairs
 type MultipleKeyValuer[T, K, V any] struct {
 	next          func() (T, bool)
@@ -109,7 +113,6 @@ func (kv *MultipleKeyValuer[T, K, V]) Next() (key K, value V, ok bool) {
 	return key, value, ok
 }
 
-func (kv *MultipleKeyValuer[T, K, V]) First() (*MultipleKeyValuer[T, K, V], K, V, bool) {
-	k, v, ok := kv.Next()
-	return kv, k, v, ok
+func (kv *MultipleKeyValuer[T, K, V]) Start() (*MultipleKeyValuer[T, K, V], K, V, bool) {
+	return startKvIt[K, V](kv)
 }

@@ -53,6 +53,10 @@ func (i *ConvFiltIter[From, To]) Cap() int {
 	return i.size
 }
 
+func (i *ConvFiltIter[From, To]) Start() (*ConvFiltIter[From, To], To, bool, error) {
+	return startBreakIt[To](i)
+}
+
 // ConvIter is the array based Iterator thath provides converting of elements by a ConvIter.
 type ConvIter[From, To any] struct {
 	array     unsafe.Pointer
@@ -84,6 +88,10 @@ func (i *ConvIter[From, To]) Next() (t To, ok bool, err error) {
 // Cap returns the iterator capacity
 func (i *ConvIter[From, To]) Cap() int {
 	return i.size
+}
+
+func (i *ConvIter[From, To]) Start() (*ConvIter[From, To], To, bool, error) {
+	return startBreakIt[To](i)
 }
 
 func nextFilt[T any](array unsafe.Pointer, size int, elemSize uintptr, filter func(T) (bool, error), index *int) (v T, ok bool, err error) {

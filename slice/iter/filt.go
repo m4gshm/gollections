@@ -33,3 +33,7 @@ func (f *FiltIter[T]) Next() (T, bool, error) {
 func (f *FiltIter[T]) Cap() int {
 	return f.size
 }
+
+func (i *FiltIter[T]) Start() (*FiltIter[T], T, bool, error) {
+	return startBreakIt[T](i)
+}

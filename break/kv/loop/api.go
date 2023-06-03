@@ -166,8 +166,3 @@ func New[S, K, V any](source S, hasNext func(S) bool, getNext func(S) (K, V, err
 		}
 	}
 }
-
-func Firs[K, V any](next func() (K, V, bool, error)) (func() (K, V, bool, error), K, V, bool, error) {
-	k, v, ok, err := next()
-	return next, k, v, ok, err
-}

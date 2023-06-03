@@ -35,6 +35,11 @@ func (f FiltIter[T]) Next() (element T, ok bool) {
 	return element, ok
 }
 
+func (f FiltIter[T]) First() (FiltIter[T], T, bool) {
+	e, ok := f.Next()
+	return f, e, ok
+}
+
 func nextFiltered[T any](next func() (T, bool), filter func(T) bool) (v T, ok bool) {
 	return First(next, filter)
 }

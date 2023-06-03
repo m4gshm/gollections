@@ -51,6 +51,10 @@ func (i *ConvertFiltIter[From, To]) Cap() int {
 	return i.size
 }
 
+func (i *ConvertFiltIter[From, To]) Start() (*ConvertFiltIter[From, To], To, bool) {
+	return startIt[To](i)
+}
+
 // ConvertIter is the array based Iterator thath provides converting of elements by a ConvertIter.
 type ConvertIter[From, To any] struct {
 	array     unsafe.Pointer
@@ -87,6 +91,10 @@ func (i *ConvertIter[From, To]) Next() (To, bool) {
 // Cap returns the iterator capacity
 func (i *ConvertIter[From, To]) Cap() int {
 	return i.size
+}
+
+func (i *ConvertIter[From, To]) Start() (*ConvertIter[From, To], To, bool) {
+	return startIt[To](i)
 }
 
 func nextFiltered[T any](array unsafe.Pointer, size int, elemSize uintptr, filter func(T) bool, index *int) (T, bool) {

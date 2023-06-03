@@ -30,7 +30,7 @@ func FromPairs[K, V any, I c.Iterator[c.KV[K, V]]](elements I) loop.KeyValuer[c.
 
 // FromIter converts a c.Iterator to a kv.KVIterator using key and value extractors
 func FromIter[T, K, V any, I c.Iterator[T]](elements I, keyExtractor func(T) K, valExtractor func(T) V) loop.KeyValuer[T, K, V] {
-	return iter.ToKV(elements, keyExtractor, valExtractor)
+	return iter.KeyValue(elements, keyExtractor, valExtractor)
 }
 
 // Group collects sets of values grouped by keys obtained by passing a key/value iterator

@@ -32,13 +32,13 @@ func ToSlice[T any](value T) []T { return []T{value} }
 // AsSlice convert an one element to a slice
 func AsSlice[T any](value T) []T { return ToSlice(value) }
 
-// ToKV transforms one element to one key/value pair
-func ToKV[T, K, V any](element T, keyExtractor func(T) K, valExtractor func(T) V) c.KV[K, V] {
+// KeyValue transforms one element to one key/value pair
+func KeyValue[T, K, V any](element T, keyExtractor func(T) K, valExtractor func(T) V) c.KV[K, V] {
 	return k.V(keyExtractor(element), valExtractor(element))
 }
 
-// ToKVs transforms one element to multiple key/value pairs slices
-func ToKVs[T, K, V any](element T, keysExtractor func(T) []K, valsExtractor func(T) []V) (out []c.KV[K, V]) {
+// KeysValues transforms one element to multiple key/value pairs slices
+func KeysValues[T, K, V any](element T, keysExtractor func(T) []K, valsExtractor func(T) []V) (out []c.KV[K, V]) {
 	var (
 		keys   = keysExtractor(element)
 		values = valsExtractor(element)
@@ -64,8 +64,8 @@ func ToKVs[T, K, V any](element T, keysExtractor func(T) []K, valsExtractor func
 	return out
 }
 
-// ExtractValues transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
-func ExtractValues[T, V any](element T, valsExtractor func(T) []V) (out []c.KV[T, V]) {
+// ExtraValues transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
+func ExtraValues[T, V any](element T, valsExtractor func(T) []V) (out []c.KV[T, V]) {
 	var (
 		key    = element
 		values = valsExtractor(element)
@@ -82,8 +82,8 @@ func ExtractValues[T, V any](element T, valsExtractor func(T) []V) (out []c.KV[T
 	return out
 }
 
-// ExtractKeys transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
-func ExtractKeys[T, K any](element T, keysExtractor func(T) []K) (out []c.KV[K, T]) {
+// ExtraKeys transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
+func ExtraKeys[T, K any](element T, keysExtractor func(T) []K) (out []c.KV[K, T]) {
 	var (
 		keys  = keysExtractor(element)
 		value = element
@@ -99,21 +99,21 @@ func ExtractKeys[T, K any](element T, keysExtractor func(T) []K) (out []c.KV[K, 
 	return out
 }
 
-// ToPointer converts a value to the value pointer
-func ToPointer[T any](value T) *T {
+// Ptr converts a value to the value pointer
+func Ptr[T any](value T) *T {
 	return &value
 }
 
-// ToValue returns a value referenced by the pointer or the zero value if the pointer is nil
-func ToValue[T any](pointer *T) (t T) {
+// PtrVal returns a value referenced by the pointer or the zero value if the pointer is nil
+func PtrVal[T any](pointer *T) (t T) {
 	if pointer != nil {
 		t = *pointer
 	}
 	return t
 }
 
-// GetValue returns a value referenced by the pointer or ok==false if the pointer is nil
-func GetValue[T any](pointer *T) (t T, ok bool) {
+// NoNilPtrVal returns a value referenced by the pointer or ok==false if the pointer is nil
+func NoNilPtrVal[T any](pointer *T) (t T, ok bool) {
 	if pointer != nil {
 		return *pointer, true
 	}

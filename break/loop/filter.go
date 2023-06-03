@@ -30,6 +30,10 @@ func (f FiltIter[T]) Next() (element T, ok bool, err error) {
 	return element, ok, err
 }
 
+func (f FiltIter[T]) Start() (FiltIter[T], T, bool, error) {
+	return startIt[T](f)
+}
+
 func nextFiltered[T any](next func() (T, bool, error), filter func(T) (bool, error)) (v T, ok bool, err error) {
 	return Firstt(next, filter)
 }

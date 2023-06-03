@@ -38,3 +38,7 @@ func (f *FilterIter[T]) Next() (T, bool) {
 func (f *FilterIter[T]) Cap() int {
 	return f.size
 }
+
+func (i *FilterIter[T]) Start() (*FilterIter[T], T, bool) {
+	return startIt[T](i)
+}
