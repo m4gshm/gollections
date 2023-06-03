@@ -773,23 +773,23 @@ func ToMapResolv[TS ~[]T, T any, K comparable, V, VR any](elements TS, keyExtrac
 	return m
 }
 
-// ToKV transforms slice elements to key/value pairs slice. One pair per one element
-func ToKV[TS ~[]T, T, K, V any](elements TS, keyExtractor func(T) K, valExtractor func(T) V) []c.KV[K, V] {
+// KeyValue transforms slice elements to key/value pairs slice. One pair per one element
+func KeyValue[TS ~[]T, T, K, V any](elements TS, keyExtractor func(T) K, valExtractor func(T) V) []c.KV[K, V] {
 	return Convert(elements, func(e T) c.KV[K, V] { return convert.KeyValue(e, keyExtractor, valExtractor) })
 }
 
-// ToKVs transforms slice elements to key/value pairs slice. Multiple pairs per one element
-func ToKVs[TS ~[]T, T, K, V any](elements TS, keysExtractor func(T) []K, valsExtractor func(T) []V) []c.KV[K, V] {
+// KeysValues transforms slice elements to key/value pairs slice. Multiple pairs per one element
+func KeysValues[TS ~[]T, T, K, V any](elements TS, keysExtractor func(T) []K, valsExtractor func(T) []V) []c.KV[K, V] {
 	return Flat(elements, func(e T) []c.KV[K, V] { return convert.KeysValues(e, keysExtractor, valsExtractor) })
 }
 
-// FlattValues transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
-func FlattValues[TS ~[]T, T, V any](elements TS, valsExtractor func(T) []V) []c.KV[T, V] {
+// ExtraValues transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
+func ExtraValues[TS ~[]T, T, V any](elements TS, valsExtractor func(T) []V) []c.KV[T, V] {
 	return Flat(elements, func(e T) []c.KV[T, V] { return convert.ExtraValues(e, valsExtractor) })
 }
 
-// FlattKeys transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
-func FlattKeys[TS ~[]T, T, K any](elements TS, keysExtractor func(T) []K) []c.KV[K, T] {
+// ExtraKeys transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
+func ExtraKeys[TS ~[]T, T, K any](elements TS, keysExtractor func(T) []K) []c.KV[K, T] {
 	return Flat(elements, func(e T) []c.KV[K, T] { return convert.ExtraKeys(e, keysExtractor) })
 }
 
