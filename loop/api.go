@@ -317,7 +317,7 @@ func ExtraValues[T, V any](next func() (T, bool), valsExtractor func(T) []V) *Mu
 	return KeyValues(next, as.Is[T], valsExtractor)
 }
 
-// ExtractValues transforms iterable elements to key/value iterator based on applying values extractor to the elements
+// ExtraValues transforms iterable elements to key/value iterator based on applying values extractor to the elements
 func ExtraValuess[T, V any](next func() (T, bool), valsExtractor func(T) ([]V, error)) *loop.MultipleKeyValuer[T, T, V] {
 	return KeyValuess(next, as.ErrTail(as.Is[T]), valsExtractor)
 }
