@@ -762,6 +762,11 @@ func NotEmpty[TS ~[]T, T any](elements TS) bool {
 	return !Empty(elements)
 }
 
+// ToMap collects key\value elements to a map by iterating over the elements
+func ToMap[TS ~[]T, T any, K comparable, V any](elements TS, keyExtractor func(T) K, valExtractor func(T) V) map[K]V {
+	return ToMapResolv(elements, keyExtractor, valExtractor, resolv.FirstVal[K, V])
+}
+
 // ToMapResolv collects key\value elements to a map by iterating over the elements with resolving of duplicated key values
 func ToMapResolv[TS ~[]T, T any, K comparable, V, VR any](elements TS, keyExtractor func(T) K, valExtractor func(T) V, resolver func(bool, K, VR, V) VR) map[K]VR {
 	m := make(map[K]VR, len(elements))

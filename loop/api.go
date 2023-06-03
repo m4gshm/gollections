@@ -40,6 +40,24 @@ func Of[T any](elements ...T) func() (e T, ok bool) {
 	}
 }
 
+type F struct {
+	stop bool
+}
+
+func Break(f *F) {
+	f.stop = true
+}
+
+func ForB[T any](next func() (T, bool), walker func(*F, T)) {
+	f := &F{}
+	for v, ok := next(); ok; v, ok = next() {
+		walker(f, v)
+		if f.stop {
+			break
+		}
+	}
+}
+
 // For applies the 'walker' function for the elements retrieved by the 'next' function. Return the c.ErrBreak to stop
 func For[T any](next func() (T, bool), walker func(T) error) error {
 	for v, ok := next(); ok; v, ok = next() {
@@ -413,6 +431,11 @@ func GroupByMultipleValues[T any, K comparable, V any](next func() (T, bool), ke
 
 func initGroup[T any, K comparable, TS ~[]T](key K, e T, groups map[K]TS) {
 	groups[key] = append(groups[key], e)
+}
+
+// ToMap collects key\value elements to a map by iterating over the elements
+func ToMap[T any, K comparable, V any](next func() (T, bool), keyExtractor func(T) K, valExtractor func(T) V) map[K]V {
+	return ToMapResolv(next, keyExtractor, valExtractor, resolv.FirstVal[K, V])
 }
 
 // ToMapResolv collects key\value elements to a map by iterating over the elements with resolving of duplicated key values
