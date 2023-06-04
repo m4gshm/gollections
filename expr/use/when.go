@@ -99,6 +99,14 @@ func (w When[T]) Eval() (out T, ok bool) {
 	return out, false
 }
 
+// Or returns the current condition 'w' if true, or 'another' otherwise
+func (w When[T]) Or(other When[T]) When[T] {
+	if w.condition {
+		return w
+	}
+	return other
+}
+
 func newWhen[T any](condition bool, then T) When[T] {
 	return When[T]{condition, then}
 }
