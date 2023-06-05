@@ -313,7 +313,7 @@ func Test_Valuer(t *testing.T) {
 }
 
 func Test_MultiValuer(t *testing.T) {
-	l := loop.ExtraValues(loop.Of(users...), User.Roles)
+	l := loop.ExtraVals(loop.Of(users...), User.Roles)
 	bob, bobRole, _ := l.Next()
 	bob2, bobRole2, _ := l.Next()
 

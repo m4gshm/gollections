@@ -163,8 +163,8 @@ func ExtraKeys[TS ~[]T, T, K, V any](elements TS, keysExtractor func(T) []K, val
 	return ToKVs(elements, keysExtractor, func(t T) []V { return convert.AsSlice(valExtractor(t)) })
 }
 
-// ExtraValues transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
-func ExtraValues[TS ~[]T, T, K, V any](elements TS, keyExtractor func(T) K, valsExtractor func(T) []V) *MultipleKeyValuer[T, K, V] {
+// ExtraVals transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
+func ExtraVals[TS ~[]T, T, K, V any](elements TS, keyExtractor func(T) K, valsExtractor func(T) []V) *MultipleKeyValuer[T, K, V] {
 	kv := NewMultipleKeyValuer(elements, func(t T) []K { return convert.AsSlice(keyExtractor(t)) }, valsExtractor)
 	return kv
 }

@@ -64,8 +64,8 @@ func KeysValues[T, K, V any](element T, keysExtractor func(T) []K, valsExtractor
 	return out
 }
 
-// ExtraValues transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
-func ExtraValues[T, V any](element T, valsExtractor func(T) []V) (out []c.KV[T, V]) {
+// ExtraVals transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
+func ExtraVals[T, V any](element T, valsExtractor func(T) []V) (out []c.KV[T, V]) {
 	var (
 		key    = element
 		values = valsExtractor(element)

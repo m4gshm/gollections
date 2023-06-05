@@ -312,13 +312,13 @@ func KeyValuess[T, K, V any](next func() (T, bool), keyExtractor func(T) (K, err
 	return loop.KeyValuess(loop.From(next), keyExtractor, valsExtractor)
 }
 
-// ExtraValues transforms iterable elements to key/value iterator based on applying values extractor to the elements
-func ExtraValues[T, V any](next func() (T, bool), valsExtractor func(T) []V) *MultipleKeyValuer[T, T, V] {
+// ExtraVals transforms iterable elements to key/value iterator based on applying values extractor to the elements
+func ExtraVals[T, V any](next func() (T, bool), valsExtractor func(T) []V) *MultipleKeyValuer[T, T, V] {
 	return KeyValues(next, as.Is[T], valsExtractor)
 }
 
-// ExtraValues transforms iterable elements to key/value iterator based on applying values extractor to the elements
-func ExtraValuess[T, V any](next func() (T, bool), valsExtractor func(T) ([]V, error)) *loop.MultipleKeyValuer[T, T, V] {
+// ExtraVals transforms iterable elements to key/value iterator based on applying values extractor to the elements
+func ExtraValss[T, V any](next func() (T, bool), valsExtractor func(T) ([]V, error)) *loop.MultipleKeyValuer[T, T, V] {
 	return KeyValuess(next, as.ErrTail(as.Is[T]), valsExtractor)
 }
 
@@ -436,6 +436,11 @@ func initGroup[T any, K comparable, TS ~[]T](key K, e T, groups map[K]TS) {
 // ToMap collects key\value elements to a map by iterating over the elements
 func ToMap[T any, K comparable, V any](next func() (T, bool), keyExtractor func(T) K, valExtractor func(T) V) map[K]V {
 	return ToMapResolv(next, keyExtractor, valExtractor, resolv.First[K, V])
+}
+
+// ToMapp collects key\value elements to a map by iterating over the elements
+func ToMapp[T any, K comparable, V any](next func() (T, bool), keyExtractor func(T) (K, error), valExtractor func(T) (V, error)) (map[K]V, error) {
+	return loop.ToMapp(loop.From(next), keyExtractor, valExtractor)
 }
 
 // ToMapResolv collects key\value elements to a map by iterating over the elements with resolving of duplicated key values
