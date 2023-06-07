@@ -30,6 +30,7 @@ func (f FiltIter[T]) Next() (element T, ok bool, err error) {
 	return element, ok, err
 }
 
+// Start is used with for loop construct like 'for i, val, ok, err := i.Start(); ok || err != nil ; val, ok, err = i.Next() { if err != nil { return err }}'
 func (f FiltIter[T]) Start() (FiltIter[T], T, bool, error) {
 	return startIt[T](f)
 }

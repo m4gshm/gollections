@@ -361,7 +361,7 @@ func ExtraVals[T, V any](next func() (T, bool, error), valsExtractor func(T) []V
 	return KeyValues(next, as.Is[T], valsExtractor)
 }
 
-// ExtraVals transforms iterable elements to key/value iterator based on applying values extractor to the elements
+// ExtraValss transforms iterable elements to key/value iterator based on applying values extractor to the elements
 func ExtraValss[T, V any](next func() (T, bool, error), valsExtractor func(T) ([]V, error)) *MultipleKeyValuer[T, T, V] {
 	return KeyValuess(next, as.ErrTail(as.Is[T]), valsExtractor)
 }
@@ -391,7 +391,7 @@ func ExtraValue[T, V any](next func() (T, bool, error), valueExtractor func(T) V
 	return KeyValue(next, as.Is[T], valueExtractor)
 }
 
-// ExtraValue transforms iterable elements to key/value iterator based on applying value extractor to the elements
+// ExtraValuee transforms iterable elements to key/value iterator based on applying value extractor to the elements
 func ExtraValuee[T, V any](next func() (T, bool, error), valExtractor func(T) (V, error)) KeyValuer[T, T, V] {
 	return KeyValuee[T, T, V](next, as.ErrTail(as.Is[T]), valExtractor)
 }

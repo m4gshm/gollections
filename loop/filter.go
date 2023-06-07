@@ -35,9 +35,9 @@ func (f FiltIter[T]) Next() (element T, ok bool) {
 	return element, ok
 }
 
-func (f FiltIter[T]) First() (FiltIter[T], T, bool) {
-	e, ok := f.Next()
-	return f, e, ok
+// Start is used with for loop construct like 'for i, val, ok := i.Start(); ok; val, ok = i.Next() { }'
+func (f FiltIter[T]) Start() (FiltIter[T], T, bool) {
+	return startIt[T](f)
 }
 
 func nextFiltered[T any](next func() (T, bool), filter func(T) bool) (v T, ok bool) {

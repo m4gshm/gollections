@@ -31,8 +31,9 @@ func (f FiltIter[K, V]) Next() (key K, value V, ok bool, err error) {
 	return key, value, ok, err
 }
 
-func (i FiltIter[K, V]) Start() (FiltIter[K, V], K, V, bool, error) {
-	return startKvIt[K, V](i)
+// Start is used with for loop construct like 'for i, k, v, ok, err := i.Start(); ok || err != nil ; k, v, ok, err = i.Next() { if err != nil { return err }}'
+func (f FiltIter[K, V]) Start() (FiltIter[K, V], K, V, bool, error) {
+	return startKvIt[K, V](f)
 }
 
 func nextFiltered[K any, V any](next func() (K, V, bool, error), filter func(K, V) (bool, error)) (key K, val V, filtered bool, err error) {

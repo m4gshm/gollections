@@ -66,8 +66,3 @@ func KeyValue[T, K, V any, IT c.Iterator[T]](elements IT, keyExtractor func(T) K
 	kv := loop.KeyValue(elements.Next, keyExtractor, valExtractor)
 	return kv
 }
-
-func Start[T any, IT c.Iterator[T]](elements IT) (IT, T, bool) {
-	element, ok := elements.Next()
-	return elements, element, ok
-}

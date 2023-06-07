@@ -53,6 +53,7 @@ func (i *Iter[S, K, V]) Error() error {
 	return i.abort
 }
 
+// Start is used with for loop construct like 'for i, k, v, ok := i.Start(); ok; k, v, ok = i.Next() { }'
 func (i *Iter[S, K, V]) Start() (*Iter[S, K, V], K, V, bool) {
 	return startKvIt[K, V](i)
 }

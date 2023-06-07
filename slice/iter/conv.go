@@ -53,6 +53,7 @@ func (i *ConvFiltIter[From, To]) Cap() int {
 	return i.size
 }
 
+// Start is used with for loop construct like 'for i, val, ok, err := i.Start(); ok || err != nil ; val, ok, err = i.Next() { if err != nil { return err }}'
 func (i *ConvFiltIter[From, To]) Start() (*ConvFiltIter[From, To], To, bool, error) {
 	return startBreakIt[To](i)
 }
@@ -90,6 +91,7 @@ func (i *ConvIter[From, To]) Cap() int {
 	return i.size
 }
 
+// Start is used with for loop construct like 'for i, val, ok, err := i.Start(); ok || err != nil ; val, ok, err = i.Next() { if err != nil { return err }}'
 func (i *ConvIter[From, To]) Start() (*ConvIter[From, To], To, bool, error) {
 	return startBreakIt[To](i)
 }

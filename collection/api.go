@@ -136,7 +136,7 @@ func ExtraVals[T, V any, I c.Iterable[T]](collection I, valsExtractor func(T) []
 	return loop.KeyValues(h.Next, as.Is[T], valsExtractor)
 }
 
-// ExtraVals transforms iterable elements to key/value iterator based on applying values extractor to the elements
+// ExtraValss transforms iterable elements to key/value iterator based on applying values extractor to the elements
 func ExtraValss[T, V any, I c.Iterable[T]](collection I, valsExtractor func(T) ([]V, error)) *breakloop.MultipleKeyValuer[T, T, V] {
 	h := collection.Iter()
 	return loop.KeyValuess(h.Next, as.ErrTail(as.Is[T]), valsExtractor)
@@ -172,7 +172,7 @@ func ExtraValue[T, V any, I c.Iterable[T]](collection I, valueExtractor func(T) 
 	return loop.ExtraValue(h.Next, valueExtractor)
 }
 
-// ExtraValue transforms iterable elements to key/value iterator based on applying value extractor to the elements
+// ExtraValuee transforms iterable elements to key/value iterator based on applying value extractor to the elements
 func ExtraValuee[T, V any, I c.Iterable[T]](collection I, valExtractor func(T) (V, error)) breakloop.KeyValuer[T, T, V] {
 	h := collection.Iter()
 	return loop.ExtraValuee(h.Next, valExtractor)

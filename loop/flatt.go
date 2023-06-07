@@ -74,6 +74,7 @@ func (i *FlatFilterIter[From, To]) Next() (t To, ok bool) {
 	}
 }
 
+// Start is used with for loop construct like 'for i, val, ok := i.Start(); ok; val, ok = i.Next() { }'
 func (i *FlatFilterIter[From, To]) Start() (*FlatFilterIter[From, To], To, bool) {
 	return startIt[To](i)
 }
@@ -129,6 +130,7 @@ func (i *FlatIter[From, To]) Next() (To, bool) {
 	}
 }
 
+// Start is used with for loop construct like 'for i, val, ok := i.Start(); ok; val, ok = i.Next() { }'
 func (i *FlatIter[From, To]) Start() (*FlatIter[From, To], To, bool) {
 	return startIt[To](i)
 }

@@ -34,6 +34,7 @@ func (f *FiltIter[T]) Cap() int {
 	return f.size
 }
 
-func (i *FiltIter[T]) Start() (*FiltIter[T], T, bool, error) {
-	return startBreakIt[T](i)
+// Start is used with for loop construct like 'for i, val, ok, err := i.Start(); ok || err != nil ; val, ok, err = i.Next() { if err != nil { return err }}'
+func (f *FiltIter[T]) Start() (*FiltIter[T], T, bool, error) {
+	return startBreakIt[T](f)
 }

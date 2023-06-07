@@ -39,6 +39,7 @@ func (i ConvertIter[K, V, K2, V2, C]) Next() (k2 K2, v2 V2, ok bool) {
 	return k2, v2, false
 }
 
+// Start is used with for loop construct like 'for i, k, v, ok := i.Start(); ok; k, v, ok = i.Next() { }'
 func (i ConvertIter[K, V, K2, V2, C]) Start() (ConvertIter[K, V, K2, V2, C], K2, V2, bool) {
 	return startKvIt[K2, V2](i)
 }

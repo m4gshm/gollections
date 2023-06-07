@@ -110,6 +110,42 @@ func Test_Convert(t *testing.T) {
 	assert.Equal(t, []string{"1", "3", "5", "7", "9", "11"}, loop.Slice(r.Next))
 }
 
+func Test_IterWitErr(t *testing.T) {
+	s := loop.Of("1", "3", "5", "7eee", "9", "11")
+	r := []int{}
+	var outErr error
+	for it, i, ok, err := loop.Conv(s, strconv.Atoi).Start(); ok || err != nil; i, ok, err = it.Next() {
+		if err != nil {
+			outErr = err
+			break
+		}
+		r = append(r, i)
+	}
+
+	assert.Error(t, outErr)
+	assert.Equal(t, []int{1, 3, 5}, r)
+
+	s = loop.Of("1", "3", "5", "7eee", "9", "11")
+	r = []int{}
+	//ignore err
+	for it, i, ok, err := loop.Conv(s, strconv.Atoi).Start(); ok || err != nil; i, ok, err = it.Next() {
+		if err == nil {
+			r = append(r, i)
+		}
+	}
+	assert.Equal(t, []int{1, 3, 5, 9, 11}, r)
+}
+
+func Test_IterStart(t *testing.T) {
+	l := loop.Convert(loop.Of(1, 3, 5, 7, 9, 11), strconv.Itoa)
+	r := []string{}
+
+	for it, i, ok := l.Start(); ok; i, ok = it.Next() {
+		r = append(r, i)
+	}
+	assert.Equal(t, []string{"1", "3", "5", "7", "9", "11"}, r)
+}
+
 func Test_ConvertNotNil(t *testing.T) {
 	type entity struct{ val string }
 	var (

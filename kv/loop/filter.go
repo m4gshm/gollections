@@ -36,6 +36,7 @@ func (f FilterIter[K, V]) Next() (key K, value V, ok bool) {
 	return key, value, ok
 }
 
+// Start is used with for loop construct like 'for i, k, v, ok := i.Start(); ok; k, v, ok = i.Next() { }'
 func (f FilterIter[K, V]) Start() (FilterIter[K, V], K, V, bool) {
 	return startKvIt[K, V](f)
 }

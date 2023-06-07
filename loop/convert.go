@@ -44,6 +44,7 @@ func (c ConvertFiltIter[From, To]) Next() (t To, ok bool) {
 	return t, false
 }
 
+// Start is used with for loop construct like 'for i, val, ok := i.Start(); ok; val, ok = i.Next() { }'
 func (c ConvertFiltIter[From, To]) Start() (ConvertFiltIter[From, To], To, bool) {
 	return startIt[To](c)
 }
@@ -81,6 +82,11 @@ func (c ConvertIter[From, To]) Next() (t To, ok bool) {
 	return t, false
 }
 
+// Start is used with for loop construct like 'for i, val, ok := i.Start(); ok; val, ok = i.Next() { }'
+func (c ConvertIter[From, To]) Start() (ConvertIter[From, To], To, bool) {
+	return startIt[To](c)
+}
+
 // ConvertCheckIter converts and filters elements at the same time
 type ConvertCheckIter[From, To any] struct {
 	next      func() (From, bool)
@@ -104,4 +110,19 @@ func (c ConvertCheckIter[From, To]) Next() (t To, ok bool) {
 		}
 	}
 	return t, false
+}
+
+// For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
+func (c ConvertCheckIter[From, To]) For(walker func(element To) error) error {
+	return For(c.Next, walker)
+}
+
+// ForEach FlatIter all elements retrieved by the iterator
+func (c ConvertCheckIter[From, To]) ForEach(walker func(element To)) {
+	ForEach(c.Next, walker)
+}
+
+// Start is used with for loop construct like 'for i, val, ok := i.Start(); ok; val, ok = i.Next() { }'
+func (c ConvertCheckIter[From, To]) Start() (ConvertCheckIter[From, To], To, bool) {
+	return startIt[To](c)
 }

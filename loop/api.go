@@ -40,24 +40,6 @@ func Of[T any](elements ...T) func() (e T, ok bool) {
 	}
 }
 
-type F struct {
-	stop bool
-}
-
-func Break(f *F) {
-	f.stop = true
-}
-
-func ForB[T any](next func() (T, bool), walker func(*F, T)) {
-	f := &F{}
-	for v, ok := next(); ok; v, ok = next() {
-		walker(f, v)
-		if f.stop {
-			break
-		}
-	}
-}
-
 // For applies the 'walker' function for the elements retrieved by the 'next' function. Return the c.ErrBreak to stop
 func For[T any](next func() (T, bool), walker func(T) error) error {
 	for v, ok := next(); ok; v, ok = next() {
@@ -317,7 +299,7 @@ func ExtraVals[T, V any](next func() (T, bool), valsExtractor func(T) []V) *Mult
 	return KeyValues(next, as.Is[T], valsExtractor)
 }
 
-// ExtraVals transforms iterable elements to key/value iterator based on applying values extractor to the elements
+// ExtraValss transforms iterable elements to key/value iterator based on applying values extractor to the elements
 func ExtraValss[T, V any](next func() (T, bool), valsExtractor func(T) ([]V, error)) *loop.MultipleKeyValuer[T, T, V] {
 	return KeyValuess(next, as.ErrTail(as.Is[T]), valsExtractor)
 }
@@ -347,7 +329,7 @@ func ExtraValue[T, V any](next func() (T, bool), valueExtractor func(T) V) KeyVa
 	return KeyValue(next, as.Is[T], valueExtractor)
 }
 
-// ExtraValue transforms iterable elements to key/value iterator based on applying value extractor to the elements
+// ExtraValuee transforms iterable elements to key/value iterator based on applying value extractor to the elements
 func ExtraValuee[T, V any](next func() (T, bool), valExtractor func(T) (V, error)) loop.KeyValuer[T, T, V] {
 	return loop.KeyValuee[T, T, V](loop.From(next), as.ErrTail(as.Is[T]), valExtractor)
 }
@@ -552,6 +534,7 @@ func ConvAndReduce[From, To any](next func() (From, bool), converter func(From) 
 	return out, nil
 }
 
+// Start is used with for loop construct like 'for i, k, v, ok := i.Start(); ok; k, v, ok = i.Next() { }'
 func Start[T any](next func() (T, bool)) (func() (T, bool), T, bool) {
 	element, ok := next()
 	return next, element, ok

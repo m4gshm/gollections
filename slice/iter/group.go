@@ -38,6 +38,7 @@ func (kv *KeyValuerIter[T, K, V]) Next() (key K, value V, ok bool) {
 	return key, value, ok
 }
 
+// Start is used with for loop construct like 'for i, k, v, ok := i.Start(); ok; k, v, ok = i.Next() { }'
 func (kv *KeyValuerIter[T, K, V]) Start() (*KeyValuerIter[T, K, V], K, V, bool) {
 	return startKvIt[K, V](kv)
 }
@@ -104,6 +105,7 @@ func (kv *MultipleKeyValuer[T, K, V]) Next() (key K, value V, ok bool) {
 	return key, value, ok
 }
 
+// Start is used with for loop construct like 'for i, k, v, ok := i.Start(); ok; k, v, ok = i.Next() { }'
 func (kv *MultipleKeyValuer[T, K, V]) Start() (*MultipleKeyValuer[T, K, V], K, V, bool) {
 	return startKvIt[K, V](kv)
 }

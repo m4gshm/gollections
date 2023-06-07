@@ -39,6 +39,7 @@ func (f *FilterIter[T]) Cap() int {
 	return f.size
 }
 
-func (i *FilterIter[T]) Start() (*FilterIter[T], T, bool) {
-	return startIt[T](i)
+// Start is used with for loop construct like 'for i, val, ok := i.Start(); ok; val, ok = i.Next() { }'
+func (f *FilterIter[T]) Start() (*FilterIter[T], T, bool) {
+	return startIt[T](f)
 }

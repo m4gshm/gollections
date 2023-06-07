@@ -43,6 +43,32 @@ func Test_Convert(t *testing.T) {
 	assert.Equal(t, []string{"1", "3", "5", "7", "9", "11"}, o)
 }
 
+func Test_IterWitErr(t *testing.T) {
+	s := breakLoop.From(loop.Of("1", "3", "5", "7eee", "9", "11"))
+	r := []int{}
+	var outErr error
+	for it, i, ok, err := breakLoop.Conv(s, strconv.Atoi).Start(); ok || err != nil; i, ok, err = it.Next() {
+		if err != nil {
+			outErr = err
+			break
+		}
+		r = append(r, i)
+	}
+
+	assert.Error(t, outErr)
+	assert.Equal(t, []int{1, 3, 5}, r)
+
+	s = breakLoop.From(loop.Of("1", "3", "5", "7eee", "9", "11"))
+	r = []int{}
+	//ignore err
+	for it, i, ok, err := breakLoop.Conv(s, strconv.Atoi).Start(); ok || err != nil; i, ok, err = it.Next() {
+		if err == nil {
+			r = append(r, i)
+		}
+	}
+	assert.Equal(t, []int{1, 3, 5, 9, 11}, r)
+}
+
 func Test_NotNil(t *testing.T) {
 	type entity struct{ val string }
 	var (

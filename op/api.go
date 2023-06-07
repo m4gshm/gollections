@@ -2,8 +2,9 @@
 package op
 
 import (
-	"github.com/m4gshm/gollections/c"
 	"golang.org/x/exp/constraints"
+
+	"github.com/m4gshm/gollections/c"
 )
 
 // Sum returns the sum of two operands
@@ -58,8 +59,4 @@ func IfGetElseGetErr[T any](ok bool, tru func() T, fal func() error) (T, error) 
 	}
 	var no T
 	return no, fal()
-}
-
-func Get[T any](getter func() T) T {
-	return getter()
 }

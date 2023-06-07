@@ -51,6 +51,7 @@ func (i *ConvertFiltIter[From, To]) Cap() int {
 	return i.size
 }
 
+// Start is used with for loop construct like 'for i, val, ok := i.Start(); ok; val, ok = i.Next() { }'
 func (i *ConvertFiltIter[From, To]) Start() (*ConvertFiltIter[From, To], To, bool) {
 	return startIt[To](i)
 }
@@ -93,6 +94,7 @@ func (i *ConvertIter[From, To]) Cap() int {
 	return i.size
 }
 
+// Start is used with for loop construct like 'for i, val, ok := i.Start(); ok; val, ok = i.Next() { }'
 func (i *ConvertIter[From, To]) Start() (*ConvertIter[From, To], To, bool) {
 	return startIt[To](i)
 }

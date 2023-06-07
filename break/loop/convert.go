@@ -44,6 +44,7 @@ func (c ConvFiltIter[From, To]) Next() (t To, ok bool, err error) {
 	}
 }
 
+// Start is used with for loop construct like 'for i, val, ok, err := i.Start(); ok || err != nil ; val, ok, err = i.Next() { if err != nil { return err }}'
 func (c ConvFiltIter[From, To]) Start() (ConvFiltIter[From, To], To, bool, error) {
 	return startIt[To](c)
 }
@@ -78,6 +79,7 @@ func (c ConvertIter[From, To]) Next() (t To, ok bool, err error) {
 	}
 }
 
+// Start is used with for loop construct like 'for i, val, ok, err := i.Start(); ok || err != nil ; val, ok, err = i.Next() { if err != nil { return err }}'
 func (c ConvertIter[From, To]) Start() (ConvertIter[From, To], To, bool, error) {
 	return startIt[To](c)
 }
@@ -115,6 +117,7 @@ func (c ConvertCheckIter[From, To]) Next() (t To, ok bool, err error) {
 	}
 }
 
+// Start is used with for loop construct like 'for i, val, ok, err := i.Start(); ok || err != nil ; val, ok, err = i.Next() { if err != nil { return err }}'
 func (c ConvertCheckIter[From, To]) Start() (ConvertCheckIter[From, To], To, bool, error) {
 	return startIt[To](c)
 }

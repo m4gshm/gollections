@@ -65,8 +65,9 @@ func (f *FlattenFiltIter[From, To]) Cap() int {
 	return f.cap
 }
 
-func (i *FlattenFiltIter[From, To]) First() (*FlattenFiltIter[From, To], To, bool) {
-	return startIt[To](i)
+// Start is used with for loop construct like 'for i, val, ok := i.Start(); ok; val, ok = i.Next() { }'
+func (f *FlattenFiltIter[From, To]) Start() (*FlattenFiltIter[From, To], To, bool) {
+	return startIt[To](f)
 }
 
 // FlattIter is the array based Iterator impelementation that converts an element to a slice and iterates over the elements of that slice.
@@ -124,6 +125,7 @@ func (f *FlattIter[From, To]) Cap() int {
 	return f.sizeFrom
 }
 
-func (i *FlattIter[From, To]) First() (*FlattIter[From, To], To, bool) {
-	return startIt[To](i)
+// Start is used with for loop construct like 'for i, k, v, ok := i.Start(); ok; k, v, ok = i.Next() { }'
+func (f *FlattIter[From, To]) Start() (*FlattIter[From, To], To, bool) {
+	return startIt[To](f)
 }
