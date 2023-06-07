@@ -105,3 +105,9 @@ func (t Iter[T]) Append(out []T) []T {
 func (t Iter[T]) HasAny(predicate func(T) bool) bool {
 	return loop.HasAny(t.next, predicate)
 }
+
+// Start is used with for loop construct like 'for i, val, ok := i.Start(); ok; val, ok = i.Next() { }'
+func (t Iter[T]) Start() (Iter[T], T, bool) {
+	n, ok := t.next()
+	return t, n, ok
+}

@@ -159,6 +159,12 @@ func (i *Iter[T]) Cap() int {
 	return i.size
 }
 
+// Start is used with for loop construct like 'for i, val, ok := i.Start(); ok; val, ok = i.Next() { }'
+func (i *Iter[T]) Start() (*Iter[T], T, bool) {
+	n, ok := i.Next()
+	return i, n, ok
+}
+
 // HasNext checks if an iterator can go forward
 func HasNext[T any](elements []T, current int) bool {
 	return HasNextBySize(notsafe.GetLen(elements), current)

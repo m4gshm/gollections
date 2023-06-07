@@ -62,7 +62,7 @@ func First[T any, I c.Iterator[T]](elements I, filter func(T) bool) (T, bool) {
 }
 
 // KeyValue converts a c.Iterator to a kv.KVIterator using key and value extractors
-func KeyValue[T, K, V any, IT c.Iterator[T]](elements IT, keyExtractor func(T) K, valExtractor func(T) V) loop.KeyValuer[T, K, V] {
+func KeyValue[T, K, V any, I c.Iterator[T]](elements I, keyExtractor func(T) K, valExtractor func(T) V) loop.KeyValuer[T, K, V] {
 	kv := loop.KeyValue(elements.Next, keyExtractor, valExtractor)
 	return kv
 }

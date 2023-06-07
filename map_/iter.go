@@ -75,6 +75,12 @@ func (i *Iter[K, V]) Cap() int {
 	return i.size
 }
 
+// Start is used with for loop construct like 'for i, val, ok := i.Start(); ok; val, ok = i.Next() { }'
+func (i *Iter[K, V]) Start() (*Iter[K, V], K, V, bool) {
+	k, v, ok := i.Next()
+	return i, k, v, ok
+}
+
 //go:linkname mapiterinit reflect.mapiterinit
 func mapiterinit(maptype, hmap unsafe.Pointer, it *hiter)
 
@@ -150,6 +156,12 @@ func (i KeyIter[K, V]) Cap() int {
 	return i.Iter.Cap()
 }
 
+// Start is used with for loop construct like 'for i, val, ok := i.Start(); ok; val, ok = i.Next() { }'
+func (i KeyIter[K, V]) Start() (KeyIter[K, V], K, bool) {
+	key, _, ok := i.Iter.Next()
+	return i, key, ok
+}
+
 // NewValIter is the main values iterator constructor
 func NewValIter[K comparable, V any](uniques map[K]V) ValIter[K, V] {
 	return ValIter[K, V]{Iter: NewIter(op.IfElse(uniques != nil, uniques, map[K]V{}))}
@@ -186,4 +198,10 @@ func (i ValIter[K, V]) Next() (V, bool) {
 // Cap returns the size of the map
 func (i ValIter[K, V]) Cap() int {
 	return i.Iter.Cap()
+}
+
+// Start is used with for loop construct like 'for i, val, ok := i.Start(); ok; val, ok = i.Next() { }'
+func (i ValIter[K, V]) Start() (ValIter[K, V], V, bool) {
+	_, val, ok := i.Iter.Next()
+	return i, val, ok
 }

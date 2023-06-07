@@ -93,3 +93,9 @@ func (i *ValIter[K, V]) Cap() int {
 	}
 	return len(i.elements)
 }
+
+// Start is used with for loop construct like 'for i, val, ok := i.Start(); ok; val, ok = i.Next() { }'
+func (i *ValIter[K, V]) Start() (*ValIter[K, V], V, bool) {
+	v, ok := i.Next()
+	return i, v, ok
+}
