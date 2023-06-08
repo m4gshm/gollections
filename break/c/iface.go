@@ -12,3 +12,7 @@ type Iterator[T any] interface {
 
 	c.ForLoop[T]
 }
+
+type IterFor[T any, I Iterator[T]] interface {
+	Start() (iterator I, val T, ok bool, err error)
+}

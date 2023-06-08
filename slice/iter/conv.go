@@ -20,6 +20,8 @@ type ConvFiltIter[From, To any] struct {
 
 var _ c.Iterator[any] = (*ConvFiltIter[any, any])(nil)
 
+var _ c.IterFor[any, *ConvFiltIter[any, any]] = (*ConvFiltIter[any, any])(nil)
+
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (i *ConvFiltIter[From, To]) For(walker func(element To) error) error {
 	return loop.For(i.Next, walker)

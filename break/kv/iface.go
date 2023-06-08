@@ -11,3 +11,7 @@ type Iterator[K, V any] interface {
 	Next() (key K, value V, ok bool, err error)
 	c.TrackLoop[K, V]
 }
+
+type IterFor[K, V any, I Iterator[K, V]] interface {
+	Start() (iterator I, key K, value V, ok bool, err error)
+}

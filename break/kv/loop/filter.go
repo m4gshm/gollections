@@ -16,6 +16,8 @@ var (
 	_ kv.Iterator[any, any] = FiltIter[any, any]{}
 )
 
+var _ kv.IterFor[any, any, FiltIter[any, any]] = FiltIter[any, any]{}
+
 // Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (f FiltIter[K, V]) Track(traker func(key K, value V) error) error {
 	return loop.Track(f.Next, traker)

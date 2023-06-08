@@ -14,6 +14,7 @@ type KeyValuerIter[T, K, V any] struct {
 }
 
 var _ kv.Iterator[int, string] = (*KeyValuerIter[any, int, string])(nil)
+var _ kv.IterFor[int, string, *KeyValuerIter[any, int, string]] = (*KeyValuerIter[any, int, string])(nil)
 
 // Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (kv KeyValuerIter[T, K, V]) Track(traker func(key K, value V) error) error {
@@ -54,6 +55,7 @@ type MultipleKeyValuer[T, K, V any] struct {
 }
 
 var _ kv.Iterator[int, string] = (*MultipleKeyValuer[any, int, string])(nil)
+var _ kv.IterFor[int, string, *MultipleKeyValuer[any, int, string]] = (*MultipleKeyValuer[any, int, string])(nil)
 
 // Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (kv *MultipleKeyValuer[T, K, V]) Track(traker func(key K, value V) error) error {

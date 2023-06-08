@@ -15,6 +15,8 @@ var (
 	_ c.Iterator[any] = FiltIter[any]{}
 )
 
+var _ c.IterFor[any, FiltIter[any]] = FiltIter[any]{}
+
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (f FiltIter[T]) For(walker func(element T) error) error {
 	return For(f.Next, walker)

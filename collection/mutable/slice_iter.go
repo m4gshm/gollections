@@ -32,6 +32,8 @@ var (
 	_ c.DelIterator[any]  = (*SliceIter[any])(nil)
 )
 
+var _ c.IterFor[int, *SliceIter[int]] = (*SliceIter[int])(nil)
+
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (i *SliceIter[T]) For(walker func(element T) error) error {
 	return loop.For(i.Next, walker)
@@ -149,4 +151,9 @@ func (i *SliceIter[T]) DeletePrev() bool {
 		return true
 	}
 	return false
+}
+
+func (i *SliceIter[T]) Start() (*SliceIter[T], T, bool) {
+	n, ok := i.Next()
+	return i, n, ok
 }

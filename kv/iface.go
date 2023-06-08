@@ -12,6 +12,10 @@ type Iterator[K, V any] interface {
 	c.TrackEachLoop[K, V]
 }
 
+type IterFor[K, V any, I Iterator[K, V]] interface {
+	Start() (iterator I, key K, value V, ok bool)
+}
+
 // Iterable is an iterator supplier interface
 type Iterable[K, V any] interface {
 	Iter() Iterator[K, V]

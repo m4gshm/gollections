@@ -21,6 +21,7 @@ type KeyValuer[T, K, V any] struct {
 
 var _ kv.Iterator[int, string] = (*KeyValuer[any, int, string])(nil)
 var _ kv.Iterator[int, string] = KeyValuer[any, int, string]{}
+var _ kv.IterFor[int, string, KeyValuer[any, int, string]] = KeyValuer[any, int, string]{}
 
 // Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (kv KeyValuer[T, K, V]) Track(traker func(key K, value V) error) error {
@@ -47,7 +48,7 @@ func (kv KeyValuer[T, K, V]) Next() (key K, value V, ok bool) {
 }
 
 // Start is used with for loop construct like 'for i, k, v, ok := i.Start(); ok; k, v, ok = i.Next() { }'
-func (kv *KeyValuer[T, K, V]) Start() (*KeyValuer[T, K, V], K, V, bool) {
+func (kv KeyValuer[T, K, V]) Start() (KeyValuer[T, K, V], K, V, bool) {
 	return startKvIt[K, V](kv)
 }
 
@@ -62,6 +63,7 @@ type MultipleKeyValuer[T, K, V any] struct {
 }
 
 var _ kv.Iterator[int, string] = (*MultipleKeyValuer[any, int, string])(nil)
+var _ kv.IterFor[int, string, *MultipleKeyValuer[any, int, string]] = (*MultipleKeyValuer[any, int, string])(nil)
 
 // Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (kv *MultipleKeyValuer[T, K, V]) Track(traker func(key K, value V) error) error {

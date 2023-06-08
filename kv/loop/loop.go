@@ -24,6 +24,8 @@ var (
 	_ kv.Iterator[any, any] = (*Iter[any, any, any])(nil)
 )
 
+var _ kv.IterFor[any, any, *Iter[any, any, any]] = (*Iter[any, any, any])(nil)
+
 // Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (i *Iter[S, K, V]) Track(traker func(key K, value V) error) error {
 	return loop.Track(i.Next, traker)

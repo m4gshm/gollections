@@ -23,6 +23,8 @@ var (
 	_ c.DelIterator[any] = (*SetIter[any])(nil)
 )
 
+var _ c.IterFor[int, *SetIter[int]] = (*SetIter[int])(nil)
+
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (i *SetIter[T]) For(walker func(element T) error) error {
 	return loop.For(i.Next, walker)
@@ -62,4 +64,9 @@ func (i *SetIter[T]) Delete() {
 			i.del(v)
 		}
 	}
+}
+
+func (i *SetIter[T]) Start() (*SetIter[T], T, bool) {
+	n, ok := i.Next()
+	return i, n, ok
 }

@@ -16,6 +16,8 @@ var (
 	_ kv.Iterator[any, any] = ConvertIter[any, any, any, any]{}
 )
 
+var _ kv.IterFor[any, any, ConvertIter[any, any, any, any]] = ConvertIter[any, any, any, any]{}
+
 // Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (i ConvertIter[K, V, K2, V2]) Track(traker func(key K2, value V2) error) error {
 	return loop.Track(i.Next, traker)

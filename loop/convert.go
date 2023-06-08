@@ -18,6 +18,8 @@ var (
 	_ c.Iterator[any] = ConvertFiltIter[any, any]{}
 )
 
+var _ c.IterFor[any, ConvertFiltIter[any, any]] = ConvertFiltIter[any, any]{}
+
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (c ConvertFiltIter[From, To]) For(walker func(element To) error) error {
 	return For(c.Next, walker)
@@ -60,6 +62,8 @@ var (
 	_ c.Iterator[any] = ConvertIter[any, any]{}
 )
 
+var _ c.IterFor[any, ConvertIter[any, any]] = ConvertIter[any, any]{}
+
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (c ConvertIter[From, To]) For(walker func(element To) error) error {
 	return For(c.Next, walker)
@@ -97,6 +101,8 @@ var (
 	_ c.Iterator[any] = (*ConvertIter[any, any])(nil)
 	_ c.Iterator[any] = ConvertIter[any, any]{}
 )
+
+var _ c.IterFor[any, ConvertIter[any, any]] = ConvertIter[any, any]{}
 
 // Next returns the next element.
 // The ok result indicates whether the element was returned by the iterator.

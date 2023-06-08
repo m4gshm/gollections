@@ -60,6 +60,10 @@ type Iterator[T any] interface {
 	ForEachLoop[T]
 }
 
+type IterFor[T any, I Iterator[T]] interface {
+	Start() (iterator I, val T, ok bool)
+}
+
 // Sized - storage interface with measurable capacity
 type Sized interface {
 	// returns an estimated internal storage capacity or -1 if the capacity cannot be calculated

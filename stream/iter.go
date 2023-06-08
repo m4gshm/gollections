@@ -27,6 +27,7 @@ var (
 	_ c.Filterable[any, Iter[any], breakStream.Iter[any]] = Iter[any]{}
 	_ c.Iterator[any]                                     = (*Iter[any])(nil)
 	_ c.Iterator[any]                                     = Iter[any]{}
+	_ c.IterFor[any, Iter[any]]                           = Iter[any]{}
 )
 
 // Next implements c.Iterator

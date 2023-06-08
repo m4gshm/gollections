@@ -19,6 +19,7 @@ type FlatFilterIter[From, To any] struct {
 }
 
 var _ c.Iterator[any] = (*FlatFilterIter[any, any])(nil)
+var _ c.IterFor[any, *FlatFilterIter[any, any]] = (*FlatFilterIter[any, any])(nil)
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (i *FlatFilterIter[From, To]) For(walker func(element To) error) error {
