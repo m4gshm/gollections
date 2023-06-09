@@ -49,6 +49,7 @@ func (i *MapIter[K, V]) Cap() int {
 	return i.elements.Cap()
 }
 
+// Start is used with for loop construct like 'for i, k, v, ok := i.Start(); ok; k, v, ok = i.Next() { }'
 func (i *MapIter[K, V]) Start() (*MapIter[K, V], K, V, bool) {
 	k, v, ok := i.Next()
 	return i, k, v, ok

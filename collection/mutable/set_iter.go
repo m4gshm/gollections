@@ -42,6 +42,7 @@ func (i *SetIter[K]) Delete() {
 	}
 }
 
+// Start is used with for loop construct like 'for i, val, ok := i.Start(); ok; val, ok = i.Next() { }'
 func (i *SetIter[K]) Start() (*SetIter[K], K, bool) {
 	n, ok := i.Next()
 	return i, n, ok

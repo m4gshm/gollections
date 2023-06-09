@@ -60,7 +60,15 @@ type Iterator[T any] interface {
 	ForEachLoop[T]
 }
 
+// IterFor extends an iterator type by a 'Start' function implementation
 type IterFor[T any, I Iterator[T]] interface {
+	// Start is used with for loop construct.
+	// Returns the iterator itself, the first element, and ok == false if the iteration must be completed.
+	//
+	// 	var i IterFor = ...
+	// 	for i, val, ok := i.Start(); ok; val, ok = i.Next() {
+	//  	_ = val
+	//	}
 	Start() (iterator I, val T, ok bool)
 }
 

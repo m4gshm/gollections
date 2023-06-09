@@ -153,6 +153,7 @@ func (i *SliceIter[T]) DeletePrev() bool {
 	return false
 }
 
+// Start is used with for loop construct like 'for i, val, ok := i.Start(); ok; val, ok = i.Next() { }'
 func (i *SliceIter[T]) Start() (*SliceIter[T], T, bool) {
 	n, ok := i.Next()
 	return i, n, ok

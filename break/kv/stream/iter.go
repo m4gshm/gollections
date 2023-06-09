@@ -108,6 +108,7 @@ func (i Iter[K, V, M]) Map() (M, error) {
 	return i.collector(i.next)
 }
 
+// Start is used with for loop construct like 'for i, k, v, ok, err := i.Start(); ok || err != nil ; k, v, ok, err = i.Next() { if err != nil { return err }}'
 func (i Iter[K, V, M]) Start() (Iter[K, V, M], K, V, bool, error) {
 	k, v, ok, err := i.next()
 	return i, k, v, ok, err
