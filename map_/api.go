@@ -31,7 +31,7 @@ func Of[K comparable, V any](elements ...c.KV[K, V]) map[K]V {
 // The hasNext specifies a predicate that tests existing of a next pair in the source.
 // The getNext extracts the pair.
 func OfLoop[S any, K comparable, V any](source S, hasNext func(S) bool, getNext func(S) (K, V, error)) (map[K]V, error) {
-	return OfLoopResolv(source, hasNext, getNext, resolv.FirstVal[K, V])
+	return OfLoopResolv(source, hasNext, getNext, resolv.First[K, V])
 }
 
 // OfLoopResolv builds a map by iterating elements of a source.
@@ -63,7 +63,7 @@ func GroupOfLoop[S any, K comparable, V any](source S, hasNext func(S) bool, get
 // Generate builds a map by an generator function.
 // The next returns a key\value pair, or false if the generation is over, or an error.
 func Generate[K comparable, V any](next func() (K, V, bool, error)) (map[K]V, error) {
-	return GenerateResolv(next, resolv.FirstVal[K, V])
+	return GenerateResolv(next, resolv.First[K, V])
 }
 
 // GenerateResolv builds a map by an generator function.

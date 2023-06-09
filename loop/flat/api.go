@@ -8,4 +8,3 @@ func AndConvert[From, I, To any](next func() (From, bool), flattener func(From) 
 	f := *loop.Flat(next, flattener)
 	return loop.Convert(f.Next, convert)
 }
-	

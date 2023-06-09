@@ -16,6 +16,7 @@ type FiltIter[T any] struct {
 }
 
 var _ c.Iterator[any] = (*FiltIter[any])(nil)
+var _ c.IterFor[any, *FiltIter[any]] = (*FiltIter[any])(nil)
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (f *FiltIter[T]) For(walker func(element T) error) error {
@@ -32,4 +33,9 @@ func (f *FiltIter[T]) Next() (T, bool, error) {
 // Cap returns the iterator capacity
 func (f *FiltIter[T]) Cap() int {
 	return f.size
+}
+
+// Start is used with for loop construct like 'for i, val, ok, err := i.Start(); ok || err != nil ; val, ok, err = i.Next() { if err != nil { return err }}'
+func (f *FiltIter[T]) Start() (*FiltIter[T], T, bool, error) {
+	return startBreakIt[T](f)
 }

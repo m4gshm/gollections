@@ -16,6 +16,8 @@ var (
 	_ kv.Iterator[any, any] = FiltIter[any, any]{}
 )
 
+var _ kv.IterFor[any, any, FiltIter[any, any]] = FiltIter[any, any]{}
+
 // Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (f FiltIter[K, V]) Track(traker func(key K, value V) error) error {
 	return loop.Track(f.Next, traker)
@@ -29,6 +31,11 @@ func (f FiltIter[K, V]) Next() (key K, value V, ok bool, err error) {
 		key, value, ok, err = nextFiltered(f.next, f.filter)
 	}
 	return key, value, ok, err
+}
+
+// Start is used with for loop construct like 'for i, k, v, ok, err := i.Start(); ok || err != nil ; k, v, ok, err = i.Next() { if err != nil { return err }}'
+func (f FiltIter[K, V]) Start() (FiltIter[K, V], K, V, bool, error) {
+	return startKvIt[K, V](f)
 }
 
 func nextFiltered[K any, V any](next func() (K, V, bool, error), filter func(K, V) (bool, error)) (key K, val V, filtered bool, err error) {

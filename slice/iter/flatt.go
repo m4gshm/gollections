@@ -19,6 +19,7 @@ type FlattenFiltIter[From, To any] struct {
 }
 
 var _ c.Iterator[any] = (*FlattenFiltIter[any, any])(nil)
+var _ c.IterFor[any, *FlattenFiltIter[any, any]] = (*FlattenFiltIter[any, any])(nil)
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (f *FlattenFiltIter[From, To]) For(walker func(element To) error) error {
@@ -65,6 +66,11 @@ func (f *FlattenFiltIter[From, To]) Cap() int {
 	return f.cap
 }
 
+// Start is used with for loop construct like 'for i, val, ok := i.Start(); ok; val, ok = i.Next() { }'
+func (f *FlattenFiltIter[From, To]) Start() (*FlattenFiltIter[From, To], To, bool) {
+	return startIt[To](f)
+}
+
 // FlattIter is the array based Iterator impelementation that converts an element to a slice and iterates over the elements of that slice.
 // For example, FlattIter can be used to iterate over all the elements of a multi-dimensional array as if it were a one-dimensional array ([][]int -> []int).
 type FlattIter[From, To any] struct {
@@ -76,6 +82,7 @@ type FlattIter[From, To any] struct {
 }
 
 var _ c.Iterator[any] = (*FlattIter[any, any])(nil)
+var _ c.IterFor[any, *FlattIter[any, any]] = (*FlattIter[any, any])(nil)
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (f *FlattIter[From, To]) For(walker func(element To) error) error {
@@ -118,4 +125,9 @@ func (f *FlattIter[From, To]) Next() (To, bool) {
 // Cap returns the iterator capacity
 func (f *FlattIter[From, To]) Cap() int {
 	return f.sizeFrom
+}
+
+// Start is used with for loop construct like 'for i, k, v, ok := i.Start(); ok; k, v, ok = i.Next() { }'
+func (f *FlattIter[From, To]) Start() (*FlattIter[From, To], To, bool) {
+	return startIt[To](f)
 }

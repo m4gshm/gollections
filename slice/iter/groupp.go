@@ -14,6 +14,7 @@ type KeyValIter[T, K, V any] struct {
 }
 
 var _ kv.Iterator[int, string] = (*KeyValIter[any, int, string])(nil)
+var _ kv.IterFor[int, string, *KeyValIter[any, int, string]] = (*KeyValIter[any, int, string])(nil)
 
 // Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (kv KeyValIter[T, K, V]) Track(traker func(key K, value V) error) error {
@@ -35,6 +36,11 @@ func (kv *KeyValIter[T, K, V]) Next() (key K, value V, ok bool, err error) {
 	return key, value, ok, err
 }
 
+// Start is used with for loop construct like 'for i, k, v, ok, err := i.Start(); ok || err != nil ; k, v, ok, err = i.Next() { if err != nil { return err }}'
+func (kv *KeyValIter[T, K, V]) Start() (*KeyValIter[T, K, V], K, V, bool, error) {
+	return startBreakKvIt[K, V](kv)
+}
+
 // MultipleKeyValIter is the Iterator wrapper that converts an element to a key\value pair and iterates over these pairs
 type MultipleKeyValIter[T, K, V any] struct {
 	iter          slice.Iter[T]
@@ -46,6 +52,7 @@ type MultipleKeyValIter[T, K, V any] struct {
 }
 
 var _ kv.Iterator[int, string] = (*MultipleKeyValIter[any, int, string])(nil)
+var _ kv.IterFor[int, string, *MultipleKeyValIter[any, int, string]] = (*MultipleKeyValIter[any, int, string])(nil)
 
 // Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (kv *MultipleKeyValIter[T, K, V]) Track(traker func(key K, value V) error) error {
@@ -99,4 +106,9 @@ func (kv *MultipleKeyValIter[T, K, V]) Next() (key K, value V, ok bool, err erro
 		}
 	}
 	return key, value, ok, err
+}
+
+// Start is used with for loop construct like 'for i, k, v, ok, err := i.Start(); ok || err != nil ; k, v, ok, err = i.Next() { if err != nil { return err }}'
+func (kv *MultipleKeyValIter[T, K, V]) Start() (*MultipleKeyValIter[T, K, V], K, V, bool, error) {
+	return startBreakKvIt[K, V](kv)
 }

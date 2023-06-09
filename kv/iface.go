@@ -12,6 +12,18 @@ type Iterator[K, V any] interface {
 	c.TrackEachLoop[K, V]
 }
 
+// IterFor extends an iterator type by a 'Start' function implementation
+type IterFor[K, V any, I Iterator[K, V]] interface {
+	// Start is used with for loop construct.
+	// Returns the iterator itself, the first key/value pair, and ok == false if the iteration must be completed.
+	//
+	// 	var i IterFor = ...
+	// 	for i, k, v, ok := i.Start(); ok; k, v, ok = i.Next() {
+	//  	_ = val
+	//	}
+	Start() (iterator I, key K, value V, ok bool)
+}
+
 // Iterable is an iterator supplier interface
 type Iterable[K, V any] interface {
 	Iter() Iterator[K, V]

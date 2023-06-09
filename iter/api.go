@@ -53,7 +53,7 @@ func Reduce[T any, I c.Iterator[T]](elements I, by func(T, T) T) T {
 
 // Group transforms iterable elements to the MapPipe based on applying key extractor to the elements
 func Group[T any, K comparable, I c.Iterator[T]](elements I, by func(T) K) stream.Iter[K, T, map[K][]T] {
-	return stream.New(loop.NewKeyValuer(elements.Next, by, as.Is[T]).Next, kvloop.Group[K, T])
+	return stream.New(loop.KeyValue(elements.Next, by, as.Is[T]).Next, kvloop.Group[K, T])
 }
 
 // First returns the first element that satisfies requirements of the predicate 'filter'
@@ -61,8 +61,8 @@ func First[T any, I c.Iterator[T]](elements I, filter func(T) bool) (T, bool) {
 	return loop.First(elements.Next, filter)
 }
 
-// ToKV converts a c.Iterator to a kv.KVIterator using key and value extractors
-func ToKV[T, K, V any, IT c.Iterator[T]](elements IT, keyExtractor func(T) K, valExtractor func(T) V) loop.KeyValuer[T, K, V] {
-	kv := loop.NewKeyValuer(elements.Next, keyExtractor, valExtractor)
+// KeyValue converts a c.Iterator to a kv.KVIterator using key and value extractors
+func KeyValue[T, K, V any, I c.Iterator[T]](elements I, keyExtractor func(T) K, valExtractor func(T) V) loop.KeyValuer[T, K, V] {
+	kv := loop.KeyValue(elements.Next, keyExtractor, valExtractor)
 	return kv
 }

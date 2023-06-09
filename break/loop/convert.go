@@ -18,6 +18,8 @@ var (
 	_ c.Iterator[any] = ConvFiltIter[any, any]{}
 )
 
+var _ c.IterFor[any, ConvFiltIter[any, any]] = ConvFiltIter[any, any]{}
+
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (c ConvFiltIter[From, To]) For(walker func(element To) error) error {
 	return For(c.Next, walker)
@@ -44,6 +46,11 @@ func (c ConvFiltIter[From, To]) Next() (t To, ok bool, err error) {
 	}
 }
 
+// Start is used with for loop construct like 'for i, val, ok, err := i.Start(); ok || err != nil ; val, ok, err = i.Next() { if err != nil { return err }}'
+func (c ConvFiltIter[From, To]) Start() (ConvFiltIter[From, To], To, bool, error) {
+	return startIt[To](c)
+}
+
 // ConvertIter iterator implementation that retrieves an element by the 'next' function and converts by the 'converter'
 type ConvertIter[From, To any] struct {
 	next      func() (From, bool, error)
@@ -54,6 +61,8 @@ var (
 	_ c.Iterator[any] = (*ConvertIter[any, any])(nil)
 	_ c.Iterator[any] = ConvertIter[any, any]{}
 )
+
+var _ c.IterFor[any, ConvertIter[any, any]] = ConvertIter[any, any]{}
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (c ConvertIter[From, To]) For(walker func(element To) error) error {
@@ -74,6 +83,11 @@ func (c ConvertIter[From, To]) Next() (t To, ok bool, err error) {
 	}
 }
 
+// Start is used with for loop construct like 'for i, val, ok, err := i.Start(); ok || err != nil ; val, ok, err = i.Next() { if err != nil { return err }}'
+func (c ConvertIter[From, To]) Start() (ConvertIter[From, To], To, bool, error) {
+	return startIt[To](c)
+}
+
 // ConvertCheckIter converts and filters elements at the same time
 type ConvertCheckIter[From, To any] struct {
 	next      func() (From, bool, error)
@@ -81,9 +95,16 @@ type ConvertCheckIter[From, To any] struct {
 }
 
 var (
-	_ c.Iterator[any] = (*ConvertIter[any, any])(nil)
-	_ c.Iterator[any] = ConvertIter[any, any]{}
+	_ c.Iterator[any] = (*ConvertCheckIter[any, any])(nil)
+	_ c.Iterator[any] = ConvertCheckIter[any, any]{}
 )
+
+var _ c.IterFor[any, ConvertCheckIter[any, any]] = ConvertCheckIter[any, any]{}
+
+// For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
+func (c ConvertCheckIter[From, To]) For(walker func(element To) error) error {
+	return For(c.Next, walker)
+}
 
 // Next returns the next element.
 // The ok result indicates whether the element was returned by the iterator.
@@ -100,4 +121,9 @@ func (c ConvertCheckIter[From, To]) Next() (t To, ok bool, err error) {
 			return t, ok, err
 		}
 	}
+}
+
+// Start is used with for loop construct like 'for i, val, ok, err := i.Start(); ok || err != nil ; val, ok, err = i.Next() { if err != nil { return err }}'
+func (c ConvertCheckIter[From, To]) Start() (ConvertCheckIter[From, To], To, bool, error) {
+	return startIt[To](c)
 }

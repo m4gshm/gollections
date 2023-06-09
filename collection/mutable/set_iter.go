@@ -23,6 +23,8 @@ var (
 	_ c.DelIterator[int] = (*SetIter[int])(nil)
 )
 
+var _ c.IterFor[int, *SetIter[int]] = (*SetIter[int])(nil)
+
 // Next returns the next element if it exists
 func (i *SetIter[K]) Next() (key K, ok bool) {
 	if i != nil {
@@ -38,4 +40,10 @@ func (i *SetIter[K]) Delete() {
 	if i != nil && i.ok {
 		i.del(i.currentKey)
 	}
+}
+
+// Start is used with for loop construct like 'for i, val, ok := i.Start(); ok; val, ok = i.Next() { }'
+func (i *SetIter[K]) Start() (*SetIter[K], K, bool) {
+	n, ok := i.Next()
+	return i, n, ok
 }

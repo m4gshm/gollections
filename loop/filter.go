@@ -15,6 +15,8 @@ var (
 	_ c.Iterator[any] = FiltIter[any]{}
 )
 
+var _ c.IterFor[any, FiltIter[any]] = FiltIter[any]{}
+
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (f FiltIter[T]) For(walker func(element T) error) error {
 	return For(f.Next, walker)
@@ -33,6 +35,11 @@ func (f FiltIter[T]) Next() (element T, ok bool) {
 		element, ok = nextFiltered(next, by)
 	}
 	return element, ok
+}
+
+// Start is used with for loop construct like 'for i, val, ok := i.Start(); ok; val, ok = i.Next() { }'
+func (f FiltIter[T]) Start() (FiltIter[T], T, bool) {
+	return startIt[T](f)
 }
 
 func nextFiltered[T any](next func() (T, bool), filter func(T) bool) (v T, ok bool) {

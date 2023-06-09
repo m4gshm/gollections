@@ -20,6 +20,8 @@ type ConvFiltIter[From, To any] struct {
 
 var _ c.Iterator[any] = (*ConvFiltIter[any, any])(nil)
 
+var _ c.IterFor[any, *ConvFiltIter[any, any]] = (*ConvFiltIter[any, any])(nil)
+
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (i *ConvFiltIter[From, To]) For(walker func(element To) error) error {
 	return loop.For(i.Next, walker)
@@ -53,6 +55,11 @@ func (i *ConvFiltIter[From, To]) Cap() int {
 	return i.size
 }
 
+// Start is used with for loop construct like 'for i, val, ok, err := i.Start(); ok || err != nil ; val, ok, err = i.Next() { if err != nil { return err }}'
+func (i *ConvFiltIter[From, To]) Start() (*ConvFiltIter[From, To], To, bool, error) {
+	return startBreakIt[To](i)
+}
+
 // ConvIter is the array based Iterator thath provides converting of elements by a ConvIter.
 type ConvIter[From, To any] struct {
 	array     unsafe.Pointer
@@ -84,6 +91,11 @@ func (i *ConvIter[From, To]) Next() (t To, ok bool, err error) {
 // Cap returns the iterator capacity
 func (i *ConvIter[From, To]) Cap() int {
 	return i.size
+}
+
+// Start is used with for loop construct like 'for i, val, ok, err := i.Start(); ok || err != nil ; val, ok, err = i.Next() { if err != nil { return err }}'
+func (i *ConvIter[From, To]) Start() (*ConvIter[From, To], To, bool, error) {
+	return startBreakIt[To](i)
 }
 
 func nextFilt[T any](array unsafe.Pointer, size int, elemSize uintptr, filter func(T) (bool, error), index *int) (v T, ok bool, err error) {

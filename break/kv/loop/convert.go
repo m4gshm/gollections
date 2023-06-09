@@ -16,6 +16,8 @@ var (
 	_ kv.Iterator[any, any] = ConvertIter[any, any, any, any]{}
 )
 
+var _ kv.IterFor[any, any, ConvertIter[any, any, any, any]] = ConvertIter[any, any, any, any]{}
+
 // Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (i ConvertIter[K, V, K2, V2]) Track(traker func(key K2, value V2) error) error {
 	return loop.Track(i.Next, traker)
@@ -34,4 +36,9 @@ func (i ConvertIter[K, V, K2, V2]) Next() (k2 K2, v2 V2, ok bool, err error) {
 		return k2, v2, err == nil, err
 	}
 	return k2, v2, false, nil
+}
+
+// Start is used with for loop construct like 'for i, k, v, ok, err := i.Start(); ok || err != nil ; k, v, ok, err = i.Next() { if err != nil { return err }}'
+func (i ConvertIter[K, V, K2, V2]) Start() (ConvertIter[K, V, K2, V2], K2, V2, bool, error) {
+	return startKvIt[K2, V2](i)
 }

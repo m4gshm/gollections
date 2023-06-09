@@ -408,13 +408,13 @@ func NotNil[TS ~[]*T, T any](elements TS) TS {
 // ToValues returns values referenced by the pointers.
 // If a pointer is nil then it is replaced by the zero value.
 func ToValues[TS ~[]*T, T any](pointers TS) []T {
-	return Convert(pointers, convert.ToValue[T])
+	return Convert(pointers, convert.PtrVal[T])
 }
 
 // GetValues returns values referenced by the pointers.
 // All nil pointers are excluded from the final result.
 func GetValues[TS ~[]*T, T any](elements TS) []T {
-	return ConvertCheck(elements, convert.GetValue[T])
+	return ConvertCheck(elements, convert.NoNilPtrVal[T])
 }
 
 // Filter creates a slice containing only the filtered elements
@@ -762,6 +762,11 @@ func NotEmpty[TS ~[]T, T any](elements TS) bool {
 	return !Empty(elements)
 }
 
+// ToMap collects key\value elements to a map by iterating over the elements
+func ToMap[TS ~[]T, T any, K comparable, V any](elements TS, keyExtractor func(T) K, valExtractor func(T) V) map[K]V {
+	return ToMapResolv(elements, keyExtractor, valExtractor, resolv.First[K, V])
+}
+
 // ToMapResolv collects key\value elements to a map by iterating over the elements with resolving of duplicated key values
 func ToMapResolv[TS ~[]T, T any, K comparable, V, VR any](elements TS, keyExtractor func(T) K, valExtractor func(T) V, resolver func(bool, K, VR, V) VR) map[K]VR {
 	m := make(map[K]VR, len(elements))
@@ -773,24 +778,24 @@ func ToMapResolv[TS ~[]T, T any, K comparable, V, VR any](elements TS, keyExtrac
 	return m
 }
 
-// ToKV transforms slice elements to key/value pairs slice. One pair per one element
-func ToKV[TS ~[]T, T, K, V any](elements TS, keyExtractor func(T) K, valExtractor func(T) V) []c.KV[K, V] {
-	return Convert(elements, func(e T) c.KV[K, V] { return convert.ToKV(e, keyExtractor, valExtractor) })
+// KeyValue transforms slice elements to key/value pairs slice. One pair per one element
+func KeyValue[TS ~[]T, T, K, V any](elements TS, keyExtractor func(T) K, valExtractor func(T) V) []c.KV[K, V] {
+	return Convert(elements, func(e T) c.KV[K, V] { return convert.KeyValue(e, keyExtractor, valExtractor) })
 }
 
-// ToKVs transforms slice elements to key/value pairs slice. Multiple pairs per one element
-func ToKVs[TS ~[]T, T, K, V any](elements TS, keysExtractor func(T) []K, valsExtractor func(T) []V) []c.KV[K, V] {
-	return Flat(elements, func(e T) []c.KV[K, V] { return convert.ToKVs(e, keysExtractor, valsExtractor) })
+// KeysValues transforms slice elements to key/value pairs slice. Multiple pairs per one element
+func KeysValues[TS ~[]T, T, K, V any](elements TS, keysExtractor func(T) []K, valsExtractor func(T) []V) []c.KV[K, V] {
+	return Flat(elements, func(e T) []c.KV[K, V] { return convert.KeysValues(e, keysExtractor, valsExtractor) })
 }
 
-// FlattValues transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
-func FlattValues[TS ~[]T, T, V any](elements TS, valsExtractor func(T) []V) []c.KV[T, V] {
-	return Flat(elements, func(e T) []c.KV[T, V] { return convert.FlatValues(e, valsExtractor) })
+// ExtraVals transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
+func ExtraVals[TS ~[]T, T, V any](elements TS, valsExtractor func(T) []V) []c.KV[T, V] {
+	return Flat(elements, func(e T) []c.KV[T, V] { return convert.ExtraVals(e, valsExtractor) })
 }
 
-// FlattKeys transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
-func FlattKeys[TS ~[]T, T, K any](elements TS, keysExtractor func(T) []K) []c.KV[K, T] {
-	return Flat(elements, func(e T) []c.KV[K, T] { return convert.FlatKeys(e, keysExtractor) })
+// ExtraKeys transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
+func ExtraKeys[TS ~[]T, T, K any](elements TS, keysExtractor func(T) []K) []c.KV[K, T] {
+	return Flat(elements, func(e T) []c.KV[K, T] { return convert.ExtraKeys(e, keysExtractor) })
 }
 
 // SplitTwo splits the elements into two slices

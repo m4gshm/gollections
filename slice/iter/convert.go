@@ -19,6 +19,7 @@ type ConvertFiltIter[From, To any] struct {
 }
 
 var _ c.Iterator[any] = (*ConvertFiltIter[any, any])(nil)
+var _ c.IterFor[any, *ConvertFiltIter[any, any]] = (*ConvertFiltIter[any, any])(nil)
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (i *ConvertFiltIter[From, To]) For(walker func(element To) error) error {
@@ -51,6 +52,11 @@ func (i *ConvertFiltIter[From, To]) Cap() int {
 	return i.size
 }
 
+// Start is used with for loop construct like 'for i, val, ok := i.Start(); ok; val, ok = i.Next() { }'
+func (i *ConvertFiltIter[From, To]) Start() (*ConvertFiltIter[From, To], To, bool) {
+	return startIt[To](i)
+}
+
 // ConvertIter is the array based Iterator thath provides converting of elements by a ConvertIter.
 type ConvertIter[From, To any] struct {
 	array     unsafe.Pointer
@@ -60,6 +66,7 @@ type ConvertIter[From, To any] struct {
 }
 
 var _ c.Iterator[any] = (*ConvertIter[any, any])(nil)
+var _ c.IterFor[any, *ConvertIter[any, any]] = (*ConvertIter[any, any])(nil)
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (i *ConvertIter[From, To]) For(walker func(element To) error) error {
@@ -87,6 +94,11 @@ func (i *ConvertIter[From, To]) Next() (To, bool) {
 // Cap returns the iterator capacity
 func (i *ConvertIter[From, To]) Cap() int {
 	return i.size
+}
+
+// Start is used with for loop construct like 'for i, val, ok := i.Start(); ok; val, ok = i.Next() { }'
+func (i *ConvertIter[From, To]) Start() (*ConvertIter[From, To], To, bool) {
+	return startIt[To](i)
 }
 
 func nextFiltered[T any](array unsafe.Pointer, size int, elemSize uintptr, filter func(T) bool, index *int) (T, bool) {

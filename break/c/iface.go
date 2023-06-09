@@ -12,3 +12,17 @@ type Iterator[T any] interface {
 
 	c.ForLoop[T]
 }
+
+// IterFor extends an iterator type by a 'Start' function implementation
+type IterFor[T any, I Iterator[T]] interface {
+	// Start is used with for loop construct.
+	// Returns the iterator itself, the first element, ok == false if the iteration must be completed, and an error.
+	//
+	// 	var i IterFor = ...
+	//	for i, val, ok, err := i.Start(); ok || err != nil; val, ok, err = i.Next() {
+	//		if err != nil {
+	//			return err
+	//		}
+	//	}
+	Start() (iterator I, val T, ok bool, err error)
+}
