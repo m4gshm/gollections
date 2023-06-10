@@ -9,7 +9,6 @@ import (
 	"github.com/m4gshm/gollections/convert/as"
 	"github.com/m4gshm/gollections/kv"
 	"github.com/m4gshm/gollections/map_/resolv"
-	"github.com/m4gshm/gollections/stream"
 )
 
 // ErrBreak is For, Track breaker
