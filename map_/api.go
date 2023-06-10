@@ -432,19 +432,23 @@ func NotEmpty[K comparable, V any](val map[K]V) bool {
 	return !Empty(val)
 }
 
-func Get[M ~map[K]V, K comparable, V any](m M, k K) V {
-	return m[k]
+// Get returns the value by the specified key from the map m or zero if the map doesn't contain that key
+func Get[M ~map[K]V, K comparable, V any](m M, key K) V {
+	return m[key]
 }
 
-func GetOk[M ~map[K]V, K comparable, V any](m M, k K) (V, bool) {
-	v, ok := m[k]
+// GetOk returns the value, and true by the specified key from the map m or zero and false if the map doesn't contain that key
+func GetOk[M ~map[K]V, K comparable, V any](m M, key K) (V, bool) {
+	v, ok := m[key]
 	return v, ok
 }
 
-func Getter[M ~map[K]V, K comparable, V any](m M) func(k K) V {
+// Getter creates a function that can be used for retrieving a value from the map m by a key
+func Getter[M ~map[K]V, K comparable, V any](m M) func(key K) V {
 	return func(k K) V { return Get(m, k) }
 }
 
-func GetterOk[M ~map[K]V, K comparable, V any](m M) func(k K) (V, bool) {
+// GetterOk creates a function that can be used for retrieving a value from the map m by a key
+func GetterOk[M ~map[K]V, K comparable, V any](m M) func(key K) (V, bool) {
 	return func(k K) (V, bool) { return GetOk(m, k) }
 }
