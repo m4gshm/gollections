@@ -201,6 +201,3 @@ type Summable interface {
 type Number interface {
 	constraints.Integer | constraints.Float | constraints.Complex
 }
-
-// Quaternary is an operation with four arguments
-type Quaternary[t1, t2 any] func(t1, t2, t1, t2) (t1, t2)
