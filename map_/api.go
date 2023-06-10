@@ -431,3 +431,20 @@ func Empty[K comparable, V any](val map[K]V) bool {
 func NotEmpty[K comparable, V any](val map[K]V) bool {
 	return !Empty(val)
 }
+
+func Get[M ~map[K]V, K comparable, V any](m M, k K) V {
+	return m[k]
+}
+
+func GetOk[M ~map[K]V, K comparable, V any](m M, k K) (V, bool) {
+	v, ok := m[k]
+	return v, ok
+}
+
+func Getter[M ~map[K]V, K comparable, V any](m M) func(k K) V {
+	return func(k K) V { return Get(m, k) }
+}
+
+func GetterOk[M ~map[K]V, K comparable, V any](m M) func(k K) (V, bool) {
+	return func(k K) (V, bool) { return GetOk(m, k) }
+}
