@@ -92,17 +92,17 @@ func DeepClone[M ~map[K]V, K comparable, V any](elements M, copier func(V) V) M 
 }
 
 // ConvertValues creates a map with converted values
-func ConvertValues[V, Vto any, K comparable, M ~map[K]V](elements M, by func(V) Vto) map[K]Vto {
+func ConvertValues[M ~map[K]V, V, Vto any, K comparable](elements M, by func(V) Vto) map[K]Vto {
 	return Convert(elements, as.Is[K], by)
 }
 
 // ConvertKeys creates a map with converted keys
-func ConvertKeys[K, Kto comparable, V, M ~map[K]V](elements M, by func(K) Kto) map[Kto]V {
+func ConvertKeys[M ~map[K]V, K, Kto comparable, V any](elements M, by func(K) Kto) map[Kto]V {
 	return Convert(elements, by, as.Is[V])
 }
 
 // Convert creates a map with converted keys and values
-func Convert[K, Kto comparable, V, Vto any, M ~map[K]V](elements M, keyConverter func(K) Kto, valConverter func(V) Vto) map[Kto]Vto {
+func Convert[M ~map[K]V, K, Kto comparable, V, Vto any](elements M, keyConverter func(K) Kto, valConverter func(V) Vto) map[Kto]Vto {
 	converted := make(map[Kto]Vto, len(elements))
 	for key, val := range elements {
 		converted[keyConverter(key)] = valConverter(val)
@@ -111,7 +111,7 @@ func Convert[K, Kto comparable, V, Vto any, M ~map[K]V](elements M, keyConverter
 }
 
 // Conv creates a map with converted keys and values
-func Conv[K, Kto comparable, V, Vto any, M ~map[K]V](elements M, keyConverter func(K) (Kto, error), valConverter func(V) (Vto, error)) (map[Kto]Vto, error) {
+func Conv[M ~map[K]V, K, Kto comparable, V, Vto any](elements M, keyConverter func(K) (Kto, error), valConverter func(V) (Vto, error)) (map[Kto]Vto, error) {
 	converted := make(map[Kto]Vto, len(elements))
 	for key, val := range elements {
 		kto, err := keyConverter(key)
@@ -127,8 +127,41 @@ func Conv[K, Kto comparable, V, Vto any, M ~map[K]V](elements M, keyConverter fu
 	return converted, nil
 }
 
+// Filter creates a map containing only the filtered elements
+func Filter[M ~map[K]V, K comparable, V any](elements M, filter func(K, V) bool) map[K]V {
+	filtered := map[K]V{}
+	for key, val := range elements {
+		if filter(key, val) {
+			filtered[key] = val
+		}
+	}
+	return filtered
+}
+
+// FilterKeys creates a map containing only the filtered elements
+func FilterKeys[M ~map[K]V, K comparable, V any](elements M, filter func(K) bool) map[K]V {
+	filtered := map[K]V{}
+	for key, val := range elements {
+		if filter(key) {
+			filtered[key] = val
+		}
+	}
+	return filtered
+}
+
+// FilterValues creates a map containing only the filtered elements
+func FilterValues[M ~map[K]V, K comparable, V any](elements M, filter func(V) bool) map[K]V {
+	filtered := map[K]V{}
+	for key, val := range elements {
+		if filter(val) {
+			filtered[key] = val
+		}
+	}
+	return filtered
+}
+
 // Keys returns keys of the 'elements' map as a slice
-func Keys[K comparable, V any, M ~map[K]V](elements M) []K {
+func Keys[M ~map[K]V, K comparable, V any](elements M) []K {
 	if elements == nil {
 		return nil
 	}
@@ -136,7 +169,7 @@ func Keys[K comparable, V any, M ~map[K]V](elements M) []K {
 }
 
 // AppendKeys collects keys of the specified 'elements' map into the specified 'out' slice
-func AppendKeys[K comparable, V any, M ~map[K]V](elements M, out []K) []K {
+func AppendKeys[M ~map[K]V, K comparable, V any](elements M, out []K) []K {
 	for key := range elements {
 		out = append(out, key)
 	}
@@ -144,7 +177,7 @@ func AppendKeys[K comparable, V any, M ~map[K]V](elements M, out []K) []K {
 }
 
 // Values returns values of the 'elements' map as a slice
-func Values[V any, K comparable, M ~map[K]V](elements M) []V {
+func Values[M ~map[K]V, K comparable, V any](elements M) []V {
 	if elements == nil {
 		return nil
 	}
@@ -152,7 +185,7 @@ func Values[V any, K comparable, M ~map[K]V](elements M) []V {
 }
 
 // AppendValues collects values of the specified 'elements' map into the specified 'out' slice
-func AppendValues[V any, K comparable, M ~map[K]V](elements M, out []V) []V {
+func AppendValues[M ~map[K]V, K comparable, V any](elements M, out []V) []V {
 	for _, val := range elements {
 		out = append(out, val)
 	}
@@ -390,11 +423,32 @@ func ToSlicee[M ~map[K]V, K comparable, V any, T any](elements M, converter func
 }
 
 // Empty checks the val map is empty
-func Empty[K comparable, V any](val map[K]V) bool {
+func Empty[M ~map[K]V, K comparable, V any](val M) bool {
 	return len(val) == 0
 }
 
 // NotEmpty checks the val map is not empty
-func NotEmpty[K comparable, V any](val map[K]V) bool {
+func NotEmpty[M ~map[K]V, K comparable, V any](val M) bool {
 	return !Empty(val)
+}
+
+// Get returns the value by the specified key from the map m or zero if the map doesn't contain that key
+func Get[M ~map[K]V, K comparable, V any](m M, key K) V {
+	return m[key]
+}
+
+// GetOk returns the value, and true by the specified key from the map m or zero and false if the map doesn't contain that key
+func GetOk[M ~map[K]V, K comparable, V any](m M, key K) (V, bool) {
+	v, ok := m[key]
+	return v, ok
+}
+
+// Getter creates a function that can be used for retrieving a value from the map m by a key
+func Getter[M ~map[K]V, K comparable, V any](m M) func(key K) V {
+	return func(key K) V { return Get(m, key) }
+}
+
+// GetterOk creates a function that can be used for retrieving a value from the map m by a key
+func GetterOk[M ~map[K]V, K comparable, V any](m M) func(key K) (V, bool) {
+	return func(key K) (V, bool) { return GetOk(m, key) }
 }
