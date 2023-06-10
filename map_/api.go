@@ -423,12 +423,12 @@ func ToSlicee[M ~map[K]V, K comparable, V any, T any](elements M, converter func
 }
 
 // Empty checks the val map is empty
-func Empty[K comparable, V any](val map[K]V) bool {
+func Empty[M ~map[K]V, K comparable, V any](val M) bool {
 	return len(val) == 0
 }
 
 // NotEmpty checks the val map is not empty
-func NotEmpty[K comparable, V any](val map[K]V) bool {
+func NotEmpty[M ~map[K]V, K comparable, V any](val M) bool {
 	return !Empty(val)
 }
 
@@ -445,10 +445,10 @@ func GetOk[M ~map[K]V, K comparable, V any](m M, key K) (V, bool) {
 
 // Getter creates a function that can be used for retrieving a value from the map m by a key
 func Getter[M ~map[K]V, K comparable, V any](m M) func(key K) V {
-	return func(k K) V { return Get(m, k) }
+	return func(key K) V { return Get(m, key) }
 }
 
 // GetterOk creates a function that can be used for retrieving a value from the map m by a key
 func GetterOk[M ~map[K]V, K comparable, V any](m M) func(key K) (V, bool) {
-	return func(k K) (V, bool) { return GetOk(m, k) }
+	return func(key K) (V, bool) { return GetOk(m, key) }
 }
