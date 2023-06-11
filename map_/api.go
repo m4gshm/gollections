@@ -434,13 +434,16 @@ func NotEmpty[M ~map[K]V, K comparable, V any](val M) bool {
 
 // Get returns the value by the specified key from the map m or zero if the map doesn't contain that key
 func Get[M ~map[K]V, K comparable, V any](m M, key K) V {
-	return m[key]
+	val, _ := GetOk(m, key)
+	return val
 }
 
 // GetOk returns the value, and true by the specified key from the map m or zero and false if the map doesn't contain that key
-func GetOk[M ~map[K]V, K comparable, V any](m M, key K) (V, bool) {
-	v, ok := m[key]
-	return v, ok
+func GetOk[M ~map[K]V, K comparable, V any](m M, key K) (val V, ok bool) {
+	if m != nil {
+		val, ok = m[key]
+	}
+	return val, ok
 }
 
 // Getter creates a function that can be used for retrieving a value from the map m by a key
@@ -451,4 +454,19 @@ func Getter[M ~map[K]V, K comparable, V any](m M) func(key K) V {
 // GetterOk creates a function that can be used for retrieving a value from the map m by a key
 func GetterOk[M ~map[K]V, K comparable, V any](m M) func(key K) (V, bool) {
 	return func(key K) (V, bool) { return GetOk(m, key) }
+}
+
+// Contains checks is the map contains a key
+func Contains[M ~map[K]V, K comparable, V any](m M, key K) (ok bool) {
+	if m != nil {
+		_, ok = m[key]
+	}
+	return ok
+}
+
+// KeyChecker creates a function that can be used to check if the map contains a key
+func KeyChecker[M ~map[K]V, K comparable, V any](m M) func(key K) (ok bool) {
+	return func(key K) (ok bool) {
+		return Contains(m, key)
+	}
 }

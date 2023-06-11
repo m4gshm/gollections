@@ -4,6 +4,8 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/m4gshm/gollections/convert/ptr"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/map_/clone"
@@ -12,7 +14,6 @@ import (
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/clone/sort"
-	"github.com/stretchr/testify/assert"
 )
 
 type entity struct{ val string }
@@ -177,4 +178,61 @@ func Test_ToSliceErrorable(t *testing.T) {
 		return v + key, err
 	})
 	assert.Equal(t, slice.Of(2, 4, 6), sort.Of(result))
+}
+
+func Test_Filter(t *testing.T) {
+	elements := map[int]string{4: "4", 2: "2", 1: "1", 3: "3"}
+
+	result := map_.Filter(elements, func(key int, val string) bool { return key <= 2 || val == "4" })
+	check := map_.KeyChecker(result)
+	assert.Equal(t, 3, len(result))
+	assert.True(t, check(1))
+	assert.True(t, check(2))
+	assert.False(t, check(3))
+	assert.True(t, check(4))
+}
+
+func Test_FilterKeys(t *testing.T) {
+	elements := map[int]string{4: "4", 2: "2", 1: "1", 3: "3"}
+
+	result := map_.FilterKeys(elements, func(key int) bool { return key <= 2 })
+	check := map_.KeyChecker(result)
+	assert.Equal(t, 2, len(result))
+	assert.True(t, check(1))
+	assert.True(t, check(2))
+	assert.False(t, check(3))
+	assert.False(t, check(4))
+}
+
+func Test_FilterValues(t *testing.T) {
+	elements := map[int]string{4: "4", 2: "2", 1: "1", 3: "3"}
+
+	result := map_.FilterValues(elements, func(val string) bool { return val <= "2" })
+	check := map_.KeyChecker(result)
+	assert.Equal(t, 2, len(result))
+	assert.True(t, check(1))
+	assert.True(t, check(2))
+	assert.False(t, check(3))
+	assert.False(t, check(4))
+}
+
+func Test_Getter(t *testing.T) {
+	elements := map[int]string{4: "4", 2: "2", 1: "1", 3: "3"}
+
+	getter := map_.Getter(elements)
+	assert.Equal(t, "1", getter(1))
+	assert.Equal(t, "2", getter(2))
+	assert.Equal(t, "3", getter(3))
+	assert.Equal(t, "4", getter(4))
+
+	nilGetter := map_.Getter[map[int]string](nil)
+
+	assert.Equal(t, "", nilGetter(0))
+
+	getterOk := map_.GetterOk(elements)
+
+	_, ok := getterOk(1)
+	assert.True(t, ok)
+	_, ok = getterOk(0)
+	assert.False(t, ok)
 }
