@@ -37,6 +37,14 @@ var (
 	_ fmt.Stringer                        = (*Set[int])(nil)
 )
 
+func (s *Set[T]) All(yield func(T) bool) {
+	for v := range s.elements {
+		if !yield(v) {
+			return
+		}
+	}
+}
+
 // Iter creates an iterator and returns as interface
 func (s *Set[T]) Iter() c.Iterator[T] {
 	h := s.Head()

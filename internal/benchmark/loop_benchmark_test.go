@@ -42,6 +42,45 @@ type benchCase struct {
 
 var cases = []benchCase{ /*{"high", HighLoad}, */ {"low", LowLoad}}
 
+func Benchmark_Loop_Reference(b *testing.B) {
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for _, v := range values {
+					casee.load(v)
+				}
+			}
+		})
+	}
+}
+
+func Benchmark_Loop_ImmutableOrderSet_go_1_22(b *testing.B) {
+	c := oset.Of(values...)
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for v := range c.All {
+					casee.load(v)
+				}
+			}
+		})
+	}
+}
+
+func Benchmark_Loop_ImmutableOrderSet_go_1_22_direct(b *testing.B) {
+	c := oset.Of(values...)
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				c.All(func(v int) bool {
+					casee.load(v)
+					return true
+				})
+			}
+		})
+	}
+}
+
 func Benchmark_Loop_ImmutableOrderSet_FirstNext(b *testing.B) {
 	c := oset.Of(values...)
 	for _, casee := range cases {
@@ -61,6 +100,19 @@ func Benchmark_Loop_ImmutableOrderSet_LastPrev(b *testing.B) {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				for it, v, ok := c.Last(); ok; v, ok = it.Prev() {
+					casee.load(v)
+				}
+			}
+		})
+	}
+}
+
+func Benchmark_Loop_ImmutableVector_go_1_22(b *testing.B) {
+	c := vector.Of(values...)
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for v := range c.All {
 					casee.load(v)
 				}
 			}

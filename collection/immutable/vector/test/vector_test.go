@@ -19,6 +19,23 @@ func Test_Vector_From(t *testing.T) {
 	assert.Equal(t, slice.Of(1, 1, 2, 2, 3, 4, 3, 2, 1), set.Slice())
 }
 
+func Test_VectorIterate_go_1_22(t *testing.T) {
+	vec := vector.Of(1, 1, 2, 4, 3, 1)
+	expected := slice.Of(1, 1, 2, 4, 3, 1)
+
+	out := []int{}
+
+	for v := range vec.All {
+		out = append(out, v)
+	}
+
+	assert.Equal(t, len(expected), len(out))
+
+	for i := range out {
+		assert.Equal(t, out[i], expected[i])
+	}
+}
+
 func Test_VectorIterate(t *testing.T) {
 	expected := slice.Of(1, 2, 3, 4)
 	v := vector.Of(1, 2, 3, 4)

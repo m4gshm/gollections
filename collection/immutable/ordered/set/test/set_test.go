@@ -4,6 +4,8 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/collection/immutable/ordered/set"
 	"github.com/m4gshm/gollections/convert/ptr"
@@ -11,14 +13,28 @@ import (
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
-
 	"github.com/m4gshm/gollections/walk/group"
-	"github.com/stretchr/testify/assert"
 )
 
 func Test_Set_From(t *testing.T) {
 	set := set.From(loop.Of(1, 1, 2, 2, 3, 4, 3, 2, 1))
 	assert.Equal(t, slice.Of(1, 2, 3, 4), set.Slice())
+}
+
+func Test_Set_Iterate_go_1_22(t *testing.T) {
+	set := set.Of(1, 1, 2, 4, 3, 1)
+	expected := slice.Of(1, 2, 3, 4)
+
+	out := make(map[int]int, 0)
+
+	for v := range set.All {
+		out[v] = v
+	}
+
+	assert.Equal(t, len(expected), len(out))
+	for k := range out {
+		assert.True(t, set.Contains(k))
+	}
 }
 
 func Test_Set_Iterate(t *testing.T) {

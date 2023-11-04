@@ -34,6 +34,12 @@ var (
 	_ fmt.Stringer                       = Vector[any]{}
 )
 
+func (v Vector[T]) All(yield func(T) bool) {
+	for i := 0; i < len(v.elements) && yield(v.elements[i]); i++ {
+
+	}
+}
+
 // Iter creates an iterator and returns as interface
 func (v Vector[T]) Iter() c.Iterator[T] {
 	h := v.Head()
