@@ -26,6 +26,10 @@ var (
 
 var _ kv.IterFor[any, any, *Iter[any, any, any]] = (*Iter[any, any, any])(nil)
 
+func (i *Iter[S, K, V]) All(yield func(key K, value V) bool) {
+	kv.All(i.Next, yield)
+}
+
 // Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (i *Iter[S, K, V]) Track(traker func(key K, value V) error) error {
 	return loop.Track(i.Next, traker)

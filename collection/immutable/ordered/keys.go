@@ -27,6 +27,10 @@ var (
 	_ fmt.Stringer      = MapKeys[int]{}
 )
 
+func (m MapKeys[K]) All(yield func(K) bool)  {
+	slice.All(m.keys, yield)
+}
+
 // Iter creates an iterator and returns as interface
 func (m MapKeys[K]) Iter() c.Iterator[K] {
 	h := m.Head()

@@ -632,6 +632,12 @@ func TrackEach[TS ~[]T, T any](elements TS, tracker func(int, T)) {
 	}
 }
 
+func All[TS ~[]T, T any](elements TS, yield func(T) bool) {
+	for i := 0; i < len(elements) && yield(elements[i]); i++ {
+
+	}
+}
+
 // For applies the 'walker' function for the elements. Return the c.ErrBreak to stop
 func For[TS ~[]T, T any](elements TS, walker func(T) error) error {
 	for _, e := range elements {

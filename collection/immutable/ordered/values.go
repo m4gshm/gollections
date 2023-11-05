@@ -89,6 +89,10 @@ func (m MapValues[K, V]) Append(out []V) (values []V) {
 	return out
 }
 
+func (m MapValues[K, V]) All(yield func(V) bool) {
+	map_.AllOrderedValues(m.order, m.elements, yield)
+}
+
 // For applies the 'walker' function for every value. Return the c.ErrBreak to stop.
 func (m MapValues[K, V]) For(walker func(V) error) error {
 	return map_.ForOrderedValues(m.order, m.elements, walker)

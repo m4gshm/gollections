@@ -33,9 +33,7 @@ var (
 )
 
 func (v Vector[T]) All(yield func(T) bool) {
-	for i := 0; i < len(v.elements) && yield(v.elements[i]); i++ {
-
-	}
+	slice.All(v.elements, yield)
 }
 
 // Iter creates an iterator and returns as interface
