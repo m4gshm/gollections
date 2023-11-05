@@ -40,6 +40,11 @@ func Of[T any](elements ...T) func() (e T, ok bool) {
 	}
 }
 
+func All[T any](next func() (T, bool), yield func(T) bool) {
+	for v, ok := next(); ok && yield(v); v, ok = next() {
+	}
+}
+
 // For applies the 'walker' function for the elements retrieved by the 'next' function. Return the c.ErrBreak to stop
 func For[T any](next func() (T, bool), walker func(T) error) error {
 	for v, ok := next(); ok; v, ok = next() {

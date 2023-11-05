@@ -69,7 +69,7 @@ func DeepClone[TS ~[]T, T any](elements TS, copier func(T) T) TS {
 }
 
 // Delete removes an element by index from the slice 'elements'
-func Delete[TS ~[]T, T any](index int, elements TS) TS {
+func Delete[TS ~[]T, T any](elements TS, index int) TS {
 	if elements == nil {
 		return nil
 	}
@@ -604,6 +604,12 @@ func Track[TS ~[]T, T any](elements TS, tracker func(int, T) error) error {
 func TrackEach[TS ~[]T, T any](elements TS, tracker func(int, T)) {
 	for i, e := range elements {
 		tracker(i, e)
+	}
+}
+
+func All[TS ~[]T, T any](elements TS, yield func(T) bool) {
+	for i := 0; i < len(elements) && yield(elements[i]); i++ {
+
 	}
 }
 

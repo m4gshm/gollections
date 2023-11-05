@@ -18,6 +18,10 @@ var (
 
 var _ kv.IterFor[any, any, ConvertIter[any, any, any, any, func(any, any) (any, any)]] = (*ConvertIter[any, any, any, any, func(any, any) (any, any)])(nil)
 
+func (i ConvertIter[K, V, K2, V2, C]) All(yield func(key K2, value V2) bool) {
+	kv.All(i.Next, yield)
+}
+
 // Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (i ConvertIter[K, V, K2, V2, C]) Track(traker func(key K2, value V2) error) error {
 	return loop.Track(i.Next, traker)

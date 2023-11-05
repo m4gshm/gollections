@@ -38,6 +38,12 @@ var (
 	_ fmt.Stringer                        = (*Set[int])(nil)
 )
 
+func (s *Set[T]) All(yield func(T) bool) {
+	if s != nil {
+		slice.All(*s.order, yield)
+	}
+}
+
 // Iter creates an iterator and returns as interface
 func (s *Set[T]) Iter() c.Iterator[T] {
 	h := s.Head()
@@ -221,7 +227,7 @@ func (s *Set[T]) DeleteActualOne(element T) bool {
 			delete(elements, element)
 			//todo: need optimize
 			order := s.order
-			ne := slice.Delete(pos, *order)
+			ne := slice.Delete(*order, pos)
 			for i := pos; i < len(ne); i++ {
 				elements[ne[i]]--
 			}

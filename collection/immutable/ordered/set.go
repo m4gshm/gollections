@@ -36,9 +36,7 @@ var (
 )
 
 func (s Set[T]) All(yield func(T) bool) {
-	for i := 0; i < len(s.order) && yield(s.order[i]); i++ {
-
-	}
+	slice.All(s.order, yield)
 }
 
 // Iter creates an iterator and returns as interface

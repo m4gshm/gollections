@@ -20,6 +20,10 @@ var (
 
 var _ c.IterFor[any, ConvertFiltIter[any, any]] = ConvertFiltIter[any, any]{}
 
+func (c ConvertFiltIter[From, To]) All(yield func(element To) bool) {
+	All(c.Next, yield)
+}
+
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (c ConvertFiltIter[From, To]) For(walker func(element To) error) error {
 	return For(c.Next, walker)
@@ -64,6 +68,10 @@ var (
 
 var _ c.IterFor[any, ConvertIter[any, any]] = ConvertIter[any, any]{}
 
+func (c ConvertIter[From, To]) All(yield func(element To) bool) {
+	All(c.Next, yield)
+}
+
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (c ConvertIter[From, To]) For(walker func(element To) error) error {
 	return For(c.Next, walker)
@@ -98,11 +106,11 @@ type ConvertCheckIter[From, To any] struct {
 }
 
 var (
-	_ c.Iterator[any] = (*ConvertIter[any, any])(nil)
-	_ c.Iterator[any] = ConvertIter[any, any]{}
+	_ c.Iterator[any] = (*ConvertCheckIter[any, any])(nil)
+	_ c.Iterator[any] = ConvertCheckIter[any, any]{}
 )
 
-var _ c.IterFor[any, ConvertIter[any, any]] = ConvertIter[any, any]{}
+var _ c.IterFor[any, ConvertCheckIter[any, any]] = ConvertCheckIter[any, any]{}
 
 // Next returns the next element.
 // The ok result indicates whether the element was returned by the iterator.
@@ -116,6 +124,10 @@ func (c ConvertCheckIter[From, To]) Next() (t To, ok bool) {
 		}
 	}
 	return t, false
+}
+
+func (c ConvertCheckIter[From, To]) All(yield func(element To) bool) {
+	All(c.Next, yield)
 }
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
