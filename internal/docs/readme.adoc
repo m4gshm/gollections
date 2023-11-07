@@ -61,7 +61,7 @@ More shortcuts you can find by exploring slices link:./slice[subpackages].
 
 ==== Main slice functions
 
-* creating - link:#slice.Of[slice.Of], range_.Of, clone.Of, slice.DeepClone
+* creating - link:#sliceof[slice.Of], range_.Of, clone.Of, slice.DeepClone
 * sorting - sort.Asc, sort.Desc, sort.By, asc.Of, desc.Of
 * stable sorting and sorting cloned slice
 * converting, filtering, summarizing - convert.AndReduce, convert.AndConvert, convert.AndFilter, filter.AndConvert, filter.ConvertFilter, sum.Of, first.Of, last.Of
