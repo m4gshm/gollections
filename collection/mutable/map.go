@@ -10,12 +10,14 @@ import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/collection/immutable"
+	"github.com/m4gshm/gollections/collection/mutable/ordered"
 	"github.com/m4gshm/gollections/kv"
 	"github.com/m4gshm/gollections/kv/loop"
 	"github.com/m4gshm/gollections/kv/stream"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/map_/convert"
 	"github.com/m4gshm/gollections/map_/filter"
+	"github.com/m4gshm/gollections/slice"
 )
 
 // WrapMap instantiates Map using a map as internal storage.
@@ -81,6 +83,23 @@ func (m *Map[K, V]) Map() (out map[K]V) {
 		return
 	}
 	return map_.Clone(*m)
+}
+
+// Sort sorts keys in-place (no copy)
+func (m *Map[K, V]) Sort(comparer slice.Comparer[K]) *ordered.Map[K, V] {
+	return m.sortBy(slice.Sort, comparer)
+}
+
+// StableSort sorts keys in-place (no copy)
+func (m *Map[K, V]) StableSort(comparer slice.Comparer[K]) *ordered.Map[K, V] {
+	return m.sortBy(slice.StableSort, comparer)
+}
+
+func (m *Map[K, V]) sortBy(sorter func([]K, slice.Comparer[K]) []K, comparer slice.Comparer[K]) *ordered.Map[K, V] {
+	if m != nil {
+		return ordered.NewMapOf(sorter(m.Keys().Slice(), comparer), m.Map())
+	}
+	return nil
 }
 
 // Len returns amount of elements

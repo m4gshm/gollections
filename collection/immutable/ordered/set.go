@@ -2,7 +2,6 @@ package ordered
 
 import (
 	"fmt"
-	"sort"
 
 	breakLoop "github.com/m4gshm/gollections/break/loop"
 	breakStream "github.com/m4gshm/gollections/break/stream"
@@ -148,19 +147,17 @@ func (s Set[T]) Contains(element T) (ok bool) {
 }
 
 // Sort sorts the elements
-func (s Set[T]) Sort(less slice.Less[T]) Set[T] {
-	return s.sortBy(sort.Slice, less)
+func (s Set[T]) Sort(comparer slice.Comparer[T]) Set[T] {
+	return s.sortBy(slice.Sort, comparer)
 }
 
 // StableSort sorts the elements
-func (s Set[T]) StableSort(less slice.Less[T]) Set[T] {
-	return s.sortBy(sort.SliceStable, less)
+func (s Set[T]) StableSort(comparer slice.Comparer[T]) Set[T] {
+	return s.sortBy(slice.StableSort, comparer)
 }
 
-func (s Set[T]) sortBy(sorter slice.Sorter, less slice.Less[T]) Set[T] {
-	order := slice.Clone(s.order)
-	slice.Sort(order, sorter, less)
-	return WrapSet(order, s.elements)
+func (s Set[T]) sortBy(sorter func([]T, slice.Comparer[T]) []T, comparer slice.Comparer[T]) Set[T] {
+	return WrapSet(sorter(slice.Clone(s.order), comparer), s.elements)
 }
 
 func (s Set[T]) String() string {

@@ -51,7 +51,7 @@ func Test_DeepClone(t *testing.T) {
 
 func Test_Keys(t *testing.T) {
 	keys := map_.Keys(entities)
-	assert.Equal(t, slice.Of(1, 2, 3), sort.Of(keys))
+	assert.Equal(t, slice.Of(1, 2, 3), sort.Asc(keys))
 }
 
 func Test_Values(t *testing.T) {
@@ -69,7 +69,7 @@ func Test_ConvertValues(t *testing.T) {
 
 func Test_ValuesConverted(t *testing.T) {
 	var values []string = map_.ValuesConverted(entities, func(e *entity) string { return e.val })
-	assert.Equal(t, slice.Of("1_first", "2_second", "3_third"), sort.Of(values))
+	assert.Equal(t, slice.Of("1_first", "2_second", "3_third"), sort.Asc(values))
 }
 
 type rows[T any] struct {
@@ -169,7 +169,7 @@ func Test_MatchAny(t *testing.T) {
 
 func Test_ToSlice(t *testing.T) {
 	result := map_.ToSlice(entities, func(key int, val *entity) string { return strconv.Itoa(key) + ":" + val.val })
-	assert.Equal(t, slice.Of("1:1_first", "2:2_second", "3:3_third"), sort.Of(result))
+	assert.Equal(t, slice.Of("1:1_first", "2:2_second", "3:3_third"), sort.Asc(result))
 }
 
 func Test_ToSliceErrorable(t *testing.T) {
@@ -177,7 +177,7 @@ func Test_ToSliceErrorable(t *testing.T) {
 		v, err := strconv.Atoi(string(val.val[0]))
 		return v + key, err
 	})
-	assert.Equal(t, slice.Of(2, 4, 6), sort.Of(result))
+	assert.Equal(t, slice.Of(2, 4, 6), sort.Asc(result))
 }
 
 func Test_Filter(t *testing.T) {

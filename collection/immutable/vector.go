@@ -2,7 +2,6 @@ package immutable
 
 import (
 	"fmt"
-	"sort"
 
 	breakLoop "github.com/m4gshm/gollections/break/loop"
 	breakStream "github.com/m4gshm/gollections/break/stream"
@@ -161,19 +160,17 @@ func (v Vector[T]) HasAny(predicate func(T) bool) bool {
 }
 
 // Sort returns a sorted clone of the Vector
-func (v Vector[T]) Sort(less slice.Less[T]) Vector[T] {
-	return v.sortBy(sort.Slice, less)
+func (v Vector[T]) Sort(comparer slice.Comparer[T]) Vector[T] {
+	return v.sortBy(slice.Sort, comparer)
 }
 
 // StableSort returns a stable sorted clone of the Vector
-func (v Vector[T]) StableSort(less slice.Less[T]) Vector[T] {
-	return v.sortBy(sort.SliceStable, less)
+func (v Vector[T]) StableSort(comparer slice.Comparer[T]) Vector[T] {
+	return v.sortBy(slice.StableSort, comparer)
 }
 
-func (v Vector[T]) sortBy(sorter slice.Sorter, less slice.Less[T]) Vector[T] {
-	elements := slice.Clone(v.elements)
-	slice.Sort(elements, sorter, less)
-	return WrapVector(elements)
+func (v Vector[T]) sortBy(sorter func([]T, slice.Comparer[T]) []T, comparer slice.Comparer[T]) Vector[T] {
+	return WrapVector(sorter(slice.Clone(v.elements), comparer))
 }
 
 func (v Vector[T]) String() string {

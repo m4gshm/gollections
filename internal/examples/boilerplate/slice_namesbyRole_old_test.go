@@ -14,8 +14,7 @@ func Test_NamesByRole_Old(t *testing.T) {
 		namesByRole[role] = append(namesByRole[role], u.Name())
 	}
 	for _, u := range users {
-		roles := u.Roles()
-		if len(roles) == 0 {
+		if roles := u.Roles(); len(roles) == 0 {
 			add("", u)
 		} else {
 			for _, r := range roles {

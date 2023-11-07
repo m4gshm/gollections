@@ -86,6 +86,29 @@ func Test_AggregateFilteredRoles(t *testing.T) {
 	assert.Equal(t, slice.Of("Admin", "manager"), roleNamesExceptManager)
 }
 
+func Test_SortStructsByField(t *testing.T) {
+	var users = []User{
+		{name: "Bob", age: 26},
+		{name: "Alice", age: 35},
+		{name: "Tom", age: 18},
+	}
+	var (
+		//sorted
+		byName       = sort.By(users, User.Name)
+		byAgeReverse = sort.DescBy(users, User.Age)
+	)
+	assert.Equal(t, []User{
+		{name: "Alice", age: 35},
+		{name: "Bob", age: 26},
+		{name: "Tom", age: 18},
+	}, byName)
+	assert.Equal(t, []User{
+		{name: "Alice", age: 35},
+		{name: "Bob", age: 26},
+		{name: "Tom", age: 18},
+	}, byAgeReverse)
+}
+
 func Test_SortStructs(t *testing.T) {
 	var users = []User{
 		{name: "Bob", age: 26},
@@ -94,31 +117,8 @@ func Test_SortStructs(t *testing.T) {
 	}
 	var (
 		//sorted
-		byName = sort.By(users, User.Name)
-		byAge  = sort.By(users, User.Age)
-	)
-	assert.Equal(t, []User{
-		{name: "Alice", age: 35},
-		{name: "Bob", age: 26},
-		{name: "Tom", age: 18},
-	}, byName)
-	assert.Equal(t, []User{
-		{name: "Tom", age: 18},
-		{name: "Bob", age: 26},
-		{name: "Alice", age: 35},
-	}, byAge)
-}
-
-func Test_SortStructsByLess(t *testing.T) {
-	var users = []User{
-		{name: "Bob", age: 26},
-		{name: "Alice", age: 35},
-		{name: "Tom", age: 18},
-	}
-	var (
-		//sorted
-		byName       = sort.ByLess(users, func(u1, u2 User) bool { return u1.name < u2.name })
-		byAgeReverse = sort.ByLess(users, func(u1, u2 User) bool { return u1.age > u2.age })
+		byName       = slice.Sort(users, func(u1, u2 User) int { return op.Compare(u1.name, u2.name) })
+		byAgeReverse = slice.Sort(users, func(u1, u2 User) int { return -op.Compare(u1.age, u2.age) })
 	)
 	assert.Equal(t, []User{
 		{name: "Alice", age: 35},
@@ -134,7 +134,7 @@ func Test_SortStructsByLess(t *testing.T) {
 
 func Test_SortInt(t *testing.T) {
 	source := []int{1, 3, -1, 2, 0}
-	sorted := sort.Of(source)
+	sorted := sort.Asc(source)
 	assert.Equal(t, []int{-1, 0, 1, 2, 3}, sorted)
 }
 

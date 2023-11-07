@@ -1,14 +1,14 @@
 # Gollections
 
-This is a set of utilities aimed at reducing boilerplate code when using
-[slices](./slice/api.go), [maps](./map_/api.go) and extending
-functionality by new collection implementations such as [ordered
-map](./collection/collection/mutable/omap/api.go) or
-[set](./collection/collection/mutable/oset/api.go).
+Gollections is set of functions for [slices](./slice/api.go),
+[maps](./map_/api.go) and additional implementations of data structures
+such as [ordered map](./collection/collection/mutable/omap/api.go) or
+[set](./collection/collection/mutable/oset/api.go) aimed to reduce
+boilerplate code.
 
 Supports Go version 1.20.
 
-For example, you want to group some
+For example, it’s need to group some
 [users](./internal/examples/boilerplate/user_type.go) by their role
 names converted to lowercase:
 
@@ -23,27 +23,28 @@ var users = []User{
 You can make clear code, extensive, but without dependencies:
 
 ``` go
-var namesByRole = map[string][]string{}
-add := func(role string, u User) {
-    namesByRole[role] = append(namesByRole[role], u.Name())
-}
-for _, u := range users {
-    roles := u.Roles()
-    if len(roles) == 0 {
-        add("", u)
-    } else {
-        for _, r := range roles {
-            add(strings.ToLower(r.Name()), u)
+   var namesByRole = map[string][]string{}
+    add := func(role string, u User) {
+        namesByRole[role] = append(namesByRole[role], u.Name())
+    }
+    for _, u := range users {
+        if roles := u.Roles(); len(roles) == 0 {
+            add("", u)
+        } else {
+            for _, r := range roles {
+                add(strings.ToLower(r.Name()), u)
+            }
         }
     }
-}
 
-assert.Equal(t, namesByRole[""], []string{"Tom"})
-assert.Equal(t, namesByRole["manager"], []string{"Bob", "Alice"})
-assert.Equal(t, namesByRole["admin"], []string{"Bob"})
+    assert.Equal(t, namesByRole[""], []string{"Tom"})
+    assert.Equal(t, namesByRole["manager"], []string{"Bob", "Alice"})
+    assert.Equal(t, namesByRole["admin"], []string{"Bob"})
+
+}
 ```
 
-Or you can write more compact code using the collections API, like so:
+Or you can write more compact code using the collections API, like:
 
 ``` go
 var namesByRole = group.ByMultipleKeys(users, func(u User) []string {
@@ -61,46 +62,106 @@ assert.Equal(t, namesByRole["admin"], []string{"Bob"})
 go get -u github.com/m4gshm/gollections
 ```
 
-or
-
-``` console
-go get -u github.com/m4gshm/gollections@HEAD
-```
-
-## Main packages
-
-All packages consists of functions placed in the package and subpackages
-aimed to make short aliases of that functions. For example the function
-[slice.SortByOrdered](./slice/api.go#L459) has aliases
-[sort.By](./slice/sort/api.go#L12) and
-[sort.Of](./slice/sort/api.go#L23).
-
-### [slice](./slice/api.go) and [map\_](./map_/api.go)
-
-Contains utility functions of [converting](./slice/api.go#L156),
-[filtering](./slice/api.go#L379) (searching),
-[reducing](./slice/api.go#L464), [cloning](./map_/api.go#L90) elements
-of embedded slices and maps. The functions compute result in-place. For
-delayed computations see
-[loops](#loop-kvloop-and-breakable-versions-breakloop-breakkvloop) or
-[collection functions](#collection-functions).
+## Slices
 
 ``` go
+data, err := slice.Conv(slice.Of("1", "2", "3", "4", "_", "6"), strconv.Atoi)
 even := func(i int) bool { return i%2 == 0 }
-result := slice.Reduce(
-    slice.Convert(
-        slice.Filter(slice.Of(1, 2, 3, 4), even),
-        strconv.Itoa,
-    ),
-    op.Sum[string],
-)
 
+result := slice.Reduce(slice.Convert(slice.Filter(data, even), strconv.Itoa), op.Sum[string])
+
+assert.ErrorIs(t, err, strconv.ErrSyntax)
 assert.Equal(t, "24", result)
 ```
 
-More examples
-[here](./internal/examples/sliceexamples/slice_examples_test.go) and
-[here](./internal/examples/mapexamples/map_examples_test.go).
+In the example is used only small set of slice functions as
+[Filter](./slice/api.go#L421), [Conv](./slice/api.go#L178)
+[Convert](./slice/api.go#L166), and [Reduce](./slice/api.go#L529). More
+you can look in the [slice](./slice/api.go) package.
+
+### Shortcut packages
+
+``` go
+result := sum.Of(filter.AndConvert(data, even, strconv.Itoa))
+```
+
+This is a shorter version of the previous example that used short
+aliases [sum.Of](./slice/sum/api.go#L10) and
+[filter.AndConvert](./slice/filter/api.go#L9).
+
+#### Brief of usage
+
+``` go
+data := slice.Of("Bob", "Chris", "Alice") // constructor
+
+sorted := sort.Asc(data) //sorting
+
+reversed := reverse.Of(clone.Of(sorted)) //reversing of cloned slice
+
+chris, ok := first.Of(reversed, func(name string) bool { return name[0] == 'C' }) //finding the first element by a predicate function
+
+var lengthMap map[int][]string = group.Of(sorted, func(name string) int { return len(name) }, as.Is[string]) // converting to a map
+
+assert.Equal(t, slice.Of("Alice", "Bob", "Chris"), sorted)
+assert.Equal(t, "Chris", chris)
+assert.True(t, true, ok)
+assert.Equal(t, slice.Of("Alice", "Chris"), lengthMap[5])
+```
+
+More shortcuts you can find by exploring slices [subpackages](./slice).
+
+#### Main slice functions
+
+- sorting - sort.Asc, sort.Desc, sort.By, asc.Of, desc.Of
+
+- stable sorting and sorting cloned slice
+
+- converting, filtering, summarizing - convert.AndReduce,
+  convert.AndConvert, convert.AndFilter, filter.AndConvert,
+  filter.ConvertFilter
+
+- versions of aboves with possible result errors - conv.AndReduce
+
+- to map transforming - slice.ToMap, slice.ToMapResolv, group.Of,
+  group.ByMultiple, group.ByMultipleKeys, group.ByMultipleValues
+
+## Maps
+
+``` go
+type Employer struct {
+    name   string
+    salary int
+}
+
+employers := map[string][]Employer{
+    "internal": {{"Alice", 100}, {"Bob", 90}},
+    "external": {{"Chris", 125}},
+    "foreing":  {{"Mari", 99}},
+}
+
+noForeings := filter.Values(employers, func(employers []Employer) bool {
+    return slice.Has(employers, func(e Employer) bool { return e.name != "Mari" })
+})
+
+assert.Equal(t, slice.Of("external", "internal"), sort.Asc(map_.Keys(noForeings)))
+
+var (
+    getSalary                 = func(e Employer) int { return e.salary }
+    getDepartmentAndSalarySum = func(department string, e []Employer) (string, int) {
+        return department, slice.ConvertAndReduce(e, getSalary, op.Sum[int])
+    }
+)
+
+departmentSalary := map_.Convert(noForeings, getDepartmentAndSalarySum)
+
+assert.Equal(t, 2, len(departmentSalary))
+assert.Equal(t, 190, departmentSalary["internal"])
+assert.Equal(t, 125, departmentSalary["external"])
+```
+
+TODO:
+
+## Data structures
 
 ### [mutable](./collection/mutable/api.go) and [immutable](./collection/immutable/api.go) collections
 
@@ -112,6 +173,8 @@ map implementation is not supported delete operations).
 Immutables are read-only datasets.
 
 Detailed description of implementations [below](#mutable-collections).
+
+## Additional API
 
 ### [predicate](./predicate/api.go) and breakable [break/predicate](./predicate/api.go)
 
@@ -168,7 +231,7 @@ assert.Equal(t, []int{1, 2, 3}, result)
 assert.ErrorContains(t, err, "invalid syntax")
 ```
 
-## Expressions: [use](./expr/use/api.go), [get](./expr/get/api.go), [first](./expr/first/api.go), [last](./expr/last/api.go)
+### Expressions: [use](./expr/use/api.go), [get](./expr/get/api.go), [first](./expr/first/api.go), [last](./expr/last/api.go)
 
 Aimed to evaluate a value using conditions. May cause to make code
 shorter by not in all cases.  

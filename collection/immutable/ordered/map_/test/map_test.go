@@ -3,11 +3,13 @@ package test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/m4gshm/gollections/collection/immutable/ordered"
 	"github.com/m4gshm/gollections/collection/immutable/ordered/map_"
 	"github.com/m4gshm/gollections/k"
+	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
-	"github.com/stretchr/testify/assert"
 )
 
 func Test_Map_Iterate(t *testing.T) {
@@ -110,4 +112,14 @@ func Test_Map_Zero(t *testing.T) {
 
 	m.StableSort(nil).For(nil)
 	m.StableSort(nil).ForEach(nil)
+}
+
+func Test_Map_Sort(t *testing.T) {
+	var m = map_.Of(k.V(5, "5"), k.V(4, "4"), k.V(-8, "-8"), k.V(10, "10"))
+	o := m.Sort(op.Compare)
+
+	expected := ordered.NewMap(k.V(-8, "-8"), k.V(4, "4"), k.V(5, "5"), k.V(10, "10"))
+
+	assert.Equal(t, expected, o)
+	assert.NotSame(t, m, o)
 }

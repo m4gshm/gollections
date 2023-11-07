@@ -65,3 +65,12 @@ func IfGetElseGetErr[T any](ok bool, tru func() T, fal func() error) (T, error) 
 func Get[T any](getter func() T) T {
 	return getter()
 }
+
+func Compare[O constraints.Ordered](o1, o2 O) int {
+	if o1 < o2 {
+		return -1
+	} else if o1 > o2 {
+		return 1
+	}
+	return 0
+}

@@ -48,14 +48,12 @@ func Test_DeepClone(t *testing.T) {
 
 func Test_Keys(t *testing.T) {
 	keys := map_.Keys(entities)
-	assert.Equal(t, slice.Of(1, 2, 3), sort.Of(keys))
+	assert.Equal(t, slice.Of(1, 2, 3), sort.Asc(keys))
 }
 
 func Test_Values(t *testing.T) {
 	values := map_.Values(entities)
-	assert.Equal(t, slice.Of(&first, &second, &third), sort.By(values, func(e *entity) string {
-		return e.val
-	}))
+	assert.Equal(t, slice.Of(&first, &second, &third), sort.By(values, func(e *entity) string { return e.val }))
 }
 
 func Test_ConvertValues(t *testing.T) {
@@ -70,7 +68,7 @@ func Test_ConvertValues(t *testing.T) {
 
 func Test_ValuesConverted(t *testing.T) {
 	var values []string = map_.ValuesConverted(entities, func(e *entity) string { return e.val })
-	assert.Equal(t, slice.Of("1_first", "2_second", "3_third"), sort.Of(values))
+	assert.Equal(t, slice.Of("1_first", "2_second", "3_third"), sort.Asc(values))
 }
 
 type rows[T any] struct {

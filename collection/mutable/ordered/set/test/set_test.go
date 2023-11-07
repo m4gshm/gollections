@@ -257,3 +257,16 @@ func Test_Set_CopyByValue(t *testing.T) {
 func copySet[T comparable](set ordered.Set[T]) ordered.Set[T] {
 	return set
 }
+
+func Test_Set_Sort(t *testing.T) {
+	ints := set.Of(3, 1, 5, 6, 8, 0, -2)
+	sorted := ints.Sort(op.Compare)
+
+	assert.Same(t, ints, sorted)
+
+	expected := ordered.NewSet(-2, 0, 1, 3, 5, 6, 8)
+	assert.Equal(t, expected, sorted)
+
+	ssorted := ints.StableSort(op.Compare)
+	assert.Equal(t, expected, ssorted)
+}

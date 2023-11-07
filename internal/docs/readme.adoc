@@ -2,12 +2,11 @@
 
 == Gollections
 
-This is a set of utilities aimed at reducing boilerplate code when using link:./slice/api.go[slices], link:./map_/api.go[maps] and 
-extending functionality by new collection implementations such as link:./collection/collection/mutable/omap/api.go[ordered map] or link:./collection/collection/mutable/oset/api.go[set].
+Gollections is set of functions for link:./slice/api.go[slices], link:./map_/api.go[maps] and additional implementations of data structures such as link:./collection/collection/mutable/omap/api.go[ordered map] or link:./collection/collection/mutable/oset/api.go[set] aimed to reduce boilerplate code.
 
 Supports Go version 1.20.
 
-For example, you want to group some link:./internal/examples/boilerplate/user_type.go[users] by their role names converted to lowercase:
+For example, it's need to group some link:./internal/examples/boilerplate/user_type.go[users] by their role names converted to lowercase:
 [source,go]
 ----
 include::../examples/boilerplate/user_data.go[lines=3..-1]
@@ -19,7 +18,7 @@ You can make clear code, extensive, but without dependencies:
 include::../examples/boilerplate/slice_namesbyRole_old_test.go[lines=11..30,indent=0]
 ----
 
-Or you can write more compact code using the collections API, like so:
+Or you can write more compact code using the collections API, like:
 [source,go]
 ----
 include::../examples/boilerplate/slice_namesbyRole_new_test.go[lines=13..21,indent=0]
@@ -32,28 +31,52 @@ include::../examples/boilerplate/slice_namesbyRole_new_test.go[lines=13..21,inde
 go get -u github.com/m4gshm/gollections
 ----
 
-or 
 
-[source,console]
-----
-go get -u github.com/m4gshm/gollections@HEAD
-----
-
-=== Main packages
-
-All packages consists of functions placed in the package and subpackages aimed to make short aliases of that functions.
-For example the function link:./slice/api.go#L459[slice.SortByOrdered] has aliases link:./slice/sort/api.go#L12[sort.By] and link:./slice/sort/api.go#L23[sort.Of].
-
-==== link:./slice/api.go[slice] and link:./map_/api.go[map_]
-
-Contains utility functions of link:./slice/api.go#L156[converting],  link:./slice/api.go#L379[filtering] (searching), link:./slice/api.go#L464[reducing], link:./map_/api.go#L90[cloning] elements of embedded slices and maps. The functions compute result in-place. For delayed computations see xref:loop-kvloop-and-breakable-versions-breakloop-breakkvloop[loops] or xref:collection-functions[collection functions]. 
+=== Slices
 
 [source,go]
 ----
-include::../examples/boilerplate/slice_filter_convert_reduce_test.go[lines=13..24,indent=0]
+include::../examples/boilerplate/slice_filter_convert_reduce_test.go[lines=15..22,indent=0]
 ----
 
-More examples link:./internal/examples/sliceexamples/slice_examples_test.go[here] and link:./internal/examples/mapexamples/map_examples_test.go[here].
+In the example is used only small set of slice functions as link:./slice/api.go#L421[Filter], link:./slice/api.go#L178[Conv] link:./slice/api.go#L166[Convert], and link:./slice/api.go#L529[Reduce]. More you can look in the link:./slice/api.go[slice] package.
+
+==== Shortcut packages
+
+[source,go]
+----
+include::../examples/boilerplate/slice_filter_convert_reduce_short_test.go[lines=18..20,indent=0]
+----
+
+This is a shorter version of the previous example that used short aliases link:./slice/sum/api.go#L10[sum.Of] and link:./slice/filter/api.go#L9[filter.AndConvert].
+
+===== Brief of usage
+[source,go]
+----
+include::../examples/boilerplate/slice_shortcuts_test.go[lines=18..33,indent=0]
+----
+
+More shortcuts you can find by exploring slices link:./slice[subpackages].
+
+===== Main slice functions
+
+* sorting - sort.Asc, sort.Desc, sort.By, asc.Of, desc.Of  
+* stable sorting and sorting cloned slice
+* converting, filtering, summarizing - convert.AndReduce, convert.AndConvert, convert.AndFilter, filter.AndConvert, filter.ConvertFilter
+* versions of aboves with possible result errors - conv.AndReduce
+* to map transforming - slice.ToMap, slice.ToMapResolv, group.Of, group.ByMultiple, group.ByMultipleKeys, group.ByMultipleValues
+
+=== Maps
+
+[source,go]
+----
+include::../examples/boilerplate/map_filter_convert_reduce_test.go[lines=16..45,indent=0]
+----
+
+TODO:
+
+
+=== Data structures
 
 ==== link:./collection/mutable/api.go[mutable] and link:./collection/immutable/api.go[immutable] collections
 
@@ -63,6 +86,8 @@ Mutables support content appending, updating and deleting (the ordered map imple
 Immutables are read-only datasets.
 
 Detailed description of implementations xref:mutable-collections[below].
+
+=== Additional API
 
 ==== link:./predicate/api.go[predicate] and breakable link:./predicate/api.go[break/predicate]
 
@@ -104,7 +129,7 @@ It is used for computations where an error may occur.
 include::../examples/loop/breakloop/loop_filter_convert_reduce_test.go[lines=17..22,indent=0]
 ----
 
-=== Expressions: link:./expr/use/api.go[use], link:./expr/get/api.go[get], link:./expr/first/api.go[first], link:./expr/last/api.go[last]
+==== Expressions: link:./expr/use/api.go[use], link:./expr/get/api.go[get], link:./expr/first/api.go[first], link:./expr/last/api.go[last]
 
 Aimed to evaluate a value using conditions. May cause to make code shorter by not in all cases. +
 As example:
