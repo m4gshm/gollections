@@ -112,8 +112,7 @@ More shortcuts you can find by exploring slices [subpackages](./slice).
 
 ### Main slice functions
 
-- creating - [slice.Of](#slice.Of), range\_.Of, clone.Of,
-  slice.DeepClone
+- creating - [slice.Of](#sliceof), range\_.Of, clone.Of, slice.DeepClone
 
 - sorting - sort.Asc, sort.Desc, sort.By, asc.Of, desc.Of
 
