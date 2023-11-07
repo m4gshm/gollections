@@ -15,7 +15,6 @@ import (
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/map_/convert"
 	"github.com/m4gshm/gollections/map_/filter"
-	"github.com/m4gshm/gollections/notsafe"
 	"github.com/m4gshm/gollections/slice"
 )
 
@@ -55,7 +54,7 @@ func (m Map[K, V]) Loop() *MapIter[K, V] {
 
 // Head creates an iterator and returns as implementation type value
 func (m Map[K, V]) Head() MapIter[K, V] {
-	return NewMapIter(m.elements, slice.NewHeadS(m.order, notsafe.GetTypeSize[K]()))
+	return NewMapIter(m.elements, slice.NewHead(m.order))
 }
 
 // First returns the first key/value pair of the map, an iterator to iterate over the remaining pair, and true\false marker of availability next pairs.
@@ -70,7 +69,7 @@ func (m Map[K, V]) First() (MapIter[K, V], K, V, bool) {
 
 // Tail creates an iterator pointing to the end of the map
 func (m Map[K, V]) Tail() MapIter[K, V] {
-	return NewMapIter(m.elements, slice.NewTailS(m.order, notsafe.GetTypeSize[K]()))
+	return NewMapIter(m.elements, slice.NewTail(m.order))
 }
 
 // Map collects the key/value pairs to a map

@@ -16,7 +16,6 @@ import (
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/map_/convert"
 	"github.com/m4gshm/gollections/map_/filter"
-	"github.com/m4gshm/gollections/notsafe"
 	"github.com/m4gshm/gollections/slice"
 )
 
@@ -29,7 +28,6 @@ func WrapMap[K comparable, V any](order []K, elements map[K]V) *Map[K, V] {
 type Map[K comparable, V any] struct {
 	order      []K
 	elements   map[K]V
-	changeMark int32
 }
 
 var (
@@ -60,14 +58,12 @@ func (m *Map[K, V]) Head() ordered.MapIter[K, V] {
 	var (
 		order    []K
 		elements map[K]V
-		ksize    uintptr
 	)
 	if m != nil {
 		elements = m.elements
 		order = m.order
-		ksize = notsafe.GetTypeSize[K]()
 	}
-	return ordered.NewMapIter(elements, slice.NewHeadS(order, ksize))
+	return ordered.NewMapIter(elements, slice.NewHead(order))
 }
 
 // Tail creates an iterator pointing to the end of the collection
@@ -75,14 +71,12 @@ func (m *Map[K, V]) Tail() ordered.MapIter[K, V] {
 	var (
 		order    []K
 		elements map[K]V
-		ksize    uintptr
 	)
 	if m != nil {
 		elements = m.elements
 		order = m.order
-		ksize = notsafe.GetTypeSize[K]()
 	}
-	return ordered.NewMapIter(elements, slice.NewTailS(order, ksize))
+	return ordered.NewMapIter(elements, slice.NewTail(order))
 }
 
 // First returns the first key/value pair of the map, an iterator to iterate over the remaining pair, and true\false marker of availability next pairs.

@@ -8,21 +8,19 @@ import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/loop"
-	"github.com/m4gshm/gollections/notsafe"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/stream"
 )
 
 // WrapSet creates a set using a map and an order slice as the internal storage.
 func WrapSet[T comparable](order []T, elements map[T]struct{}) Set[T] {
-	return Set[T]{order: order, elements: elements, esize: notsafe.GetTypeSize[T]()}
+	return Set[T]{order: order, elements: elements}
 }
 
 // Set is a collection implementation that provides storage for unique elements, prevents duplication, and guarantees access order. The elements must be comparable.
 type Set[T comparable] struct {
 	order    []T
 	elements map[T]struct{}
-	esize    uintptr
 }
 
 var (
@@ -48,19 +46,19 @@ func (s Set[T]) Loop() *slice.Iter[T] {
 
 // Head creates an iterator and returns as implementation type value
 func (s Set[T]) Head() slice.Iter[T] {
-	return slice.NewHeadS(s.order, s.esize)
+	return slice.NewHead(s.order)
 }
 
 // Tail creates an iterator pointing to the end of the collection
 func (s Set[T]) Tail() slice.Iter[T] {
-	return slice.NewTailS(s.order, s.esize)
+	return slice.NewTail(s.order)
 }
 
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
 func (s Set[T]) First() (slice.Iter[T], T, bool) {
 	var (
-		iterator  = slice.NewHeadS(s.order, s.esize)
+		iterator  = slice.NewHead(s.order)
 		first, ok = iterator.Next()
 	)
 	return iterator, first, ok
@@ -70,7 +68,7 @@ func (s Set[T]) First() (slice.Iter[T], T, bool) {
 // If no more elements then ok==false.
 func (s Set[T]) Last() (slice.Iter[T], T, bool) {
 	var (
-		iterator  = slice.NewTailS(s.order, s.esize)
+		iterator  = slice.NewTail(s.order)
 		first, ok = iterator.Prev()
 	)
 	return iterator, first, ok
