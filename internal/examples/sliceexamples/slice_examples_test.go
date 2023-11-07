@@ -87,16 +87,19 @@ func Test_AggregateFilteredRoles(t *testing.T) {
 }
 
 func Test_SortStructsByField(t *testing.T) {
+
 	var users = []User{
 		{name: "Bob", age: 26},
 		{name: "Alice", age: 35},
 		{name: "Tom", age: 18},
 	}
+
 	var (
 		//sorted
 		byName       = sort.By(users, User.Name)
 		byAgeReverse = sort.DescBy(users, User.Age)
 	)
+
 	assert.Equal(t, []User{
 		{name: "Alice", age: 35},
 		{name: "Bob", age: 26},
@@ -110,6 +113,7 @@ func Test_SortStructsByField(t *testing.T) {
 }
 
 func Test_SortStructs(t *testing.T) {
+
 	var users = []User{
 		{name: "Bob", age: 26},
 		{name: "Alice", age: 35},
@@ -130,12 +134,23 @@ func Test_SortStructs(t *testing.T) {
 		{name: "Bob", age: 26},
 		{name: "Tom", age: 18},
 	}, byAgeReverse)
+
+}
+
+func Test_SliceOf(t *testing.T) {
+
+	s := slice.Of(1, 3, -1, 2, 0)
+	
+	assert.Equal(t, []int{1, 3, -1, 2, 0}, s)
+
 }
 
 func Test_SortInt(t *testing.T) {
-	source := []int{1, 3, -1, 2, 0}
-	sorted := sort.Asc(source)
+
+	sorted := sort.Asc([]int{1, 3, -1, 2, 0})
+
 	assert.Equal(t, []int{-1, 0, 1, 2, 3}, sorted)
+
 }
 
 func Test_Reverse(t *testing.T) {

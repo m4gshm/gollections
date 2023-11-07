@@ -51,6 +51,7 @@ include::../examples/boilerplate/slice_filter_convert_reduce_short_test.go[lines
 This is a shorter version of the previous example that used short aliases link:./slice/sum/api.go#L10[sum.Of] and link:./slice/filter/api.go#L9[filter.AndConvert].
 
 ===== Brief of usage
+
 [source,go]
 ----
 include::../examples/boilerplate/slice_shortcuts_test.go[lines=18..33,indent=0]
@@ -60,7 +61,7 @@ More shortcuts you can find by exploring slices link:./slice[subpackages].
 
 ==== Main slice functions
 
-* creating - slice.Of, range_.Of, clone.Of, slice.DeepClone
+* creating - link:#slice.Of[slice.Of], range_.Of, clone.Of, slice.DeepClone
 * sorting - sort.Asc, sort.Desc, sort.By, asc.Of, desc.Of
 * stable sorting and sorting cloned slice
 * converting, filtering, summarizing - convert.AndReduce, convert.AndConvert, convert.AndFilter, filter.AndConvert, filter.ConvertFilter, sum.Of, first.Of, last.Of
@@ -211,4 +212,13 @@ Intermediates should wrap one by one to make a lazy computation chain that can b
 [source,go]
 ----
 include::../examples/collection/functions/collection_functions_test.go[lines=14..33,indent=0]
+----
+
+=== API
+
+==== slice.Of
+
+[source,go]
+----
+include::../examples/sliceexamples/slice_examples_test.go[lines=141..143,indent=0]
 ----

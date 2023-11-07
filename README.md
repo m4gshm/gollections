@@ -112,7 +112,8 @@ More shortcuts you can find by exploring slices [subpackages](./slice).
 
 ### Main slice functions
 
-- creating - slice.Of, range\_.Of, clone.Of, slice.DeepClone
+- creating - [slice.Of](#slice.Of), range\_.Of, clone.Of,
+  slice.DeepClone
 
 - sorting - sort.Asc, sort.Desc, sort.By, asc.Of, desc.Of
 
@@ -369,4 +370,12 @@ assert.Equal(t, map[int][]string{
     6: {"second_", "fourth_", "eighth_"},
     7: {"seventh_"},
 }, groupedByLength)
+```
+
+## API
+
+### slice.Of
+
+``` go
+s := slice.Of(1, 3, -1, 2, 0)
 ```
