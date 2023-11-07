@@ -26,8 +26,8 @@ func WrapMap[K comparable, V any](order []K, elements map[K]V) *Map[K, V] {
 
 // Map is a collection implementation that provides elements access by an unique key.
 type Map[K comparable, V any] struct {
-	order      []K
-	elements   map[K]V
+	order    []K
+	elements map[K]V
 }
 
 var (

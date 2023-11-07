@@ -4,7 +4,7 @@
 
 Gollections is set of functions for link:./slice/api.go[slices], link:./map_/api.go[maps] and additional implementations of data structures such as link:./collection/collection/mutable/omap/api.go[ordered map] or link:./collection/collection/mutable/oset/api.go[set] aimed to reduce boilerplate code.
 
-Supports Go version 1.20.
+Supports Go version 1.21.
 
 For example, it's need to group some link:./internal/examples/boilerplate/user_type.go[users] by their role names converted to lowercase:
 [source,go]
@@ -58,11 +58,12 @@ include::../examples/boilerplate/slice_shortcuts_test.go[lines=18..33,indent=0]
 
 More shortcuts you can find by exploring slices link:./slice[subpackages].
 
-===== Main slice functions
+==== Main slice functions
 
-* sorting - sort.Asc, sort.Desc, sort.By, asc.Of, desc.Of  
+* creating - slice.Of, range_.Of, clone.Of, slice.DeepClone
+* sorting - sort.Asc, sort.Desc, sort.By, asc.Of, desc.Of
 * stable sorting and sorting cloned slice
-* converting, filtering, summarizing - convert.AndReduce, convert.AndConvert, convert.AndFilter, filter.AndConvert, filter.ConvertFilter
+* converting, filtering, summarizing - convert.AndReduce, convert.AndConvert, convert.AndFilter, filter.AndConvert, filter.ConvertFilter, sum.Of, first.Of, last.Of
 * versions of aboves with possible result errors - conv.AndReduce
 * to map transforming - slice.ToMap, slice.ToMapResolv, group.Of, group.ByMultiple, group.ByMultipleKeys, group.ByMultipleValues
 
@@ -73,7 +74,14 @@ More shortcuts you can find by exploring slices link:./slice[subpackages].
 include::../examples/boilerplate/map_filter_convert_reduce_test.go[lines=16..45,indent=0]
 ----
 
-TODO:
+More shortcuts are link:./map_[here].
+
+==== Main map functions (TODO)
+
+* creating - map_.Of, clone.Of, map_.DeepClone
+* extract keys, values - map_.Keys, map_.Values
+* converting, filtering, summarizing - map_.Convert, map_.ConvertKeys, map_.ConvertValues, map_.ToSlice, map_.Reduce
+* versions of aboves with possible result errors - map_.Conv
 
 
 === Data structures

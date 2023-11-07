@@ -6,7 +6,7 @@ such as [ordered map](./collection/collection/mutable/omap/api.go) or
 [set](./collection/collection/mutable/oset/api.go) aimed to reduce
 boilerplate code.
 
-Supports Go version 1.20.
+Supports Go version 1.21.
 
 For example, it’s need to group some
 [users](./internal/examples/boilerplate/user_type.go) by their role
@@ -110,7 +110,9 @@ assert.Equal(t, slice.Of("Alice", "Chris"), lengthMap[5])
 
 More shortcuts you can find by exploring slices [subpackages](./slice).
 
-#### Main slice functions
+### Main slice functions
+
+- creating - slice.Of, range\_.Of, clone.Of, slice.DeepClone
 
 - sorting - sort.Asc, sort.Desc, sort.By, asc.Of, desc.Of
 
@@ -118,7 +120,7 @@ More shortcuts you can find by exploring slices [subpackages](./slice).
 
 - converting, filtering, summarizing - convert.AndReduce,
   convert.AndConvert, convert.AndFilter, filter.AndConvert,
-  filter.ConvertFilter
+  filter.ConvertFilter, sum.Of, first.Of, last.Of
 
 - versions of aboves with possible result errors - conv.AndReduce
 
@@ -159,7 +161,18 @@ assert.Equal(t, 190, departmentSalary["internal"])
 assert.Equal(t, 125, departmentSalary["external"])
 ```
 
-TODO:
+More shortcuts are [here](./map_).
+
+### Main map functions (TODO)
+
+- creating - map\_.Of, clone.Of, map\_.DeepClone
+
+- extract keys, values - map\_.Keys, map\_.Values
+
+- converting, filtering, summarizing - map\_.Convert, map\_.ConvertKeys,
+  map\_.ConvertValues, map\_.ToSlice, map\_.Reduce
+
+- versions of aboves with possible result errors - map\_.Conv
 
 ## Data structures
 
