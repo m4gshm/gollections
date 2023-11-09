@@ -323,6 +323,7 @@ func Test_Slice_ReduceSum(t *testing.T) {
 func Test_Slice_Sum(t *testing.T) {
 
 	var sum = sum.Of(1, 2, 3, 4, 5, 6)
+	//21
 
 	assert.Equal(t, 21, sum)
 }
@@ -362,7 +363,7 @@ func Test_RangeClosed(t *testing.T) {
 
 		decreasing = range_.Closed('e', 'a')
 		//[]rune{'e', 'd', 'c', 'b', 'a'}
-		
+
 		one        = range_.Closed(1, 1)
 		//[]int{1}
 	)

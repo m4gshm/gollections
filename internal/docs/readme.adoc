@@ -89,17 +89,17 @@ include::../examples/sliceexamples/slice_examples_test.go[lines=99..102,indent=0
 ===== sum.Of
 [source,go]
 ----
-include::../examples/sliceexamples/slice_examples_test.go[lines=324..326,indent=0]
+include::../examples/sliceexamples/slice_examples_test.go[lines=324..327,indent=0]
 ----
 ===== range_.Of
 [source,go]
 ----
-include::../examples/sliceexamples/slice_examples_test.go[lines=340..351,indent=0]
+include::../examples/sliceexamples/slice_examples_test.go[lines=341..352,indent=0]
 ----
 ===== range_.Closed
 [source,go]
 ----
-include::../examples/sliceexamples/slice_examples_test.go[lines=358..369,indent=0]
+include::../examples/sliceexamples/slice_examples_test.go[lines=359..370,indent=0]
 ----
 
 ===== first.Of

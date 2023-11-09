@@ -155,6 +155,7 @@ var byAgeReverse = sort.DescBy(users, User.Age)
 
 ``` go
 var sum = sum.Of(1, 2, 3, 4, 5, 6)
+//21
 ```
 
 #### range\_.Of
@@ -181,7 +182,7 @@ var (
 
     decreasing = range_.Closed('e', 'a')
     //[]rune{'e', 'd', 'c', 'b', 'a'}
-    
+
     one        = range_.Closed(1, 1)
     //[]int{1}
 )
