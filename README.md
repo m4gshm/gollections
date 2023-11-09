@@ -116,7 +116,7 @@ More shortcuts you can find by exploring slices [subpackages](./slice).
 
 </div>
 
-``` go%collapsible
+``` go
 var s []int = slice.Of(1, 3, -1, 2, 0)
 ```
 
