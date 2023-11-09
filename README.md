@@ -1,10 +1,9 @@
 # Gollections
 
-Gollections is set of functions for [slices](./slice/api.go),
-[maps](./map_/api.go) and additional implementations of data structures
-such as [ordered map](./collection/collection/mutable/omap/api.go) or
-[set](./collection/collection/mutable/oset/api.go) aimed to reduce
-boilerplate code.
+Gollections is set of functions for [slices](#slces#), [maps](#maps) and
+additional implementations of data structures such as [ordered
+map](#mutable-collections) or [set](#mutable-collections) aimed to
+reduce boilerplate code.
 
 Supports Go version 1.21.
 
@@ -75,9 +74,9 @@ assert.Equal(t, "24", result)
 ```
 
 In the example is used only small set of slice functions as
-[Filter](./slice/api.go#L421), [Conv](./slice/api.go#L178)
-[Convert](./slice/api.go#L166), and [Reduce](./slice/api.go#L529). More
-you can look in the [slice](./slice/api.go) package.
+[slice.Filter](#slice-filter), [Conv](#slice-conv)
+[Convert](./slice/api.go#L166), and [Reduce](#slice-reduce). More you
+can look in the [slice](./slice/api.go) package.
 
 ### Shortcut packages
 
@@ -86,8 +85,7 @@ result := sum.Of(filter.AndConvert(data, even, strconv.Itoa))
 ```
 
 This is a shorter version of the previous example that used short
-aliases [sum.Of](./slice/sum/api.go#L10) and
-[filter.AndConvert](./slice/filter/api.go#L9).
+aliases [sum.Of](#sum-of) and [filter.AndConvert](#filter-andonvert).
 
 #### Brief of usage
 
@@ -112,7 +110,18 @@ More shortcuts you can find by exploring slices [subpackages](./slice).
 
 ### Main slice functions
 
-- creating - [slice.Of](#sliceof), range\_.Of, clone.Of, slice.DeepClone
+<div class="formalpara-title">
+
+**slice.Of**
+
+</div>
+
+``` go%collapsible
+var s []int = slice.Of(1, 3, -1, 2, 0)
+```
+
+- creating - [range\_.Of](#range-of), [clone.Of](#clone-of),
+  [slice.DeepClone](#slice-deepclone)
 
 - sorting - sort.Asc, sort.Desc, sort.By, asc.Of, desc.Of
 
@@ -373,8 +382,14 @@ assert.Equal(t, map[int][]string{
 
 ## API
 
-### slice.Of
+slice.Of
 
 ``` go
-s := slice.Of(1, 3, -1, 2, 0)
+var s []int = slice.Of(1, 3, -1, 2, 0)
+```
+
+### sort.Asc
+
+``` go
+sorted := sort.Asc([]int{1, 3, -1, 2, 0})
 ```
