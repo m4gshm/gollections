@@ -110,31 +110,110 @@ More shortcuts you can find by exploring slices [subpackages](./slice).
 
 ### Main slice functions
 
-<div class="formalpara-title">
-
-**slice.Of**
-
-</div>
+#### slice.Of
 
 ``` go
-var s []int = slice.Of(1, 3, -1, 2, 0)
+var s = slice.Of(1, 3, -1, 2, 0)
+//[]int{1, 3, -1, 2, 0}
 ```
 
-- creating - [range\_.Of](#range-of), [clone.Of](#clone-of),
-  [slice.DeepClone](#slice-deepclone)
+#### sort.Asc
 
-- sorting - sort.Asc, sort.Desc, sort.By, asc.Of, desc.Of
+``` go
+var ascengingSorted = sort.Asc([]int{1, 3, -1, 2, 0})
+//[]int{-1, 0, 1, 2, 3}
+```
 
-- stable sorting and sorting cloned slice
+#### sort.Desc
 
-- converting, filtering, summarizing - convert.AndReduce,
-  convert.AndConvert, convert.AndFilter, filter.AndConvert,
-  filter.ConvertFilter, sum.Of, first.Of, last.Of
+``` go
+var descendingSorted = sort.Desc([]int{1, 3, -1, 2, 0})
+//[]int{3, 2, 1, 0, -1}
+```
 
-- versions of aboves with possible result errors - conv.AndReduce
+#### sort.By (used User struct from above examples)
 
-- to map transforming - slice.ToMap, slice.ToMapResolv, group.Of,
-  group.ByMultiple, group.ByMultipleKeys, group.ByMultipleValues
+``` go
+var users = []User{
+    {name: "Bob", age: 26},
+    {name: "Alice", age: 35},
+    {name: "Tom", age: 18},
+}
+
+var byName = sort.By(users, User.Name)
+//[]User{{name: "Alice", age: 35}, {name: "Bob", age: 26},{name: "Tom", age: 18}}
+```
+
+#### sort.ByDesc
+
+``` go
+var byAgeReverse = sort.DescBy(users, User.Age)
+//[]User{{name: "Alice", age: 35}, {name: "Bob", age: 26}, {name: "Tom", age: 18}}
+```
+
+#### sum.Of
+
+``` go
+var sum = sum.Of(1, 2, 3, 4, 5, 6)
+```
+
+#### range\_.Of
+
+``` go
+var (
+    increasing = range_.Of(-1, 3)
+    //[]int{-1, 0, 1, 2}
+
+    decreasing = range_.Of('e', 'a')
+    //[]rune{'e', 'd', 'c', 'b'}
+
+    nothing = range_.Of(1, 1)
+    //nil
+)
+```
+
+#### range\_.Closed
+
+``` go
+var (
+    increasing = range_.Closed(-1, 3)
+    //[]int{-1, 0, 1, 2, 3}
+
+    decreasing = range_.Closed('e', 'a')
+    //[]rune{'e', 'd', 'c', 'b', 'a'}
+    
+    one        = range_.Closed(1, 1)
+    //[]int{1}
+)
+```
+
+#### first.Of
+
+#### last.Of
+
+#### convert.AndReduce
+
+#### conv.AndReduce
+
+#### convert.AndConvert
+
+#### convert.AndFilter
+
+#### filter.AndConvert
+
+#### filter.ConvertFilter
+
+#### slice.ToMap
+
+#### slice.ToMapResolv
+
+#### group.Of
+
+#### group.ByMultiple
+
+#### group.ByMultipleKeys
+
+#### group.ByMultipleValues
 
 ## Maps
 
@@ -378,18 +457,4 @@ assert.Equal(t, map[int][]string{
     6: {"second_", "fourth_", "eighth_"},
     7: {"seventh_"},
 }, groupedByLength)
-```
-
-## API
-
-slice.Of
-
-``` go
-var s []int = slice.Of(1, 3, -1, 2, 0)
-```
-
-### sort.Asc
-
-``` go
-sorted := sort.Asc([]int{1, 3, -1, 2, 0})
 ```

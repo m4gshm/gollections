@@ -452,7 +452,7 @@ func Filt[TS ~[]T, T any](elements TS, filter func(T) (bool, error)) ([]T, error
 }
 
 // RangeClosed generates a slice of integers in the range defined by from and to inclusive
-func RangeClosed[T constraints.Integer](from T, toInclusive T) []T {
+func RangeClosed[T constraints.Integer| rune](from T, toInclusive T) []T {
 	if toInclusive == from {
 		return []T{from}
 	}
@@ -474,7 +474,7 @@ func RangeClosed[T constraints.Integer](from T, toInclusive T) []T {
 }
 
 // Range generates a slice of integers in the range defined by from and to exclusive
-func Range[T constraints.Integer](from T, toExclusive T) []T {
+func Range[T constraints.Integer | rune](from T, toExclusive T) []T {
 	if toExclusive == from {
 		return nil
 	}

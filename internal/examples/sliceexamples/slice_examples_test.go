@@ -94,11 +94,11 @@ func Test_SortStructsByField(t *testing.T) {
 		{name: "Tom", age: 18},
 	}
 
-	var (
-		//sorted
-		byName       = sort.By(users, User.Name)
-		byAgeReverse = sort.DescBy(users, User.Age)
-	)
+	var byName = sort.By(users, User.Name)
+	//[]User{{name: "Alice", age: 35}, {name: "Bob", age: 26},{name: "Tom", age: 18}}
+
+	var byAgeReverse = sort.DescBy(users, User.Age)
+	//[]User{{name: "Alice", age: 35}, {name: "Bob", age: 26}, {name: "Tom", age: 18}}
 
 	assert.Equal(t, []User{
 		{name: "Alice", age: 35},
@@ -139,18 +139,26 @@ func Test_SortStructs(t *testing.T) {
 
 func Test_SliceOf(t *testing.T) {
 
-	s := slice.Of(1, 3, -1, 2, 0)
-	
-	assert.Equal(t, []int{1, 3, -1, 2, 0}, s)
+	var s = slice.Of(1, 3, -1, 2, 0)
+	//[]int{1, 3, -1, 2, 0}
 
+	assert.Equal(t, []int{1, 3, -1, 2, 0}, s)
 }
 
-func Test_SortInt(t *testing.T) {
+func Test_SortAsc(t *testing.T) {
 
-	sorted := sort.Asc([]int{1, 3, -1, 2, 0})
+	var ascengingSorted = sort.Asc([]int{1, 3, -1, 2, 0})
+	//[]int{-1, 0, 1, 2, 3}
 
-	assert.Equal(t, []int{-1, 0, 1, 2, 3}, sorted)
+	assert.Equal(t, []int{-1, 0, 1, 2, 3}, ascengingSorted)
+}
 
+func Test_SortDesc(t *testing.T) {
+
+	var descendingSorted = sort.Desc([]int{1, 3, -1, 2, 0})
+	//[]int{3, 2, 1, 0, -1}
+
+	assert.Equal(t, []int{3, 2, 1, 0, -1}, descendingSorted)
 }
 
 func Test_Reverse(t *testing.T) {
@@ -313,11 +321,10 @@ func Test_Slice_ReduceSum(t *testing.T) {
 }
 
 func Test_Slice_Sum(t *testing.T) {
-	var (
-		sum      = sum.Of(1, 2, 3, 4, 5, 6)
-		expected = 1 + 2 + 3 + 4 + 5 + 6
-	)
-	assert.Equal(t, expected, sum)
+
+	var sum = sum.Of(1, 2, 3, 4, 5, 6)
+
+	assert.Equal(t, 21, sum)
 }
 
 func Test_Slice_Flatt(t *testing.T) {
@@ -329,12 +336,40 @@ func Test_Slice_Flatt(t *testing.T) {
 	assert.Equal(t, expected, result)
 }
 
-func Test_Range(t *testing.T) {
-	assert.Equal(t, []int{-1, 0, 1, 2}, range_.Of(-1, 3))
-	assert.Equal(t, []int{-1, 0, 1, 2, 3}, range_.Closed(-1, 3))
-	assert.Equal(t, []int{3, 2, 1, 0, -1}, range_.Closed(3, -1))
-	assert.Nil(t, range_.Of(1, 1))
-	assert.Equal(t, []int{1}, range_.Closed(1, 1))
+func Test_RangeOf(t *testing.T) {
+
+	var (
+		increasing = range_.Of(-1, 3)
+		//[]int{-1, 0, 1, 2}
+
+		decreasing = range_.Of('e', 'a')
+		//[]rune{'e', 'd', 'c', 'b'}
+
+		nothing = range_.Of(1, 1)
+		//nil
+	)
+
+	assert.Equal(t, []int{-1, 0, 1, 2}, increasing)
+	assert.Equal(t, []rune{'e', 'd', 'c', 'b'}, decreasing)
+	assert.Nil(t, nothing)
+}
+
+func Test_RangeClosed(t *testing.T) {
+
+	var (
+		increasing = range_.Closed(-1, 3)
+		//[]int{-1, 0, 1, 2, 3}
+
+		decreasing = range_.Closed('e', 'a')
+		//[]rune{'e', 'd', 'c', 'b', 'a'}
+		
+		one        = range_.Closed(1, 1)
+		//[]int{1}
+	)
+
+	assert.Equal(t, []int{-1, 0, 1, 2, 3}, increasing)
+	assert.Equal(t, []rune{'e', 'd', 'c', 'b', 'a'}, decreasing)
+	assert.Equal(t, []int{1}, one)
 }
 
 func Test_First(t *testing.T) {

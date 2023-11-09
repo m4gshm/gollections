@@ -2,7 +2,7 @@
 
 == Gollections
 
-Gollections is set of functions for link:./slice/api.go[slices], link:./map_/api.go[maps] and additional implementations of data structures such as link:./collection/collection/mutable/omap/api.go[ordered map] or link:./collection/collection/mutable/oset/api.go[set] aimed to reduce boilerplate code.
+Gollections is set of functions for link:#slces#[slices], link:#maps[maps] and additional implementations of data structures such as link:#mutable-collections[ordered map] or link:#mutable-collections[set] aimed to reduce boilerplate code.
 
 Supports Go version 1.21.
 
@@ -39,7 +39,7 @@ go get -u github.com/m4gshm/gollections
 include::../examples/boilerplate/slice_filter_convert_reduce_test.go[lines=15..22,indent=0]
 ----
 
-In the example is used only small set of slice functions as link:./slice/api.go#L421[Filter], link:./slice/api.go#L178[Conv] link:./slice/api.go#L166[Convert], and link:./slice/api.go#L529[Reduce]. More you can look in the link:./slice/api.go[slice] package.
+In the example is used only small set of slice functions as link:#slice-filter[slice.Filter], link:#slice-conv[Conv] link:./slice/api.go#L166[Convert], and link:#slice-reduce[Reduce]. More you can look in the link:./slice/api.go[slice] package.
 
 ==== Shortcut packages
 
@@ -48,7 +48,7 @@ In the example is used only small set of slice functions as link:./slice/api.go#
 include::../examples/boilerplate/slice_filter_convert_reduce_short_test.go[lines=18..20,indent=0]
 ----
 
-This is a shorter version of the previous example that used short aliases link:./slice/sum/api.go#L10[sum.Of] and link:./slice/filter/api.go#L9[filter.AndConvert].
+This is a shorter version of the previous example that used short aliases link:#sum-of[sum.Of] and link:#filter-andonvert[filter.AndConvert].
 
 ===== Brief of usage
 
@@ -61,12 +61,62 @@ More shortcuts you can find by exploring slices link:./slice[subpackages].
 
 ==== Main slice functions
 
-* creating - link:#sliceof[slice.Of], range_.Of, clone.Of, slice.DeepClone
-* sorting - sort.Asc, sort.Desc, sort.By, asc.Of, desc.Of
-* stable sorting and sorting cloned slice
-* converting, filtering, summarizing - convert.AndReduce, convert.AndConvert, convert.AndFilter, filter.AndConvert, filter.ConvertFilter, sum.Of, first.Of, last.Of
-* versions of aboves with possible result errors - conv.AndReduce
-* to map transforming - slice.ToMap, slice.ToMapResolv, group.Of, group.ByMultiple, group.ByMultipleKeys, group.ByMultipleValues
+===== slice.Of
+[source,go]
+----
+include::../examples/sliceexamples/slice_examples_test.go[lines=141..144,indent=0]
+----
+===== sort.Asc
+[source,go]
+----
+include::../examples/sliceexamples/slice_examples_test.go[lines=149..152,indent=0]
+----
+===== sort.Desc 
+[source,go]
+----
+include::../examples/sliceexamples/slice_examples_test.go[lines=157..160,indent=0]
+----
+===== sort.By (used User struct from above examples)
+[source,go]
+----
+include::../examples/sliceexamples/slice_examples_test.go[lines=90..99,indent=0]
+----
+===== sort.ByDesc
+[source,go]
+----
+include::../examples/sliceexamples/slice_examples_test.go[lines=99..102,indent=0]
+----
+===== sum.Of
+[source,go]
+----
+include::../examples/sliceexamples/slice_examples_test.go[lines=324..326,indent=0]
+----
+===== range_.Of
+[source,go]
+----
+include::../examples/sliceexamples/slice_examples_test.go[lines=340..351,indent=0]
+----
+===== range_.Closed
+[source,go]
+----
+include::../examples/sliceexamples/slice_examples_test.go[lines=358..369,indent=0]
+----
+
+===== first.Of
+===== last.Of
+
+===== convert.AndReduce
+===== conv.AndReduce
+===== convert.AndConvert
+===== convert.AndFilter
+===== filter.AndConvert
+===== filter.ConvertFilter
+===== slice.ToMap
+===== slice.ToMapResolv
+===== group.Of
+===== group.ByMultiple
+===== group.ByMultipleKeys
+===== group.ByMultipleValues
 
 === Maps
 
@@ -212,13 +262,4 @@ Intermediates should wrap one by one to make a lazy computation chain that can b
 [source,go]
 ----
 include::../examples/collection/functions/collection_functions_test.go[lines=14..33,indent=0]
-----
-
-=== API
-
-==== slice.Of
-
-[source,go]
-----
-include::../examples/sliceexamples/slice_examples_test.go[lines=141..143,indent=0]
 ----

@@ -8,11 +8,11 @@ import (
 )
 
 // Of - range_.Of short alias of the slice.Range
-func Of[T constraints.Integer](from T, to T) []T {
+func Of[T constraints.Integer | rune](from T, to T) []T {
 	return slice.Range(from, to)
 }
 
 // Closed - range_.Closed short alias of the slice.RangeClosed
-func Closed[T constraints.Integer](from T, to T) []T {
+func Closed[T constraints.Integer | rune](from T, to T) []T {
 	return slice.RangeClosed(from, to)
 }
