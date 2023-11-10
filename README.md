@@ -187,8 +187,7 @@ ageGroupedSortedNames = slice.ToMapResolv(users, func(u User) string {
 ``` go
 import "github.com/m4gshm/gollections/op/sum"
 
-var sum = sum.Of(1, 2, 3, 4, 5, 6)
-//21
+var sum = sum.Of(1, 2, 3, 4, 5, 6) //21
 ```
 
 #### range\_.Of

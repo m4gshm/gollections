@@ -96,7 +96,7 @@ include::../examples/sliceexamples/slice_ToMapResolv_test.go[lines=14..22,indent
 [source,go]
 ----
 include::../examples/sliceexamples/sum_Of_test.go[lines=9..9,indent=0]
-include::../examples/sliceexamples/sum_Of_test.go[lines=12..15,indent=0]
+include::../examples/sliceexamples/sum_Of_test.go[lines=12..14,indent=0]
 ----
 ===== range_.Of
 [source,go]
