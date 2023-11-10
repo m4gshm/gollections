@@ -88,8 +88,9 @@ include::../examples/sliceexamples/group_Of_test.go[lines=19..27,indent=0]
 ===== slice.ToMap, slice.ToMapResolv
 [source,go]
 ----
-include::../examples/sliceexamples/slice_ToMapResolv_test.go[lines=9..13,indent=0]
-include::../examples/sliceexamples/slice_ToMapResolv_test.go[lines=16..24,indent=0]
+include::../examples/sliceexamples/slice_ToMapResolv_test.go[lines=3..3,indent=0]
+include::../examples/sliceexamples/slice_ToMapResolv_test.go[lines=8..11,indent=0]
+include::../examples/sliceexamples/slice_ToMapResolv_test.go[lines=14..22,indent=0]
 ----
 ===== sum.Of
 [source,go]
