@@ -60,63 +60,96 @@ include::../examples/boilerplate/slice_shortcuts_test.go[lines=18..33,indent=0]
 More shortcuts you can find by exploring slices link:./slice[subpackages].
 
 ==== Main slice functions
-
 ===== slice.Of
 [source,go]
 ----
-include::../examples/sliceexamples/slice_examples_test.go[lines=141..144,indent=0]
+include::../examples/sliceexamples/slice_Of_test.go[lines=8..8,indent=0]
+include::../examples/sliceexamples/slice_Of_test.go[lines=12..14,indent=0]
 ----
-===== sort.Asc
+===== sort.Asc, sort.Desc 
 [source,go]
 ----
-include::../examples/sliceexamples/slice_examples_test.go[lines=149..152,indent=0]
+include::../examples/sliceexamples/sort_Asc_Desc_test.go[lines=9..10,indent=0]
+include::../examples/sliceexamples/sort_Asc_Desc_test.go[lines=13..16,indent=0]
 ----
-===== sort.Desc 
+===== sort.By, sort.ByDesc
 [source,go]
 ----
-include::../examples/sliceexamples/slice_examples_test.go[lines=157..160,indent=0]
+include::../examples/sliceexamples/clone_sort_By_test.go[lines=9..10,indent=0]
+
+include::../examples/sliceexamples/data_users_test.go[lines=3..10,indent=0]
+include::../examples/sliceexamples/clone_sort_By_test.go[lines=13..16,indent=0]
 ----
-===== sort.By (used User struct from above examples)
+===== group.Of
 [source,go]
 ----
-include::../examples/sliceexamples/slice_examples_test.go[lines=90..99,indent=0]
+include::../examples/sliceexamples/group_Of_test.go[lines=12..16,indent=0]
+include::../examples/sliceexamples/group_Of_test.go[lines=19..27,indent=0]
 ----
-===== sort.ByDesc
+===== slice.ToMap, slice.ToMapResolv
 [source,go]
 ----
-include::../examples/sliceexamples/slice_examples_test.go[lines=99..102,indent=0]
+include::../examples/sliceexamples/slice_ToMapResolv_test.go[lines=9..13,indent=0]
+include::../examples/sliceexamples/slice_ToMapResolv_test.go[lines=16..24,indent=0]
 ----
 ===== sum.Of
 [source,go]
 ----
-include::../examples/sliceexamples/slice_examples_test.go[lines=324..327,indent=0]
+include::../examples/sliceexamples/sum_Of_test.go[lines=9..9,indent=0]
+include::../examples/sliceexamples/sum_Of_test.go[lines=12..15,indent=0]
 ----
 ===== range_.Of
 [source,go]
 ----
-include::../examples/sliceexamples/slice_examples_test.go[lines=341..352,indent=0]
+include::../examples/sliceexamples/range_Of_test.go[lines=9..9,indent=0]
+include::../examples/sliceexamples/range_Of_test.go[lines=12..16,indent=0]
 ----
 ===== range_.Closed
 [source,go]
 ----
-include::../examples/sliceexamples/slice_examples_test.go[lines=359..370,indent=0]
+include::../examples/sliceexamples/range_Closed_test.go[lines=9..9,indent=0]
+include::../examples/sliceexamples/range_Closed_test.go[lines=12..16,indent=0]
+----
+===== first.Of
+[source,go]
+----
+include::../examples/expressionexamples/first_Of_test.go[lines=9..12,indent=0]
+include::../examples/expressionexamples/first_Of_test.go[lines=15..17,indent=0]
+----
+===== last.Of
+[source,go]
+----
+include::../examples/expressionexamples/last_Of_test.go[lines=9..12,indent=0]
+include::../examples/expressionexamples/last_Of_test.go[lines=15..17,indent=0]
 ----
 
-===== first.Of
-===== last.Of
+===== slice.Convert
+[source,go]
+----
+include::../examples/sliceexamples/slice_Convert_test.go[lines=9..10,indent=0]
+include::../examples/sliceexamples/slice_Convert_test.go[lines=13..16,indent=0]
+----
+
+===== slice.Conv
+[source,go]
+----
+include::../examples/sliceexamples/slice_Conv_test.go[lines=9..10,indent=0]
+include::../examples/sliceexamples/slice_Conv_test.go[lines=13..16,indent=0]
+----
+
+===== slice.Filter
+[source,go]
+----
+include::../examples/sliceexamples/slice_Filter.go[lines=3..3,indent=0]
+include::../examples/sliceexamples/slice_Filter.go[lines=8..11,indent=0]
+include::../examples/sliceexamples/slice_Filter.go[lines=14..17,indent=0]
+----
 
 ===== convert.AndReduce
 ===== conv.AndReduce
-===== convert.AndConvert
 ===== convert.AndFilter
 ===== filter.AndConvert
-===== filter.ConvertFilter
-===== slice.ToMap
-===== slice.ToMapResolv
-===== group.Of
-===== group.ByMultiple
-===== group.ByMultipleKeys
-===== group.ByMultipleValues
+
 
 === Maps
 

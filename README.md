@@ -113,47 +113,81 @@ More shortcuts you can find by exploring slices [subpackages](./slice).
 #### slice.Of
 
 ``` go
-var s = slice.Of(1, 3, -1, 2, 0)
-//[]int{1, 3, -1, 2, 0}
+"github.com/m4gshm/gollections/slice"
+
+var s = slice.Of(1, 3, -1, 2, 0) //[]int{1, 3, -1, 2, 0}
 ```
 
-#### sort.Asc
+#### sort.Asc, sort.Desc
 
 ``` go
-var ascengingSorted = sort.Asc([]int{1, 3, -1, 2, 0})
-//[]int{-1, 0, 1, 2, 3}
+// sorting in-place API
+import "github.com/m4gshm/gollections/slice/sort"
+
+var ascendingSorted = sort.Asc([]int{1, 3, -1, 2, 0})   //[]int{-1, 0, 1, 2, 3}
+var descendingSorted = sort.Desc([]int{1, 3, -1, 2, 0}) //[]int{3, 2, 1, 0, -1}
 ```
 
-#### sort.Desc
+#### sort.By, sort.ByDesc
 
 ``` go
-var descendingSorted = sort.Desc([]int{1, 3, -1, 2, 0})
-//[]int{3, 2, 1, 0, -1}
-```
+// sorting copied slice API does not change original slice
+import "github.com/m4gshm/gollections/slice/clone/sort" 
 
-#### sort.By (used User struct from above examples)
-
-``` go
+// see the User structure above
 var users = []User{
     {name: "Bob", age: 26},
     {name: "Alice", age: 35},
     {name: "Tom", age: 18},
+    {name: "Chris", age: 41},
 }
 
-var byName = sort.By(users, User.Name)
-//[]User{{name: "Alice", age: 35}, {name: "Bob", age: 26},{name: "Tom", age: 18}}
+var byName = sort.By(users, User.Name) //[{Alice 35 []} {Bob 26 []} {Chris 41 []} {Tom 18 []}]
+var byAgeReverse = sort.DescBy(users, User.Age) //[{Chris 41 []} {Alice 35 []} {Bob 26 []} {Tom 18 []}]
 ```
 
-#### sort.ByDesc
+#### group.Of
 
 ``` go
-var byAgeReverse = sort.DescBy(users, User.Age)
-//[]User{{name: "Alice", age: 35}, {name: "Bob", age: 26}, {name: "Tom", age: 18}}
+import (
+    "github.com/m4gshm/gollections/convert/as"
+    "github.com/m4gshm/gollections/expr/use"
+    "github.com/m4gshm/gollections/slice/group"
+)
+
+var ageGroups map[string][]User
+
+ageGroups = group.Of(users, func(u User) string {
+    return use.If(u.age <= 20, "<=20").If(u.age <= 30, "<=30").Else(">30")
+}, as.Is[User])
+
+//map[<=20:[{Tom 18 []}] <=30:[{Bob 26 []}] >30:[{Alice 35 []} {Chris 41 []}]]
+```
+
+#### slice.ToMap, slice.ToMapResolv
+
+``` go
+   "github.com/stretchr/testify/assert"
+)
+
+func Test_Slice_ToMapResolv(t *testing.T) {
+
+    ageGroupedSortedNames = slice.ToMapResolv(users, func(u User) string {
+        return op.IfElse(u.age <= 30, "<=30", ">30")
+    }, User.Name, resolv.SortedSlice)
+
+    //map[<=30:[Bob Tom] >30:[Alice Chris]]
+
+    assert.Equal(t, slice.Of("Bob", "Tom"), ageGroupedSortedNames["<=30"])
+    assert.Equal(t, slice.Of("Alice", "Chris"), ageGroupedSortedNames[">30"])
+}
 ```
 
 #### sum.Of
 
 ``` go
+import "github.com/m4gshm/gollections/op/sum"
+
 var sum = sum.Of(1, 2, 3, 4, 5, 6)
 //21
 ```
@@ -161,60 +195,85 @@ var sum = sum.Of(1, 2, 3, 4, 5, 6)
 #### range\_.Of
 
 ``` go
-var (
-    increasing = range_.Of(-1, 3)
-    //[]int{-1, 0, 1, 2}
+import "github.com/m4gshm/gollections/slice/range_"
 
-    decreasing = range_.Of('e', 'a')
-    //[]rune{'e', 'd', 'c', 'b'}
-
-    nothing = range_.Of(1, 1)
-    //nil
-)
+var increasing = range_.Of(-1, 3)    //[]int{-1, 0, 1, 2}
+var decreasing = range_.Of('e', 'a') //[]rune{'e', 'd', 'c', 'b'}
+var nothing = range_.Of(1, 1)        //nil
 ```
 
 #### range\_.Closed
 
 ``` go
-var (
-    increasing = range_.Closed(-1, 3)
-    //[]int{-1, 0, 1, 2, 3}
+import "github.com/m4gshm/gollections/slice/range_"
 
-    decreasing = range_.Closed('e', 'a')
-    //[]rune{'e', 'd', 'c', 'b', 'a'}
-
-    one        = range_.Closed(1, 1)
-    //[]int{1}
-)
+var increasing = range_.Closed(-1, 3)    //[]int{-1, 0, 1, 2, 3}
+var decreasing = range_.Closed('e', 'a') //[]rune{'e', 'd', 'c', 'b', 'a'}
+var one = range_.Closed(1, 1)            //[]int{1}
 ```
 
 #### first.Of
 
+``` go
+import (
+    "github.com/m4gshm/gollections/expr/first"
+    "github.com/m4gshm/gollections/predicate/more"
+)
+
+result, ok := first.Of(1, 3, 5, 7, 9, 11).By(more.Than(5)) //7, true
+```
+
 #### last.Of
+
+``` go
+import (
+    "github.com/m4gshm/gollections/expr/last"
+    "github.com/m4gshm/gollections/predicate/less"
+)
+
+result, ok := last.Of(1, 3, 5, 7, 9, 11).By(less.Than(9)) //7, true
+```
+
+#### slice.Convert
+
+``` go
+import "strconv"
+import "github.com/m4gshm/gollections/slice"
+
+var s []string = slice.Convert([]int{1, 3, 5, 7, 9, 11}, strconv.Itoa)
+//[]string{"1", "3", "5", "7", "9", "11"}
+```
+
+#### slice.Conv
+
+``` go
+import "strconv"
+import "github.com/m4gshm/gollections/slice"
+
+result, err := slice.Conv(slice.Of("1", "3", "5", "_7", "9", "11"), strconv.Atoi)
+//[]int{1, 3, 5}, ErrSyntax
+```
+
+#### slice.Filter
+
+``` go
+import (
+    "github.com/m4gshm/gollections/predicate/exclude"
+    "github.com/m4gshm/gollections/predicate/one"
+    "github.com/m4gshm/gollections/slice"
+)
+
+var f1 = slice.Filter([]int{1, 3, 5, 7, 9, 11}, one.Of(1, 7).Or(one.Of(11))) //[]int{1, 7, 11}
+var f2 = slice.Filter([]int{1, 3, 5, 7, 9, 11}, exclude.All(1, 7, 11))       //[]int{3, 5, 9}
+```
 
 #### convert.AndReduce
 
 #### conv.AndReduce
 
-#### convert.AndConvert
-
 #### convert.AndFilter
 
 #### filter.AndConvert
-
-#### filter.ConvertFilter
-
-#### slice.ToMap
-
-#### slice.ToMapResolv
-
-#### group.Of
-
-#### group.ByMultiple
-
-#### group.ByMultipleKeys
-
-#### group.ByMultipleValues
 
 ## Maps
 

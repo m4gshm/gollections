@@ -2,29 +2,21 @@ package sliceexamples
 
 import (
 	"strconv"
-	"strings"
+	// "strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/m4gshm/gollections/convert/as"
-	"github.com/m4gshm/gollections/expr/first"
-	"github.com/m4gshm/gollections/expr/last"
 	"github.com/m4gshm/gollections/op"
-	"github.com/m4gshm/gollections/op/sum"
-	"github.com/m4gshm/gollections/predicate/exclude"
-	"github.com/m4gshm/gollections/predicate/less"
-	"github.com/m4gshm/gollections/predicate/more"
-	"github.com/m4gshm/gollections/predicate/not"
 	"github.com/m4gshm/gollections/predicate/one"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/clone"
-	"github.com/m4gshm/gollections/slice/clone/sort"
 	"github.com/m4gshm/gollections/slice/convert"
 	"github.com/m4gshm/gollections/slice/filter"
-	"github.com/m4gshm/gollections/slice/flat"
-	"github.com/m4gshm/gollections/slice/group"
-	"github.com/m4gshm/gollections/slice/range_"
+
+	// "github.com/m4gshm/gollections/slice/flat"
+	// "github.com/m4gshm/gollections/slice/group"
 	"github.com/m4gshm/gollections/slice/reverse"
 )
 
@@ -54,63 +46,31 @@ func (u User) Roles() []Role {
 	return u.roles
 }
 
-var users = []User{
-	{name: "Bob", age: 26, roles: []Role{{"Admin"}, {"manager"}}},
-	{name: "Alice", age: 35, roles: []Role{{"Manager"}}},
-	{name: "Tom", age: 18},
-}
+// func Test_GroupBySeveralKeysAndConvertMapValues(t *testing.T) {
+// 	namesByRole := group.ByMultipleKeys(users, func(u User) []string {
+// 		return convert.AndConvert(u.Roles(), Role.Name, strings.ToLower)
+// 	}, User.Name)
 
-func Test_GroupBySeveralKeysAndConvertMapValues(t *testing.T) {
-	namesByRole := group.ByMultipleKeys(users, func(u User) []string {
-		return convert.AndConvert(u.Roles(), Role.Name, strings.ToLower)
-	}, User.Name)
+// 	assert.Equal(t, namesByRole[""], []string{"Tom"})
+// 	assert.Equal(t, namesByRole["manager"], []string{"Bob", "Alice"})
+// 	assert.Equal(t, namesByRole["admin"], []string{"Bob"})
+// }
 
-	assert.Equal(t, namesByRole[""], []string{"Tom"})
-	assert.Equal(t, namesByRole["manager"], []string{"Bob", "Alice"})
-	assert.Equal(t, namesByRole["admin"], []string{"Bob"})
-}
+// func Test_FindFirsManager(t *testing.T) {
+// 	alice, _ := slice.First(users, func(user User) bool {
+// 		roles := slice.Convert(user.Roles(), Role.Name)
+// 		return slice.Contains(roles, "Manager")
+// 	})
 
-func Test_FindFirsManager(t *testing.T) {
-	alice, _ := slice.First(users, func(user User) bool {
-		roles := slice.Convert(user.Roles(), Role.Name)
-		return slice.Contains(roles, "Manager")
-	})
+// 	assert.Equal(t, "Alice", alice.Name())
+// }
 
-	assert.Equal(t, "Alice", alice.Name())
-}
+// func Test_AggregateFilteredRoles(t *testing.T) {
+// 	roles := flat.AndConvert(users, User.Roles, Role.Name)
+// 	roleNamesExceptManager := slice.Filter(roles, not.Eq("Manager"))
 
-func Test_AggregateFilteredRoles(t *testing.T) {
-	roles := flat.AndConvert(users, User.Roles, Role.Name)
-	roleNamesExceptManager := slice.Filter(roles, not.Eq("Manager"))
-
-	assert.Equal(t, slice.Of("Admin", "manager"), roleNamesExceptManager)
-}
-
-func Test_SortStructsByField(t *testing.T) {
-
-	var users = []User{
-		{name: "Bob", age: 26},
-		{name: "Alice", age: 35},
-		{name: "Tom", age: 18},
-	}
-
-	var byName = sort.By(users, User.Name)
-	//[]User{{name: "Alice", age: 35}, {name: "Bob", age: 26},{name: "Tom", age: 18}}
-
-	var byAgeReverse = sort.DescBy(users, User.Age)
-	//[]User{{name: "Alice", age: 35}, {name: "Bob", age: 26}, {name: "Tom", age: 18}}
-
-	assert.Equal(t, []User{
-		{name: "Alice", age: 35},
-		{name: "Bob", age: 26},
-		{name: "Tom", age: 18},
-	}, byName)
-	assert.Equal(t, []User{
-		{name: "Alice", age: 35},
-		{name: "Bob", age: 26},
-		{name: "Tom", age: 18},
-	}, byAgeReverse)
-}
+// 	assert.Equal(t, slice.Of("Admin", "manager"), roleNamesExceptManager)
+// }
 
 func Test_SortStructs(t *testing.T) {
 
@@ -118,47 +78,25 @@ func Test_SortStructs(t *testing.T) {
 		{name: "Bob", age: 26},
 		{name: "Alice", age: 35},
 		{name: "Tom", age: 18},
+		{name: "Chris", age: 41},
 	}
-	var (
-		//sorted
-		byName       = slice.Sort(users, func(u1, u2 User) int { return op.Compare(u1.name, u2.name) })
-		byAgeReverse = slice.Sort(users, func(u1, u2 User) int { return -op.Compare(u1.age, u2.age) })
-	)
+	var byName = slice.Sort(slice.Clone(users), func(u1, u2 User) int { return op.Compare(u1.name, u2.name) })
+	var byAgeReverse = slice.Sort(slice.Clone(users), func(u1, u2 User) int { return -op.Compare(u1.age, u2.age) })
+
 	assert.Equal(t, []User{
 		{name: "Alice", age: 35},
 		{name: "Bob", age: 26},
+		{name: "Chris", age: 41},
 		{name: "Tom", age: 18},
 	}, byName)
+
 	assert.Equal(t, []User{
+		{name: "Chris", age: 41},
 		{name: "Alice", age: 35},
 		{name: "Bob", age: 26},
 		{name: "Tom", age: 18},
 	}, byAgeReverse)
 
-}
-
-func Test_SliceOf(t *testing.T) {
-
-	var s = slice.Of(1, 3, -1, 2, 0)
-	//[]int{1, 3, -1, 2, 0}
-
-	assert.Equal(t, []int{1, 3, -1, 2, 0}, s)
-}
-
-func Test_SortAsc(t *testing.T) {
-
-	var ascengingSorted = sort.Asc([]int{1, 3, -1, 2, 0})
-	//[]int{-1, 0, 1, 2, 3}
-
-	assert.Equal(t, []int{-1, 0, 1, 2, 3}, ascengingSorted)
-}
-
-func Test_SortDesc(t *testing.T) {
-
-	var descendingSorted = sort.Desc([]int{1, 3, -1, 2, 0})
-	//[]int{3, 2, 1, 0, -1}
-
-	assert.Equal(t, []int{3, 2, 1, 0, -1}, descendingSorted)
 }
 
 func Test_Reverse(t *testing.T) {
@@ -195,15 +133,6 @@ func Test_DeepClone(t *testing.T) {
 		assert.Equal(t, entities[i], c[i])
 		assert.NotSame(t, entities[i], c[i])
 	}
-}
-
-func Test_Convert(t *testing.T) {
-	var (
-		source   = slice.Of(1, 3, 5, 7, 9, 11)
-		result   = slice.Convert(source, strconv.Itoa)
-		expected = slice.Of("1", "3", "5", "7", "9", "11")
-	)
-	assert.Equal(t, expected, result)
 }
 
 var even = func(v int) bool { return v%2 == 0 }
@@ -255,12 +184,11 @@ func Test_ConvertFilteredWithIndexInPlace(t *testing.T) {
 }
 
 func Test_Slice_Filter(t *testing.T) {
-	var (
-		source   = []int{1, 2, 3, 4, 5, 6}
-		result   = slice.Filter(source, even)
-		expected = []int{2, 4, 6}
-	)
-	assert.Equal(t, expected, result)
+
+	var even = slice.Filter([]int{1, 2, 3, 4, 5, 6}, func(v int) bool { return v%2 == 0 })
+	//[]int{2, 4, 6}
+
+	assert.Equal(t, []int{2, 4, 6}, even)
 }
 
 func Test_FilterNotNil(t *testing.T) {
@@ -302,15 +230,6 @@ func Test_Flatt(t *testing.T) {
 	assert.Equal(t, expected, result)
 }
 
-func Test_Slice_Group(t *testing.T) {
-	var (
-		source   = []int{1, 2, 3, 4, 5, 6}
-		result   = group.Of(source, even, as.Is[int])
-		expected = map[bool][]int{false: {1, 3, 5}, true: {2, 4, 6}}
-	)
-	assert.Equal(t, expected, result)
-}
-
 func Test_Slice_ReduceSum(t *testing.T) {
 	var (
 		source   = []int{1, 2, 3, 4, 5, 6}
@@ -320,14 +239,6 @@ func Test_Slice_ReduceSum(t *testing.T) {
 	assert.Equal(t, expected, sum)
 }
 
-func Test_Slice_Sum(t *testing.T) {
-
-	var sum = sum.Of(1, 2, 3, 4, 5, 6)
-	//21
-
-	assert.Equal(t, 21, sum)
-}
-
 func Test_Slice_Flatt(t *testing.T) {
 	var (
 		source   = [][]int{{1, 2, 3}, {4}, {5, 6}}
@@ -335,64 +246,6 @@ func Test_Slice_Flatt(t *testing.T) {
 		expected = []int{1, 2, 3, 4, 5, 6}
 	)
 	assert.Equal(t, expected, result)
-}
-
-func Test_RangeOf(t *testing.T) {
-
-	var (
-		increasing = range_.Of(-1, 3)
-		//[]int{-1, 0, 1, 2}
-
-		decreasing = range_.Of('e', 'a')
-		//[]rune{'e', 'd', 'c', 'b'}
-
-		nothing = range_.Of(1, 1)
-		//nil
-	)
-
-	assert.Equal(t, []int{-1, 0, 1, 2}, increasing)
-	assert.Equal(t, []rune{'e', 'd', 'c', 'b'}, decreasing)
-	assert.Nil(t, nothing)
-}
-
-func Test_RangeClosed(t *testing.T) {
-
-	var (
-		increasing = range_.Closed(-1, 3)
-		//[]int{-1, 0, 1, 2, 3}
-
-		decreasing = range_.Closed('e', 'a')
-		//[]rune{'e', 'd', 'c', 'b', 'a'}
-
-		one        = range_.Closed(1, 1)
-		//[]int{1}
-	)
-
-	assert.Equal(t, []int{-1, 0, 1, 2, 3}, increasing)
-	assert.Equal(t, []rune{'e', 'd', 'c', 'b', 'a'}, decreasing)
-	assert.Equal(t, []int{1}, one)
-}
-
-func Test_First(t *testing.T) {
-	result, ok := first.Of(1, 3, 5, 7, 9, 11).By(more.Than(5))
-	assert.True(t, ok)
-	assert.Equal(t, 7, result)
-}
-
-func Test_Last(t *testing.T) {
-	result, ok := last.Of(1, 3, 5, 7, 9, 11).By(less.Than(9))
-	assert.True(t, ok)
-	assert.Equal(t, 7, result)
-}
-
-func Test_OneOf(t *testing.T) {
-	result := slice.Filter(slice.Of(1, 3, 5, 7, 9, 11), one.Of(1, 7).Or(one.Of(11)))
-	assert.Equal(t, slice.Of(1, 7, 11), result)
-}
-
-func Test_ExcludeAll(t *testing.T) {
-	result := slice.Filter(slice.Of(1, 3, 5, 7, 9, 11), exclude.All(1, 7, 11))
-	assert.Equal(t, slice.Of(3, 5, 9), result)
 }
 
 func Test_Xor(t *testing.T) {

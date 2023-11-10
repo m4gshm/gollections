@@ -408,7 +408,7 @@ func Group[T any, K comparable, V any](next func() (T, bool, error), keyExtracto
 // The valExtractor converts an element to an value.
 func Groupp[T any, K comparable, V any](next func() (T, bool, error), keyExtractor func(T) (K, error), valExtractor func(T) (V, error)) (map[K][]V, error) {
 	return ToMapResolvv(next, keyExtractor, valExtractor, func(ok bool, k K, rv []V, v V) ([]V, error) {
-		return resolv.Append(ok, k, rv, v), nil
+		return resolv.Slice(ok, k, rv, v), nil
 	})
 }
 
