@@ -77,7 +77,7 @@ include::../examples/sliceexamples/sort_Asc_Desc_test.go[lines=13..16,indent=0]
 include::../examples/sliceexamples/clone_sort_By_test.go[lines=9..10,indent=0]
 
 include::../examples/sliceexamples/data_users_test.go[lines=3..10,indent=0]
-include::../examples/sliceexamples/clone_sort_By_test.go[lines=13..16,indent=0]
+include::../examples/sliceexamples/clone_sort_By_test.go[lines=13..19,indent=0]
 ----
 ===== group.Of
 [source,go]

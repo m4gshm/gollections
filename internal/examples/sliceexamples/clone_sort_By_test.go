@@ -11,8 +11,11 @@ import "github.com/m4gshm/gollections/slice/clone/sort"
 
 func Test_SortBy(t *testing.T) {
 
-	var byName = sort.By(users, User.Name) //[{Alice 35 []} {Bob 26 []} {Chris 41 []} {Tom 18 []}]
-	var byAgeReverse = sort.DescBy(users, User.Age) //[{Chris 41 []} {Alice 35 []} {Bob 26 []} {Tom 18 []}]
+	var byName = sort.By(users, User.Name)
+	//[{Alice 35 []} {Bob 26 []} {Chris 41 []} {Tom 18 []}]
+
+	var byAgeReverse = sort.DescBy(users, User.Age)
+	//[{Chris 41 []} {Alice 35 []} {Bob 26 []} {Tom 18 []}]
 
 	assert.Equal(t, []User{
 		{name: "Alice", age: 35},
