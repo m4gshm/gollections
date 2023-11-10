@@ -4,9 +4,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-
-	"github.com/m4gshm/gollections/slice"
 )
+
+import "github.com/m4gshm/gollections/slice"
 
 func Test_SliceOf(t *testing.T) {
 

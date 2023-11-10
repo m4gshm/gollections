@@ -62,7 +62,7 @@ More shortcuts you can find by exploring slices link:./slice[subpackages].
 ===== slice.Of
 [source,go]
 ----
-include::../examples/sliceexamples/slice_Of_test.go[lines=8..8,indent=0]
+include::../examples/sliceexamples/slice_Of_test.go[lines=9..9,indent=0]
 include::../examples/sliceexamples/slice_Of_test.go[lines=12..14,indent=0]
 ----
 ===== sort.Asc, sort.Desc 

@@ -113,7 +113,7 @@ More shortcuts you can find by exploring slices [subpackages](./slice).
 #### slice.Of
 
 ``` go
-"github.com/m4gshm/gollections/slice"
+import "github.com/m4gshm/gollections/slice"
 
 var s = slice.Of(1, 3, -1, 2, 0) //[]int{1, 3, -1, 2, 0}
 ```
