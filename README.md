@@ -74,9 +74,9 @@ assert.Equal(t, "24", result)
 ```
 
 In the example is used only small set of slice functions as
-[slice.Filter](#slice-filter), [Conv](#slice-conv)
-[Convert](./slice/api.go#L166), and [Reduce](#slice-reduce). More you
-can look in the [slice](./slice/api.go) package.
+[slice.Filter](#slicefilter), [slice.Conv](#sliceconv)
+[Convert](./slice/api.go#L166), and [Reduce](#slicereduce). More you can
+look in the [slice](./slice/api.go) package.
 
 ### Shortcut packages
 
@@ -85,7 +85,7 @@ result := sum.Of(filter.AndConvert(data, even, strconv.Itoa))
 ```
 
 This is a shorter version of the previous example that used short
-aliases [sum.Of](#sum-of) and [filter.AndConvert](#filter-andonvert).
+aliases [sum.Of](#sumof) and [filter.AndConvert](#filterandonvert).
 
 #### Brief of usage
 

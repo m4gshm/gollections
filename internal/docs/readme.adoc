@@ -31,7 +31,6 @@ include::../examples/boilerplate/slice_namesbyRole_new_test.go[lines=13..21,inde
 go get -u github.com/m4gshm/gollections
 ----
 
-
 === Slices
 
 [source,go]
@@ -39,7 +38,7 @@ go get -u github.com/m4gshm/gollections
 include::../examples/boilerplate/slice_filter_convert_reduce_test.go[lines=15..22,indent=0]
 ----
 
-In the example is used only small set of slice functions as link:#slice-filter[slice.Filter], link:#slice-conv[Conv] link:./slice/api.go#L166[Convert], and link:#slice-reduce[Reduce]. More you can look in the link:./slice/api.go[slice] package.
+In the example is used only small set of slice functions as link:#slicefilter[slice.Filter], link:#sliceconv[slice.Conv] link:./slice/api.go#L166[Convert], and link:#slicereduce[Reduce]. More you can look in the link:./slice/api.go[slice] package.
 
 ==== Shortcut packages
 
@@ -48,7 +47,7 @@ In the example is used only small set of slice functions as link:#slice-filter[s
 include::../examples/boilerplate/slice_filter_convert_reduce_short_test.go[lines=18..20,indent=0]
 ----
 
-This is a shorter version of the previous example that used short aliases link:#sum-of[sum.Of] and link:#filter-andonvert[filter.AndConvert].
+This is a shorter version of the previous example that used short aliases link:#sumof[sum.Of] and link:#filterandonvert[filter.AndConvert].
 
 ===== Brief of usage
 
