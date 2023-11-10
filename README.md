@@ -131,7 +131,7 @@ var descendingSorted = sort.Desc([]int{1, 3, -1, 2, 0}) //[]int{3, 2, 1, 0, -1}
 #### sort.By, sort.ByDesc
 
 ``` go
-// sorting copied slice API does not change original slice
+// sorting copied slice API does not change the original slice
 import "github.com/m4gshm/gollections/slice/clone/sort" 
 
 // see the User structure above
