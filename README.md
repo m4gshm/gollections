@@ -1,7 +1,7 @@
 # Gollections
 
-Gollections is set of functions for [slices](#slices#), [maps](#maps)
-and additional implementations of data structures such as [ordered
+Gollections is set of functions for [slices](#slices), [maps](#maps) and
+additional implementations of data structures such as [ordered
 map](#mutable-collections) or [set](#mutable-collections) aimed to
 reduce boilerplate code.
 
