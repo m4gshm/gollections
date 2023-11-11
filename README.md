@@ -327,8 +327,6 @@ fmt.Printf("%v\n", copy)      //map[devops:map[name:Bob]]
 ##### map\_.Keys, map\_.Values
 
 ``` go
-import "github.com/m4gshm/gollections/map_"
-
 var employers = map[string]map[string]string{
     "devops": {"name": "Bob"},
     "jun":    {"name": "Tom"},
