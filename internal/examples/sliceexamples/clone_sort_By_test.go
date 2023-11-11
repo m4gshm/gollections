@@ -3,11 +3,10 @@ package sliceexamples
 import (
 	"testing"
 
-	"github.com/m4gshm/gollections/slice/clone/sort"
 	"github.com/stretchr/testify/assert"
-)
 
-// sorting copied slice API does not change the original slice
+	"github.com/m4gshm/gollections/slice/clone/sort"
+)
 
 func Test_SortBy(t *testing.T) {
 

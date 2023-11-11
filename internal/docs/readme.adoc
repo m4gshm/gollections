@@ -74,81 +74,90 @@ include::../examples/sliceexamples/range_Closed_test.go[lines=12..16,indent=0]
 ====== sort.Asc, sort.Desc 
 [source,go]
 ----
-include::../examples/sliceexamples/sort_Asc_Desc_test.go[lines=9..10,indent=0]
-include::../examples/sliceexamples/sort_Asc_Desc_test.go[lines=13..16,indent=0]
+// sorting in-place API
+import "github.com/m4gshm/gollections/slice/sort"
+include::../examples/sliceexamples/sort_Asc_Desc_test.go[lines=12..15,indent=0]
 ----
 ====== sort.By, sort.ByDesc
 [source,go]
 ----
-include::../examples/sliceexamples/clone_sort_By_test.go[lines=9..10,indent=0]
+// sorting copied slice API does not change the original slice
+import "github.com/m4gshm/gollections/slice/clone/sort"
 
 include::../examples/sliceexamples/data_users_test.go[lines=3..10,indent=0]
-include::../examples/sliceexamples/clone_sort_By_test.go[lines=13..19,indent=0]
+include::../examples/sliceexamples/clone_sort_By_test.go[lines=12..18,indent=0]
 ----
 ===== To map converters
 ====== group.Of
 [source,go]
 ----
-include::../examples/sliceexamples/group_Of_test.go[lines=12..16,indent=0]
-include::../examples/sliceexamples/group_Of_test.go[lines=19..27,indent=0]
+import "github.com/m4gshm/gollections/expr/use"
+import "github.com/m4gshm/gollections/slice/group"
+include::../examples/sliceexamples/group_Of_test.go[lines=16..22,indent=0]
 ----
 ====== group.ByMultipleKeys
 [source,go]
 ----
-include::../examples/boilerplate/slice_namesbyRole_new_test.go[lines=9..13,indent=0]
-include::../examples/boilerplate/slice_namesbyRole_new_test.go[lines=16..21,indent=0]
+import "github.com/m4gshm/gollections/slice/convert"
+import "github.com/m4gshm/gollections/slice/group"
+include::../examples/boilerplate/slice_namesbyRole_new_test.go[lines=14..19,indent=0]
 ----
 ====== slice.ToMap, slice.ToMapResolv
 [source,go]
 ----
-include::../examples/sliceexamples/slice_ToMapResolv_test.go[lines=3..3,indent=0]
-include::../examples/sliceexamples/slice_ToMapResolv_test.go[lines=8..11,indent=0]
+import (
+    "github.com/m4gshm/gollections/map_/resolv"
+    "github.com/m4gshm/gollections/op"
+    "github.com/m4gshm/gollections/slice"
+)
 include::../examples/sliceexamples/slice_ToMapResolv_test.go[lines=14..22,indent=0]
 ----
 ===== Reducers
 ====== sum.Of
 [source,go]
 ----
-include::../examples/sliceexamples/sum_Of_test.go[lines=9..9,indent=0]
+import "github.com/m4gshm/gollections/op/sum"
 include::../examples/sliceexamples/sum_Of_test.go[lines=12..14,indent=0]
 ----
 ====== slice.First
 [source,go]
 ----
-include::../examples/sliceexamples/slice_First_test.go[lines=9..12,indent=0]
-include::../examples/sliceexamples/slice_First_test.go[lines=15..17,indent=0]
+import "github.com/m4gshm/gollections/predicate/more"
+import "github.com/m4gshm/gollections/slice"
+include::../examples/sliceexamples/slice_First_test.go[lines=13..15,indent=0]
 ----
 ====== slice.Last
 [source,go]
 ----
-include::../examples/sliceexamples/slice_Last_test.go[lines=9..12,indent=0]
-include::../examples/sliceexamples/slice_Last_test.go[lines=15..17,indent=0]
+import "github.com/m4gshm/gollections/predicate/less"
+import "github.com/m4gshm/gollections/slice"
+include::../examples/sliceexamples/slice_Last_test.go[lines=13..15,indent=0]
 ----
 ===== Converters
 ====== slice.Convert
 [source,go]
 ----
-include::../examples/sliceexamples/slice_Convert_test.go[lines=9..10,indent=0]
 include::../examples/sliceexamples/slice_Convert_test.go[lines=13..16,indent=0]
 ----
 ====== slice.Conv
 [source,go]
 ----
-include::../examples/sliceexamples/slice_Conv_test.go[lines=9..10,indent=0]
 include::../examples/sliceexamples/slice_Conv_test.go[lines=13..16,indent=0]
 ----
 ====== slice.Filter
 [source,go]
 ----
-include::../examples/sliceexamples/slice_Filter.go[lines=3..3,indent=0]
-include::../examples/sliceexamples/slice_Filter.go[lines=8..11,indent=0]
+import "github.com/m4gshm/gollections/predicate/exclude"
+import "github.com/m4gshm/gollections/predicate/one"
+import "github.com/m4gshm/gollections/slice"
 include::../examples/sliceexamples/slice_Filter.go[lines=14..17,indent=0]
 ----
 ====== slice.Flat
 [source,go]
 ----
-include::../examples/sliceexamples/slice_Flat_test.go[lines=9..12,indent=0]
-include::../examples/sliceexamples/slice_Flat_test.go[lines=15..18,indent=0]
+import "github.com/m4gshm/gollections/convert/as"
+import "github.com/m4gshm/gollections/slice"
+include::../examples/sliceexamples/slice_Flat_test.go[lines=13..16,indent=0]
 ----
 ===== Operations chain functions
 * convert.AndReduce, conv.AndReduce 
@@ -163,20 +172,19 @@ These functions combine converters, filters and reducers.
 ====== clone.Of
 [source,go]
 ----
-include::../examples/mapexamples/clone_Of_test.go[lines=3..10,indent=0]
+import "github.com/m4gshm/gollections/map_/clone"
 include::../examples/mapexamples/clone_Of_test.go[lines=13..28,indent=0]
 ----
 ====== clone.Deep
 [source,go]
 ----
-include::../examples/mapexamples/clone_Deep_test.go[lines=3..10,indent=0]
+import "github.com/m4gshm/gollections/map_/clone"
 include::../examples/mapexamples/clone_Deep_test.go[lines=13..30,indent=0]
 ----
 ===== Keys, values exrtractors
 ====== map_.Keys, map_.Values
 [source,go]
 ----
-import "github.com/m4gshm/gollections/map_"
 include::../examples/mapexamples/map_Keys_Values_test.go[lines=15..23,indent=0]
 ----
 ===== Converters

@@ -3,9 +3,10 @@ package sliceexamples
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/m4gshm/gollections/predicate/more"
 	"github.com/m4gshm/gollections/slice"
-	"github.com/stretchr/testify/assert"
 )
 
 func Test_First(t *testing.T) {

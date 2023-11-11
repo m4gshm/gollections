@@ -1,12 +1,12 @@
 package sliceexamples
 
 import (
+	"strconv"
 	"testing"
 
-	"strconv"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/m4gshm/gollections/slice"
-	"github.com/stretchr/testify/assert"
 )
 
 func Test_Conv(t *testing.T) {

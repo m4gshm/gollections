@@ -41,8 +41,8 @@ for _, u := range users {
 Or you can write more compact code using the collections API, like:
 
 ``` go
-   "github.com/m4gshm/gollections/slice/group"
-    "github.com/stretchr/testify/assert"
+   "github.com/m4gshm/gollections/slice/convert"
+    "github.com/m4gshm/gollections/slice/group"
 )
 
 func Test_NamesByRole_New(t *testing.T) {
@@ -125,6 +125,7 @@ assert.Equal(t, []int{-1, 0, 1, 2, 3}, increasing)
 
 ``` go
 // sorting in-place API
+import "github.com/m4gshm/gollections/slice/sort"
 
 var ascendingSorted = sort.Asc([]int{1, 3, -1, 2, 0})   //[]int{-1, 0, 1, 2, 3}
 var descendingSorted = sort.Desc([]int{1, 3, -1, 2, 0}) //[]int{3, 2, 1, 0, -1}
@@ -134,6 +135,7 @@ var descendingSorted = sort.Desc([]int{1, 3, -1, 2, 0}) //[]int{3, 2, 1, 0, -1}
 
 ``` go
 // sorting copied slice API does not change the original slice
+import "github.com/m4gshm/gollections/slice/clone/sort"
 
 // see the User structure above
 var users = []User{
@@ -155,36 +157,26 @@ var byAgeReverse = sort.DescBy(users, User.Age)
 ##### group.Of
 
 ``` go
-   "github.com/m4gshm/gollections/slice/sort"
-)
+import "github.com/m4gshm/gollections/expr/use"
+import "github.com/m4gshm/gollections/slice/group"
 
-func Test_Slice_Group(t *testing.T) {
-
-ageGroups = group.Of(users, func(u User) string {
+var ageGroups = group.Of(users, func(u User) string {
     return use.If(u.age <= 20, "<=20").If(u.age <= 30, "<=30").Else(">30")
 }, as.Is[User])
 
 //map[<=20:[{Tom 18 []}] <=30:[{Bob 26 []}] >30:[{Alice 35 []} {Chris 41 []}]]
-
-assert.Equal(t, slice.Of("Alice", "Chris"), sort.Asc(slice.Convert(ageGroups[">30"], User.Name)))
-assert.Equal(t, slice.Of("Bob"), slice.Convert(ageGroups["<=30"], User.Name))
-assert.Equal(t, slice.Of("Tom"), slice.Convert(ageGroups["<=20"], User.Name))
 ```
 
 ##### group.ByMultipleKeys
 
 ``` go
-   "github.com/m4gshm/gollections/slice/group"
-    "github.com/stretchr/testify/assert"
-)
+import "github.com/m4gshm/gollections/slice/convert"
+import "github.com/m4gshm/gollections/slice/group"
 
-func Test_NamesByRole_New(t *testing.T) {
+var namesByRole = group.ByMultipleKeys(users, func(u User) []string {
     return convert.AndConvert(u.Roles(), Role.Name, strings.ToLower)
 }, User.Name)
 // map[:[Tom] admin:[Bob] manager:[Bob Alice]]
-
-assert.Equal(t, namesByRole[""], []string{"Tom"})
-assert.Equal(t, namesByRole["manager"], []string{"Bob", "Alice"})
 ```
 
 ##### slice.ToMap, slice.ToMapResolv
@@ -210,33 +202,27 @@ ageGroupedSortedNames = slice.ToMapResolv(users, func(u User) string {
 ##### sum.Of
 
 ``` go
-var sum = sum.Of(1, 2, 3, 4, 5, 6) //21
+import "github.com/m4gshm/gollections/op/sum"
 
-assert.Equal(t, 21, sum)
+var sum = sum.Of(1, 2, 3, 4, 5, 6) //21
 ```
 
 ##### slice.First
 
 ``` go
-)
+import "github.com/m4gshm/gollections/predicate/more"
+import "github.com/m4gshm/gollections/slice"
 
-func Test_First(t *testing.T) {
-
-    assert.True(t, ok)
-    assert.Equal(t, 7, result)
-}
+result, ok := slice.First([]int{1, 3, 5, 7, 9, 11}, more.Than(5)) //7, true
 ```
 
 ##### slice.Last
 
 ``` go
-)
+import "github.com/m4gshm/gollections/predicate/less"
+import "github.com/m4gshm/gollections/slice"
 
-func Test_Last(t *testing.T) {
-
-    assert.True(t, ok)
-    assert.Equal(t, 7, result)
-}
+result, ok := slice.Last([]int{1, 3, 5, 7, 9, 11}, less.Than(9)) //7, true
 ```
 
 #### Converters
@@ -244,9 +230,6 @@ func Test_Last(t *testing.T) {
 ##### slice.Convert
 
 ``` go
-   "github.com/stretchr/testify/assert"
-)
-
 var s []string = slice.Convert([]int{1, 3, 5, 7, 9, 11}, strconv.Itoa)
 //[]string{"1", "3", "5", "7", "9", "11"}
 ```
@@ -254,9 +237,6 @@ var s []string = slice.Convert([]int{1, 3, 5, 7, 9, 11}, strconv.Itoa)
 ##### slice.Conv
 
 ``` go
-   "github.com/stretchr/testify/assert"
-)
-
 result, err := slice.Conv(slice.Of("1", "3", "5", "_7", "9", "11"), strconv.Atoi)
 //[]int{1, 3, 5}, ErrSyntax
 ```
@@ -264,11 +244,9 @@ result, err := slice.Conv(slice.Of("1", "3", "5", "_7", "9", "11"), strconv.Atoi
 ##### slice.Filter
 
 ``` go
-import (
-    "github.com/m4gshm/gollections/predicate/exclude"
-    "github.com/m4gshm/gollections/predicate/one"
-    "github.com/m4gshm/gollections/slice"
-)
+import "github.com/m4gshm/gollections/predicate/exclude"
+import "github.com/m4gshm/gollections/predicate/one"
+import "github.com/m4gshm/gollections/slice"
 
 var f1 = slice.Filter([]int{1, 3, 5, 7, 9, 11}, one.Of(1, 7).Or(one.Of(11))) //[]int{1, 7, 11}
 var f2 = slice.Filter([]int{1, 3, 5, 7, 9, 11}, exclude.All(1, 7, 11))       //[]int{3, 5, 9}
@@ -277,13 +255,11 @@ var f2 = slice.Filter([]int{1, 3, 5, 7, 9, 11}, exclude.All(1, 7, 11))       //[
 ##### slice.Flat
 
 ``` go
-)
+import "github.com/m4gshm/gollections/convert/as"
+import "github.com/m4gshm/gollections/slice"
 
-func Test_Slice_Flat(t *testing.T) {
-
-
-    assert.Equal(t, []int{1, 2, 3, 4, 5, 6}, i)
-}
+var i []int = slice.Flat([][]int{{1, 2, 3}, {4}, {5, 6}}, as.Is[[]int])
+//[]int{1, 2, 3, 4, 5, 6}
 ```
 
 #### Operations chain functions
@@ -305,14 +281,7 @@ These functions combine converters, filters and reducers.
 ##### clone.Of
 
 ``` go
-import (
-    "fmt"
-    "testing"
-
-    "github.com/stretchr/testify/assert"
-
-    "github.com/m4gshm/gollections/map_/clone"
-)
+import "github.com/m4gshm/gollections/map_/clone"
 
 var bob = map[string]string{"name": "Bob"}
 var tom = map[string]string{"name": "Tom"}
@@ -333,14 +302,7 @@ fmt.Printf("%v\n", copy)      //map[devops:map[name:Superbob]]
 ##### clone.Deep
 
 ``` go
-import (
-    "fmt"
-    "testing"
-
-    "github.com/stretchr/testify/assert"
-
-    "github.com/m4gshm/gollections/map_/clone"
-)
+import "github.com/m4gshm/gollections/map_/clone"
 
 var bob = map[string]string{"name": "Bob"}
 var tom = map[string]string{"name": "Tom"}

@@ -3,11 +3,10 @@ package sliceexamples
 import (
 	"testing"
 
-	"github.com/m4gshm/gollections/slice/sort"
 	"github.com/stretchr/testify/assert"
-)
 
-// sorting in-place API
+	"github.com/m4gshm/gollections/slice/sort"
+)
 
 func Test_SortAscDesc(t *testing.T) {
 
