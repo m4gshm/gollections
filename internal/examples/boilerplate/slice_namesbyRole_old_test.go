@@ -22,6 +22,7 @@ func Test_NamesByRole_Old(t *testing.T) {
 			}
 		}
 	}
+	//map[:[Tom] admin:[Bob] manager:[Bob Alice]]
 
 	assert.Equal(t, namesByRole[""], []string{"Tom"})
 	assert.Equal(t, namesByRole["manager"], []string{"Bob", "Alice"})

@@ -20,32 +20,6 @@ import (
 	"github.com/m4gshm/gollections/slice/reverse"
 )
 
-type User struct {
-	name  string
-	age   int
-	roles []Role
-}
-
-type Role struct {
-	name string
-}
-
-func (u Role) Name() string {
-	return u.name
-}
-
-func (u User) Name() string {
-	return u.name
-}
-
-func (u User) Age() int {
-	return u.age
-}
-
-func (u User) Roles() []Role {
-	return u.roles
-}
-
 // func Test_GroupBySeveralKeysAndConvertMapValues(t *testing.T) {
 // 	namesByRole := group.ByMultipleKeys(users, func(u User) []string {
 // 		return convert.AndConvert(u.Roles(), Role.Name, strings.ToLower)

@@ -15,13 +15,14 @@ include::../examples/boilerplate/user_data.go[lines=3..-1]
 You can make clear code, extensive, but without dependencies:
 [source,go]
 ----
-include::../examples/boilerplate/slice_namesbyRole_old_test.go[lines=11..30,indent=0]
+include::../examples/boilerplate/slice_namesbyRole_old_test.go[lines=11..26,indent=0]
 ----
 
 Or you can write more compact code using the collections API, like:
 [source,go]
 ----
-include::../examples/boilerplate/slice_namesbyRole_new_test.go[lines=13..21,indent=0]
+include::../examples/boilerplate/slice_namesbyRole_new_test.go[lines=9..13,indent=0]
+include::../examples/boilerplate/slice_namesbyRole_new_test.go[lines=16..21,indent=0]
 ----
 
 === Installation
@@ -85,6 +86,12 @@ include::../examples/sliceexamples/clone_sort_By_test.go[lines=13..19,indent=0]
 include::../examples/sliceexamples/group_Of_test.go[lines=12..16,indent=0]
 include::../examples/sliceexamples/group_Of_test.go[lines=19..27,indent=0]
 ----
+===== group.ByMultipleKeys
+[source,go]
+----
+include::../examples/boilerplate/slice_namesbyRole_new_test.go[lines=9..13,indent=0]
+include::../examples/boilerplate/slice_namesbyRole_new_test.go[lines=16..21,indent=0]
+----
 ===== slice.ToMap, slice.ToMapResolv
 [source,go]
 ----
@@ -110,17 +117,17 @@ include::../examples/sliceexamples/range_Of_test.go[lines=12..16,indent=0]
 include::../examples/sliceexamples/range_Closed_test.go[lines=9..9,indent=0]
 include::../examples/sliceexamples/range_Closed_test.go[lines=12..16,indent=0]
 ----
-===== first.Of
+===== slice.First
 [source,go]
 ----
-include::../examples/expressionexamples/first_Of_test.go[lines=9..12,indent=0]
-include::../examples/expressionexamples/first_Of_test.go[lines=15..17,indent=0]
+include::../examples/sliceexamples/slice_First_test.go[lines=9..12,indent=0]
+include::../examples/sliceexamples/slice_First_test.go[lines=15..17,indent=0]
 ----
-===== last.Of
+===== slice.Last
 [source,go]
 ----
-include::../examples/expressionexamples/last_Of_test.go[lines=9..12,indent=0]
-include::../examples/expressionexamples/last_Of_test.go[lines=15..17,indent=0]
+include::../examples/sliceexamples/slice_Last_test.go[lines=9..12,indent=0]
+include::../examples/sliceexamples/slice_Last_test.go[lines=15..17,indent=0]
 ----
 
 ===== slice.Convert
@@ -150,23 +157,32 @@ include::../examples/sliceexamples/slice_Filter.go[lines=14..17,indent=0]
 ===== convert.AndFilter
 ===== filter.AndConvert
 
-
 === Maps
-
 [source,go]
 ----
 include::../examples/boilerplate/map_filter_convert_reduce_test.go[lines=16..45,indent=0]
 ----
-
-More shortcuts are link:./map_[here].
-
-==== Main map functions (TODO)
-
-* creating - map_.Of, clone.Of, map_.DeepClone
-* extract keys, values - map_.Keys, map_.Values
-* converting, filtering, summarizing - map_.Convert, map_.ConvertKeys, map_.ConvertValues, map_.ToSlice, map_.Reduce
-* versions of aboves with possible result errors - map_.Conv
-
+==== Main map functions
+===== clone.Of
+[source,go]
+----
+include::../examples/mapexamples/clone_Of_test.go[lines=3..10,indent=0]
+include::../examples/mapexamples/clone_Of_test.go[lines=13..39,indent=0]
+----
+===== map_.DeepClone
+[source,go]
+----
+include::../examples/mapexamples/clone_Deep_test.go[lines=3..10,indent=0]
+include::../examples/mapexamples/clone_Deep_test.go[lines=13..40,indent=0]
+----
+===== map_.Keys
+===== map_.Values
+===== map_.Convert
+===== map_.Conv
+===== map_.ConvertKeys
+===== map_.ConvertValues
+===== map_.ToSlice
+===== map_.Reduce
 
 === Data structures
 
