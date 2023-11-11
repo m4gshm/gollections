@@ -35,16 +35,6 @@ func Test_DeepClone(t *testing.T) {
 	}
 }
 
-func Test_Keys(t *testing.T) {
-	keys := map_.Keys(entities)
-	assert.Equal(t, slice.Of(1, 2, 3), sort.Asc(keys))
-}
-
-func Test_Values(t *testing.T) {
-	values := map_.Values(entities)
-	assert.Equal(t, slice.Of(&first, &second, &third), sort.By(values, func(e *entity) string { return e.val }))
-}
-
 func Test_ConvertValues(t *testing.T) {
 	var strValues map[int]string = map_.ConvertValues(entities, func(e *entity) string {
 		return e.val

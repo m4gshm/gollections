@@ -16,24 +16,21 @@ func Test_Clone(t *testing.T) {
 
 	var employers = map[string]map[string]string{
 		"devops": bob,
-		"":       tom,
+		"jun":    tom,
 	}
 
 	copy := clone.Of(employers)
-	delete(copy, "")
-	copy["jun"] = tom
+	delete(copy, "jun")
 	bob["name"] = "Superbob"
 
-	fmt.Printf("src  %v\n", employers) //src  map[:map[name:Tom] devops:map[name:Superbob]]
-	fmt.Printf("copy %v\n", copy)      //copy map[devops:map[name:Superbob] jun:map[name:Tom]]
+	fmt.Printf("%v\n", employers) //map[devops:map[name:Superbob] jun:map[name:Tom]]
+	fmt.Printf("%v\n", copy)      //map[devops:map[name:Superbob]]
 
 	assert.NotSame(t, copy, employers)
+
 	assert.Equal(t, "Superbob", copy["devops"]["name"])
 
-	assert.Contains(t, employers, "")
-	assert.NotContains(t, employers, "jun")
-
-	assert.NotContains(t, copy, "")
-	assert.Contains(t, copy, "jun")
+	assert.Contains(t, employers, "jun")
+	assert.NotContains(t, copy, "jun")
 
 }

@@ -3,11 +3,11 @@ package sliceexamples
 import (
 	"testing"
 
+	"strconv"
+
+	"github.com/m4gshm/gollections/slice"
 	"github.com/stretchr/testify/assert"
 )
-
-import "strconv"
-import "github.com/m4gshm/gollections/slice"
 
 func Test_Conv(t *testing.T) {
 
@@ -15,6 +15,5 @@ func Test_Conv(t *testing.T) {
 	//[]int{1, 3, 5}, ErrSyntax
 
 	assert.Equal(t, slice.Of(1, 3, 5), result)
-	assert.ErrorIs(t,  err, strconv.ErrSyntax)
+	assert.ErrorIs(t, err, strconv.ErrSyntax)
 }
-

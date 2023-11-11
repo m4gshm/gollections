@@ -3,11 +3,11 @@ package sliceexamples
 import (
 	"testing"
 
+	"strconv"
+
+	"github.com/m4gshm/gollections/slice"
 	"github.com/stretchr/testify/assert"
 )
-
-import "strconv"
-import "github.com/m4gshm/gollections/slice"
 
 func Test_Convert(t *testing.T) {
 

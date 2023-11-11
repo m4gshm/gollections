@@ -7,7 +7,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/m4gshm/gollections/convert/as"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/predicate/one"
 	"github.com/m4gshm/gollections/slice"
@@ -195,15 +194,6 @@ func Test_ConvertNotnilPointersToValues(t *testing.T) {
 	assert.Equal(t, expected, result)
 }
 
-func Test_Flatt(t *testing.T) {
-	var (
-		source   = [][]int{{1, 2, 3}, {4}, {5, 6}}
-		result   = slice.Flat(source, as.Is[[]int])
-		expected = []int{1, 2, 3, 4, 5, 6}
-	)
-	assert.Equal(t, expected, result)
-}
-
 func Test_Slice_ReduceSum(t *testing.T) {
 	var (
 		source   = []int{1, 2, 3, 4, 5, 6}
@@ -211,15 +201,6 @@ func Test_Slice_ReduceSum(t *testing.T) {
 		expected = 1 + 2 + 3 + 4 + 5 + 6
 	)
 	assert.Equal(t, expected, sum)
-}
-
-func Test_Slice_Flatt(t *testing.T) {
-	var (
-		source   = [][]int{{1, 2, 3}, {4}, {5, 6}}
-		result   = slice.Flat(source, as.Is[[]int])
-		expected = []int{1, 2, 3, 4, 5, 6}
-	)
-	assert.Equal(t, expected, result)
 }
 
 func Test_Xor(t *testing.T) {

@@ -319,7 +319,7 @@ func Benchmark_Flatt_Convert_AsIs(b *testing.B) {
 	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
 
 	for i := 0; i < b.N; i++ {
-		_ = slice.FlattAndConvert(md, func(i []int) []int { return i }, as.Is[int])
+		_ = slice.FlatAndConvert(md, func(i []int) []int { return i }, as.Is[int])
 	}
 }
 

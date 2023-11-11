@@ -3,10 +3,9 @@ package sliceexamples
 import (
 	"testing"
 
+	"github.com/m4gshm/gollections/slice"
 	"github.com/stretchr/testify/assert"
 )
-
-import "github.com/m4gshm/gollections/slice"
 
 func Test_SliceOf(t *testing.T) {
 

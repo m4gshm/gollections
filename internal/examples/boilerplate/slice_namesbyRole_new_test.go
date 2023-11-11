@@ -3,13 +3,11 @@ package boilerplate
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-)
-
-import (
 	"strings"
+
 	"github.com/m4gshm/gollections/slice/convert"
 	"github.com/m4gshm/gollections/slice/group"
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_NamesByRole_New(t *testing.T) {

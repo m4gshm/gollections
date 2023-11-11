@@ -3,10 +3,9 @@ package sliceexamples
 import (
 	"testing"
 
+	"github.com/m4gshm/gollections/op/sum"
 	"github.com/stretchr/testify/assert"
 )
-
-import "github.com/m4gshm/gollections/op/sum"
 
 func Test_Slice_Sum(t *testing.T) {
 

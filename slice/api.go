@@ -311,7 +311,7 @@ func ConvertCheckIndexed[FS ~[]From, From, To any](elements FS, by func(index in
 }
 
 // Flat unfolds the n-dimensional slice into a n-1 dimensional slice
-func Flat[FS ~[]From, From, To any](elements FS, flattener func(From) []To) []To {
+func Flat[FS ~[]From, From any, TS ~[]To, To any](elements FS, flattener func(From) TS) []To {
 	if elements == nil {
 		return nil
 	}
@@ -340,8 +340,8 @@ func Flatt[FS ~[]From, From, To any](elements FS, flattener func(From) ([]To, er
 	return result, nil
 }
 
-// FlattAndConvert unfolds the n-dimensional slice into a n-1 dimensional slice and converts the elements
-func FlattAndConvert[FS ~[]From, From, I, To any](elements FS, flattener func(From) []I, convert func(I) To) []To {
+// FlatAndConvert unfolds the n-dimensional slice into a n-1 dimensional slice and converts the elements
+func FlatAndConvert[FS ~[]From, From any, IS ~[]I, I, To any](elements FS, flattener func(From) IS, convert func(I) To) []To {
 	if elements == nil {
 		return nil
 	}
