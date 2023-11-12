@@ -188,12 +188,31 @@ include::../examples/mapexamples/clone_Deep_test.go[lines=13..30,indent=0]
 include::../examples/mapexamples/map_Keys_Values_test.go[lines=15..23,indent=0]
 ----
 ===== Converters
+====== map_.ConvertKeys
+[source,go]
+----
+include::../examples/mapexamples/map_ConvertKeys_test.go[lines=17..22,indent=0]
+----
+====== map_.ConvertValues
+[source,go]
+----
+include::../examples/mapexamples/map_ConvertValues_test.go[lines=17..22,indent=0]
+----
 ====== map_.Convert
+[source,go]
+----
+include::../examples/mapexamples/map_Convert_test.go[lines=17..22,indent=0]
+----
 ====== map_.Conv
-====== map_.ConvertKeys, map_.ConvertValues
+[source,go]
+----
+include::../examples/mapexamples/map_Conv_test.go[lines=17..22,indent=0]
+----
 ====== map_.ToSlice
-===== Reducers
-====== map_.Reduce
+[source,go]
+----
+include::../examples/mapexamples/map_ToSlice_test.go[lines=19..24,indent=0]
+----
 
 === Data structures
 ==== link:./collection/mutable/api.go[mutable] and link:./collection/immutable/api.go[immutable] collections
@@ -213,7 +232,9 @@ Provides predicate builder api that used for filtering collection elements.
 
 [source,go]
 ----
-include::../examples/boilerplate/predicate_test.go[lines=17..20,indent=0]
+import "github.com/m4gshm/gollections/predicate/where"
+import "github.com/m4gshm/gollections/slice"
+include::../examples/boilerplate/predicate_test.go[lines=16..18,indent=0]
 ----
 [#loop]
 ==== link:./loop/api.go[loop], link:./kv/loop/api.go[kv/loop] and breakable versions link:./break/loop/api.go[break/loop], link:./break/kv/loop/api.go[break/kv/loop]
@@ -247,7 +268,7 @@ It is used for computations where an error may occur.
 include::../examples/loop/breakloop/loop_filter_convert_reduce_test.go[lines=17..22,indent=0]
 ----
 
-==== Expressions: link:./expr/use/api.go[use], link:./expr/get/api.go[get], link:./expr/first/api.go[first], link:./expr/last/api.go[last]
+==== Expressions: link:./expr/use/api.go[use.If], link:./expr/get/api.go[get.If], link:#firstof[first.Of], link:#lastof[last.Of]
 
 Aimed to evaluate a value using conditions. May cause to make code shorter by not in all cases. +
 As example:
@@ -264,6 +285,20 @@ instead of:
 include::../examples/boilerplate/expr_use_test.go[lines=27..38,indent=0]
 ----
 
+===== first.Of
+[source,go]
+----
+import "github.com/m4gshm/gollections/expr/first"
+import "github.com/m4gshm/gollections/predicate/more"
+include::../examples/expressionexamples/first_Of_test.go[lines=13..15,indent=0]
+----
+===== last.Of
+[source,go]
+----
+import "github.com/m4gshm/gollections/expr/last"
+import "github.com/m4gshm/gollections/predicate/less"
+include::../examples/expressionexamples/last_Of_test.go[lines=13..15,indent=0]
+----
 
 === Mutable collections
 

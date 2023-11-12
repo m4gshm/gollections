@@ -338,17 +338,50 @@ values := map_.Values(employers) //[map[name:Bob] map[name:Tom]]
 
 #### Converters
 
+##### map\_.ConvertKeys
+
+``` go
+var keys = map_.ConvertKeys(employers, func(title string) string {
+    return string([]rune(title)[0])
+})
+//map[d:map[name:Bob] j:map[name:Tom]]
+```
+
+##### map\_.ConvertValues
+
+``` go
+var vals = map_.ConvertValues(employers, func(employer map[string]string) string {
+    return employer["name"]
+})
+//map[devops:Bob jun:Tom]
+```
+
 ##### map\_.Convert
+
+``` go
+var all = map_.Convert(employers, func(title string, employer map[string]string) (string, string) {
+    return string([]rune(title)[0]), employer["name"]
+})
+//map[d:Bob j:Tom]
+```
 
 ##### map\_.Conv
 
-##### map\_.ConvertKeys, map\_.ConvertValues
+``` go
+var all, err = map_.Conv(employers, func(title string, employer map[string]string) (string, string, error) {
+    return string([]rune(title)[0]), employer["name"], nil
+})
+//map[d:Bob j:Tom], nil
+```
 
 ##### map\_.ToSlice
 
-#### Reducers
-
-##### map\_.Reduce
+``` go
+var users = map_.ToSlice(employers, func(title string, employer map[string]string) User {
+    return User{name: employer["name"], roles: []Role{{name: title}}}
+})
+//[{name:Bob age:0 roles:[{name:devops}]} {name:Tom age:0 roles:[{name:jun}]}]
+```
 
 ## Data structures
 
@@ -371,9 +404,10 @@ Provides predicate builder api that used for filtering collection
 elements.
 
 ``` go
-bob, _ := slice.First(users, where.Eq(User.Name, "Bob"))
+import "github.com/m4gshm/gollections/predicate/where"
+import "github.com/m4gshm/gollections/slice"
 
-assert.Equal(t, "Bob", bob.Name())
+bob, _ := slice.First(users, where.Eq(User.Name, "Bob"))
 ```
 
 ### [loop](./loop/api.go), [kv/loop](./kv/loop/api.go) and breakable versions [break/loop](./break/loop/api.go), [break/kv/loop](./break/kv/loop/api.go)
@@ -420,7 +454,7 @@ assert.Equal(t, []int{1, 2, 3}, result)
 assert.ErrorContains(t, err, "invalid syntax")
 ```
 
-### Expressions: [use](./expr/use/api.go), [get](./expr/get/api.go), [first](./expr/first/api.go), [last](./expr/last/api.go)
+### Expressions: [use.If](./expr/use/api.go), [get.If](./expr/get/api.go), [first.Of](#firstof), [last.Of](#lastof)
 
 Aimed to evaluate a value using conditions. May cause to make code
 shorter by not in all cases.  
@@ -448,6 +482,24 @@ if len(user.surname) == 0 {
 }
 
 assert.Equal(t, "Bob Smith", fullName)
+```
+
+#### first.Of
+
+``` go
+import "github.com/m4gshm/gollections/expr/first"
+import "github.com/m4gshm/gollections/predicate/more"
+
+result, ok := first.Of(1, 3, 5, 7, 9, 11).By(more.Than(5)) //7, true
+```
+
+#### last.Of
+
+``` go
+import "github.com/m4gshm/gollections/expr/last"
+import "github.com/m4gshm/gollections/predicate/less"
+
+result, ok := last.Of(1, 3, 5, 7, 9, 11).By(less.Than(9)) //7, true
 ```
 
 ## Mutable collections

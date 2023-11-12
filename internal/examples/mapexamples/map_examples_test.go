@@ -35,15 +35,7 @@ func Test_DeepClone(t *testing.T) {
 	}
 }
 
-func Test_ConvertValues(t *testing.T) {
-	var strValues map[int]string = map_.ConvertValues(entities, func(e *entity) string {
-		return e.val
-	})
 
-	assert.Equal(t, "1_first", strValues[1])
-	assert.Equal(t, "2_second", strValues[2])
-	assert.Equal(t, "3_third", strValues[3])
-}
 
 func Test_ValuesConverted(t *testing.T) {
 	var values []string = map_.ValuesConverted(entities, func(e *entity) string { return e.val })

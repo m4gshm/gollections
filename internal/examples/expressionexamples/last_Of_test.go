@@ -3,9 +3,10 @@ package sliceexamples
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/m4gshm/gollections/expr/last"
 	"github.com/m4gshm/gollections/predicate/less"
-	"github.com/stretchr/testify/assert"
 )
 
 func Test_Last(t *testing.T) {
