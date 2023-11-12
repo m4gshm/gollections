@@ -56,7 +56,7 @@ This is a shorter version of the previous example that used short aliases link:#
 ====== slice.Of
 [source,go]
 ----
-include::../examples/sliceexamples/slice_Of_test.go[lines=12..14,indent=0]
+include::../examples/sliceexamples/slice_Of_test.go[lines=11..13,indent=0]
 ----
 ====== range_.Of
 [source,go]

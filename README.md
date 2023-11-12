@@ -92,8 +92,6 @@ find by exploring slices [subpackages](./slice).
 
 ``` go
 var s = slice.Of(1, 3, -1, 2, 0) //[]int{1, 3, -1, 2, 0}
-
-assert.Equal(t, []int{1, 3, -1, 2, 0}, s)
 ```
 
 ##### range\_.Of
