@@ -468,14 +468,12 @@ shorter by not in all cases.
 As example:
 
 ``` go
-func Test_UseSimple(t *testing.T) {
+user := User{name: "Bob", surname: "Smith"}
 
-    user := User{name: "Bob", surname: "Smith"}
+fullName := use.If(len(user.surname) == 0, user.name).If(len(user.name) == 0, user.surname).
+    ElseGet(func() string { return user.name + " " + user.surname })
 
-    fullName := use.If(len(user.surname) == 0, user.name).If(len(user.name) == 0, user.surname).
-        ElseGet(func() string { return user.name + " " + user.surname })
-
-    assert.Equal(t, "Bob Smith", fullName)
+assert.Equal(t, "Bob Smith", fullName)
 ```
 
 instead of:

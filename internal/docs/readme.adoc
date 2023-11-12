@@ -282,7 +282,7 @@ As example:
 
 [source,go]
 ----
-include::../examples/boilerplate/expr_use_test.go[lines=14..21,indent=0]
+include::../examples/boilerplate/expr_use_test.go[lines=15..22,indent=0]
 ----
 
 instead of:
