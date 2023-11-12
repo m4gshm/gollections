@@ -51,7 +51,7 @@ include::../examples/boilerplate/slice_filter_convert_reduce_short_test.go[lines
 
 This is a shorter version of the previous example that used short aliases link:#sumof[sum.Of] and link:#operations-chain-functions[filter.AndConvert]. More shortcuts you can find by exploring slices link:./slice[subpackages].
 
-*Be careful* when use several slice functions subsequently like [source,go]`slice.Filter(slice.Convert(...))`. This can lead to unnecessary RAM consumption. Consider link:#operations-chain-functions[chain functions] instead or link:#additional-api[loop] for delayed operations.
+*Be careful* when use several slice functions subsequently like [source,go]`slice.Filter(slice.Convert(...))`. This can lead to unnecessary RAM consumption. Consider link:#operations-chain-functions[chain functions] instead, link:#additional-api[loop] or link:#collection-functions[collections] for delayed operations.
 
 ==== Main slice functions
 ===== Instantiators
@@ -354,9 +354,9 @@ The same underlying interfaces but for read-only use cases.
 
 There are three groups of operations:
 
-* Immediate - retrieves the result in place (link:./collection/mutable/vector.go#L322[Sort], link:./collection/immutable/vector.go#L154[Reduce], link:./collection/immutable/vector.go#L111[Track], link:./collection/mutable/ordered/map.go#L182[TrackEach], link:./collection/immutable/vector.go#L122[For], link:./collection/immutable/ordered/map.go#L175[ForEach])
-* Intermediate - only defines a computation (link:./collection/api.go#L17[Convert], link:./collection/immutable/ordered/set.go#L124[Filter], link:./collection/api.go#L36[Flatt], link:./collection/api.go#L69[Group]).
-* Final - applies intermediates and retrieves a result (link:./collection/api.go#L75[First], link:./collection/immutable/ordered/set.go#L94[Slice], link:./collection/immutable/ordered/set.go#L146[Reduce])
+* Immediate - retrieves the result in place (link:./collection/mutable/vector.go#L322[Sort], link:./collection/immutable/vector.go#L152[Reduce], link:./collection/immutable/vector.go#L109[Track], link:./collection/mutable/ordered/map.go#L155[TrackEach], link:./collection/immutable/vector.go#L120[For], link:./collection/immutable/ordered/map.go#L151[ForEach])
+* Intermediate - only defines a computation (link:./collection/api.go#22[Convert], link:./collection/immutable/ordered/set.go#L108[Filter], link:./collection/api.go#L41[Flat], link:./collection/api.go#L182[Group]).
+* Final - applies intermediates and retrieves a result (link:./collection/api.go#L188[First], link:./collection/immutable/ordered/set.go#L78[Slice], link:./collection/stream/iter.go#L76[Reduce]).
 
 Intermediates should wrap one by one to make a lazy computation chain that can be applied to the latest final operation.
 

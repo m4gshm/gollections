@@ -87,7 +87,8 @@ find by exploring slices [subpackages](./slice).
 **Be careful** when use several slice functions subsequently like
 `slice.Filter(slice.Convert(…​))`. This can lead to unnecessary RAM
 consumption. Consider [chain functions](#operations-chain-functions)
-instead or [loop](#additional-api) for delayed operations.
+instead, [loop](#additional-api) or [collections](#collection-functions)
+for delayed operations.
 
 ### Main slice functions
 
@@ -569,21 +570,21 @@ There are three groups of operations:
 
 - Immediate - retrieves the result in place
   ([Sort](./collection/mutable/vector.go#L322),
-  [Reduce](./collection/immutable/vector.go#L154),
-  [Track](./collection/immutable/vector.go#L111),
-  [TrackEach](./collection/mutable/ordered/map.go#L182),
-  [For](./collection/immutable/vector.go#L122),
-  [ForEach](./collection/immutable/ordered/map.go#L175))
+  [Reduce](./collection/immutable/vector.go#L152),
+  [Track](./collection/immutable/vector.go#L109),
+  [TrackEach](./collection/mutable/ordered/map.go#L155),
+  [For](./collection/immutable/vector.go#L120),
+  [ForEach](./collection/immutable/ordered/map.go#L151))
 
 - Intermediate - only defines a computation
-  ([Convert](./collection/api.go#L17),
-  [Filter](./collection/immutable/ordered/set.go#L124),
-  [Flatt](./collection/api.go#L36), [Group](./collection/api.go#L69)).
+  ([Convert](./collection/api.go#22),
+  [Filter](./collection/immutable/ordered/set.go#L108),
+  [Flat](./collection/api.go#L41), [Group](./collection/api.go#L182)).
 
 - Final - applies intermediates and retrieves a result
-  ([First](./collection/api.go#L75),
-  [Slice](./collection/immutable/ordered/set.go#L94),
-  [Reduce](./collection/immutable/ordered/set.go#L146))
+  ([First](./collection/api.go#L188),
+  [Slice](./collection/immutable/ordered/set.go#L78),
+  [Reduce](./collection/stream/iter.go#L76)).
 
 Intermediates should wrap one by one to make a lazy computation chain
 that can be applied to the latest final operation.
