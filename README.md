@@ -41,17 +41,13 @@ for _, u := range users {
 Or you can write more compact code using the collections API, like:
 
 ``` go
-   "github.com/m4gshm/gollections/slice/convert"
-    "github.com/m4gshm/gollections/slice/group"
-)
+import "github.com/m4gshm/gollections/slice/convert"
+import "github.com/m4gshm/gollections/slice/group"
 
-func Test_NamesByRole_New(t *testing.T) {
+var namesByRole = group.ByMultipleKeys(users, func(u User) []string {
     return convert.AndConvert(u.Roles(), Role.Name, strings.ToLower)
 }, User.Name)
 // map[:[Tom] admin:[Bob] manager:[Bob Alice]]
-
-assert.Equal(t, namesByRole[""], []string{"Tom"})
-assert.Equal(t, namesByRole["manager"], []string{"Bob", "Alice"})
 ```
 
 ## Installation
@@ -74,8 +70,8 @@ assert.Equal(t, "24", result)
 
 In the example is used only small set of slice functions as
 [slice.Filter](#slicefilter), [slice.Conv](#sliceconv)
-[Convert](./slice/api.go#L166), and [Reduce](#slicereduce). More you can
-look in the [slice](./slice/api.go) package.
+[slice.Convert](#sliceconvert#), and [slice.Reduce](#slicereduce). More
+you can look in the [slice](./slice/api.go) package.
 
 ### Shortcut packages
 
@@ -84,8 +80,9 @@ result := sum.Of(filter.AndConvert(data, even, strconv.Itoa))
 ```
 
 This is a shorter version of the previous example that used short
-aliases [sum.Of](#sumof) and [filter.AndConvert](#filterandonvert). More
-shortcuts you can find by exploring slices [subpackages](./slice).
+aliases [sum.Of](#sumof) and
+[filter.AndConvert](#operations-chain-functions). More shortcuts you can
+find by exploring slices [subpackages](./slice).
 
 ### Main slice functions
 
@@ -102,11 +99,11 @@ assert.Equal(t, []int{1, 3, -1, 2, 0}, s)
 ##### range\_.Of
 
 ``` go
+import "github.com/m4gshm/gollections/slice/range_"
+
 var increasing = range_.Of(-1, 3)    //[]int{-1, 0, 1, 2}
 var decreasing = range_.Of('e', 'a') //[]rune{'e', 'd', 'c', 'b'}
 var nothing = range_.Of(1, 1)        //nil
-
-assert.Equal(t, []int{-1, 0, 1, 2}, increasing)
 ```
 
 ##### range\_.Closed
@@ -115,8 +112,6 @@ assert.Equal(t, []int{-1, 0, 1, 2}, increasing)
 var increasing = range_.Closed(-1, 3)    //[]int{-1, 0, 1, 2, 3}
 var decreasing = range_.Closed('e', 'a') //[]rune{'e', 'd', 'c', 'b', 'a'}
 var one = range_.Closed(1, 1)            //[]int{1}
-
-assert.Equal(t, []int{-1, 0, 1, 2, 3}, increasing)
 ```
 
 #### Sorters
@@ -205,6 +200,12 @@ ageGroupedSortedNames = slice.ToMapResolv(users, func(u User) string {
 import "github.com/m4gshm/gollections/op/sum"
 
 var sum = sum.Of(1, 2, 3, 4, 5, 6) //21
+```
+
+##### slice.Reduce
+
+``` go
+var sum = slice.Reduce([]int{1, 2, 3, 4, 5, 6}, func(i1, i2 int) int { return i1 + i2 })
 ```
 
 ##### slice.First
@@ -461,17 +462,21 @@ shorter by not in all cases.
 As example:
 
 ``` go
-user := User{name: "Bob", surname: "Smith"}
+func Test_UseSimple(t *testing.T) {
 
-fullName := use.If(len(user.surname) == 0, user.name).If(len(user.name) == 0, user.surname).
-    ElseGet(func() string { return user.name + " " + user.surname })
+    user := User{name: "Bob", surname: "Smith"}
 
-assert.Equal(t, "Bob Smith", fullName)
+    fullName := use.If(len(user.surname) == 0, user.name).If(len(user.name) == 0, user.surname).
+        ElseGet(func() string { return user.name + " " + user.surname })
+
+    assert.Equal(t, "Bob Smith", fullName)
 ```
 
 instead of:
 
 ``` go
+user := User{name: "Bob", surname: "Smith"}
+
 fullName := ""
 if len(user.surname) == 0 {
     fullName = user.name

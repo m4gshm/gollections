@@ -3,8 +3,9 @@ package sliceexamples
 import (
 	"testing"
 
-	"github.com/m4gshm/gollections/slice/range_"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/m4gshm/gollections/slice/range_"
 )
 
 func Test_RangeClosed(t *testing.T) {

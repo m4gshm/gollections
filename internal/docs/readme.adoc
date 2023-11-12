@@ -21,8 +21,9 @@ include::../examples/boilerplate/slice_namesbyRole_old_test.go[lines=11..26,inde
 Or you can write more compact code using the collections API, like:
 [source,go]
 ----
-include::../examples/boilerplate/slice_namesbyRole_new_test.go[lines=9..13,indent=0]
-include::../examples/boilerplate/slice_namesbyRole_new_test.go[lines=16..21,indent=0]
+import "github.com/m4gshm/gollections/slice/convert"
+import "github.com/m4gshm/gollections/slice/group"
+include::../examples/boilerplate/slice_namesbyRole_new_test.go[lines=14..19,indent=0]
 ----
 
 === Installation
@@ -39,7 +40,7 @@ go get -u github.com/m4gshm/gollections
 include::../examples/boilerplate/slice_filter_convert_reduce_test.go[lines=15..22,indent=0]
 ----
 
-In the example is used only small set of slice functions as link:#slicefilter[slice.Filter], link:#sliceconv[slice.Conv] link:./slice/api.go#L166[Convert], and link:#slicereduce[Reduce]. More you can look in the link:./slice/api.go[slice] package.
+In the example is used only small set of slice functions as link:#slicefilter[slice.Filter], link:#sliceconv[slice.Conv] link:#sliceconvert#[slice.Convert], and link:#slicereduce[slice.Reduce]. More you can look in the link:./slice/api.go[slice] package.
 
 ==== Shortcut packages
 
@@ -48,26 +49,24 @@ In the example is used only small set of slice functions as link:#slicefilter[sl
 include::../examples/boilerplate/slice_filter_convert_reduce_short_test.go[lines=18..20,indent=0]
 ----
 
-This is a shorter version of the previous example that used short aliases link:#sumof[sum.Of] and link:#filterandonvert[filter.AndConvert]. More shortcuts you can find by exploring slices link:./slice[subpackages].
+This is a shorter version of the previous example that used short aliases link:#sumof[sum.Of] and link:#operations-chain-functions[filter.AndConvert]. More shortcuts you can find by exploring slices link:./slice[subpackages].
 
 ==== Main slice functions
 ===== Instantiators
 ====== slice.Of
 [source,go]
 ----
-include::../examples/sliceexamples/slice_Of_test.go[lines=9..9,indent=0]
 include::../examples/sliceexamples/slice_Of_test.go[lines=12..14,indent=0]
 ----
 ====== range_.Of
 [source,go]
 ----
-include::../examples/sliceexamples/range_Of_test.go[lines=9..9,indent=0]
-include::../examples/sliceexamples/range_Of_test.go[lines=12..16,indent=0]
+import "github.com/m4gshm/gollections/slice/range_"
+include::../examples/sliceexamples/range_Of_test.go[lines=11..15,indent=0]
 ----
 ====== range_.Closed
 [source,go]
 ----
-include::../examples/sliceexamples/range_Closed_test.go[lines=9..9,indent=0]
 include::../examples/sliceexamples/range_Closed_test.go[lines=12..16,indent=0]
 ----
 ===== Sorters
@@ -118,6 +117,11 @@ include::../examples/sliceexamples/slice_ToMapResolv_test.go[lines=14..22,indent
 ----
 import "github.com/m4gshm/gollections/op/sum"
 include::../examples/sliceexamples/sum_Of_test.go[lines=12..14,indent=0]
+----
+====== slice.Reduce
+[source,go]
+----
+include::../examples/sliceexamples/slice_Reduce_test.go[lines=12..14,indent=0]
 ----
 ====== slice.First
 [source,go]

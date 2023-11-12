@@ -194,15 +194,6 @@ func Test_ConvertNotnilPointersToValues(t *testing.T) {
 	assert.Equal(t, expected, result)
 }
 
-func Test_Slice_ReduceSum(t *testing.T) {
-	var (
-		source   = []int{1, 2, 3, 4, 5, 6}
-		sum      = slice.Reduce(source, op.Sum[int])
-		expected = 1 + 2 + 3 + 4 + 5 + 6
-	)
-	assert.Equal(t, expected, sum)
-}
-
 func Test_Xor(t *testing.T) {
 	result := slice.Filter(slice.Of(1, 3, 5, 7, 9, 11), one.Of(1, 3, 5, 7).Xor(one.Of(7, 9, 11)))
 	assert.Equal(t, slice.Of(1, 3, 5, 9, 11), result)
