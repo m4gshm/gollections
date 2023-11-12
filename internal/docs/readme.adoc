@@ -90,6 +90,7 @@ include::../examples/sliceexamples/clone_sort_By_test.go[lines=12..18,indent=0]
 ====== group.Of
 [source,go]
 ----
+import "github.com/m4gshm/gollections/convert/as"
 import "github.com/m4gshm/gollections/expr/use"
 import "github.com/m4gshm/gollections/slice/group"
 include::../examples/sliceexamples/group_Of_test.go[lines=16..22,indent=0]
@@ -121,7 +122,7 @@ include::../examples/sliceexamples/sum_Of_test.go[lines=12..14,indent=0]
 ====== slice.Reduce
 [source,go]
 ----
-include::../examples/sliceexamples/slice_Reduce_test.go[lines=12..14,indent=0]
+include::../examples/sliceexamples/slice_Reduce_test.go[lines=12..15,indent=0]
 ----
 ====== slice.First
 [source,go]

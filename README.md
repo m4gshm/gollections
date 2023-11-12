@@ -150,6 +150,7 @@ var byAgeReverse = sort.DescBy(users, User.Age)
 ##### group.Of
 
 ``` go
+import "github.com/m4gshm/gollections/convert/as"
 import "github.com/m4gshm/gollections/expr/use"
 import "github.com/m4gshm/gollections/slice/group"
 
@@ -204,6 +205,7 @@ var sum = sum.Of(1, 2, 3, 4, 5, 6) //21
 
 ``` go
 var sum = slice.Reduce([]int{1, 2, 3, 4, 5, 6}, func(i1, i2 int) int { return i1 + i2 })
+//21
 ```
 
 ##### slice.First
