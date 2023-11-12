@@ -84,6 +84,11 @@ aliases [sum.Of](#sumof) and
 [filter.AndConvert](#operations-chain-functions). More shortcuts you can
 find by exploring slices [subpackages](./slice).
 
+**Be careful** when use several slice functions subsequently like
+`slice.Filter(slice.Convert(…​))`. This can lead to unnecessary RAM
+consumption. Consider [chain functions](#operations-chain-functions)
+instead or [loop](#additional-api) for delayed operations.
+
 ### Main slice functions
 
 #### Instantiators
