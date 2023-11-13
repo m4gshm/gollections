@@ -9,6 +9,7 @@ import (
 	"github.com/m4gshm/gollections/convert/ptr"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/map_/clone"
+	"github.com/m4gshm/gollections/map_/filter"
 	"github.com/m4gshm/gollections/map_/group"
 	"github.com/m4gshm/gollections/map_/resolv"
 	"github.com/m4gshm/gollections/op"
@@ -195,7 +196,7 @@ func Test_Filter(t *testing.T) {
 func Test_FilterKeys(t *testing.T) {
 	elements := map[int]string{4: "4", 2: "2", 1: "1", 3: "3"}
 
-	result := map_.FilterKeys(elements, func(key int) bool { return key <= 2 })
+	result := filter.Keys(elements, func(key int) bool { return key <= 2 })
 	check := map_.KeyChecker(result)
 	assert.Equal(t, 2, len(result))
 	assert.True(t, check(1))
@@ -207,7 +208,7 @@ func Test_FilterKeys(t *testing.T) {
 func Test_FilterValues(t *testing.T) {
 	elements := map[int]string{4: "4", 2: "2", 1: "1", 3: "3"}
 
-	result := map_.FilterValues(elements, func(val string) bool { return val <= "2" })
+	result := filter.Values(elements, func(val string) bool { return val <= "2" })
 	check := map_.KeyChecker(result)
 	assert.Equal(t, 2, len(result))
 	assert.True(t, check(1))

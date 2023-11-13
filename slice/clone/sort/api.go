@@ -8,13 +8,14 @@ import (
 	"github.com/m4gshm/gollections/slice/sort"
 )
 
-// By makes clone of sorted elements by converting them to Ordered values and applying the operator <
-func By[T any, O constraints.Ordered, TS ~[]T](elements TS, order func(T) O) TS {
-	return sort.By(clone.Of(elements), order)
+// By sorts cloned elements slice in ascending order, using the orderConverner function to retrieve a value of type Ordered.
+func By[T any, O constraints.Ordered, TS ~[]T](elements TS, orderConverner func(T) O) TS {
+	return sort.By(clone.Of(elements), orderConverner)
 }
 
-func DescBy[T any, O constraints.Ordered, TS ~[]T](elements TS, order func(T) O) TS {
-	return sort.DescBy(clone.Of(elements), order)
+// DescBy sorts cloned elements slice in descending order, using the orderConverner function to retrieve a value of type Ordered.
+func DescBy[T any, O constraints.Ordered, TS ~[]T](elements TS, orderConverner func(T) O) TS {
+	return sort.DescBy(clone.Of(elements), orderConverner)
 }
 
 // Asc sorts orderable elements ascending

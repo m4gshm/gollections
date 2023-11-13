@@ -13,6 +13,7 @@ func By[T any, O constraints.Ordered, TS ~[]T](elements TS, orderConverter func(
 	return slice.SortAsc(elements, orderConverter)
 }
 
+// DescBy sorts elements in descending order, using the orderConverner function to retrieve a value of type Ordered.
 func DescBy[T any, O constraints.Ordered, TS ~[]T](elements TS, orderConverter func(T) O) TS {
 	return slice.SortDesc(elements, orderConverter)
 }

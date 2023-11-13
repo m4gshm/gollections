@@ -25,7 +25,3 @@ func Eq[From any, To comparable](getter func(From) To, example To) predicate.Pre
 func Not[From, To any](getter func(From) To, condition predicate.Predicate[To]) predicate.Predicate[From] {
 	return predicate.Not(Match(getter, condition))
 }
-
-func Key[K comparable, V any, M ~map[K]V](key K) predicate.Predicate[M] {
-	return func(m M) bool { _, ok := m[key]; return ok }
-}

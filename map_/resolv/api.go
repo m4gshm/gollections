@@ -1,4 +1,4 @@
-// Package resolv provides values resolvers for maps thath builded by iterating over key/values loop, slice or collection
+// Package resolv provides values resolvers for maps that builded by ToMap-converter functions
 package resolv
 
 import (
@@ -8,17 +8,18 @@ import (
 	"github.com/m4gshm/gollections/op"
 )
 
-// First - ToMap value resolver
+// First keeps the first value of a key
 func First[K, V any](exists bool, _ K, old, new V) V { return op.IfElse(exists, old, new) }
 
-// Last - ToMap value resolver
+// Last retrieves the last value of a key
 func Last[K, V any](_ bool, _ K, _, new V) V { return new }
 
-// Slice - ToMap value resolver
+// Slice puts the values of one key into a slice
 func Slice[K, V any](_ bool, _ K, rv []V, v V) []V {
 	return append(rv, v)
 }
 
+// SortedSlice puts the values of one key into a sorted slice
 func SortedSlice[K, V cmp.Ordered](_ bool, _ K, rv []V, v V) []V {
 	i, _ := slices.BinarySearch[[]V, V](rv, v)
 	r := append(append(rv[:i], v), rv[i:]...)

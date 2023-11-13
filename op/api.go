@@ -66,6 +66,7 @@ func Get[T any](getter func() T) T {
 	return getter()
 }
 
+// Compare returns -1 if o1 less than o2, 0 if equal and 1 if 01 more tha o2
 func Compare[O constraints.Ordered](o1, o2 O) int {
 	if o1 < o2 {
 		return -1
