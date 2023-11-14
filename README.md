@@ -468,10 +468,13 @@ shorter by not in all cases.
 As example:
 
 ``` go
+import "github.com/m4gshm/gollections/expr/use"
+import "github.com/m4gshm/gollections/op/delay/sum"
+
 user := User{name: "Bob", surname: "Smith"}
 
 fullName := use.If(len(user.surname) == 0, user.name).If(len(user.name) == 0, user.surname).
-    ElseGet(func() string { return user.name + " " + user.surname })
+    ElseGet(sum.Of(user.name, " ", user.surname))
 
 assert.Equal(t, "Bob Smith", fullName)
 ```

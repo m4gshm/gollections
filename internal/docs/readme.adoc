@@ -282,6 +282,8 @@ As example:
 
 [source,go]
 ----
+import "github.com/m4gshm/gollections/expr/use"
+import "github.com/m4gshm/gollections/op/delay/sum"
 include::../examples/boilerplate/expr_use_test.go[lines=15..22,indent=0]
 ----
 
