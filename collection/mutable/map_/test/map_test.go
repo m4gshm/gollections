@@ -4,12 +4,15 @@ import (
 	"sort"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/m4gshm/gollections/collection/mutable"
 	"github.com/m4gshm/gollections/collection/mutable/map_"
+	"github.com/m4gshm/gollections/collection/mutable/ordered"
 	"github.com/m4gshm/gollections/convert/as"
 	"github.com/m4gshm/gollections/k"
+	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
-	"github.com/stretchr/testify/assert"
 )
 
 func Test_Map_Iterate(t *testing.T) {
@@ -222,4 +225,18 @@ func Test_Map_new(t *testing.T) {
 	m.Values().ForEach(func(element string) {})
 	m.Values().Convert(as.Is[string]).For(func(element string) error { return nil })
 	m.Values().Filter(func(s string) bool { return true }).ForEach(func(element string) {})
+}
+
+func Test_Map_Sort(t *testing.T) {
+	var m = new(mutable.Map[int, string])
+
+	m.Set(5, "5")
+	m.Set(4, "4")
+	m.Set(-8, "-8")
+	m.Set(10, "10")
+
+	o := m.Sort(op.Compare)
+
+	assert.Equal(t, ordered.NewMap(k.V(-8, "-8"), k.V(4, "4"), k.V(5, "5"), k.V(10, "10")), o)
+	assert.NotSame(t, m, o)
 }

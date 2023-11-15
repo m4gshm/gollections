@@ -92,33 +92,38 @@ func DeepClone[M ~map[K]V, K comparable, V any](elements M, copier func(V) V) M 
 }
 
 // ConvertValues creates a map with converted values
-func ConvertValues[M ~map[K]V, V, Vto any, K comparable](elements M, by func(V) Vto) map[K]Vto {
-	return Convert(elements, as.Is[K], by)
+func ConvertValues[M ~map[K]V, V, Vto any, K comparable](elements M, converter func(V) Vto) map[K]Vto {
+	converted := make(map[K]Vto, len(elements))
+	for key, val := range elements {
+		converted[key] = converter(val)
+	}
+	return converted
 }
 
 // ConvertKeys creates a map with converted keys
-func ConvertKeys[M ~map[K]V, K, Kto comparable, V any](elements M, by func(K) Kto) map[Kto]V {
-	return Convert(elements, by, as.Is[V])
+func ConvertKeys[M ~map[K]V, K, Kto comparable, V any](elements M, converter func(K) Kto) map[Kto]V {
+	converted := make(map[Kto]V, len(elements))
+	for key, val := range elements {
+		converted[converter(key)] = val
+	}
+	return converted
 }
 
 // Convert creates a map with converted keys and values
-func Convert[M ~map[K]V, K, Kto comparable, V, Vto any](elements M, keyConverter func(K) Kto, valConverter func(V) Vto) map[Kto]Vto {
+func Convert[M ~map[K]V, K, Kto comparable, V, Vto any](elements M, converter func(K, V) (Kto, Vto)) map[Kto]Vto {
 	converted := make(map[Kto]Vto, len(elements))
 	for key, val := range elements {
-		converted[keyConverter(key)] = valConverter(val)
+		kto, vto := converter(key, val)
+		converted[kto] = vto
 	}
 	return converted
 }
 
 // Conv creates a map with converted keys and values
-func Conv[M ~map[K]V, K, Kto comparable, V, Vto any](elements M, keyConverter func(K) (Kto, error), valConverter func(V) (Vto, error)) (map[Kto]Vto, error) {
+func Conv[M ~map[K]V, K, Kto comparable, V, Vto any](elements M, converter func(K, V) (Kto, Vto, error)) (map[Kto]Vto, error) {
 	converted := make(map[Kto]Vto, len(elements))
 	for key, val := range elements {
-		kto, err := keyConverter(key)
-		if err != nil {
-			return converted, err
-		}
-		vto, err := valConverter(val)
+		kto, vto, err := converter(key, val)
 		if err != nil {
 			return converted, err
 		}

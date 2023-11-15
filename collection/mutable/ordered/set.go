@@ -2,7 +2,6 @@ package ordered
 
 import (
 	"fmt"
-	"sort"
 
 	breakLoop "github.com/m4gshm/gollections/break/loop"
 	breakStream "github.com/m4gshm/gollections/break/stream"
@@ -302,19 +301,22 @@ func (s *Set[K]) HasAny(predicate func(K) bool) bool {
 }
 
 // Sort sorts the elements
-func (s *Set[T]) Sort(less slice.Less[T]) *Set[T] {
-	return s.sortBy(sort.Slice, less)
+func (s *Set[T]) Sort(comparer slice.Comparer[T]) *Set[T] {
+	return s.sortBy(slice.Sort, comparer)
 }
 
 // StableSort sorts the elements
-func (s *Set[T]) StableSort(less slice.Less[T]) *Set[T] {
-	return s.sortBy(sort.SliceStable, less)
+func (s *Set[T]) StableSort(comparer slice.Comparer[T]) *Set[T] {
+	return s.sortBy(slice.StableSort, comparer)
 }
 
-func (s *Set[T]) sortBy(sorter slice.Sorter, less slice.Less[T]) *Set[T] {
+func (s *Set[T]) sortBy(sorter func([]T, slice.Comparer[T]) []T, comparer slice.Comparer[T]) *Set[T] {
 	if s != nil {
 		if order := s.order; order != nil {
-			slice.Sort(*order, sorter, less)
+			sorter(*order, comparer)
+			for i, v := range *order {
+				s.elements[v] = i
+			}
 		}
 	}
 	return s

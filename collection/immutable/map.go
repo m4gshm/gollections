@@ -2,7 +2,6 @@ package immutable
 
 import (
 	"fmt"
-	"sort"
 
 	breakLoop "github.com/m4gshm/gollections/break/kv/loop"
 	breakKvStream "github.com/m4gshm/gollections/break/kv/stream"
@@ -128,18 +127,18 @@ func (m Map[K, V]) V() MapValues[K, V] {
 	return WrapVal(m.elements)
 }
 
-// Sort sorts the keys
-func (m Map[K, V]) Sort(less slice.Less[K]) ordered.Map[K, V] {
-	return m.sortBy(sort.Slice, less)
+// Sort returns sorted by keys map
+func (m Map[K, V]) Sort(comparer slice.Comparer[K]) ordered.Map[K, V] {
+	return m.sortBy(slice.Sort, comparer)
 }
 
-// StableSort sorts the keys
-func (m Map[K, V]) StableSort(less slice.Less[K]) ordered.Map[K, V] {
-	return m.sortBy(sort.SliceStable, less)
+// StableSort returns sorted by keys map
+func (m Map[K, V]) StableSort(comparer slice.Comparer[K]) ordered.Map[K, V] {
+	return m.sortBy(slice.StableSort, comparer)
 }
 
-func (m Map[K, V]) sortBy(sorter slice.Sorter, less slice.Less[K]) ordered.Map[K, V] {
-	return ordered.WrapMap(slice.Sort(map_.Keys(m.elements), sorter, less), m.elements)
+func (m Map[K, V]) sortBy(sorter func([]K, slice.Comparer[K]) []K, comparer slice.Comparer[K]) ordered.Map[K, V] {
+	return ordered.WrapMap(sorter(map_.Keys(m.elements), comparer), m.elements)
 }
 
 func (m Map[K, V]) String() string {

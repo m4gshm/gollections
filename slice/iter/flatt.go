@@ -92,7 +92,7 @@ func (f *FlattIter[From, To]) All(yield func(element To) bool) {
 	loop.All(f.Next, yield)
 }
 
-// For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
+// For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak.
 func (f *FlattIter[From, To]) For(walker func(element To) error) error {
 	return loop.For(f.Next, walker)
 }

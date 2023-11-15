@@ -23,17 +23,6 @@ var (
 	entities = map[int]*entity{1: &first, 2: &second, 3: &third}
 )
 
-func Test_Clone(t *testing.T) {
-	c := clone.Of(entities)
-
-	assert.Equal(t, entities, c)
-	assert.NotSame(t, entities, c)
-
-	for k := range entities {
-		assert.Same(t, entities[k], c[k])
-	}
-}
-
 func Test_DeepClone(t *testing.T) {
 	c := clone.Deep(entities, func(e *entity) *entity { return ptr.Of(*e) })
 
@@ -46,31 +35,9 @@ func Test_DeepClone(t *testing.T) {
 	}
 }
 
-func Test_Keys(t *testing.T) {
-	keys := map_.Keys(entities)
-	assert.Equal(t, slice.Of(1, 2, 3), sort.Of(keys))
-}
-
-func Test_Values(t *testing.T) {
-	values := map_.Values(entities)
-	assert.Equal(t, slice.Of(&first, &second, &third), sort.By(values, func(e *entity) string {
-		return e.val
-	}))
-}
-
-func Test_ConvertValues(t *testing.T) {
-	var strValues map[int]string = map_.ConvertValues(entities, func(e *entity) string {
-		return e.val
-	})
-
-	assert.Equal(t, "1_first", strValues[1])
-	assert.Equal(t, "2_second", strValues[2])
-	assert.Equal(t, "3_third", strValues[3])
-}
-
 func Test_ValuesConverted(t *testing.T) {
 	var values []string = map_.ValuesConverted(entities, func(e *entity) string { return e.val })
-	assert.Equal(t, slice.Of("1_first", "2_second", "3_third"), sort.Of(values))
+	assert.Equal(t, slice.Of("1_first", "2_second", "3_third"), sort.Asc(values))
 }
 
 type rows[T any] struct {

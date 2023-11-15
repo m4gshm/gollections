@@ -9,6 +9,7 @@ import (
 	"github.com/m4gshm/gollections/convert/ptr"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/map_/clone"
+	"github.com/m4gshm/gollections/map_/filter"
 	"github.com/m4gshm/gollections/map_/group"
 	"github.com/m4gshm/gollections/map_/resolv"
 	"github.com/m4gshm/gollections/op"
@@ -51,7 +52,7 @@ func Test_DeepClone(t *testing.T) {
 
 func Test_Keys(t *testing.T) {
 	keys := map_.Keys(entities)
-	assert.Equal(t, slice.Of(1, 2, 3), sort.Of(keys))
+	assert.Equal(t, slice.Of(1, 2, 3), sort.Asc(keys))
 }
 
 func Test_Values(t *testing.T) {
@@ -69,7 +70,7 @@ func Test_ConvertValues(t *testing.T) {
 
 func Test_ValuesConverted(t *testing.T) {
 	var values []string = map_.ValuesConverted(entities, func(e *entity) string { return e.val })
-	assert.Equal(t, slice.Of("1_first", "2_second", "3_third"), sort.Of(values))
+	assert.Equal(t, slice.Of("1_first", "2_second", "3_third"), sort.Asc(values))
 }
 
 type rows[T any] struct {
@@ -169,7 +170,7 @@ func Test_MatchAny(t *testing.T) {
 
 func Test_ToSlice(t *testing.T) {
 	result := map_.ToSlice(entities, func(key int, val *entity) string { return strconv.Itoa(key) + ":" + val.val })
-	assert.Equal(t, slice.Of("1:1_first", "2:2_second", "3:3_third"), sort.Of(result))
+	assert.Equal(t, slice.Of("1:1_first", "2:2_second", "3:3_third"), sort.Asc(result))
 }
 
 func Test_ToSliceErrorable(t *testing.T) {
@@ -177,7 +178,7 @@ func Test_ToSliceErrorable(t *testing.T) {
 		v, err := strconv.Atoi(string(val.val[0]))
 		return v + key, err
 	})
-	assert.Equal(t, slice.Of(2, 4, 6), sort.Of(result))
+	assert.Equal(t, slice.Of(2, 4, 6), sort.Asc(result))
 }
 
 func Test_Filter(t *testing.T) {
@@ -195,7 +196,7 @@ func Test_Filter(t *testing.T) {
 func Test_FilterKeys(t *testing.T) {
 	elements := map[int]string{4: "4", 2: "2", 1: "1", 3: "3"}
 
-	result := map_.FilterKeys(elements, func(key int) bool { return key <= 2 })
+	result := filter.Keys(elements, func(key int) bool { return key <= 2 })
 	check := map_.KeyChecker(result)
 	assert.Equal(t, 2, len(result))
 	assert.True(t, check(1))
@@ -207,7 +208,7 @@ func Test_FilterKeys(t *testing.T) {
 func Test_FilterValues(t *testing.T) {
 	elements := map[int]string{4: "4", 2: "2", 1: "1", 3: "3"}
 
-	result := map_.FilterValues(elements, func(val string) bool { return val <= "2" })
+	result := filter.Values(elements, func(val string) bool { return val <= "2" })
 	check := map_.KeyChecker(result)
 	assert.Equal(t, 2, len(result))
 	assert.True(t, check(1))

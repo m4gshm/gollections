@@ -2,28 +2,28 @@
 package sort
 
 import (
-	"sort"
-
-	"github.com/m4gshm/gollections/slice"
-	"github.com/m4gshm/gollections/slice/clone"
 	"golang.org/x/exp/constraints"
+
+	"github.com/m4gshm/gollections/slice/clone"
+	"github.com/m4gshm/gollections/slice/sort"
 )
 
-// By makes clone of sorted elements by converting them to Ordered values and applying the operator <
-func By[T any, o constraints.Ordered, TS ~[]T](elements TS, by func(T) o) TS {
-	c := clone.Of(elements)
-	slice.SortByOrdered(c, sort.Slice, by)
-	return c
+// By sorts cloned elements slice in ascending order, using the orderConverner function to retrieve a value of type Ordered.
+func By[T any, O constraints.Ordered, TS ~[]T](elements TS, orderConverner func(T) O) TS {
+	return sort.By(clone.Of(elements), orderConverner)
 }
 
-// ByLess makes clone and sorts elements using a function that checks if an element is smaller than the others
-func ByLess[T any, TS ~[]T](elements TS, less slice.Less[T]) TS {
-	c := clone.Of(elements)
-	slice.Sort(c, sort.Slice, less)
-	return c
+// DescBy sorts cloned elements slice in descending order, using the orderConverner function to retrieve a value of type Ordered.
+func DescBy[T any, O constraints.Ordered, TS ~[]T](elements TS, orderConverner func(T) O) TS {
+	return sort.DescBy(clone.Of(elements), orderConverner)
 }
 
-// Of makes clone of sorted orderable elements
-func Of[T constraints.Ordered, TS ~[]T](elements TS) TS {
-	return By(elements, func(o T) T { return o })
+// Asc sorts orderable elements ascending
+func Asc[T constraints.Ordered, TS ~[]T](elements TS) TS {
+	return sort.Asc(clone.Of(elements))
+}
+
+// Desc sorts orderable elements descending
+func Desc[T constraints.Ordered, TS ~[]T](elements TS) TS {
+	return sort.Desc(clone.Of(elements))
 }

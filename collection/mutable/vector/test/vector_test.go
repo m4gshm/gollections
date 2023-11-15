@@ -69,11 +69,11 @@ func Test_VectorReverseIteration(t *testing.T) {
 func Test_Vector_Sort(t *testing.T) {
 	var (
 		elements = vector.Of(3, 1, 5, 6, 8, 0, -2)
-		sorted   = elements.Sort(func(e1, e2 int) bool { return e1 < e2 })
+		sorted   = elements.Sort(op.Compare)
 	)
 	assert.Equal(t, vector.Of(-2, 0, 1, 3, 5, 6, 8), sorted)
 	assert.Equal(t, vector.Of(-2, 0, 1, 3, 5, 6, 8), elements)
-	assert.Equal(t, elements, sorted)
+	assert.Same(t, elements, sorted)
 }
 
 func Test_Vector_SortStructByField(t *testing.T) {

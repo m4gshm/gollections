@@ -33,7 +33,7 @@ func To[K, V any](next func() (K, V, bool, error), errConsumer func(error)) func
 
 // Group collects sets of values grouped by keys obtained by passing a key/value iterator
 func Group[K comparable, V any](next func() (K, V, bool, error)) (map[K][]V, error) {
-	return ToMapResolv(next, resolv.Append[K, V])
+	return ToMapResolv(next, resolv.Slice[K, V])
 }
 
 // Reduce reduces the key/value pairs retrieved by the 'next' function into an one pair using the 'merge' function

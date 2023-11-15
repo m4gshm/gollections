@@ -2,12 +2,11 @@
 
 == Gollections
 
-This is a set of utilities aimed at reducing boilerplate code when using link:./slice/api.go[slices], link:./map_/api.go[maps] and 
-extending functionality by new collection implementations such as link:./collection/collection/mutable/omap/api.go[ordered map] or link:./collection/collection/mutable/oset/api.go[set].
+Gollections is set of functions for link:#slices[slices], link:#maps[maps] and additional implementations of data structures such as link:#mutable-collections[ordered map] or link:#mutable-collections[set] aimed to reduce boilerplate code.
 
-Supports Go version 1.20.
+Supports Go version 1.21.
 
-For example, you want to group some link:./internal/examples/boilerplate/user_type.go[users] by their role names converted to lowercase:
+For example, it's need to group some link:./internal/examples/boilerplate/user_type.go[users] by their role names converted to lowercase:
 [source,go]
 ----
 include::../examples/boilerplate/user_data.go[lines=3..-1]
@@ -16,13 +15,15 @@ include::../examples/boilerplate/user_data.go[lines=3..-1]
 You can make clear code, extensive, but without dependencies:
 [source,go]
 ----
-include::../examples/boilerplate/slice_namesbyRole_old_test.go[lines=11..30,indent=0]
+include::../examples/boilerplate/slice_namesbyRole_old_test.go[lines=11..26,indent=0]
 ----
 
-Or you can write more compact code using the collections API, like so:
+Or you can write more compact code using the collections API, like:
 [source,go]
 ----
-include::../examples/boilerplate/slice_namesbyRole_new_test.go[lines=13..21,indent=0]
+import "github.com/m4gshm/gollections/slice/convert"
+import "github.com/m4gshm/gollections/slice/group"
+include::../examples/boilerplate/slice_namesbyRole_new_test.go[lines=14..19,indent=0]
 ----
 
 === Installation
@@ -32,29 +33,195 @@ include::../examples/boilerplate/slice_namesbyRole_new_test.go[lines=13..21,inde
 go get -u github.com/m4gshm/gollections
 ----
 
-or 
-
-[source,console]
-----
-go get -u github.com/m4gshm/gollections@HEAD
-----
-
-=== Main packages
-
-All packages consists of functions placed in the package and subpackages aimed to make short aliases of that functions.
-For example the function link:./slice/api.go#L459[slice.SortByOrdered] has aliases link:./slice/sort/api.go#L12[sort.By] and link:./slice/sort/api.go#L23[sort.Of].
-
-==== link:./slice/api.go[slice] and link:./map_/api.go[map_]
-
-Contains utility functions of link:./slice/api.go#L156[converting],  link:./slice/api.go#L379[filtering] (searching), link:./slice/api.go#L464[reducing], link:./map_/api.go#L90[cloning] elements of embedded slices and maps. The functions compute result in-place. For delayed computations see xref:loop-kvloop-and-breakable-versions-breakloop-breakkvloop[loops] or xref:collection-functions[collection functions]. 
+=== Slices
 
 [source,go]
 ----
-include::../examples/boilerplate/slice_filter_convert_reduce_test.go[lines=13..24,indent=0]
+include::../examples/boilerplate/slice_filter_convert_reduce_test.go[lines=15..22,indent=0]
 ----
 
-More examples link:./internal/examples/sliceexamples/slice_examples_test.go[here] and link:./internal/examples/mapexamples/map_examples_test.go[here].
+In the example is used only small set of slice functions as link:#slicefilter[slice.Filter], link:#sliceconv[slice.Conv] link:#sliceconvert#[slice.Convert], and link:#slicereduce[slice.Reduce]. More you can look in the link:./slice/api.go[slice] package.
 
+==== Shortcut packages
+
+[source,go]
+----
+include::../examples/boilerplate/slice_filter_convert_reduce_short_test.go[lines=18..20,indent=0]
+----
+
+This is a shorter version of the previous example that used short aliases link:#sumof[sum.Of] and link:#operations-chain-functions[filter.AndConvert]. More shortcuts you can find by exploring slices link:./slice[subpackages].
+
+*Be careful* when use several slice functions subsequently like [source,go]`slice.Filter(slice.Convert(...))`. This can lead to unnecessary RAM consumption. Consider link:#operations-chain-functions[chain functions] instead, link:#additional-api[loop] or link:#collection-functions[collections] for delayed operations.
+
+==== Main slice functions
+===== Instantiators
+====== slice.Of
+[source,go]
+----
+include::../examples/sliceexamples/slice_Of_test.go[lines=11..13,indent=0]
+----
+====== range_.Of
+[source,go]
+----
+import "github.com/m4gshm/gollections/slice/range_"
+include::../examples/sliceexamples/range_Of_test.go[lines=11..15,indent=0]
+----
+====== range_.Closed
+[source,go]
+----
+include::../examples/sliceexamples/range_Closed_test.go[lines=12..16,indent=0]
+----
+===== Sorters
+====== sort.Asc, sort.Desc 
+[source,go]
+----
+// sorting in-place API
+import "github.com/m4gshm/gollections/slice/sort"
+include::../examples/sliceexamples/sort_Asc_Desc_test.go[lines=12..15,indent=0]
+----
+====== sort.By, sort.ByDesc
+[source,go]
+----
+// sorting copied slice API does not change the original slice
+import "github.com/m4gshm/gollections/slice/clone/sort"
+
+include::../examples/sliceexamples/data_users_test.go[lines=3..10,indent=0]
+include::../examples/sliceexamples/clone_sort_By_test.go[lines=12..18,indent=0]
+----
+===== To map converters
+====== group.Of
+[source,go]
+----
+import "github.com/m4gshm/gollections/convert/as"
+import "github.com/m4gshm/gollections/expr/use"
+import "github.com/m4gshm/gollections/slice/group"
+include::../examples/sliceexamples/group_Of_test.go[lines=16..22,indent=0]
+----
+====== group.ByMultipleKeys
+[source,go]
+----
+import "github.com/m4gshm/gollections/slice/convert"
+import "github.com/m4gshm/gollections/slice/group"
+include::../examples/boilerplate/slice_namesbyRole_new_test.go[lines=14..19,indent=0]
+----
+====== slice.ToMap, slice.ToMapResolv
+[source,go]
+----
+import (
+    "github.com/m4gshm/gollections/map_/resolv"
+    "github.com/m4gshm/gollections/op"
+    "github.com/m4gshm/gollections/slice"
+)
+include::../examples/sliceexamples/slice_ToMapResolv_test.go[lines=14..22,indent=0]
+----
+===== Reducers
+====== sum.Of
+[source,go]
+----
+import "github.com/m4gshm/gollections/op/sum"
+include::../examples/sliceexamples/sum_Of_test.go[lines=12..14,indent=0]
+----
+====== slice.Reduce
+[source,go]
+----
+include::../examples/sliceexamples/slice_Reduce_test.go[lines=12..15,indent=0]
+----
+====== slice.First
+[source,go]
+----
+import "github.com/m4gshm/gollections/predicate/more"
+import "github.com/m4gshm/gollections/slice"
+include::../examples/sliceexamples/slice_First_test.go[lines=13..15,indent=0]
+----
+====== slice.Last
+[source,go]
+----
+import "github.com/m4gshm/gollections/predicate/less"
+import "github.com/m4gshm/gollections/slice"
+include::../examples/sliceexamples/slice_Last_test.go[lines=13..15,indent=0]
+----
+===== Converters
+====== slice.Convert
+[source,go]
+----
+include::../examples/sliceexamples/slice_Convert_test.go[lines=13..16,indent=0]
+----
+====== slice.Conv
+[source,go]
+----
+include::../examples/sliceexamples/slice_Conv_test.go[lines=13..16,indent=0]
+----
+====== slice.Filter
+[source,go]
+----
+import "github.com/m4gshm/gollections/predicate/exclude"
+import "github.com/m4gshm/gollections/predicate/one"
+import "github.com/m4gshm/gollections/slice"
+include::../examples/sliceexamples/slice_Filter.go[lines=14..17,indent=0]
+----
+====== slice.Flat
+[source,go]
+----
+import "github.com/m4gshm/gollections/convert/as"
+import "github.com/m4gshm/gollections/slice"
+include::../examples/sliceexamples/slice_Flat_test.go[lines=13..16,indent=0]
+----
+===== Operations chain functions
+* convert.AndReduce, conv.AndReduce 
+* convert.AndFilter 
+* filter.AndConvert
+
+These functions combine converters, filters and reducers.
+
+=== Maps
+==== Main map functions
+===== Instantiators
+====== clone.Of
+[source,go]
+----
+import "github.com/m4gshm/gollections/map_/clone"
+include::../examples/mapexamples/clone_Of_test.go[lines=13..28,indent=0]
+----
+====== clone.Deep
+[source,go]
+----
+import "github.com/m4gshm/gollections/map_/clone"
+include::../examples/mapexamples/clone_Deep_test.go[lines=13..30,indent=0]
+----
+===== Keys, values exrtractors
+====== map_.Keys, map_.Values
+[source,go]
+----
+include::../examples/mapexamples/map_Keys_Values_test.go[lines=15..23,indent=0]
+----
+===== Converters
+====== map_.ConvertKeys
+[source,go]
+----
+include::../examples/mapexamples/map_ConvertKeys_test.go[lines=17..22,indent=0]
+----
+====== map_.ConvertValues
+[source,go]
+----
+include::../examples/mapexamples/map_ConvertValues_test.go[lines=17..22,indent=0]
+----
+====== map_.Convert
+[source,go]
+----
+include::../examples/mapexamples/map_Convert_test.go[lines=17..22,indent=0]
+----
+====== map_.Conv
+[source,go]
+----
+include::../examples/mapexamples/map_Conv_test.go[lines=17..22,indent=0]
+----
+====== map_.ToSlice
+[source,go]
+----
+include::../examples/mapexamples/map_ToSlice_test.go[lines=19..24,indent=0]
+----
+
+=== Data structures
 ==== link:./collection/mutable/api.go[mutable] and link:./collection/immutable/api.go[immutable] collections
 
 Provides implelentations of link:./collection/iface.go#L25[Vector], link:./collection/iface.go#L35[Set] and link:./collection/iface.go#L41[Map].
@@ -64,13 +231,17 @@ Immutables are read-only datasets.
 
 Detailed description of implementations xref:mutable-collections[below].
 
+=== Additional API
+
 ==== link:./predicate/api.go[predicate] and breakable link:./predicate/api.go[break/predicate]
 
 Provides predicate builder api that used for filtering collection elements.
 
 [source,go]
 ----
-include::../examples/boilerplate/predicate_test.go[lines=17..20,indent=0]
+import "github.com/m4gshm/gollections/predicate/where"
+import "github.com/m4gshm/gollections/slice"
+include::../examples/boilerplate/predicate_test.go[lines=16..18,indent=0]
 ----
 [#loop]
 ==== link:./loop/api.go[loop], link:./kv/loop/api.go[kv/loop] and breakable versions link:./break/loop/api.go[break/loop], link:./break/kv/loop/api.go[break/kv/loop]
@@ -104,14 +275,15 @@ It is used for computations where an error may occur.
 include::../examples/loop/breakloop/loop_filter_convert_reduce_test.go[lines=17..22,indent=0]
 ----
 
-=== Expressions: link:./expr/use/api.go[use], link:./expr/get/api.go[get], link:./expr/first/api.go[first], link:./expr/last/api.go[last]
+==== Expressions: link:./expr/use/api.go[use.If], link:./expr/get/api.go[get.If], link:#firstof[first.Of], link:#lastof[last.Of]
 
 Aimed to evaluate a value using conditions. May cause to make code shorter by not in all cases. +
 As example:
 
 [source,go]
 ----
-include::../examples/boilerplate/expr_use_test.go[lines=14..21,indent=0]
+import "github.com/m4gshm/gollections/expr/use"
+include::../examples/boilerplate/expr_use_test.go[lines=15..22,indent=0]
 ----
 
 instead of:
@@ -121,6 +293,20 @@ instead of:
 include::../examples/boilerplate/expr_use_test.go[lines=27..38,indent=0]
 ----
 
+===== first.Of
+[source,go]
+----
+import "github.com/m4gshm/gollections/expr/first"
+import "github.com/m4gshm/gollections/predicate/more"
+include::../examples/expressionexamples/first_Of_test.go[lines=13..15,indent=0]
+----
+===== last.Of
+[source,go]
+----
+import "github.com/m4gshm/gollections/expr/last"
+import "github.com/m4gshm/gollections/predicate/less"
+include::../examples/expressionexamples/last_Of_test.go[lines=13..15,indent=0]
+----
 
 === Mutable collections
 
@@ -169,9 +355,9 @@ The same underlying interfaces but for read-only use cases.
 
 There are three groups of operations:
 
-* Immediate - retrieves the result in place (link:./collection/mutable/vector.go#L322[Sort], link:./collection/immutable/vector.go#L154[Reduce], link:./collection/immutable/vector.go#L111[Track], link:./collection/mutable/ordered/map.go#L182[TrackEach], link:./collection/immutable/vector.go#L122[For], link:./collection/immutable/ordered/map.go#L175[ForEach])
-* Intermediate - only defines a computation (link:./collection/api.go#L17[Convert], link:./collection/immutable/ordered/set.go#L124[Filter], link:./collection/api.go#L36[Flatt], link:./collection/api.go#L69[Group]).
-* Final - applies intermediates and retrieves a result (link:./collection/api.go#L75[First], link:./collection/immutable/ordered/set.go#L94[Slice], link:./collection/immutable/ordered/set.go#L146[Reduce])
+* Immediate - retrieves the result in place (link:./collection/mutable/vector.go#L322[Sort], link:./collection/immutable/vector.go#L152[Reduce], link:./collection/immutable/vector.go#L109[Track], link:./collection/mutable/ordered/map.go#L155[TrackEach], link:./collection/immutable/vector.go#L120[For], link:./collection/immutable/ordered/map.go#L151[ForEach])
+* Intermediate - only defines a computation (link:./collection/api.go#22[Convert], link:./collection/immutable/ordered/set.go#L108[Filter], link:./collection/api.go#L41[Flat], link:./collection/api.go#L182[Group]).
+* Final - applies intermediates and retrieves a result (link:./collection/api.go#L188[First], link:./collection/immutable/ordered/set.go#L78[Slice], link:./collection/stream/iter.go#L76[Reduce]).
 
 Intermediates should wrap one by one to make a lazy computation chain that can be applied to the latest final operation.
 

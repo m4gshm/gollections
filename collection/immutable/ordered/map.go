@@ -2,7 +2,6 @@ package ordered
 
 import (
 	"fmt"
-	"sort"
 
 	breakLoop "github.com/m4gshm/gollections/break/kv/loop"
 	kvstream "github.com/m4gshm/gollections/break/kv/stream"
@@ -16,20 +15,18 @@ import (
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/map_/convert"
 	"github.com/m4gshm/gollections/map_/filter"
-	"github.com/m4gshm/gollections/notsafe"
 	"github.com/m4gshm/gollections/slice"
 )
 
 // WrapMap instantiates ordered Map using a map and an order slice as internal storage.
 func WrapMap[K comparable, V any](order []K, elements map[K]V) Map[K, V] {
-	return Map[K, V]{order: order, elements: elements, ksize: notsafe.GetTypeSize[K]()}
+	return Map[K, V]{order: order, elements: elements}
 }
 
 // Map is a collection implementation that provides elements access by an unique key.
 type Map[K comparable, V any] struct {
 	order    []K
 	elements map[K]V
-	ksize    uintptr
 }
 
 var (
@@ -61,7 +58,7 @@ func (m Map[K, V]) Loop() *MapIter[K, V] {
 
 // Head creates an iterator and returns as implementation type value
 func (m Map[K, V]) Head() MapIter[K, V] {
-	return NewMapIter(m.elements, slice.NewHeadS(m.order, m.ksize))
+	return NewMapIter(m.elements, slice.NewHead(m.order))
 }
 
 // First returns the first key/value pair of the map, an iterator to iterate over the remaining pair, and true\false marker of availability next pairs.
@@ -76,7 +73,7 @@ func (m Map[K, V]) First() (MapIter[K, V], K, V, bool) {
 
 // Tail creates an iterator pointing to the end of the map
 func (m Map[K, V]) Tail() MapIter[K, V] {
-	return NewMapIter(m.elements, slice.NewTailS(m.order, m.ksize))
+	return NewMapIter(m.elements, slice.NewTail(m.order))
 }
 
 // Map collects the key/value pairs to a map
@@ -121,20 +118,18 @@ func (m Map[K, V]) Values() MapValues[K, V] {
 	return WrapVal(m.order, m.elements)
 }
 
-// Sort sorts the elements
-func (m Map[K, V]) Sort(less slice.Less[K]) Map[K, V] {
-	return m.sortBy(sort.Slice, less)
+// Sort returns sorted by keys map
+func (m Map[K, V]) Sort(comparer slice.Comparer[K]) Map[K, V] {
+	return m.sortBy(slice.Sort, comparer)
 }
 
-// StableSort sorts the elements
-func (m Map[K, V]) StableSort(less slice.Less[K]) Map[K, V] {
-	return m.sortBy(sort.SliceStable, less)
+// StableSort returns sorted by keys map
+func (m Map[K, V]) StableSort(comparer slice.Comparer[K]) Map[K, V] {
+	return m.sortBy(slice.StableSort, comparer)
 }
 
-func (m Map[K, V]) sortBy(sorter slice.Sorter, less slice.Less[K]) Map[K, V] {
-	order := slice.Clone(m.order)
-	slice.Sort(order, sorter, less)
-	return WrapMap(order, m.elements)
+func (m Map[K, V]) sortBy(sorter func([]K, slice.Comparer[K]) []K, comparer slice.Comparer[K]) Map[K, V] {
+	return WrapMap(sorter(slice.Clone(m.order), comparer), m.elements)
 }
 
 func (m Map[K, V]) String() string {

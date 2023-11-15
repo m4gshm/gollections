@@ -2,7 +2,6 @@ package mutable
 
 import (
 	"fmt"
-	"sort"
 
 	breakLoop "github.com/m4gshm/gollections/break/loop"
 	breakStream "github.com/m4gshm/gollections/break/stream"
@@ -290,22 +289,19 @@ func (s *Set[K]) HasAny(predicate func(K) bool) bool {
 }
 
 // Sort transforms to the ordered Set contains sorted elements
-func (s *Set[T]) Sort(less slice.Less[T]) *ordered.Set[T] {
-	return s.sortBy(sort.Slice, less)
+func (s *Set[T]) Sort(comparer slice.Comparer[T]) *ordered.Set[T] {
+	if s != nil {
+		return ordered.NewSet(slice.Sort(s.Slice(), comparer)...)
+	}
+	return nil
 }
 
 // StableSort transforms to the ordered Set contains sorted elements
-func (s *Set[T]) StableSort(less slice.Less[T]) *ordered.Set[T] {
-	return s.sortBy(sort.SliceStable, less)
-}
-
-func (s *Set[T]) sortBy(sorter slice.Sorter, less slice.Less[T]) *ordered.Set[T] {
-	var sortedElements []T
+func (s *Set[T]) StableSort(comparer slice.Comparer[T]) *ordered.Set[T] {
 	if s != nil {
-		sortedElements = slice.Clone(s.Slice())
-		slice.Sort(sortedElements, sorter, less)
+		return ordered.NewSet(slice.StableSort(s.Slice(), comparer)...)
 	}
-	return ordered.NewSet(sortedElements...)
+	return nil
 }
 
 func (s *Set[T]) String() string {

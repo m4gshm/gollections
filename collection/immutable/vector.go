@@ -2,7 +2,6 @@ package immutable
 
 import (
 	"fmt"
-	"sort"
 
 	breakLoop "github.com/m4gshm/gollections/break/loop"
 	breakStream "github.com/m4gshm/gollections/break/stream"
@@ -16,13 +15,12 @@ import (
 
 // WrapVector instantiates Vector using a slise as internal storage.
 func WrapVector[T any](elements []T) Vector[T] {
-	return Vector[T]{elements: elements, esize: notsafe.GetTypeSize[T]()}
+	return Vector[T]{elements: elements}
 }
 
 // Vector is a collection implementation that provides elements order and index access.
 type Vector[T any] struct {
 	elements []T
-	esize    uintptr
 }
 
 var (
@@ -52,19 +50,19 @@ func (v Vector[T]) Loop() *slice.Iter[T] {
 
 // Head creates an iterator and returns as implementation type value
 func (v Vector[T]) Head() slice.Iter[T] {
-	return slice.NewHeadS(v.elements, v.esize)
+	return slice.NewHead(v.elements)
 }
 
 // Tail creates an iterator pointing to the end of the collection
 func (v Vector[T]) Tail() slice.Iter[T] {
-	return slice.NewTailS(v.elements, v.esize)
+	return slice.NewTail(v.elements)
 }
 
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
 func (v Vector[T]) First() (slice.Iter[T], T, bool) {
 	var (
-		iterator  = slice.NewHeadS(v.elements, v.esize)
+		iterator  = slice.NewHead(v.elements)
 		first, ok = iterator.Next()
 	)
 	return iterator, first, ok
@@ -74,7 +72,7 @@ func (v Vector[T]) First() (slice.Iter[T], T, bool) {
 // If no more elements then ok==false.
 func (v Vector[T]) Last() (slice.Iter[T], T, bool) {
 	var (
-		iterator  = slice.NewTailS(v.elements, v.esize)
+		iterator  = slice.NewTail(v.elements)
 		first, ok = iterator.Prev()
 	)
 	return iterator, first, ok
@@ -165,19 +163,17 @@ func (v Vector[T]) HasAny(predicate func(T) bool) bool {
 }
 
 // Sort returns a sorted clone of the Vector
-func (v Vector[T]) Sort(less slice.Less[T]) Vector[T] {
-	return v.sortBy(sort.Slice, less)
+func (v Vector[T]) Sort(comparer slice.Comparer[T]) Vector[T] {
+	return v.sortBy(slice.Sort, comparer)
 }
 
 // StableSort returns a stable sorted clone of the Vector
-func (v Vector[T]) StableSort(less slice.Less[T]) Vector[T] {
-	return v.sortBy(sort.SliceStable, less)
+func (v Vector[T]) StableSort(comparer slice.Comparer[T]) Vector[T] {
+	return v.sortBy(slice.StableSort, comparer)
 }
 
-func (v Vector[T]) sortBy(sorter slice.Sorter, less slice.Less[T]) Vector[T] {
-	elements := slice.Clone(v.elements)
-	slice.Sort(elements, sorter, less)
-	return WrapVector(elements)
+func (v Vector[T]) sortBy(sorter func([]T, slice.Comparer[T]) []T, comparer slice.Comparer[T]) Vector[T] {
+	return WrapVector(sorter(slice.Clone(v.elements), comparer))
 }
 
 func (v Vector[T]) String() string {

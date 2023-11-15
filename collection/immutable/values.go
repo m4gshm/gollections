@@ -2,7 +2,6 @@ package immutable
 
 import (
 	"fmt"
-	"sort"
 
 	breakLoop "github.com/m4gshm/gollections/break/loop"
 	breakStream "github.com/m4gshm/gollections/break/stream"
@@ -132,10 +131,8 @@ func (m MapValues[K, V]) HasAny(predicate func(V) bool) bool {
 }
 
 // Sort creates a vector with sorted the values
-func (m MapValues[K, V]) Sort(less func(e1, e2 V) bool) Vector[V] {
-	var dest = m.Slice()
-	sort.Slice(dest, func(i, j int) bool { return less(dest[i], dest[j]) })
-	return WrapVector(dest)
+func (m MapValues[K, V]) Sort(comparer slice.Comparer[V]) Vector[V] {
+	return WrapVector(slice.Sort(m.Slice(), comparer))
 }
 
 func (m MapValues[K, V]) String() string {

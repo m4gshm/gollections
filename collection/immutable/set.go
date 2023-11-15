@@ -2,7 +2,6 @@ package immutable
 
 import (
 	"fmt"
-	"sort"
 
 	breakLoop "github.com/m4gshm/gollections/break/loop"
 	breakStream "github.com/m4gshm/gollections/break/stream"
@@ -142,17 +141,17 @@ func (s Set[T]) Contains(element T) (ok bool) {
 }
 
 // Sort transforms to the ordered set with sorted elements
-func (s Set[T]) Sort(less slice.Less[T]) ordered.Set[T] {
-	return s.sortBy(sort.Slice, less)
+func (s Set[T]) Sort(comparer slice.Comparer[T]) ordered.Set[T] {
+	return s.sortBy(slice.Sort, comparer)
 }
 
 // StableSort transforms to the ordered set with sorted elements
-func (s Set[T]) StableSort(less slice.Less[T]) ordered.Set[T] {
-	return s.sortBy(sort.SliceStable, less)
+func (s Set[T]) StableSort(comparer slice.Comparer[T]) ordered.Set[T] {
+	return s.sortBy(slice.StableSort, comparer)
 }
 
-func (s Set[T]) sortBy(sorter slice.Sorter, less slice.Less[T]) ordered.Set[T] {
-	return ordered.WrapSet(slice.Sort(s.Slice(), sorter, less), s.elements)
+func (s Set[T]) sortBy(sorter func([]T, slice.Comparer[T]) []T, comparer slice.Comparer[T]) ordered.Set[T] {
+	return ordered.WrapSet(sorter(s.Slice(), comparer), s.elements)
 }
 
 func (s Set[T]) String() string {

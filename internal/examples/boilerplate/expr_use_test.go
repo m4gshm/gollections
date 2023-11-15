@@ -3,9 +3,10 @@ package boilerplate
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/m4gshm/gollections/expr/use"
 	"github.com/m4gshm/gollections/op/delay/sum"
-	"github.com/stretchr/testify/assert"
 )
 
 var isEmpty = func(s string) func() bool { return func() bool { return len(s) == 0 } }

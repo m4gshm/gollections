@@ -42,15 +42,6 @@ func GetSliceHeaderByRef(elements unsafe.Pointer) *reflect.SliceHeader {
 	return (*reflect.SliceHeader)(elements)
 }
 
-// Noescape prevent escaping of t
-//
-//go:nosplit
-//go:nocheckptr
-func Noescape[T any](t *T) *T {
-	x := uintptr(unsafe.Pointer(t))
-	return (*T)(unsafe.Pointer(x ^ 0)) //nolint
-}
-
 // InHeap is generic link to runtime.inheap
 func InHeap[T any](t *T) bool {
 	return inheap(uintptr(unsafe.Pointer(t)))

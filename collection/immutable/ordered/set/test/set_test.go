@@ -100,9 +100,10 @@ func Test_Set_Group_By_Iterator(t *testing.T) {
 func Test_Set_Sort(t *testing.T) {
 	var (
 		elements = set.Of(3, 3, 1, 1, 1, 5, 6, 8, 8, 0, -2, -2)
-		sorted   = elements.Sort(func(e1, e2 int) bool { return e1 < e2 })
+		sorted   = elements.Sort(op.Compare)
 	)
 	assert.Equal(t, set.Of(-2, 0, 1, 3, 5, 6, 8), sorted)
+	assert.NotSame(t, elements, sorted)
 }
 func Test_Set_SortStructByField(t *testing.T) {
 	var (

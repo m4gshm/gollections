@@ -1,3 +1,4 @@
+// Package chain provides functions call chain builder
 package chain
 
 // Of returns a function that calls the specified functions in sequence with the argument returned by the previous one

@@ -54,7 +54,7 @@ lint:
 	goimports -w .
 	# go vet ./...
 	# go install github.com/tetafro/godot/cmd/godot@latest
-	# godot ./:
+	# godot .
 	go install github.com/kisielk/errcheck@latest
 	errcheck -ignoretests ./...
 	go install github.com/alexkohler/nakedret/cmd/nakedret@latest
@@ -62,7 +62,7 @@ lint:
 	# go install golang.org/x/lint/golint@latest
 	# golint ./...
 	go install github.com/mgechev/revive@latest
-	revive ./...
+	revive -exclude internal/... ./...
 
 .PHONY: readme
 readme:

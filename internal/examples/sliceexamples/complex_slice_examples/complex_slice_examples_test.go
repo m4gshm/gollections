@@ -4,6 +4,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/m4gshm/gollections/collection/immutable/set"
 	"github.com/m4gshm/gollections/iter"
 	"github.com/m4gshm/gollections/loop"
@@ -17,7 +19,6 @@ import (
 	"github.com/m4gshm/gollections/slice/group"
 	sliceIter "github.com/m4gshm/gollections/slice/iter"
 	"github.com/m4gshm/gollections/slice/stream"
-	"github.com/stretchr/testify/assert"
 )
 
 type User struct {
@@ -66,8 +67,7 @@ func Test_GroupBySeveralKeysAndConvertMapValues(t *testing.T) {
 	//old
 	legacyNamesByRole := map[string][]string{}
 	for _, u := range users {
-		roles := u.Roles()
-		if len(roles) == 0 {
+		if roles := u.Roles(); len(roles) == 0 {
 			lr := ""
 			names := legacyNamesByRole[lr]
 			names = append(names, u.Name())
