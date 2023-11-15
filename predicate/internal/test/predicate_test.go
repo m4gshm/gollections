@@ -3,13 +3,14 @@ package test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/m4gshm/gollections/convert/as"
 	"github.com/m4gshm/gollections/predicate/less"
 	"github.com/m4gshm/gollections/predicate/match"
 	"github.com/m4gshm/gollections/predicate/more"
 	"github.com/m4gshm/gollections/predicate/one"
 	"github.com/m4gshm/gollections/slice"
-	"github.com/stretchr/testify/assert"
 )
 
 func Test_lessThan(t *testing.T) {

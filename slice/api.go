@@ -4,11 +4,13 @@ package slice
 import (
 	"bytes"
 	"fmt"
+	"slices"
 	"unsafe"
 
 	"golang.org/x/exp/constraints"
 
 	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/comparer"
 	"github.com/m4gshm/gollections/convert"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_/resolv"
@@ -69,7 +71,7 @@ func DeepClone[TS ~[]T, T any](elements TS, copier func(T) T) TS {
 }
 
 // Delete removes an element by index from the slice 'elements'
-func Delete[TS ~[]T, T any](index int, elements TS) TS {
+func Delete[TS ~[]T, T any](elements TS, index int) TS {
 	if elements == nil {
 		return nil
 	}
@@ -83,7 +85,7 @@ func Group[TS ~[]T, T any, K comparable, V any](elements TS, keyExtractor func(T
 	if elements == nil {
 		return nil
 	}
-	return ToMapResolv(elements, keyExtractor, valExtractor, resolv.Append[K, V])
+	return ToMapResolv(elements, keyExtractor, valExtractor, resolv.Slice[K, V])
 }
 
 // GroupByMultiple converts the 'elements' slice into a map, extracting multiple keys, values per each element applying the 'keysExtractor' and 'valsExtractor' functions.
@@ -309,7 +311,7 @@ func ConvertCheckIndexed[FS ~[]From, From, To any](elements FS, by func(index in
 }
 
 // Flat unfolds the n-dimensional slice into a n-1 dimensional slice
-func Flat[FS ~[]From, From, To any](elements FS, flattener func(From) []To) []To {
+func Flat[FS ~[]From, From any, TS ~[]To, To any](elements FS, flattener func(From) TS) []To {
 	if elements == nil {
 		return nil
 	}
@@ -338,8 +340,8 @@ func Flatt[FS ~[]From, From, To any](elements FS, flattener func(From) ([]To, er
 	return result, nil
 }
 
-// FlattAndConvert unfolds the n-dimensional slice into a n-1 dimensional slice and converts the elements
-func FlattAndConvert[FS ~[]From, From, I, To any](elements FS, flattener func(From) []I, convert func(I) To) []To {
+// FlatAndConvert unfolds the n-dimensional slice into a n-1 dimensional slice and converts the elements
+func FlatAndConvert[FS ~[]From, From any, IS ~[]I, I, To any](elements FS, flattener func(From) IS, convert func(I) To) []To {
 	if elements == nil {
 		return nil
 	}
@@ -450,7 +452,7 @@ func Filt[TS ~[]T, T any](elements TS, filter func(T) (bool, error)) ([]T, error
 }
 
 // RangeClosed generates a slice of integers in the range defined by from and to inclusive
-func RangeClosed[T constraints.Integer](from T, toInclusive T) []T {
+func RangeClosed[T constraints.Integer | rune](from T, toInclusive T) []T {
 	if toInclusive == from {
 		return []T{from}
 	}
@@ -472,7 +474,7 @@ func RangeClosed[T constraints.Integer](from T, toInclusive T) []T {
 }
 
 // Range generates a slice of integers in the range defined by from and to exclusive
-func Range[T constraints.Integer](from T, toExclusive T) []T {
+func Range[T constraints.Integer | rune](from T, toExclusive T) []T {
 	if toExclusive == from {
 		return nil
 	}
@@ -507,22 +509,45 @@ func Reverse[TS ~[]T, T any](elements TS) []T {
 	return elements
 }
 
-// Less less element qualifier alias.
-// Is a function that must return true it the first element is less the second
-type Less[T any] func(first, second T) bool
+// Comparer aims to compare two values and must return a positive num if the first value is more then the second, a negative if less, and 0 if they equal.
+type Comparer[T any] func(T, T) int
 
-// Sorter is alias for sort.Slice or SliceStable functions
-type Sorter func(x any, less func(i, j int) bool)
+// Sorter is alias for slices.SortFunc or slices.SortStableFunc functions
+type Sorter[TS ~[]T, T any] func(TS, func(T, T) int)
 
-// Sort sorts elements in place using a function that checks if an element is smaller than the others
-func Sort[TS ~[]T, T any](elements TS, sorter Sorter, less Less[T]) TS {
-	sorter(elements, func(i, j int) bool { return less(elements[i], elements[j]) })
-	return elements
+// Sort sorts elements in place using the comparer function
+func Sort[TS ~[]T, T any](elements TS, comparer Comparer[T]) TS {
+	return sort(elements, slices.SortFunc, comparer)
 }
 
-// SortByOrdered sorts elements in place by converting them to constraints.Ordered values and applying the operator <
-func SortByOrdered[T any, o constraints.Ordered, TS ~[]T](elements TS, sorter Sorter, by func(T) o) TS {
-	return Sort(elements, sorter, func(e1, e2 T) bool { return by(e1) < by(e2) })
+// StableSort sorts elements in place using the comparer function
+func StableSort[TS ~[]T, T any](elements TS, comparer Comparer[T]) TS {
+	return sort(elements, slices.SortStableFunc, comparer)
+}
+
+// SortAsc sorts elements in ascending order, using the orderConverner function to retrieve a value of type Ordered.
+func SortAsc[T any, O constraints.Ordered, TS ~[]T](elements TS, orderConverner func(T) O) TS {
+	return Sort(elements, comparer.Of(orderConverner))
+}
+
+// StableSortAsc sorts elements in ascending order, using the orderConverner function to retrieve a value of type Ordered.
+func StableSortAsc[T any, O constraints.Ordered, TS ~[]T](elements TS, orderConverner func(T) O) TS {
+	return StableSort(elements, comparer.Of(orderConverner))
+}
+
+// SortDesc sorts elements in descending order, using the orderConverner function to retrieve a value of type Ordered.
+func SortDesc[T any, O constraints.Ordered, TS ~[]T](elements TS, orderConverner func(T) O) TS {
+	return Sort(elements, comparer.Reverse(orderConverner))
+}
+
+// StableSortDesc sorts elements in descending order, using the orderConverner function to retrieve a value of type Ordered.
+func StableSortDesc[T any, O constraints.Ordered, TS ~[]T](elements TS, orderConverner func(T) O) TS {
+	return StableSort(elements, comparer.Reverse(orderConverner))
+}
+
+func sort[TS ~[]T, T any](elements TS, sorter Sorter[TS, T], comparer Comparer[T]) TS {
+	sorter(elements, comparer)
+	return elements
 }
 
 // Reduce reduces the elements into an one using the 'merge' function

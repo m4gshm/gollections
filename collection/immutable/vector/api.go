@@ -20,6 +20,11 @@ func New[T any](elements []T) immutable.Vector[T] {
 	return immutable.NewVector(elements...)
 }
 
+// Wrap instantiates Vector using a slise as internal storage.
+func Wrap[T any](elements []T) immutable.Vector[T] {
+	return immutable.WrapVector(elements)
+}
+
 // From instantiates a vector with elements retrieved by the 'next' function.
 // The next returns an element with true or zero value with false if there are no more elements.
 func From[T any](next func() (T, bool)) immutable.Vector[T] {

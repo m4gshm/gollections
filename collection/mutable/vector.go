@@ -194,7 +194,7 @@ func (v *Vector[T]) Remove(index int) (t T, ok bool) {
 	}
 	if e := *v; index >= 0 && index < len(e) {
 		de := e[index]
-		*v = slice.Delete(index, e)
+		*v = slice.Delete(e, index)
 		return de, true
 	}
 	return t, ok
@@ -319,18 +319,18 @@ func (v *Vector[T]) HasAny(predicate func(T) bool) (ok bool) {
 }
 
 // Sort sorts the Vector in-place and returns it
-func (v *Vector[T]) Sort(less slice.Less[T]) *Vector[T] {
-	return v.sortBy(sort.Slice, less)
+func (v *Vector[T]) Sort(comparer slice.Comparer[T]) *Vector[T] {
+	return v.sortBy(slice.Sort, comparer)
 }
 
 // StableSort stable sorts the Vector in-place and returns it
-func (v *Vector[T]) StableSort(less slice.Less[T]) *Vector[T] {
-	return v.sortBy(sort.SliceStable, less)
+func (v *Vector[T]) StableSort(comparer slice.Comparer[T]) *Vector[T] {
+	return v.sortBy(slice.StableSort, comparer)
 }
 
-func (v *Vector[T]) sortBy(sorter slice.Sorter, less slice.Less[T]) *Vector[T] {
+func (v *Vector[T]) sortBy(sorter func([]T, slice.Comparer[T]) []T, comparer slice.Comparer[T]) *Vector[T] {
 	if v != nil {
-		slice.Sort(*v, sorter, less)
+		sorter(*v, comparer)
 	}
 	return v
 }

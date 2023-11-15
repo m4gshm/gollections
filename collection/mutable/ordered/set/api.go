@@ -31,7 +31,7 @@ func NewCap[T comparable](capacity int) *ordered.Set[T] {
 }
 
 // Sort copy the specified set with sorted elements
-func Sort[T comparable, f constraints.Ordered](s *ordered.Set[T], by func(T) f) *ordered.Set[T] {
+func Sort[T comparable, O constraints.Ordered](s *ordered.Set[T], by func(T) O) *ordered.Set[T] {
 	return collection.Sort[*ordered.Set[T]](s, by)
 }
 

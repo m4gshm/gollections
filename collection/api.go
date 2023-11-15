@@ -7,6 +7,7 @@ import (
 	breakloop "github.com/m4gshm/gollections/break/loop"
 	breakstream "github.com/m4gshm/gollections/break/stream"
 	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/comparer"
 	"github.com/m4gshm/gollections/convert"
 	"github.com/m4gshm/gollections/convert/as"
 	kvloop "github.com/m4gshm/gollections/kv/loop"
@@ -14,7 +15,6 @@ import (
 	"github.com/m4gshm/gollections/loop"
 	loopconvert "github.com/m4gshm/gollections/loop/convert"
 	"github.com/m4gshm/gollections/op/check/not"
-	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/stream"
 )
 
@@ -197,6 +197,8 @@ func Firstt[T any, I c.Iterable[T]](collection I, predicate func(T) (bool, error
 }
 
 // Sort sorts the specified sortable collection that contains orderable elements
-func Sort[O any, S interface{ Sort(less slice.Less[T]) O }, T any, f constraints.Ordered](collection S, by func(T) f) O {
-	return collection.Sort(func(e1, e2 T) bool { return by(e1) < by(e2) })
+func Sort[SC any, Cmp ~func(T, T) int, C interface {
+	Sort(Cmp) SC
+}, T any, O constraints.Ordered](collection C, order func(T) O) SC {
+	return collection.Sort(comparer.Of(order))
 }
