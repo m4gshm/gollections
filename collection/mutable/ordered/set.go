@@ -39,7 +39,7 @@ var (
 
 func (s *Set[T]) All(yield func(T) bool) {
 	if s != nil {
-		slice.All(*s.order, yield)
+		slice.PeekWhile(*s.order, yield)
 	}
 }
 
@@ -253,7 +253,7 @@ func (s *Set[T]) For(walker func(T) error) error {
 func (s *Set[T]) ForEach(walker func(T)) {
 	if s != nil {
 		if order := s.order; order != nil {
-			slice.ForEach(*order, walker)
+			slice.Peek(*order, walker)
 		}
 	}
 }
