@@ -33,7 +33,7 @@ var (
 )
 
 func (v Vector[T]) All(yield func(T) bool) {
-	slice.All(v.elements, yield)
+	slice.PeekWhile(v.elements, yield)
 }
 
 // Iter creates an iterator and returns as interface
@@ -117,7 +117,6 @@ func (v Vector[T]) Track(tracker func(int, T) error) error {
 // TrackEach applies the 'tracker' function for every key/value pairs
 func (v Vector[T]) TrackEach(tracker func(int, T)) {
 	slice.TrackEach(v.elements, tracker)
-
 }
 
 // For applies the 'walker' function for the elements. Return the c.ErrBreak to stop.
@@ -127,7 +126,7 @@ func (v Vector[T]) For(walker func(T) error) error {
 
 // ForEach applies the 'walker' function for every element
 func (v Vector[T]) ForEach(walker func(T)) {
-	slice.ForEach(v.elements, walker)
+	slice.Peek(v.elements, walker)
 }
 
 // Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function

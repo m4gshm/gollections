@@ -632,12 +632,6 @@ func TrackEach[TS ~[]T, T any](elements TS, tracker func(int, T)) {
 	}
 }
 
-func All[TS ~[]T, T any](elements TS, yield func(T) bool) {
-	for i := 0; i < len(elements) && yield(elements[i]); i++ {
-
-	}
-}
-
 // For applies the 'walker' function for the elements. Return the c.ErrBreak to stop
 func For[TS ~[]T, T any](elements TS, walker func(T) error) error {
 	for _, e := range elements {
@@ -650,15 +644,25 @@ func For[TS ~[]T, T any](elements TS, walker func(T) error) error {
 	return nil
 }
 
-// ForEach applies the 'walker' function for the elements
-func ForEach[TS ~[]T, T any](elements TS, walker func(T)) {
+func PeekWhile[TS ~[]T, T any](elements TS, peek func(T) bool) {
+	for i := 0; i < len(elements) && peek(elements[i]); i++ {
+
+	}
+}
+
+func All[TS ~[]T, T any](elements TS) c.RangeFunc[T] {
+	return func(yield func(T) bool) { PeekWhile(elements, yield) }
+}
+
+// Peek applies the 'walker' function for the elements
+func Peek[TS ~[]T, T any](elements TS, walker func(T)) {
 	for _, e := range elements {
 		walker(e)
 	}
 }
 
-// ForEachRef applies the 'walker' function for the references
-func ForEachRef[T any, TS ~[]*T](references TS, walker func(T)) {
+// PeekRef applies the 'walker' function for the references
+func PeekRef[T any, TS ~[]*T](references TS, walker func(T)) {
 	for _, e := range references {
 		walker(*e)
 	}

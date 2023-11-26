@@ -203,3 +203,5 @@ type Summable interface {
 type Number interface {
 	constraints.Integer | constraints.Float | constraints.Complex
 }
+
+type RangeFunc[T any] func(func(T) bool)

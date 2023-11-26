@@ -37,7 +37,7 @@ var (
 
 func (v *Vector[T]) All(yield func(T) bool) {
 	if v != nil {
-		slice.All(*v, yield)
+		slice.PeekWhile(*v, yield)
 	}
 }
 
@@ -149,7 +149,7 @@ func (v *Vector[T]) For(walker func(T) error) error {
 // ForEach applies walker to elements without error checking
 func (v *Vector[T]) ForEach(walker func(T)) {
 	if !(v == nil) {
-		slice.ForEach(*v, walker)
+		slice.Peek(*v, walker)
 	}
 }
 

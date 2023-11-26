@@ -18,6 +18,11 @@ import (
 	"github.com/m4gshm/gollections/stream"
 )
 
+func Convert2[From, To any, I c.Iterable[From]](collection I, converter func(From) To) func (func (To) bool) {
+	b := collection.Iter()
+	return stream.New(loop.Convert(b.Next, converter).Next).All
+}
+
 // Convert returns a stream that applies the 'converter' function to the collection elements
 func Convert[From, To any, I c.Iterable[From]](collection I, converter func(From) To) stream.Iter[To] {
 	b := collection.Iter()
