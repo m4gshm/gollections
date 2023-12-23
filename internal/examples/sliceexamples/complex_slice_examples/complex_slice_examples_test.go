@@ -208,7 +208,7 @@ func Benchmark_AggregateFilteredRoles_Iter(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		roles := sliceIter.Flat(users, User.Roles)
 		roleNamesExceptManager := iter.Filter(iter.Convert(roles, Role.Name), not.Eq("Manager"))
-		_ = roleNamesExceptManager
+		_ = loop.Slice(roleNamesExceptManager.Next)
 	}
 }
 
@@ -216,7 +216,7 @@ func Benchmark_AggregateFilteredRoles_Loop(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		roles := sliceIter.Flat(users, User.Roles)
 		roleNamesExceptManager := loopConv.AndFilter(roles.Next, Role.Name, not.Eq("Manager"))
-		_ = roleNamesExceptManager
+		_ = loop.Slice(roleNamesExceptManager.Next)
 	}
 }
 
