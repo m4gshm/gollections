@@ -32,6 +32,12 @@ var (
 	_ fmt.Stringer                       = Set[int]{}
 )
 
+func (s Set[T]) All(yield func(T) bool) {
+	for i := 0; i < len(s.order) && yield(s.order[i]); i++ {
+
+	}
+}
+
 // Iter creates an iterator and returns as interface
 func (s Set[T]) Iter() c.Iterator[T] {
 	h := s.Head()
