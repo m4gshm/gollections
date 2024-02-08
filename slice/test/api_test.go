@@ -15,12 +15,10 @@ import (
 
 	_less "github.com/m4gshm/gollections/break/predicate/less"
 	_more "github.com/m4gshm/gollections/break/predicate/more"
-	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/convert/as"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/op/delay/chain"
 	"github.com/m4gshm/gollections/op/delay/string_/wrap"
-	"github.com/m4gshm/gollections/over"
 	"github.com/m4gshm/gollections/predicate/eq"
 	"github.com/m4gshm/gollections/predicate/more"
 	"github.com/m4gshm/gollections/slice"
