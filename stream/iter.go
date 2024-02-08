@@ -67,6 +67,10 @@ func (t Iter[T]) ForEach(walker func(T)) {
 	loop.ForEach(t.next, walker)
 }
 
+func (t Iter[T]) All(yield func(T) bool) {
+	loop.All(t.next, yield)
+}
+
 // For applies the 'walker' function for the elements. Return the c.ErrBreak to stop.
 func (t Iter[T]) For(walker func(T) error) error {
 	return loop.For(t.next, walker)

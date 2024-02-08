@@ -24,6 +24,7 @@ type Collection[T any] interface {
 	SliceFactory[T]
 
 	Reduce(merger func(T, T) T) T
+	All(yield func(T) bool)
 }
 
 // Filterable provides filtering content functionality
@@ -58,6 +59,7 @@ type Iterator[T any] interface {
 
 	ForLoop[T]
 	ForEachLoop[T]
+	All(yield func(T) bool)
 }
 
 // IterFor extends an iterator type by a 'Start' function implementation

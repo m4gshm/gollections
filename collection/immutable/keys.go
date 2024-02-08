@@ -32,6 +32,10 @@ var (
 	_ fmt.Stringer                              = MapKeys[int, any]{}
 )
 
+func (m MapKeys[K, V]) All(yield func(K) bool) {
+	map_.AllKeys(m.elements, yield)
+}
+
 // Iter creates an iterator and returns as interface
 func (m MapKeys[K, V]) Iter() c.Iterator[K] {
 	h := m.Head()

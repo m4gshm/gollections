@@ -35,6 +35,12 @@ var (
 	_ fmt.Stringer                      = (*Vector[any])(nil)
 )
 
+func (v *Vector[T]) All(yield func(T) bool) {
+	if v != nil {
+		slice.All(*v, yield)
+	}
+}
+
 // Iter creates an iterator and returns as interface
 func (v *Vector[T]) Iter() c.Iterator[T] {
 	h := v.Head()
