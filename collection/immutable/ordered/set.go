@@ -33,7 +33,7 @@ var (
 )
 
 func (s Set[T]) All(yield func(T) bool) {
-	slice.All(s.order, yield)
+	slice.PeekWhile(s.order, yield)
 }
 
 // Iter creates an iterator and returns as interface
@@ -105,7 +105,7 @@ func (s Set[T]) For(walker func(T) error) error {
 
 // ForEach applies the 'walker' function for every element
 func (s Set[T]) ForEach(walker func(T)) {
-	slice.ForEach(s.order, walker)
+	slice.Peek(s.order, walker)
 }
 
 // Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function
