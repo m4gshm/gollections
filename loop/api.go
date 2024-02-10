@@ -468,7 +468,7 @@ func RangeClosed[T constraints.Integer](from T, toInclusive T) func() (T, bool) 
 }
 
 // Range creates a loop that generates integers in the range defined by from and to exclusive
-func Range[T constraints.Integer](from T, toExclusive T) func() (T, bool) {
+func Range[T constraints.Integer | rune](from T, toExclusive T) func() (T, bool) {
 	amount := toExclusive - from
 	delta := T(1)
 	if amount < 0 {
