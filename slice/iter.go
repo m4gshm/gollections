@@ -71,6 +71,10 @@ var (
 	_ c.PrevIterator[any] = (*Iter[any])(nil)
 )
 
+func (i *Iter[T]) All(yield func(element T) bool) {
+	loop.All(i.Next, yield)
+}
+
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (i *Iter[T]) For(walker func(element T) error) error {
 	return loop.For(i.Next, walker)

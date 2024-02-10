@@ -7,3 +7,8 @@ import "github.com/m4gshm/gollections/c"
 func New[K any, V any](key K, value V) c.KV[K, V] {
 	return c.KV[K, V]{K: key, V: value}
 }
+
+func All[K, V any](next func() (K, V, bool), yield func(K, V) bool) {
+	for k, v, ok := next(); ok && yield(k, v); k, v, ok = next() {
+	}
+}

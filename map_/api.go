@@ -320,6 +320,46 @@ func ForEachValue[M ~map[K]V, K comparable, V any](elements M, walker func(V)) {
 	}
 }
 
+func All[M ~map[K]V, K comparable, V any](elements M, yield func(K, V) bool) {
+	for key, val := range elements {
+		if !yield(key, val) {
+			break
+		}
+	}
+}
+
+func AllKeys[M ~map[K]V, K comparable, V any](elements M, yield func(K) bool) {
+	for key := range elements {
+		if !yield(key) {
+			break
+		}
+	}
+}
+
+func AllValues[M ~map[K]V, K comparable, V any](elements M, yield func(V) bool) {
+	for _, val := range elements {
+		if !yield(val) {
+			break
+		}
+	}
+}
+
+func AllOrdered[M ~map[K]V, K comparable, V any](order []K, elements M, yield func(K, V) bool) {
+	for _, key := range order {
+		if !yield(key, elements[key]) {
+			return
+		}
+	}
+}
+
+func AllOrderedValues[M ~map[K]V, K comparable, V any](order []K, elements M, yield func(V) bool) {
+	for _, key := range order {
+		if !yield(elements[key]) {
+			return
+		}
+	}
+}
+
 // ForOrderedValues applies the 'walker' function for values from the 'elements' map in order of the 'order' slice. Return the c.ErrBreak to stop..
 func ForOrderedValues[M ~map[K]V, K comparable, V any](order []K, elements M, walker func(V) error) error {
 	for _, key := range order {

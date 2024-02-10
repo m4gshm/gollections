@@ -24,8 +24,14 @@ type Looper[T any, I interface{ Next() (T, bool) }] interface {
 	Loop() I
 }
 
+type Loop[T any] func() (T, bool)
+
+func (n Loop[T]) All(yield func(T) bool) {
+	All(n, yield)
+}
+
 // Of wrap the elements by loop function
-func Of[T any](elements ...T) func() (e T, ok bool) {
+func Of[T any](elements ...T) Loop[T] {
 	l := len(elements)
 	i := 0
 	if l == 0 || i < 0 || i >= l {
@@ -37,6 +43,11 @@ func Of[T any](elements ...T) func() (e T, ok bool) {
 			i++
 		}
 		return e, ok
+	}
+}
+
+func All[T any](next func() (T, bool), yield func(T) bool) {
+	for v, ok := next(); ok && yield(v); v, ok = next() {
 	}
 }
 
@@ -447,7 +458,7 @@ func New[S, T any](source S, hasNext func(S) bool, getNext func(S) T) func() (T,
 }
 
 // RangeClosed creates a loop that generates integers in the range defined by from and to inclusive
-func RangeClosed[T constraints.Integer](from T, toInclusive T) func() (T, bool) {
+func RangeClosed[T constraints.Integer | rune](from T, toInclusive T) Loop[T] {
 	amount := toInclusive - from
 	delta := T(1)
 	if amount < 0 {
@@ -468,7 +479,7 @@ func RangeClosed[T constraints.Integer](from T, toInclusive T) func() (T, bool) 
 }
 
 // Range creates a loop that generates integers in the range defined by from and to exclusive
-func Range[T constraints.Integer](from T, toExclusive T) func() (T, bool) {
+func Range[T constraints.Integer | rune](from T, toExclusive T) Loop[T] {
 	amount := toExclusive - from
 	delta := T(1)
 	if amount < 0 {
@@ -490,7 +501,7 @@ func Range[T constraints.Integer](from T, toExclusive T) func() (T, bool) {
 // OfIndexed builds a loop by extracting elements from an indexed soruce.
 // the len is length ot the source.
 // the getAt retrieves an element by its index from the source.
-func OfIndexed[T any](len int, next func(int) T) func() (T, bool) {
+func OfIndexed[T any](len int, next func(int) T) Loop[T] {
 	i := 0
 	return func() (out T, ok bool) {
 		if ok = i < len; ok {

@@ -38,6 +38,10 @@ var (
 	_ kv.IterFor[string, any, Iter[string, any, map[string][]any]]    = Iter[string, any, map[string][]any]{}
 )
 
+func (i Iter[K, V, M]) All(yield func(key K, value V) bool) {
+	kv.All(i.Next, yield)
+}
+
 // Next implements kv.KVIterator
 func (i Iter[K, V, M]) Next() (K, V, bool) {
 	return i.next()

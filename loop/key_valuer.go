@@ -1,6 +1,8 @@
 package loop
 
-import "github.com/m4gshm/gollections/kv"
+import (
+	"github.com/m4gshm/gollections/kv"
+)
 
 // NewKeyValuer creates instance of the KeyValuer
 func NewKeyValuer[T any, K, V any](next func() (T, bool), keyExtractor func(T) K, valsExtractor func(T) V) KeyValuer[T, K, V] {
@@ -22,6 +24,10 @@ type KeyValuer[T, K, V any] struct {
 var _ kv.Iterator[int, string] = (*KeyValuer[any, int, string])(nil)
 var _ kv.Iterator[int, string] = KeyValuer[any, int, string]{}
 var _ kv.IterFor[int, string, KeyValuer[any, int, string]] = KeyValuer[any, int, string]{}
+
+func (i KeyValuer[T, K, V]) All(yield func(key K, value V) bool) {
+	kv.All(i.Next, yield)
+}
 
 // Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (kv KeyValuer[T, K, V]) Track(traker func(key K, value V) error) error {
@@ -64,6 +70,10 @@ type MultipleKeyValuer[T, K, V any] struct {
 
 var _ kv.Iterator[int, string] = (*MultipleKeyValuer[any, int, string])(nil)
 var _ kv.IterFor[int, string, *MultipleKeyValuer[any, int, string]] = (*MultipleKeyValuer[any, int, string])(nil)
+
+func (i *MultipleKeyValuer[T, K, V]) All(yield func(key K, value V) bool) {
+	kv.All(i.Next, yield)
+}
 
 // Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (kv *MultipleKeyValuer[T, K, V]) Track(traker func(key K, value V) error) error {

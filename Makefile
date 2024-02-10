@@ -28,6 +28,8 @@ clean:
 .PHONY: build
 build:
 	$(info #Building...)
+	# go env -w GOEXPERIMENT=rangefunc,newinliner	
+	go env -w GOEXPERIMENT=rangefunc
 	go build ./...
 
 .PHONY: builda
@@ -39,6 +41,8 @@ builda:
 .PHONY: bench
 bench:
 	$(info #Running benchmarks...)
+	# go env -w GOEXPERIMENT=rangefunc,newinliner
+	go env -w GOEXPERIMENT=rangefunc
 	go test -benchtime 1s -bench . -benchmem ./...
 
 .PHONY: update
@@ -57,12 +61,14 @@ lint:
 	# godot .
 	go install github.com/kisielk/errcheck@latest
 	errcheck -ignoretests ./...
-	go install github.com/alexkohler/nakedret/cmd/nakedret@latest
-	nakedret ./...
+	# go install github.com/alexkohler/nakedret/cmd/nakedret@latest
+	# nakedret ./...
 	# go install golang.org/x/lint/golint@latest
 	# golint ./...
 	go install github.com/mgechev/revive@latest
 	revive -exclude internal/... ./...
+	go install github.com/alexkohler/prealloc@latest
+	prealloc ./...
 
 .PHONY: readme
 readme:

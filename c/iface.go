@@ -58,6 +58,7 @@ type Iterator[T any] interface {
 
 	ForLoop[T]
 	ForEachLoop[T]
+	All(yield func(T) bool)
 }
 
 // IterFor extends an iterator type by a 'Start' function implementation
@@ -201,3 +202,5 @@ type Summable interface {
 type Number interface {
 	constraints.Integer | constraints.Float | constraints.Complex
 }
+
+type RangeFunc[T any] func(func(T) bool)

@@ -337,7 +337,7 @@ func Test_Keyer(t *testing.T) {
 	assert.Equal(t, m["Bob"], slice.Of(users[0]))
 	assert.Equal(t, m["Tom"], slice.Of(users[2]))
 
-	g := loop.Group(loop.Of(users...), User.Name, as.Is[User])
+	g := loop.Group(loop.Of(users...), User.Name, as.Is)
 	assert.Equal(t, m, g)
 }
 

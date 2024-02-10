@@ -518,7 +518,7 @@ func Test_SplitTwo2(t *testing.T) {
 func Test_SplitAndReduce(t *testing.T) {
 	byIndex := func(i int) func(string) string { return func(s string) string { return string(s[i]) } }
 
-	first, second := split.AndReduce(slice.Of("1a", "2b", "3c"), byIndex(0), chain.Of(byIndex(1), wrap.By("{", "}")), op.Sum[string], op.Sum[string])
+	first, second := split.AndReduce(slice.Of("1a", "2b", "3c"), byIndex(0), chain.Of(byIndex(1), wrap.By("{", "}")), op.Sum, op.Sum)
 
 	assert.Equal(t, "123", first)
 	assert.Equal(t, "{a}{b}{c}", second)
@@ -528,4 +528,17 @@ func Test_OfIndexed(t *testing.T) {
 	indexed := slice.Of("0", "1", "2", "3", "4")
 	result := slice.OfIndexed(len(indexed), func(i int) string { return indexed[i] })
 	assert.Equal(t, indexed, result)
+}
+
+func Test_PeekWhile(t *testing.T) {
+	expected := slice.Of(1, 3, 5, 7, 9, 11)
+
+	s := []int{}
+
+	slice.PeekWhile(expected, func(e int) bool {
+		s = append(s, e)
+		return true
+	})
+
+	assert.Equal(t, expected, s)
 }

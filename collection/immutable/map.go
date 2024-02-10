@@ -40,6 +40,14 @@ var (
 	_ fmt.Stringer                                     = Map[int, any]{}
 )
 
+func (m Map[K, V]) All(yield func(k K, v V) bool) {
+	for k, v := range m.elements {
+		if !yield(k, v) {
+			break
+		}
+	}
+}
+
 // Iter creates an iterator and returns as interface
 func (m Map[K, V]) Iter() kv.Iterator[K, V] {
 	h := m.Head()

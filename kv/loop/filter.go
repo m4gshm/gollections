@@ -18,6 +18,10 @@ var (
 
 var _ kv.IterFor[any, any, FilterIter[any, any]] = FilterIter[any, any]{}
 
+func (f FilterIter[K, V]) All(yield func(key K, value V) bool) {
+	kv.All(f.Next, yield)
+}
+
 // Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (f FilterIter[K, V]) Track(traker func(key K, value V) error) error {
 	return loop.Track(f.Next, traker)

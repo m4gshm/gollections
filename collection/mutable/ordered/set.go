@@ -37,6 +37,12 @@ var (
 	_ fmt.Stringer                        = (*Set[int])(nil)
 )
 
+func (s *Set[T]) All(yield func(T) bool) {
+	if s != nil {
+		slice.PeekWhile(*s.order, yield)
+	}
+}
+
 // Iter creates an iterator and returns as interface
 func (s *Set[T]) Iter() c.Iterator[T] {
 	h := s.Head()
@@ -247,7 +253,7 @@ func (s *Set[T]) For(walker func(T) error) error {
 func (s *Set[T]) ForEach(walker func(T)) {
 	if s != nil {
 		if order := s.order; order != nil {
-			slice.ForEach(*order, walker)
+			slice.Peek(*order, walker)
 		}
 	}
 }

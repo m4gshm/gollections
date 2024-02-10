@@ -25,6 +25,10 @@ var (
 
 var _ c.IterFor[int, *SetIter[int]] = (*SetIter[int])(nil)
 
+func (i *SetIter[T]) All(yield func(element T) bool) {
+	loop.All(i.Next, yield)
+}
+
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (i *SetIter[T]) For(walker func(element T) error) error {
 	return loop.For(i.Next, walker)

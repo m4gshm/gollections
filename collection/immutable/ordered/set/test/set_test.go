@@ -21,6 +21,22 @@ func Test_Set_From(t *testing.T) {
 	assert.Equal(t, slice.Of(1, 2, 3, 4), set.Slice())
 }
 
+func Test_Set_Iterate_go_1_22(t *testing.T) {
+	set := set.Of(1, 1, 2, 4, 3, 1)
+	expected := slice.Of(1, 2, 3, 4)
+
+	out := make(map[int]int, 0)
+
+	for v := range set.All {
+		out[v] = v
+	}
+
+	assert.Equal(t, len(expected), len(out))
+	for k := range out {
+		assert.True(t, set.Contains(k))
+	}
+}
+
 func Test_Set_Iterate(t *testing.T) {
 	set := set.Of(1, 1, 2, 4, 3, 1)
 	values := set.Slice()

@@ -35,6 +35,12 @@ var (
 	_ fmt.Stringer                      = (*Vector[any])(nil)
 )
 
+func (v *Vector[T]) All(yield func(int, T) bool) {
+	if v != nil {
+		slice.PeekIWhile(*v, yield)
+	}
+}
+
 // Iter creates an iterator and returns as interface
 func (v *Vector[T]) Iter() c.Iterator[T] {
 	h := v.Head()
@@ -143,7 +149,7 @@ func (v *Vector[T]) For(walker func(T) error) error {
 // ForEach applies walker to elements without error checking
 func (v *Vector[T]) ForEach(walker func(T)) {
 	if !(v == nil) {
-		slice.ForEach(*v, walker)
+		slice.Peek(*v, walker)
 	}
 }
 
