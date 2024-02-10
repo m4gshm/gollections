@@ -37,8 +37,8 @@ func Test_AllConverted(t *testing.T) {
 }
 
 var (
-	max        = 100000
-	values     = range_.Closed(1, max)
+	max    = 100000
+	values = range_.Closed(1, max)
 )
 
 func Benchmark_OrderedSet_Filter_Convert(b *testing.B) {

@@ -35,9 +35,9 @@ var (
 	_ fmt.Stringer                      = (*Vector[any])(nil)
 )
 
-func (v *Vector[T]) All(yield func(T) bool) {
+func (v *Vector[T]) All(yield func(int, T) bool) {
 	if v != nil {
-		slice.PeekWhile(*v, yield)
+		slice.PeekIWhile(*v, yield)
 	}
 }
 

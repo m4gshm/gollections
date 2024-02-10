@@ -24,7 +24,6 @@ type Collection[T any] interface {
 	SliceFactory[T]
 
 	Reduce(merger func(T, T) T) T
-	All(yield func(T) bool)
 }
 
 // Filterable provides filtering content functionality

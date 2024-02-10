@@ -8,7 +8,6 @@ import (
 	"github.com/m4gshm/gollections/collection/immutable/vector"
 	moset "github.com/m4gshm/gollections/collection/mutable/ordered/set"
 	mvector "github.com/m4gshm/gollections/collection/mutable/vector"
-	"github.com/m4gshm/gollections/convert/ptr"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/range_"
@@ -42,12 +41,72 @@ type benchCase struct {
 
 var cases = []benchCase{ /*{"high", HighLoad}, */ {"low", LowLoad}}
 
-func Benchmark_Loop_Reference(b *testing.B) {
+func Benchmark_Loop_Slice_Embedded_ForByRange(b *testing.B) {
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				for _, v := range values {
 					casee.load(v)
+				}
+			}
+		})
+	}
+}
+
+func Benchmark_Loop_Slice_Embedded_ForByRangeIF(b *testing.B) {
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for _, v := range values {
+					if v <= max {
+						casee.load(v)
+					} else {
+						break
+					}
+				}
+			}
+		})
+	}
+}
+
+func Benchmark_Loop_Slice_Embedded_ForByRangeIndex(b *testing.B) {
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for j := range values {
+					v := values[j]
+					casee.load(v)
+				}
+			}
+		})
+	}
+}
+
+func Benchmark_Loop_Slice_Embedded_ForByIndex(b *testing.B) {
+	l := len(values)
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for j := 0; j < l; j++ {
+					v := values[j]
+					casee.load(v)
+				}
+			}
+		})
+	}
+}
+
+func Benchmark_Loop_Slice_Embedded_ForByIndexIf(b *testing.B) {
+	l := len(values)
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for j := 0; j < l; j++ {
+					if v := values[j]; v <= max {
+						casee.load(v)
+					} else {
+						break
+					}
 				}
 			}
 		})
@@ -94,6 +153,20 @@ func Benchmark_Loop_ImmutableOrderSet_FirstNext(b *testing.B) {
 	}
 }
 
+func Benchmark_Loop_ImmutableOrderSet_FirstNext2(b *testing.B) {
+	c := oset.Of(values...)
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				it, v, ok := c.First()
+				for ; ok; v, ok = it.Next() {
+					casee.load(v)
+				}
+			}
+		})
+	}
+}
+
 func Benchmark_Loop_ImmutableOrderSet_LastPrev(b *testing.B) {
 	c := oset.Of(values...)
 	for _, casee := range cases {
@@ -112,7 +185,7 @@ func Benchmark_Loop_ImmutableVector_go_1_22(b *testing.B) {
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				for v := range c.All {
+				for _, v := range c.All {
 					casee.load(v)
 				}
 			}
@@ -219,8 +292,8 @@ func Benchmark_Loop_MutableVector_HeadNext(b *testing.B) {
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				next := ptr.Of(c.Head()).Next
-				for v, ok := next(); ok; v, ok = next() {
+				head := c.Head()
+				for v, ok := head.Next(); ok; v, ok = head.Next() {
 					casee.load(v)
 				}
 			}
@@ -260,45 +333,6 @@ func Benchmark_Loop_Slice_NewHead_HasNextGetNext(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				for it := slice.NewHead(values); it.HasNext(); {
 					casee.load(it.GetNext())
-				}
-			}
-		})
-	}
-}
-
-func Benchmark_Loop_Slice_Embedded_ForByRange(b *testing.B) {
-	for _, casee := range cases {
-		b.Run(casee.name, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
-				for _, v := range values {
-					casee.load(v)
-				}
-			}
-		})
-	}
-}
-
-func Benchmark_Loop_Slice_Embedded_ForByRangeIndex(b *testing.B) {
-	for _, casee := range cases {
-		b.Run(casee.name, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
-				for j := range values {
-					v := values[j]
-					casee.load(v)
-				}
-			}
-		})
-	}
-}
-
-func Benchmark_Loop_Slice_Embedded_ForByIndex(b *testing.B) {
-	l := len(values)
-	for _, casee := range cases {
-		b.Run(casee.name, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
-				for j := 0; j < l; j++ {
-					v := values[j]
-					casee.load(v)
 				}
 			}
 		})

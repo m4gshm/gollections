@@ -685,8 +685,18 @@ func For[TS ~[]T, T any](elements TS, walker func(T) error) error {
 }
 
 func PeekWhile[TS ~[]T, T any](elements TS, peek func(T) bool) {
-	for i := 0; i < len(elements) && peek(elements[i]); i++ {
+	for _, e := range elements {
+		if !peek(e) {
+			break
+		}
+	}
+}
 
+func PeekIWhile[TS ~[]T, T any](elements TS, peek func(int, T) bool) {
+	for i, e := range elements {
+		if !peek(i, e) {
+			break
+		}
 	}
 }
 

@@ -518,7 +518,7 @@ func Test_SplitTwo2(t *testing.T) {
 func Test_SplitAndReduce(t *testing.T) {
 	byIndex := func(i int) func(string) string { return func(s string) string { return string(s[i]) } }
 
-	first, second := split.AndReduce(slice.Of("1a", "2b", "3c"), byIndex(0), chain.Of(byIndex(1), wrap.By("{", "}")), op.Sum[string], op.Sum[string])
+	first, second := split.AndReduce(slice.Of("1a", "2b", "3c"), byIndex(0), chain.Of(byIndex(1), wrap.By("{", "}")), op.Sum, op.Sum)
 
 	assert.Equal(t, "123", first)
 	assert.Equal(t, "{a}{b}{c}", second)

@@ -32,7 +32,6 @@ type Iter[K comparable, V any] struct {
 var _ kv.Iterator[int, any] = (*Iter[int, any])(nil)
 var _ kv.IterFor[int, any, *Iter[int, any]] = (*Iter[int, any])(nil)
 
-
 func (i *Iter[K, V]) All(yield func(key K, value V) bool) {
 	kv.All(i.Next, yield)
 }

@@ -26,7 +26,7 @@ func Test_VectorIterate_go_1_22(t *testing.T) {
 
 	out := []int{}
 
-	for v := range vec.All {
+	for _, v := range vec.All {
 		out = append(out, v)
 	}
 

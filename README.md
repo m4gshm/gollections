@@ -62,7 +62,7 @@ go get -u github.com/m4gshm/gollections
 data, err := slice.Conv(slice.Of("1", "2", "3", "4", "_", "6"), strconv.Atoi)
 even := func(i int) bool { return i%2 == 0 }
 
-result := slice.Reduce(slice.Convert(slice.Filter(data, even), strconv.Itoa), op.Sum[string])
+result := slice.Reduce(slice.Convert(slice.Filter(data, even), strconv.Itoa), op.Sum)
 
 assert.ErrorIs(t, err, strconv.ErrSyntax)
 assert.Equal(t, "24", result)
@@ -162,7 +162,7 @@ import "github.com/m4gshm/gollections/slice/group"
 
 var ageGroups = group.Of(users, func(u User) string {
     return use.If(u.age <= 20, "<=20").If(u.age <= 30, "<=30").Else(">30")
-}, as.Is[User])
+}, as.Is)
 
 //map[<=20:[{Tom 18 []}] <=30:[{Bob 26 []}] >30:[{Alice 35 []} {Chris 41 []}]]
 ```
@@ -459,6 +459,23 @@ result, err := loop.Slice(iter.Next)
 
 assert.Equal(t, []int{1, 2, 3}, result)
 assert.ErrorContains(t, err, "invalid syntax")
+```
+
+### Go 1.22 range-over-function iterators (not finalized feature)
+
+Activates by `go env -w GOEXPERIMENT=rangefunc`
+
+Introduced as `All(yield func(T) bool)` method of collection, iterator
+types.
+
+``` go
+var letters []rune
+for letter := range loop.RangeClosed('A', 'H').All {
+    letters = append(letters, letter)
+}
+word := string(letters) //ABCDEFGH
+
+assert.Equal(t, "ABCDEFGH", word)
 ```
 
 ### Expressions: [use.If](./expr/use/api.go), [get.If](./expr/get/api.go), [first.Of](#firstof), [last.Of](#lastof)

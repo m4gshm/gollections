@@ -32,8 +32,8 @@ var (
 	_ fmt.Stringer                       = Vector[any]{}
 )
 
-func (v Vector[T]) All(yield func(T) bool) {
-	slice.PeekWhile(v.elements, yield)
+func (v Vector[T]) All(yield func(int, T) bool) {
+	slice.PeekIWhile(v.elements, yield)
 }
 
 // Iter creates an iterator and returns as interface
