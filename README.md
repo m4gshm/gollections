@@ -62,7 +62,7 @@ go get -u github.com/m4gshm/gollections
 data, err := slice.Conv(slice.Of("1", "2", "3", "4", "_", "6"), strconv.Atoi)
 even := func(i int) bool { return i%2 == 0 }
 
-result := slice.Reduce(slice.Convert(slice.Filter(data, even), strconv.Itoa), op.Sum[string])
+result := slice.Reduce(slice.Convert(slice.Filter(data, even), strconv.Itoa), op.Sum)
 
 assert.ErrorIs(t, err, strconv.ErrSyntax)
 assert.Equal(t, "24", result)
@@ -162,7 +162,7 @@ import "github.com/m4gshm/gollections/slice/group"
 
 var ageGroups = group.Of(users, func(u User) string {
     return use.If(u.age <= 20, "<=20").If(u.age <= 30, "<=30").Else(">30")
-}, as.Is[User])
+}, as.Is)
 
 //map[<=20:[{Tom 18 []}] <=30:[{Bob 26 []}] >30:[{Alice 35 []} {Chris 41 []}]]
 ```
@@ -265,7 +265,7 @@ var f2 = slice.Filter([]int{1, 3, 5, 7, 9, 11}, exclude.All(1, 7, 11))       //[
 import "github.com/m4gshm/gollections/convert/as"
 import "github.com/m4gshm/gollections/slice"
 
-var i []int = slice.Flat([][]int{{1, 2, 3}, {4}, {5, 6}}, as.Is[[]int])
+var i []int = slice.Flat([][]int{{1, 2, 3}, {4}, {5, 6}}, as.Is)
 //[]int{1, 2, 3, 4, 5, 6}
 ```
 

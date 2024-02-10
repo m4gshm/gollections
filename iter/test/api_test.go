@@ -66,11 +66,11 @@ func Test_FlattSlices(t *testing.T) {
 		multiDimension = [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
 		expected       = slice.Of(1, 3, 5, 7)
 	)
-	f := iter.Filter(iter.Flat(iter.Flat(slice.NewIter(multiDimension), as.Is[[][]int]), as.Is[[]int]), odds)
+	f := iter.Filter(iter.Flat(iter.Flat(slice.NewIter(multiDimension), as.Is[[][]int]), as.Is), odds)
 	a := loop.Slice(f.Next)
 	assert.Equal(t, expected, a)
 
-	a = loop.Slice(iter.Filter(iter.Flat(sliceIter.Flat(multiDimension, as.Is[[][]int]), as.Is[[]int]), odds).Next)
+	a = loop.Slice(iter.Filter(iter.Flat(sliceIter.Flat(multiDimension, as.Is[[][]int]), as.Is), odds).Next)
 	assert.Equal(t, expected, a)
 
 	//plain old style
@@ -103,10 +103,10 @@ func Test_ReduceSlices(t *testing.T) {
 
 	e := 1 + 3 + 5 + 7
 
-	oddSum := loop.Reduce(iter.Filter(iter.Flat(iter.Flat(slice.NewIter(multiDimension), as.Is[[][]int]), as.Is[[]int]), odds).Next, op.Sum[int])
+	oddSum := loop.Reduce(iter.Filter(iter.Flat(iter.Flat(slice.NewIter(multiDimension), as.Is[[][]int]), as.Is), odds).Next, op.Sum[int])
 	assert.Equal(t, e, oddSum)
 
-	oddSum = loop.Reduce(iter.Filter(iter.Flat(sliceIter.Flat(multiDimension, as.Is[[][]int]), as.Is[[]int]), odds).Next, op.Sum[int])
+	oddSum = loop.Reduce(iter.Filter(iter.Flat(sliceIter.Flat(multiDimension, as.Is[[][]int]), as.Is), odds).Next, op.Sum[int])
 	assert.Equal(t, e, oddSum)
 
 	//plain old style

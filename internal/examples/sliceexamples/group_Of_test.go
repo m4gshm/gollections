@@ -16,7 +16,7 @@ func Test_Slice_Group(t *testing.T) {
 
 	var ageGroups = group.Of(users, func(u User) string {
 		return use.If(u.age <= 20, "<=20").If(u.age <= 30, "<=30").Else(">30")
-	}, as.Is[User])
+	}, as.Is)
 
 	//map[<=20:[{Tom 18 []}] <=30:[{Bob 26 []}] >30:[{Alice 35 []} {Chris 41 []}]]
 
