@@ -63,7 +63,7 @@ func Test_Match_To(t *testing.T) {
 	assert.False(t, oneEvenMatcher(1))
 	assert.True(t, oneEvenMatcher(2))
 
-	anyEvenMatcher := match.To(as.Is[[]int], func(i []int) bool { return len(i) > 2 })
+	anyEvenMatcher := match.To(as.Is, func(i []int) bool { return len(i) > 2 })
 
 	assert.False(t, anyEvenMatcher(slice.Of(1, 2)))
 	assert.True(t, anyEvenMatcher(slice.Of(1, 2, 3)))
@@ -72,7 +72,7 @@ func Test_Match_To(t *testing.T) {
 
 func Test_Match_Any(t *testing.T) {
 
-	anyEvenMatcher := match.Any(as.Is[[]int], func(i int) bool { return i%2 == 0 })
+	anyEvenMatcher := match.Any(as.Is, func(i int) bool { return i%2 == 0 })
 
 	assert.False(t, anyEvenMatcher(slice.Of(1, 3)))
 	assert.True(t, anyEvenMatcher(slice.Of(1, 2)))

@@ -258,7 +258,7 @@ func Benchmark_Flatt_Iterable(b *testing.B) {
 	multiDimension := [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		oneDimension := loop.Slice[int](iter.Filter(iter.Flat(iter.Flat(slice.NewIter(multiDimension), as.Is[[][]int]), as.Is[[]int]), odds).Next)
+		oneDimension := loop.Slice[int](iter.Filter(iter.Flat(iter.Flat(slice.NewIter(multiDimension), as.Is[[][]int]), as.Is), odds).Next)
 		_ = oneDimension
 	}
 	b.StopTimer()
@@ -271,7 +271,7 @@ func Benchmark_Flatt_Loop(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		next := loop.Of(multiDimension...)
 		twoD := loop.Flat(next, as.Is[[][]int])
-		oneD := loop.Flat(twoD.Next, as.Is[[]int])
+		oneD := loop.Flat(twoD.Next, as.Is)
 		f := loop.Filter(oneD.Next, odds)
 		oneDimension := loop.Slice(f.Next)
 		_ = oneDimension
@@ -284,7 +284,7 @@ func Benchmark_Flatt_Slice_Iterated(b *testing.B) {
 	multiDimension := [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		oneDimension := loop.Slice[int](iter.Filter(iter.Flat(sliceIter.Flat(multiDimension, as.Is[[][]int]), as.Is[[]int]), odds).Next)
+		oneDimension := loop.Slice[int](iter.Filter(iter.Flat(sliceIter.Flat(multiDimension, as.Is[[][]int]), as.Is), odds).Next)
 		_ = oneDimension
 	}
 	b.StopTimer()
@@ -296,7 +296,7 @@ func Benchmark_Flatt_Slice_Looped(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		sf := sliceIter.Flat(multiDimension, as.Is[[][]int])
-		oneD := loop.Flat(sf.Next, as.Is[[]int])
+		oneD := loop.Flat(sf.Next, as.Is)
 		f := loop.Filter(oneD.Next, odds)
 		oneDimension := loop.Slice(f.Next)
 		_ = oneDimension
@@ -329,7 +329,7 @@ func Benchmark_ReduceSum_Iterable(b *testing.B) {
 	b.ResetTimer()
 	result := 0
 	for i := 0; i < b.N; i++ {
-		result = loop.Reduce(iter.Filter(iter.Flat(iter.Flat(slice.NewIter(multiDimension), as.Is[[][]int]), as.Is[[]int]), odds).Next, sop.Sum[int])
+		result = loop.Reduce(iter.Filter(iter.Flat(iter.Flat(slice.NewIter(multiDimension), as.Is[[][]int]), as.Is), odds).Next, sop.Sum[int])
 	}
 	b.StopTimer()
 	if result != expected {
@@ -346,7 +346,7 @@ func Benchmark_ReduceSum_Loop(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		next := loop.Of(multiDimension...)
 		f1 := loop.Flat(next, as.Is[[][]int])
-		f2 := loop.Flat(f1.Next, as.Is[[]int])
+		f2 := loop.Flat(f1.Next, as.Is)
 		f3 := loop.Filter(f2.Next, odds)
 		result = loop.Reduce(f3.Next, sop.Sum[int])
 	}
@@ -363,7 +363,7 @@ func Benchmark_ReduceSum_Slice(b *testing.B) {
 	b.ResetTimer()
 	result := 0
 	for i := 0; i < b.N; i++ {
-		result = loop.Reduce(iter.Filter(iter.Flat(sliceIter.Flat(multiDimension, as.Is[[][]int]), as.Is[[]int]), odds).Next, sop.Sum[int])
+		result = loop.Reduce(iter.Filter(iter.Flat(sliceIter.Flat(multiDimension, as.Is[[][]int]), as.Is), odds).Next, sop.Sum[int])
 	}
 	b.StopTimer()
 	if result != expected {
@@ -382,7 +382,7 @@ func Benchmark_ReduceSum_Slice_Looped(b *testing.B) {
 	result := 0
 	for i := 0; i < b.N; i++ {
 		f1 := sliceIter.Flat(multiDimension, as.Is[[][]int])
-		f2 := loop.Flat(f1.Next, as.Is[[]int])
+		f2 := loop.Flat(f1.Next, as.Is)
 		f3 := loop.Filter(f2.Next, odds)
 		result = loop.Reduce(f3.Next, sop.Sum[int])
 	}

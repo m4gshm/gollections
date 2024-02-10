@@ -265,7 +265,7 @@ var f2 = slice.Filter([]int{1, 3, 5, 7, 9, 11}, exclude.All(1, 7, 11))       //[
 import "github.com/m4gshm/gollections/convert/as"
 import "github.com/m4gshm/gollections/slice"
 
-var i []int = slice.Flat([][]int{{1, 2, 3}, {4}, {5, 6}}, as.Is[[]int])
+var i []int = slice.Flat([][]int{{1, 2, 3}, {4}, {5, 6}}, as.Is)
 //[]int{1, 2, 3, 4, 5, 6}
 ```
 
