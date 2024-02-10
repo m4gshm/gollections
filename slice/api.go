@@ -164,26 +164,26 @@ func initGroup[K comparable, T any, TS ~[]T](key K, e T, groups map[K]TS) {
 	groups[key] = append(groups[key], e)
 }
 
-// Convert creates a slice consisting of the transformed elements using the converter 'by'
-func Convert[FS ~[]From, From, To any](elements FS, by func(From) To) []To {
+// Convert creates a slice consisting of the transformed elements using the converter.
+func Convert[FS ~[]From, From, To any](elements FS, converter func(From) To) []To {
 	if elements == nil {
 		return nil
 	}
 	result := make([]To, len(elements))
 	for i, e := range elements {
-		result[i] = by(e)
+		result[i] = converter(e)
 	}
 	return result
 }
 
-// Conv creates a slice consisting of the transformed elements using the converter 'by'
-func Conv[FS ~[]From, From, To any](elements FS, by func(From) (To, error)) ([]To, error) {
+// Conv creates a slice consisting of the transformed elements using the converter.
+func Conv[FS ~[]From, From, To any](elements FS, converter func(From) (To, error)) ([]To, error) {
 	if elements == nil {
 		return nil, nil
 	}
 	result := make([]To, len(elements))
 	for i, e := range elements {
-		c, err := by(e)
+		c, err := converter(e)
 		if err != nil {
 			return result[:i], err
 		}
@@ -192,71 +192,87 @@ func Conv[FS ~[]From, From, To any](elements FS, by func(From) (To, error)) ([]T
 	return result, nil
 }
 
-// FilterAndConvert returns a stream that filters source elements and converts them
-func FilterAndConvert[FS ~[]From, From, To any](elements FS, filter func(From) bool, by func(From) To) []To {
+// FilterAndConvert selects elements that match the filter, converts and places them into a new slice.
+func FilterAndConvert[FS ~[]From, From, To any](elements FS, filter func(From) bool, converter func(From) To) []To {
 	if elements == nil {
 		return nil
 	}
-	var result = make([]To, 0, len(elements)/2)
-	for _, e := range elements {
-		if filter(e) {
-			result = append(result, by(e))
-		}
-	}
-	return result
+	return AppendFilterAndConvert(elements, make([]To, 0, len(elements)/2), filter, converter)
 }
 
-// FiltAndConv returns a stream that filters source elements and converts them
+// AppendFilterAndConvert selects elements that match the filter, converts and appends them to the dest.
+func AppendFilterAndConvert[FS ~[]From, DS ~[]To, From, To any](src FS, dest DS, filter func(From) bool, converter func(From) To) DS {
+	for _, e := range src {
+		if filter(e) {
+			dest = append(dest, converter(e))
+		}
+	}
+	return dest
+}
+
+// FiltAndConv selects elements that match the filter, converts and returns them.
 func FiltAndConv[FS ~[]From, From, To any](elements FS, filter func(From) (bool, error), by func(From) (To, error)) ([]To, error) {
 	if elements == nil {
 		return nil, nil
 	}
-	var result = make([]To, 0, len(elements)/2)
-	for _, e := range elements {
+	return AppendFiltAndConv(elements, make([]To, 0, len(elements)/2), filter, by)
+}
+
+// AppendFiltAndConv selects elements that match the filter, converts and appends them to the dest.
+func AppendFiltAndConv[FS ~[]From, DS ~[]To, From, To any](src FS, dest DS, filter func(From) (bool, error), by func(From) (To, error)) (DS, error) {
+	for _, e := range src {
 		if ok, err := filter(e); err != nil {
-			return result, err
+			return dest, err
 		} else if ok {
 			c, err := by(e)
 			if err != nil {
-				return result, err
+				return dest, err
 			}
-			result = append(result, c)
+			dest = append(dest, c)
 		}
 	}
-	return result, nil
+	return dest, nil
 }
 
-// ConvertAndFilter additionally filters 'To' elements
-func ConvertAndFilter[FS ~[]From, From, To any](elements FS, by func(From) To, filter func(To) bool) []To {
+// ConvertAndFilter converts elements, filters and returns them.
+func ConvertAndFilter[FS ~[]From, From, To any](elements FS, converter func(From) To, filter func(To) bool) []To {
 	if elements == nil {
 		return nil
 	}
-	var result = make([]To, 0, len(elements)/2)
-	for _, e := range elements {
-		if r := by(e); filter(r) {
-			result = append(result, r)
-		}
-	}
-	return result
+	return AppendConvertAndFilter(elements, make([]To, 0, len(elements)/2), converter, filter)
 }
 
-// FilterConvertFilter filters source, converts, and filters converted elements
-func FilterConvertFilter[FS ~[]From, From, To any](elements FS, filter func(From) bool, by func(From) To, filterConverted func(To) bool) []To {
+// AppendConvertAndFilter converts elements, filters and append mached ones to the dest slice.
+func AppendConvertAndFilter[FS ~[]From, DS ~[]To, From, To any](src FS, dest DS, converter func(From) To, filter func(To) bool) DS {
+	for _, e := range src {
+		if r := converter(e); filter(r) {
+			dest = append(dest, r)
+		}
+	}
+	return dest
+}
+
+// FilterConvertFilter applies operations chain: filter, convert, filter the converted elemens of the src slice and returns them.
+func FilterConvertFilter[FS ~[]From, From, To any](elements FS, filter func(From) bool, converter func(From) To, filterConverted func(To) bool) []To {
 	if elements == nil {
 		return nil
 	}
-	var result = make([]To, 0, len(elements)/4)
-	for _, e := range elements {
+	return AppendFilterConvertFilter(elements, make([]To, 0, len(elements)/2), filter, converter, filterConverted)
+}
+
+// AppendFilterConvertFilter applies operations chain filter->convert->filter the src elemens and addends to the dest slice.
+func AppendFilterConvertFilter[FS ~[]From, DS ~[]To, From, To any](src FS, dest DS, filter func(From) bool, converter func(From) To, filterConverted func(To) bool) DS {
+	for _, e := range src {
 		if filter(e) {
-			if r := by(e); filterConverted(r) {
-				result = append(result, r)
+			if r := converter(e); filterConverted(r) {
+				dest = append(dest, r)
 			}
 		}
 	}
-	return result
+	return dest
 }
 
-// ConvertIndexed creates a slice consisting of the transformed elements using the 'converter' function which additionally applies the index of the element being converted
+// ConvertIndexed converets the elements using the converter that takes the index and value of each element from the elements slice.
 func ConvertIndexed[FS ~[]From, From, To any](elements FS, converter func(index int, from From) To) []To {
 	if elements == nil {
 		return nil
@@ -268,18 +284,22 @@ func ConvertIndexed[FS ~[]From, From, To any](elements FS, converter func(index 
 	return result
 }
 
-// FilterAndConvertIndexed additionally filters 'From' elements
+// FilterAndConvertIndexed filter elements that match the filter condition, converts and returns a slice of result elements.
 func FilterAndConvertIndexed[FS ~[]From, From, To any](elements FS, filter func(index int, from From) bool, converter func(index int, from From) To) []To {
 	if elements == nil {
 		return nil
 	}
-	var result = make([]To, 0, len(elements)/2)
-	for i, e := range elements {
+	return AppendFilterAndConvertIndexed(elements, make([]To, 0, len(elements)/2), filter, converter)
+}
+
+// AppendFilterAndConvertIndexed filters elements that match the filter condition, converts them and appends to the dest.
+func AppendFilterAndConvertIndexed[FS ~[]From, DS ~[]To, From, To any](src FS, dest DS, filter func(index int, from From) bool, converter func(index int, from From) To) DS {
+	for i, e := range src {
 		if filter(i, e) {
-			result = append(result, converter(i, e))
+			dest = append(dest, converter(i, e))
 		}
 	}
-	return result
+	return dest
 }
 
 // ConvertCheck is similar to ConvertFilt, but it checks and transforms elements together
@@ -354,52 +374,64 @@ func FlatAndConvert[FS ~[]From, From any, IS ~[]I, I, To any](elements FS, flatt
 	return result
 }
 
-// FilterAndFlat filters source elements and extracts slices of 'To' by the 'flattener' function
+// FilterAndFlat retrieves src elements that match the filter condition, extracts 'To' type slices from them and joins into a new slice.
 func FilterAndFlat[FS ~[]From, From, To any](elements FS, filter func(From) bool, flattener func(From) []To) []To {
 	if elements == nil {
 		return nil
 	}
-	var result = make([]To, 0, int(float32(len(elements)/2)*1.618))
-	for _, e := range elements {
-		if filter(e) {
-			result = append(result, flattener(e)...)
-		}
-	}
-	return result
+	return AppendFilterAndFlat(elements, make([]To, 0, int(float32(len(elements)/2)*1.618)), filter, flattener)
 }
 
-// FlatAndFiler unfolds the n-dimensional slice into a n-1 dimensional slice with additinal filtering of 'To' elements.
-func FlatAndFiler[FS ~[]From, From, To any](elements FS, by func(From) []To, filter func(To) bool) []To {
+// AppendFilterAndFlat retrieves src elements that match the filter condition, extracts 'To' type slices from them and appends the dest.
+func AppendFilterAndFlat[FS ~[]From, DS ~[]To, From, To any](src FS, dest DS, filter func(From) bool, flattener func(From) []To) DS {
+	for _, e := range src {
+		if filter(e) {
+			dest = append(dest, flattener(e)...)
+		}
+	}
+	return dest
+}
+
+// FlatAndFiler extracts a slice of type "To" from each src element, filters and joins into a new slice.
+func FlatAndFiler[FS ~[]From, From, To any](elements FS, flattener func(From) []To, filter func(To) bool) []To {
 	if elements == nil {
 		return nil
 	}
-	var result = make([]To, 0, int(float32(len(elements))*1.618)/2)
-	for _, e := range elements {
-		for _, to := range by(e) {
+	return AppendFlatAndFiler(elements, make([]To, 0, int(float32(len(elements))*1.618)/2), flattener, filter)
+}
+
+// AppendFlatAndFiler extracts a slice of type "To" from each src element, filters and appends to dest.
+func AppendFlatAndFiler[FS ~[]From, DS ~[]To, From, To any](src FS, dest DS, flattener func(From) []To, filter func(To) bool) DS {
+	for _, e := range src {
+		for _, to := range flattener(e) {
 			if filter(to) {
-				result = append(result, to)
+				dest = append(dest, to)
 			}
 		}
 	}
-	return result
+	return dest
 }
 
-// FilterFlatFilter unfolds the n-dimensional slice 'elements' into a n-1 dimensional slice with additinal filtering of 'From' and 'To' elements.
-func FilterFlatFilter[FS ~[]From, From, To any](elements FS, filterFrom func(From) bool, by func(From) []To, filterTo func(To) bool) []To {
+// FilterFlatFilter applies operations chain filter->flat->filter the src elemens and returns that result.
+func FilterFlatFilter[FS ~[]From, From, To any](elements FS, filterFrom func(From) bool, flat func(From) []To, filterTo func(To) bool) []To {
 	if elements == nil {
 		return nil
 	}
-	var result = make([]To, 0, int(float32(len(elements)/2)*1.618)/2)
-	for _, e := range elements {
+	return AppendFilterFlatFilter(elements, make([]To, 0, int(float32(len(elements)/2)*1.618)/2), filterFrom, flat, filterTo)
+}
+
+// AppendFilterFlatFilter applies operations chain filter->flat->filter the src elemens and addends to the dest.
+func AppendFilterFlatFilter[FS ~[]From, DS ~[]To, From, To any](src FS, dest DS, filterFrom func(From) bool, flat func(From) []To, filterTo func(To) bool) DS {
+	for _, e := range src {
 		if filterFrom(e) {
-			for _, to := range by(e) {
+			for _, to := range flat(e) {
 				if filterTo(to) {
-					result = append(result, to)
+					dest = append(dest, to)
 				}
 			}
 		}
 	}
-	return result
+	return dest
 }
 
 // NotNil returns only not nil elements
@@ -419,36 +451,44 @@ func GetValues[TS ~[]*T, T any](elements TS) []T {
 	return ConvertCheck(elements, convert.NoNilPtrVal[T])
 }
 
-// Filter creates a slice containing only the filtered elements
+// Filter filters elements that match the filter condition and returns them.
 func Filter[TS ~[]T, T any](elements TS, filter func(T) bool) []T {
 	if elements == nil {
 		return nil
 	}
-	var result = make([]T, 0, len(elements)/2)
-	for _, e := range elements {
-		if filter(e) {
-			result = append(result, e)
-		}
-	}
-	return result
+	return AppendFilter(elements, make([]T, 0, len(elements)/2), filter)
 }
 
-// Filt creates a slice containing only the filtered elements
+// AppendFilter filters elements that match the filter condition and adds them to the dest.
+func AppendFilter[TS ~[]T, DS ~[]T, T any](src TS, dest DS, filter func(T) bool) DS {
+	for _, e := range src {
+		if filter(e) {
+			dest = append(dest, e)
+		}
+	}
+	return dest
+}
+
+// Filt filters elements that match the filter condition and returns them.
 func Filt[TS ~[]T, T any](elements TS, filter func(T) (bool, error)) ([]T, error) {
 	if elements == nil {
 		return nil, nil
 	}
-	var result = make([]T, 0, len(elements)/2)
-	for _, e := range elements {
+	return AppendFilt(elements, make([]T, 0, len(elements)/2), filter)
+}
+
+// AppendFilt filters elements that match the filter condition and adds them to the dest.
+func AppendFilt[TS ~[]T, DS ~[]T, T any](src TS, dest DS, filter func(T) (bool, error)) (DS, error) {
+	for _, e := range src {
 		ok, err := filter(e)
 		if ok {
-			result = append(result, e)
+			dest = append(dest, e)
 		}
 		if err != nil {
-			return result, err
+			return dest, err
 		}
 	}
-	return result, nil
+	return dest, nil
 }
 
 // RangeClosed generates a slice of integers in the range defined by from and to inclusive
