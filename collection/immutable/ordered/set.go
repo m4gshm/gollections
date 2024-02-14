@@ -36,6 +36,10 @@ func (s Set[T]) All(yield func(T) bool) {
 	slice.PeekWhile(s.order, yield)
 }
 
+func (s Set[T]) All2(yield func(T) bool) {
+	slice.PeekWhile2(s.order, yield)
+}
+
 // Iter creates an iterator and returns as interface
 func (s Set[T]) Iter() c.Iterator[T] {
 	h := s.Head()

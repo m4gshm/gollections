@@ -78,18 +78,6 @@ func Benchmark_Loop_Slice_Embedded_ForByIndex(b *testing.B) {
 	}
 }
 
-func Benchmark_Loop_Slice_Embedded_ForByRange(b *testing.B) {
-	for _, casee := range cases {
-		b.Run(casee.name, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
-				for _, v := range values {
-					casee.load(v)
-				}
-			}
-		})
-	}
-}
-
 func Benchmark_Loop_Slice_Embedded_ForByRangeIF(b *testing.B) {
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
@@ -100,33 +88,6 @@ func Benchmark_Loop_Slice_Embedded_ForByRangeIF(b *testing.B) {
 					} else {
 						break
 					}
-				}
-			}
-		})
-	}
-}
-
-func Benchmark_Loop_Slice_Embedded_ForByRangeIndex(b *testing.B) {
-	for _, casee := range cases {
-		b.Run(casee.name, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
-				for j := range values {
-					v := values[j]
-					casee.load(v)
-				}
-			}
-		})
-	}
-}
-
-func Benchmark_Loop_Slice_Embedded_ForByIndex(b *testing.B) {
-	l := len(values)
-	for _, casee := range cases {
-		b.Run(casee.name, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
-				for j := 0; j < l; j++ {
-					v := values[j]
-					casee.load(v)
 				}
 			}
 		})
@@ -145,33 +106,6 @@ func Benchmark_Loop_Slice_Embedded_ForByIndexIf(b *testing.B) {
 						break
 					}
 				}
-			}
-		})
-	}
-}
-
-func Benchmark_Loop_ImmutableOrderSet_go_1_22(b *testing.B) {
-	c := oset.Of(values...)
-	for _, casee := range cases {
-		b.Run(casee.name, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
-				for v := range c.All {
-					casee.load(v)
-				}
-			}
-		})
-	}
-}
-
-func Benchmark_Loop_ImmutableOrderSet_go_1_22_direct(b *testing.B) {
-	c := oset.Of(values...)
-	for _, casee := range cases {
-		b.Run(casee.name, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
-				c.All(func(v int) bool {
-					casee.load(v)
-					return true
-				})
 			}
 		})
 	}
@@ -210,19 +144,6 @@ func Benchmark_Loop_ImmutableOrderSet_LastPrev(b *testing.B) {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				for it, v, ok := c.Last(); ok; v, ok = it.Prev() {
-					casee.load(v)
-				}
-			}
-		})
-	}
-}
-
-func Benchmark_Loop_ImmutableVector_go_1_22(b *testing.B) {
-	c := vector.Of(values...)
-	for _, casee := range cases {
-		b.Run(casee.name, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
-				for _, v := range c.All {
 					casee.load(v)
 				}
 			}

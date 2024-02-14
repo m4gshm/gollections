@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	max    = 128
+	max    = 10000
 	values = range_.Closed(1, max)
 )
 

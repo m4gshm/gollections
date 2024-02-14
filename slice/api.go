@@ -14,6 +14,7 @@ import (
 	"github.com/m4gshm/gollections/convert"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_/resolv"
+	"github.com/m4gshm/gollections/notsafe"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/op/check/not"
 )
@@ -689,6 +690,18 @@ func PeekWhile[TS ~[]T, T any](elements TS, peek func(T) bool) {
 		if !peek(e) {
 			break
 		}
+	}
+}
+
+func PeekWhile2[TS ~[]T, T any](elements TS, peek func(T) bool) {
+	var (
+		header = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
+		array  = unsafe.Pointer(header.Data)
+		size   = len(elements)
+		esize  = notsafe.GetTypeSize[T]()
+	)
+
+	for i := 0; i < size && peek(notsafe.GetArrayElem[T](array, i, esize)); i++ {
 	}
 }
 
