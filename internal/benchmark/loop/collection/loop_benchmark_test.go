@@ -1,6 +1,7 @@
-package benchmark
+package collection
 
 import (
+	"strconv"
 	"testing"
 
 	oset "github.com/m4gshm/gollections/collection/immutable/ordered/set"
@@ -14,24 +15,21 @@ import (
 )
 
 var (
-	max        = 100000
+	max        = 10000
 	values     = range_.Closed(1, max)
-	ResultInt  = 0
 	threshhold = max / 2
 )
 
+var resultStr = ""
+
 func HighLoad(v int) {
-	ResultInt = v *
-		v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v *
-		v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v *
-		v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v *
-		v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v *
-		v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v *
-		v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v
+	resultStr = strconv.Itoa(v)
 }
 
+var resultInt = 0
+
 func LowLoad(v int) {
-	ResultInt = v * v
+	resultInt = v * v
 }
 
 type benchCase struct {
@@ -39,7 +37,46 @@ type benchCase struct {
 	load func(int)
 }
 
-var cases = []benchCase{ /*{"high", HighLoad}, */ {"low", LowLoad}}
+var cases = []benchCase{{"high", HighLoad}, {"low", LowLoad}}
+
+func Benchmark_Loop_Slice_Embedded_ForByRange(b *testing.B) {
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for _, v := range values {
+					casee.load(v)
+				}
+			}
+		})
+	}
+}
+
+func Benchmark_Loop_Slice_Embedded_ForByRangeIndex(b *testing.B) {
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for j := range values {
+					v := values[j]
+					casee.load(v)
+				}
+			}
+		})
+	}
+}
+
+func Benchmark_Loop_Slice_Embedded_ForByIndex(b *testing.B) {
+	l := len(values)
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for j := 0; j < l; j++ {
+					v := values[j]
+					casee.load(v)
+				}
+			}
+		})
+	}
+}
 
 func Benchmark_Loop_Slice_Embedded_ForByRange(b *testing.B) {
 	for _, casee := range cases {

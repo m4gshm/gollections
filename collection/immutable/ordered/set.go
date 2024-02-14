@@ -68,6 +68,14 @@ func (s Set[T]) First() (slice.Iter[T], T, bool) {
 	return iterator, first, ok
 }
 
+func (s Set[T]) First2() (*slice.Iter[T], T, bool) {
+	var (
+		iterator  = slice.NewHead(s.order)
+		first, ok = iterator.Next()
+	)
+	return &iterator, first, ok
+}
+
 // Last returns the latest element of the collection, an iterator to reverse iterate over the remaining elements, and true\false marker of availability previous elements.
 // If no more elements then ok==false.
 func (s Set[T]) Last() (slice.Iter[T], T, bool) {

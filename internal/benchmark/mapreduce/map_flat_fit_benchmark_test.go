@@ -1,9 +1,11 @@
-package benchmark
+package mapreduce
 
 import (
 	"fmt"
 	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 
 	"github.com/m4gshm/gollections/convert"
 	"github.com/m4gshm/gollections/convert/as"
@@ -13,13 +15,16 @@ import (
 	"github.com/m4gshm/gollections/op/check/not"
 	"github.com/m4gshm/gollections/slice"
 	sliceIter "github.com/m4gshm/gollections/slice/iter"
-	"github.com/stretchr/testify/assert"
+	"github.com/m4gshm/gollections/slice/range_"
 )
 
 var (
-	toString = func(i int) string { return fmt.Sprintf("%d", i) }
-	addTail  = func(s string) string { return s + "_tail" }
-	even     = func(v int) bool { return v%2 == 0 }
+	toString   = func(i int) string { return fmt.Sprintf("%d", i) }
+	addTail    = func(s string) string { return s + "_tail" }
+	even       = func(v int) bool { return v%2 == 0 }
+	max        = 100000
+	values     = range_.Closed(1, max)
+	threshhold = max / 2
 )
 
 func Benchmark_First_PlainOld(b *testing.B) {

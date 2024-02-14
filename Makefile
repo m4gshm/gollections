@@ -41,6 +41,7 @@ builda:
 .PHONY: bench
 bench:
 	$(info #Running benchmarks...)
+	# go test -gcflags=-d=loopvar=3 -benchtime 1s -bench . -benchmem ./...
 	# go env -w GOEXPERIMENT=rangefunc,newinliner
 	go env -w GOEXPERIMENT=rangefunc
 	go test -benchtime 1s -bench . -benchmem ./...

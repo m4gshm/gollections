@@ -1,6 +1,7 @@
-package benchmark
+package convert
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/m4gshm/gollections/collection"
@@ -12,6 +13,15 @@ import (
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/slice"
 	sliceIter "github.com/m4gshm/gollections/slice/iter"
+	"github.com/m4gshm/gollections/slice/range_"
+)
+
+var (
+	toString = func(i int) string { return fmt.Sprintf("%d", i) }
+	addTail  = func(s string) string { return s + "_tail" }
+	even     = func(v int) bool { return v%2 == 0 }
+	max      = 100000
+	values   = range_.Closed(1, max)
 )
 
 func Benchmark_Convert_Slice(b *testing.B) {
