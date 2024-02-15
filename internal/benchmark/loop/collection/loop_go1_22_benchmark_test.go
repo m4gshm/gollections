@@ -9,7 +9,6 @@ import (
 	"github.com/m4gshm/gollections/collection/immutable/vector"
 )
 
-
 func Benchmark_Loop_ImmutableOrderSet_go_1_22_direct(b *testing.B) {
 	c := oset.Of(values...)
 	for _, casee := range cases {
@@ -50,7 +49,6 @@ func Benchmark_Loop_ImmutableOrderSet_go_1_22_2(b *testing.B) {
 	}
 }
 
-
 func Benchmark_Loop_ImmutableVector_go_1_22(b *testing.B) {
 	c := vector.Of(values...)
 	for _, casee := range cases {
@@ -63,4 +61,3 @@ func Benchmark_Loop_ImmutableVector_go_1_22(b *testing.B) {
 		})
 	}
 }
-

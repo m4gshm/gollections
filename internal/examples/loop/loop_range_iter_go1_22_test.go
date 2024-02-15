@@ -1,10 +1,13 @@
+//go:build goexperiment.rangefunc
+
 package loop
 
 import (
 	"testing"
 
-	"github.com/m4gshm/gollections/loop"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/m4gshm/gollections/loop"
 )
 
 func Test_Range_Loop(t *testing.T) {

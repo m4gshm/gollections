@@ -469,13 +469,12 @@ Introduced as `All(yield func(T) bool)` method of collection, iterator
 types.
 
 ``` go
-var letters []rune
-for letter := range loop.RangeClosed('A', 'H').All {
-    letters = append(letters, letter)
-}
-word := string(letters) //ABCDEFGH
+func Test_Range_Loop(t *testing.T) {
 
-assert.Equal(t, "ABCDEFGH", word)
+    var letters []rune
+    for letter := range loop.RangeClosed('A', 'H').All {
+        letters = append(letters, letter)
+    }
 ```
 
 ### Expressions: [use.If](./expr/use/api.go), [get.If](./expr/get/api.go), [first.Of](#firstof), [last.Of](#lastof)
