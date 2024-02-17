@@ -535,7 +535,7 @@ func Test_PeekWhile(t *testing.T) {
 
 	s := []int{}
 
-	slice.PeekWhile(expected, func(e int) bool {
+	slice.WalkWhile(expected, func(e int) bool {
 		s = append(s, e)
 		return true
 	})

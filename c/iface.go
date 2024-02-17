@@ -58,7 +58,7 @@ type Iterator[T any] interface {
 
 	ForLoop[T]
 	ForEachLoop[T]
-	All(yield func(T) bool)
+	All(consumer func(T) bool)
 }
 
 // IterFor extends an iterator type by a 'Start' function implementation

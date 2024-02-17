@@ -26,8 +26,8 @@ var (
 
 var _ kv.IterFor[any, any, *Iter[any, any, any]] = (*Iter[any, any, any])(nil)
 
-func (i *Iter[S, K, V]) All(yield func(key K, value V) bool) {
-	kv.All(i.Next, yield)
+func (i *Iter[S, K, V]) All(consumer func(key K, value V) bool) {
+	kv.All(i.Next, consumer)
 }
 
 // Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak

@@ -89,8 +89,8 @@ func (m MapValues[K, V]) Append(out []V) (values []V) {
 	return out
 }
 
-func (m MapValues[K, V]) All(yield func(V) bool) {
-	map_.AllOrderedValues(m.order, m.elements, yield)
+func (m MapValues[K, V]) All(consumer func(V) bool) {
+	map_.TrackOrderedValuesWhile(m.order, m.elements, consumer)
 }
 
 // For applies the 'walker' function for every value. Return the c.ErrBreak to stop.

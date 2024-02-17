@@ -21,8 +21,8 @@ type ConvertFiltIter[From, To any] struct {
 var _ c.Iterator[any] = (*ConvertFiltIter[any, any])(nil)
 var _ c.IterFor[any, *ConvertFiltIter[any, any]] = (*ConvertFiltIter[any, any])(nil)
 
-func (i *ConvertFiltIter[From, To]) All(yield func(element To) bool) {
-	loop.All(i.Next, yield)
+func (i *ConvertFiltIter[From, To]) All(consumer func(element To) bool) {
+	loop.All(i.Next, consumer)
 }
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
@@ -72,8 +72,8 @@ type ConvertIter[From, To any] struct {
 var _ c.Iterator[any] = (*ConvertIter[any, any])(nil)
 var _ c.IterFor[any, *ConvertIter[any, any]] = (*ConvertIter[any, any])(nil)
 
-func (f *ConvertIter[From, To]) All(yield func(element To) bool) {
-	loop.All(f.Next, yield)
+func (f *ConvertIter[From, To]) All(consumer func(element To) bool) {
+	loop.All(f.Next, consumer)
 }
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak

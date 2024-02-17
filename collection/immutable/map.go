@@ -40,9 +40,9 @@ var (
 	_ fmt.Stringer                                     = Map[int, any]{}
 )
 
-func (m Map[K, V]) All(yield func(k K, v V) bool) {
+func (m Map[K, V]) All(consumer func(k K, v V) bool) {
 	for k, v := range m.elements {
-		if !yield(k, v) {
+		if !consumer(k, v) {
 			break
 		}
 	}
@@ -153,16 +153,6 @@ func (m Map[K, V]) Track(tracker func(K, V) error) error {
 // TrackEach applies the 'tracker' function for every key/value pairs
 func (m Map[K, V]) TrackEach(tracker func(K, V)) {
 	map_.TrackEach(m.elements, tracker)
-}
-
-// For applies the 'walker' function for every key/value pair. Return the c.ErrBreak to stop.
-func (m Map[K, V]) For(walker func(c.KV[K, V]) error) error {
-	return map_.For(m.elements, walker)
-}
-
-// ForEach applies the 'walker' function for every key/value pair
-func (m Map[K, V]) ForEach(walker func(c.KV[K, V])) {
-	map_.ForEach(m.elements, walker)
 }
 
 // FilterKey returns a stream consisting of key/value pairs where the key satisfies the condition of the 'predicate' function

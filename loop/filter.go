@@ -17,8 +17,8 @@ var (
 
 var _ c.IterFor[any, FiltIter[any]] = FiltIter[any]{}
 
-func (f FiltIter[T]) All(yield func(element T) bool) {
-	All(f.Next, yield)
+func (f FiltIter[T]) All(consumer func(element T) bool) {
+	All(f.Next, consumer)
 }
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak

@@ -21,8 +21,8 @@ var (
 var _ c.IterFor[any, ConvFiltIter[any, any]] = ConvFiltIter[any, any]{}
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
-func (c ConvFiltIter[From, To]) For(walker func(element To) error) error {
-	return For(c.Next, walker)
+func (c ConvFiltIter[From, To]) For(consumer func(element To) error) error {
+	return For(c.Next, consumer)
 }
 
 // Next returns the next element.
@@ -65,8 +65,8 @@ var (
 var _ c.IterFor[any, ConvertIter[any, any]] = ConvertIter[any, any]{}
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
-func (c ConvertIter[From, To]) For(walker func(element To) error) error {
-	return For(c.Next, walker)
+func (c ConvertIter[From, To]) For(consumer func(element To) error) error {
+	return For(c.Next, consumer)
 }
 
 // Next returns the next element.
@@ -102,8 +102,8 @@ var (
 var _ c.IterFor[any, ConvertCheckIter[any, any]] = ConvertCheckIter[any, any]{}
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
-func (c ConvertCheckIter[From, To]) For(walker func(element To) error) error {
-	return For(c.Next, walker)
+func (c ConvertCheckIter[From, To]) For(consumer func(element To) error) error {
+	return For(c.Next, consumer)
 }
 
 // Next returns the next element.

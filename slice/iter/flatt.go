@@ -21,8 +21,8 @@ type FlattenFiltIter[From, To any] struct {
 var _ c.Iterator[any] = (*FlattenFiltIter[any, any])(nil)
 var _ c.IterFor[any, *FlattenFiltIter[any, any]] = (*FlattenFiltIter[any, any])(nil)
 
-func (f *FlattenFiltIter[From, To]) All(yield func(element To) bool) {
-	loop.All(f.Next, yield)
+func (f *FlattenFiltIter[From, To]) All(consumer func(element To) bool) {
+	loop.All(f.Next, consumer)
 }
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
@@ -88,8 +88,8 @@ type FlattIter[From, To any] struct {
 var _ c.Iterator[any] = (*FlattIter[any, any])(nil)
 var _ c.IterFor[any, *FlattIter[any, any]] = (*FlattIter[any, any])(nil)
 
-func (f *FlattIter[From, To]) All(yield func(element To) bool) {
-	loop.All(f.Next, yield)
+func (f *FlattIter[From, To]) All(consumer func(element To) bool) {
+	loop.All(f.Next, consumer)
 }
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak.

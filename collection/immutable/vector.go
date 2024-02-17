@@ -32,8 +32,8 @@ var (
 	_ fmt.Stringer                       = Vector[any]{}
 )
 
-func (v Vector[T]) All(yield func(int, T) bool) {
-	slice.PeekIWhile(v.elements, yield)
+func (v Vector[T]) All(consumer func(int, T) bool) {
+	slice.TrackWhile(v.elements, consumer)
 }
 
 // Iter creates an iterator and returns as interface
@@ -126,7 +126,7 @@ func (v Vector[T]) For(walker func(T) error) error {
 
 // ForEach applies the 'walker' function for every element
 func (v Vector[T]) ForEach(walker func(T)) {
-	slice.Peek(v.elements, walker)
+	slice.ForEach(v.elements, walker)
 }
 
 // Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function

@@ -32,8 +32,8 @@ var (
 	_ fmt.Stringer                              = MapValues[int, any]{}
 )
 
-func (m MapValues[K, V]) All(yield func(V) bool) {
-	map_.AllValues(m.elements, yield)
+func (m MapValues[K, V]) All(consumer func(V) bool) {
+	map_.TrackValuesWhile(m.elements, consumer)
 }
 
 // Iter creates an iterator and returns as interface

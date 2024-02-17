@@ -27,8 +27,8 @@ var (
 	_ fmt.Stringer      = MapKeys[int]{}
 )
 
-func (m MapKeys[K]) All(yield func(K) bool) {
-	slice.PeekWhile(m.keys, yield)
+func (m MapKeys[K]) All(consumer func(K) bool) {
+	slice.WalkWhile(m.keys, consumer)
 }
 
 // Iter creates an iterator and returns as interface
@@ -85,7 +85,7 @@ func (m MapKeys[K]) For(walker func(K) error) error {
 
 // ForEach applies the 'walker' function for every element
 func (m MapKeys[K]) ForEach(walker func(K)) {
-	slice.Peek(m.keys, walker)
+	slice.ForEach(m.keys, walker)
 }
 
 // Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function

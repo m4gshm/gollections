@@ -34,8 +34,8 @@ var (
 
 var _ c.IterFor[int, *SliceIter[int]] = (*SliceIter[int])(nil)
 
-func (i *SliceIter[T]) All(yield func(element T) bool) {
-	loop.All(i.Next, yield)
+func (i *SliceIter[T]) All(consumer func(element T) bool) {
+	loop.All(i.Next, consumer)
 }
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak

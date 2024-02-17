@@ -33,8 +33,8 @@ var (
 	_ fmt.Stringer                                   = Set[int]{}
 )
 
-func (s Set[T]) All(yield func(T) bool) {
-	map_.AllKeys(s.elements, yield)
+func (s Set[T]) All(consumer func(T) bool) {
+	map_.TrackKeysWhile(s.elements, consumer)
 }
 
 // Iter creates an iterator and returns as interface

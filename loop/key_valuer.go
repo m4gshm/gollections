@@ -25,8 +25,8 @@ var _ kv.Iterator[int, string] = (*KeyValuer[any, int, string])(nil)
 var _ kv.Iterator[int, string] = KeyValuer[any, int, string]{}
 var _ kv.IterFor[int, string, KeyValuer[any, int, string]] = KeyValuer[any, int, string]{}
 
-func (i KeyValuer[T, K, V]) All(yield func(key K, value V) bool) {
-	kv.All(i.Next, yield)
+func (i KeyValuer[T, K, V]) All(consumer func(key K, value V) bool) {
+	kv.All(i.Next, consumer)
 }
 
 // Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak
@@ -71,8 +71,8 @@ type MultipleKeyValuer[T, K, V any] struct {
 var _ kv.Iterator[int, string] = (*MultipleKeyValuer[any, int, string])(nil)
 var _ kv.IterFor[int, string, *MultipleKeyValuer[any, int, string]] = (*MultipleKeyValuer[any, int, string])(nil)
 
-func (i *MultipleKeyValuer[T, K, V]) All(yield func(key K, value V) bool) {
-	kv.All(i.Next, yield)
+func (i *MultipleKeyValuer[T, K, V]) All(consumer func(key K, value V) bool) {
+	kv.All(i.Next, consumer)
 }
 
 // Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak

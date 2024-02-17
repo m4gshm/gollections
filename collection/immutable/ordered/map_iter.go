@@ -22,8 +22,8 @@ type MapIter[K comparable, V any] struct {
 var _ kv.Iterator[string, any] = (*MapIter[string, any])(nil)
 var _ kv.IterFor[int, string, *MapIter[int, string]] = (*MapIter[int, string])(nil)
 
-func (i *MapIter[K, V]) All(yield func(key K, value V) bool) {
-	kv.All(i.Next, yield)
+func (i *MapIter[K, V]) All(consumer func(key K, value V) bool) {
+	kv.All(i.Next, consumer)
 }
 
 // Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak
@@ -78,8 +78,8 @@ var (
 
 var _ c.IterFor[any, *ValIter[int, any]] = (*ValIter[int, any])(nil)
 
-func (i *ValIter[K, V]) All(yield func(element V) bool) {
-	loop.All(i.Next, yield)
+func (i *ValIter[K, V]) All(consumer func(element V) bool) {
+	loop.All(i.Next, consumer)
 }
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak

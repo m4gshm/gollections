@@ -42,9 +42,9 @@ var (
 	_ fmt.Stringer                                                         = (*Map[int, any])(nil)
 )
 
-func (m *Map[K, V]) All(yield func(K, V) bool) {
+func (m *Map[K, V]) All(consumer func(K, V) bool) {
 	if m != nil {
-		map_.All(*m, yield)
+		map_.TrackWhile(*m, consumer)
 	}
 }
 
@@ -119,21 +119,6 @@ func (m *Map[K, V]) Len() int {
 // IsEmpty returns true if the map is empty
 func (m *Map[K, V]) IsEmpty() bool {
 	return m.Len() == 0
-}
-
-// For applies the 'walker' function for every key/value pair. Return the c.ErrBreak to stop.
-func (m *Map[K, V]) For(walker func(c.KV[K, V]) error) error {
-	if m == nil {
-		return nil
-	}
-	return map_.For(*m, walker)
-}
-
-// ForEach applies the 'walker' function for every element
-func (m *Map[K, V]) ForEach(walker func(c.KV[K, V])) {
-	if m != nil {
-		map_.ForEach(*m, walker)
-	}
 }
 
 // Track applies the 'tracker' function for key/value pairs. Return the c.ErrBreak to stop.

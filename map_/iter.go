@@ -32,8 +32,8 @@ type Iter[K comparable, V any] struct {
 var _ kv.Iterator[int, any] = (*Iter[int, any])(nil)
 var _ kv.IterFor[int, any, *Iter[int, any]] = (*Iter[int, any])(nil)
 
-func (i *Iter[K, V]) All(yield func(key K, value V) bool) {
-	kv.All(i.Next, yield)
+func (i *Iter[K, V]) All(consumer func(key K, value V) bool) {
+	kv.All(i.Next, consumer)
 }
 
 // Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak
@@ -140,8 +140,8 @@ var (
 
 var _ c.IterFor[string, KeyIter[string, any]] = KeyIter[string, any]{}
 
-func (i KeyIter[K, V]) All(yield func(element K) bool) {
-	loop.All(i.Next, yield)
+func (i KeyIter[K, V]) All(consumer func(element K) bool) {
+	loop.All(i.Next, consumer)
 }
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
@@ -190,8 +190,8 @@ var (
 
 var _ c.IterFor[string, ValIter[int, string]] = ValIter[int, string]{}
 
-func (i ValIter[K, V]) All(yield func(element V) bool) {
-	loop.All(i.Next, yield)
+func (i ValIter[K, V]) All(consumer func(element V) bool) {
+	loop.All(i.Next, consumer)
 }
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak

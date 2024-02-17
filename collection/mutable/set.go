@@ -36,9 +36,9 @@ var (
 	_ fmt.Stringer                        = (*Set[int])(nil)
 )
 
-func (s *Set[T]) All(yield func(T) bool) {
+func (s *Set[T]) All(consumer func(T) bool) {
 	for v := range s.elements {
-		if !yield(v) {
+		if !consumer(v) {
 			return
 		}
 	}

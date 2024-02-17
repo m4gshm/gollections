@@ -35,9 +35,9 @@ var (
 	_ fmt.Stringer                      = (*Vector[any])(nil)
 )
 
-func (v *Vector[T]) All(yield func(int, T) bool) {
+func (v *Vector[T]) All(consumer func(int, T) bool) {
 	if v != nil {
-		slice.PeekIWhile(*v, yield)
+		slice.TrackWhile(*v, consumer)
 	}
 }
 
@@ -149,7 +149,7 @@ func (v *Vector[T]) For(walker func(T) error) error {
 // ForEach applies walker to elements without error checking
 func (v *Vector[T]) ForEach(walker func(T)) {
 	if !(v == nil) {
-		slice.Peek(*v, walker)
+		slice.ForEach(*v, walker)
 	}
 }
 

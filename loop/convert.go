@@ -20,8 +20,8 @@ var (
 
 var _ c.IterFor[any, ConvertFiltIter[any, any]] = ConvertFiltIter[any, any]{}
 
-func (c ConvertFiltIter[From, To]) All(yield func(element To) bool) {
-	All(c.Next, yield)
+func (c ConvertFiltIter[From, To]) All(consumer func(element To) bool) {
+	All(c.Next, consumer)
 }
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
@@ -68,8 +68,8 @@ var (
 
 var _ c.IterFor[any, ConvertIter[any, any]] = ConvertIter[any, any]{}
 
-func (c ConvertIter[From, To]) All(yield func(element To) bool) {
-	All(c.Next, yield)
+func (c ConvertIter[From, To]) All(consumer func(element To) bool) {
+	All(c.Next, consumer)
 }
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
@@ -126,8 +126,8 @@ func (c ConvertCheckIter[From, To]) Next() (t To, ok bool) {
 	return t, false
 }
 
-func (c ConvertCheckIter[From, To]) All(yield func(element To) bool) {
-	All(c.Next, yield)
+func (c ConvertCheckIter[From, To]) All(consumer func(element To) bool) {
+	All(c.Next, consumer)
 }
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak

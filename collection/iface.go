@@ -30,7 +30,7 @@ type Vector[T any] interface {
 
 	c.Access[int, T]
 
-	All(yield func(int, T) bool)
+	All(consumer func(int, T) bool)
 }
 
 // Set - collection interface that ensures the uniqueness of elements (does not insert duplicate values).
@@ -38,7 +38,7 @@ type Set[T comparable] interface {
 	Collection[T]
 	c.Checkable[T]
 
-	All(yield func(T) bool)
+	All(consumer func(T) bool)
 }
 
 // Map - collection interface that stores key/value pairs and provide access to an element by its key

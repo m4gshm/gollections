@@ -18,8 +18,8 @@ type FilterIter[T any] struct {
 var _ c.Iterator[any] = (*FilterIter[any])(nil)
 var _ c.IterFor[any, *FilterIter[any]] = (*FilterIter[any])(nil)
 
-func (f *FilterIter[T]) All(yield func(element T) bool) {
-	loop.All(f.Next, yield)
+func (f *FilterIter[T]) All(consumer func(element T) bool) {
+	loop.All(f.Next, consumer)
 }
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak

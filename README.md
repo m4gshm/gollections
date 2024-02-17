@@ -465,8 +465,8 @@ assert.ErrorContains(t, err, "invalid syntax")
 
 Activates by `go env -w GOEXPERIMENT=rangefunc`
 
-Introduced as `All(yield func(T) bool)` method of collection, iterator
-types.
+Introduced as `All(consumer func(T) bool)` method of collection,
+iterator types.
 
 ``` go
 var letters []rune

@@ -26,8 +26,8 @@ type Looper[T any, I interface{ Next() (T, bool) }] interface {
 
 type Loop[T any] func() (T, bool)
 
-func (n Loop[T]) All(yield func(T) bool) {
-	All(n, yield)
+func (n Loop[T]) All(consumer func(T) bool) {
+	All(n, consumer)
 }
 
 // Of wrap the elements by loop function
@@ -46,8 +46,8 @@ func Of[T any](elements ...T) Loop[T] {
 	}
 }
 
-func All[T any](next func() (T, bool), yield func(T) bool) {
-	for v, ok := next(); ok && yield(v); v, ok = next() {
+func All[T any](next func() (T, bool), consumer func(T) bool) {
+	for v, ok := next(); ok && consumer(v); v, ok = next() {
 	}
 }
 

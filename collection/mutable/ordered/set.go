@@ -37,9 +37,9 @@ var (
 	_ fmt.Stringer                        = (*Set[int])(nil)
 )
 
-func (s *Set[T]) All(yield func(T) bool) {
+func (s *Set[T]) All(consumer func(T) bool) {
 	if s != nil {
-		slice.PeekWhile(*s.order, yield)
+		slice.WalkWhile(*s.order, consumer)
 	}
 }
 
@@ -253,7 +253,7 @@ func (s *Set[T]) For(walker func(T) error) error {
 func (s *Set[T]) ForEach(walker func(T)) {
 	if s != nil {
 		if order := s.order; order != nil {
-			slice.Peek(*order, walker)
+			slice.ForEach(*order, walker)
 		}
 	}
 }

@@ -32,12 +32,8 @@ var (
 	_ fmt.Stringer                       = Set[int]{}
 )
 
-func (s Set[T]) All(yield func(T) bool) {
-	slice.PeekWhile(s.order, yield)
-}
-
-func (s Set[T]) All2(yield func(T) bool) {
-	slice.PeekWhile2(s.order, yield)
+func (s Set[T]) All(consumer func(T) bool) {
+	slice.WalkWhile(s.order, consumer)
 }
 
 // Iter creates an iterator and returns as interface
@@ -117,7 +113,7 @@ func (s Set[T]) For(walker func(T) error) error {
 
 // ForEach applies the 'walker' function for every element
 func (s Set[T]) ForEach(walker func(T)) {
-	slice.Peek(s.order, walker)
+	slice.ForEach(s.order, walker)
 }
 
 // Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function

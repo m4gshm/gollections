@@ -279,7 +279,7 @@ include::../examples/loop/breakloop/loop_filter_convert_reduce_test.go[lines=17.
 
 Activates by `go env -w GOEXPERIMENT=rangefunc`
 
-Introduced as `All(yield func(T) bool)` method of collection, iterator types.
+Introduced as `All(consumer func(T) bool)` method of collection, iterator types.
 
 
 [source,go]
