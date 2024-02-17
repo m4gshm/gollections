@@ -33,6 +33,19 @@ type benchCase struct {
 
 var cases = []benchCase{{"high", HighLoad}, {"mid", MidLoad}, {"low", LowLoad}}
 
+func Benchmark_SliceRange_Iterating(b *testing.B) {
+	integers := slice.Range(0, max)
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for _, v := range integers {
+					casee.load(v)
+				}
+			}
+		})
+	}
+}
+
 func Benchmark_LoopRange_Iterating(b *testing.B) {
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
@@ -55,19 +68,6 @@ func Benchmark_LoopRange_Iterating2(b *testing.B) {
 				for ok {
 					casee.load(v)
 					v, ok = next()
-				}
-			}
-		})
-	}
-}
-
-func Benchmark_SliceRange_Iterating(b *testing.B) {
-	integers := slice.Range(0, max)
-	for _, casee := range cases {
-		b.Run(casee.name, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
-				for _, v := range integers {
-					casee.load(v)
 				}
 			}
 		})

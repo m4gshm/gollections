@@ -284,7 +284,7 @@ Introduced as `All(yield func(T) bool)` method of collection, iterator types.
 
 [source,go]
 ----
-include::../examples/loop/loop_range_iter_go1_22_test.go[lines=12..18,indent=0]
+include::../examples/loop/loop_range_iter_go1_22_test.go[lines=15..20,indent=0]
 ----
 
 ==== Expressions: link:./expr/use/api.go[use.If], link:./expr/get/api.go[get.If], link:#firstof[first.Of], link:#lastof[last.Of]
