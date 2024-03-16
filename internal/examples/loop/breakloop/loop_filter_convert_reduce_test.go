@@ -1,6 +1,7 @@
 package breakableloop
 
 import (
+	"database/sql"
 	"strconv"
 	"testing"
 
@@ -20,5 +21,18 @@ func Test_Slice_Vs_Loop(t *testing.T) {
 
 	assert.Equal(t, []int{1, 2, 3}, result)
 	assert.ErrorContains(t, err, "invalid syntax")
-
 }
+
+// func Test_Loop_Over_Sql_Rows(t *testing.T) {
+// 	type User struct {
+// 		name string
+// 		age  int
+// 	}
+// 	var rows *sql.Rows
+
+// 	users := loop.New(rows, (*sql.Rows).Next, func(row *sql.Rows) (*User, error) {
+// 		user := User{}
+// 		return &user, rows.Scan(&user.name, &user.age)
+// 	}).Filter(func(u *User) bool { return u.age > 18 })
+
+// }
