@@ -2,6 +2,7 @@
 package loop
 
 import (
+
 	"golang.org/x/exp/constraints"
 
 	"github.com/m4gshm/gollections/break/loop"
@@ -16,10 +17,13 @@ import (
 	"github.com/m4gshm/gollections/predicate/always"
 )
 
-// ErrBreak is the 'break' statement of the For, Track methods
+// ErrBreak is the 'break' statement of the For, Track methods.
 var ErrBreak = c.ErrBreak
 
-// Looper provides an iterable loop function
+// Next is a function that returns the next element or false if there are no more elements.
+type Next[T any] func() (T, bool)
+
+// Looper provides an iterable loop function.
 type Looper[T any, I interface{ Next() (T, bool) }] interface {
 	Loop() I
 }
@@ -446,8 +450,24 @@ func New[S, T any](source S, hasNext func(S) bool, getNext func(S) T) func() (T,
 	}
 }
 
+// Sequence makes a sequence by applying the 'next' function to the previous step generated value.
+func Sequence[T any](first T, next func(T) (T, bool)) func() (T, bool) {
+	current := first
+	init := true
+	return func() (out T, ok bool) {
+		if init {
+			init = false
+			return current, true
+		} else {
+			next, ok := next(current)
+			current = next
+			return current, ok
+		}
+	}
+}
+
 // RangeClosed creates a loop that generates integers in the range defined by from and to inclusive
-func RangeClosed[T constraints.Integer](from T, toInclusive T) func() (T, bool) {
+func RangeClosed[T constraints.Integer | rune](from T, toInclusive T) func() (T, bool) {
 	amount := toInclusive - from
 	delta := T(1)
 	if amount < 0 {
@@ -532,10 +552,4 @@ func ConvAndReduce[From, To any](next func() (From, bool), converter func(From) 
 		out = merger(out, c)
 	}
 	return out, nil
-}
-
-// Start is used with for loop construct like 'for i, k, v, ok := i.Start(); ok; k, v, ok = i.Next() { }'
-func Start[T any](next func() (T, bool)) (func() (T, bool), T, bool) {
-	element, ok := next()
-	return next, element, ok
 }
