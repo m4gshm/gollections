@@ -7,7 +7,6 @@ import (
 	breakStream "github.com/m4gshm/gollections/break/stream"
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/collection"
-	"github.com/m4gshm/gollections/loop"
 	iter "github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/slice"
@@ -32,19 +31,12 @@ var (
 	_ c.AddableAllNew[c.ForEachLoop[int]] = (*Set[int])(nil)
 	_ c.Deleteable[int]                   = (*Set[int])(nil)
 	_ c.DeleteableVerify[int]             = (*Set[int])(nil)
-	_ collection.Set[int]                 = (*Set[int])(nil)
-	_ loop.Looper[int, *SetIter[int]]     = (*Set[int])(nil)
+	_ collection.Set[int, *SetIter[int]]  = (*Set[int])(nil)
 	_ fmt.Stringer                        = (*Set[int])(nil)
 )
 
 // Iter creates an iterator and returns as interface
-func (s *Set[T]) Iter() c.Iterator[T] {
-	h := s.Head()
-	return &h
-}
-
-// Loop creates an iterator and returns as implementation type reference
-func (s *Set[T]) Loop() *SetIter[T] {
+func (s *Set[T]) Iter() *SetIter[T] {
 	h := s.Head()
 	return &h
 }

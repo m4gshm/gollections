@@ -5,7 +5,6 @@ import (
 
 	breakLoop "github.com/m4gshm/gollections/break/loop"
 	breakStream "github.com/m4gshm/gollections/break/stream"
-	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/notsafe"
@@ -24,22 +23,14 @@ type Vector[T any] struct {
 }
 
 var (
-	_ collection.Vector[any]             = (*Vector[any])(nil)
-	_ collection.Vector[any]             = Vector[any]{}
-	_ loop.Looper[any, *slice.Iter[any]] = (*Vector[any])(nil)
-	_ loop.Looper[any, *slice.Iter[any]] = Vector[any]{}
-	_ fmt.Stringer                       = (*Vector[any])(nil)
-	_ fmt.Stringer                       = Vector[any]{}
+	_ collection.Vector[any, *slice.Iter[any]] = (*Vector[any])(nil)
+	_ collection.Vector[any, *slice.Iter[any]] = Vector[any]{}
+	_ fmt.Stringer                             = (*Vector[any])(nil)
+	_ fmt.Stringer                             = Vector[any]{}
 )
 
 // Iter creates an iterator and returns as interface
-func (v Vector[T]) Iter() c.Iterator[T] {
-	h := v.Head()
-	return &h
-}
-
-// Loop creates an iterator and returns as implementation type reference
-func (v Vector[T]) Loop() *slice.Iter[T] {
+func (v Vector[T]) Iter() *slice.Iter[T] {
 	h := v.Head()
 	return &h
 }

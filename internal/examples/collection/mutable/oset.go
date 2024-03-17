@@ -8,5 +8,5 @@ import (
 
 var (
 	_ *ordered.Set[int]   = set.Of(1, 2, 3)
-	_ collection.Set[int] = &ordered.Set[int]{}
+	_ collection.Set[int, *ordered.SetIter[int]] = &ordered.Set[int]{}
 )

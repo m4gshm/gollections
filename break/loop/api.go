@@ -14,13 +14,11 @@ import (
 	"github.com/m4gshm/gollections/op/check/not"
 )
 
-// ErrBreak is the 'break' statement of the For, Track methods
+// ErrBreak is the 'break' statement of the For, Track methods.
 var ErrBreak = c.ErrBreak
 
-// Looper provides an iterable loop function
-type Looper[T any, I interface{ Next() (T, bool, error) }] interface {
-	Loop() I
-}
+// Next is a function that returns the next element or false if there are no more elements.
+type Next[T any] func() (T, bool, error)
 
 // Of wrap the elements by loop function
 func Of[T any](elements ...T) func() (e T, ok bool, err error) {

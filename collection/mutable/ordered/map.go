@@ -10,7 +10,6 @@ import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/collection/immutable/ordered"
-	"github.com/m4gshm/gollections/kv"
 	"github.com/m4gshm/gollections/kv/loop"
 	"github.com/m4gshm/gollections/kv/stream"
 	"github.com/m4gshm/gollections/map_"
@@ -35,20 +34,13 @@ var (
 	_ c.SettableNew[int, any]                                     = (*Map[int, any])(nil)
 	_ c.SettableMap[c.TrackEachLoop[int, any]]                    = (*Map[int, any])(nil)
 	_ c.ImmutableMapConvert[ordered.Map[int, any]]                = (*Map[int, any])(nil)
-	_ collection.Map[int, any]                                    = (*Map[int, any])(nil)
-	_ loop.Looper[int, any, *ordered.MapIter[int, any]]           = (*Map[int, any])(nil)
+	_ collection.Map[int, any, *ordered.MapIter[int, any]]        = (*Map[int, any])(nil)
 	_ c.KeyVal[ordered.MapKeys[int], ordered.MapValues[int, any]] = (*Map[int, any])(nil)
 	_ fmt.Stringer                                                = (*Map[int, any])(nil)
 )
 
 // Iter creates an iterator and returns as interface
-func (m *Map[K, V]) Iter() kv.Iterator[K, V] {
-	h := m.Head()
-	return &h
-}
-
-// Loop creates an iterator and returns as implementation type reference
-func (m *Map[K, V]) Loop() *ordered.MapIter[K, V] {
+func (m *Map[K, V]) Iter() *ordered.MapIter[K, V] {
 	h := m.Head()
 	return &h
 }

@@ -8,6 +8,6 @@ import (
 )
 
 // Of - group.Of synonym of the iter.Group
-func Of[T any, K comparable, IT c.Iterable[T]](elements IT, by func(T) K) stream.Iter[K, T, map[K][]T] {
+func Of[T any, K comparable, I c.Iterator[T], IT c.Iterable[T, I]](elements IT, by func(T) K) stream.Iter[K, T, map[K][]T] {
 	return iter.Group(elements.Iter(), by)
 }

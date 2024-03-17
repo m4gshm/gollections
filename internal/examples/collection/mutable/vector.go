@@ -8,5 +8,5 @@ import (
 
 var (
 	_ *mutable.Vector[int]   = vector.Of(1, 2, 3)
-	_ collection.Vector[int] = &mutable.Vector[int]{}
+	_ collection.Vector[int, *mutable.SliceIter[int]] = &mutable.Vector[int]{}
 )

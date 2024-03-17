@@ -2,7 +2,6 @@
 package loop
 
 import (
-
 	"golang.org/x/exp/constraints"
 
 	"github.com/m4gshm/gollections/break/loop"
@@ -22,11 +21,6 @@ var ErrBreak = c.ErrBreak
 
 // Next is a function that returns the next element or false if there are no more elements.
 type Next[T any] func() (T, bool)
-
-// Looper provides an iterable loop function.
-type Looper[T any, I interface{ Next() (T, bool) }] interface {
-	Loop() I
-}
 
 // Of wrap the elements by loop function
 func Of[T any](elements ...T) func() (e T, ok bool) {
@@ -116,7 +110,11 @@ func SliceCap[T any](next func() (T, bool), cap int) (out []T) {
 
 // Append collects the elements retrieved by the 'next' function into the specified 'out' slice
 func Append[T any, TS ~[]T](next func() (T, bool), out TS) TS {
-	for v, ok := next(); ok; v, ok = next() {
+	for {
+		v, ok := next()
+		if !ok {
+			break
+		}
 		out = append(out, v)
 	}
 	return out

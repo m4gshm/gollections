@@ -21,14 +21,14 @@ type MapKeys[K comparable] struct {
 }
 
 var (
-	_ c.Collection[int] = (*MapKeys[int])(nil)
-	_ c.Collection[int] = MapKeys[int]{}
-	_ fmt.Stringer      = (*MapKeys[int])(nil)
-	_ fmt.Stringer      = MapKeys[int]{}
+	_ c.Collection[int, *slice.Iter[int]] = (*MapKeys[int])(nil)
+	_ c.Collection[int, *slice.Iter[int]] = MapKeys[int]{}
+	_ fmt.Stringer                       = (*MapKeys[int])(nil)
+	_ fmt.Stringer                       = MapKeys[int]{}
 )
 
 // Iter creates an iterator and returns as interface
-func (m MapKeys[K]) Iter() c.Iterator[K] {
+func (m MapKeys[K]) Iter() *slice.Iter[K] {
 	h := m.Head()
 	return &h
 }

@@ -24,25 +24,18 @@ func WrapVector[T any](elements []T) *Vector[T] {
 type Vector[T any] []T
 
 var (
-	_ c.Addable[any]                    = (*Vector[any])(nil)
-	_ c.AddableAll[c.ForEachLoop[any]]  = (*Vector[any])(nil)
-	_ c.Deleteable[int]                 = (*Vector[any])(nil)
-	_ c.DeleteableVerify[int]           = (*Vector[any])(nil)
-	_ c.Settable[int, any]              = (*Vector[any])(nil)
-	_ c.SettableNew[int, any]           = (*Vector[any])(nil)
-	_ collection.Vector[any]            = (*Vector[any])(nil)
-	_ loop.Looper[any, *SliceIter[any]] = (*Vector[any])(nil)
-	_ fmt.Stringer                      = (*Vector[any])(nil)
+	_ c.Addable[any]                          = (*Vector[any])(nil)
+	_ c.AddableAll[c.ForEachLoop[any]]        = (*Vector[any])(nil)
+	_ c.Deleteable[int]                       = (*Vector[any])(nil)
+	_ c.DeleteableVerify[int]                 = (*Vector[any])(nil)
+	_ c.Settable[int, any]                    = (*Vector[any])(nil)
+	_ c.SettableNew[int, any]                 = (*Vector[any])(nil)
+	_ collection.Vector[any, *SliceIter[any]] = (*Vector[any])(nil)
+	_ fmt.Stringer                            = (*Vector[any])(nil)
 )
 
 // Iter creates an iterator and returns as interface
-func (v *Vector[T]) Iter() c.Iterator[T] {
-	h := v.Head()
-	return &h
-}
-
-// Loop creates an iterator and returns as implementation type reference
-func (v *Vector[T]) Loop() *SliceIter[T] {
+func (v *Vector[T]) Iter() *SliceIter[T] {
 	h := v.Head()
 	return &h
 }
