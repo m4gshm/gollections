@@ -25,8 +25,8 @@ type Set[T comparable] struct {
 var (
 	_ collection.Set[int, *slice.Iter[int]] = (*Set[int])(nil)
 	_ collection.Set[int, *slice.Iter[int]] = Set[int]{}
-	_ fmt.Stringer                         = (*Set[int])(nil)
-	_ fmt.Stringer                         = Set[int]{}
+	_ fmt.Stringer                          = (*Set[int])(nil)
+	_ fmt.Stringer                          = Set[int]{}
 )
 
 // Iter creates an iterator and returns as interface

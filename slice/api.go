@@ -796,7 +796,7 @@ func DowncastRef[TS ~[]T, T any](elements *[]T) *TS {
 
 // Filled returns the 'ifEmpty' if the 'elements' slise is empty
 func Filled[TS ~[]T, T any](elements TS, ifEmpty []T) TS {
-	if Empty(elements) {
+	if IsEmpty(elements) {
 		return elements
 	}
 	return ifEmpty
@@ -833,14 +833,14 @@ func Has[TS ~[]T, T any](elements TS, condition func(T) bool) bool {
 	return false
 }
 
-// Empty checks whether the specified slice is empty
-func Empty[TS ~[]T, T any](elements TS) bool {
+// IsEmpty checks whether the specified slice is empty
+func IsEmpty[TS ~[]T, T any](elements TS) bool {
 	return len(elements) == 0
 }
 
 // NotEmpty checks whether the specified slice is not empty
 func NotEmpty[TS ~[]T, T any](elements TS) bool {
-	return !Empty(elements)
+	return !IsEmpty(elements)
 }
 
 // ToMap collects key\value elements to a map by iterating over the elements

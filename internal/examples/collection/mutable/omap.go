@@ -7,6 +7,7 @@ import (
 )
 
 var (
+	//
 	_ *ordered.Map[int, string] = map_.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
 	_ *ordered.Map[int, string] = ordered.NewMapOf(
 		/*order  */ []int{3, 1, 2},

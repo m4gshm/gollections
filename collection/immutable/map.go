@@ -29,8 +29,8 @@ type Map[K comparable, V any] struct {
 }
 
 var (
-	_ collection.Map[int, any, *map_.Iter[int, any]]                         = (*Map[int, any])(nil)
-	_ collection.Map[int, any, *map_.Iter[int, any]]                         = Map[int, any]{}
+	_ collection.Map[int, any, *map_.Iter[int, any]]   = (*Map[int, any])(nil)
+	_ collection.Map[int, any, *map_.Iter[int, any]]   = Map[int, any]{}
 	_ c.KeyVal[MapKeys[int, any], MapValues[int, any]] = (*Map[int, any])(nil)
 	_ c.KeyVal[MapKeys[int, any], MapValues[int, any]] = Map[int, any]{}
 	_ fmt.Stringer                                     = (*Map[int, any])(nil)
