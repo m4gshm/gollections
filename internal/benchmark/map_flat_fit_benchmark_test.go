@@ -374,7 +374,7 @@ func Benchmark_ReduceSum_Slice(b *testing.B) {
 //go:noinline
 func odds(v int) bool { return v%2 != 0 }
 
-func Benchmark_ReduceSum_Slice_Looped2(b *testing.B) {
+func Benchmark_ReduceSum_Slice_Looped(b *testing.B) {
 	multiDimension := [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
 	expected := 1 + 3 + 5 + 7
 
