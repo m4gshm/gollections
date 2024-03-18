@@ -5,7 +5,6 @@ import (
 
 	breakLoop "github.com/m4gshm/gollections/break/loop"
 	breakStream "github.com/m4gshm/gollections/break/stream"
-	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/collection/immutable/ordered"
 	"github.com/m4gshm/gollections/loop"
@@ -25,22 +24,14 @@ type Set[T comparable] struct {
 }
 
 var (
-	_ collection.Set[int]                            = (*Set[int])(nil)
-	_ collection.Set[int]                            = Set[int]{}
-	_ loop.Looper[int, *map_.KeyIter[int, struct{}]] = (*Set[int])(nil)
-	_ loop.Looper[int, *map_.KeyIter[int, struct{}]] = Set[int]{}
-	_ fmt.Stringer                                   = (*Set[int])(nil)
-	_ fmt.Stringer                                   = Set[int]{}
+	_ collection.Set[int, *map_.KeyIter[int, struct{}]] = (*Set[int])(nil)
+	_ collection.Set[int, *map_.KeyIter[int, struct{}]] = Set[int]{}
+	_ fmt.Stringer                                      = (*Set[int])(nil)
+	_ fmt.Stringer                                      = Set[int]{}
 )
 
 // Iter creates an iterator and returns as interface
-func (s Set[T]) Iter() c.Iterator[T] {
-	h := s.Head()
-	return &h
-}
-
-// Loop creates an iterator and returns as implementation type reference
-func (s Set[T]) Loop() *map_.KeyIter[T, struct{}] {
+func (s Set[T]) Iter() *map_.KeyIter[T, struct{}] {
 	h := s.Head()
 	return &h
 }

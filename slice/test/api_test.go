@@ -494,9 +494,9 @@ func Test_MatchAny(t *testing.T) {
 }
 
 func Test_Empty(t *testing.T) {
-	assert.False(t, slice.Empty(slice.Of(1)))
-	assert.True(t, slice.Empty(slice.Of[int]()))
-	assert.True(t, slice.Empty[[]int](nil))
+	assert.False(t, slice.IsEmpty(slice.Of(1)))
+	assert.True(t, slice.IsEmpty(slice.Of[int]()))
+	assert.True(t, slice.IsEmpty[[]int](nil))
 }
 
 func Test_SplitTwo(t *testing.T) {

@@ -4,7 +4,7 @@ import "github.com/m4gshm/gollections/break/c"
 
 // Stream is collection or stream of elements in transformation state.
 // It supports interrupting on an error that may occur in intermediate or final executor functions.
-type Stream[T, I any] interface {
+type Stream[T any, I c.Iterator[T]] interface {
 	c.Iterator[T]
 	Iter() I
 

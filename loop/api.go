@@ -16,16 +16,11 @@ import (
 	"github.com/m4gshm/gollections/predicate/always"
 )
 
-// ErrBreak is the 'break' statement of the For, Track methods
+// ErrBreak is the 'break' statement of the For, Track methods.
 var ErrBreak = c.ErrBreak
 
-// Looper provides an iterable loop function
-type Looper[T any, I interface{ Next() (T, bool) }] interface {
-	Loop() I
-}
-
 // Of wrap the elements by loop function
-func Of[T any](elements ...T) func() (e T, ok bool) {
+func Of[T any](elements ...T) Loop[T] {
 	l := len(elements)
 	i := 0
 	if l == 0 || i < 0 || i >= l {
@@ -112,7 +107,11 @@ func SliceCap[T any](next func() (T, bool), cap int) (out []T) {
 
 // Append collects the elements retrieved by the 'next' function into the specified 'out' slice
 func Append[T any, TS ~[]T](next func() (T, bool), out TS) TS {
-	for v, ok := next(); ok; v, ok = next() {
+	for {
+		v, ok := next()
+		if !ok {
+			break
+		}
 		out = append(out, v)
 	}
 	return out
@@ -437,7 +436,7 @@ func ToMapResolv[T any, K comparable, V, VR any](next func() (T, bool), keyExtra
 }
 
 // New makes a loop from an abstract source
-func New[S, T any](source S, hasNext func(S) bool, getNext func(S) T) func() (T, bool) {
+func New[S, T any](source S, hasNext func(S) bool, getNext func(S) T) Loop[T] {
 	return func() (out T, ok bool) {
 		if hasNext(source) {
 			out, ok = getNext(source), true
@@ -446,8 +445,24 @@ func New[S, T any](source S, hasNext func(S) bool, getNext func(S) T) func() (T,
 	}
 }
 
+// Sequence makes a sequence by applying the 'next' function to the previous step generated value.
+func Sequence[T any](first T, next func(T) (T, bool)) Loop[T] {
+	current := first
+	init := true
+	return func() (out T, ok bool) {
+		if init {
+			init = false
+			return current, true
+		} else {
+			next, ok := next(current)
+			current = next
+			return current, ok
+		}
+	}
+}
+
 // RangeClosed creates a loop that generates integers in the range defined by from and to inclusive
-func RangeClosed[T constraints.Integer](from T, toInclusive T) func() (T, bool) {
+func RangeClosed[T constraints.Integer | rune](from T, toInclusive T) Loop[T] {
 	amount := toInclusive - from
 	delta := T(1)
 	if amount < 0 {
@@ -468,7 +483,7 @@ func RangeClosed[T constraints.Integer](from T, toInclusive T) func() (T, bool) 
 }
 
 // Range creates a loop that generates integers in the range defined by from and to exclusive
-func Range[T constraints.Integer | rune](from T, toExclusive T) func() (T, bool) {
+func Range[T constraints.Integer | rune](from T, toExclusive T) Loop[T] {
 	amount := toExclusive - from
 	delta := T(1)
 	if amount < 0 {
@@ -490,7 +505,7 @@ func Range[T constraints.Integer | rune](from T, toExclusive T) func() (T, bool)
 // OfIndexed builds a loop by extracting elements from an indexed soruce.
 // the len is length ot the source.
 // the getAt retrieves an element by its index from the source.
-func OfIndexed[T any](len int, next func(int) T) func() (T, bool) {
+func OfIndexed[T any](len int, next func(int) T) Loop[T] {
 	i := 0
 	return func() (out T, ok bool) {
 		if ok = i < len; ok {
@@ -532,10 +547,4 @@ func ConvAndReduce[From, To any](next func() (From, bool), converter func(From) 
 		out = merger(out, c)
 	}
 	return out, nil
-}
-
-// Start is used with for loop construct like 'for i, k, v, ok := i.Start(); ok; k, v, ok = i.Next() { }'
-func Start[T any](next func() (T, bool)) (func() (T, bool), T, bool) {
-	element, ok := next()
-	return next, element, ok
 }

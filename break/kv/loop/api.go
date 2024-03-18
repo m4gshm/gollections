@@ -5,10 +5,8 @@ import (
 	"github.com/m4gshm/gollections/map_/resolv"
 )
 
-// Looper provides an iterable loop function
-type Looper[K, V any, I interface{ Next() (K, V, bool, error) }] interface {
-	Loop() I
-}
+// Next is a function that returns the next key, value or false if there are no more elements.
+type Next[K, V any] func() (K, V, bool, error)
 
 // From wrap the next loop to a breakable loop
 func From[K, V any](next func() (K, V, bool)) func() (K, V, bool, error) {

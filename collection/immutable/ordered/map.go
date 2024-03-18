@@ -9,7 +9,6 @@ import (
 	breakMapFilter "github.com/m4gshm/gollections/break/map_/filter"
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/collection"
-	"github.com/m4gshm/gollections/kv"
 	"github.com/m4gshm/gollections/kv/loop"
 	"github.com/m4gshm/gollections/kv/stream"
 	"github.com/m4gshm/gollections/map_"
@@ -30,24 +29,16 @@ type Map[K comparable, V any] struct {
 }
 
 var (
-	_ collection.Map[int, any]                    = (*Map[int, any])(nil)
-	_ collection.Map[int, any]                    = Map[int, any]{}
-	_ loop.Looper[int, any, *MapIter[int, any]]   = (*Map[int, any])(nil)
-	_ loop.Looper[int, any, *MapIter[int, any]]   = Map[int, any]{}
-	_ c.KeyVal[MapKeys[int], MapValues[int, any]] = (*Map[int, any])(nil)
-	_ c.KeyVal[MapKeys[int], MapValues[int, any]] = Map[int, any]{}
-	_ fmt.Stringer                                = (*Map[int, any])(nil)
-	_ fmt.Stringer                                = Map[int, any]{}
+	_ collection.Map[int, any, *MapIter[int, any]] = (*Map[int, any])(nil)
+	_ collection.Map[int, any, *MapIter[int, any]] = Map[int, any]{}
+	_ c.KeyVal[MapKeys[int], MapValues[int, any]]  = (*Map[int, any])(nil)
+	_ c.KeyVal[MapKeys[int], MapValues[int, any]]  = Map[int, any]{}
+	_ fmt.Stringer                                 = (*Map[int, any])(nil)
+	_ fmt.Stringer                                 = Map[int, any]{}
 )
 
 // Iter creates an iterator and returns as interface
-func (m Map[K, V]) Iter() kv.Iterator[K, V] {
-	h := m.Head()
-	return &h
-}
-
-// Loop creates an iterator and returns as implementation type reference
-func (m Map[K, V]) Loop() *MapIter[K, V] {
+func (m Map[K, V]) Iter() *MapIter[K, V] {
 	h := m.Head()
 	return &h
 }

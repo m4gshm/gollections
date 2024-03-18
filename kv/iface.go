@@ -25,15 +25,15 @@ type IterFor[K, V any, I Iterator[K, V]] interface {
 }
 
 // Iterable is an iterator supplier interface
-type Iterable[K, V any] interface {
-	Iter() Iterator[K, V]
+type Iterable[K, V any, I Iterator[K, V]] interface {
+	Iter() I
 }
 
 // Collection is the base interface of associative collections
-type Collection[K comparable, V any, M map[K]V | map[K][]V] interface {
+type Collection[K comparable, V any, I Iterator[K, V], M map[K]V | map[K][]V] interface {
 	c.TrackLoop[K, V]
 	c.TrackEachLoop[K, V]
-	Iterable[K, V]
+	Iterable[K, V, I]
 	c.MapFactory[K, V, M]
 
 	Reduce(merger func(K, K, V, V) (K, V)) (K, V)

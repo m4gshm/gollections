@@ -19,10 +19,8 @@ type Iter[T any] struct {
 }
 
 var (
-	_ Stream[any]                                         = (*Iter[any])(nil)
-	_ Stream[any]                                         = Iter[any]{}
-	_ loop.Looper[any, Iter[any]]                         = (*Iter[any])(nil)
-	_ loop.Looper[any, Iter[any]]                         = Iter[any]{}
+	_ Stream[any, Iter[any]]                              = (*Iter[any])(nil)
+	_ Stream[any, Iter[any]]                              = Iter[any]{}
 	_ c.Filterable[any, Iter[any], breakStream.Iter[any]] = (*Iter[any])(nil)
 	_ c.Filterable[any, Iter[any], breakStream.Iter[any]] = Iter[any]{}
 	_ c.Iterator[any]                                     = (*Iter[any])(nil)
@@ -83,12 +81,7 @@ func (t Iter[T]) First(predicate func(T) bool) (T, bool) {
 }
 
 // Iter creates an iterator and returns as interface
-func (t Iter[T]) Iter() c.Iterator[T] {
-	return t
-}
-
-// Loop creates an iterator and returns as implementation type reference
-func (t Iter[T]) Loop() Iter[T] {
+func (t Iter[T]) Iter() Iter[T] {
 	return t
 }
 

@@ -10,8 +10,8 @@ import (
 )
 
 // Collection is the base interface for the Vector and the Set impelementations
-type Collection[T any] interface {
-	c.Collection[T]
+type Collection[T any, I c.Iterator[T]] interface {
+	c.Collection[T, I]
 	c.Filterable[T, stream.Iter[T], breakStream.Iter[T]]
 	c.Convertable[T, stream.Iter[T], breakStream.Iter[T]]
 
@@ -22,8 +22,8 @@ type Collection[T any] interface {
 }
 
 // Vector - collection interface that provides elements order and access by index to the elements.
-type Vector[T any] interface {
-	Collection[T]
+type Vector[T any, I c.Iterator[T]] interface {
+	Collection[T, I]
 
 	c.TrackLoop[int, T]
 	c.TrackEachLoop[int, T]
@@ -32,14 +32,14 @@ type Vector[T any] interface {
 }
 
 // Set - collection interface that ensures the uniqueness of elements (does not insert duplicate values).
-type Set[T comparable] interface {
-	Collection[T]
+type Set[T comparable, I c.Iterator[T]] interface {
+	Collection[T, I]
 	c.Checkable[T]
 }
 
 // Map - collection interface that stores key/value pairs and provide access to an element by its key
-type Map[K comparable, V any] interface {
-	kv.Collection[K, V, map[K]V]
+type Map[K comparable, V any, I kv.Iterator[K, V]] interface {
+	kv.Collection[K, V, I, map[K]V]
 	kv.Filterable[K, V, kvstream.Iter[K, V, map[K]V], breakKvstream.Iter[K, V, map[K]V]]
 	kv.Convertable[K, V, kvstream.Iter[K, V, map[K]V], breakKvstream.Iter[K, V, map[K]V]]
 	c.Checkable[K]

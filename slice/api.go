@@ -452,7 +452,7 @@ func GetValues[TS ~[]*T, T any](elements TS) []T {
 }
 
 // Filter filters elements that match the filter condition and returns them.
-func Filter[TS ~[]T, T any](elements TS, filter func(T) bool) []T {
+func Filter[TS ~[]T, T any](elements TS, filter func(T) bool) TS {
 	if elements == nil {
 		return nil
 	}
@@ -470,7 +470,7 @@ func AppendFilter[TS ~[]T, DS ~[]T, T any](src TS, dest DS, filter func(T) bool)
 }
 
 // Filt filters elements that match the filter condition and returns them.
-func Filt[TS ~[]T, T any](elements TS, filter func(T) (bool, error)) ([]T, error) {
+func Filt[TS ~[]T, T any](elements TS, filter func(T) (bool, error)) (TS, error) {
 	if elements == nil {
 		return nil, nil
 	}
@@ -489,6 +489,22 @@ func AppendFilt[TS ~[]T, DS ~[]T, T any](src TS, dest DS, filter func(T) (bool, 
 		}
 	}
 	return dest, nil
+}
+
+// Sequence makes a sequence slice by applying the 'next' function to the previous step generated value.
+func Sequence[T any](first T, next func(T) (T, bool)) []T {
+	current := first
+	sequence := make([]T, 0, 16)
+	sequence = append(sequence, current)
+	for {
+		next, ok := next(current)
+		if !ok {
+			break
+		}
+		sequence = append(sequence, next)
+		current = next
+	}
+	return sequence
 }
 
 // RangeClosed generates a slice of integers in the range defined by from and to inclusive
@@ -780,7 +796,7 @@ func DowncastRef[TS ~[]T, T any](elements *[]T) *TS {
 
 // Filled returns the 'ifEmpty' if the 'elements' slise is empty
 func Filled[TS ~[]T, T any](elements TS, ifEmpty []T) TS {
-	if Empty(elements) {
+	if IsEmpty(elements) {
 		return elements
 	}
 	return ifEmpty
@@ -817,14 +833,14 @@ func Has[TS ~[]T, T any](elements TS, condition func(T) bool) bool {
 	return false
 }
 
-// Empty checks whether the specified slice is empty
-func Empty[TS ~[]T, T any](elements TS) bool {
+// IsEmpty checks whether the specified slice is empty
+func IsEmpty[TS ~[]T, T any](elements TS) bool {
 	return len(elements) == 0
 }
 
 // NotEmpty checks whether the specified slice is not empty
 func NotEmpty[TS ~[]T, T any](elements TS) bool {
-	return !Empty(elements)
+	return !IsEmpty(elements)
 }
 
 // ToMap collects key\value elements to a map by iterating over the elements
