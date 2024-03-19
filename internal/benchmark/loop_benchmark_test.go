@@ -9,6 +9,7 @@ import (
 	moset "github.com/m4gshm/gollections/collection/mutable/ordered/set"
 	mvector "github.com/m4gshm/gollections/collection/mutable/vector"
 	"github.com/m4gshm/gollections/convert/ptr"
+	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/range_"
@@ -392,6 +393,16 @@ func Benchmark_Loop_MutableOrdererSet_ForEach(b *testing.B) {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				c.ForEach(casee.load)
+			}
+		})
+	}
+}
+
+func Benchmark_Loop_Loop_Next(b *testing.B) {
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				loop.RangeClosed(1, max).ForEach(casee.load)
 			}
 		})
 	}
