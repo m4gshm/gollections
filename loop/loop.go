@@ -12,9 +12,7 @@ func (next Loop[T]) For(walker func(T) error) error {
 
 // ForEach applies the 'walker' function to the elements retrieved by the 'next' function
 func (next Loop[T]) ForEach(walker func(T)) {
-	for v, ok := next(); ok; v, ok = next() {
-		walker(v)
-	}
+	ForEach(next, walker)
 }
 
 // ForEachFiltered applies the 'walker' function to the elements retrieved by the 'next' function that satisfy the 'predicate' function condition
