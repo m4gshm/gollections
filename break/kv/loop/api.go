@@ -5,8 +5,18 @@ import (
 	"github.com/m4gshm/gollections/map_/resolv"
 )
 
-// Next is a function that returns the next key, value or false if there are no more elements.
-type Next[K, V any] func() (K, V, bool, error)
+// New is the mai breakable key/value loop constructor
+func New[S, K, V any](source S, hasNext func(S) bool, getNext func(S) (K, V, error)) Loop[K, V] {
+	return func() (k K, v V, ok bool, err error) {
+		if ok := hasNext(source); !ok {
+			return k, v, false, nil
+		} else if k, v, err = getNext(source); err != nil {
+			return k, v, false, err
+		} else {
+			return k, v, true, nil
+		}
+	}
+}
 
 // From wrap the next loop to a breakable loop
 func From[K, V any](next func() (K, V, bool)) func() (K, V, bool, error) {
@@ -148,19 +158,6 @@ func ToSlice[K, V, T any](next func() (K, V, bool, error), converter func(K, V) 
 		}
 		if !ok || err != nil {
 			return s, err
-		}
-	}
-}
-
-// New is the mai breakable key/value loop constructor
-func New[S, K, V any](source S, hasNext func(S) bool, getNext func(S) (K, V, error)) func() (K, V, bool, error) {
-	return func() (k K, v V, ok bool, err error) {
-		if ok := hasNext(source); !ok {
-			return k, v, false, nil
-		} else if k, v, err = getNext(source); err != nil {
-			return k, v, false, err
-		} else {
-			return k, v, true, nil
 		}
 	}
 }

@@ -17,9 +17,6 @@ import (
 // ErrBreak is the 'break' statement of the For, Track methods.
 var ErrBreak = c.ErrBreak
 
-// Next is a function that returns the next element or false if there are no more elements.
-type Next[T any] func() (T, bool, error)
-
 // Of wrap the elements by loop function
 func Of[T any](elements ...T) func() (e T, ok bool, err error) {
 	l := len(elements)
@@ -36,8 +33,19 @@ func Of[T any](elements ...T) func() (e T, ok bool, err error) {
 	}
 }
 
+// New is the main breakable loop constructor
+func New[S, T any](source S, hasNext func(S) bool, getNext func(S) (T, error)) Loop[T] {
+	return func() (out T, ok bool, err error) {
+		if ok := hasNext(source); !ok {
+			return out, false, nil
+		}
+		out, err = getNext(source)
+		return out, err == nil, err
+	}
+}
+
 // From wrap the next loop to a breakable loop
-func From[T any](next func() (T, bool)) func() (T, bool, error) {
+func From[T any](next func() (T, bool)) Loop[T] {
 	return func() (T, bool, error) {
 		e, ok := next()
 		return e, ok, nil
@@ -509,17 +517,6 @@ func ToMapResolvv[T any, K comparable, V, VR any](
 				return m, err
 			}
 		}
-	}
-}
-
-// New is the main breakable loop constructor
-func New[S, T any](source S, hasNext func(S) bool, getNext func(S) (T, error)) func() (T, bool, error) {
-	return func() (out T, ok bool, err error) {
-		if ok := hasNext(source); !ok {
-			return out, false, nil
-		}
-		out, err = getNext(source)
-		return out, err == nil, err
 	}
 }
 

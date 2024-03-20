@@ -390,6 +390,46 @@ var users = map_.ToSlice(employers, func(title string, employer map[string]strin
 //[{name:Bob age:0 roles:[{name:devops}]} {name:Tom age:0 roles:[{name:jun}]}]
 ```
 
+## [loop](./loop/api.go), [kv/loop](./kv/loop/api.go) and breakable versions [break/loop](./break/loop/api.go), [break/kv/loop](./break/kv/loop/api.go)
+
+Low-level API for iteration based on next functions:
+
+``` go
+type (
+    Loop[T any]           func() (element T, ok bool)
+    KVLoop[K, V any]      func() (key K, value V, ok bool)
+    BreakLoop[T any]      func() (element T, ok bool, err error)
+    BreakKVLoop[K, V any] func() (key K, value V, ok bool, err error)
+)
+```
+
+The `Loop` function retrieves a next element from a dataset and returns
+`ok==true` if successful.  
+The `KVLoop` behaves similar but returns a key/value pair.  
+
+``` go
+even := func(i int) bool { return i%2 == 0 }
+stringSeq := loop.Convert(loop.Filter(loop.Of(1, 2, 3, 4), even).Next, strconv.Itoa)
+
+assert.Equal(t, []string{"2", "4"}, loop.Slice(stringSeq.Next))
+```
+
+`BreakLoop` and `BreakKVLoop` are used for sources that can issue an
+error.
+
+``` go
+intSeq := loop.Conv(loop.Of("1", "2", "3", "ddd4", "5"), strconv.Atoi)
+ints, err := loop.Slice(intSeq.Next)
+
+assert.Equal(t, []int{1, 2, 3}, ints)
+assert.ErrorContains(t, err, "invalid syntax")
+```
+
+The API in most cases is similar to the [slice](./slice/api.go) API but
+with delayed computation which means that the methods don’t compute a
+result but only return a loop provider. The loop provider is type with a
+`Next` method that returns a next processed element.
+
 ## Data structures
 
 ### [mutable](./collection/mutable/api.go) and [immutable](./collection/immutable/api.go) collections
@@ -417,48 +457,13 @@ import "github.com/m4gshm/gollections/slice"
 bob, _ := slice.First(users, where.Eq(User.Name, "Bob"))
 ```
 
-### [loop](./loop/api.go), [kv/loop](./kv/loop/api.go) and breakable versions [break/loop](./break/loop/api.go), [break/kv/loop](./break/kv/loop/api.go)
-
-Low level iteration api based on `next` function.
-
-``` go
-type (
-    next[T any]      func() (element T, ok bool)
-    kvNext[K, V any] func() (key K, value V, ok bool)
-)
-```
-
-The function retrieves a next element from a dataset and returns
-`ok==true` if successful.  
-The API in most cases is similar to the [slice](./slice/api.go) API but
-with delayed computation which means that the methods don’t compute a
-result but only return a loop provider. The loop provider is type with a
-`Next` method that returns a next processed element.
-
-``` go
-even := func(i int) bool { return i%2 == 0 }
-loopStream := loop.Convert(loop.Filter(loop.Of(1, 2, 3, 4), even).Next, strconv.Itoa)
-
-assert.Equal(t, []string{"2", "4"}, loop.Slice(loopStream.Next))
-```
-
-Breakable loops additionaly have error returned value.
-
-``` go
-type (
-    next[T any]      func() (element T, ok bool, err error)
-    kvNext[K, V any] func() (key K, value V, ok bool, err error)
-)
-```
-
 It is used for computations where an error may occur.
 
 ``` go
-iter := loop.Conv(loop.Of("1", "2", "3", "ddd4", "5"), strconv.Atoi)
-result, err := loop.Slice(iter.Next)
+   assert.Equal(t, []int{1, 2, 3}, ints)
+    assert.ErrorContains(t, err, "invalid syntax")
 
-assert.Equal(t, []int{1, 2, 3}, result)
-assert.ErrorContains(t, err, "invalid syntax")
+}
 ```
 
 ### Expressions: [use.If](./expr/use/api.go), [get.If](./expr/get/api.go), [first.Of](#firstof), [last.Of](#lastof)
@@ -537,8 +542,8 @@ _ *mutable.Set[int] = &mutable.Set[int]{}
   supports [stream functions](#stream-functions).
 
 ``` go
-   _ *mutable.Map[int, string] = mutable.NewMapOf(map[int]string{1: "2", 2: "2", 3: "3"})
-)
+_ *mutable.Map[int, string] = map_.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
+_ *mutable.Map[int, string] = mutable.NewMapOf(map[int]string{1: "2", 2: "2", 3: "3"})
 ```
 
 - [OrderedSet](./collection/mutable/oset/api.go) - collection of unique

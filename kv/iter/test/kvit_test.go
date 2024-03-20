@@ -4,13 +4,14 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	breakLoop "github.com/m4gshm/gollections/break/kv/loop"
 	"github.com/m4gshm/gollections/iter"
 	"github.com/m4gshm/gollections/k"
 	kviter "github.com/m4gshm/gollections/kv/iter"
 	"github.com/m4gshm/gollections/kv/loop"
 	"github.com/m4gshm/gollections/slice"
-	"github.com/stretchr/testify/assert"
 )
 
 func Test_Collect_Group(t *testing.T) {
@@ -60,9 +61,9 @@ func Test_OfLoop(t *testing.T) {
 		return next%2 == 0, next, nil
 	}
 
-	iterator := breakLoop.New(data, (*rows[int]).hasNext, evens)
+	loop := breakLoop.New(data, (*rows[int]).hasNext, evens)
 
-	m, err := breakLoop.ToMap(iterator)
+	m, err := breakLoop.ToMap(loop)
 
 	assert.Equal(t, 2, m[true])
 	assert.Equal(t, 1, m[false])

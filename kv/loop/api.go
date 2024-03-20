@@ -6,6 +6,17 @@ import (
 	"github.com/m4gshm/gollections/map_/resolv"
 )
 
+// New makes a loop from an abstract source
+func New[S, K, V any](source S, hasNext func(S) bool, getNext func(S) (K, V)) Loop[K, V] {
+	return func() (k K, v V, ok bool) {
+		if hasNext(source) {
+			k, v = getNext(source)
+			return k, v, true
+		}
+		return k, v, false
+	}
+}
+
 // Group collects sets of values grouped by keys obtained by passing a key/value iterator
 func Group[K comparable, V any](next func() (K, V, bool)) map[K][]V {
 	return ToMapResolv(next, resolv.Slice[K, V])

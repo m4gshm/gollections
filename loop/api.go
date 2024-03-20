@@ -35,6 +35,16 @@ func Of[T any](elements ...T) Loop[T] {
 	}
 }
 
+// New makes a loop from an abstract source
+func New[S, T any](source S, hasNext func(S) bool, getNext func(S) T) Loop[T] {
+	return func() (out T, ok bool) {
+		if hasNext(source) {
+			out, ok = getNext(source), true
+		}
+		return out, ok
+	}
+}
+
 // For applies the 'walker' function for the elements retrieved by the 'next' function. Return the c.ErrBreak to stop
 func For[T any](next func() (T, bool), walker func(T) error) error {
 	for v, ok := next(); ok; v, ok = next() {
@@ -433,16 +443,6 @@ func ToMapResolv[T any, K comparable, V, VR any](next func() (T, bool), keyExtra
 		m[k] = resolver(ok, k, exists, v)
 	}
 	return m
-}
-
-// New makes a loop from an abstract source
-func New[S, T any](source S, hasNext func(S) bool, getNext func(S) T) Loop[T] {
-	return func() (out T, ok bool) {
-		if hasNext(source) {
-			out, ok = getNext(source), true
-		}
-		return out, ok
-	}
 }
 
 // Sequence makes a sequence by applying the 'next' function to the previous step generated value.
