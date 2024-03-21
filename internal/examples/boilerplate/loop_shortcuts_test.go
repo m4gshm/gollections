@@ -18,7 +18,7 @@ func Test_Loop_schortcuts(t *testing.T) {
 
 	lowers := loop.Convert(data, strings.ToLower)
 
-	var lengthMap map[int][]string = group.Of(lowers.Next, func(name string) int { return len(name) }, as.Is[string]) // converting to map
+	var lengthMap map[int][]string = group.Of(lowers, func(name string) int { return len(name) }, as.Is[string]) // converting to map
 
 	assert.Equal(t, slice.Of("chris", "alice"), lengthMap[5])
 

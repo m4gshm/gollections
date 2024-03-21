@@ -24,16 +24,16 @@ type MapValues[K comparable, V any] struct {
 }
 
 var (
-	_ c.Collection[any, *map_.ValIter[int, any]] = (*MapValues[int, any])(nil)
-	_ c.Collection[any, *map_.ValIter[int, any]] = MapValues[int, any]{}
-	_ fmt.Stringer                               = (*MapValues[int, any])(nil)
-	_ fmt.Stringer                               = MapValues[int, any]{}
+	_ c.Collection[any] = (*MapValues[int, any])(nil)
+	_ c.Collection[any] = MapValues[int, any]{}
+	_ fmt.Stringer      = (*MapValues[int, any])(nil)
+	_ fmt.Stringer      = MapValues[int, any]{}
 )
 
 // Iter creates an iterator and returns as interface
-func (m MapValues[K, V]) Iter() *map_.ValIter[K, V] {
+func (m MapValues[K, V]) Loop() func() (V, bool) {
 	h := m.Head()
-	return &h
+	return (&h).Next
 }
 
 // Head creates an iterator and returns as implementation type value
@@ -84,13 +84,13 @@ func (m MapValues[K, V]) ForEach(walker func(V)) {
 // Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function
 func (m MapValues[K, V]) Filter(filter func(V) bool) stream.Iter[V] {
 	h := m.Head()
-	return stream.New(loop.Filter(h.Next, filter).Next)
+	return stream.New(loop.Filter(h.Next, filter))
 }
 
 // Filt returns a breakable stream consisting of elements that satisfy the condition of the 'predicate' function
 func (m MapValues[K, V]) Filt(predicate func(V) (bool, error)) breakStream.Iter[V] {
 	h := m.Head()
-	return breakStream.New(breakLoop.Filt(breakLoop.From(h.Next), predicate).Next)
+	return breakStream.New(breakLoop.Filt(breakLoop.From(h.Next), predicate))
 }
 
 // Convert returns a stream that applies the 'converter' function to the collection elements

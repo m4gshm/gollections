@@ -29,11 +29,11 @@ func (next Loop[K, V]) HasAny(predicate func(K, V) bool) bool {
 }
 
 // Filt creates an iterator that checks elements by the 'filter' function and returns successful ones.
-func (next Loop[K, V]) Filt(filter func(K, V) (bool, error)) breakkvloop.FiltIter[K, V] {
+func (next Loop[K, V]) Filt(filter func(K, V) (bool, error)) breakkvloop.Loop[K, V] {
 	return Filt(next, filter)
 }
 
 // Filter creates an iterator that checks elements by the 'filter' function and returns successful ones.
-func (next Loop[K, V]) Filter(filter func(K, V) bool) FilterIter[K, V] {
+func (next Loop[K, V]) Filter(filter func(K, V) bool) Loop[K, V] {
 	return Filter(next, filter)
 }

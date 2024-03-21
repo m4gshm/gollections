@@ -3,11 +3,14 @@ package group
 
 import (
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/iter"
+	"github.com/m4gshm/gollections/convert/as"
+	kvloop "github.com/m4gshm/gollections/kv/loop"
 	"github.com/m4gshm/gollections/kv/stream"
+	"github.com/m4gshm/gollections/loop"
 )
 
-// Of - group.Of synonym of the iter.Group
-func Of[T any, K comparable, I c.Iterator[T], IT c.Iterable[T, I]](elements IT, by func(T) K) stream.Iter[K, T, map[K][]T] {
-	return iter.Group(elements.Iter(), by)
+// Group groups elements by keys into a map
+func Of[T any, K comparable, IT c.Iterable[T]](elements IT, by func(T) K) stream.Iter[K, T, map[K][]T] {
+	loop.Group(elements.Loop(), by, as.Is)
+	return stream.New(loop.KeyValue(elements.Loop(), by, as.Is), kvloop.Group)
 }

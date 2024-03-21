@@ -8,10 +8,9 @@ import (
 	"github.com/m4gshm/gollections/collection/mutable"
 	mvector "github.com/m4gshm/gollections/collection/mutable/vector"
 	"github.com/m4gshm/gollections/convert"
-	"github.com/m4gshm/gollections/iter"
+
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/slice"
-	sliceIter "github.com/m4gshm/gollections/slice/iter"
 )
 
 func Benchmark_Convert_Slice(b *testing.B) {
@@ -39,35 +38,13 @@ func Benchmark_Convert_Slice_EveryElement(b *testing.B) {
 	b.StopTimer()
 }
 
-func Benchmark_Convert_Iterator(b *testing.B) {
-	op := convert.And(toString, addTail)
-	var s []string
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		s = loop.Slice(iter.Convert(iter.Of(values...), op).Next)
-	}
-	_ = s
-	b.StopTimer()
-}
-
-func Benchmark_Convert_SliceIter(b *testing.B) {
-	op := convert.And(toString, addTail)
-	var s []string
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		s = loop.Slice(sliceIter.Convert(values, op).Next)
-	}
-	_ = s
-	b.StopTimer()
-}
-
 func Benchmark_Convert_Loop(b *testing.B) {
 	op := convert.And(toString, addTail)
 	var s []string
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		it := slice.NewHead(values)
-		s = loop.SliceCap(loop.Convert(it.Next, op).Next, len(values))
+		s = loop.SliceCap(loop.Convert(it.Next, op), len(values))
 	}
 	_ = s
 	b.StopTimer()
@@ -129,9 +106,9 @@ func Benchmark_Convert_ImmutableVector_Head_Loop(b *testing.B) {
 	var s []string
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		h := items.Iter()
-		c := loop.Convert(h.Next, concat)
-		s = loop.SliceCap(c.Next, len(values))
+		h := items.Loop()
+		c := loop.Convert(h, concat)
+		s = loop.SliceCap(c, len(values))
 	}
 	_ = s
 	b.StopTimer()

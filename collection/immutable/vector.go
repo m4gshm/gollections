@@ -23,16 +23,15 @@ type Vector[T any] struct {
 }
 
 var (
-	_ collection.Vector[any, *slice.Iter[any]] = (*Vector[any])(nil)
-	_ collection.Vector[any, *slice.Iter[any]] = Vector[any]{}
-	_ fmt.Stringer                             = (*Vector[any])(nil)
-	_ fmt.Stringer                             = Vector[any]{}
+	_ collection.Vector[any] = (*Vector[any])(nil)
+	_ collection.Vector[any] = Vector[any]{}
+	_ fmt.Stringer           = (*Vector[any])(nil)
+	_ fmt.Stringer           = Vector[any]{}
 )
 
 // Iter creates an iterator and returns as interface
-func (v Vector[T]) Iter() *slice.Iter[T] {
-	h := v.Head()
-	return &h
+func (v Vector[T]) Loop() func() (T, bool) {
+	return loop.Of(v.elements...)
 }
 
 // Head creates an iterator and returns as implementation type value
@@ -120,13 +119,13 @@ func (v Vector[T]) ForEach(walker func(T)) {
 // Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function
 func (v Vector[T]) Filter(filter func(T) bool) stream.Iter[T] {
 	h := v.Head()
-	return stream.New(loop.Filter(h.Next, filter).Next)
+	return stream.New(loop.Filter(h.Next, filter))
 }
 
 // Filt returns a breakable stream consisting of elements that satisfy the condition of the 'predicate' function
 func (v Vector[T]) Filt(predicate func(T) (bool, error)) breakStream.Iter[T] {
 	h := v.Head()
-	return breakStream.New(breakLoop.Filt(breakLoop.From(h.Next), predicate).Next)
+	return breakStream.New(breakLoop.Filt(breakLoop.From(h.Next), predicate))
 }
 
 // Convert returns a stream that applies the 'converter' function to the collection elements

@@ -588,7 +588,7 @@ There are three groups of operations:
 
 - Final - applies intermediates and retrieves a result
   ([First](./collection/api.go#L188),
-  [Slice](./collection/immutable/ordered/set.go#L78),
+  [Slice](./collection/immutable/ordered/set.go#L69),
   [Reduce](./collection/stream/iter.go#L76)).
 
 Intermediates should wrap one by one to make a lazy computation chain

@@ -9,14 +9,14 @@ import (
 	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/collection/immutable"
 	"github.com/m4gshm/gollections/collection/immutable/vector"
-	"github.com/m4gshm/gollections/iter"
+
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
 )
 
 func Test_Vector_From(t *testing.T) {
-	set := vector.From(iter.Of(1, 1, 2, 2, 3, 4, 3, 2, 1).Next)
+	set := vector.From(loop.Of(1, 1, 2, 2, 3, 4, 3, 2, 1))
 	assert.Equal(t, slice.Of(1, 1, 2, 2, 3, 4, 3, 2, 1), set.Slice())
 }
 
@@ -107,7 +107,7 @@ func Test_Vector_SortStructByField(t *testing.T) {
 func Test_Vector_Convert(t *testing.T) {
 	var (
 		ints     = vector.Of(3, 1, 5, 6, 8, 0, -2)
-		strings  = loop.Slice(iter.Filter(vector.Convert(ints, strconv.Itoa), func(s string) bool { return len(s) == 1 }).Next)
+		strings  = loop.Slice(loop.Filter(vector.Convert(ints, strconv.Itoa).Next, func(s string) bool { return len(s) == 1 }))
 		strings2 = vector.Convert(ints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 }).Slice()
 	)
 	assert.Equal(t, slice.Of("3", "1", "5", "6", "8", "0"), strings)

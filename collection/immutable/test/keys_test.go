@@ -12,7 +12,7 @@ import (
 func Test_MapKeys_Zero_Safety(t *testing.T) {
 	var collection immutable.MapKeys[int, string]
 
-	collection.Iter()
+	collection.Loop()
 	collection.Head()
 	collection.Convert(func(i int) int { return i })
 	collection.Filter(func(i int) bool { return true })
@@ -26,7 +26,7 @@ func Test_MapKeys_Zero_Safety(t *testing.T) {
 func Test_Map_Zero(t *testing.T) {
 	var collection ordered.Map[int, string]
 
-	collection.Iter().Next()
+	collection.Loop().Next()
 	ptr.Of(collection.Head()).Next()
 	collection.Convert(func(i int, s string) (int, string) { return 0, "" })
 	collection.Filter(func(i int, s string) bool { return true })

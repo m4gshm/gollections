@@ -5,9 +5,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/collection/mutable"
 	"github.com/m4gshm/gollections/collection/mutable/vector"
-	"github.com/m4gshm/gollections/iter"
+
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/range_"
@@ -15,7 +16,7 @@ import (
 )
 
 func Test_Vector_From(t *testing.T) {
-	set := vector.From(iter.Of(1, 1, 2, 2, 3, 4, 3, 2, 1).Next)
+	set := vector.From(loop.Of(1, 1, 2, 2, 3, 4, 3, 2, 1))
 	assert.Equal(t, slice.Of(1, 1, 2, 2, 3, 4, 3, 2, 1), set.Slice())
 }
 

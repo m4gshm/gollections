@@ -16,7 +16,7 @@ import (
 )
 
 func Test_HasAny(t *testing.T) {
-	kvl := loop.KeyValue(slice.NewIter(slice.Of(k.V(1, "one"), k.V(2, "two"), k.V(3, "three"))).Next, c.KV[int, string].Key, c.KV[int, string].Value).Next
+	kvl := loop.KeyValue(loop.Of(k.V(1, "one"), k.V(2, "two"), k.V(3, "three")), c.KV[int, string].Key, c.KV[int, string].Value)
 
 	result := kvloop.HasAny(kvl, func(key int, val string) bool { return key == 2 })
 
@@ -24,7 +24,7 @@ func Test_HasAny(t *testing.T) {
 }
 
 func Test_Firstt(t *testing.T) {
-	kvl := loop.KeyValue(slice.NewIter(slice.Of(k.V(1, "one"), k.V(2, "two"), k.V(3, "three"))).Next, c.KV[int, string].Key, c.KV[int, string].Value).Next
+	kvl := loop.KeyValue(loop.Of(k.V(1, "one"), k.V(2, "two"), k.V(3, "three")), c.KV[int, string].Key, c.KV[int, string].Value)
 
 	k, v, ok, _ := kvloop.Firstt(kvl, func(key int, val string) (bool, error) { return key == 2 || val == "three", nil })
 
@@ -34,7 +34,7 @@ func Test_Firstt(t *testing.T) {
 }
 
 func Test_Reduce(t *testing.T) {
-	kvl := loop.KeyValue(slice.NewIter(slice.Of(k.V(1, "one"), k.V(2, "two"), k.V(3, "three"))).Next, c.KV[int, string].Key, c.KV[int, string].Value).Next
+	kvl := loop.KeyValue(loop.Of(k.V(1, "one"), k.V(2, "two"), k.V(3, "three")), c.KV[int, string].Key, c.KV[int, string].Value)
 
 	k, v := kvloop.Reduce(kvl, func(kl, kr int, vl, vr string) (int, string) { return kl + kr, vl + vr })
 
@@ -43,7 +43,7 @@ func Test_Reduce(t *testing.T) {
 }
 
 func Test_Reducee(t *testing.T) {
-	kvl := loop.KeyValue(slice.NewIter(slice.Of(k.V(1, "one"), k.V(2, "two"), k.V(3, "three"))).Next, c.KV[int, string].Key, c.KV[int, string].Value).Next
+	kvl := loop.KeyValue(loop.Of(k.V(1, "one"), k.V(2, "two"), k.V(3, "three")), c.KV[int, string].Key, c.KV[int, string].Value)
 
 	k, v, _ := kvloop.Reducee(kvl, func(kl, kr int, vl, vr string) (int, string, error) { return kl + kr, vl + vr, nil })
 
@@ -52,44 +52,44 @@ func Test_Reducee(t *testing.T) {
 }
 
 func Test_Convert(t *testing.T) {
-	kvl := loop.KeyValue(slice.NewIter(slice.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))).Next, c.KV[int, string].Key, c.KV[int, string].Value).Next
+	kvl := loop.KeyValue(loop.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3")), c.KV[int, string].Key, c.KV[int, string].Value)
 
-	out := kvloop.ToSlice(kvloop.Convert(kvl, func(k int, v string) (int, string) { return k * k, v + v }).Next, k.V[int, string])
+	out := kvloop.ToSlice(kvloop.Convert(kvl, func(k int, v string) (int, string) { return k * k, v + v }), k.V[int, string])
 
 	assert.Equal(t, slice.Of(k.V(1, "11"), k.V(4, "22"), k.V(9, "33")), out)
 }
 
 func Test_Conv(t *testing.T) {
-	kvl := loop.KeyValue(slice.NewIter(slice.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))).Next, c.KV[int, string].Key, c.KV[int, string].Value).Next
+	kvl := loop.KeyValue(loop.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3")), c.KV[int, string].Key, c.KV[int, string].Value)
 
-	out, _ := breakkvloop.ToSlice(kvloop.Conv(kvl, func(k int, v string) (int, string, error) { return k * k, v + v, nil }).Next, k.V[int, string])
+	out, _ := breakkvloop.ToSlice(kvloop.Conv(kvl, func(k int, v string) (int, string, error) { return k * k, v + v, nil }), k.V[int, string])
 
 	assert.Equal(t, slice.Of(k.V(1, "11"), k.V(4, "22"), k.V(9, "33")), out)
 }
 
 func Test_Filter(t *testing.T) {
-	kvl := loop.KeyValue(slice.NewIter(slice.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))).Next, c.KV[int, string].Key, c.KV[int, string].Value).Next
+	kvl := loop.KeyValue(loop.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3")), c.KV[int, string].Key, c.KV[int, string].Value)
 
-	out := kvloop.ToSlice(kvloop.Filter(kvl, func(key int, val string) bool { return key != 2 }).Next, k.V[int, string])
+	out := kvloop.ToSlice(kvloop.Filter(kvl, func(key int, val string) bool { return key != 2 }), k.V[int, string])
 
 	assert.Equal(t, slice.Of(k.V(1, "1"), k.V(3, "3")), out)
 }
 
 func Test_Filt(t *testing.T) {
-	kvl := loop.KeyValue(slice.NewIter(slice.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))).Next, c.KV[int, string].Key, c.KV[int, string].Value).Next
+	kvl := loop.KeyValue(loop.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3")), c.KV[int, string].Key, c.KV[int, string].Value)
 
-	out, _ := breakkvloop.ToSlice(kvloop.Filt(kvl, func(key int, val string) (bool, error) { return key != 2, nil }).Next, k.V[int, string])
+	out, _ := breakkvloop.ToSlice(kvloop.Filt(kvl, func(key int, val string) (bool, error) { return key != 2, nil }), k.V[int, string])
 
 	assert.Equal(t, slice.Of(k.V(1, "1"), k.V(3, "3")), out)
 }
 
 func Test_Filt2(t *testing.T) {
-	kvl := loop.KeyValue(slice.NewIter(slice.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))).Next, c.KV[int, string].Key, c.KV[int, string].Value).Next
+	kvl := loop.KeyValue(loop.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3")), c.KV[int, string].Key, c.KV[int, string].Value)
 
 	out, err := breakkvloop.ToSlice(kvloop.Filt(kvl, func(key int, val string) (bool, error) {
 		ok := key <= 2
 		return ok, op.IfElse(key == 2, errors.New("abort"), nil)
-	}).Next, k.V[int, string])
+	}), k.V[int, string])
 
 	assert.Error(t, err)
 	assert.Equal(t, slice.Of(k.V(1, "1"), k.V(2, "2")), out)

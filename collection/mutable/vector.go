@@ -24,24 +24,24 @@ func WrapVector[T any](elements []T) *Vector[T] {
 type Vector[T any] []T
 
 var (
-	_ c.Addable[any]                          = (*Vector[any])(nil)
-	_ c.AddableAll[c.ForEachLoop[any]]        = (*Vector[any])(nil)
-	_ c.Deleteable[int]                       = (*Vector[any])(nil)
-	_ c.DeleteableVerify[int]                 = (*Vector[any])(nil)
-	_ c.Settable[int, any]                    = (*Vector[any])(nil)
-	_ c.SettableNew[int, any]                 = (*Vector[any])(nil)
-	_ collection.Vector[any, *SliceIter[any]] = (*Vector[any])(nil)
-	_ fmt.Stringer                            = (*Vector[any])(nil)
+	_ c.Addable[any]                   = (*Vector[any])(nil)
+	_ c.AddableAll[c.ForEachLoop[any]] = (*Vector[any])(nil)
+	_ c.Deleteable[int]                = (*Vector[any])(nil)
+	_ c.DeleteableVerify[int]          = (*Vector[any])(nil)
+	_ c.Settable[int, any]             = (*Vector[any])(nil)
+	_ c.SettableNew[int, any]          = (*Vector[any])(nil)
+	_ collection.Vector[any]           = (*Vector[any])(nil)
+	_ fmt.Stringer                     = (*Vector[any])(nil)
 )
 
 // Iter creates an iterator and returns as interface
-func (v *Vector[T]) Iter() *SliceIter[T] {
+func (v *Vector[T]) Loop() func() (T, bool) {
 	h := v.Head()
-	return &h
+	return (&h).Next
 }
 
 // IterEdit creates iterator that can delete iterable elements
-func (v *Vector[T]) IterEdit() c.DelIterator[T] {
+func (v *Vector[T]) IterEdit() *SliceIter[T] {
 	h := v.Head()
 	return &h
 }
@@ -276,13 +276,13 @@ func (v *Vector[T]) SetNew(index int, value T) bool {
 // Filter returns a stream consisting of vector elements matching the filter
 func (v *Vector[T]) Filter(filter func(T) bool) stream.Iter[T] {
 	h := v.Head()
-	return stream.New(loop.Filter(h.Next, filter).Next)
+	return stream.New(loop.Filter(h.Next, filter))
 }
 
 // Filt returns a breakable stream consisting of elements that satisfy the condition of the 'predicate' function
 func (v *Vector[T]) Filt(predicate func(T) (bool, error)) breakStream.Iter[T] {
 	h := v.Head()
-	return breakStream.New(breakLoop.Filt(breakLoop.From(h.Next), predicate).Next)
+	return breakStream.New(breakLoop.Filt(breakLoop.From(h.Next), predicate))
 }
 
 // Convert returns a stream that applies the 'converter' function to the collection elements

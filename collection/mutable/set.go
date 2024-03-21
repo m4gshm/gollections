@@ -31,14 +31,14 @@ var (
 	_ c.AddableAllNew[c.ForEachLoop[int]] = (*Set[int])(nil)
 	_ c.Deleteable[int]                   = (*Set[int])(nil)
 	_ c.DeleteableVerify[int]             = (*Set[int])(nil)
-	_ collection.Set[int, *SetIter[int]]  = (*Set[int])(nil)
+	_ collection.Set[int]                 = (*Set[int])(nil)
 	_ fmt.Stringer                        = (*Set[int])(nil)
 )
 
 // Iter creates an iterator and returns as interface
-func (s *Set[T]) Iter() *SetIter[T] {
+func (s *Set[T]) Loop() func() (T, bool) {
 	h := s.Head()
-	return &h
+	return (&h).Next
 }
 
 // IterEdit creates iterator that can delete iterable elements
@@ -234,13 +234,13 @@ func (s *Set[T]) ForEach(walker func(T)) {
 // Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function
 func (s *Set[T]) Filter(predicate func(T) bool) stream.Iter[T] {
 	h := s.Head()
-	return stream.New(loop.Filter(h.Next, predicate).Next)
+	return stream.New(loop.Filter(h.Next, predicate))
 }
 
 // Filt returns a breakable stream consisting of elements that satisfy the condition of the 'predicate' function
 func (s Set[T]) Filt(predicate func(T) (bool, error)) breakStream.Iter[T] {
 	h := s.Head()
-	return breakStream.New(breakLoop.Filt(breakLoop.From(h.Next), predicate).Next)
+	return breakStream.New(breakLoop.Filt(breakLoop.From(h.Next), predicate))
 }
 
 // Convert returns a stream that applies the 'converter' function to the collection elements

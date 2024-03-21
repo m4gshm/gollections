@@ -12,7 +12,7 @@ import (
 func Test_Slice_Vs_Loop(t *testing.T) {
 
 	intSeq := loop.Conv(loop.Of("1", "2", "3", "ddd4", "5"), strconv.Atoi)
-	ints, err := loop.Slice(intSeq.Next)
+	ints, err := loop.Slice(intSeq)
 
 	assert.Equal(t, []int{1, 2, 3}, ints)
 	assert.ErrorContains(t, err, "invalid syntax")

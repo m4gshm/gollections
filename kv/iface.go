@@ -26,7 +26,7 @@ type IterFor[K, V any, I Iterator[K, V]] interface {
 
 // Iterable is an iterator supplier interface
 type Iterable[K, V any, I Iterator[K, V]] interface {
-	Iter() I
+	Loop() I
 }
 
 // Collection is the base interface of associative collections

@@ -39,6 +39,6 @@ func (next Loop[T]) HasAny(predicate func(T) bool) (bool, error) {
 }
 
 // Filter creates an iterator that checks elements by the 'filter' function and returns successful ones.
-func (next Loop[T]) Filter(filter func(T) bool) FiltIter[T] {
+func (next Loop[T]) Filter(filter func(T) bool) Loop[T] {
 	return Filter(next, filter)
 }

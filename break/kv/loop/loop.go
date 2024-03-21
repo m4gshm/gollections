@@ -26,11 +26,11 @@ func (next Loop[K, V]) HasAny(predicate func(K, V) bool) (bool, error) {
 }
 
 // Filt creates an iterator that checks elements by the 'filter' function and returns successful ones.
-func (next Loop[K, V]) Filt(filter func(K, V) (bool, error)) FiltIter[K, V] {
+func (next Loop[K, V]) Filt(filter func(K, V) (bool, error))  Loop[K, V] {
 	return Filt(next, filter)
 }
 
 // Filter creates an iterator that checks elements by the 'filter' function and returns successful ones.
-func (next Loop[K, V]) Filter(filter func(K, V) bool) FiltIter[K, V] {
+func (next Loop[K, V]) Filter(filter func(K, V) bool) Loop[K, V] {
 	return Filter(next, filter)
 }

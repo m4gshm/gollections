@@ -74,8 +74,8 @@ func Benchmark_Loop_ImmutableVector_IterNextNext(b *testing.B) {
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				iter := c.Iter()
-				for v, ok := iter.Next(); ok; v, ok = iter.Next() {
+				next := c.Loop()
+				for v, ok := next(); ok; v, ok = next() {
 					casee.load(v)
 				}
 			}
@@ -83,18 +83,18 @@ func Benchmark_Loop_ImmutableVector_IterNextNext(b *testing.B) {
 	}
 }
 
-func Benchmark_Loop_ImmutableVector_IterHasNextGetNext(b *testing.B) {
-	c := vector.Of(values...)
-	for _, casee := range cases {
-		b.Run(casee.name, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
-				for it := c.Iter(); it.HasNext(); {
-					casee.load(it.GetNext())
-				}
-			}
-		})
-	}
-}
+// func Benchmark_Loop_ImmutableVector_IterHasNextGetNext(b *testing.B) {
+// 	c := vector.Of(values...)
+// 	for _, casee := range cases {
+// 		b.Run(casee.name, func(b *testing.B) {
+// 			for i := 0; i < b.N; i++ {
+// 				for it := c.Loop(); it.HasNext(); {
+// 					casee.load(it.GetNext())
+// 				}
+// 			}
+// 		})
+// 	}
+// }
 
 func Benchmark_Loop_ImmutableVector_HeadHasNextGetNext(b *testing.B) {
 	c := vector.Of(values...)
@@ -203,11 +203,11 @@ func Benchmark_Loop_ImmutableVector_TailHasPrevGetPrev(b *testing.B) {
 	}
 }
 
-func Benchmark_Loop_Slice_Wrap_NextNext(b *testing.B) {
+func Benchmark_Loop_Slice_Loop_NextNext(b *testing.B) {
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				next := slice.NewIter(values).Next
+				next := loop.Of(values...)
 				for v, ok := next(); ok; v, ok = next() {
 					casee.load(v)
 				}

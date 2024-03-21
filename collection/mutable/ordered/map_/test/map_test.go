@@ -23,7 +23,7 @@ func Test_Map_Iterate(t *testing.T) {
 
 	keys := make([]int, 0)
 	values := make([]string, 0)
-	it := ordered.Iter()
+	it := ordered.Loop()
 	for key, val, ok := it.Next(); ok; key, val, ok = it.Next() {
 		keys = append(keys, key)
 		values = append(values, val)

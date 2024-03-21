@@ -86,22 +86,36 @@ func Firstt[K, V any](next func() (K, V, bool), predicate func(K, V) (bool, erro
 }
 
 // Convert creates an iterator that applies a transformer to iterable key\values.
-func Convert[K, V any, k2, v2 any](next func() (K, V, bool), converter func(K, V) (k2, v2)) ConvertIter[K, V, k2, v2, func(K, V) (k2, v2)] {
-	return ConvertIter[K, V, k2, v2, func(K, V) (k2, v2)]{next: next, converter: converter}
+func Convert[K, V any, KOUT, VOUT any](next func() (K, V, bool), converter func(K, V) (KOUT, VOUT)) Loop[KOUT, VOUT] {
+	if next == nil {
+		return nil
+	}
+	return func() (k2 KOUT, v2 VOUT, ok bool) {
+		if k, v, ok := next(); ok {
+			k2, v2 = converter(k, v)
+			return k2, v2, true
+		}
+		return k2, v2, false
+	}
 }
 
 // Conv creates an iterator that applies a transformer to iterable key\values.
-func Conv[K, V any, KOUT, VOUT any](next func() (K, V, bool), converter func(K, V) (KOUT, VOUT, error)) loop.ConvertIter[K, V, KOUT, VOUT] {
+func Conv[K, V any, KOUT, VOUT any](next func() (K, V, bool), converter func(K, V) (KOUT, VOUT, error)) loop.Loop[KOUT, VOUT] {
 	return loop.Conv(loop.From(next), converter)
 }
 
 // Filter creates an iterator that checks elements by a filter and returns successful ones
-func Filter[K, V any](next func() (K, V, bool), filter func(K, V) bool) FilterIter[K, V] {
-	return FilterIter[K, V]{next: next, filter: filter}
+func Filter[K, V any](next func() (K, V, bool), filter func(K, V) bool) Loop[K, V] {
+	if next == nil {
+		return nil
+	}
+	return func() (K, V, bool) {
+		return First(next, filter)
+	}
 }
 
 // Filt creates an iterator that checks elements by a filter and returns successful ones
-func Filt[K, V any](next func() (K, V, bool), filter func(K, V) (bool, error)) loop.FiltIter[K, V] {
+func Filt[K, V any](next func() (K, V, bool), filter func(K, V) (bool, error)) loop.Loop[K, V] {
 	return loop.Filt(loop.From(next), filter)
 }
 

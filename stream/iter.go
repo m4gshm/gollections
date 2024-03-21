@@ -19,8 +19,8 @@ type Iter[T any] struct {
 }
 
 var (
-	_ Stream[any, Iter[any]]                              = (*Iter[any])(nil)
-	_ Stream[any, Iter[any]]                              = Iter[any]{}
+	_ Stream[any]                                         = (*Iter[any])(nil)
+	_ Stream[any]                                         = Iter[any]{}
 	_ c.Filterable[any, Iter[any], breakStream.Iter[any]] = (*Iter[any])(nil)
 	_ c.Filterable[any, Iter[any], breakStream.Iter[any]] = Iter[any]{}
 	_ c.Iterator[any]                                     = (*Iter[any])(nil)
@@ -39,25 +39,25 @@ func (t Iter[T]) Next() (element T, ok bool) {
 // Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function
 func (t Iter[T]) Filter(predicate func(T) bool) Iter[T] {
 	f := loop.Filter(t.next, predicate)
-	return New(f.Next)
+	return New(f)
 }
 
 // Filt returns a breakable stream consisting of elements that satisfy the condition of the 'predicate' function
 func (t Iter[T]) Filt(predicate func(T) (bool, error)) breakStream.Iter[T] {
 	f := breakLoop.Filt(breakLoop.From(t.next), predicate)
-	return breakStream.New(f.Next)
+	return breakStream.New(f)
 }
 
 // Convert returns a stream that applies the 'converter' function to the collection elements
 func (t Iter[T]) Convert(converter func(T) T) Iter[T] {
 	conv := loop.Convert(t.next, converter)
-	return New(conv.Next)
+	return New(conv)
 }
 
 // Conv returns a breakable stream that applies the 'converter' function to the collection elements
 func (t Iter[T]) Conv(converter func(T) (T, error)) breakStream.Iter[T] {
 	conv := breakLoop.Conv(breakLoop.From(t.next), converter)
-	return breakStream.New(conv.Next)
+	return breakStream.New(conv)
 }
 
 // ForEach applies the 'walker' function for every element
@@ -81,8 +81,8 @@ func (t Iter[T]) First(predicate func(T) bool) (T, bool) {
 }
 
 // Iter creates an iterator and returns as interface
-func (t Iter[T]) Iter() Iter[T] {
-	return t
+func (t Iter[T]) Loop() func() (T, bool) {
+	return t.Next
 }
 
 // Slice collects the elements to a slice

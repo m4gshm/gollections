@@ -38,7 +38,7 @@ var (
 )
 
 // Iter creates an iterator and returns as interface
-func (m Map[K, V]) Iter() *map_.Iter[K, V] {
+func (m Map[K, V]) Loop() *map_.Iter[K, V] {
 	h := m.Head()
 	return &h
 }
@@ -151,73 +151,73 @@ func (m Map[K, V]) ForEach(walker func(c.KV[K, V])) {
 // FilterKey returns a stream consisting of key/value pairs where the key satisfies the condition of the 'predicate' function
 func (m Map[K, V]) FilterKey(predicate func(K) bool) stream.Iter[K, V, map[K]V] {
 	h := m.Head()
-	return stream.New(loop.Filter(h.Next, filter.Key[V](predicate)).Next, loop.ToMap[K, V])
+	return stream.New(loop.Filter(h.Next, filter.Key[V](predicate)), loop.ToMap[K, V])
 }
 
 // FiltKey returns a stream consisting of key/value pairs where the key satisfies the condition of the 'predicate' function
 func (m Map[K, V]) FiltKey(predicate func(K) (bool, error)) breakKvStream.Iter[K, V, map[K]V] {
 	h := m.Head()
-	return breakKvStream.New(breakLoop.Filt(breakLoop.From(h.Next), breakMapFilter.Key[V](predicate)).Next, breakLoop.ToMap[K, V])
+	return breakKvStream.New(breakLoop.Filt(breakLoop.From(h.Next), breakMapFilter.Key[V](predicate)), breakLoop.ToMap[K, V])
 }
 
 // ConvertKey returns a stream that applies the 'converter' function to keys of the map
 func (m Map[K, V]) ConvertKey(by func(K) K) stream.Iter[K, V, map[K]V] {
 	h := m.Head()
-	return stream.New(loop.Convert(h.Next, convert.Key[V](by)).Next, loop.ToMap[K, V])
+	return stream.New(loop.Convert(h.Next, convert.Key[V](by)), loop.ToMap[K, V])
 }
 
 // ConvKey returns a stream that applies the 'converter' function to keys of the map
 func (m Map[K, V]) ConvKey(converter func(K) (K, error)) breakKvStream.Iter[K, V, map[K]V] {
 	h := m.Head()
-	return breakKvStream.New(breakLoop.Conv(breakLoop.From(h.Next), breakMapConvert.Key[V](converter)).Next, breakLoop.ToMap[K, V])
+	return breakKvStream.New(breakLoop.Conv(breakLoop.From(h.Next), breakMapConvert.Key[V](converter)), breakLoop.ToMap[K, V])
 }
 
 // FilterValue returns a stream consisting of key/value pairs where the value satisfies the condition of the 'predicate' function
 func (m Map[K, V]) FilterValue(predicate func(V) bool) stream.Iter[K, V, map[K]V] {
 	h := m.Head()
-	return stream.New(loop.Filter(h.Next, filter.Value[K](predicate)).Next, loop.ToMap[K, V])
+	return stream.New(loop.Filter(h.Next, filter.Value[K](predicate)), loop.ToMap[K, V])
 }
 
 // FiltValue returns a stream consisting of key/value pairs where the value satisfies the condition of the 'predicate' function
 func (m Map[K, V]) FiltValue(predicate func(V) (bool, error)) breakKvStream.Iter[K, V, map[K]V] {
 	h := m.Head()
-	return breakKvStream.New(breakLoop.Filt(breakLoop.From(h.Next), breakMapFilter.Value[K](predicate)).Next, breakLoop.ToMap[K, V])
+	return breakKvStream.New(breakLoop.Filt(breakLoop.From(h.Next), breakMapFilter.Value[K](predicate)), breakLoop.ToMap[K, V])
 }
 
 // ConvertValue returns a stream that applies the 'converter' function to values of the map
 func (m Map[K, V]) ConvertValue(by func(V) V) stream.Iter[K, V, map[K]V] {
 	h := m.Head()
-	return stream.New(loop.Convert(h.Next, convert.Value[K](by)).Next, loop.ToMap[K, V])
+	return stream.New(loop.Convert(h.Next, convert.Value[K](by)), loop.ToMap[K, V])
 }
 
 // ConvValue returns a stream that applies the 'converter' function to values of the map
 func (m Map[K, V]) ConvValue(converter func(V) (V, error)) breakKvStream.Iter[K, V, map[K]V] {
 	h := m.Head()
-	return breakKvStream.New(breakLoop.Conv(breakLoop.From(h.Next), breakMapConvert.Value[K](converter)).Next, breakLoop.ToMap[K, V])
+	return breakKvStream.New(breakLoop.Conv(breakLoop.From(h.Next), breakMapConvert.Value[K](converter)), breakLoop.ToMap[K, V])
 }
 
 // Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function
 func (m Map[K, V]) Filter(predicate func(K, V) bool) stream.Iter[K, V, map[K]V] {
 	h := m.Head()
-	return stream.New(loop.Filter(h.Next, predicate).Next, loop.ToMap[K, V])
+	return stream.New(loop.Filter(h.Next, predicate), loop.ToMap[K, V])
 }
 
 // Filt returns a breakable stream consisting of elements that satisfy the condition of the 'predicate' function
 func (m Map[K, V]) Filt(predicate func(K, V) (bool, error)) breakKvStream.Iter[K, V, map[K]V] {
 	h := m.Head()
-	return breakKvStream.New(breakLoop.Filt(breakLoop.From(h.Next), predicate).Next, breakLoop.ToMap[K, V])
+	return breakKvStream.New(breakLoop.Filt(breakLoop.From(h.Next), predicate), breakLoop.ToMap[K, V])
 }
 
 // Convert returns a stream that applies the 'converter' function to the collection elements
 func (m Map[K, V]) Convert(converter func(K, V) (K, V)) stream.Iter[K, V, map[K]V] {
 	h := m.Head()
-	return stream.New(loop.Convert(h.Next, converter).Next, loop.ToMap[K, V])
+	return stream.New(loop.Convert(h.Next, converter), loop.ToMap[K, V])
 }
 
 // Conv returns a breakable stream that applies the 'converter' function to the collection elements
 func (m Map[K, V]) Conv(converter func(K, V) (K, V, error)) breakKvStream.Iter[K, V, map[K]V] {
 	h := m.Head()
-	return breakKvStream.New(breakLoop.Conv(breakLoop.From(h.Next), converter).Next, breakLoop.ToMap[K, V])
+	return breakKvStream.New(breakLoop.Conv(breakLoop.From(h.Next), converter), breakLoop.ToMap[K, V])
 }
 
 // Reduce reduces the key/value pairs of the map into an one pair using the 'merge' function

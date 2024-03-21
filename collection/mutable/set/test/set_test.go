@@ -12,7 +12,7 @@ import (
 	"github.com/m4gshm/gollections/collection/mutable/ordered"
 	"github.com/m4gshm/gollections/collection/mutable/set"
 	"github.com/m4gshm/gollections/collection/mutable/vector"
-	"github.com/m4gshm/gollections/iter"
+
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
@@ -21,7 +21,7 @@ import (
 )
 
 func Test_Set_From(t *testing.T) {
-	set := set.From(iter.Of(1, 1, 2, 2, 3, 4, 3, 2, 1).Next)
+	set := set.From(loop.Of(1, 1, 2, 2, 3, 4, 3, 2, 1))
 	assert.Equal(t, slice.Of(1, 2, 3, 4), sort.Asc(set.Slice()))
 }
 
@@ -34,12 +34,12 @@ func Test_Set_Iterate(t *testing.T) {
 	expected := slice.Of(1, 2, 3, 4)
 	assert.Equal(t, expected, values)
 
-	iterSlice := sort.Asc(loop.Slice[int](set.Iter().Next))
-	assert.Equal(t, expected, iterSlice)
+	loopSlice := sort.Asc(loop.Slice[int](set.Loop()))
+	assert.Equal(t, expected, loopSlice)
 
 	out := make(map[int]int, 0)
-	it := set.Iter()
-	for v, ok := it.Next(); ok; v, ok = it.Next() {
+	next := set.Loop()
+	for v, ok := next(); ok; v, ok = next() {
 		out[v] = v
 	}
 
@@ -106,12 +106,12 @@ func Test_Set_Delete(t *testing.T) {
 
 func Test_Set_DeleteByIterator(t *testing.T) {
 	set := set.Of(1, 1, 2, 4, 3, 1)
-	iterator := set.IterEdit()
+	loopator := set.IterEdit()
 
 	i := 0
-	for _, ok := iterator.Next(); ok; _, ok = iterator.Next() {
+	for _, ok := loopator.Next(); ok; _, ok = loopator.Next() {
 		i++
-		iterator.Delete()
+		loopator.Delete()
 	}
 
 	assert.Equal(t, 4, i)
@@ -157,7 +157,7 @@ func Test_Set_Group_By_Iterator(t *testing.T) {
 func Test_Set_Convert(t *testing.T) {
 	var (
 		ints     = set.Of(3, 3, 1, 1, 1, 5, 6, 8, 8, 0, -2, -2)
-		strings  = sort.Asc(loop.Slice[string](iter.Filter(set.Convert(ints, strconv.Itoa), func(s string) bool { return len(s) == 1 }).Next))
+		strings  = sort.Asc(loop.Slice[string](loop.Filter(set.Convert(ints, strconv.Itoa).Next, func(s string) bool { return len(s) == 1 })))
 		strings2 = sort.Asc(set.Convert(ints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 }).Slice())
 	)
 	assert.Equal(t, slice.Of("0", "1", "3", "5", "6", "8"), strings)
