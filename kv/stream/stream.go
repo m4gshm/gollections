@@ -31,7 +31,6 @@ var (
 	_ kv.Iterator[string, any]                                                   = Iter[string, any, map[string]any]{}
 	_ Stream[string, any, Iter[string, any, map[string]any], map[string]any]     = Iter[string, any, map[string]any]{}
 	_ Stream[string, any, Iter[string, any, map[string][]any], map[string][]any] = Iter[string, any, map[string][]any]{}
-	_ kv.IterFor[string, any, Iter[string, any, map[string][]any]]               = Iter[string, any, map[string][]any]{}
 )
 
 // Next implements kv.KVIterator
@@ -128,12 +127,6 @@ func (i Iter[K, V, M]) Loop() Iter[K, V, M] {
 // Map collects the key/value pairs to a map
 func (i Iter[K, V, M]) Map() M {
 	return i.collector(i.next)
-}
-
-// Start is used with for loop construct like 'for i, k, v, ok := i.Start(); ok; k, v, ok = i.Next() { }'
-func (i Iter[K, V, M]) Start() (Iter[K, V, M], K, V, bool) {
-	k, v, ok := i.Next()
-	return i, k, v, ok
 }
 
 // MapCollector is Converter of key/value Iterator that collects all values to any slice or map, mostly used to extract slice fields to flatting a result

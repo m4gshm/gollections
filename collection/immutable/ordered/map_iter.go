@@ -20,7 +20,6 @@ type MapIter[K comparable, V any] struct {
 }
 
 var _ kv.Iterator[string, any] = (*MapIter[string, any])(nil)
-var _ kv.IterFor[int, string, *MapIter[int, string]] = (*MapIter[int, string])(nil)
 
 // Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (i *MapIter[K, V]) Track(traker func(key K, value V) error) error {
@@ -49,12 +48,6 @@ func (i *MapIter[K, V]) Cap() int {
 	return i.elements.Cap()
 }
 
-// Start is used with for loop construct like 'for i, k, v, ok := i.Start(); ok; k, v, ok = i.Next() { }'
-func (i *MapIter[K, V]) Start() (*MapIter[K, V], K, V, bool) {
-	k, v, ok := i.Next()
-	return i, k, v, ok
-}
-
 // NewValIter is default ValIter constructor
 func NewValIter[K comparable, V any](elements []K, uniques map[K]V) ValIter[K, V] {
 	return ValIter[K, V]{elements: elements, uniques: uniques, current: slice.IterNoStarted}
@@ -71,8 +64,6 @@ var (
 	_ c.Iterator[any] = (*ValIter[int, any])(nil)
 	_ c.Sized         = (*ValIter[int, any])(nil)
 )
-
-var _ c.IterFor[any, *ValIter[int, any]] = (*ValIter[int, any])(nil)
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (i *ValIter[K, V]) For(walker func(element V) error) error {
@@ -101,10 +92,4 @@ func (i *ValIter[K, V]) Cap() int {
 		return 0
 	}
 	return len(i.elements)
-}
-
-// Start is used with for loop construct like 'for i, val, ok := i.Start(); ok; val, ok = i.Next() { }'
-func (i *ValIter[K, V]) Start() (*ValIter[K, V], V, bool) {
-	v, ok := i.Next()
-	return i, v, ok
 }

@@ -9,11 +9,6 @@ type Stream[T any] interface {
 
 	Slice() ([]T, error)
 
-	// Filt(predicate func(T) (bool, error)) StreamBreakable[T]
-	// Filter(predicate func(T) bool) StreamBreakable[T]
-	// Conv(converter func(T) (T, error)) StreamBreakable[T]
-	// Convert(converter func(T) T) StreamBreakable[T]
-
 	Reduce(merger func(T, T) (T, error)) (T, error)
 	HasAny(predicate func(T) (bool, error)) (bool, error)
 }

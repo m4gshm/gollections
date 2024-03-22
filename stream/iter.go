@@ -25,7 +25,6 @@ var (
 	_ c.Filterable[any, Iter[any], breakStream.Iter[any]] = Iter[any]{}
 	_ c.Iterator[any]                                     = (*Iter[any])(nil)
 	_ c.Iterator[any]                                     = Iter[any]{}
-	_ c.IterFor[any, Iter[any]]                           = Iter[any]{}
 )
 
 // Next implements c.Iterator
@@ -98,10 +97,4 @@ func (t Iter[T]) Append(out []T) []T {
 // HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful
 func (t Iter[T]) HasAny(predicate func(T) bool) bool {
 	return loop.HasAny(t.next, predicate)
-}
-
-// Start is used with for loop construct like 'for i, val, ok := i.Start(); ok; val, ok = i.Next() { }'
-func (t Iter[T]) Start() (Iter[T], T, bool) {
-	n, ok := t.next()
-	return t, n, ok
 }
