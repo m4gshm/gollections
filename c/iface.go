@@ -60,10 +60,10 @@ type Iterator[T any] interface {
 	ForEachLoop[T]
 }
 
-// Sized - storage interface with measurable capacity
+// Sized - storage interface with measurable size
 type Sized interface {
-	// returns an estimated internal storage capacity or -1 if the capacity cannot be calculated
-	Cap() int
+	// returns an estimated internal storage size or -1 if the size cannot be calculated
+	Size() int
 }
 
 // PrevIterator is the Iterator that provides reverse iteration over elements of a collection

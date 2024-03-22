@@ -151,8 +151,8 @@ func (i *Iter[T]) Get() (v T, ok bool) {
 	return v, ok
 }
 
-// Cap returns the iterator capacity
-func (i *Iter[T]) Cap() int {
+// Size returns the iterator capacity
+func (i *Iter[T]) Size() int {
 	if i == nil {
 		return 0
 	}

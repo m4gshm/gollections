@@ -43,9 +43,9 @@ func (i *MapIter[K, V]) Next() (key K, val V, ok bool) {
 	return key, val, ok
 }
 
-// Cap returns the iterator capacity
-func (i *MapIter[K, V]) Cap() int {
-	return i.elements.Cap()
+// Size returns the iterator capacity
+func (i *MapIter[K, V]) Size() int {
+	return i.elements.Size()
 }
 
 // NewValIter is default ValIter constructor
@@ -86,8 +86,8 @@ func (i *ValIter[K, V]) Next() (val V, ok bool) {
 	return val, false
 }
 
-// Cap returns the iterator capacity
-func (i *ValIter[K, V]) Cap() int {
+// Size returns the iterator capacity
+func (i *ValIter[K, V]) Size() int {
 	if i == nil {
 		return 0
 	}

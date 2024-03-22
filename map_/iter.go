@@ -67,8 +67,8 @@ func (i *Iter[K, V]) Next() (key K, value V, ok bool) {
 	return key, value, true
 }
 
-// Cap returns the size of the map
-func (i *Iter[K, V]) Cap() int {
+// Size returns the size of the map
+func (i *Iter[K, V]) Size() int {
 	if i == nil {
 		return 0
 	}
@@ -145,9 +145,9 @@ func (i KeyIter[K, V]) Next() (K, bool) {
 	return key, ok
 }
 
-// Cap returns the iterator capacity
-func (i KeyIter[K, V]) Cap() int {
-	return i.Iter.Cap()
+// Size returns the iterator capacity
+func (i KeyIter[K, V]) Size() int {
+	return i.Iter.Size()
 }
 
 // NewValIter is the main values iterator constructor
@@ -183,8 +183,7 @@ func (i ValIter[K, V]) Next() (V, bool) {
 	return val, ok
 }
 
-// Cap returns the size of the map
-func (i ValIter[K, V]) Cap() int {
-	return i.Iter.Cap()
+// Size returns the size of the map
+func (i ValIter[K, V]) Size() int {
+	return i.Iter.Size()
 }
-

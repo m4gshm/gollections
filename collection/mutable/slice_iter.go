@@ -115,8 +115,8 @@ func (i *SliceIter[T]) Get() (t T, ok bool) {
 	return t, ok
 }
 
-// Cap returns the iterator capacity
-func (i *SliceIter[T]) Cap() int {
+// Size returns the iterator capacity
+func (i *SliceIter[T]) Size() int {
 	if i == nil || i.elements == nil {
 		return 0
 	}

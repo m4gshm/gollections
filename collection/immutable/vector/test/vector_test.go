@@ -158,7 +158,7 @@ func Test_Vector_Zero(t *testing.T) {
 	assert.False(t, ok)
 	_, ok = head.Next()
 	assert.False(t, ok)
-	head.Cap()
+	head.Size()
 
 	tail := vec.Tail()
 	assert.False(t, tail.HasNext())
@@ -168,7 +168,7 @@ func Test_Vector_Zero(t *testing.T) {
 	assert.False(t, ok)
 	_, ok = tail.Next()
 	assert.False(t, ok)
-	tail.Cap()
+	tail.Size()
 }
 
 type user struct {

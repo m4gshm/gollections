@@ -5,9 +5,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/collection/mutable"
 	"github.com/m4gshm/gollections/collection/mutable/vector"
+	"github.com/m4gshm/gollections/loop"
 
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
@@ -122,7 +122,7 @@ func Test_Vector_Nil(t *testing.T) {
 	assert.False(t, ok)
 	_, ok = head.Next()
 	assert.False(t, ok)
-	head.Cap()
+	head.Size()
 
 	tail := vec.Tail()
 	assert.False(t, tail.HasNext())
@@ -132,7 +132,7 @@ func Test_Vector_Nil(t *testing.T) {
 	assert.False(t, ok)
 	_, ok = tail.Next()
 	assert.False(t, ok)
-	tail.Cap()
+	tail.Size()
 }
 
 func Test_Vector_Zero(t *testing.T) {
@@ -171,7 +171,7 @@ func Test_Vector_Zero(t *testing.T) {
 	fv, ok := head.Next()
 	assert.True(t, ok)
 	assert.Equal(t, "a", fv)
-	c := head.Cap()
+	c := head.Size()
 	assert.Equal(t, 4, c)
 
 	tail := vec.Tail()
@@ -183,7 +183,7 @@ func Test_Vector_Zero(t *testing.T) {
 	tv, ok := tail.Prev()
 	assert.True(t, ok)
 	assert.Equal(t, "d", tv)
-	c = tail.Cap()
+	c = tail.Size()
 	assert.Equal(t, 4, c)
 }
 
@@ -223,7 +223,7 @@ func Test_Vector_new(t *testing.T) {
 	fv, ok := head.Next()
 	assert.True(t, ok)
 	assert.Equal(t, "a", fv)
-	c := head.Cap()
+	c := head.Size()
 	assert.Equal(t, 4, c)
 
 	tail := vec.Tail()
@@ -235,7 +235,7 @@ func Test_Vector_new(t *testing.T) {
 	tv, ok := tail.Prev()
 	assert.True(t, ok)
 	assert.Equal(t, "d", tv)
-	c = tail.Cap()
+	c = tail.Size()
 	assert.Equal(t, 4, c)
 }
 
