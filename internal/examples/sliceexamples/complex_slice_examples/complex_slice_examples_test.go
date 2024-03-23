@@ -16,7 +16,6 @@ import (
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/convert"
 	"github.com/m4gshm/gollections/slice/group"
-	"github.com/m4gshm/gollections/slice/stream"
 )
 
 type User struct {
@@ -117,15 +116,6 @@ func Benchmark_FindFirsManager_Predicate_ContainsConverted(b *testing.B) {
 func Benchmark_FindFirsManager_Predicate_HasAnyConverted(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		alice, ok := slice.First(users, match.Any(User.Roles, match.To(Role.Name, func(name string) bool { return name == "manager" })))
-		_, _ = alice, ok
-	}
-}
-
-func Benchmark_FindFirsManager_Stream(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		alice, ok := slice.First(users, func(user User) bool {
-			return stream.Convert(user.Roles(), Role.Name).HasAny(eq.To("Manager"))
-		})
 		_, _ = alice, ok
 	}
 }
