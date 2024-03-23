@@ -30,7 +30,7 @@ var (
 )
 
 // Iter creates an iterator and returns as interface
-func (s Set[T]) Loop() func() (T, bool) {
+func (s Set[T]) Loop() loop.Loop[T]{
 	h := s.Head()
 	return (&h).Next
 }

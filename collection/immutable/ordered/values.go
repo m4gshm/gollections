@@ -5,7 +5,6 @@ import (
 
 	breakLoop "github.com/m4gshm/gollections/break/loop"
 	breakStream "github.com/m4gshm/gollections/break/stream"
-	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_"
@@ -25,12 +24,12 @@ type MapValues[K comparable, V any] struct {
 }
 
 var (
-	_ c.Collection[any] = (*MapValues[int, any])(nil)
-	_ fmt.Stringer      = (*MapValues[int, any])(nil)
+	_ collection.Collection[any] = (*MapValues[int, any])(nil)
+	_ fmt.Stringer               = (*MapValues[int, any])(nil)
 )
 
 // Iter creates an iterator and returns as interface
-func (m MapValues[K, V]) Loop() func() (V, bool) {
+func (m MapValues[K, V]) Loop() loop.Loop[V] {
 	h := m.Head()
 	return (&h).Next
 }

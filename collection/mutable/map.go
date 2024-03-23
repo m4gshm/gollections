@@ -35,15 +35,15 @@ var (
 	_ c.SettableNew[int, any]                                              = (*Map[int, any])(nil)
 	_ c.SettableMap[c.TrackEachLoop[int, any]]                             = (*Map[int, any])(nil)
 	_ c.ImmutableMapConvert[immutable.Map[int, any]]                       = (*Map[int, any])(nil)
-	_ collection.Map[int, any, *map_.Iter[int, any]]                       = (*Map[int, any])(nil)
+	_ collection.Map[int, any]                                             = (*Map[int, any])(nil)
 	_ c.KeyVal[immutable.MapKeys[int, any], immutable.MapValues[int, any]] = (*Map[int, any])(nil)
 	_ fmt.Stringer                                                         = (*Map[int, any])(nil)
 )
 
 // Iter creates an iterator and returns as interface
-func (m *Map[K, V]) Loop() *map_.Iter[K, V] {
+func (m *Map[K, V]) Loop() loop.Loop[K, V] {
 	h := m.Head()
-	return &h
+	return h.Next
 }
 
 // Head creates an iterator and returns as implementation type value

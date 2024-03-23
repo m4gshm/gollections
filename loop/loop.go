@@ -59,3 +59,7 @@ func (next Loop[T]) Filt(filter func(T) (bool, error)) loop.Loop[T] {
 func (next Loop[T]) Filter(filter func(T) bool) Loop[T] {
 	return Filter(next, filter)
 }
+
+func (next Loop[T]) Crank() (Loop[T], T, bool) {
+	return Crank(next)
+}

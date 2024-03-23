@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	breakStream "github.com/m4gshm/gollections/break/stream"
-	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/stream"
@@ -21,14 +21,14 @@ type MapKeys[K comparable] struct {
 }
 
 var (
-	_ c.Collection[int] = (*MapKeys[int])(nil)
-	_ c.Collection[int] = MapKeys[int]{}
-	_ fmt.Stringer      = (*MapKeys[int])(nil)
-	_ fmt.Stringer      = MapKeys[int]{}
+	_ collection.Collection[int] = (*MapKeys[int])(nil)
+	_ collection.Collection[int] = MapKeys[int]{}
+	_ fmt.Stringer               = (*MapKeys[int])(nil)
+	_ fmt.Stringer               = MapKeys[int]{}
 )
 
 // Iter creates an iterator and returns as interface
-func (m MapKeys[K]) Loop() func() (K, bool) {
+func (m MapKeys[K]) Loop() loop.Loop[K] {
 	h := m.Head()
 	return (&h).Next
 }

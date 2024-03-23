@@ -3,7 +3,7 @@ package ordered
 
 import (
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/kv"
+	"github.com/m4gshm/gollections/kv/collection"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/slice"
 )
@@ -19,7 +19,7 @@ type MapIter[K comparable, V any] struct {
 	uniques  map[K]V
 }
 
-var _ kv.Iterator[string, any] = (*MapIter[string, any])(nil)
+var _ collection.Iterator[string, any] = (*MapIter[string, any])(nil)
 
 // Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak
 func (i *MapIter[K, V]) Track(traker func(key K, value V) error) error {

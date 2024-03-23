@@ -80,7 +80,7 @@ func (t Iter[T]) First(predicate func(T) bool) (T, bool) {
 }
 
 // Iter creates an iterator and returns as interface
-func (t Iter[T]) Loop() func() (T, bool) {
+func (t Iter[T]) Loop() loop.Loop[T] {
 	return t.Next
 }
 

@@ -2,7 +2,7 @@
 package loop
 
 import (
-	"unsafe"
+		"unsafe"
 
 	"golang.org/x/exp/constraints"
 
@@ -734,4 +734,9 @@ func ConvAndReduce[From, To any](next func() (From, bool), converter func(From) 
 		out = merger(out, c)
 	}
 	return out, nil
+}
+
+func Crank[T any](next func() (T, bool)) (func() (T, bool), T, bool) {
+	n, ok := next()
+	return next, n, ok
 }

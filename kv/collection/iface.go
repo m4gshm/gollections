@@ -1,6 +1,9 @@
-package kv
+package collection
 
-import "github.com/m4gshm/gollections/c"
+import (
+	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/kv/loop"
+)
 
 // Iterator provides iterate over key/value pairs
 type Iterator[K, V any] interface {
@@ -13,15 +16,15 @@ type Iterator[K, V any] interface {
 }
 
 // Iterable is an iterator supplier interface
-type Iterable[K, V any, I Iterator[K, V]] interface {
-	Loop() I
+type Iterable[K, V any] interface {
+	Loop() loop.Loop[K, V]
 }
 
 // Collection is the base interface of associative collections
-type Collection[K comparable, V any, I Iterator[K, V], M map[K]V | map[K][]V] interface {
+type Collection[K comparable, V any, M map[K]V | map[K][]V] interface {
 	c.TrackLoop[K, V]
 	c.TrackEachLoop[K, V]
-	Iterable[K, V, I]
+	Iterable[K, V]
 	c.MapFactory[K, V, M]
 
 	Reduce(merger func(K, K, V, V) (K, V)) (K, V)

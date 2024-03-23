@@ -26,7 +26,7 @@ func Test_MapKeys_Zero_Safety(t *testing.T) {
 func Test_Map_Zero(t *testing.T) {
 	var collection ordered.Map[int, string]
 
-	collection.Loop().Next()
+	collection.Loop()
 	ptr.Of(collection.Head()).Next()
 	collection.Convert(func(i int, s string) (int, string) { return 0, "" })
 	collection.Filter(func(i int, s string) bool { return true })

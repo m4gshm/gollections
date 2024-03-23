@@ -30,7 +30,7 @@ var (
 )
 
 // Iter creates an iterator and returns as interface
-func (v Vector[T]) Loop() func() (T, bool) {
+func (v Vector[T]) Loop() loop.Loop[T] {
 	return loop.Of(v.elements...)
 }
 

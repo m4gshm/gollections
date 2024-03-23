@@ -35,7 +35,7 @@ var (
 )
 
 // Iter creates an iterator and returns as interface
-func (v *Vector[T]) Loop() func() (T, bool) {
+func (v *Vector[T]) Loop() loop.Loop[T] {
 	h := v.Head()
 	return (&h).Next
 }

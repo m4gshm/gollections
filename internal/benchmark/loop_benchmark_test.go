@@ -74,8 +74,7 @@ func Benchmark_Loop_ImmutableVector_IterNextNext(b *testing.B) {
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				next := c.Loop()
-				for v, ok := next(); ok; v, ok = next() {
+				for next, v, ok :=c.Loop().Crank(); ok; v, ok = next() {
 					casee.load(v)
 				}
 			}

@@ -18,7 +18,6 @@ type KeyVal[Keys any, Vals any] interface {
 
 // Collection is the base interface of non-associative collections
 type Collection[T any] interface {
-	Iterable[T]
 	ForLoop[T]
 	ForEachLoop[T]
 	SliceFactory[T]
@@ -77,11 +76,6 @@ type PrevIterator[T any] interface {
 type DelIterator[T any] interface {
 	Iterator[T]
 	Delete()
-}
-
-// Iterable is a loop supplier interface
-type Iterable[T any] interface {
-	Loop() func() (T, bool)
 }
 
 // ForLoop is the interface of a collection that provides traversing of the elements.

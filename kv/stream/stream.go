@@ -5,7 +5,7 @@ import (
 	"github.com/m4gshm/gollections/break/kv/stream"
 	breakMapConvert "github.com/m4gshm/gollections/break/map_/convert"
 	breakFilter "github.com/m4gshm/gollections/break/map_/filter"
-	"github.com/m4gshm/gollections/kv"
+	"github.com/m4gshm/gollections/kv/collection"
 	kvloop "github.com/m4gshm/gollections/kv/loop"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_/convert"
@@ -24,16 +24,16 @@ type Iter[K comparable, V any, M map[K]V | map[K][]V] struct {
 }
 
 var (
-	_ kv.Iterator[string, any]                                                   = (*Iter[string, any, map[string]any])(nil)
-	_ Stream[string, any, Iter[string, any, map[string]any], map[string]any]     = (*Iter[string, any, map[string]any])(nil)
-	_ Stream[string, any, Iter[string, any, map[string][]any], map[string][]any] = (*Iter[string, any, map[string][]any])(nil)
+	_ collection.Iterator[string, any]      = (*Iter[string, any, map[string]any])(nil)
+	_ Stream[string, any, map[string]any]   = (*Iter[string, any, map[string]any])(nil)
+	_ Stream[string, any, map[string][]any] = (*Iter[string, any, map[string][]any])(nil)
 
-	_ kv.Iterator[string, any]                                                   = Iter[string, any, map[string]any]{}
-	_ Stream[string, any, Iter[string, any, map[string]any], map[string]any]     = Iter[string, any, map[string]any]{}
-	_ Stream[string, any, Iter[string, any, map[string][]any], map[string][]any] = Iter[string, any, map[string][]any]{}
+	_ collection.Iterator[string, any]      = Iter[string, any, map[string]any]{}
+	_ Stream[string, any, map[string]any]   = Iter[string, any, map[string]any]{}
+	_ Stream[string, any, map[string][]any] = Iter[string, any, map[string][]any]{}
 )
 
-// Next implements kv.KVIterator
+// Next implements Iterator
 func (i Iter[K, V, M]) Next() (K, V, bool) {
 	return i.next()
 }
@@ -120,8 +120,8 @@ func (i Iter[K, V, M]) HasAny(predicate func(K, V) bool) bool {
 }
 
 // Iter creates an iterator and returns as interface
-func (i Iter[K, V, M]) Loop() Iter[K, V, M] {
-	return i
+func (i Iter[K, V, M]) Loop() kvloop.Loop[K, V] {
+	return i.next
 }
 
 // Map collects the key/value pairs to a map

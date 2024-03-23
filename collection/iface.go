@@ -4,13 +4,20 @@ import (
 	breakKvstream "github.com/m4gshm/gollections/break/kv/stream"
 	breakStream "github.com/m4gshm/gollections/break/stream"
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/kv"
+	kv "github.com/m4gshm/gollections/kv/collection"
 	kvstream "github.com/m4gshm/gollections/kv/stream"
+	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/stream"
 )
 
+// Iterable is a loop supplier interface
+type Iterable[T any] interface {
+	Loop() loop.Loop[T]
+}
+
 // Collection is the base interface for the Vector and the Set impelementations
 type Collection[T any] interface {
+	Iterable[T]
 	c.Collection[T]
 	c.Filterable[T, stream.Iter[T], breakStream.Iter[T]]
 	c.Convertable[T, stream.Iter[T], breakStream.Iter[T]]
@@ -38,8 +45,8 @@ type Set[T comparable] interface {
 }
 
 // Map - collection interface that stores key/value pairs and provide access to an element by its key
-type Map[K comparable, V any, I kv.Iterator[K, V]] interface {
-	kv.Collection[K, V, I, map[K]V]
+type Map[K comparable, V any] interface {
+	kv.Collection[K, V, map[K]V]
 	kv.Filterable[K, V, kvstream.Iter[K, V, map[K]V], breakKvstream.Iter[K, V, map[K]V]]
 	kv.Convertable[K, V, kvstream.Iter[K, V, map[K]V], breakKvstream.Iter[K, V, map[K]V]]
 	c.Checkable[K]

@@ -82,8 +82,8 @@ func (i Iter[K, V, M]) HasAny(predicate func(K, V) (bool, error)) (bool, error) 
 }
 
 // Iter creates an iterator and returns as interface
-func (i Iter[K, V, M]) Loop() func() (K, V, bool, error) {
-	return i.Next
+func (i Iter[K, V, M]) Loop() loop.Loop[K, V] {
+	return i.next
 }
 
 // Map collects the key/value pairs to a map
