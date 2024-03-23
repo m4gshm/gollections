@@ -11,7 +11,7 @@ import (
 // IterNoStarted is the head Iterator position
 const IterNoStarted = -1
 
-// NewIter instantiates an iterator based on the 'elements' slice
+// NewIter creates a loop based on the 'elements' slice
 func NewIter[TS ~[]T, T any](elements TS) *Iter[T] {
 	h := NewHead(elements)
 	return &h

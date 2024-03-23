@@ -11,9 +11,7 @@ import (
 )
 
 // Iterable is a loop supplier interface
-type Iterable[T any] interface {
-	Loop() loop.Loop[T]
-}
+type Iterable[T any] c.Iterable[T, loop.Loop[T]]
 
 // Collection is the base interface for the Vector and the Set impelementations
 type Collection[T any] interface {

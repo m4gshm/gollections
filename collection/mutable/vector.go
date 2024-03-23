@@ -34,7 +34,7 @@ var (
 	_ fmt.Stringer                 = (*Vector[any])(nil)
 )
 
-// Iter creates an iterator and returns as interface
+// Loop creates a loop to iterating through elements.
 func (v *Vector[T]) Loop() loop.Loop[T] {
 	h := v.Head()
 	return (&h).Next

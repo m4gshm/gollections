@@ -9,6 +9,4 @@ import (
 type Stream[K comparable, V any, M map[K]V | map[K][]V] interface {
 	collection.Iterator[K, V]
 	collection.Collection[K, V, M]
-
-	HasAny(func(K, V) bool) bool
 }

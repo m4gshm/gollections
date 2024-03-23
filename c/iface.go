@@ -10,6 +10,11 @@ import (
 // ErrBreak is the 'break' statement of the For, Track methods
 var ErrBreak = errors.New("Break")
 
+// Iterable is a loop supplier interface
+type Iterable[T any, L ~func() (T, bool)] interface {
+	Loop() L
+}
+
 // KeyVal provides extracing of a keys or values collection from key/value pairs
 type KeyVal[Keys any, Vals any] interface {
 	Keys() Keys
@@ -23,6 +28,7 @@ type Collection[T any] interface {
 	SliceFactory[T]
 
 	Reduce(merger func(T, T) T) T
+	HasAny(func(T) bool) bool
 }
 
 // Filterable provides filtering content functionality

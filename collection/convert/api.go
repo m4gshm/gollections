@@ -9,7 +9,7 @@ import (
 
 // AndConvert - convert.AndConvert makes double converts From->Intermediate->To of the elements
 func AndConvert[From, To, Too any, IT collection.Iterable[From]](elements IT, firsConverter func(From) To, secondConverter func(To) Too) stream.Iter[Too] {
-	cc:= collection.Convert(collection.Convert(elements, firsConverter), secondConverter)
+	cc := collection.Convert(collection.Convert(elements, firsConverter), secondConverter)
 	return cc
 }
 

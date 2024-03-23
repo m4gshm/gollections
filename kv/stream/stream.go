@@ -119,7 +119,7 @@ func (i Iter[K, V, M]) HasAny(predicate func(K, V) bool) bool {
 	return kvloop.HasAny(next, predicate)
 }
 
-// Iter creates an iterator and returns as interface
+// Loop creates a loop to iterating through elements.
 func (i Iter[K, V, M]) Loop() kvloop.Loop[K, V] {
 	return i.next
 }

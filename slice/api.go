@@ -869,12 +869,12 @@ func KeysValues[TS ~[]T, T, K, V any](elements TS, keysExtractor func(T) []K, va
 	return Flat(elements, func(e T) []c.KV[K, V] { return convert.KeysValues(e, keysExtractor, valsExtractor) })
 }
 
-// ExtraVals transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
+// ExtraVals transforms slice elements to key/value slice based on applying key, value extractor to the elements.
 func ExtraVals[TS ~[]T, T, V any](elements TS, valsExtractor func(T) []V) []c.KV[T, V] {
 	return Flat(elements, func(e T) []c.KV[T, V] { return convert.ExtraVals(e, valsExtractor) })
 }
 
-// ExtraKeys transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
+// ExtraKeys transforms slic elements to key/value slice based on applying key, value extractor to the elemen
 func ExtraKeys[TS ~[]T, T, K any](elements TS, keysExtractor func(T) []K) []c.KV[K, T] {
 	return Flat(elements, func(e T) []c.KV[K, T] { return convert.ExtraKeys(e, keysExtractor) })
 }

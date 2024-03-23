@@ -1,4 +1,4 @@
-// Package loop provides helpers for loop operation over key/value pairs and iterator implementations
+// Package loop provides helpers for loop operation over key/value pairs.
 package loop
 
 import (
@@ -39,7 +39,7 @@ func To[K, V any](next func() (K, V, bool, error), errConsumer func(error)) func
 	}
 }
 
-// Group collects sets of values grouped by keys obtained by passing a key/value iterator
+// Group collects sets of values grouped by keys obtained by passing a key/value loop.
 func Group[K comparable, V any](next func() (K, V, bool, error)) (map[K][]V, error) {
 	return ToMapResolv(next, resolv.Slice[K, V])
 }
@@ -110,7 +110,7 @@ func Firstt[K, V any](next func() (K, V, bool, error), predicate func(K, V) (boo
 	}
 }
 
-// Convert creates an iterator that applies a transformer to iterable key\values.
+// Convert creates a loop that applies the 'converter' function to iterable key\values.
 func Convert[K, V any, KOUT, VOUT any](next func() (K, V, bool, error), converter func(K, V) (KOUT, VOUT)) Loop[KOUT, VOUT] {
 	if next == nil {
 		return nil
@@ -125,7 +125,7 @@ func Convert[K, V any, KOUT, VOUT any](next func() (K, V, bool, error), converte
 	}
 }
 
-// Conv creates an iterator that applies a transformer to iterable key\values.
+// Conv creates a loop that applies the 'converter' function to iterable key\values.
 func Conv[K, V any, KOUT, VOUT any](next func() (K, V, bool, error), converter func(K, V) (KOUT, VOUT, error)) Loop[KOUT, VOUT] {
 	if next == nil {
 		return nil
@@ -140,7 +140,7 @@ func Conv[K, V any, KOUT, VOUT any](next func() (K, V, bool, error), converter f
 	}
 }
 
-// Filter creates an iterator that checks elements by a filter and returns successful ones
+// Filter creates a loop that checks elements by a filter and returns successful ones
 func Filter[K, V any](next func() (K, V, bool, error), filter func(K, V) bool) Loop[K, V] {
 	if next == nil {
 		return nil
@@ -150,7 +150,7 @@ func Filter[K, V any](next func() (K, V, bool, error), filter func(K, V) bool) L
 	}
 }
 
-// Filt creates an iterator that checks elements by a filter and returns successful ones
+// Filt creates a loop that checks elements by a filter and returns successful ones
 func Filt[K, V any](next func() (K, V, bool, error), filter func(K, V) (bool, error)) Loop[K, V] {
 	if next == nil {
 		return nil

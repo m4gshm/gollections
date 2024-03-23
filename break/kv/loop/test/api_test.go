@@ -24,7 +24,7 @@ func Test_HasAny(t *testing.T) {
 }
 
 func Test_HasAnyy(t *testing.T) {
-	kvl := breakkvloop.From(loop.KeyValue(loop.Of(k.V(1, "one"), k.V(2, "two"), k.V(3,"three")), c.KV[int, string].Key, c.KV[int, string].Value))
+	kvl := breakkvloop.From(loop.KeyValue(loop.Of(k.V(1, "one"), k.V(2, "two"), k.V(3, "three")), c.KV[int, string].Key, c.KV[int, string].Value))
 
 	result, _ := breakkvloop.HasAnyy(kvl, func(key int, val string) (bool, error) { return key == 2, nil })
 
@@ -32,7 +32,7 @@ func Test_HasAnyy(t *testing.T) {
 }
 
 func Test_Firstt(t *testing.T) {
-	kvl := breakkvloop.From(loop.KeyValue(loop.Of(k.V(1, "one"), k.V(2, "two"), k.V(3,"three")), c.KV[int, string].Key, c.KV[int, string].Value))
+	kvl := breakkvloop.From(loop.KeyValue(loop.Of(k.V(1, "one"), k.V(2, "two"), k.V(3, "three")), c.KV[int, string].Key, c.KV[int, string].Value))
 
 	k, v, ok, _ := breakkvloop.Firstt(kvl, func(key int, val string) (bool, error) { return key == 2 || val == "three", nil })
 
@@ -42,7 +42,7 @@ func Test_Firstt(t *testing.T) {
 }
 
 func Test_Reduce(t *testing.T) {
-	kvl := breakkvloop.From(loop.KeyValue(loop.Of(k.V(1, "one"), k.V(2, "two"), k.V(3,"three")), c.KV[int, string].Key, c.KV[int, string].Value))
+	kvl := breakkvloop.From(loop.KeyValue(loop.Of(k.V(1, "one"), k.V(2, "two"), k.V(3, "three")), c.KV[int, string].Key, c.KV[int, string].Value))
 
 	k, v, _ := breakkvloop.Reduce(kvl, func(kl, kr int, vl, vr string) (int, string) { return kl + kr, vl + vr })
 
@@ -51,7 +51,7 @@ func Test_Reduce(t *testing.T) {
 }
 
 func Test_Reducee(t *testing.T) {
-	kvl := breakkvloop.From(loop.KeyValue(loop.Of(k.V(1, "one"), k.V(2, "two"), k.V(3,"three")), c.KV[int, string].Key, c.KV[int, string].Value))
+	kvl := breakkvloop.From(loop.KeyValue(loop.Of(k.V(1, "one"), k.V(2, "two"), k.V(3, "three")), c.KV[int, string].Key, c.KV[int, string].Value))
 
 	k, v, _ := breakkvloop.Reducee(kvl, func(kl, kr int, vl, vr string) (int, string, error) { return kl + kr, vl + vr, nil })
 

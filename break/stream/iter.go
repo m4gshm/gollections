@@ -70,7 +70,7 @@ func (t Iter[T]) First(predicate func(T) (bool, error)) (T, bool, error) {
 	return loop.Firstt(t.next, predicate)
 }
 
-// Iter creates an iterator and returns as interface
+// Loop creates a loop to iterating through elements.
 func (t Iter[T]) Loop() loop.Loop[T] {
 	return t.Next
 }

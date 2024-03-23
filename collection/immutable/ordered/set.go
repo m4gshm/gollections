@@ -29,8 +29,8 @@ var (
 	_ fmt.Stringer        = Set[int]{}
 )
 
-// Iter creates an iterator and returns as interface
-func (s Set[T]) Loop() loop.Loop[T]{
+// Loop creates a loop to iterating through elements.
+func (s Set[T]) Loop() loop.Loop[T] {
 	h := s.Head()
 	return (&h).Next
 }

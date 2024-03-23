@@ -81,7 +81,7 @@ func (i Iter[K, V, M]) HasAny(predicate func(K, V) (bool, error)) (bool, error) 
 	return loop.HasAnyy(next, predicate)
 }
 
-// Iter creates an iterator and returns as interface
+// Loop creates a loop to iterating through elements.
 func (i Iter[K, V, M]) Loop() loop.Loop[K, V] {
 	return i.next
 }

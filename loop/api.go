@@ -2,7 +2,7 @@
 package loop
 
 import (
-		"unsafe"
+	"unsafe"
 
 	"golang.org/x/exp/constraints"
 
@@ -174,12 +174,12 @@ func Contains[T comparable](next func() (T, bool), example T) bool {
 	return false
 }
 
-// Conv instantiates an iterator that converts elements with a converter and returns them.
+// Conv creates a loop that applies the 'converter' function to iterable elements.
 func Conv[From, To any](next func() (From, bool), converter func(From) (To, error)) breakloop.Loop[To] {
 	return breakloop.Conv(breakloop.From(next), converter)
 }
 
-// Convert instantiates an iterator that converts elements with a converter and returns them.
+// Convert creates a loop that applies the 'converter' function to iterable elements.
 func Convert[From, To any](next func() (From, bool), converter func(From) To) Loop[To] {
 	if next == nil {
 		return nil
@@ -213,7 +213,7 @@ func ConvertCheck[From, To any](next func() (From, bool), converter func(from Fr
 	}
 }
 
-// FiltAndConv returns a stream that filters source elements and converts them
+// FiltAndConv creates a loop that filters source elements and converts them
 func FiltAndConv[From, To any](next func() (From, bool), filter func(From) (bool, error), converter func(From) (To, error)) breakloop.Loop[To] {
 	if next == nil {
 		return nil
@@ -231,7 +231,7 @@ func FiltAndConv[From, To any](next func() (From, bool), filter func(From) (bool
 	}
 }
 
-// FilterAndConvert returns a stream that filters source elements and converts them
+// FilterAndConvert creates a loop that filters source elements and converts them
 func FilterAndConvert[From, To any](next func() (From, bool), filter func(From) bool, converter func(From) To) Loop[To] {
 	return FilterConvertFilter(next, filter, converter, always.True[To])
 }
@@ -258,12 +258,12 @@ func ConvertAndFilter[From, To any](next func() (From, bool), converter func(Fro
 	return FilterConvertFilter(next, always.True[From], converter, filter)
 }
 
-// Flatt instantiates an iterator that extracts slices of 'To' by a flattener from elements of 'From' and flattens as one iterable collection of 'To' elements.
+// Flatt creates a loop that extracts slices of 'To' by a flattener from elements of 'From' and flattens as one iterable collection of 'To' elements.
 func Flatt[From, To any](next func() (From, bool), flattener func(From) ([]To, error)) breakloop.Loop[To] {
 	return breakloop.Flatt(breakloop.From(next), flattener)
 }
 
-// Flat instantiates an iterator that extracts slices of 'To' by a flattener from elements of 'From' and flattens as one iterable collection of 'To' elements.
+// Flat creates a loop that extracts slices of 'To' by a flattener from elements of 'From' and flattens as one iterable collection of 'To' elements.
 func Flat[From, To any](next func() (From, bool), flattener func(From) []To) Loop[To] {
 	if next == nil {
 		return nil
@@ -369,12 +369,12 @@ func FilterFlatFilter[From, To any](next func() (From, bool), filterFrom func(Fr
 	// return &FlatFilterIter[From, To]{next: next, filterFrom: filterFrom, flattener: flattener, filterTo: filterTo, elemSizeTo: notsafe.GetTypeSize[To]()}
 }
 
-// Filt creates an iterator that checks elements by the 'filter' function and returns successful ones.
+// Filt creates a loop that checks elements by the 'filter' function and returns successful ones.
 func Filt[T any](next func() (T, bool), filter func(T) (bool, error)) breakloop.Loop[T] {
 	return breakloop.Filt(breakloop.From(next), filter)
 }
 
-// Filter creates an iterator that checks elements by the 'filter' function and returns successful ones.
+// Filter creates a loop that checks elements by the 'filter' function and returns successful ones.
 func Filter[T any](next func() (T, bool), filter func(T) bool) Loop[T] {
 	if next == nil {
 		return nil
@@ -385,24 +385,24 @@ func Filter[T any](next func() (T, bool), filter func(T) bool) Loop[T] {
 	// return FiltIter[T]{next: next, by: filter}
 }
 
-// NotNil creates an iterator that filters nullable elements
+// NotNil creates a loop that filters nullable elements
 func NotNil[T any](next func() (*T, bool)) Loop[*T] {
 	return Filter(next, not.Nil[T])
 }
 
-// PtrVal creates an iterator that transform pointers to the values referenced by those pointers.
+// PtrVal creates a loop that transform pointers to the values referenced by those pointers.
 // Nil pointers are transformet to zero values.
 func PtrVal[T any](next func() (*T, bool)) Loop[T] {
 	return Convert(next, convert.PtrVal[T])
 }
 
-// NoNilPtrVal creates an iterator that transform only not nil pointers to the values referenced referenced by those pointers.
+// NoNilPtrVal creates a loop that transform only not nil pointers to the values referenced referenced by those pointers.
 // Nil pointers are ignored.
 func NoNilPtrVal[T any](next func() (*T, bool)) Loop[T] {
 	return ConvertCheck(next, convert.NoNilPtrVal[T])
 }
 
-// KeyValue transforms iterable elements to key/value iterator based on applying key, value extractors to the elements
+// KeyValue transforms a loop to the key/value loop based on applying key, value extractors to the elements
 func KeyValue[T any, K, V any](next func() (T, bool), keyExtractor func(T) K, valExtractor func(T) V) func() (K, V, bool) {
 	if next == nil {
 		return nil
@@ -418,12 +418,12 @@ func KeyValue[T any, K, V any](next func() (T, bool), keyExtractor func(T) K, va
 	// return NewKeyValuer(next, keyExtractor, valExtractor)
 }
 
-// KeyValuee transforms iterable elements to key/value iterator based on applying key, value extractors to the elements
+// KeyValuee transforms a loop to the key/value loop based on applying key, value extractors to the elements
 func KeyValuee[T any, K, V any](next func() (T, bool), keyExtractor func(T) (K, error), valExtractor func(T) (V, error)) func() (K, V, bool, error) {
 	return breakloop.KeyValuee(breakloop.From(next), keyExtractor, valExtractor)
 }
 
-// KeysValues transforms iterable elements to key/value iterator based on applying multiple keys, values extractor to the elements
+// KeysValues transforms a loop to the key/value loop based on applying multiple keys, values extractor to the elements
 func KeysValues[T, K, V any](next func() (T, bool), keysExtractor func(T) []K, valsExtractor func(T) []V) func() (K, V, bool) {
 	if next == nil {
 		return nil
@@ -470,62 +470,62 @@ func KeysValues[T, K, V any](next func() (T, bool), keysExtractor func(T) []K, v
 	}
 }
 
-// KeysValue transforms iterable elements to key/value iterator based on applying keys, value extractor to the elements
+// KeysValue transforms a loop to the key/value loop based on applying keys, value extractor to the elements
 func KeysValue[T, K, V any](next func() (T, bool), keysExtractor func(T) []K, valExtractor func(T) V) func() (K, V, bool) {
 	return KeysValues(next, keysExtractor, func(t T) []V { return convert.AsSlice(valExtractor(t)) })
 }
 
-// KeysValuee transforms iterable elements to key/value iterator based on applying keys, value extractor to the elements
+// KeysValuee transforms a loop to the key/value loop based on applying keys, value extractor to the elements
 func KeysValuee[T, K, V any](next func() (T, bool), keysExtractor func(T) ([]K, error), valExtractor func(T) (V, error)) func() (K, V, bool, error) {
 	return breakloop.KeysValuee(breakloop.From(next), keysExtractor, valExtractor)
 }
 
-// KeyValues transforms iterable elements to key/value iterator based on applying key, values extractor to the elements
+// KeyValues transforms a loop to the key/value loop based on applying key, values extractor to the elements
 func KeyValues[T, K, V any](next func() (T, bool), keyExtractor func(T) K, valsExtractor func(T) []V) func() (K, V, bool) {
 	return KeysValues(next, func(t T) []K { return convert.AsSlice(keyExtractor(t)) }, valsExtractor)
 }
 
-// KeyValuess transforms iterable elements to key/value iterator based on applying key, values extractor to the elements
+// KeyValuess transforms a loop to the key/value loop based on applying key, values extractor to the elements
 func KeyValuess[T, K, V any](next func() (T, bool), keyExtractor func(T) (K, error), valsExtractor func(T) ([]V, error)) func() (K, V, bool, error) {
 	return breakloop.KeyValuess(breakloop.From(next), keyExtractor, valsExtractor)
 }
 
-// ExtraVals transforms iterable elements to key/value iterator based on applying values extractor to the elements
+// ExtraVals transforms a loop to the key/value loop based on applying values extractor to the elements
 func ExtraVals[T, V any](next func() (T, bool), valsExtractor func(T) []V) func() (T, V, bool) {
 	return KeyValues(next, as.Is[T], valsExtractor)
 }
 
-// ExtraValss transforms iterable elements to key/value iterator based on applying values extractor to the elements
+// ExtraValss transforms a loop to the key/value loop based on applying values extractor to the elements
 func ExtraValss[T, V any](next func() (T, bool), valsExtractor func(T) ([]V, error)) func() (T, V, bool, error) {
 	return KeyValuess(next, as.ErrTail(as.Is[T]), valsExtractor)
 }
 
-// ExtraKeys transforms iterable elements to key/value iterator based on applying key extractor to the elements
+// ExtraKeys transforms a loop to the key/value loop based on applying key extractor to the elements
 func ExtraKeys[T, K any](next func() (T, bool), keysExtractor func(T) []K) func() (K, T, bool) {
 	return KeysValue(next, keysExtractor, as.Is[T])
 }
 
-// ExtraKeyss transforms iterable elements to key/value iterator based on applying key extractor to the elements
+// ExtraKeyss transforms a loop to the key/value loop based on applying key extractor to the elements
 func ExtraKeyss[T, K any](next func() (T, bool), keyExtractor func(T) (K, error)) func() (K, T, bool, error) {
 	return KeyValuess(next, keyExtractor, as.ErrTail(convert.AsSlice[T]))
 }
 
-// ExtraKey transforms iterable elements to key/value iterator based on applying key extractor to the elements
+// ExtraKey transforms a loop to the key/value loop based on applying key extractor to the elements
 func ExtraKey[T, K any](next func() (T, bool), keysExtractor func(T) K) func() (K, T, bool) {
 	return KeyValue(next, keysExtractor, as.Is[T])
 }
 
-// ExtraKeyy transforms iterable elements to key/value iterator based on applying key extractor to the elements
+// ExtraKeyy transforms a loop to the key/value loop based on applying key extractor to the elements
 func ExtraKeyy[T, K any](next func() (T, bool), keyExtractor func(T) (K, error)) func() (K, T, bool, error) {
 	return breakloop.KeyValuee[T, K](breakloop.From(next), keyExtractor, as.ErrTail(as.Is[T]))
 }
 
-// ExtraValue transforms iterable elements to key/value iterator based on applying value extractor to the elements
+// ExtraValue transforms a loop to the key/value loop based on applying value extractor to the elements
 func ExtraValue[T, V any](next func() (T, bool), valueExtractor func(T) V) func() (T, V, bool) {
 	return KeyValue(next, as.Is[T], valueExtractor)
 }
 
-// ExtraValuee transforms iterable elements to key/value iterator based on applying value extractor to the elements
+// ExtraValuee transforms a loop to the key/value loop based on applying value extractor to the elements
 func ExtraValuee[T, V any](next func() (T, bool), valExtractor func(T) (V, error)) func() (T, V, bool, error) {
 	return breakloop.KeyValuee[T, T, V](breakloop.From(next), as.ErrTail(as.Is[T]), valExtractor)
 }

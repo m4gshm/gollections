@@ -28,12 +28,12 @@ func (next Loop[K, V]) HasAny(predicate func(K, V) bool) bool {
 	return HasAny(next, predicate)
 }
 
-// Filt creates an iterator that checks elements by the 'filter' function and returns successful ones.
+// Filt creates a loop that checks elements by the 'filter' function and returns successful ones.
 func (next Loop[K, V]) Filt(filter func(K, V) (bool, error)) breakkvloop.Loop[K, V] {
 	return Filt(next, filter)
 }
 
-// Filter creates an iterator that checks elements by the 'filter' function and returns successful ones.
+// Filter creates a loop that checks elements by the 'filter' function and returns successful ones.
 func (next Loop[K, V]) Filter(filter func(K, V) bool) Loop[K, V] {
 	return Filter(next, filter)
 }

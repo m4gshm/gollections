@@ -27,7 +27,7 @@ var (
 	_ fmt.Stringer               = MapKeys[int]{}
 )
 
-// Iter creates an iterator and returns as interface
+// Loop creates a loop to iterating through elements.
 func (m MapKeys[K]) Loop() loop.Loop[K] {
 	h := m.Head()
 	return (&h).Next

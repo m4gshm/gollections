@@ -46,7 +46,7 @@ func (i *SetIter[T]) Next() (t T, ok bool) {
 	return t, ok
 }
 
-// Cap returns the iterator capacity
+// Size returns the iterator capacity
 func (i *SetIter[T]) Size() (capacity int) {
 	if !(i == nil || i.elements == nil) {
 		capacity = len(*i.elements)

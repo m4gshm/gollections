@@ -37,7 +37,7 @@ var (
 	_ fmt.Stringer                                     = Map[int, any]{}
 )
 
-// Iter creates an iterator and returns as interface
+// Loop creates a loop to iterating through elements.
 func (m Map[K, V]) Loop() loop.Loop[K, V] {
 	h := m.Head()
 	return h.Next

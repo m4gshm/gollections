@@ -50,12 +50,12 @@ func (next Loop[T]) HasAny(predicate func(T) bool) bool {
 	return HasAny(next, predicate)
 }
 
-// Filt creates an iterator that checks elements by the 'filter' function and returns successful ones.
+// Filt creates a loop that checks elements by the 'filter' function and returns successful ones.
 func (next Loop[T]) Filt(filter func(T) (bool, error)) loop.Loop[T] {
 	return Filt(next, filter)
 }
 
-// Filter creates an iterator that checks elements by the 'filter' function and returns successful ones.
+// Filter creates a loop that checks elements by the 'filter' function and returns successful ones.
 func (next Loop[T]) Filter(filter func(T) bool) Loop[T] {
 	return Filter(next, filter)
 }

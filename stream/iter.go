@@ -25,6 +25,8 @@ var (
 	_ c.Filterable[any, Iter[any], breakStream.Iter[any]] = Iter[any]{}
 	_ c.Iterator[any]                                     = (*Iter[any])(nil)
 	_ c.Iterator[any]                                     = Iter[any]{}
+	_ c.Iterable[any, loop.Loop[any]]                     = Iter[any]{}
+	_ c.Iterable[any, loop.Loop[any]]                     = (*Iter[any])(nil)
 )
 
 // Next implements c.Iterator
@@ -79,7 +81,7 @@ func (t Iter[T]) First(predicate func(T) bool) (T, bool) {
 	return loop.First(t.next, predicate)
 }
 
-// Iter creates an iterator and returns as interface
+// Loop creates a loop to iterating through elements.
 func (t Iter[T]) Loop() loop.Loop[T] {
 	return t.Next
 }

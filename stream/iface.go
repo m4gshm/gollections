@@ -7,9 +7,7 @@ import (
 
 // Stream is collection or stream of elements in transformation state
 type Stream[T any] interface {
-	Loop() loop.Loop[T]
-
+	c.Iterator[T]
+	c.Iterable[T, loop.Loop[T]]
 	c.Collection[T]
-
-	HasAny(func(T) bool) bool
 }

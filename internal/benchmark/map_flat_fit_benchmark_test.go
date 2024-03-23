@@ -104,7 +104,6 @@ func Benchmark_ConvertAndFilter_Slice_Loop(b *testing.B) {
 	b.StopTimer()
 }
 
-
 func Benchmark_ConvertAndFilter_Slice_PlainOld(b *testing.B) {
 	var (
 		toString = func(i int) string { return fmt.Sprintf("%d", i) }
@@ -179,7 +178,6 @@ func Benchmark_FilterAndConvert_Slice(b *testing.B) {
 	b.StopTimer()
 }
 
-
 func Benchmark_Flatt_Loop(b *testing.B) {
 	odds := func(v int) bool { return v%2 != 0 }
 	multiDimension := [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
@@ -212,7 +210,6 @@ func Benchmark_Flatt_Slice_PlainOld(b *testing.B) {
 	}
 	b.StopTimer()
 }
-
 
 func Benchmark_ReduceSum_Loop(b *testing.B) {
 	odds := func(v int) bool { return v%2 != 0 }
