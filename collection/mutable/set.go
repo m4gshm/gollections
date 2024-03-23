@@ -25,14 +25,14 @@ type Set[T comparable] struct {
 }
 
 var (
-	_ c.Addable[int]                      = (*Set[int])(nil)
-	_ c.AddableNew[int]                   = (*Set[int])(nil)
-	_ c.AddableAll[c.ForEachLoop[int]]    = (*Set[int])(nil)
-	_ c.AddableAllNew[c.ForEachLoop[int]] = (*Set[int])(nil)
-	_ c.Deleteable[int]                   = (*Set[int])(nil)
-	_ c.DeleteableVerify[int]             = (*Set[int])(nil)
-	_ collection.Set[int]                 = (*Set[int])(nil)
-	_ fmt.Stringer                        = (*Set[int])(nil)
+	_ c.Addable[int]                  = (*Set[int])(nil)
+	_ c.AddableNew[int]               = (*Set[int])(nil)
+	_ c.AddableAll[c.ForEach[int]]    = (*Set[int])(nil)
+	_ c.AddableAllNew[c.ForEach[int]] = (*Set[int])(nil)
+	_ c.Deleteable[int]               = (*Set[int])(nil)
+	_ c.DeleteableVerify[int]         = (*Set[int])(nil)
+	_ collection.Set[int]             = (*Set[int])(nil)
+	_ fmt.Stringer                    = (*Set[int])(nil)
 )
 
 // Iter creates an iterator and returns as interface
@@ -164,14 +164,14 @@ func (s *Set[T]) AddOneNew(element T) (ok bool) {
 }
 
 // AddAll inserts all elements from the "other" collection
-func (s *Set[T]) AddAll(elements c.ForEachLoop[T]) {
+func (s *Set[T]) AddAll(elements c.ForEach[T]) {
 	if !(s == nil || elements == nil) {
 		elements.ForEach(s.AddOne)
 	}
 }
 
 // AddAllNew inserts elements from the "other" collection if they are not contained in the collection
-func (s *Set[T]) AddAllNew(other c.ForEachLoop[T]) (ok bool) {
+func (s *Set[T]) AddAllNew(other c.ForEach[T]) (ok bool) {
 	if !(s == nil || other == nil) {
 		other.ForEach(func(element T) { ok = s.AddOneNew(element) || ok })
 	}

@@ -24,14 +24,14 @@ func WrapVector[T any](elements []T) *Vector[T] {
 type Vector[T any] []T
 
 var (
-	_ c.Addable[any]                   = (*Vector[any])(nil)
-	_ c.AddableAll[c.ForEachLoop[any]] = (*Vector[any])(nil)
-	_ c.Deleteable[int]                = (*Vector[any])(nil)
-	_ c.DeleteableVerify[int]          = (*Vector[any])(nil)
-	_ c.Settable[int, any]             = (*Vector[any])(nil)
-	_ c.SettableNew[int, any]          = (*Vector[any])(nil)
-	_ collection.Vector[any]           = (*Vector[any])(nil)
-	_ fmt.Stringer                     = (*Vector[any])(nil)
+	_ c.Addable[any]               = (*Vector[any])(nil)
+	_ c.AddableAll[c.ForEach[any]] = (*Vector[any])(nil)
+	_ c.Deleteable[int]            = (*Vector[any])(nil)
+	_ c.DeleteableVerify[int]      = (*Vector[any])(nil)
+	_ c.Settable[int, any]         = (*Vector[any])(nil)
+	_ c.SettableNew[int, any]      = (*Vector[any])(nil)
+	_ collection.Vector[any]       = (*Vector[any])(nil)
+	_ fmt.Stringer                 = (*Vector[any])(nil)
 )
 
 // Iter creates an iterator and returns as interface
@@ -163,7 +163,7 @@ func (v *Vector[T]) AddOne(element T) {
 }
 
 // AddAll inserts all elements from the "other" collection
-func (v *Vector[T]) AddAll(other c.ForEachLoop[T]) {
+func (v *Vector[T]) AddAll(other c.ForEach[T]) {
 	if v != nil {
 		other.ForEach(func(element T) { *v = append(*v, element) })
 	}

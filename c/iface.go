@@ -18,8 +18,8 @@ type KeyVal[Keys any, Vals any] interface {
 
 // Collection is the base interface of non-associative collections
 type Collection[T any] interface {
-	ForLoop[T]
-	ForEachLoop[T]
+	For[T]
+	ForEach[T]
 	SliceFactory[T]
 
 	Reduce(merger func(T, T) T) T
@@ -55,8 +55,8 @@ type Iterator[T any] interface {
 	// If ok == false, then the iteration must be completed.
 	Next() (out T, ok bool)
 
-	ForLoop[T]
-	ForEachLoop[T]
+	For[T]
+	ForEach[T]
 }
 
 // Sized - storage interface with measurable size
@@ -78,26 +78,26 @@ type DelIterator[T any] interface {
 	Delete()
 }
 
-// ForLoop is the interface of a collection that provides traversing of the elements.
-type ForLoop[IT any] interface {
+// For is the interface of a collection that provides traversing of the elements.
+type For[IT any] interface {
 	//For takes elements of the collection. Can be interrupt by returning ErrBreak.
 	For(func(element IT) error) error
 }
 
-// ForEachLoop is the interface of a collection that provides traversing of the elements without error checking.
-type ForEachLoop[T any] interface {
+// ForEach is the interface of a collection that provides traversing of the elements without error checking.
+type ForEach[T any] interface {
 	// ForEach takes all elements of the collection
 	ForEach(func(element T))
 }
 
-// TrackLoop is the interface of a collection that provides traversing of the elements with position tracking (index, key, coordinates, etc.).
-type TrackLoop[P any, T any] interface {
+// Track is the interface of a collection that provides traversing of the elements with position tracking (index, key, coordinates, etc.).
+type Track[P any, T any] interface {
 	// return ErrBreak for loop breaking
 	Track(func(position P, element T) error) error
 }
 
-// TrackEachLoop is the interface of a collection that provides traversing of the elements with position tracking (index, key, coordinates, etc.) without error checking
-type TrackEachLoop[P any, T any] interface {
+// TrackEach is the interface of a collection that provides traversing of the elements with position tracking (index, key, coordinates, etc.) without error checking
+type TrackEach[P any, T any] interface {
 	TrackEach(func(position P, element T))
 }
 

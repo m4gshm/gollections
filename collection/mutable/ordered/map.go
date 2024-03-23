@@ -32,7 +32,7 @@ type Map[K comparable, V any] struct {
 var (
 	_ c.Settable[int, any]                                        = (*Map[int, any])(nil)
 	_ c.SettableNew[int, any]                                     = (*Map[int, any])(nil)
-	_ c.SettableMap[c.TrackEachLoop[int, any]]                    = (*Map[int, any])(nil)
+	_ c.SettableMap[c.TrackEach[int, any]]                        = (*Map[int, any])(nil)
 	_ c.ImmutableMapConvert[ordered.Map[int, any]]                = (*Map[int, any])(nil)
 	_ collection.Map[int, any]                                    = (*Map[int, any])(nil)
 	_ c.KeyVal[ordered.MapKeys[int], ordered.MapValues[int, any]] = (*Map[int, any])(nil)
@@ -336,7 +336,7 @@ func (m *Map[K, V]) Immutable() ordered.Map[K, V] {
 }
 
 // SetMap inserts all elements from the 'other' map
-func (m *Map[K, V]) SetMap(kvs c.TrackEachLoop[K, V]) {
+func (m *Map[K, V]) SetMap(kvs c.TrackEach[K, V]) {
 	if m == nil || kvs == nil {
 		return
 	}

@@ -7,6 +7,6 @@ import (
 )
 
 // Of - group.Of synonym of the walk.Group.
-func Of[T any, K comparable, W c.ForEachLoop[T]](elements W, by func(T) K) map[K][]T {
+func Of[T any, K comparable, W c.ForEach[T]](elements W, by func(T) K) map[K][]T {
 	return walk.Group(elements, by)
 }

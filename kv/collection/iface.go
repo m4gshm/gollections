@@ -11,8 +11,8 @@ type Iterator[K, V any] interface {
 	// The ok result indicates whether the element was returned by the iterator.
 	// If ok == false, then the iteration must be completed.
 	Next() (key K, value V, ok bool)
-	c.TrackLoop[K, V]
-	c.TrackEachLoop[K, V]
+	c.Track[K, V]
+	c.TrackEach[K, V]
 }
 
 // Iterable is an iterator supplier interface
@@ -22,8 +22,8 @@ type Iterable[K, V any] interface {
 
 // Collection is the base interface of associative collections
 type Collection[K comparable, V any, M map[K]V | map[K][]V] interface {
-	c.TrackLoop[K, V]
-	c.TrackEachLoop[K, V]
+	c.Track[K, V]
+	c.TrackEach[K, V]
 	Iterable[K, V]
 	c.MapFactory[K, V, M]
 

@@ -33,7 +33,7 @@ var (
 	_ c.Removable[int, any]                                                = (*Map[int, any])(nil)
 	_ c.Settable[int, any]                                                 = (*Map[int, any])(nil)
 	_ c.SettableNew[int, any]                                              = (*Map[int, any])(nil)
-	_ c.SettableMap[c.TrackEachLoop[int, any]]                             = (*Map[int, any])(nil)
+	_ c.SettableMap[c.TrackEach[int, any]]                                 = (*Map[int, any])(nil)
 	_ c.ImmutableMapConvert[immutable.Map[int, any]]                       = (*Map[int, any])(nil)
 	_ collection.Map[int, any]                                             = (*Map[int, any])(nil)
 	_ c.KeyVal[immutable.MapKeys[int, any], immutable.MapValues[int, any]] = (*Map[int, any])(nil)
@@ -324,7 +324,7 @@ func (m *Map[K, V]) Immutable() immutable.Map[K, V] {
 }
 
 // SetMap inserts all elements from the 'other' map
-func (m *Map[K, V]) SetMap(other c.TrackEachLoop[K, V]) {
+func (m *Map[K, V]) SetMap(other c.TrackEach[K, V]) {
 	if m == nil || other == nil {
 		return
 	}
