@@ -1,4 +1,4 @@
-// Package filter provides helpers for filtering keys or values of a map
+// Package predicate provides helpers for filtering keys or values of a map
 package predicate
 
 // Key adapts a key appliable predicate to a key\value one

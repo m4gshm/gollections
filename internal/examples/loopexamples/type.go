@@ -1,4 +1,4 @@
-package loop
+package loopexamples
 
 type (
 	Loop[T any]           func() (element T, ok bool)

@@ -104,7 +104,7 @@ func Track[I, T any](next func() (I, T, bool), tracker func(I, T) error) error {
 
 // TrackEach applies the 'tracker' function to position/element pairs retrieved by the 'next' function
 func TrackEach[I, T any](next func() (I, T, bool), tracker func(I, T)) {
-	 kvloop.TrackEach(next, tracker)
+	kvloop.TrackEach(next, tracker)
 }
 
 // Slice collects the elements retrieved by the 'next' function into a new slice
@@ -395,7 +395,7 @@ func NoNilPtrVal[T any](next func() (*T, bool)) Loop[T] {
 }
 
 // KeyValue transforms a loop to the key/value loop based on applying key, value extractors to the elements
-func KeyValue[T any, K, V any](next func() (T, bool), keyExtractor func(T) K, valExtractor func(T) V) kvloop.Loop[K,V] {
+func KeyValue[T any, K, V any](next func() (T, bool), keyExtractor func(T) K, valExtractor func(T) V) kvloop.Loop[K, V] {
 	if next == nil {
 		return nil
 	}
@@ -727,6 +727,7 @@ func ConvAndReduce[From, To any](next func() (From, bool), converter func(From) 
 	return out, nil
 }
 
+// Crank rertieves a next element from the 'next' function, returns the function, element, successfully flag.
 func Crank[T any](next func() (T, bool)) (func() (T, bool), T, bool) {
 	n, ok := next()
 	return next, n, ok

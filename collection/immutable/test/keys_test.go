@@ -15,9 +15,9 @@ func Test_MapKeys_Zero_Safety(t *testing.T) {
 	collection.Loop()
 	collection.Head()
 	collection.Convert(func(i int) int { return i })
-	collection.Filter(func(i int) bool { return true })
+	collection.Filter(func(_ int) bool { return true })
 	collection.Slice()
-	collection.Reduce(func(i1, i2 int) int { return 0 })
+	collection.Reduce(func(_, _ int) int { return 0 })
 	s := collection.String()
 	assert.Equal(t, "[]", s)
 
@@ -28,10 +28,10 @@ func Test_Map_Zero(t *testing.T) {
 
 	collection.Loop()
 	ptr.Of(collection.Head()).Next()
-	collection.Convert(func(i int, s string) (int, string) { return 0, "" })
-	collection.Filter(func(i int, s string) bool { return true })
+	collection.Convert(func(_ int, _ string) (int, string) { return 0, "" })
+	collection.Filter(func(_ int, _ string) bool { return true })
 	collection.Map()
-	collection.Reduce(func(i1, i2 int, s1, s2 string) (int, string) { return 0, "" })
+	collection.Reduce(func(_, _ int, _, _ string) (int, string) { return 0, "" })
 	s := collection.String()
 	assert.Equal(t, "[]", s)
 

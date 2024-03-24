@@ -108,7 +108,7 @@ func (m MapKeys[K, V]) Reduce(merge func(K, K) K) K {
 
 // HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful
 func (m MapKeys[K, V]) HasAny(predicate func(K) bool) bool {
-	return map_.HasAny(m.elements, func(k K, v V) bool {
+	return map_.HasAny(m.elements, func(k K, _ V) bool {
 		return predicate(k)
 	})
 }

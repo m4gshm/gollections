@@ -18,7 +18,7 @@ import (
 func Test_HasAny(t *testing.T) {
 	kvl := loop.KeyValue(loop.Of(k.V(1, "one"), k.V(2, "two"), k.V(3, "three")), c.KV[int, string].Key, c.KV[int, string].Value)
 
-	result := kvloop.HasAny(kvl, func(key int, val string) bool { return key == 2 })
+	result := kvloop.HasAny(kvl, func(key int, _ string) bool { return key == 2 })
 
 	assert.True(t, result)
 }
@@ -70,7 +70,7 @@ func Test_Conv(t *testing.T) {
 func Test_Filter(t *testing.T) {
 	kvl := loop.KeyValue(loop.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3")), c.KV[int, string].Key, c.KV[int, string].Value)
 
-	out := kvloop.ToSlice(kvloop.Filter(kvl, func(key int, val string) bool { return key != 2 }), k.V[int, string])
+	out := kvloop.ToSlice(kvloop.Filter(kvl, func(key int, _ string) bool { return key != 2 }), k.V[int, string])
 
 	assert.Equal(t, slice.Of(k.V(1, "1"), k.V(3, "3")), out)
 }
@@ -78,7 +78,7 @@ func Test_Filter(t *testing.T) {
 func Test_Filt(t *testing.T) {
 	kvl := loop.KeyValue(loop.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3")), c.KV[int, string].Key, c.KV[int, string].Value)
 
-	out, _ := breakkvloop.ToSlice(kvloop.Filt(kvl, func(key int, val string) (bool, error) { return key != 2, nil }), k.V[int, string])
+	out, _ := breakkvloop.ToSlice(kvloop.Filt(kvl, func(key int, _ string) (bool, error) { return key != 2, nil }), k.V[int, string])
 
 	assert.Equal(t, slice.Of(k.V(1, "1"), k.V(3, "3")), out)
 }
@@ -86,7 +86,7 @@ func Test_Filt(t *testing.T) {
 func Test_Filt2(t *testing.T) {
 	kvl := loop.KeyValue(loop.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3")), c.KV[int, string].Key, c.KV[int, string].Value)
 
-	out, err := breakkvloop.ToSlice(kvloop.Filt(kvl, func(key int, val string) (bool, error) {
+	out, err := breakkvloop.ToSlice(kvloop.Filt(kvl, func(key int, _ string) (bool, error) {
 		ok := key <= 2
 		return ok, op.IfElse(key == 2, errors.New("abort"), nil)
 	}), k.V[int, string])

@@ -37,7 +37,6 @@ func TrackEach[I, T any](next func() (I, T, bool), tracker func(I, T)) {
 	}
 }
 
-
 // Group collects sets of values grouped by keys obtained by passing a key/value iterator
 func Group[K comparable, V any](next func() (K, V, bool)) map[K][]V {
 	return ToMapResolv(next, resolv.Slice[K, V])

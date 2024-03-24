@@ -155,10 +155,10 @@ func Test_Vector_Zero(t *testing.T) {
 	l := vec.Len()
 	assert.Equal(t, 4, l)
 
-	vec.For(func(s string) error { return nil })
-	vec.ForEach(func(s string) {})
-	vec.Track(func(i int, s string) error { return nil })
-	vec.TrackEach(func(i int, s string) {})
+	vec.For(func(_ string) error { return nil })
+	vec.ForEach(func(_ string) {})
+	vec.Track(func(_ int, _ string) error { return nil })
+	vec.TrackEach(func(_ int, _ string) {})
 
 	assert.Equal(t, slice.Of("a", "b", "c", "d"), vec.Slice())
 
@@ -207,10 +207,10 @@ func Test_Vector_new(t *testing.T) {
 	l := vec.Len()
 	assert.Equal(t, 4, l)
 
-	vec.For(func(s string) error { return nil })
-	vec.ForEach(func(s string) {})
-	vec.Track(func(i int, s string) error { return nil })
-	vec.TrackEach(func(i int, s string) {})
+	vec.For(func(_ string) error { return nil })
+	vec.ForEach(func(_ string) {})
+	vec.Track(func(_ int, _ string) error { return nil })
+	vec.TrackEach(func(_ int, _ string) {})
 
 	assert.Equal(t, slice.Of("a", "b", "c", "d"), vec.Slice())
 

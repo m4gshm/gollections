@@ -55,7 +55,7 @@ func OfLoopResolv[S any, K comparable, E, V any](source S, hasNext func(S) bool,
 // The hasNext specifies a predicate that tests existing of a next pair in the source.
 // The getNext extracts the pair.
 func GroupOfLoop[S any, K comparable, V any](source S, hasNext func(S) bool, getNext func(S) (K, V, error)) (map[K][]V, error) {
-	return OfLoopResolv(source, hasNext, getNext, func(exists bool, key K, elements []V, val V) []V {
+	return OfLoopResolv(source, hasNext, getNext, func(_ bool, _ K, elements []V, val V) []V {
 		return append(elements, val)
 	})
 }

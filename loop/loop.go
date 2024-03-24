@@ -68,14 +68,17 @@ func (next Loop[T]) Filter(filter func(T) bool) Loop[T] {
 	return Filter(next, filter)
 }
 
+// Convert creates a loop that applies the 'converter' function to iterable elements.
 func (next Loop[T]) Convert(converter func(T) T) Loop[T] {
 	return Convert(next, converter)
 }
 
-func (next Loop[T]) Conv(converter func(T) (T, error))  loop.Loop[T] {
+// Conv creates a loop that applies the 'converter' function to iterable elements.
+func (next Loop[T]) Conv(converter func(T) (T, error)) loop.Loop[T] {
 	return Conv(next, converter)
 }
 
+// Crank rertieves a next element from the 'next' function, returns the function, element, successfully flag.
 func (next Loop[T]) Crank() (Loop[T], T, bool) {
 	return Crank(next)
 }

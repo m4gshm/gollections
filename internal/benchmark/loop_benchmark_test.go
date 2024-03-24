@@ -8,7 +8,6 @@ import (
 	"github.com/m4gshm/gollections/collection/immutable/vector"
 	moset "github.com/m4gshm/gollections/collection/mutable/ordered/set"
 	mvector "github.com/m4gshm/gollections/collection/mutable/vector"
-	"github.com/m4gshm/gollections/convert/ptr"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/slice"
@@ -162,12 +161,12 @@ func Benchmark_Loop_MutableVector_FirstNext(b *testing.B) {
 	}
 }
 
-func Benchmark_Loop_MutableVector_HeadNext(b *testing.B) {
+func Benchmark_Loop_MutableVector_LoopNext(b *testing.B) {
 	c := mvector.Of(values...)
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				next := ptr.Of(c.Head()).Next
+				next := c.Loop()
 				for v, ok := next(); ok; v, ok = next() {
 					casee.load(v)
 				}
@@ -270,7 +269,7 @@ func Benchmark_Loop_Map_Embedded_ForByKeyValueRange(b *testing.B) {
 	}
 }
 
-func Benchmark_Loop_NewKV_NextNextNext(b *testing.B) {
+func Benchmark_Loop_Map_NewIter_NextNext(b *testing.B) {
 	values := map[int]int{}
 	for i := 0; i < max; i++ {
 		values[i] = i

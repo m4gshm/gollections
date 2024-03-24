@@ -41,10 +41,12 @@ func (next Loop[K, V]) Filter(filter func(K, V) bool) Loop[K, V] {
 	return Filter(next, filter)
 }
 
+// Convert creates a loop that applies the 'converter' function to iterable key\values.
 func (next Loop[K, V]) Convert(converter func(K, V) (K, V)) Loop[K, V] {
 	return Convert(next, converter)
 }
 
+// Conv creates a loop that applies the 'converter' function to iterable key\values.
 func (next Loop[K, V]) Conv(converter func(K, V) (K, V, error)) breakkvloop.Loop[K, V] {
 	return Conv(next, converter)
 }

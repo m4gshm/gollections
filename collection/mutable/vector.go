@@ -34,8 +34,10 @@ var (
 
 // Loop creates a loop to iterating through elements.
 func (v *Vector[T]) Loop() loop.Loop[T] {
-	h := v.Head()
-	return (&h).Next
+	if v == nil {
+		return nil
+	}
+	return loop.Of((*v)...)
 }
 
 // IterEdit creates iterator that can delete iterable elements
