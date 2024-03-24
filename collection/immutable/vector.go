@@ -4,12 +4,10 @@ import (
 	"fmt"
 
 	breakLoop "github.com/m4gshm/gollections/break/loop"
-	breakStream "github.com/m4gshm/gollections/break/stream"
 	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/notsafe"
 	"github.com/m4gshm/gollections/slice"
-	"github.com/m4gshm/gollections/stream"
 )
 
 // WrapVector instantiates Vector using a slise as internal storage.
@@ -116,26 +114,24 @@ func (v Vector[T]) ForEach(walker func(T)) {
 	slice.ForEach(v.elements, walker)
 }
 
-// Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function
-func (v Vector[T]) Filter(filter func(T) bool) stream.Iter[T] {
-	h := v.Head()
-	return stream.New(loop.Filter(h.Next, filter))
+// Filter returns a loop consisting of elements that satisfy the condition of the 'predicate' function
+func (v Vector[T]) Filter(filter func(T) bool) loop.Loop[T] {
+	return loop.Filter(v.Loop(), filter)
 }
 
-// Filt returns a breakable stream consisting of elements that satisfy the condition of the 'predicate' function
-func (v Vector[T]) Filt(predicate func(T) (bool, error)) breakStream.Iter[T] {
-	h := v.Head()
-	return breakStream.New(breakLoop.Filt(breakLoop.From(h.Next), predicate))
+// Filt returns a breakable loop consisting of elements that satisfy the condition of the 'predicate' function
+func (v Vector[T]) Filt(predicate func(T) (bool, error)) breakLoop.Loop[T] {
+	return loop.Filt(v.Loop(), predicate)
 }
 
-// Convert returns a stream that applies the 'converter' function to the collection elements
-func (v Vector[T]) Convert(converter func(T) T) stream.Iter[T] {
-	return collection.Convert(v, converter)
+// Convert returns a loop that applies the 'converter' function to the collection elements
+func (v Vector[T]) Convert(converter func(T) T) loop.Loop[T] {
+	return loop.Convert(v.Loop(), converter)
 }
 
-// Conv returns a breakable stream that applies the 'converter' function to the collection elements
-func (v Vector[T]) Conv(converter func(T) (T, error)) breakStream.Iter[T] {
-	return collection.Conv(v, converter)
+// Conv returns a breakable loop that applies the 'converter' function to the collection elements
+func (v Vector[T]) Conv(converter func(T) (T, error)) breakLoop.Loop[T] {
+	return loop.Conv(v.Loop(), converter)
 }
 
 // Reduce reduces the elements into an one using the 'merge' function

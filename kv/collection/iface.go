@@ -1,6 +1,7 @@
 package collection
 
 import (
+	breakloop "github.com/m4gshm/gollections/break/kv/loop"
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/kv/loop"
 )
@@ -32,25 +33,25 @@ type Collection[K comparable, V any, M map[K]V | map[K][]V] interface {
 }
 
 // Convertable provides limited kit of map transformation methods
-type Convertable[K, V, KVStream, KVStreamBreakable any] interface {
-	Convert(converter func(K, V) (K, V)) KVStream
-	Conv(converter func(K, V) (K, V, error)) KVStreamBreakable
+type Convertable[K, V any] interface {
+	Convert(converter func(K, V) (K, V)) loop.Loop[K, V]
+	Conv(converter func(K, V) (K, V, error)) breakloop.Loop[K, V]
 
-	ConvertKey(converter func(K) K) KVStream
-	ConvertValue(converter func(V) V) KVStream
+	ConvertKey(converter func(K) K) loop.Loop[K, V]
+	ConvertValue(converter func(V) V) loop.Loop[K, V]
 
-	ConvKey(converter func(K) (K, error)) KVStreamBreakable
-	ConvValue(converter func(V) (V, error)) KVStreamBreakable
+	ConvKey(converter func(K) (K, error)) breakloop.Loop[K, V]
+	ConvValue(converter func(V) (V, error)) breakloop.Loop[K, V]
 }
 
 // Filterable provides limited kit of filering methods
-type Filterable[K, V, KVStream, KVStreamBreakable any] interface {
-	Filter(predicate func(K, V) bool) KVStream
-	Filt(predicate func(K, V) (bool, error)) KVStreamBreakable
+type Filterable[K, V any] interface {
+	Filter(predicate func(K, V) bool) loop.Loop[K, V]
+	Filt(predicate func(K, V) (bool, error)) breakloop.Loop[K, V]
 
-	FilterKey(predicate func(K) bool) KVStream
-	FilterValue(predicate func(V) bool) KVStream
+	FilterKey(predicate func(K) bool) loop.Loop[K, V]
+	FilterValue(predicate func(V) bool) loop.Loop[K, V]
 
-	FiltKey(predicate func(K) (bool, error)) KVStreamBreakable
-	FiltValue(predicate func(V) (bool, error)) KVStreamBreakable
+	FiltKey(predicate func(K) (bool, error)) breakloop.Loop[K, V]
+	FiltValue(predicate func(V) (bool, error)) breakloop.Loop[K, V]
 }

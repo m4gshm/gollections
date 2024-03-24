@@ -6,7 +6,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/collection/immutable"
 	oset "github.com/m4gshm/gollections/collection/immutable/ordered/set"
 	"github.com/m4gshm/gollections/collection/immutable/set"
@@ -119,7 +118,7 @@ func Test_Set_SortStructByField(t *testing.T) {
 func Test_Set_Convert(t *testing.T) {
 	var (
 		ints     = set.Of(3, 3, 1, 1, 1, 5, 6, 8, 8, 0, -2, -2)
-		strings  = sort.Asc(loop.Slice(loop.Filter(set.Convert(ints, strconv.Itoa).Next, func(s string) bool { return len(s) == 1 })))
+		strings  = sort.Asc(loop.Slice(loop.Filter(set.Convert(ints, strconv.Itoa), func(s string) bool { return len(s) == 1 })))
 		strings2 = sort.Asc(set.Convert(ints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 }).Slice())
 	)
 	assert.Equal(t, slice.Of("0", "1", "3", "5", "6", "8"), strings)
@@ -131,8 +130,8 @@ func Test_Set_Flatt(t *testing.T) {
 	var (
 		ints        = set.Of(3, 3, 1, 1, 1, 5, 6, 8, 8, 0, -2, -2)
 		fints       = set.Flat(ints, func(i int) []int { return slice.Of(i) })
-		convFilt    = collection.Convert(fints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 })
-		stringsPipe = collection.Filter(convFilt, func(s string) bool { return len(s) == 1 })
+		convFilt    = loop.Convert(fints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 })
+		stringsPipe = loop.Filter(convFilt, func(s string) bool { return len(s) == 1 })
 	)
 	assert.Equal(t, slice.Of("0", "1", "3", "5", "6", "8"), sort.Asc(stringsPipe.Slice()))
 }
@@ -141,7 +140,7 @@ func Test_Set_DoubleConvert(t *testing.T) {
 	var (
 		ints               = set.Of(3, 1, 5, 6, 8, 0, -2)
 		stringsPipe        = set.Convert(ints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 })
-		prefixedStrinsPipe = collection.Convert(stringsPipe, func(s string) string { return "_" + s })
+		prefixedStrinsPipe = loop.Convert(stringsPipe, func(s string) string { return "_" + s })
 	)
 	assert.Equal(t, slice.Of("_0", "_1", "_3", "_5", "_6", "_8"), sort.Asc(prefixedStrinsPipe.Slice()))
 

@@ -4,12 +4,10 @@ import (
 	"fmt"
 
 	breakLoop "github.com/m4gshm/gollections/break/loop"
-	breakStream "github.com/m4gshm/gollections/break/stream"
 	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/slice"
-	"github.com/m4gshm/gollections/stream"
 )
 
 // WrapKeys instantiates MapKeys using the elements as internal storage
@@ -80,26 +78,24 @@ func (m MapKeys[K, V]) ForEach(walker func(K)) {
 	map_.ForEachKey(m.elements, walker)
 }
 
-// Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function
-func (m MapKeys[K, V]) Filter(filter func(K) bool) stream.Iter[K] {
-	h := m.Head()
-	return stream.New(loop.Filter(h.Next, filter))
+// Filter returns a loop consisting of elements that satisfy the condition of the 'predicate' function
+func (m MapKeys[K, V]) Filter(filter func(K) bool) loop.Loop[K] {
+	return loop.Filter(m.Loop(), filter)
 }
 
-// Filt returns a breakable stream consisting of elements that satisfy the condition of the 'predicate' function
-func (m MapKeys[K, V]) Filt(predicate func(K) (bool, error)) breakStream.Iter[K] {
-	h := m.Head()
-	return breakStream.New(breakLoop.Filt(breakLoop.From(h.Next), predicate))
+// Filt returns a breakable loop consisting of elements that satisfy the condition of the 'predicate' function
+func (m MapKeys[K, V]) Filt(predicate func(K) (bool, error)) breakLoop.Loop[K] {
+	return loop.Filt(m.Loop(), predicate)
 }
 
-// Convert returns a stream that applies the 'converter' function to the collection elements
-func (m MapKeys[K, V]) Convert(converter func(K) K) stream.Iter[K] {
-	return collection.Convert(m, converter)
+// Convert returns a loop that applies the 'converter' function to the collection elements
+func (m MapKeys[K, V]) Convert(converter func(K) K) loop.Loop[K] {
+	return loop.Convert(m.Loop(), converter)
 }
 
-// Conv returns a breakable stream that applies the 'converter' function to the collection elements
-func (m MapKeys[K, V]) Conv(converter func(K) (K, error)) breakStream.Iter[K] {
-	return collection.Conv(m, converter)
+// Conv returns a breakable loop that applies the 'converter' function to the collection elements
+func (m MapKeys[K, V]) Conv(converter func(K) (K, error)) breakLoop.Loop[K] {
+	return loop.Conv(m.Loop(), converter)
 }
 
 // Reduce reduces the elements into an one using the 'merge' function

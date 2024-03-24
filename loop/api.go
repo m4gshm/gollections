@@ -11,6 +11,7 @@ import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/convert"
 	"github.com/m4gshm/gollections/convert/as"
+	kvloop "github.com/m4gshm/gollections/kv/loop"
 	"github.com/m4gshm/gollections/map_/resolv"
 	"github.com/m4gshm/gollections/notsafe"
 	"github.com/m4gshm/gollections/op"
@@ -96,23 +97,14 @@ func Firstt[T any](next func() (T, bool), predicate func(T) (bool, error)) (T, b
 	}
 }
 
-// Track applies the 'tracker' function to position/element pairs retrieved by the 'next' function. Return the c.ErrBreak to stop tracking..
+// Track applies the 'tracker' function to position/element pairs retrieved by the 'next' function. Return the c.ErrBreak to stop tracking.
 func Track[I, T any](next func() (I, T, bool), tracker func(I, T) error) error {
-	for p, v, ok := next(); ok; p, v, ok = next() {
-		if err := tracker(p, v); err == ErrBreak {
-			return nil
-		} else if err != nil {
-			return err
-		}
-	}
-	return nil
+	return kvloop.Track(next, tracker)
 }
 
 // TrackEach applies the 'tracker' function to position/element pairs retrieved by the 'next' function
 func TrackEach[I, T any](next func() (I, T, bool), tracker func(I, T)) {
-	for p, v, ok := next(); ok; p, v, ok = next() {
-		tracker(p, v)
-	}
+	 kvloop.TrackEach(next, tracker)
 }
 
 // Slice collects the elements retrieved by the 'next' function into a new slice
@@ -403,7 +395,7 @@ func NoNilPtrVal[T any](next func() (*T, bool)) Loop[T] {
 }
 
 // KeyValue transforms a loop to the key/value loop based on applying key, value extractors to the elements
-func KeyValue[T any, K, V any](next func() (T, bool), keyExtractor func(T) K, valExtractor func(T) V) func() (K, V, bool) {
+func KeyValue[T any, K, V any](next func() (T, bool), keyExtractor func(T) K, valExtractor func(T) V) kvloop.Loop[K,V] {
 	if next == nil {
 		return nil
 	}
@@ -415,7 +407,6 @@ func KeyValue[T any, K, V any](next func() (T, bool), keyExtractor func(T) K, va
 		}
 		return key, value, ok
 	}
-	// return NewKeyValuer(next, keyExtractor, valExtractor)
 }
 
 // KeyValuee transforms a loop to the key/value loop based on applying key, value extractors to the elements

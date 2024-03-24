@@ -3,6 +3,7 @@ package loop
 
 import (
 	"github.com/m4gshm/gollections/break/kv/loop"
+	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/map_/resolv"
 )
 
@@ -16,6 +17,26 @@ func New[S, K, V any](source S, hasNext func(S) bool, getNext func(S) (K, V)) Lo
 		return k, v, false
 	}
 }
+
+// Track applies the 'tracker' function to position/element pairs retrieved by the 'next' function. Return the c.ErrBreak to stop tracking..
+func Track[I, T any](next func() (I, T, bool), tracker func(I, T) error) error {
+	for p, v, ok := next(); ok; p, v, ok = next() {
+		if err := tracker(p, v); err == c.ErrBreak {
+			return nil
+		} else if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// TrackEach applies the 'tracker' function to position/element pairs retrieved by the 'next' function
+func TrackEach[I, T any](next func() (I, T, bool), tracker func(I, T)) {
+	for p, v, ok := next(); ok; p, v, ok = next() {
+		tracker(p, v)
+	}
+}
+
 
 // Group collects sets of values grouped by keys obtained by passing a key/value iterator
 func Group[K comparable, V any](next func() (K, V, bool)) map[K][]V {

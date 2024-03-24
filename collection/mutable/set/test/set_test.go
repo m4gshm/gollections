@@ -6,8 +6,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/m4gshm/gollections/collection"
-	cGroup "github.com/m4gshm/gollections/collection/group"
 	"github.com/m4gshm/gollections/collection/mutable"
 	"github.com/m4gshm/gollections/collection/mutable/ordered"
 	"github.com/m4gshm/gollections/collection/mutable/set"
@@ -143,21 +141,10 @@ func Test_Set_Group_By_Walker(t *testing.T) {
 	assert.Equal(t, []int{0, 2, 4, 6}, tg)
 }
 
-func Test_Set_Group_By_Iterator(t *testing.T) {
-	groups := cGroup.Of(set.Of(0, 1, 1, 2, 4, 3, 1, 6, 7), func(e int) bool { return e%2 == 0 }).Map()
-
-	assert.Equal(t, len(groups), 2)
-	fg := sort.Asc(groups[false])
-	tg := sort.Asc(groups[true])
-
-	assert.Equal(t, []int{1, 3, 7}, fg)
-	assert.Equal(t, []int{0, 2, 4, 6}, tg)
-}
-
 func Test_Set_Convert(t *testing.T) {
 	var (
 		ints     = set.Of(3, 3, 1, 1, 1, 5, 6, 8, 8, 0, -2, -2)
-		strings  = sort.Asc(loop.Slice[string](loop.Filter(set.Convert(ints, strconv.Itoa).Next, func(s string) bool { return len(s) == 1 })))
+		strings  = sort.Asc(loop.Slice[string](loop.Filter(set.Convert(ints, strconv.Itoa), func(s string) bool { return len(s) == 1 })))
 		strings2 = sort.Asc(set.Convert(ints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 }).Slice())
 	)
 	assert.Equal(t, slice.Of("0", "1", "3", "5", "6", "8"), strings)
@@ -168,7 +155,7 @@ func Test_Set_Flatt(t *testing.T) {
 	var (
 		ints        = set.Of(3, 3, 1, 1, 1, 5, 6, 8, 8, 0, -2, -2)
 		fints       = set.Flat(ints, func(i int) []int { return slice.Of(i) })
-		stringsPipe = collection.Filter(collection.Convert(fints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 }), func(s string) bool { return len(s) == 1 })
+		stringsPipe = loop.Filter(loop.Convert(fints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 }), func(s string) bool { return len(s) == 1 })
 	)
 	assert.Equal(t, slice.Of("0", "1", "3", "5", "6", "8"), sort.Asc(stringsPipe.Slice()))
 }
@@ -177,7 +164,7 @@ func Test_Set_DoubleConvert(t *testing.T) {
 	var (
 		ints               = set.Of(3, 1, 5, 6, 8, 0, -2)
 		stringsPipe        = set.Convert(ints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 })
-		prefixedStrinsPipe = collection.Convert(stringsPipe, func(s string) string { return "_" + s })
+		prefixedStrinsPipe = loop.Convert(stringsPipe, func(s string) string { return "_" + s })
 	)
 	s := prefixedStrinsPipe.Slice()
 	assert.Equal(t, slice.Of("_0", "_1", "_3", "_5", "_6", "_8"), sort.Asc(s))

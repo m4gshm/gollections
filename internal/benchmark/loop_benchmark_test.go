@@ -69,7 +69,7 @@ func Benchmark_Loop_ImmutableOrderSet_LastPrev(b *testing.B) {
 	}
 }
 
-func Benchmark_Loop_ImmutableVector_IterNextNext(b *testing.B) {
+func Benchmark_Loop_ImmutableVector_LoopCrankNext(b *testing.B) {
 	c := vector.Of(values...)
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
@@ -81,19 +81,6 @@ func Benchmark_Loop_ImmutableVector_IterNextNext(b *testing.B) {
 		})
 	}
 }
-
-// func Benchmark_Loop_ImmutableVector_IterHasNextGetNext(b *testing.B) {
-// 	c := vector.Of(values...)
-// 	for _, casee := range cases {
-// 		b.Run(casee.name, func(b *testing.B) {
-// 			for i := 0; i < b.N; i++ {
-// 				for it := c.Loop(); it.HasNext(); {
-// 					casee.load(it.GetNext())
-// 				}
-// 			}
-// 		})
-// 	}
-// }
 
 func Benchmark_Loop_ImmutableVector_HeadHasNextGetNext(b *testing.B) {
 	c := vector.Of(values...)

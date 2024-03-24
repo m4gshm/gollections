@@ -1,9 +1,17 @@
 package loop
 
-import "github.com/m4gshm/gollections/break/loop"
+import (
+	"github.com/m4gshm/gollections/break/loop"
+	"github.com/m4gshm/gollections/c"
+)
 
 // Loop is a function that returns the next element or false if there are no more elements.
 type Loop[T any] func() (T, bool)
+
+var (
+	_ c.Filterable[any, Loop[any], loop.Loop[any]]  = (Loop[any])(nil)
+	_ c.Convertable[any, Loop[any], loop.Loop[any]] = (Loop[any])(nil)
+)
 
 // For applies the 'walker' function for the elements retrieved by the 'next' function. Return the c.ErrBreak to stop
 func (next Loop[T]) For(walker func(T) error) error {
@@ -58,6 +66,14 @@ func (next Loop[T]) Filt(filter func(T) (bool, error)) loop.Loop[T] {
 // Filter creates a loop that checks elements by the 'filter' function and returns successful ones.
 func (next Loop[T]) Filter(filter func(T) bool) Loop[T] {
 	return Filter(next, filter)
+}
+
+func (next Loop[T]) Convert(converter func(T) T) Loop[T] {
+	return Convert(next, converter)
+}
+
+func (next Loop[T]) Conv(converter func(T) (T, error))  loop.Loop[T] {
+	return Conv(next, converter)
 }
 
 func (next Loop[T]) Crank() (Loop[T], T, bool) {

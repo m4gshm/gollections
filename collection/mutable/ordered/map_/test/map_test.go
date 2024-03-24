@@ -80,14 +80,9 @@ func Test_Map_Nil(t *testing.T) {
 
 	m.Reduce(nil)
 	m.Convert(nil).Track(nil)
-	m.ConvertKey(nil).Next()
 	m.ConvertKey(nil).Track(nil)
-	m.ConvertKey(nil).TrackEach(nil)
-	m.ConvertValue(nil).Next()
 	m.ConvertValue(nil).Track(nil)
-	m.ConvertValue(nil).TrackEach(nil)
 	m.Filter(nil).Convert(nil).Track(nil)
-	m.Filter(nil).Convert(nil).TrackEach(nil)
 
 	m.Keys().For(nil)
 	m.Keys().ForEach(nil)
@@ -132,14 +127,9 @@ func Test_Map_Zero(t *testing.T) {
 
 	m.Reduce(func(k1, v1, k2, v2 string) (string, string) { return k1 + k2, v1 + v2 })
 	m.Convert(func(k, v string) (string, string) { return k, v }).Track(func(position, element string) error { return nil })
-	m.ConvertKey(func(s string) string { return s }).Next()
 	m.ConvertKey(func(s string) string { return s }).Track(func(position, element string) error { return nil })
-	m.ConvertKey(func(s string) string { return s }).TrackEach(func(position, element string) {})
-	m.ConvertValue(func(s string) string { return s }).Next()
 	m.ConvertValue(func(s string) string { return s }).Track(func(position, element string) error { return nil })
-	m.ConvertValue(func(s string) string { return s }).TrackEach(func(position, element string) {})
 	m.Filter(func(s1, s2 string) bool { return true }).Convert(func(s1, s2 string) (string, string) { return s1, s2 }).Track(func(position, element string) error { return nil })
-	m.Filter(func(s1, s2 string) bool { return true }).Convert(func(s1, s2 string) (string, string) { return s1, s2 }).TrackEach(func(position, element string) {})
 
 	m.Keys().For(func(element string) error { return nil })
 	m.Keys().ForEach(func(element string) {})
@@ -190,14 +180,9 @@ func Test_Map_new(t *testing.T) {
 
 	m.Reduce(func(k1, v1, k2, v2 string) (string, string) { return k1 + k2, v1 + v2 })
 	m.Convert(func(k, v string) (string, string) { return k, v }).Track(func(position, element string) error { return nil })
-	m.ConvertKey(func(s string) string { return s }).Next()
 	m.ConvertKey(func(s string) string { return s }).Track(func(position, element string) error { return nil })
-	m.ConvertKey(func(s string) string { return s }).TrackEach(func(position, element string) {})
-	m.ConvertValue(func(s string) string { return s }).Next()
 	m.ConvertValue(func(s string) string { return s }).Track(func(position, element string) error { return nil })
-	m.ConvertValue(func(s string) string { return s }).TrackEach(func(position, element string) {})
 	m.Filter(func(s1, s2 string) bool { return true }).Convert(func(s1, s2 string) (string, string) { return s1, s2 }).Track(func(position, element string) error { return nil })
-	m.Filter(func(s1, s2 string) bool { return true }).Convert(func(s1, s2 string) (string, string) { return s1, s2 }).TrackEach(func(position, element string) {})
 
 	m.Keys().For(func(element string) error { return nil })
 	m.Keys().ForEach(func(element string) {})

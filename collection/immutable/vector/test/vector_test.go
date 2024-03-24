@@ -6,7 +6,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/collection/immutable"
 	"github.com/m4gshm/gollections/collection/immutable/vector"
 
@@ -107,7 +106,7 @@ func Test_Vector_SortStructByField(t *testing.T) {
 func Test_Vector_Convert(t *testing.T) {
 	var (
 		ints     = vector.Of(3, 1, 5, 6, 8, 0, -2)
-		strings  = loop.Slice(loop.Filter(vector.Convert(ints, strconv.Itoa).Next, func(s string) bool { return len(s) == 1 }))
+		strings  = loop.Slice(loop.Filter(vector.Convert(ints, strconv.Itoa), func(s string) bool { return len(s) == 1 }))
 		strings2 = vector.Convert(ints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 }).Slice()
 	)
 	assert.Equal(t, slice.Of("3", "1", "5", "6", "8", "0"), strings)
@@ -118,8 +117,8 @@ func Test_Vector_Flatt(t *testing.T) {
 	var (
 		deepInts    = vector.Of(vector.Of(3, 1), vector.Of(5, 6, 8, 0, -2))
 		ints        = vector.Flat(deepInts, immutable.Vector[int].Slice)
-		c           = collection.Convert(ints, strconv.Itoa)
-		stringsPipe = collection.Filter(c.Filter(func(s string) bool { return len(s) == 1 }), func(s string) bool { return len(s) == 1 })
+		c           = loop.Convert(ints, strconv.Itoa)
+		stringsPipe = loop.Filter(c.Filter(func(s string) bool { return len(s) == 1 }), func(s string) bool { return len(s) == 1 })
 	)
 	assert.Equal(t, slice.Of("3", "1", "5", "6", "8", "0"), stringsPipe.Slice())
 }
@@ -128,7 +127,7 @@ func Test_Vector_DoubleConvert(t *testing.T) {
 	var (
 		ints               = vector.Of(3, 1, 5, 6, 8, 0, -2)
 		stringsPipe        = vector.Convert(ints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 })
-		prefixedStrinsPipe = collection.Convert(stringsPipe, func(s string) string { return "_" + s })
+		prefixedStrinsPipe = loop.Convert(stringsPipe, func(s string) string { return "_" + s })
 	)
 	assert.Equal(t, slice.Of("_3", "_1", "_5", "_6", "_8", "_0"), prefixedStrinsPipe.Slice())
 

@@ -11,8 +11,8 @@ import (
 var ErrBreak = errors.New("Break")
 
 // Iterable is a loop supplier interface
-type Iterable[T any, L ~func() (T, bool)] interface {
-	Loop() L
+type Iterable[T any, Loop ~func() (T, bool)] interface {
+	Loop() Loop
 }
 
 // KeyVal provides extracing of a keys or values collection from key/value pairs
@@ -32,15 +32,15 @@ type Collection[T any] interface {
 }
 
 // Filterable provides filtering content functionality
-type Filterable[T, Stream, StreamBreakable any] interface {
-	Filter(predicate func(T) bool) Stream
-	Filt(predicate func(T) (bool, error)) StreamBreakable
+type Filterable[T any, Loop ~func() (T, bool), LoopErr ~func() (T, bool, error)] interface {
+	Filter(predicate func(T) bool) Loop
+	Filt(predicate func(T) (bool, error)) LoopErr
 }
 
 // Convertable provides converaton of collection elements functionality
-type Convertable[T, Stream, StreamBreakable any] interface {
-	Convert(converter func(T) T) Stream
-	Conv(converter func(T) (T, error)) StreamBreakable
+type Convertable[T any, Loop ~func() (T, bool), LoopErr ~func() (T, bool, error)] interface {
+	Convert(converter func(T) T) Loop
+	Conv(converter func(T) (T, error)) LoopErr
 }
 
 // SliceFactory collects the elements of the collection into a slice
