@@ -7,8 +7,8 @@ import (
 	"golang.org/x/exp/constraints"
 )
 
-// ErrBreak is the 'break' statement of the For, Track methods
-var ErrBreak = errors.New("Break")
+// Break is the 'break' statement of the For, Track methods
+var Break = errors.New("Break")
 
 // Iterable is a loop supplier interface
 type Iterable[T any, Loop ~func() (T, bool)] interface {
@@ -86,7 +86,7 @@ type DelIterator[T any] interface {
 
 // For is the interface of a collection that provides traversing of the elements.
 type For[IT any] interface {
-	//For takes elements of the collection. Can be interrupt by returning ErrBreak.
+	//For takes elements of the collection. Can be interrupt by returning Break.
 	For(func(element IT) error) error
 }
 
@@ -98,7 +98,7 @@ type ForEach[T any] interface {
 
 // Track is the interface of a collection that provides traversing of the elements with position tracking (index, key, coordinates, etc.).
 type Track[P any, T any] interface {
-	// return ErrBreak for loop breaking
+	// return Break for loop breaking
 	Track(func(position P, element T) error) error
 }
 

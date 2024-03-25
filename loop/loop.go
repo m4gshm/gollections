@@ -13,7 +13,7 @@ var (
 	_ c.Convertable[any, Loop[any], loop.Loop[any]] = (Loop[any])(nil)
 )
 
-// For applies the 'walker' function for the elements retrieved by the 'next' function. Return the c.ErrBreak to stop
+// For applies the 'walker' function for the elements retrieved by the 'next' function. Return the c.Break to stop
 func (next Loop[T]) For(walker func(T) error) error {
 	return For(next, walker)
 }

@@ -126,7 +126,7 @@ func (m Map[K, V]) String() string {
 	return map_.ToString(m.elements)
 }
 
-// Track applies the 'tracker' function for key/value pairs. Return the c.ErrBreak to stop.
+// Track applies the 'tracker' function for key/value pairs. Return the c.Break to stop.
 func (m Map[K, V]) Track(tracker func(K, V) error) error {
 	return map_.Track(m.elements, tracker)
 }
@@ -136,7 +136,7 @@ func (m Map[K, V]) TrackEach(tracker func(K, V)) {
 	map_.TrackEach(m.elements, tracker)
 }
 
-// For applies the 'walker' function for every key/value pair. Return the c.ErrBreak to stop.
+// For applies the 'walker' function for every key/value pair. Return the c.Break to stop.
 func (m Map[K, V]) For(walker func(c.KV[K, V]) error) error {
 	return map_.For(m.elements, walker)
 }

@@ -43,7 +43,7 @@ func (m Map[K, V]) Loop() kvloop.Loop[K, V] {
 
 // Head creates an iterator and returns as implementation type value
 func (m Map[K, V]) Head() MapIter[K, V] {
-	return NewMapIter(m.elements, slice.NewHead(m.order))
+	return NewMapIter(m.elements, *slice.NewHead(m.order))
 }
 
 // First returns the first key/value pair of the map, an iterator to iterate over the remaining pair, and true\false marker of availability next pairs.
@@ -58,7 +58,7 @@ func (m Map[K, V]) First() (MapIter[K, V], K, V, bool) {
 
 // Tail creates an iterator pointing to the end of the map
 func (m Map[K, V]) Tail() MapIter[K, V] {
-	return NewMapIter(m.elements, slice.NewTail(m.order))
+	return NewMapIter(m.elements, *slice.NewTail(m.order))
 }
 
 // Map collects the key/value pairs to a map
@@ -121,7 +121,7 @@ func (m Map[K, V]) String() string {
 	return map_.ToStringOrdered(m.order, m.elements)
 }
 
-// Track applies the 'tracker' function for key/value pairs. Return the c.ErrBreak to stop.
+// Track applies the 'tracker' function for key/value pairs. Return the c.Break to stop.
 func (m Map[K, V]) Track(tracker func(K, V) error) error {
 	return map_.TrackOrdered(m.order, m.elements, tracker)
 }
@@ -131,7 +131,7 @@ func (m Map[K, V]) TrackEach(tracker func(K, V)) {
 	map_.TrackEachOrdered(m.order, m.elements, tracker)
 }
 
-// For applies the 'walker' function for key/value pairs. Return the c.ErrBreak to stop.
+// For applies the 'walker' function for key/value pairs. Return the c.Break to stop.
 func (m Map[K, V]) For(walker func(c.KV[K, V]) error) error {
 	return map_.ForOrdered(m.order, m.elements, walker)
 }

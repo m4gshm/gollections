@@ -68,7 +68,7 @@ func (m MapValues[K, V]) Append(out []V) []V {
 	return map_.AppendValues(m.elements, out)
 }
 
-// For applies the 'walker' function for collection values. Return the c.ErrBreak to stop.
+// For applies the 'walker' function for collection values. Return the c.Break to stop.
 func (m MapValues[K, V]) For(walker func(V) error) error {
 	return map_.ForValues(m.elements, walker)
 }

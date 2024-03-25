@@ -7,16 +7,19 @@ import (
 )
 
 // NewHead instantiates Iter starting at the first element of a slice.
-func NewHead[TS ~[]T, T any](elements *TS, del func(int) bool) SliceIter[T] {
-	return SliceIter[T]{elements: slice.UpcastRef(elements), current: slice.IterNoStarted, del: del}
+func NewHead[TS ~[]T, T any](elements *TS, del func(int) bool) *SliceIter[T] {
+	if elements == nil {
+		return nil
+	}
+	return &SliceIter[T]{elements: slice.UpcastRef(elements), current: slice.IterNoStarted, del: del}
 }
 
 // NewTail instantiates Iter starting at the last element of a slice.
-func NewTail[TS ~[]T, T any](elements *TS, del func(int) bool) SliceIter[T] {
+func NewTail[TS ~[]T, T any](elements *TS, del func(int) bool) *SliceIter[T] {
 	if elements == nil {
-		return SliceIter[T]{}
+		return nil
 	}
-	return SliceIter[T]{elements: slice.UpcastRef(elements), current: len(*elements), del: del}
+	return &SliceIter[T]{elements: slice.UpcastRef(elements), current: len(*elements), del: del}
 }
 
 // SliceIter is the Iterator implementation for mutable containers.
@@ -32,7 +35,7 @@ var (
 	_ c.DelIterator[any]  = (*SliceIter[any])(nil)
 )
 
-// For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
+// For takes elements retrieved by the iterator. Can be interrupt by returning Break
 func (i *SliceIter[T]) For(walker func(element T) error) error {
 	return loop.For(i.Next, walker)
 }

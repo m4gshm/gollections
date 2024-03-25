@@ -10,7 +10,7 @@ import (
 	"github.com/m4gshm/gollections/op"
 )
 
-func Test_Slice_ToMapResolv(t *testing.T) {
+func Test_ToMapResolv(t *testing.T) {
 
 	var ageGroupedSortedNames map[string][]string
 

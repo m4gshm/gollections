@@ -221,7 +221,7 @@ func (s *Set[T]) DeleteActualOne(element T) bool {
 	return false
 }
 
-// For applies the 'walker' function for the elements. Return the c.ErrBreak to stop.
+// For applies the 'walker' function for the elements. Return the c.Break to stop.
 func (s *Set[T]) For(walker func(T) error) error {
 	if s == nil {
 		return nil

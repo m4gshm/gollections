@@ -438,7 +438,7 @@ func Test_For(t *testing.T) {
 	var out []int
 	err := loop.For(loop.Of(1, 2, 3, 4), func(i int) error {
 		if i == 3 {
-			return c.ErrBreak
+			return c.Break
 		}
 		out = append(out, i)
 		return nil

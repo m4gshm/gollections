@@ -11,25 +11,15 @@ import (
 // IterNoStarted is the head Iterator position
 const IterNoStarted = -1
 
-// NewIter creates a loop based on the 'elements' slice
-func NewIter[TS ~[]T, T any](elements TS) *Iter[T] {
-	h := NewHead(elements)
-	return &h
-}
-
 // NewHead instantiates Iter based on elements slice
-func NewHead[TS ~[]T, T any](elements TS) Iter[T] {
-	return NewHeadS(elements, notsafe.GetTypeSize[T]())
-}
-
-// NewHeadS instantiates Iter based on elements slice with predefined element size
-func NewHeadS[TS ~[]T, T any](elements TS, elementSize uintptr) Iter[T] {
+func NewHead[TS ~[]T, T any](elements TS) *Iter[T] {
 	var (
-		header = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
-		array  = unsafe.Pointer(header.Data)
-		size   = header.Len
+		elementSize = notsafe.GetTypeSize[T]()
+		header      = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
+		array       = unsafe.Pointer(header.Data)
+		size        = header.Len
 	)
-	return Iter[T]{
+	return &Iter[T]{
 		array:       array,
 		elementSize: elementSize,
 		size:        size,
@@ -39,18 +29,14 @@ func NewHeadS[TS ~[]T, T any](elements TS, elementSize uintptr) Iter[T] {
 }
 
 // NewTail instantiates Iter based on elements slice for reverse iterating
-func NewTail[T any](elements []T) Iter[T] {
-	return NewTailS(elements, notsafe.GetTypeSize[T]())
-}
-
-// NewTailS instantiates Iter based on elements slice with predefined element size for reverse iterating
-func NewTailS[T any](elements []T, elementSize uintptr) Iter[T] {
+func NewTail[T any](elements []T) *Iter[T] {
 	var (
-		header = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
-		array  = unsafe.Pointer(header.Data)
-		size   = header.Len
+		elementSize = notsafe.GetTypeSize[T]()
+		header      = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
+		array       = unsafe.Pointer(header.Data)
+		size        = header.Len
 	)
-	return Iter[T]{
+	return &Iter[T]{
 		array:       array,
 		elementSize: elementSize,
 		size:        size,
@@ -71,7 +57,7 @@ var (
 	_ c.PrevIterator[any] = (*Iter[any])(nil)
 )
 
-// For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
+// For takes elements retrieved by the iterator. Can be interrupt by returning Break
 func (i *Iter[T]) For(walker func(element T) error) error {
 	return loop.For(i.Next, walker)
 }
@@ -157,6 +143,22 @@ func (i *Iter[T]) Size() int {
 		return 0
 	}
 	return i.size
+}
+
+// Crank rertieves a next element, returns the iterator, element and successfully flag.
+func (i *Iter[T]) Crank() (it *Iter[T], t T, ok bool) {
+	if i != nil {
+		t, ok = i.Next()
+	}
+	return i, t, ok
+}
+
+// Crank rertieves a prev element, returns the iterator, element and successfully flag.
+func (i *Iter[T]) CrankPrev() (it *Iter[T], t T, ok bool) {
+	if i != nil {
+		t, ok = i.Prev()
+	}
+	return i, t, ok
 }
 
 // HasNext checks if an iterator can go forward

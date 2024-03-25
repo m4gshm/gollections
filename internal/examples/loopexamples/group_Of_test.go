@@ -12,7 +12,7 @@ import (
 	"github.com/m4gshm/gollections/slice/sort"
 )
 
-func Test_Slice_Group(t *testing.T) {
+func Test_Group(t *testing.T) {
 
 	var ageGroups = group.Of(users, func(u User) string {
 		return use.If(u.age <= 20, "<=20").If(u.age <= 30, "<=30").Else(">30")

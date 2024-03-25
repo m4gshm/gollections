@@ -18,10 +18,13 @@ func New[S, K, V any](source S, hasNext func(S) bool, getNext func(S) (K, V)) Lo
 	}
 }
 
-// Track applies the 'tracker' function to position/element pairs retrieved by the 'next' function. Return the c.ErrBreak to stop tracking..
+// Track applies the 'tracker' function to position/element pairs retrieved by the 'next' function. Return the c.Break to stop tracking..
 func Track[I, T any](next func() (I, T, bool), tracker func(I, T) error) error {
+	if next == nil {
+		return nil
+	}
 	for p, v, ok := next(); ok; p, v, ok = next() {
-		if err := tracker(p, v); err == c.ErrBreak {
+		if err := tracker(p, v); err == c.Break {
 			return nil
 		} else if err != nil {
 			return err
@@ -32,6 +35,9 @@ func Track[I, T any](next func() (I, T, bool), tracker func(I, T) error) error {
 
 // TrackEach applies the 'tracker' function to position/element pairs retrieved by the 'next' function
 func TrackEach[I, T any](next func() (I, T, bool), tracker func(I, T)) {
+	if next == nil {
+		return
+	}
 	for p, v, ok := next(); ok; p, v, ok = next() {
 		tracker(p, v)
 	}

@@ -55,6 +55,47 @@ func Benchmark_Loop_ImmutableOrderSet_FirstNext(b *testing.B) {
 	}
 }
 
+func Benchmark_Loop_ImmutableOrderSet_HeadNextNext(b *testing.B) {
+	c := oset.Of(values...)
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				h := c.Head()
+				for v, ok := h.Next(); ok; v, ok = h.Next() {
+					casee.load(v)
+				}
+			}
+		})
+	}
+}
+
+func Benchmark_Loop_ImmutableOrderSet_LoopNextNext(b *testing.B) {
+	c := oset.Of(values...)
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				next := c.Loop()
+				for v, ok := next(); ok; v, ok = next() {
+					casee.load(v)
+				}
+			}
+		})
+	}
+}
+
+func Benchmark_Loop_ImmutableOrderSet_LoopCrankNext(b *testing.B) {
+	c := oset.Of(values...)
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for next, v, ok := c.Loop().Crank(); ok; v, ok = next() {
+					casee.load(v)
+				}
+			}
+		})
+	}
+}
+
 func Benchmark_Loop_ImmutableOrderSet_LastPrev(b *testing.B) {
 	c := oset.Of(values...)
 	for _, casee := range cases {
@@ -74,6 +115,24 @@ func Benchmark_Loop_ImmutableVector_LoopCrankNext(b *testing.B) {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				for next, v, ok := c.Loop().Crank(); ok; v, ok = next() {
+					casee.load(v)
+				}
+			}
+		})
+	}
+}
+
+func Benchmark_Loop_ImmutableVector_LoopNext(b *testing.B) {
+	c := vector.Of(values...)
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				next := c.Loop()
+				for {
+					v, ok := next()
+					if !ok {
+						break
+					}
 					casee.load(v)
 				}
 			}
@@ -383,11 +442,33 @@ func Benchmark_Loop_MutableOrdererSet_ForEach(b *testing.B) {
 	}
 }
 
-func Benchmark_Loop_Loop_Next(b *testing.B) {
+func Benchmark_Loop_Loop_RangeClosed_ForEach(b *testing.B) {
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				loop.RangeClosed(1, max).ForEach(casee.load)
+			}
+		})
+	}
+}
+
+func Benchmark_Loop_Loop_Of_ForEach(b *testing.B) {
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				loop.Of(values...).ForEach(casee.load)
+			}
+		})
+	}
+}
+
+func Benchmark_Loop_Slice_Head_Next(b *testing.B) {
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for i, v, ok := slice.NewHead(values).Crank(); ok; v, ok = i.Next() {
+					casee.load(v)
+				}
 			}
 		})
 	}

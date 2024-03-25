@@ -37,28 +37,22 @@ func (v *Vector[T]) Loop() loop.Loop[T] {
 	if v == nil {
 		return nil
 	}
-	return loop.Of((*v)...)
-}
-
-// IterEdit creates iterator that can delete iterable elements
-func (v *Vector[T]) IterEdit() *SliceIter[T] {
-	h := v.Head()
-	return &h
+	return v.Head().Next
 }
 
 // Head creates an iterator and returns as implementation type value
-func (v *Vector[T]) Head() SliceIter[T] {
+func (v *Vector[T]) Head() *SliceIter[T] {
 	return NewHead(v, v.DeleteActualOne)
 }
 
 // Tail creates an iterator pointing to the end of the collection
-func (v *Vector[T]) Tail() SliceIter[T] {
+func (v *Vector[T]) Tail() *SliceIter[T] {
 	return NewTail(v, v.DeleteActualOne)
 }
 
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
-func (v *Vector[T]) First() (SliceIter[T], T, bool) {
+func (v *Vector[T]) First() (*SliceIter[T], T, bool) {
 	var (
 		iterator  = NewHead(v, v.DeleteActualOne)
 		first, ok = iterator.Next()
@@ -68,7 +62,7 @@ func (v *Vector[T]) First() (SliceIter[T], T, bool) {
 
 // Last returns the latest element of the collection, an iterator to reverse iterate over the remaining elements, and true\false marker of availability previous elements.
 // If no more elements then ok==false.
-func (v *Vector[T]) Last() (SliceIter[T], T, bool) {
+func (v *Vector[T]) Last() (*SliceIter[T], T, bool) {
 	var (
 		iterator  = NewTail(v, v.DeleteActualOne)
 		first, ok = iterator.Prev()
@@ -110,7 +104,7 @@ func (v *Vector[T]) Len() int {
 	return notsafe.GetLen(*v)
 }
 
-// Track applies tracker to elements with error checking. Return the c.ErrBreak to stop tracking.
+// Track applies tracker to elements with error checking. Return the c.Break to stop tracking.
 func (v *Vector[T]) Track(tracker func(int, T) error) error {
 	if v == nil {
 		return nil
@@ -125,7 +119,7 @@ func (v *Vector[T]) TrackEach(tracker func(int, T)) {
 	}
 }
 
-// For applies the 'walker' function for the elements. Return the c.ErrBreak to stop.
+// For applies the 'walker' function for the elements. Return the c.Break to stop.
 func (v *Vector[T]) For(walker func(T) error) error {
 	if v == nil {
 		return nil

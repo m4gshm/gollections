@@ -30,22 +30,22 @@ var (
 // Loop creates a loop to iterating through elements.
 func (s Set[T]) Loop() loop.Loop[T] {
 	h := s.Head()
-	return (&h).Next
+	return h.Next
 }
 
 // Head creates an iterator and returns as implementation type value
-func (s Set[T]) Head() slice.Iter[T] {
+func (s Set[T]) Head() *slice.Iter[T] {
 	return slice.NewHead(s.order)
 }
 
 // Tail creates an iterator pointing to the end of the collection
-func (s Set[T]) Tail() slice.Iter[T] {
+func (s Set[T]) Tail() *slice.Iter[T] {
 	return slice.NewTail(s.order)
 }
 
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
-func (s Set[T]) First() (slice.Iter[T], T, bool) {
+func (s Set[T]) First() (*slice.Iter[T], T, bool) {
 	var (
 		iterator  = slice.NewHead(s.order)
 		first, ok = iterator.Next()
@@ -55,7 +55,7 @@ func (s Set[T]) First() (slice.Iter[T], T, bool) {
 
 // Last returns the latest element of the collection, an iterator to reverse iterate over the remaining elements, and true\false marker of availability previous elements.
 // If no more elements then ok==false.
-func (s Set[T]) Last() (slice.Iter[T], T, bool) {
+func (s Set[T]) Last() (*slice.Iter[T], T, bool) {
 	var (
 		iterator  = slice.NewTail(s.order)
 		first, ok = iterator.Prev()
@@ -83,7 +83,7 @@ func (s Set[T]) IsEmpty() bool {
 	return s.Len() == 0
 }
 
-// For applies the 'walker' function for every element. Return the c.ErrBreak to stop.
+// For applies the 'walker' function for every element. Return the c.Break to stop.
 func (s Set[T]) For(walker func(T) error) error {
 	return slice.For(s.order, walker)
 }

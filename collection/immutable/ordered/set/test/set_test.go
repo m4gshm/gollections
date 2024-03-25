@@ -7,7 +7,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/m4gshm/gollections/collection/immutable/ordered/set"
-	"github.com/m4gshm/gollections/convert/ptr"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
@@ -28,7 +27,7 @@ func Test_Set_Iterate(t *testing.T) {
 	expected := slice.Of(1, 2, 4, 3)
 	assert.Equal(t, expected, values)
 
-	loopService := loop.Slice(ptr.Of(set.Head()).Next)
+	loopService := loop.Slice(set.Head().Next)
 	assert.Equal(t, expected, loopService)
 
 	out := make([]int, 0)

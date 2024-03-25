@@ -559,6 +559,44 @@ var i []int = loop.Flat(loop.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...), as.Is).Slic
 
 These functions combine converters, filters and reducers.
 
+### Iterating over loops
+
+- Using `for` statement like:
+
+``` go
+next := range_.Of(0, 100)
+for i, ok := next(); ok; i, ok = next() {
+    doOp(i)
+}
+```
+
+- or
+
+``` go
+for next, i, ok := range_.Of(0, 100).Crank(); ok; i, ok = next() {
+    doOp(i)
+}
+```
+
+- `ForEach` method
+
+``` go
+range_.Of(0, 100).ForEach(func(i int) { doOp(i) })
+```
+
+- or `For` method that can be aborted by returning `Break` for expected
+  completion, or another error otherwise.
+
+``` go
+range_.Of(0, 100).For(func(i int) error {
+    if i > 22 {
+        return loop.Break
+    }
+    doOp(i)
+    return nil
+})
+```
+
 ## Data structures
 
 ### [mutable](./collection/mutable/api.go) and [immutable](./collection/immutable/api.go) collections
@@ -698,3 +736,45 @@ _ *ordered.Map[int, string] = ordered.NewMapOf(
 ### Immutable containers
 
 The same underlying interfaces but for read-only use cases.
+
+### Iterating over containers
+
+- Using `for` statement like:
+
+``` go
+uniques := set.From(range_.Of(0, 100))
+next := uniques.Loop()
+for i, ok := next(); ok; i, ok = next() {
+    doOp(i)
+}
+```
+
+- or
+
+``` go
+uniques := set.From(range_.Of(0, 100))
+for iter, i, ok := uniques.First(); ok; i, ok = iter.Next() {
+    doOp(i)
+}
+```
+
+- `ForEach` method
+
+``` go
+uniques := set.From(range_.Of(0, 100))
+uniques.ForEach(func(i int) { doOp(i) })
+```
+
+- or `For` method that can be aborted by returning `Break` for expected
+  completion, or another error otherwise.
+
+``` go
+uniques := set.From(range_.Of(0, 100))
+uniques.For(func(i int) error {
+    if i > 22 {
+        return loop.Break
+    }
+    doOp(i)
+    return nil
+})
+```

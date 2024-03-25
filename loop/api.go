@@ -19,15 +19,15 @@ import (
 	"github.com/m4gshm/gollections/predicate/always"
 )
 
-// ErrBreak is the 'break' statement of the For, Track methods.
-var ErrBreak = c.ErrBreak
+// Break is the 'break' statement of the For, Track methods.
+var Break = c.Break
 
 // Of wrap the elements by loop function
 func Of[T any](elements ...T) Loop[T] {
 	l := len(elements)
 	i := 0
-	if l == 0 || i < 0 || i >= l {
-		return func() (e T, ok bool) { return e, false }
+	if l == 0 {
+		return nil
 	}
 	return func() (e T, ok bool) {
 		if i < l {
@@ -48,10 +48,13 @@ func New[S, T any](source S, hasNext func(S) bool, getNext func(S) T) Loop[T] {
 	}
 }
 
-// For applies the 'walker' function for the elements retrieved by the 'next' function. Return the c.ErrBreak to stop
+// For applies the 'walker' function for the elements retrieved by the 'next' function. Return the c.Break to stop
 func For[T any](next func() (T, bool), walker func(T) error) error {
+	if next == nil {
+		return nil
+	}
 	for v, ok := next(); ok; v, ok = next() {
-		if err := walker(v); err == ErrBreak {
+		if err := walker(v); err == Break {
 			return nil
 		} else if err != nil {
 			return err
@@ -62,6 +65,9 @@ func For[T any](next func() (T, bool), walker func(T) error) error {
 
 // ForEach applies the 'walker' function to the elements retrieved by the 'next' function
 func ForEach[T any](next func() (T, bool), walker func(T)) {
+	if next == nil {
+		return
+	}
 	for v, ok := next(); ok; v, ok = next() {
 		walker(v)
 	}
@@ -69,6 +75,9 @@ func ForEach[T any](next func() (T, bool), walker func(T)) {
 
 // ForEachFiltered applies the 'walker' function to the elements retrieved by the 'next' function that satisfy the 'predicate' function condition
 func ForEachFiltered[T any](next func() (T, bool), predicate func(T) bool, walker func(T)) {
+	if next == nil {
+		return
+	}
 	for v, ok := next(); ok; v, ok = next() {
 		if predicate(v) {
 			walker(v)
@@ -78,6 +87,9 @@ func ForEachFiltered[T any](next func() (T, bool), predicate func(T) bool, walke
 
 // First returns the first element that satisfies the condition of the 'predicate' function
 func First[T any](next func() (T, bool), predicate func(T) bool) (v T, ok bool) {
+	if next == nil {
+		return v, false
+	}
 	for one, ok := next(); ok; one, ok = next() {
 		if predicate(one) {
 			return one, true
@@ -87,7 +99,10 @@ func First[T any](next func() (T, bool), predicate func(T) bool) (v T, ok bool) 
 }
 
 // Firstt returns the first element that satisfies the condition of the 'predicate' function
-func Firstt[T any](next func() (T, bool), predicate func(T) (bool, error)) (T, bool, error) {
+func Firstt[T any](next func() (T, bool), predicate func(T) (bool, error)) (v T, ok bool, err error) {
+	if next == nil {
+		return v, false, nil
+	}
 	for {
 		if out, ok := next(); !ok {
 			return out, false, nil
@@ -97,7 +112,7 @@ func Firstt[T any](next func() (T, bool), predicate func(T) (bool, error)) (T, b
 	}
 }
 
-// Track applies the 'tracker' function to position/element pairs retrieved by the 'next' function. Return the c.ErrBreak to stop tracking.
+// Track applies the 'tracker' function to position/element pairs retrieved by the 'next' function. Return the c.Break to stop tracking.
 func Track[I, T any](next func() (I, T, bool), tracker func(I, T) error) error {
 	return kvloop.Track(next, tracker)
 }
@@ -114,6 +129,9 @@ func Slice[T any](next func() (T, bool)) []T {
 
 // SliceCap collects the elements retrieved by the 'next' function into a new slice with predefined capacity
 func SliceCap[T any](next func() (T, bool), cap int) (out []T) {
+	if next == nil {
+		return nil
+	}
 	if cap > 0 {
 		out = make([]T, 0, cap)
 	}
@@ -122,6 +140,9 @@ func SliceCap[T any](next func() (T, bool), cap int) (out []T) {
 
 // Append collects the elements retrieved by the 'next' function into the specified 'out' slice
 func Append[T any, TS ~[]T](next func() (T, bool), out TS) TS {
+	if next == nil {
+		return nil
+	}
 	for {
 		v, ok := next()
 		if !ok {
@@ -134,6 +155,9 @@ func Append[T any, TS ~[]T](next func() (T, bool), out TS) TS {
 
 // Reduce reduces the elements retrieved by the 'next' function into an one using the 'merger' function
 func Reduce[T any](next func() (T, bool), merger func(T, T) T) (result T) {
+	if next == nil {
+		return result
+	}
 	if v, ok := next(); ok {
 		result = v
 	} else {
@@ -158,6 +182,9 @@ func HasAny[T any](next func() (T, bool), predicate func(T) bool) bool {
 
 // Contains finds the first element that equal to the example and returns true
 func Contains[T comparable](next func() (T, bool), example T) bool {
+	if next == nil {
+		return false
+	}
 	for one, ok := next(); ok; one, ok = next() {
 		if one == example {
 			return true
@@ -419,7 +446,6 @@ func KeysValues[T, K, V any](next func() (T, bool), keysExtractor func(T) []K, v
 	if next == nil {
 		return nil
 	}
-
 	var (
 		keys   []K
 		values []V
@@ -539,6 +565,9 @@ func Groupp[T any, K comparable, V any](next func() (T, bool), keyExtractor func
 // The keysExtractor retrieves one or more keys per element.
 // The valsExtractor retrieves one or more values per element.
 func GroupByMultiple[T any, K comparable, V any](next func() (T, bool), keysExtractor func(T) []K, valsExtractor func(T) []V) map[K][]V {
+	if next == nil {
+		return nil
+	}
 	groups := map[K][]V{}
 	for e, ok := next(); ok; e, ok = next() {
 		if keys, vals := keysExtractor(e), valsExtractor(e); len(keys) == 0 {
@@ -566,6 +595,9 @@ func GroupByMultiple[T any, K comparable, V any](next func() (T, bool), keysExtr
 // The keysExtractor retrieves one or more keys per element.
 // The valExtractor converts an element to a value.
 func GroupByMultipleKeys[T any, K comparable, V any](next func() (T, bool), keysExtractor func(T) []K, valExtractor func(T) V) map[K][]V {
+	if next == nil {
+		return nil
+	}
 	groups := map[K][]V{}
 	for e, ok := next(); ok; e, ok = next() {
 		if keys, v := keysExtractor(e), valExtractor(e); len(keys) == 0 {
@@ -584,6 +616,9 @@ func GroupByMultipleKeys[T any, K comparable, V any](next func() (T, bool), keys
 // The keyExtractor converts an element to a key.
 // The valsExtractor retrieves one or more values per element.
 func GroupByMultipleValues[T any, K comparable, V any](next func() (T, bool), keyExtractor func(T) K, valsExtractor func(T) []V) map[K][]V {
+	if next == nil {
+		return nil
+	}
 	groups := map[K][]V{}
 	for e, ok := next(); ok; e, ok = next() {
 		if key, vals := keyExtractor(e), valsExtractor(e); len(vals) == 0 {
@@ -614,6 +649,9 @@ func ToMapp[T any, K comparable, V any](next func() (T, bool), keyExtractor func
 
 // ToMapResolv collects key\value elements to a map by iterating over the elements with resolving of duplicated key values
 func ToMapResolv[T any, K comparable, V, VR any](next func() (T, bool), keyExtractor func(T) K, valExtractor func(T) V, resolver func(bool, K, VR, V) VR) map[K]VR {
+	if next == nil {
+		return nil
+	}
 	m := map[K]VR{}
 	for e, ok := next(); ok; e, ok = next() {
 		k, v := keyExtractor(e), valExtractor(e)
@@ -625,6 +663,9 @@ func ToMapResolv[T any, K comparable, V, VR any](next func() (T, bool), keyExtra
 
 // Sequence makes a sequence by applying the 'next' function to the previous step generated value.
 func Sequence[T any](first T, next func(T) (T, bool)) Loop[T] {
+	if next == nil {
+		return nil
+	}
 	current := first
 	init := true
 	return func() (out T, ok bool) {
@@ -684,6 +725,9 @@ func Range[T constraints.Integer | rune](from T, toExclusive T) Loop[T] {
 // the len is length ot the source.
 // the getAt retrieves an element by its index from the source.
 func OfIndexed[T any](len int, next func(int) T) Loop[T] {
+	if next == nil {
+		return nil
+	}
 	i := 0
 	return func() (out T, ok bool) {
 		if ok = i < len; ok {
@@ -696,6 +740,9 @@ func OfIndexed[T any](len int, next func(int) T) Loop[T] {
 
 // ConvertAndReduce converts each elements and merges them into one
 func ConvertAndReduce[From, To any](next func() (From, bool), converter func(From) To, merger func(To, To) To) (out To) {
+	if next == nil {
+		return out
+	}
 	if v, ok := next(); ok {
 		out = converter(v)
 	} else {
@@ -709,6 +756,9 @@ func ConvertAndReduce[From, To any](next func() (From, bool), converter func(Fro
 
 // ConvAndReduce converts each elements and merges them into one
 func ConvAndReduce[From, To any](next func() (From, bool), converter func(From) (To, error), merger func(To, To) To) (out To, err error) {
+	if next == nil {
+		return out, nil
+	}
 	if v, ok := next(); ok {
 		out, err = converter(v)
 		if err != nil {
@@ -728,7 +778,9 @@ func ConvAndReduce[From, To any](next func() (From, bool), converter func(From) 
 }
 
 // Crank rertieves a next element from the 'next' function, returns the function, element, successfully flag.
-func Crank[T any](next func() (T, bool)) (func() (T, bool), T, bool) {
-	n, ok := next()
-	return next, n, ok
+func Crank[T any](next func() (T, bool)) (n Loop[T], t T, ok bool) {
+	if next != nil {
+		t, ok = next()
+	}
+	return next, t, ok
 }

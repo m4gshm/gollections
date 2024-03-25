@@ -31,7 +31,7 @@ type Iter[K comparable, V any] struct {
 
 var _ collection.Iterator[int, any] = (*Iter[int, any])(nil)
 
-// Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak
+// Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning Break
 func (i *Iter[K, V]) Track(traker func(key K, value V) error) error {
 	return loop.Track(i.Next, traker)
 }
@@ -127,7 +127,7 @@ var (
 	_ c.Iterator[string] = KeyIter[string, any]{}
 )
 
-// For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
+// For takes elements retrieved by the iterator. Can be interrupt by returning Break
 func (i KeyIter[K, V]) For(walker func(element K) error) error {
 	return loop.For(i.Next, walker)
 }
@@ -165,7 +165,7 @@ var (
 	_ c.Iterator[any] = ValIter[int, any]{}
 )
 
-// For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
+// For takes elements retrieved by the iterator. Can be interrupt by returning Break
 func (i ValIter[K, V]) For(walker func(element V) error) error {
 	return loop.For(i.Next, walker)
 }

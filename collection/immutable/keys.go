@@ -68,7 +68,7 @@ func (m MapKeys[K, V]) Append(out []K) []K {
 	return map_.AppendKeys(m.elements, out)
 }
 
-// For applies the 'walker' function for every key. Return the c.ErrBreak to stop.
+// For applies the 'walker' function for every key. Return the c.Break to stop.
 func (m MapKeys[K, V]) For(walker func(K) error) error {
 	return map_.ForKeys(m.elements, walker)
 }

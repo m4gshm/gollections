@@ -332,6 +332,35 @@ include::../examples/loopexamples/loop_Flat_test.go[lines=13..16,indent=0]
 
 These functions combine converters, filters and reducers.
 
+==== Iterating over loops
+* Using `for` statement like:
+
+[source,go]
+----
+include::../examples/loopexamples/loop_iterating_test.go[lines=11..16,indent=0]
+----
+
+* or
+
+[source,go]
+----
+include::../examples/loopexamples/loop_iterating_test.go[lines=20..24,indent=0]
+----
+
+* `ForEach` method
+
+[source,go]
+----
+include::../examples/loopexamples/loop_iterating_test.go[lines=28..30,indent=0]
+----
+
+* or `For` method that can be aborted by returning `Break` for expected completion, or another error otherwise.
+
+[source,go]
+----
+include::../examples/loopexamples/loop_iterating_test.go[lines=34..42,indent=0]
+----
+
 === Data structures
 ==== link:./collection/mutable/api.go[mutable] and link:./collection/immutable/api.go[immutable] collections
 
@@ -437,3 +466,32 @@ include::../examples/collection/mutable/omap.go[lines=11..15,indent=0]
 ==== Immutable containers
 
 The same underlying interfaces but for read-only use cases.
+
+==== Iterating over containers
+* Using `for` statement like:
+
+[source,go]
+----
+include::../examples/collection/collection_iterating_test.go[lines=12..18,indent=0]
+----
+
+* or
+
+[source,go]
+----
+include::../examples/collection/collection_iterating_test.go[lines=22..27,indent=0]
+----
+
+* `ForEach` method
+
+[source,go]
+----
+include::../examples/collection/collection_iterating_test.go[lines=31..34,indent=0]
+----
+
+* or `For` method that can be aborted by returning `Break` for expected completion, or another error otherwise.
+
+[source,go]
+----
+include::../examples/collection/collection_iterating_test.go[lines=38..47,indent=0]
+----

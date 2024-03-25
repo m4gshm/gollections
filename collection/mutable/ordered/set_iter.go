@@ -23,7 +23,7 @@ var (
 	_ c.DelIterator[any] = (*SetIter[any])(nil)
 )
 
-// For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
+// For takes elements retrieved by the iterator. Can be interrupt by returning Break
 func (i *SetIter[T]) For(walker func(element T) error) error {
 	return loop.For(i.Next, walker)
 }

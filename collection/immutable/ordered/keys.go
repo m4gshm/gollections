@@ -28,22 +28,18 @@ var (
 
 // Loop creates a loop to iterating through elements.
 func (m MapKeys[K]) Loop() loop.Loop[K] {
-	return loop.Of(m.keys...)
+	return m.Head().Next
 }
 
 // Head creates an iterator and returns as implementation type value
-func (m MapKeys[K]) Head() slice.Iter[K] {
+func (m MapKeys[K]) Head() *slice.Iter[K] {
 	return slice.NewHead(m.keys)
 }
 
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
-func (m MapKeys[K]) First() (slice.Iter[K], K, bool) {
-	var (
-		iterator  = m.Head()
-		first, ok = iterator.Next()
-	)
-	return iterator, first, ok
+func (m MapKeys[K]) First() (*slice.Iter[K], K, bool) {
+	return m.Head().Crank()
 }
 
 // Len returns amount of elements
@@ -72,7 +68,7 @@ func (m MapKeys[K]) Append(out []K) []K {
 	return out
 }
 
-// For applies the 'walker' function for every key. Return the c.ErrBreak to stop.
+// For applies the 'walker' function for every key. Return the c.Break to stop.
 func (m MapKeys[K]) For(walker func(K) error) error {
 	return slice.For(m.keys, walker)
 }

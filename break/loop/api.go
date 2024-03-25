@@ -15,8 +15,8 @@ import (
 	"github.com/m4gshm/gollections/op/check/not"
 )
 
-// ErrBreak is the 'break' statement of the For, Track methods.
-var ErrBreak = c.ErrBreak
+// Break is the 'break' statement of the For, Track methods.
+var Break = c.Break
 
 // Of wrap the elements by loop function
 func Of[T any](elements ...T) func() (e T, ok bool, err error) {
@@ -47,6 +47,9 @@ func New[S, T any](source S, hasNext func(S) bool, getNext func(S) (T, error)) L
 
 // From wrap the next loop to a breakable loop
 func From[T any](next func() (T, bool)) Loop[T] {
+	if next == nil {
+		return nil
+	}
 	return func() (T, bool, error) {
 		e, ok := next()
 		return e, ok, nil
@@ -66,7 +69,7 @@ func To[T any](next func() (T, bool, error), errConsumer func(error)) func() (T,
 	}
 }
 
-// For applies the 'walker' function for the elements retrieved by the 'next' function. Return the c.ErrBreak to stop
+// For applies the 'walker' function for the elements retrieved by the 'next' function. Return the c.Break to stop
 func For[T any](next func() (T, bool, error), walker func(T) error) error {
 	for {
 		if v, ok, err := next(); err != nil || !ok {
@@ -112,7 +115,7 @@ func Firstt[T any](next func() (T, bool, error), predicate func(T) (bool, error)
 	}
 }
 
-// Track applies the 'tracker' function to position/element pairs retrieved by the 'next' function. Return the c.ErrBreak to stop tracking..
+// Track applies the 'tracker' function to position/element pairs retrieved by the 'next' function. Return the c.Break to stop tracking..
 func Track[I, T any](next func() (I, T, bool, error), tracker func(I, T) error) error {
 	for {
 		if p, v, ok, err := next(); err != nil || !ok {
@@ -160,6 +163,9 @@ func Append[T any, TS ~[]T](next func() (T, bool, error), out TS) (TS, error) {
 
 // Reduce reduces the elements retrieved by the 'next' function into an one using the 'merge' function
 func Reduce[T any](next func() (T, bool, error), merger func(T, T) T) (out T, e error) {
+	if next == nil {
+		return out, nil
+	}
 	v, ok, err := next()
 	if err != nil || !ok {
 		return out, err
@@ -776,6 +782,9 @@ func ToMapResolvv[T any, K comparable, V, VR any](
 	next func() (T, bool, error), keyExtractor func(T) (K, error), valExtractor func(T) (V, error),
 	resolver func(bool, K, VR, V) (VR, error),
 ) (m map[K]VR, err error) {
+	if next == nil {
+		return nil, nil
+	}
 	m = map[K]VR{}
 	for {
 		if e, ok, err := next(); err != nil || !ok {
@@ -804,7 +813,7 @@ func ConvAndReduce[From, To any](next func() (From, bool, error), converter func
 }
 
 func brk(err error) error {
-	if errors.Is(err, c.ErrBreak) {
+	if errors.Is(err, c.Break) {
 		return nil
 	}
 	return err

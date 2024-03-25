@@ -29,37 +29,29 @@ var (
 
 // Loop creates a loop to iterating through elements.
 func (v Vector[T]) Loop() loop.Loop[T] {
-	return loop.Of(v.elements...)
+	return v.Head().Next
 }
 
 // Head creates an iterator and returns as implementation type value
-func (v Vector[T]) Head() slice.Iter[T] {
+func (v Vector[T]) Head() *slice.Iter[T] {
 	return slice.NewHead(v.elements)
 }
 
 // Tail creates an iterator pointing to the end of the collection
-func (v Vector[T]) Tail() slice.Iter[T] {
+func (v Vector[T]) Tail() *slice.Iter[T] {
 	return slice.NewTail(v.elements)
 }
 
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
-func (v Vector[T]) First() (slice.Iter[T], T, bool) {
-	var (
-		iterator  = slice.NewHead(v.elements)
-		first, ok = iterator.Next()
-	)
-	return iterator, first, ok
+func (v Vector[T]) First() (*slice.Iter[T], T, bool) {
+	return slice.NewHead(v.elements).Crank()
 }
 
 // Last returns the latest element of the collection, an iterator to reverse iterate over the remaining elements, and true\false marker of availability previous elements.
 // If no more elements then ok==false.
-func (v Vector[T]) Last() (slice.Iter[T], T, bool) {
-	var (
-		iterator  = slice.NewTail(v.elements)
-		first, ok = iterator.Prev()
-	)
-	return iterator, first, ok
+func (v Vector[T]) Last() (*slice.Iter[T], T, bool) {
+	return slice.NewTail(v.elements).CrankPrev()
 }
 
 // Slice collects the elements to a slice
@@ -93,7 +85,7 @@ func (v Vector[T]) Get(index int) (out T, ok bool) {
 	return slice.Gett(v.elements, index)
 }
 
-// Track applies the 'tracker' function for elements. Return the c.ErrBreak to stop.
+// Track applies the 'tracker' function for elements. Return the c.Break to stop.
 func (v Vector[T]) Track(tracker func(int, T) error) error {
 	return slice.Track(v.elements, tracker)
 }
@@ -104,7 +96,7 @@ func (v Vector[T]) TrackEach(tracker func(int, T)) {
 
 }
 
-// For applies the 'walker' function for the elements. Return the c.ErrBreak to stop.
+// For applies the 'walker' function for the elements. Return the c.Break to stop.
 func (v Vector[T]) For(walker func(T) error) error {
 	return slice.For(v.elements, walker)
 }

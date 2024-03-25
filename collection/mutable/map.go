@@ -105,7 +105,7 @@ func (m *Map[K, V]) IsEmpty() bool {
 	return m.Len() == 0
 }
 
-// For applies the 'walker' function for every key/value pair. Return the c.ErrBreak to stop.
+// For applies the 'walker' function for every key/value pair. Return the c.Break to stop.
 func (m *Map[K, V]) For(walker func(c.KV[K, V]) error) error {
 	if m == nil {
 		return nil
@@ -120,7 +120,7 @@ func (m *Map[K, V]) ForEach(walker func(c.KV[K, V])) {
 	}
 }
 
-// Track applies the 'tracker' function for key/value pairs. Return the c.ErrBreak to stop.
+// Track applies the 'tracker' function for key/value pairs. Return the c.Break to stop.
 func (m *Map[K, V]) Track(tracker func(K, V) error) error {
 	if m == nil {
 		return nil

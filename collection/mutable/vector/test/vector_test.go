@@ -430,7 +430,7 @@ func Test_Vector_Set(t *testing.T) {
 
 func Test_Vector_DeleteByIterator(t *testing.T) {
 	vec := vector.Of(1, 1, 2, 4, 3, 1)
-	iterator := vec.IterEdit()
+	iterator := vec.Head()
 
 	i := 0
 	var v int

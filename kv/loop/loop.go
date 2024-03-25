@@ -11,7 +11,7 @@ import (
 // Loop is a function that returns the next key, value or false if there are no more elements.
 type Loop[K, V any] func() (K, V, bool)
 
-// Track applies the 'tracker' function to position/element pairs retrieved by the 'next' function. Return the c.ErrBreak to stop tracking..
+// Track applies the 'tracker' function to position/element pairs retrieved by the 'next' function. Return the c.Break to stop tracking..
 func (next Loop[K, V]) Track(tracker func(K, V) error) error {
 	return Track(next, tracker)
 }

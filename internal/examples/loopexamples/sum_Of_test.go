@@ -9,7 +9,7 @@ import (
 	"github.com/m4gshm/gollections/loop/sum"
 )
 
-func Test_Slice_Sum(t *testing.T) {
+func Test_Sum(t *testing.T) {
 
 	var sum = sum.Of(loop.Of(1, 2, 3, 4, 5, 6)) //21
 

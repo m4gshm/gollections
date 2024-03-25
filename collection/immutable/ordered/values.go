@@ -29,11 +29,11 @@ var (
 // Loop creates a loop to iterating through elements.
 func (m MapValues[K, V]) Loop() loop.Loop[V] {
 	h := m.Head()
-	return (&h).Next
+	return h.Next
 }
 
 // Head creates an iterator and returns as implementation type value
-func (m MapValues[K, V]) Head() ValIter[K, V] {
+func (m MapValues[K, V]) Head() *ValIter[K, V] {
 	var (
 		order    []K
 		elements map[K]V
@@ -47,7 +47,7 @@ func (m MapValues[K, V]) Head() ValIter[K, V] {
 
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
-func (m MapValues[K, V]) First() (ValIter[K, V], V, bool) {
+func (m MapValues[K, V]) First() (*ValIter[K, V], V, bool) {
 	var (
 		iterator  = m.Head()
 		first, ok = iterator.Next()
@@ -79,7 +79,7 @@ func (m MapValues[K, V]) Append(out []V) (values []V) {
 	return out
 }
 
-// For applies the 'walker' function for every value. Return the c.ErrBreak to stop.
+// For applies the 'walker' function for every value. Return the c.Break to stop.
 func (m MapValues[K, V]) For(walker func(V) error) error {
 	return map_.ForOrderedValues(m.order, m.elements, walker)
 }

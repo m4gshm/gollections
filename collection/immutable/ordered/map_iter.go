@@ -21,7 +21,7 @@ type MapIter[K comparable, V any] struct {
 
 var _ collection.Iterator[string, any] = (*MapIter[string, any])(nil)
 
-// Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak
+// Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning Break
 func (i *MapIter[K, V]) Track(traker func(key K, value V) error) error {
 	return loop.Track(i.Next, traker)
 }
@@ -49,8 +49,8 @@ func (i *MapIter[K, V]) Size() int {
 }
 
 // NewValIter is default ValIter constructor
-func NewValIter[K comparable, V any](elements []K, uniques map[K]V) ValIter[K, V] {
-	return ValIter[K, V]{elements: elements, uniques: uniques, current: slice.IterNoStarted}
+func NewValIter[K comparable, V any](elements []K, uniques map[K]V) *ValIter[K, V] {
+	return &ValIter[K, V]{elements: elements, uniques: uniques, current: slice.IterNoStarted}
 }
 
 // ValIter is the Iteratoc over Map values
@@ -65,7 +65,7 @@ var (
 	_ c.Sized         = (*ValIter[int, any])(nil)
 )
 
-// For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
+// For takes elements retrieved by the iterator. Can be interrupt by returning Break
 func (i *ValIter[K, V]) For(walker func(element V) error) error {
 	return loop.For(i.Next, walker)
 }
