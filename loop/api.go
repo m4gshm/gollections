@@ -38,6 +38,11 @@ func Of[T any](elements ...T) Loop[T] {
 	}
 }
 
+func All[T any](next func() (T, bool), consumer func(T) bool) {
+	for v, ok := next(); ok && consumer(v); v, ok = next() {
+	}
+}
+
 // New makes a loop from an abstract source
 func New[S, T any](source S, hasNext func(S) bool, getNext func(S) T) Loop[T] {
 	return func() (out T, ok bool) {

@@ -391,6 +391,18 @@ It is used for computations where an error may occur.
 include::../examples/loopexamples/breakloop/loop_filter_convert_reduce_test.go[lines=13..19,indent=0]
 ----
 
+==== Go 1.22 range-over-function iterators (not finalized feature)
+
+Activates by `go env -w GOEXPERIMENT=rangefunc`
+
+Introduced as `All(consumer func(T) bool)` method of collection, iterator types.
+
+
+[source,go]
+----
+include::../examples/loop/loop_range_iter_go1_22_test.go[lines=15..20,indent=0]
+----
+
 ==== Expressions: link:./expr/use/api.go[use.If], link:./expr/get/api.go[get.If], link:#firstof[first.Of], link:#lastof[last.Of]
 
 Aimed to evaluate a value using conditions. May cause to make code shorter by not in all cases. +

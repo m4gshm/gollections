@@ -35,6 +35,10 @@ var (
 	_ fmt.Stringer                                = Map[int, any]{}
 )
 
+func (m Map[K, V]) All(consumer func(K, V) bool) {
+	map_.TrackOrderedWhile(m.order, m.elements, consumer)
+}
+
 // Loop creates a loop to iterating through elements.
 func (m Map[K, V]) Loop() kvloop.Loop[K, V] {
 	h := m.Head()
@@ -129,16 +133,6 @@ func (m Map[K, V]) Track(tracker func(K, V) error) error {
 // TrackEach applies the 'tracker' function for every key/value pairs
 func (m Map[K, V]) TrackEach(tracker func(K, V)) {
 	map_.TrackEachOrdered(m.order, m.elements, tracker)
-}
-
-// For applies the 'walker' function for key/value pairs. Return the c.Break to stop.
-func (m Map[K, V]) For(walker func(c.KV[K, V]) error) error {
-	return map_.ForOrdered(m.order, m.elements, walker)
-}
-
-// ForEach applies the 'walker' function for every key/value pair
-func (m Map[K, V]) ForEach(walker func(c.KV[K, V])) {
-	map_.ForEachOrdered(m.order, m.elements, walker)
 }
 
 // FilterKey returns a loop consisting of key/value pairs where the key satisfies the condition of the 'predicate' function

@@ -27,6 +27,10 @@ var (
 	_ fmt.Stringer               = MapKeys[int, any]{}
 )
 
+func (m MapKeys[K, V]) All(consumer func(K) bool) {
+	map_.TrackKeysWhile(m.elements, consumer)
+}
+
 // Loop creates a loop to iterating through elements.
 func (m MapKeys[K, V]) Loop() loop.Loop[K] {
 	h := m.Head()

@@ -27,6 +27,10 @@ var (
 	_ fmt.Stringer        = Set[int]{}
 )
 
+func (s Set[T]) All(consumer func(T) bool) {
+	slice.WalkWhile(s.order, consumer)
+}
+
 // Loop creates a loop to iterating through elements.
 func (s Set[T]) Loop() loop.Loop[T] {
 	h := s.Head()

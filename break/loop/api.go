@@ -69,24 +69,24 @@ func To[T any](next func() (T, bool, error), errConsumer func(error)) func() (T,
 	}
 }
 
-// For applies the 'walker' function for the elements retrieved by the 'next' function. Return the c.Break to stop
-func For[T any](next func() (T, bool, error), walker func(T) error) error {
+// For applies the 'consumer' function for the elements retrieved by the 'next' function. Return the c.Break to stop
+func For[T any](next func() (T, bool, error), consumer func(T) error) error {
 	for {
 		if v, ok, err := next(); err != nil || !ok {
 			return err
-		} else if err := walker(v); err != nil {
+		} else if err := consumer(v); err != nil {
 			return brk(err)
 		}
 	}
 }
 
-// ForFiltered applies the 'walker' function to the elements retrieved by the 'next' function that satisfy the 'predicate' function condition
-func ForFiltered[T any](next func() (T, bool, error), walker func(T) error, predicate func(T) bool) error {
+// ForFiltered applies the 'consumer' function to the elements retrieved by the 'next' function that satisfy the 'predicate' function condition
+func ForFiltered[T any](next func() (T, bool, error), consumer func(T) error, predicate func(T) bool) error {
 	for {
 		if v, ok, err := next(); err != nil || !ok {
 			return err
 		} else if ok := predicate(v); ok {
-			if err := walker(v); err != nil {
+			if err := consumer(v); err != nil {
 				return brk(err)
 			}
 		}

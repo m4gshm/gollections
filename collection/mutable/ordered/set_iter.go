@@ -23,6 +23,10 @@ var (
 	_ c.DelIterator[any] = (*SetIter[any])(nil)
 )
 
+func (i *SetIter[T]) All(consumer func(element T) bool) {
+	loop.All(i.Next, consumer)
+}
+
 // For takes elements retrieved by the iterator. Can be interrupt by returning Break
 func (i *SetIter[T]) For(walker func(element T) error) error {
 	return loop.For(i.Next, walker)

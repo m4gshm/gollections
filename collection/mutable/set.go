@@ -33,6 +33,14 @@ var (
 	_ fmt.Stringer                    = (*Set[int])(nil)
 )
 
+func (s *Set[T]) All(consumer func(T) bool) {
+	for v := range s.elements {
+		if !consumer(v) {
+			return
+		}
+	}
+}
+
 // Loop creates a loop to iterating through elements.
 func (s *Set[T]) Loop() loop.Loop[T] {
 	h := s.Head()

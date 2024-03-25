@@ -115,7 +115,7 @@ func Benchmark_FindFirsManager_Predicate_ContainsConverted(b *testing.B) {
 
 func Benchmark_FindFirsManager_Predicate_HasAnyConverted(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		alice, ok := slice.First(users, match.Any(User.Roles, match.To(Role.Name, func(name string) bool { return name == "manager" })))
+		alice, ok := slice.First(users, match.Any(User.Roles, match.To(Role.Name, func(roleName string) bool { return roleName == "manager" })))
 		_, _ = alice, ok
 	}
 }

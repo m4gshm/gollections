@@ -26,6 +26,10 @@ var (
 	_ fmt.Stringer               = MapKeys[int]{}
 )
 
+func (m MapKeys[K]) All(consumer func(K) bool) {
+	slice.WalkWhile(m.keys, consumer)
+}
+
 // Loop creates a loop to iterating through elements.
 func (m MapKeys[K]) Loop() loop.Loop[K] {
 	return m.Head().Next

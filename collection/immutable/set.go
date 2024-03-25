@@ -28,6 +28,10 @@ var (
 	_ fmt.Stringer        = Set[int]{}
 )
 
+func (s Set[T]) All(consumer func(T) bool) {
+	map_.TrackKeysWhile(s.elements, consumer)
+}
+
 // Loop creates a loop to iterating through elements.
 func (s Set[T]) Loop() loop.Loop[T] {
 	h := s.Head()

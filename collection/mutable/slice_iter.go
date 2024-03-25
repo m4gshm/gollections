@@ -35,6 +35,10 @@ var (
 	_ c.DelIterator[any]  = (*SliceIter[any])(nil)
 )
 
+func (i *SliceIter[T]) All(consumer func(element T) bool) {
+	loop.All(i.Next, consumer)
+}
+
 // For takes elements retrieved by the iterator. Can be interrupt by returning Break
 func (i *SliceIter[T]) For(walker func(element T) error) error {
 	return loop.For(i.Next, walker)

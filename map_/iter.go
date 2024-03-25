@@ -4,6 +4,7 @@ import (
 	"unsafe"
 
 	"github.com/m4gshm/gollections/c"
+	kvloop "github.com/m4gshm/gollections/kv/loop"
 	"github.com/m4gshm/gollections/kv/collection"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
@@ -30,6 +31,10 @@ type Iter[K comparable, V any] struct {
 }
 
 var _ collection.Iterator[int, any] = (*Iter[int, any])(nil)
+
+func (i *Iter[K, V]) All(consumer func(key K, value V) bool) {
+	kvloop.All(i.Next, consumer)
+}
 
 // Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning Break
 func (i *Iter[K, V]) Track(traker func(key K, value V) error) error {
@@ -127,6 +132,10 @@ var (
 	_ c.Iterator[string] = KeyIter[string, any]{}
 )
 
+func (i KeyIter[K, V]) All(consumer func(element K) bool) {
+	loop.All(i.Next, consumer)
+}
+
 // For takes elements retrieved by the iterator. Can be interrupt by returning Break
 func (i KeyIter[K, V]) For(walker func(element K) error) error {
 	return loop.For(i.Next, walker)
@@ -164,6 +173,10 @@ var (
 	_ c.Iterator[any] = (*ValIter[int, any])(nil)
 	_ c.Iterator[any] = ValIter[int, any]{}
 )
+
+func (i ValIter[K, V]) All(consumer func(element V) bool) {
+	loop.All(i.Next, consumer)
+}
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning Break
 func (i ValIter[K, V]) For(walker func(element V) error) error {

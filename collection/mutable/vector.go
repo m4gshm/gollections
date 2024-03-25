@@ -32,6 +32,12 @@ var (
 	_ fmt.Stringer                 = (*Vector[any])(nil)
 )
 
+func (v *Vector[T]) All(consumer func(int, T) bool) {
+	if v != nil {
+		slice.TrackWhile(*v, consumer)
+	}
+}
+
 // Loop creates a loop to iterating through elements.
 func (v *Vector[T]) Loop() loop.Loop[T] {
 	if v == nil {

@@ -18,6 +18,11 @@ func New[S, K, V any](source S, hasNext func(S) bool, getNext func(S) (K, V)) Lo
 	}
 }
 
+func All[K, V any](next func() (K, V, bool), consumer func(K, V) bool) {
+	for k, v, ok := next(); ok && consumer(k, v); k, v, ok = next() {
+	}
+}
+
 // Track applies the 'tracker' function to position/element pairs retrieved by the 'next' function. Return the c.Break to stop tracking..
 func Track[I, T any](next func() (I, T, bool), tracker func(I, T) error) error {
 	if next == nil {

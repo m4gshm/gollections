@@ -27,6 +27,10 @@ var (
 	_ fmt.Stringer           = Vector[any]{}
 )
 
+func (v Vector[T]) All(consumer func(int, T) bool) {
+	slice.TrackWhile(v.elements, consumer)
+}
+
 // Loop creates a loop to iterating through elements.
 func (v Vector[T]) Loop() loop.Loop[T] {
 	return v.Head().Next
@@ -93,7 +97,6 @@ func (v Vector[T]) Track(tracker func(int, T) error) error {
 // TrackEach applies the 'tracker' function for every key/value pairs
 func (v Vector[T]) TrackEach(tracker func(int, T)) {
 	slice.TrackEach(v.elements, tracker)
-
 }
 
 // For applies the 'walker' function for the elements. Return the c.Break to stop.

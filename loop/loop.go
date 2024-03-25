@@ -8,6 +8,10 @@ import (
 // Loop is a function that returns the next element or false if there are no more elements.
 type Loop[T any] func() (T, bool)
 
+func (next Loop[T]) All(consumer func(T) bool) {
+	All(next, consumer)
+}
+
 var (
 	_ c.Filterable[any, Loop[any], loop.Loop[any]]  = (Loop[any])(nil)
 	_ c.Convertable[any, Loop[any], loop.Loop[any]] = (Loop[any])(nil)

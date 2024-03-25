@@ -5,7 +5,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/collection/mutable/map_"
 	"github.com/m4gshm/gollections/collection/mutable/ordered"
 	omap "github.com/m4gshm/gollections/collection/mutable/ordered/map_"
@@ -73,13 +72,12 @@ func Test_Map_Nil(t *testing.T) {
 	_, _, ok = head.Next()
 	assert.False(t, ok)
 
-	m.For(nil)
-	m.ForEach(nil)
 	m.Track(nil)
 	m.TrackEach(nil)
 
 	m.Reduce(nil)
 	m.Convert(nil).Track(nil)
+	m.ConvertKey(nil).FiltKey(nil)
 	m.ConvertKey(nil).Track(nil)
 	m.ConvertValue(nil).Track(nil)
 	m.Filter(nil).Convert(nil).Track(nil)
@@ -120,10 +118,8 @@ func Test_Map_Zero(t *testing.T) {
 	_, _, ok = head.Next()
 	assert.True(t, ok)
 
-	m.For(func(_ c.KV[string, string]) error { return nil })
-	m.ForEach(func(_ c.KV[string, string]) {})
-	m.Track(func(_, _ string) error { return nil })
-	m.TrackEach(func(_, _ string) {})
+	m.Track(func(k, v string) error { return nil })
+	m.TrackEach(func(k, v string) {})
 
 	m.Reduce(func(k1, v1, k2, v2 string) (string, string) { return k1 + k2, v1 + v2 })
 	m.Convert(func(_, _ string) (string, string) { return k, v }).Track(func(_, _ string) error { return nil })
@@ -173,10 +169,8 @@ func Test_Map_new(t *testing.T) {
 	_, _, ok = head.Next()
 	assert.True(t, ok)
 
-	m.For(func(_ c.KV[string, string]) error { return nil })
-	m.ForEach(func(_ c.KV[string, string]) {})
-	m.Track(func(_, _ string) error { return nil })
-	m.TrackEach(func(_, _ string) {})
+	m.Track(func(k, v string) error { return nil })
+	m.TrackEach(func(k, v string) {})
 
 	m.Reduce(func(k1, v1, k2, v2 string) (string, string) { return k1 + k2, v1 + v2 })
 	m.Convert(func(_, _ string) (string, string) { return k, v }).Track(func(_, _ string) error { return nil })
