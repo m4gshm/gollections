@@ -5,7 +5,7 @@ import "github.com/m4gshm/gollections/break/loop"
 // Loop is a function that returns the next key, value or false if there are no more elements.
 type Loop[K, V any] func() (K, V, bool, error)
 
-// Track applies the 'tracker' function to position/element pairs retrieved by the 'next' function. Return the c.ErrBreak to stop tracking..
+// Track applies the 'tracker' function to position/element pairs retrieved by the 'next' function. Return the c.Break to stop tracking..
 func (next Loop[K, V]) Track(tracker func(K, V) error) error {
 	return loop.Track(next, tracker)
 }
@@ -25,12 +25,12 @@ func (next Loop[K, V]) HasAny(predicate func(K, V) bool) (bool, error) {
 	return HasAny(next, predicate)
 }
 
-// Filt creates an iterator that checks elements by the 'filter' function and returns successful ones.
-func (next Loop[K, V]) Filt(filter func(K, V) (bool, error)) FiltIter[K, V] {
+// Filt creates a loop that checks elements by the 'filter' function and returns successful ones.
+func (next Loop[K, V]) Filt(filter func(K, V) (bool, error)) Loop[K, V] {
 	return Filt(next, filter)
 }
 
-// Filter creates an iterator that checks elements by the 'filter' function and returns successful ones.
-func (next Loop[K, V]) Filter(filter func(K, V) bool) FiltIter[K, V] {
+// Filter creates a loop that checks elements by the 'filter' function and returns successful ones.
+func (next Loop[K, V]) Filter(filter func(K, V) bool) Loop[K, V] {
 	return Filter(next, filter)
 }

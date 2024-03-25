@@ -146,7 +146,7 @@ func Test_StringRepresentation(t *testing.T) {
 
 func Test_Reduce(t *testing.T) {
 	elements := map[int]string{4: "4", 2: "2", 1: "1", 3: "3"}
-	k, _ := map_.Reduce(elements, func(k, k2 int, v, v2 string) (int, string) {
+	k, _ := map_.Reduce(elements, func(k, k2 int, _, _ string) (int, string) {
 		return k + k2, ""
 	})
 
@@ -161,7 +161,7 @@ func Test_MatchAny(t *testing.T) {
 
 	assert.True(t, ok)
 
-	noOk := map_.HasAny(elements, func(k int, v string) bool {
+	noOk := map_.HasAny(elements, func(k int, _ string) bool {
 		return k > 5
 	})
 

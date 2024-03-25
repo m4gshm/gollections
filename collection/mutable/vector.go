@@ -5,13 +5,11 @@ import (
 	"sort"
 
 	breakLoop "github.com/m4gshm/gollections/break/loop"
-	breakStream "github.com/m4gshm/gollections/break/stream"
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/notsafe"
 	"github.com/m4gshm/gollections/slice"
-	"github.com/m4gshm/gollections/stream"
 )
 
 // WrapVector instantiates Vector using a slise as internal storage
@@ -24,41 +22,37 @@ func WrapVector[T any](elements []T) *Vector[T] {
 type Vector[T any] []T
 
 var (
-	_ c.Addable[any]                          = (*Vector[any])(nil)
-	_ c.AddableAll[c.ForEachLoop[any]]        = (*Vector[any])(nil)
-	_ c.Deleteable[int]                       = (*Vector[any])(nil)
-	_ c.DeleteableVerify[int]                 = (*Vector[any])(nil)
-	_ c.Settable[int, any]                    = (*Vector[any])(nil)
-	_ c.SettableNew[int, any]                 = (*Vector[any])(nil)
-	_ collection.Vector[any, *SliceIter[any]] = (*Vector[any])(nil)
-	_ fmt.Stringer                            = (*Vector[any])(nil)
+	_ c.Addable[any]               = (*Vector[any])(nil)
+	_ c.AddableAll[c.ForEach[any]] = (*Vector[any])(nil)
+	_ c.Deleteable[int]            = (*Vector[any])(nil)
+	_ c.DeleteableVerify[int]      = (*Vector[any])(nil)
+	_ c.Settable[int, any]         = (*Vector[any])(nil)
+	_ c.SettableNew[int, any]      = (*Vector[any])(nil)
+	_ collection.Vector[any]       = (*Vector[any])(nil)
+	_ fmt.Stringer                 = (*Vector[any])(nil)
 )
 
-// Iter creates an iterator and returns as interface
-func (v *Vector[T]) Iter() *SliceIter[T] {
-	h := v.Head()
-	return &h
-}
-
-// IterEdit creates iterator that can delete iterable elements
-func (v *Vector[T]) IterEdit() c.DelIterator[T] {
-	h := v.Head()
-	return &h
+// Loop creates a loop to iterating through elements.
+func (v *Vector[T]) Loop() loop.Loop[T] {
+	if v == nil {
+		return nil
+	}
+	return v.Head().Next
 }
 
 // Head creates an iterator and returns as implementation type value
-func (v *Vector[T]) Head() SliceIter[T] {
+func (v *Vector[T]) Head() *SliceIter[T] {
 	return NewHead(v, v.DeleteActualOne)
 }
 
 // Tail creates an iterator pointing to the end of the collection
-func (v *Vector[T]) Tail() SliceIter[T] {
+func (v *Vector[T]) Tail() *SliceIter[T] {
 	return NewTail(v, v.DeleteActualOne)
 }
 
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
-func (v *Vector[T]) First() (SliceIter[T], T, bool) {
+func (v *Vector[T]) First() (*SliceIter[T], T, bool) {
 	var (
 		iterator  = NewHead(v, v.DeleteActualOne)
 		first, ok = iterator.Next()
@@ -68,7 +62,7 @@ func (v *Vector[T]) First() (SliceIter[T], T, bool) {
 
 // Last returns the latest element of the collection, an iterator to reverse iterate over the remaining elements, and true\false marker of availability previous elements.
 // If no more elements then ok==false.
-func (v *Vector[T]) Last() (SliceIter[T], T, bool) {
+func (v *Vector[T]) Last() (*SliceIter[T], T, bool) {
 	var (
 		iterator  = NewTail(v, v.DeleteActualOne)
 		first, ok = iterator.Prev()
@@ -110,7 +104,7 @@ func (v *Vector[T]) Len() int {
 	return notsafe.GetLen(*v)
 }
 
-// Track applies tracker to elements with error checking. Return the c.ErrBreak to stop tracking.
+// Track applies tracker to elements with error checking. Return the c.Break to stop tracking.
 func (v *Vector[T]) Track(tracker func(int, T) error) error {
 	if v == nil {
 		return nil
@@ -125,7 +119,7 @@ func (v *Vector[T]) TrackEach(tracker func(int, T)) {
 	}
 }
 
-// For applies the 'walker' function for the elements. Return the c.ErrBreak to stop.
+// For applies the 'walker' function for the elements. Return the c.Break to stop.
 func (v *Vector[T]) For(walker func(T) error) error {
 	if v == nil {
 		return nil
@@ -163,7 +157,7 @@ func (v *Vector[T]) AddOne(element T) {
 }
 
 // AddAll inserts all elements from the "other" collection
-func (v *Vector[T]) AddAll(other c.ForEachLoop[T]) {
+func (v *Vector[T]) AddAll(other c.ForEach[T]) {
 	if v != nil {
 		other.ForEach(func(element T) { *v = append(*v, element) })
 	}
@@ -273,26 +267,24 @@ func (v *Vector[T]) SetNew(index int, value T) bool {
 	return true
 }
 
-// Filter returns a stream consisting of vector elements matching the filter
-func (v *Vector[T]) Filter(filter func(T) bool) stream.Iter[T] {
-	h := v.Head()
-	return stream.New(loop.Filter(h.Next, filter).Next)
+// Filter returns a loop consisting of vector elements matching the filter
+func (v *Vector[T]) Filter(filter func(T) bool) loop.Loop[T] {
+	return loop.Filter(v.Loop(), filter)
 }
 
-// Filt returns a breakable stream consisting of elements that satisfy the condition of the 'predicate' function
-func (v *Vector[T]) Filt(predicate func(T) (bool, error)) breakStream.Iter[T] {
-	h := v.Head()
-	return breakStream.New(breakLoop.Filt(breakLoop.From(h.Next), predicate).Next)
+// Filt returns a breakable loop consisting of elements that satisfy the condition of the 'predicate' function
+func (v *Vector[T]) Filt(predicate func(T) (bool, error)) breakLoop.Loop[T] {
+	return loop.Filt(v.Loop(), predicate)
 }
 
-// Convert returns a stream that applies the 'converter' function to the collection elements
-func (v *Vector[T]) Convert(converter func(T) T) stream.Iter[T] {
-	return collection.Convert(v, converter)
+// Convert returns a loop that applies the 'converter' function to the collection elements
+func (v *Vector[T]) Convert(converter func(T) T) loop.Loop[T] {
+	return loop.Convert(v.Loop(), converter)
 }
 
-// Conv returns a breakable stream that applies the 'converter' function to the collection elements
-func (v *Vector[T]) Conv(converter func(T) (T, error)) breakStream.Iter[T] {
-	return collection.Conv(v, converter)
+// Conv returns a breakable loop that applies the 'converter' function to the collection elements
+func (v *Vector[T]) Conv(converter func(T) (T, error)) breakLoop.Loop[T] {
+	return loop.Conv(v.Loop(), converter)
 }
 
 // Reduce reduces the elements into an one using the 'merge' function

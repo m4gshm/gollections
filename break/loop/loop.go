@@ -3,7 +3,7 @@ package loop
 // Loop is a function that returns the next element, false if there are no more elements or error if something is wrong.
 type Loop[T any] func() (T, bool, error)
 
-// For applies the 'walker' function for the elements retrieved by the 'next' function. Return the c.ErrBreak to stop
+// For applies the 'walker' function for the elements retrieved by the 'next' function. Return the c.Break to stop
 func (next Loop[T]) For(walker func(T) error) error {
 	return For(next, walker)
 }
@@ -38,7 +38,7 @@ func (next Loop[T]) HasAny(predicate func(T) bool) (bool, error) {
 	return HasAny(next, predicate)
 }
 
-// Filter creates an iterator that checks elements by the 'filter' function and returns successful ones.
-func (next Loop[T]) Filter(filter func(T) bool) FiltIter[T] {
+// Filter creates a loop that checks elements by the 'filter' function and returns successful ones.
+func (next Loop[T]) Filter(filter func(T) bool) Loop[T] {
 	return Filter(next, filter)
 }

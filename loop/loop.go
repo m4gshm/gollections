@@ -1,11 +1,19 @@
 package loop
 
-import "github.com/m4gshm/gollections/break/loop"
+import (
+	"github.com/m4gshm/gollections/break/loop"
+	"github.com/m4gshm/gollections/c"
+)
 
 // Loop is a function that returns the next element or false if there are no more elements.
 type Loop[T any] func() (T, bool)
 
-// For applies the 'walker' function for the elements retrieved by the 'next' function. Return the c.ErrBreak to stop
+var (
+	_ c.Filterable[any, Loop[any], loop.Loop[any]]  = (Loop[any])(nil)
+	_ c.Convertable[any, Loop[any], loop.Loop[any]] = (Loop[any])(nil)
+)
+
+// For applies the 'walker' function for the elements retrieved by the 'next' function. Return the c.Break to stop
 func (next Loop[T]) For(walker func(T) error) error {
 	return For(next, walker)
 }
@@ -50,12 +58,27 @@ func (next Loop[T]) HasAny(predicate func(T) bool) bool {
 	return HasAny(next, predicate)
 }
 
-// Filt creates an iterator that checks elements by the 'filter' function and returns successful ones.
-func (next Loop[T]) Filt(filter func(T) (bool, error)) loop.FiltIter[T] {
+// Filt creates a loop that checks elements by the 'filter' function and returns successful ones.
+func (next Loop[T]) Filt(filter func(T) (bool, error)) loop.Loop[T] {
 	return Filt(next, filter)
 }
 
-// Filter creates an iterator that checks elements by the 'filter' function and returns successful ones.
-func (next Loop[T]) Filter(filter func(T) bool) FiltIter[T] {
+// Filter creates a loop that checks elements by the 'filter' function and returns successful ones.
+func (next Loop[T]) Filter(filter func(T) bool) Loop[T] {
 	return Filter(next, filter)
+}
+
+// Convert creates a loop that applies the 'converter' function to iterable elements.
+func (next Loop[T]) Convert(converter func(T) T) Loop[T] {
+	return Convert(next, converter)
+}
+
+// Conv creates a loop that applies the 'converter' function to iterable elements.
+func (next Loop[T]) Conv(converter func(T) (T, error)) loop.Loop[T] {
+	return Conv(next, converter)
+}
+
+// Crank rertieves a next element from the 'next' function, returns the function, element, successfully flag.
+func (next Loop[T]) Crank() (Loop[T], T, bool) {
+	return Crank(next)
 }

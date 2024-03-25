@@ -4,12 +4,10 @@ import (
 	"fmt"
 
 	breakLoop "github.com/m4gshm/gollections/break/loop"
-	breakStream "github.com/m4gshm/gollections/break/stream"
 	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/notsafe"
 	"github.com/m4gshm/gollections/slice"
-	"github.com/m4gshm/gollections/stream"
 )
 
 // WrapVector instantiates Vector using a slise as internal storage.
@@ -23,46 +21,37 @@ type Vector[T any] struct {
 }
 
 var (
-	_ collection.Vector[any, *slice.Iter[any]] = (*Vector[any])(nil)
-	_ collection.Vector[any, *slice.Iter[any]] = Vector[any]{}
-	_ fmt.Stringer                             = (*Vector[any])(nil)
-	_ fmt.Stringer                             = Vector[any]{}
+	_ collection.Vector[any] = (*Vector[any])(nil)
+	_ collection.Vector[any] = Vector[any]{}
+	_ fmt.Stringer           = (*Vector[any])(nil)
+	_ fmt.Stringer           = Vector[any]{}
 )
 
-// Iter creates an iterator and returns as interface
-func (v Vector[T]) Iter() *slice.Iter[T] {
-	h := v.Head()
-	return &h
+// Loop creates a loop to iterating through elements.
+func (v Vector[T]) Loop() loop.Loop[T] {
+	return v.Head().Next
 }
 
 // Head creates an iterator and returns as implementation type value
-func (v Vector[T]) Head() slice.Iter[T] {
+func (v Vector[T]) Head() *slice.Iter[T] {
 	return slice.NewHead(v.elements)
 }
 
 // Tail creates an iterator pointing to the end of the collection
-func (v Vector[T]) Tail() slice.Iter[T] {
+func (v Vector[T]) Tail() *slice.Iter[T] {
 	return slice.NewTail(v.elements)
 }
 
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
-func (v Vector[T]) First() (slice.Iter[T], T, bool) {
-	var (
-		iterator  = slice.NewHead(v.elements)
-		first, ok = iterator.Next()
-	)
-	return iterator, first, ok
+func (v Vector[T]) First() (*slice.Iter[T], T, bool) {
+	return slice.NewHead(v.elements).Crank()
 }
 
 // Last returns the latest element of the collection, an iterator to reverse iterate over the remaining elements, and true\false marker of availability previous elements.
 // If no more elements then ok==false.
-func (v Vector[T]) Last() (slice.Iter[T], T, bool) {
-	var (
-		iterator  = slice.NewTail(v.elements)
-		first, ok = iterator.Prev()
-	)
-	return iterator, first, ok
+func (v Vector[T]) Last() (*slice.Iter[T], T, bool) {
+	return slice.NewTail(v.elements).CrankPrev()
 }
 
 // Slice collects the elements to a slice
@@ -96,7 +85,7 @@ func (v Vector[T]) Get(index int) (out T, ok bool) {
 	return slice.Gett(v.elements, index)
 }
 
-// Track applies the 'tracker' function for elements. Return the c.ErrBreak to stop.
+// Track applies the 'tracker' function for elements. Return the c.Break to stop.
 func (v Vector[T]) Track(tracker func(int, T) error) error {
 	return slice.Track(v.elements, tracker)
 }
@@ -107,7 +96,7 @@ func (v Vector[T]) TrackEach(tracker func(int, T)) {
 
 }
 
-// For applies the 'walker' function for the elements. Return the c.ErrBreak to stop.
+// For applies the 'walker' function for the elements. Return the c.Break to stop.
 func (v Vector[T]) For(walker func(T) error) error {
 	return slice.For(v.elements, walker)
 }
@@ -117,26 +106,24 @@ func (v Vector[T]) ForEach(walker func(T)) {
 	slice.ForEach(v.elements, walker)
 }
 
-// Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function
-func (v Vector[T]) Filter(filter func(T) bool) stream.Iter[T] {
-	h := v.Head()
-	return stream.New(loop.Filter(h.Next, filter).Next)
+// Filter returns a loop consisting of elements that satisfy the condition of the 'predicate' function
+func (v Vector[T]) Filter(filter func(T) bool) loop.Loop[T] {
+	return loop.Filter(v.Loop(), filter)
 }
 
-// Filt returns a breakable stream consisting of elements that satisfy the condition of the 'predicate' function
-func (v Vector[T]) Filt(predicate func(T) (bool, error)) breakStream.Iter[T] {
-	h := v.Head()
-	return breakStream.New(breakLoop.Filt(breakLoop.From(h.Next), predicate).Next)
+// Filt returns a breakable loop consisting of elements that satisfy the condition of the 'predicate' function
+func (v Vector[T]) Filt(predicate func(T) (bool, error)) breakLoop.Loop[T] {
+	return loop.Filt(v.Loop(), predicate)
 }
 
-// Convert returns a stream that applies the 'converter' function to the collection elements
-func (v Vector[T]) Convert(converter func(T) T) stream.Iter[T] {
-	return collection.Convert(v, converter)
+// Convert returns a loop that applies the 'converter' function to the collection elements
+func (v Vector[T]) Convert(converter func(T) T) loop.Loop[T] {
+	return loop.Convert(v.Loop(), converter)
 }
 
-// Conv returns a breakable stream that applies the 'converter' function to the collection elements
-func (v Vector[T]) Conv(converter func(T) (T, error)) breakStream.Iter[T] {
-	return collection.Conv(v, converter)
+// Conv returns a breakable loop that applies the 'converter' function to the collection elements
+func (v Vector[T]) Conv(converter func(T) (T, error)) breakLoop.Loop[T] {
+	return loop.Conv(v.Loop(), converter)
 }
 
 // Reduce reduces the elements into an one using the 'merge' function

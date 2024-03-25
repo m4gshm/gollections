@@ -7,6 +7,6 @@ import (
 )
 
 // Of an alias of the loop.Sum
-func Of[T c.Summable, IT c.Iterator[T]](sum func() (T, bool)) T {
+func Of[T c.Summable](sum func() (T, bool)) T {
 	return loop.Sum(sum)
 }

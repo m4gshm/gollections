@@ -18,8 +18,8 @@ import (
 	"github.com/m4gshm/gollections/op/check/not"
 )
 
-// ErrBreak is the 'break' statement of the For, Track methods
-var ErrBreak = loop.ErrBreak
+// Break is the 'break' statement of the For, Track methods
+var Break = loop.Break
 
 // Of is generic slice constructor
 func Of[T any](elements ...T) []T { return elements }
@@ -669,10 +669,10 @@ func Lastt[TS ~[]T, T any](elements TS, by func(T) (bool, error)) (no T, ok bool
 	return no, false, nil
 }
 
-// Track applies the 'tracker' function to the elements. Return the c.ErrBreak to stop tracking
+// Track applies the 'tracker' function to the elements. Return the c.Break to stop tracking
 func Track[TS ~[]T, T any](elements TS, tracker func(int, T) error) error {
 	for i, e := range elements {
-		if err := tracker(i, e); err == ErrBreak {
+		if err := tracker(i, e); err == Break {
 			return nil
 		} else if err != nil {
 			return err
@@ -688,10 +688,10 @@ func TrackEach[TS ~[]T, T any](elements TS, tracker func(int, T)) {
 	}
 }
 
-// For applies the 'walker' function for the elements. Return the c.ErrBreak to stop
+// For applies the 'walker' function for the elements. Return the c.Break to stop
 func For[TS ~[]T, T any](elements TS, walker func(T) error) error {
 	for _, e := range elements {
-		if err := walker(e); err == ErrBreak {
+		if err := walker(e); err == Break {
 			return nil
 		} else if err != nil {
 			return err
@@ -869,12 +869,12 @@ func KeysValues[TS ~[]T, T, K, V any](elements TS, keysExtractor func(T) []K, va
 	return Flat(elements, func(e T) []c.KV[K, V] { return convert.KeysValues(e, keysExtractor, valsExtractor) })
 }
 
-// ExtraVals transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
+// ExtraVals transforms slice elements to key/value slice based on applying key, value extractor to the elements.
 func ExtraVals[TS ~[]T, T, V any](elements TS, valsExtractor func(T) []V) []c.KV[T, V] {
 	return Flat(elements, func(e T) []c.KV[T, V] { return convert.ExtraVals(e, valsExtractor) })
 }
 
-// ExtraKeys transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
+// ExtraKeys transforms slic elements to key/value slice based on applying key, value extractor to the elemen
 func ExtraKeys[TS ~[]T, T, K any](elements TS, keysExtractor func(T) []K) []c.KV[K, T] {
 	return Flat(elements, func(e T) []c.KV[K, T] { return convert.ExtraKeys(e, keysExtractor) })
 }

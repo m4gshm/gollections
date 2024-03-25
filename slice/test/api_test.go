@@ -158,7 +158,7 @@ func Test_Firstt(t *testing.T) {
 	_, nook, _ := slice.Firstt(s, _more.Than(12))
 	assert.False(t, nook)
 
-	_, _, err := slice.Firstt(s, func(i int) (bool, error) { return true, errors.New("abort") })
+	_, _, err := slice.Firstt(s, func(_ int) (bool, error) { return true, errors.New("abort") })
 	assert.Error(t, err)
 }
 
@@ -181,7 +181,7 @@ func Test_Lastt(t *testing.T) {
 	_, nook, _ := slice.Lastt(s, _less.Than(1))
 	assert.False(t, nook)
 
-	_, _, err := slice.Lastt(s, func(i int) (bool, error) { return true, errors.New("abort") })
+	_, _, err := slice.Lastt(s, func(_ int) (bool, error) { return true, errors.New("abort") })
 	assert.Error(t, err)
 }
 

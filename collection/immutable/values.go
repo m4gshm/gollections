@@ -4,13 +4,10 @@ import (
 	"fmt"
 
 	breakLoop "github.com/m4gshm/gollections/break/loop"
-	breakStream "github.com/m4gshm/gollections/break/stream"
-	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/slice"
-	"github.com/m4gshm/gollections/stream"
 )
 
 // WrapVal instantiates MapValues using elements as internal storage.
@@ -24,16 +21,16 @@ type MapValues[K comparable, V any] struct {
 }
 
 var (
-	_ c.Collection[any, *map_.ValIter[int, any]] = (*MapValues[int, any])(nil)
-	_ c.Collection[any, *map_.ValIter[int, any]] = MapValues[int, any]{}
-	_ fmt.Stringer                               = (*MapValues[int, any])(nil)
-	_ fmt.Stringer                               = MapValues[int, any]{}
+	_ collection.Collection[any] = (*MapValues[int, any])(nil)
+	_ collection.Collection[any] = MapValues[int, any]{}
+	_ fmt.Stringer               = (*MapValues[int, any])(nil)
+	_ fmt.Stringer               = MapValues[int, any]{}
 )
 
-// Iter creates an iterator and returns as interface
-func (m MapValues[K, V]) Iter() *map_.ValIter[K, V] {
+// Loop creates a loop to iterating through elements.
+func (m MapValues[K, V]) Loop() loop.Loop[V] {
 	h := m.Head()
-	return &h
+	return (&h).Next
 }
 
 // Head creates an iterator and returns as implementation type value
@@ -71,7 +68,7 @@ func (m MapValues[K, V]) Append(out []V) []V {
 	return map_.AppendValues(m.elements, out)
 }
 
-// For applies the 'walker' function for collection values. Return the c.ErrBreak to stop.
+// For applies the 'walker' function for collection values. Return the c.Break to stop.
 func (m MapValues[K, V]) For(walker func(V) error) error {
 	return map_.ForValues(m.elements, walker)
 }
@@ -81,26 +78,25 @@ func (m MapValues[K, V]) ForEach(walker func(V)) {
 	map_.ForEachValue(m.elements, walker)
 }
 
-// Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function
-func (m MapValues[K, V]) Filter(filter func(V) bool) stream.Iter[V] {
+// Filter returns a loop consisting of elements that satisfy the condition of the 'predicate' function
+func (m MapValues[K, V]) Filter(filter func(V) bool) loop.Loop[V] {
 	h := m.Head()
-	return stream.New(loop.Filter(h.Next, filter).Next)
+	return loop.Filter(h.Next, filter)
 }
 
-// Filt returns a breakable stream consisting of elements that satisfy the condition of the 'predicate' function
-func (m MapValues[K, V]) Filt(predicate func(V) (bool, error)) breakStream.Iter[V] {
-	h := m.Head()
-	return breakStream.New(breakLoop.Filt(breakLoop.From(h.Next), predicate).Next)
+// Filt returns a breakable loop consisting of elements that satisfy the condition of the 'predicate' function
+func (m MapValues[K, V]) Filt(predicate func(V) (bool, error)) breakLoop.Loop[V] {
+	return loop.Filt(m.Loop(), predicate)
 }
 
-// Convert returns a stream that applies the 'converter' function to the collection elements
-func (m MapValues[K, V]) Convert(converter func(V) V) stream.Iter[V] {
-	return collection.Convert(m, converter)
+// Convert returns a loop that applies the 'converter' function to the collection elements
+func (m MapValues[K, V]) Convert(converter func(V) V) loop.Loop[V] {
+	return loop.Convert(m.Loop(), converter)
 }
 
-// Conv returns a breakable stream that applies the 'converter' function to the collection elements
-func (m MapValues[K, V]) Conv(converter func(V) (V, error)) breakStream.Iter[V] {
-	return collection.Conv(m, converter)
+// Conv returns a breakable loop that applies the 'converter' function to the collection elements
+func (m MapValues[K, V]) Conv(converter func(V) (V, error)) breakLoop.Loop[V] {
+	return loop.Conv(m.Loop(), converter)
 }
 
 // Reduce reduces the elements into an one using the 'merge' function

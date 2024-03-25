@@ -3,7 +3,7 @@ package ordered
 
 import (
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/kv"
+	"github.com/m4gshm/gollections/kv/collection"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/slice"
 )
@@ -19,10 +19,9 @@ type MapIter[K comparable, V any] struct {
 	uniques  map[K]V
 }
 
-var _ kv.Iterator[string, any] = (*MapIter[string, any])(nil)
-var _ kv.IterFor[int, string, *MapIter[int, string]] = (*MapIter[int, string])(nil)
+var _ collection.Iterator[string, any] = (*MapIter[string, any])(nil)
 
-// Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak
+// Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning Break
 func (i *MapIter[K, V]) Track(traker func(key K, value V) error) error {
 	return loop.Track(i.Next, traker)
 }
@@ -44,20 +43,14 @@ func (i *MapIter[K, V]) Next() (key K, val V, ok bool) {
 	return key, val, ok
 }
 
-// Cap returns the iterator capacity
-func (i *MapIter[K, V]) Cap() int {
-	return i.elements.Cap()
-}
-
-// Start is used with for loop construct like 'for i, k, v, ok := i.Start(); ok; k, v, ok = i.Next() { }'
-func (i *MapIter[K, V]) Start() (*MapIter[K, V], K, V, bool) {
-	k, v, ok := i.Next()
-	return i, k, v, ok
+// Size returns the iterator capacity
+func (i *MapIter[K, V]) Size() int {
+	return i.elements.Size()
 }
 
 // NewValIter is default ValIter constructor
-func NewValIter[K comparable, V any](elements []K, uniques map[K]V) ValIter[K, V] {
-	return ValIter[K, V]{elements: elements, uniques: uniques, current: slice.IterNoStarted}
+func NewValIter[K comparable, V any](elements []K, uniques map[K]V) *ValIter[K, V] {
+	return &ValIter[K, V]{elements: elements, uniques: uniques, current: slice.IterNoStarted}
 }
 
 // ValIter is the Iteratoc over Map values
@@ -72,9 +65,7 @@ var (
 	_ c.Sized         = (*ValIter[int, any])(nil)
 )
 
-var _ c.IterFor[any, *ValIter[int, any]] = (*ValIter[int, any])(nil)
-
-// For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
+// For takes elements retrieved by the iterator. Can be interrupt by returning Break
 func (i *ValIter[K, V]) For(walker func(element V) error) error {
 	return loop.For(i.Next, walker)
 }
@@ -95,16 +86,10 @@ func (i *ValIter[K, V]) Next() (val V, ok bool) {
 	return val, false
 }
 
-// Cap returns the iterator capacity
-func (i *ValIter[K, V]) Cap() int {
+// Size returns the iterator capacity
+func (i *ValIter[K, V]) Size() int {
 	if i == nil {
 		return 0
 	}
 	return len(i.elements)
-}
-
-// Start is used with for loop construct like 'for i, val, ok := i.Start(); ok; val, ok = i.Next() { }'
-func (i *ValIter[K, V]) Start() (*ValIter[K, V], V, bool) {
-	v, ok := i.Next()
-	return i, v, ok
 }

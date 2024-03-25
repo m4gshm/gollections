@@ -1,4 +1,4 @@
-// Package loop provides helpers for loop operation over key/value pairs and iterator implementations
+// Package loop provides helpers for loop operation over key/value pairs.
 package loop
 
 import (
@@ -39,7 +39,7 @@ func To[K, V any](next func() (K, V, bool, error), errConsumer func(error)) func
 	}
 }
 
-// Group collects sets of values grouped by keys obtained by passing a key/value iterator
+// Group collects sets of values grouped by keys obtained by passing a key/value loop.
 func Group[K comparable, V any](next func() (K, V, bool, error)) (map[K][]V, error) {
 	return ToMapResolv(next, resolv.Slice[K, V])
 }
@@ -110,24 +110,54 @@ func Firstt[K, V any](next func() (K, V, bool, error), predicate func(K, V) (boo
 	}
 }
 
-// Convert creates an iterator that applies a transformer to iterable key\values.
-func Convert[K, V any, KOUT, VOUT any](next func() (K, V, bool, error), converter func(K, V) (KOUT, VOUT)) ConvertIter[K, V, KOUT, VOUT] {
-	return ConvertIter[K, V, KOUT, VOUT]{next: next, converter: func(k K, v V) (KOUT, VOUT, error) { ko, vo := converter(k, v); return ko, vo, nil }}
+// Convert creates a loop that applies the 'converter' function to iterable key\values.
+func Convert[K, V any, KOUT, VOUT any](next func() (K, V, bool, error), converter func(K, V) (KOUT, VOUT)) Loop[KOUT, VOUT] {
+	if next == nil {
+		return nil
+	}
+	return func() (k2 KOUT, v2 VOUT, ok bool, err error) {
+		k, v, ok, err := next()
+		if err != nil || !ok {
+			return k2, v2, false, err
+		}
+		k2, v2 = converter(k, v)
+		return k2, v2, true, nil
+	}
 }
 
-// Conv creates an iterator that applies a transformer to iterable key\values.
-func Conv[K, V any, KOUT, VOUT any](next func() (K, V, bool, error), converter func(K, V) (KOUT, VOUT, error)) ConvertIter[K, V, KOUT, VOUT] {
-	return ConvertIter[K, V, KOUT, VOUT]{next: next, converter: converter}
+// Conv creates a loop that applies the 'converter' function to iterable key\values.
+func Conv[K, V any, KOUT, VOUT any](next func() (K, V, bool, error), converter func(K, V) (KOUT, VOUT, error)) Loop[KOUT, VOUT] {
+	if next == nil {
+		return nil
+	}
+	return func() (k2 KOUT, v2 VOUT, ok bool, err error) {
+		k, v, ok, err := next()
+		if err != nil || !ok {
+			return k2, v2, false, err
+		}
+		k2, v2, err = converter(k, v)
+		return k2, v2, err == nil, err
+	}
 }
 
-// Filter creates an iterator that checks elements by a filter and returns successful ones
-func Filter[K, V any](next func() (K, V, bool, error), filter func(K, V) bool) FiltIter[K, V] {
-	return FiltIter[K, V]{next: next, filter: func(k K, v V) (bool, error) { return filter(k, v), nil }}
+// Filter creates a loop that checks elements by a filter and returns successful ones
+func Filter[K, V any](next func() (K, V, bool, error), filter func(K, V) bool) Loop[K, V] {
+	if next == nil {
+		return nil
+	}
+	return func() (K, V, bool, error) {
+		return First(next, filter)
+	}
 }
 
-// Filt creates an iterator that checks elements by a filter and returns successful ones
-func Filt[K, V any](next func() (K, V, bool, error), filter func(K, V) (bool, error)) FiltIter[K, V] {
-	return FiltIter[K, V]{next: next, filter: filter}
+// Filt creates a loop that checks elements by a filter and returns successful ones
+func Filt[K, V any](next func() (K, V, bool, error), filter func(K, V) (bool, error)) Loop[K, V] {
+	if next == nil {
+		return nil
+	}
+	return func() (K, V, bool, error) {
+		return Firstt(next, filter)
+	}
 }
 
 // ToMapResolv collects key\value elements to a map by iterating over the elements with resolving of duplicated key values

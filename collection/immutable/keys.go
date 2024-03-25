@@ -4,13 +4,10 @@ import (
 	"fmt"
 
 	breakLoop "github.com/m4gshm/gollections/break/loop"
-	breakStream "github.com/m4gshm/gollections/break/stream"
-	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/slice"
-	"github.com/m4gshm/gollections/stream"
 )
 
 // WrapKeys instantiates MapKeys using the elements as internal storage
@@ -24,16 +21,16 @@ type MapKeys[K comparable, V any] struct {
 }
 
 var (
-	_ c.Collection[int, *map_.KeyIter[int, any]] = (*MapKeys[int, any])(nil)
-	_ c.Collection[int, *map_.KeyIter[int, any]] = MapKeys[int, any]{}
-	_ fmt.Stringer                               = (*MapKeys[int, any])(nil)
-	_ fmt.Stringer                               = MapKeys[int, any]{}
+	_ collection.Collection[int] = (*MapKeys[int, any])(nil)
+	_ collection.Collection[int] = MapKeys[int, any]{}
+	_ fmt.Stringer               = (*MapKeys[int, any])(nil)
+	_ fmt.Stringer               = MapKeys[int, any]{}
 )
 
-// Iter creates an iterator and returns as interface
-func (m MapKeys[K, V]) Iter() *map_.KeyIter[K, V] {
+// Loop creates a loop to iterating through elements.
+func (m MapKeys[K, V]) Loop() loop.Loop[K] {
 	h := m.Head()
-	return &h
+	return (&h).Next
 }
 
 // Head creates an iterator and returns as implementation type value
@@ -71,7 +68,7 @@ func (m MapKeys[K, V]) Append(out []K) []K {
 	return map_.AppendKeys(m.elements, out)
 }
 
-// For applies the 'walker' function for every key. Return the c.ErrBreak to stop.
+// For applies the 'walker' function for every key. Return the c.Break to stop.
 func (m MapKeys[K, V]) For(walker func(K) error) error {
 	return map_.ForKeys(m.elements, walker)
 }
@@ -81,26 +78,24 @@ func (m MapKeys[K, V]) ForEach(walker func(K)) {
 	map_.ForEachKey(m.elements, walker)
 }
 
-// Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function
-func (m MapKeys[K, V]) Filter(filter func(K) bool) stream.Iter[K] {
-	h := m.Head()
-	return stream.New(loop.Filter(h.Next, filter).Next)
+// Filter returns a loop consisting of elements that satisfy the condition of the 'predicate' function
+func (m MapKeys[K, V]) Filter(filter func(K) bool) loop.Loop[K] {
+	return loop.Filter(m.Loop(), filter)
 }
 
-// Filt returns a breakable stream consisting of elements that satisfy the condition of the 'predicate' function
-func (m MapKeys[K, V]) Filt(predicate func(K) (bool, error)) breakStream.Iter[K] {
-	h := m.Head()
-	return breakStream.New(breakLoop.Filt(breakLoop.From(h.Next), predicate).Next)
+// Filt returns a breakable loop consisting of elements that satisfy the condition of the 'predicate' function
+func (m MapKeys[K, V]) Filt(predicate func(K) (bool, error)) breakLoop.Loop[K] {
+	return loop.Filt(m.Loop(), predicate)
 }
 
-// Convert returns a stream that applies the 'converter' function to the collection elements
-func (m MapKeys[K, V]) Convert(converter func(K) K) stream.Iter[K] {
-	return collection.Convert(m, converter)
+// Convert returns a loop that applies the 'converter' function to the collection elements
+func (m MapKeys[K, V]) Convert(converter func(K) K) loop.Loop[K] {
+	return loop.Convert(m.Loop(), converter)
 }
 
-// Conv returns a breakable stream that applies the 'converter' function to the collection elements
-func (m MapKeys[K, V]) Conv(converter func(K) (K, error)) breakStream.Iter[K] {
-	return collection.Conv(m, converter)
+// Conv returns a breakable loop that applies the 'converter' function to the collection elements
+func (m MapKeys[K, V]) Conv(converter func(K) (K, error)) breakLoop.Loop[K] {
+	return loop.Conv(m.Loop(), converter)
 }
 
 // Reduce reduces the elements into an one using the 'merge' function
@@ -113,7 +108,7 @@ func (m MapKeys[K, V]) Reduce(merge func(K, K) K) K {
 
 // HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful
 func (m MapKeys[K, V]) HasAny(predicate func(K) bool) bool {
-	return map_.HasAny(m.elements, func(k K, v V) bool {
+	return map_.HasAny(m.elements, func(k K, _ V) bool {
 		return predicate(k)
 	})
 }
