@@ -17,19 +17,19 @@ var (
 	_ c.Convertable[any, Loop[any], loop.Loop[any]] = (Loop[any])(nil)
 )
 
-// For applies the 'walker' function for the elements retrieved by the 'next' function. Return the c.Break to stop
-func (next Loop[T]) For(walker func(T) error) error {
-	return For(next, walker)
+// For applies the 'consumer' function for the elements retrieved by the 'next' function. Return the c.Break to stop
+func (next Loop[T]) For(consumer func(T) error) error {
+	return For(next, consumer)
 }
 
-// ForEach applies the 'walker' function to the elements retrieved by the 'next' function
-func (next Loop[T]) ForEach(walker func(T)) {
-	ForEach(next, walker)
+// ForEach applies the 'consumer' function to the elements retrieved by the 'next' function
+func (next Loop[T]) ForEach(consumer func(T)) {
+	ForEach(next, consumer)
 }
 
-// ForEachFiltered applies the 'walker' function to the elements retrieved by the 'next' function that satisfy the 'predicate' function condition
-func (next Loop[T]) ForEachFiltered(predicate func(T) bool, walker func(T)) {
-	ForEachFiltered(next, predicate, walker)
+// ForEachFiltered applies the 'consumer' function to the elements retrieved by the 'next' function that satisfy the 'predicate' function condition
+func (next Loop[T]) ForEachFiltered(predicate func(T) bool, consumer func(T)) {
+	ForEachFiltered(next, predicate, consumer)
 }
 
 // First returns the first element that satisfies the condition of the 'predicate' function

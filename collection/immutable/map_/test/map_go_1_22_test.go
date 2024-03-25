@@ -13,7 +13,7 @@ import (
 	"github.com/m4gshm/gollections/slice"
 )
 
-func Test_Map_Iterate_go_1_22(t *testing.T) {
+func Test_Map_Iterate_All(t *testing.T) {
 	dict := map_.Of(k.V(1, "1"), k.V(1, "1"), k.V(2, "2"), k.V(4, "4"), k.V(3, "3"), k.V(1, "1"))
 
 	expectedK := slice.Of(1, 2, 3, 4)

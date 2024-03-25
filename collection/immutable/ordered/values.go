@@ -83,14 +83,14 @@ func (m MapValues[K, V]) All(consumer func(V) bool) {
 	map_.TrackOrderedValuesWhile(m.order, m.elements, consumer)
 }
 
-// For applies the 'walker' function for every value. Return the c.Break to stop.
-func (m MapValues[K, V]) For(walker func(V) error) error {
-	return map_.ForOrderedValues(m.order, m.elements, walker)
+// For applies the 'consumer' function for every value. Return the c.Break to stop.
+func (m MapValues[K, V]) For(consumer func(V) error) error {
+	return map_.ForOrderedValues(m.order, m.elements, consumer)
 }
 
-// ForEach applies the 'walker' function for every value
-func (m MapValues[K, V]) ForEach(walker func(V)) {
-	map_.ForEachOrderedValues(m.order, m.elements, walker)
+// ForEach applies the 'consumer' function for every value
+func (m MapValues[K, V]) ForEach(consumer func(V)) {
+	map_.ForEachOrderedValues(m.order, m.elements, consumer)
 }
 
 // Get returns an element by the index, otherwise, if the provided index is ouf of the collection len, returns zero T and false in the second result

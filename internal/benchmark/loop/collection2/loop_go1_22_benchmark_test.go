@@ -8,7 +8,7 @@ import (
 	oset "github.com/m4gshm/gollections/collection/immutable/ordered/set"
 )
 
-func Benchmark_Loop_ImmutableOrderSet_go_1_22_direct(b *testing.B) {
+func Benchmark_Loop_ImmutableOrderSet_All_direct(b *testing.B) {
 	c := oset.Of(values...)
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
@@ -22,7 +22,7 @@ func Benchmark_Loop_ImmutableOrderSet_go_1_22_direct(b *testing.B) {
 	}
 }
 
-func Benchmark_Loop_ImmutableOrderSet_go_1_22(b *testing.B) {
+func Benchmark_Loop_ImmutableOrderSet_All(b *testing.B) {
 	c := oset.Of(values...)
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {

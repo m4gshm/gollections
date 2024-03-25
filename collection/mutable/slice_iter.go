@@ -40,13 +40,13 @@ func (i *SliceIter[T]) All(consumer func(element T) bool) {
 }
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning Break
-func (i *SliceIter[T]) For(walker func(element T) error) error {
-	return loop.For(i.Next, walker)
+func (i *SliceIter[T]) For(consumer func(element T) error) error {
+	return loop.For(i.Next, consumer)
 }
 
 // ForEach FlatIter all elements retrieved by the iterator
-func (i *SliceIter[T]) ForEach(walker func(element T)) {
-	loop.ForEach(i.Next, walker)
+func (i *SliceIter[T]) ForEach(consumer func(element T)) {
+	loop.ForEach(i.Next, consumer)
 }
 
 // HasNext checks the next element existing

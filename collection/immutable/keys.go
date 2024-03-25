@@ -72,14 +72,14 @@ func (m MapKeys[K, V]) Append(out []K) []K {
 	return map_.AppendKeys(m.elements, out)
 }
 
-// For applies the 'walker' function for every key. Return the c.Break to stop.
-func (m MapKeys[K, V]) For(walker func(K) error) error {
-	return map_.ForKeys(m.elements, walker)
+// For applies the 'consumer' function for every key. Return the c.Break to stop.
+func (m MapKeys[K, V]) For(consumer func(K) error) error {
+	return map_.ForKeys(m.elements, consumer)
 }
 
-// ForEach applies the 'walker' function for every key
-func (m MapKeys[K, V]) ForEach(walker func(K)) {
-	map_.ForEachKey(m.elements, walker)
+// ForEach applies the 'consumer' function for every key
+func (m MapKeys[K, V]) ForEach(consumer func(K)) {
+	map_.ForEachKey(m.elements, consumer)
 }
 
 // Filter returns a loop consisting of elements that satisfy the condition of the 'predicate' function

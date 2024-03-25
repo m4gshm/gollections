@@ -33,8 +33,7 @@ func (s Set[T]) All(consumer func(T) bool) {
 
 // Loop creates a loop to iterating through elements.
 func (s Set[T]) Loop() loop.Loop[T] {
-	h := s.Head()
-	return h.Next
+	return loop.Of(s.order...)
 }
 
 // Head creates an iterator and returns as implementation type value
@@ -87,14 +86,14 @@ func (s Set[T]) IsEmpty() bool {
 	return s.Len() == 0
 }
 
-// For applies the 'walker' function for every element. Return the c.Break to stop.
-func (s Set[T]) For(walker func(T) error) error {
-	return slice.For(s.order, walker)
+// For applies the 'consumer' function for every element. Return the c.Break to stop.
+func (s Set[T]) For(consumer func(T) error) error {
+	return slice.For(s.order, consumer)
 }
 
-// ForEach applies the 'walker' function for every element
-func (s Set[T]) ForEach(walker func(T)) {
-	slice.ForEach(s.order, walker)
+// ForEach applies the 'consumer' function for every element
+func (s Set[T]) ForEach(consumer func(T)) {
+	slice.ForEach(s.order, consumer)
 }
 
 // Filter returns a loop consisting of elements that satisfy the condition of the 'predicate' function

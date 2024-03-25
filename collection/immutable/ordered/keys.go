@@ -32,7 +32,7 @@ func (m MapKeys[K]) All(consumer func(K) bool) {
 
 // Loop creates a loop to iterating through elements.
 func (m MapKeys[K]) Loop() loop.Loop[K] {
-	return m.Head().Next
+	return loop.Of(m.keys...)
 }
 
 // Head creates an iterator and returns as implementation type value
@@ -72,14 +72,14 @@ func (m MapKeys[K]) Append(out []K) []K {
 	return out
 }
 
-// For applies the 'walker' function for every key. Return the c.Break to stop.
-func (m MapKeys[K]) For(walker func(K) error) error {
-	return slice.For(m.keys, walker)
+// For applies the 'consumer' function for every key. Return the c.Break to stop.
+func (m MapKeys[K]) For(consumer func(K) error) error {
+	return slice.For(m.keys, consumer)
 }
 
-// ForEach applies the 'walker' function for every element
-func (m MapKeys[K]) ForEach(walker func(K)) {
-	slice.ForEach(m.keys, walker)
+// ForEach applies the 'consumer' function for every element
+func (m MapKeys[K]) ForEach(consumer func(K)) {
+	slice.ForEach(m.keys, consumer)
 }
 
 // Filter returns a loop consisting of elements that satisfy the condition of the 'predicate' function

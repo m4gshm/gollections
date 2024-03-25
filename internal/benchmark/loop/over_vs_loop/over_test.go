@@ -24,7 +24,7 @@ func Benchmark_loop_Converted(b *testing.B) {
 	}
 }
 
-func Benchmark_loop_Converted_rangefunc(b *testing.B) {
+func Benchmark_loop_Converted_All(b *testing.B) {
 	integers := range_.Of(0, max)
 	for i := 0; i < b.N; i++ {
 		for element := range loop.Convert(integers, strconv.Itoa).All {

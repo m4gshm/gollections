@@ -11,7 +11,7 @@ import (
 	"github.com/m4gshm/gollections/slice"
 )
 
-func Test_VectorIterate_go_1_22(t *testing.T) {
+func Test_VectorIterate_All(t *testing.T) {
 	vec := vector.Of(1, 1, 2, 4, 3, 1)
 	expected := slice.Of(1, 1, 2, 4, 3, 1)
 

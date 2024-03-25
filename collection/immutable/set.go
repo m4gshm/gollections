@@ -73,15 +73,15 @@ func (s Set[T]) IsEmpty() bool {
 	return s.Len() == 0
 }
 
-// For applies the 'walker' function for the elements. Return the c.Break to stop.
-func (s Set[T]) For(walker func(T) error) error {
+// For applies the 'consumer' function for the elements. Return the c.Break to stop.
+func (s Set[T]) For(consumer func(T) error) error {
 
-	return map_.ForKeys(s.elements, walker)
+	return map_.ForKeys(s.elements, consumer)
 }
 
-// ForEach applies the 'walker' function for every element
-func (s Set[T]) ForEach(walker func(T)) {
-	map_.ForEachKey(s.elements, walker)
+// ForEach applies the 'consumer' function for every element
+func (s Set[T]) ForEach(consumer func(T)) {
+	map_.ForEachKey(s.elements, consumer)
 }
 
 // Filter returns a loop consisting of elements that satisfy the condition of the 'predicate' function

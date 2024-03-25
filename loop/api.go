@@ -53,13 +53,13 @@ func New[S, T any](source S, hasNext func(S) bool, getNext func(S) T) Loop[T] {
 	}
 }
 
-// For applies the 'walker' function for the elements retrieved by the 'next' function. Return the c.Break to stop
-func For[T any](next func() (T, bool), walker func(T) error) error {
+// For applies the 'consumer' function for the elements retrieved by the 'next' function. Return the c.Break to stop
+func For[T any](next func() (T, bool), consumer func(T) error) error {
 	if next == nil {
 		return nil
 	}
 	for v, ok := next(); ok; v, ok = next() {
-		if err := walker(v); err == Break {
+		if err := consumer(v); err == Break {
 			return nil
 		} else if err != nil {
 			return err
@@ -68,24 +68,24 @@ func For[T any](next func() (T, bool), walker func(T) error) error {
 	return nil
 }
 
-// ForEach applies the 'walker' function to the elements retrieved by the 'next' function
-func ForEach[T any](next func() (T, bool), walker func(T)) {
+// ForEach applies the 'consumer' function to the elements retrieved by the 'next' function
+func ForEach[T any](next func() (T, bool), consumer func(T)) {
 	if next == nil {
 		return
 	}
 	for v, ok := next(); ok; v, ok = next() {
-		walker(v)
+		consumer(v)
 	}
 }
 
-// ForEachFiltered applies the 'walker' function to the elements retrieved by the 'next' function that satisfy the 'predicate' function condition
-func ForEachFiltered[T any](next func() (T, bool), predicate func(T) bool, walker func(T)) {
+// ForEachFiltered applies the 'consumer' function to the elements retrieved by the 'next' function that satisfy the 'predicate' function condition
+func ForEachFiltered[T any](next func() (T, bool), predicate func(T) bool, consumer func(T)) {
 	if next == nil {
 		return
 	}
 	for v, ok := next(); ok; v, ok = next() {
 		if predicate(v) {
-			walker(v)
+			consumer(v)
 		}
 	}
 }

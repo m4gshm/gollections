@@ -41,8 +41,10 @@ func (s *Set[T]) All(consumer func(T) bool) {
 
 // Loop creates a loop to iterating through elements.
 func (s *Set[T]) Loop() loop.Loop[T] {
-	h := s.Head()
-	return (&h).Next
+	if s == nil {
+		return nil
+	}
+	return loop.Of((*s.order)...)
 }
 
 // IterEdit creates iterator that can delete iterable elements
@@ -227,8 +229,8 @@ func (s *Set[T]) DeleteActualOne(element T) bool {
 	return false
 }
 
-// For applies the 'walker' function for the elements. Return the c.Break to stop.
-func (s *Set[T]) For(walker func(T) error) error {
+// For applies the 'consumer' function for the elements. Return the c.Break to stop.
+func (s *Set[T]) For(consumer func(T) error) error {
 	if s == nil {
 		return nil
 	}
@@ -236,14 +238,14 @@ func (s *Set[T]) For(walker func(T) error) error {
 	if order == nil {
 		return nil
 	}
-	return slice.For(*order, walker)
+	return slice.For(*order, consumer)
 }
 
-// ForEach applies the 'walker' function for every element
-func (s *Set[T]) ForEach(walker func(T)) {
+// ForEach applies the 'consumer' function for every element
+func (s *Set[T]) ForEach(consumer func(T)) {
 	if s != nil {
 		if order := s.order; order != nil {
-			slice.ForEach(*order, walker)
+			slice.ForEach(*order, consumer)
 		}
 	}
 }

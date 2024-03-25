@@ -4,8 +4,8 @@ import (
 	"unsafe"
 
 	"github.com/m4gshm/gollections/c"
-	kvloop "github.com/m4gshm/gollections/kv/loop"
 	"github.com/m4gshm/gollections/kv/collection"
+	kvloop "github.com/m4gshm/gollections/kv/loop"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
 )
@@ -137,13 +137,13 @@ func (i KeyIter[K, V]) All(consumer func(element K) bool) {
 }
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning Break
-func (i KeyIter[K, V]) For(walker func(element K) error) error {
-	return loop.For(i.Next, walker)
+func (i KeyIter[K, V]) For(consumer func(element K) error) error {
+	return loop.For(i.Next, consumer)
 }
 
 // ForEach FlatIter all elements retrieved by the iterator
-func (i KeyIter[K, V]) ForEach(walker func(element K)) {
-	loop.ForEach(i.Next, walker)
+func (i KeyIter[K, V]) ForEach(consumer func(element K)) {
+	loop.ForEach(i.Next, consumer)
 }
 
 // Next returns the next element.
@@ -179,13 +179,13 @@ func (i ValIter[K, V]) All(consumer func(element V) bool) {
 }
 
 // For takes elements retrieved by the iterator. Can be interrupt by returning Break
-func (i ValIter[K, V]) For(walker func(element V) error) error {
-	return loop.For(i.Next, walker)
+func (i ValIter[K, V]) For(consumer func(element V) error) error {
+	return loop.For(i.Next, consumer)
 }
 
 // ForEach FlatIter all elements retrieved by the iterator
-func (i ValIter[K, V]) ForEach(walker func(element V)) {
-	loop.ForEach(i.Next, walker)
+func (i ValIter[K, V]) ForEach(consumer func(element V)) {
+	loop.ForEach(i.Next, consumer)
 }
 
 // Next returns the next element.

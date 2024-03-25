@@ -59,17 +59,6 @@ func Benchmark_Loop_ImmutableOrderSet_FirstNext(b *testing.B) {
 	}
 }
 
-func Benchmark_Loop_ImmutableOrderSet_ForEach(b *testing.B) {
-	c := oset.Of(values...)
-	for _, casee := range cases {
-		b.Run(casee.name, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
-				c.ForEach(casee.load)
-			}
-		})
-	}
-}
-
 func Benchmark_Loop_ImmutableOrderSet_FirstNext2(b *testing.B) {
 	c := oset.Of(values...)
 	for _, casee := range cases {
@@ -85,6 +74,17 @@ func Benchmark_Loop_ImmutableOrderSet_FirstNext2(b *testing.B) {
 	}
 }
 
+func Benchmark_Loop_ImmutableOrderSet_ForEach(b *testing.B) {
+	c := oset.Of(values...)
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				c.ForEach(casee.load)
+			}
+		})
+	}
+}
+
 func Benchmark_Loop_ImmutableOrderSet_Head_HasNext_GetNext(b *testing.B) {
 	c := oset.Of(values...)
 	for _, casee := range cases {
@@ -93,6 +93,37 @@ func Benchmark_Loop_ImmutableOrderSet_Head_HasNext_GetNext(b *testing.B) {
 				it := c.Head()
 				for it.HasNext() {
 					casee.load(it.GetNext())
+				}
+			}
+		})
+	}
+}
+
+func Benchmark_Loop_ImmutableOrderSet_Loop_Crank_Next(b *testing.B) {
+	c := oset.Of(values...)
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for next, v, ok := c.Loop().Crank(); ok; v, ok = next() {
+					casee.load(v)
+				}
+			}
+		})
+	}
+}
+
+func Benchmark_Loop_ImmutableOrderSet_Loop_Next(b *testing.B) {
+	c := oset.Of(values...)
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				next := c.Loop()
+				for {
+					v, ok := next()
+					if !ok {
+						break
+					}
+					casee.load(v)
 				}
 			}
 		})

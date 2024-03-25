@@ -33,7 +33,7 @@ func (v Vector[T]) All(consumer func(int, T) bool) {
 
 // Loop creates a loop to iterating through elements.
 func (v Vector[T]) Loop() loop.Loop[T] {
-	return v.Head().Next
+	return loop.Of(v.elements...)
 }
 
 // Head creates an iterator and returns as implementation type value
@@ -99,14 +99,14 @@ func (v Vector[T]) TrackEach(tracker func(int, T)) {
 	slice.TrackEach(v.elements, tracker)
 }
 
-// For applies the 'walker' function for the elements. Return the c.Break to stop.
-func (v Vector[T]) For(walker func(T) error) error {
-	return slice.For(v.elements, walker)
+// For applies the 'consumer' function for the elements. Return the c.Break to stop.
+func (v Vector[T]) For(consumer func(T) error) error {
+	return slice.For(v.elements, consumer)
 }
 
-// ForEach applies the 'walker' function for every element
-func (v Vector[T]) ForEach(walker func(T)) {
-	slice.ForEach(v.elements, walker)
+// ForEach applies the 'consumer' function for every element
+func (v Vector[T]) ForEach(consumer func(T)) {
+	slice.ForEach(v.elements, consumer)
 }
 
 // Filter returns a loop consisting of elements that satisfy the condition of the 'predicate' function

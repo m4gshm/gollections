@@ -222,18 +222,18 @@ func (s *Set[T]) DeleteActualOne(element T) (ok bool) {
 	return ok
 }
 
-// For applies the 'walker' function for the elements. Return the c.Break to stop.
-func (s *Set[T]) For(walker func(T) error) error {
+// For applies the 'consumer' function for the elements. Return the c.Break to stop.
+func (s *Set[T]) For(consumer func(T) error) error {
 	if s == nil {
 		return nil
 	}
-	return map_.ForKeys(s.elements, walker)
+	return map_.ForKeys(s.elements, consumer)
 }
 
-// ForEach applies the 'walker' function for every element
-func (s *Set[T]) ForEach(walker func(T)) {
+// ForEach applies the 'consumer' function for every element
+func (s *Set[T]) ForEach(consumer func(T)) {
 	if s != nil {
-		map_.ForEachKey(s.elements, walker)
+		map_.ForEachKey(s.elements, consumer)
 	}
 }
 
