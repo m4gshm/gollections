@@ -118,6 +118,8 @@ func Test_Map_Nil(t *testing.T) {
 
 	m.Reduce(nil)
 	m.Convert(nil).Track(nil)
+	m.ConvertKey(nil).Filter(nil)
+	m.ConvertValue(nil).Filter(nil)
 	m.Filter(nil).Convert(nil).Track(nil)
 
 	m.Keys().For(nil)

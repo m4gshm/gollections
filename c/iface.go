@@ -63,6 +63,7 @@ type Iterator[T any] interface {
 
 	For[T]
 	ForEach[T]
+	All(consumer func(T) bool)
 }
 
 // Sized - storage interface with measurable size
@@ -189,3 +190,5 @@ type Summable interface {
 type Number interface {
 	constraints.Integer | constraints.Float | constraints.Complex
 }
+
+type RangeFunc[T any] func(func(T) bool)

@@ -57,14 +57,18 @@ var (
 	_ c.PrevIterator[any] = (*Iter[any])(nil)
 )
 
+func (i *Iter[T]) All(consumer func(element T) bool) {
+	loop.All(i.Next, consumer)
+}
+
 // For takes elements retrieved by the iterator. Can be interrupt by returning Break
-func (i *Iter[T]) For(walker func(element T) error) error {
-	return loop.For(i.Next, walker)
+func (i *Iter[T]) For(consumer func(element T) error) error {
+	return loop.For(i.Next, consumer)
 }
 
 // ForEach takes all elements retrieved by the iterator.
-func (i *Iter[T]) ForEach(walker func(element T)) {
-	loop.ForEach(i.Next, walker)
+func (i *Iter[T]) ForEach(consumer func(element T)) {
+	loop.ForEach(i.Next, consumer)
 }
 
 // HasNext checks the next element existing

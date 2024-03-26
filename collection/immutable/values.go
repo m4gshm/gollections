@@ -27,6 +27,10 @@ var (
 	_ fmt.Stringer               = MapValues[int, any]{}
 )
 
+func (m MapValues[K, V]) All(consumer func(V) bool) {
+	map_.TrackValuesWhile(m.elements, consumer)
+}
+
 // Loop creates a loop to iterating through elements.
 func (m MapValues[K, V]) Loop() loop.Loop[V] {
 	h := m.Head()
@@ -68,14 +72,14 @@ func (m MapValues[K, V]) Append(out []V) []V {
 	return map_.AppendValues(m.elements, out)
 }
 
-// For applies the 'walker' function for collection values. Return the c.Break to stop.
-func (m MapValues[K, V]) For(walker func(V) error) error {
-	return map_.ForValues(m.elements, walker)
+// For applies the 'consumer' function for collection values. Return the c.Break to stop.
+func (m MapValues[K, V]) For(consumer func(V) error) error {
+	return map_.ForValues(m.elements, consumer)
 }
 
-// ForEach applies the 'walker' function for every value of the collection
-func (m MapValues[K, V]) ForEach(walker func(V)) {
-	map_.ForEachValue(m.elements, walker)
+// ForEach applies the 'consumer' function for every value of the collection
+func (m MapValues[K, V]) ForEach(consumer func(V)) {
+	map_.ForEachValue(m.elements, consumer)
 }
 
 // Filter returns a loop consisting of elements that satisfy the condition of the 'predicate' function

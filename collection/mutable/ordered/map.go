@@ -37,6 +37,12 @@ var (
 	_ fmt.Stringer                                                = (*Map[int, any])(nil)
 )
 
+func (m *Map[K, V]) All(consumer func(K, V) bool) {
+	if m != nil {
+		map_.TrackOrderedWhile(m.order, m.elements, consumer)
+	}
+}
+
 // Loop creates a loop to iterating through elements.
 func (m *Map[K, V]) Loop() loop.Loop[K, V] {
 	h := m.Head()
@@ -115,22 +121,6 @@ func (m *Map[K, V]) Len() int {
 // IsEmpty returns true if the map is empty
 func (m *Map[K, V]) IsEmpty() bool {
 	return m.Len() == 0
-}
-
-// For applies the 'walker' function for key/value pairs. Return the c.Break to stop.
-func (m *Map[K, V]) For(walker func(c.KV[K, V]) error) error {
-	if m == nil {
-		return nil
-	}
-	return map_.ForOrdered(m.order, m.elements, walker)
-}
-
-// ForEach applies the 'walker' function for every key/value pair
-func (m *Map[K, V]) ForEach(walker func(c.KV[K, V])) {
-	if m == nil {
-		return
-	}
-	map_.ForEachOrdered(m.order, m.elements, walker)
 }
 
 // Track applies the 'tracker' function for key/value pairs. Return the c.Break to stop.

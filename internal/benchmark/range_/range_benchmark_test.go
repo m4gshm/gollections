@@ -10,16 +10,25 @@ import (
 )
 
 var (
-	max = 100000
+	max    = 100000
+	values = srange.Closed(1, max)
 )
 
-func Benchmark_Generate_Slice_RangeClosed(b *testing.B) {
+func Benchmark_Slice_RangeClosed_Generate(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		_ = srange.Closed(1, max)
 	}
 }
 
-func Benchmark_For_Over_Loop_RangeClosed(b *testing.B) {
+func Benchmark_Slice_RangeClosed_Iterate(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		for i, v := range values {
+			_, _ = i, v
+		}
+	}
+}
+
+func Benchmark_Loop_RangeClosed_GenerateIterate(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		next := lrange.Closed(1, max)
 		for {
@@ -32,13 +41,13 @@ func Benchmark_For_Over_Loop_RangeClosed(b *testing.B) {
 	}
 }
 
-func Benchmark_Generate_Slice_Sequence(b *testing.B) {
+func Benchmark_Slice_Sequence_Generate(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		_ = slice.Sequence(1, func(prev int) (int, bool) { return prev + 1, prev <= max })
 	}
 }
 
-func Benchmark_For_Over_Loop_Sequence(b *testing.B) {
+func Benchmark_Loop_Sequence_Generate_Iterate(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		next := loop.Sequence(1, func(prev int) (int, bool) { return prev + 1, prev <= max })
 		for {

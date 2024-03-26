@@ -3,9 +3,9 @@ package loop
 // Loop is a function that returns the next element, false if there are no more elements or error if something is wrong.
 type Loop[T any] func() (T, bool, error)
 
-// For applies the 'walker' function for the elements retrieved by the 'next' function. Return the c.Break to stop
-func (next Loop[T]) For(walker func(T) error) error {
-	return For(next, walker)
+// For applies the 'consumer' function for the elements retrieved by the 'next' function. Return the c.Break to stop
+func (next Loop[T]) For(consumer func(T) error) error {
+	return For(next, consumer)
 }
 
 // First returns the first element that satisfies the condition of the 'predicate' function

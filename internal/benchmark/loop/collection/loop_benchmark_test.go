@@ -1,6 +1,7 @@
-package benchmark
+package collection
 
 import (
+	"strconv"
 	"testing"
 
 	oset "github.com/m4gshm/gollections/collection/immutable/ordered/set"
@@ -17,22 +18,16 @@ import (
 var (
 	max        = 100000
 	values     = range_.Closed(1, max)
-	ResultInt  = 0
+	resultInt  = 0
+	resultStr = ""
 	threshhold = max / 2
 )
 
 func HighLoad(v int) {
-	ResultInt = v *
-		v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v *
-		v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v *
-		v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v *
-		v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v *
-		v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v *
-		v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v
+	resultStr = strconv.Itoa(v)
 }
-
 func LowLoad(v int) {
-	ResultInt = v * v
+	resultInt = v * v
 }
 
 type benchCase struct {

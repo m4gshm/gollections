@@ -7,7 +7,6 @@ import (
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/convert/as"
-	"github.com/m4gshm/gollections/kv"
 	"github.com/m4gshm/gollections/map_/resolv"
 )
 
@@ -206,10 +205,10 @@ func ValuesConverted[M ~map[K]V, K comparable, V, Vto any](elements M, by func(V
 	return values
 }
 
-// Track applies the 'tracker' function for every key/value pairs from the 'elements' map. Return the c.Break to stop
-func Track[M ~map[K]V, K comparable, V any](elements M, tracker func(K, V) error) error {
+// Track applies the 'consumer' function for every key/value pairs from the 'elements' map. Return the c.Break to stop
+func Track[M ~map[K]V, K comparable, V any](elements M, consumer func(K, V) error) error {
 	for key, val := range elements {
-		if err := tracker(key, val); err == Break {
+		if err := consumer(key, val); err == Break {
 			return nil
 		} else if err != nil {
 			return err
@@ -218,17 +217,25 @@ func Track[M ~map[K]V, K comparable, V any](elements M, tracker func(K, V) error
 	return nil
 }
 
-// TrackEach applies the 'tracker' function for every key/value pairs from the 'elements' map
-func TrackEach[M ~map[K]V, K comparable, V any](elements M, tracker func(K, V)) {
+// TrackEach applies the 'consumer' function for every key/value pairs from the 'elements' map
+func TrackEach[M ~map[K]V, K comparable, V any](elements M, consumer func(K, V)) {
 	for key, val := range elements {
-		tracker(key, val)
+		consumer(key, val)
 	}
 }
 
-// For applies the 'walker' function for key/value pairs from the elements. Return the c.Break to stop.
-func For[M ~map[K]V, K comparable, V any](elements M, walker func(c.KV[K, V]) error) error {
+func TrackWhile[M ~map[K]V, K comparable, V any](elements M, consumer func(K, V) bool) {
 	for key, val := range elements {
-		if err := walker(kv.New(key, val)); err == Break {
+		if !consumer(key, val) {
+			break
+		}
+	}
+}
+
+// TrackOrdered applies the 'consumer' function for key/value pairs from the 'elements' map in order of the 'order' slice. Return the c.Break to stop
+func TrackOrdered[M ~map[K]V, K comparable, V any](order []K, elements M, consumer func(K, V) error) error {
+	for _, key := range order {
+		if err := consumer(key, elements[key]); err == Break {
 			return nil
 		} else if err != nil {
 			return err
@@ -237,74 +244,49 @@ func For[M ~map[K]V, K comparable, V any](elements M, walker func(c.KV[K, V]) er
 	return nil
 }
 
-// ForEach applies the 'walker' function for every key/value pair from the elements map
-func ForEach[M ~map[K]V, K comparable, V any](elements M, walker func(c.KV[K, V])) {
-	for key, val := range elements {
-		walker(kv.New(key, val))
+// TrackEachOrdered applies the 'consumer' function for evey key/value pair from the 'elements' map in order of the 'order' slice
+func TrackEachOrdered[M ~map[K]V, K comparable, V any](order []K, uniques M, consumer func(K, V)) {
+	for _, key := range order {
+		consumer(key, uniques[key])
 	}
 }
 
-// TrackOrdered applies the 'tracker' function for key/value pairs from the 'elements' map in order of the 'order' slice. Return the c.Break to stop
-func TrackOrdered[M ~map[K]V, K comparable, V any](order []K, elements M, tracker func(K, V) error) error {
+func TrackOrderedWhile[M ~map[K]V, K comparable, V any](order []K, elements M, consumer func(K, V) bool) {
 	for _, key := range order {
-		if err := tracker(key, elements[key]); err == Break {
-			return nil
-		} else if err != nil {
-			return err
+		if !consumer(key, elements[key]) {
+			return
 		}
 	}
-	return nil
 }
 
-// TrackEachOrdered applies the 'tracker' function for evey key/value pair from the 'elements' map in order of the 'order' slice
-func TrackEachOrdered[M ~map[K]V, K comparable, V any](order []K, uniques M, tracker func(K, V)) {
+func TrackOrderedValuesWhile[M ~map[K]V, K comparable, V any](order []K, elements M, consumer func(V) bool) {
 	for _, key := range order {
-		tracker(key, uniques[key])
-	}
-}
-
-// ForOrdered applies the 'walker' function for every key/value pair from the 'elements' map in order of the 'order' slice. Return the c.Break to stop.
-func ForOrdered[M ~map[K]V, K comparable, V any](order []K, elements M, walker func(c.KV[K, V]) error) error {
-	for _, key := range order {
-		if err := walker(kv.New(key, elements[key])); err == Break {
-			return nil
-		} else if err != nil {
-			return err
+		if !consumer(elements[key]) {
+			return
 		}
 	}
-	return nil
 }
 
-// ForEachOrdered applies the 'walker' function for every key/value pair from the 'elements' map in order of the 'order' slice.
-func ForEachOrdered[M ~map[K]V, K comparable, V any](order []K, elements M, walker func(c.KV[K, V])) {
-	for _, key := range order {
-		walker(kv.New(key, elements[key]))
-	}
-}
-
-// ForKeys applies the 'walker' function for keys from the 'elements' map . Return the c.Break to stop.
-func ForKeys[M ~map[K]V, K comparable, V any](elements M, walker func(K) error) error {
+func TrackKeysWhile[M ~map[K]V, K comparable, V any](elements M, consumer func(K) bool) {
 	for key := range elements {
-		if err := walker(key); err == Break {
-			return nil
-		} else if err != nil {
-			return err
+		if !consumer(key) {
+			break
 		}
 	}
-	return nil
 }
 
-// ForEachKey applies the 'walker' function for every key from from the 'elements' map
-func ForEachKey[M ~map[K]V, K comparable, V any](elements M, walker func(K)) {
+func TrackValuesWhile[M ~map[K]V, K comparable, V any](elements M, consumer func(V) bool) {
+	for _, val := range elements {
+		if !consumer(val) {
+			break
+		}
+	}
+}
+
+// ForKeys applies the 'consumer' function for keys from the 'elements' map . Return the c.Break to stop.
+func ForKeys[M ~map[K]V, K comparable, V any](elements M, consumer func(K) error) error {
 	for key := range elements {
-		walker(key)
-	}
-}
-
-// ForValues applies the 'walker' function for values from the 'elements' map . Return the c.Break to stop..
-func ForValues[M ~map[K]V, K comparable, V any](elements M, walker func(V) error) error {
-	for _, val := range elements {
-		if err := walker(val); err == Break {
+		if err := consumer(key); err == Break {
 			return nil
 		} else if err != nil {
 			return err
@@ -313,18 +295,37 @@ func ForValues[M ~map[K]V, K comparable, V any](elements M, walker func(V) error
 	return nil
 }
 
-// ForEachValue applies the 'walker' function for every value from from the 'elements' map
-func ForEachValue[M ~map[K]V, K comparable, V any](elements M, walker func(V)) {
-	for _, val := range elements {
-		walker(val)
+// ForEachKey applies the 'consumer' function for every key from from the 'elements' map
+func ForEachKey[M ~map[K]V, K comparable, V any](elements M, consumer func(K)) {
+	for key := range elements {
+		consumer(key)
 	}
 }
 
-// ForOrderedValues applies the 'walker' function for values from the 'elements' map in order of the 'order' slice. Return the c.Break to stop..
-func ForOrderedValues[M ~map[K]V, K comparable, V any](order []K, elements M, walker func(V) error) error {
+// ForValues applies the 'consumer' function for values from the 'elements' map . Return the c.Break to stop..
+func ForValues[M ~map[K]V, K comparable, V any](elements M, consumer func(V) error) error {
+	for _, val := range elements {
+		if err := consumer(val); err == Break {
+			return nil
+		} else if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// ForEachValue applies the 'consumer' function for every value from from the 'elements' map
+func ForEachValue[M ~map[K]V, K comparable, V any](elements M, consumer func(V)) {
+	for _, val := range elements {
+		consumer(val)
+	}
+}
+
+// ForOrderedValues applies the 'consumer' function for values from the 'elements' map in order of the 'order' slice. Return the c.Break to stop..
+func ForOrderedValues[M ~map[K]V, K comparable, V any](order []K, elements M, consumer func(V) error) error {
 	for _, key := range order {
 		val := elements[key]
-		if err := walker(val); err == Break {
+		if err := consumer(val); err == Break {
 			return nil
 		} else if err != nil {
 			return err
@@ -333,11 +334,11 @@ func ForOrderedValues[M ~map[K]V, K comparable, V any](order []K, elements M, wa
 	return nil
 }
 
-// ForEachOrderedValues applies the 'walker' function for each value from the 'elements' map in order of the 'order' slice
-func ForEachOrderedValues[M ~map[K]V, K comparable, V any](order []K, elements M, walker func(V)) {
+// ForEachOrderedValues applies the 'consumer' function for each value from the 'elements' map in order of the 'order' slice
+func ForEachOrderedValues[M ~map[K]V, K comparable, V any](order []K, elements M, consumer func(V)) {
 	for _, key := range order {
 		val := elements[key]
-		walker(val)
+		consumer(val)
 	}
 }
 

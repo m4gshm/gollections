@@ -1,4 +1,4 @@
-package loopexamples
+package collection
 
 import (
 	"testing"
@@ -30,7 +30,7 @@ func Test_Iterating_Iter(t *testing.T) {
 func Test_Iterating_ForEach(t *testing.T) {
 
 	uniques := set.From(range_.Of(0, 100))
-	uniques.ForEach(func(i int) { doOp(i) })
+	uniques.ForEach(doOp)
 
 }
 

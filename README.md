@@ -561,6 +561,16 @@ These functions combine converters, filters and reducers.
 
 ### Iterating over loops
 
+- (only for go 1.22) Using rangefunc `All` like:
+
+``` go
+for i := range range_.Of(0, 100).All {
+    doOp(i)
+}
+```
+
+don’t forget exec `go env -w GOEXPERIMENT=rangefunc` before compile.
+
 - Using `for` statement like:
 
 ``` go
@@ -581,7 +591,7 @@ for next, i, ok := range_.Of(0, 100).Crank(); ok; i, ok = next() {
 - `ForEach` method
 
 ``` go
-range_.Of(0, 100).ForEach(func(i int) { doOp(i) })
+range_.Of(0, 100).ForEach(doOp)
 ```
 
 - or `For` method that can be aborted by returning `Break` for expected
@@ -739,6 +749,15 @@ The same underlying interfaces but for read-only use cases.
 
 ### Iterating over containers
 
+- (only for go 1.22) Using rangefunc `All` like:
+
+``` go
+uniques := set.From(range_.Of(0, 100))
+for i := range uniques.All {
+    doOp(i)
+}
+```
+
 - Using `for` statement like:
 
 ``` go
@@ -762,7 +781,7 @@ for iter, i, ok := uniques.First(); ok; i, ok = iter.Next() {
 
 ``` go
 uniques := set.From(range_.Of(0, 100))
-uniques.ForEach(func(i int) { doOp(i) })
+uniques.ForEach(doOp)
 ```
 
 - or `For` method that can be aborted by returning `Break` for expected

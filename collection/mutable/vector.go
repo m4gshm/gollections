@@ -32,12 +32,18 @@ var (
 	_ fmt.Stringer                 = (*Vector[any])(nil)
 )
 
+func (v *Vector[T]) All(consumer func(int, T) bool) {
+	if v != nil {
+		slice.TrackWhile(*v, consumer)
+	}
+}
+
 // Loop creates a loop to iterating through elements.
 func (v *Vector[T]) Loop() loop.Loop[T] {
 	if v == nil {
 		return nil
 	}
-	return v.Head().Next
+	return loop.Of(*v...)
 }
 
 // Head creates an iterator and returns as implementation type value
@@ -119,18 +125,18 @@ func (v *Vector[T]) TrackEach(tracker func(int, T)) {
 	}
 }
 
-// For applies the 'walker' function for the elements. Return the c.Break to stop.
-func (v *Vector[T]) For(walker func(T) error) error {
+// For applies the 'consumer' function for the elements. Return the c.Break to stop.
+func (v *Vector[T]) For(consumer func(T) error) error {
 	if v == nil {
 		return nil
 	}
-	return slice.For(*v, walker)
+	return slice.For(*v, consumer)
 }
 
-// ForEach applies walker to elements without error checking
-func (v *Vector[T]) ForEach(walker func(T)) {
+// ForEach applies consumer to elements without error checking
+func (v *Vector[T]) ForEach(consumer func(T)) {
 	if !(v == nil) {
-		slice.ForEach(*v, walker)
+		slice.ForEach(*v, consumer)
 	}
 }
 

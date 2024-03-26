@@ -26,7 +26,7 @@ func Test_Iterating_EmbeddedFor2(t *testing.T) {
 
 func Test_Iterating_ForEach(t *testing.T) {
 
-	range_.Of(0, 100).ForEach(func(i int) { doOp(i) })
+	range_.Of(0, 100).ForEach(doOp)
 
 }
 
