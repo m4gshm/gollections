@@ -333,6 +333,14 @@ include::../examples/loopexamples/loop_Flat_test.go[lines=13..16,indent=0]
 These functions combine converters, filters and reducers.
 
 ==== Iterating over loops
+* (only for go 1.22) Using rangefunc `All` like:
+
+[source,go]
+----
+include::../examples/loopexamples/loop_iterating_go_1_22_test.go[lines=12..16,indent=0]
+----
+don't forget exec `go env -w GOEXPERIMENT=rangefunc` before compile.
+
 * Using `for` statement like:
 
 [source,go]
@@ -389,18 +397,6 @@ It is used for computations where an error may occur.
 [source,go]
 ----
 include::../examples/loopexamples/breakloop/loop_filter_convert_reduce_test.go[lines=13..19,indent=0]
-----
-
-==== Go 1.22 range-over-function iterators (not finalized feature)
-
-Activates by `go env -w GOEXPERIMENT=rangefunc`
-
-Introduced as `All(consumer func(T) bool)` method of collection, iterator types.
-
-
-[source,go]
-----
-include::../examples/loop/loop_range_iter_go1_22_test.go[lines=15..20,indent=0]
 ----
 
 ==== Expressions: link:./expr/use/api.go[use.If], link:./expr/get/api.go[get.If], link:#firstof[first.Of], link:#lastof[last.Of]
@@ -480,6 +476,12 @@ include::../examples/collection/mutable/omap.go[lines=11..15,indent=0]
 The same underlying interfaces but for read-only use cases.
 
 ==== Iterating over containers
+* (only for go 1.22) Using rangefunc `All` like:
+
+[source,go]
+----
+include::../examples/collection/collection_iterating_go_1_22_test.go[lines=13..18,indent=0]
+----
 * Using `for` statement like:
 
 [source,go]
