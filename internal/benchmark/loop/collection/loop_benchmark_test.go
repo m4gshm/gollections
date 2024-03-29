@@ -1,7 +1,6 @@
 package collection
 
 import (
-	"strconv"
 	"testing"
 
 	oset "github.com/m4gshm/gollections/collection/immutable/ordered/set"
@@ -19,15 +18,15 @@ var (
 	max        = 100000
 	values     = range_.Closed(1, max)
 	resultInt  = 0
-	resultStr = ""
 	threshhold = max / 2
 )
 
-func HighLoad(v int) {
-	resultStr = strconv.Itoa(v)
-}
 func LowLoad(v int) {
-	resultInt = v * v
+	resultInt = 0
+}
+
+func HighLoad(v int) {
+	resultInt = v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v
 }
 
 type benchCase struct {
@@ -35,7 +34,7 @@ type benchCase struct {
 	load func(int)
 }
 
-var cases = []benchCase{ /*{"high", HighLoad}, */ {"low", LowLoad}}
+var cases = []benchCase{{"high", HighLoad}, {"low", LowLoad}}
 
 func Benchmark_Loop_ImmutableOrderSet_FirstNext(b *testing.B) {
 	c := oset.Of(values...)

@@ -65,7 +65,7 @@ func Benchmark_loop_Convert_Filtered(b *testing.B) {
 	}
 }
 
-func Benchmark_loop_Convert_Filtered_rengefunc(b *testing.B) {
+func Benchmark_loop_Convert_Filtered_rangefunc(b *testing.B) {
 	integers := range_.Of(0, max)
 	for i := 0; i < b.N; i++ {
 		for element := range loop.Convert(loop.Filter(integers, even), strconv.Itoa).All {

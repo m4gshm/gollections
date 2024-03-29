@@ -1,7 +1,6 @@
 package collection2
 
 import (
-	"strconv"
 	"testing"
 
 	oset "github.com/m4gshm/gollections/collection/immutable/ordered/set"
@@ -13,16 +12,14 @@ var (
 	values = range_.Closed(1, max)
 )
 
-var resultStr = ""
-
-func HighLoad(v int) {
-	resultStr = strconv.Itoa(v)
-}
-
 var resultInt = 0
 
 func LowLoad(v int) {
 	resultInt = v * v
+}
+
+func HighLoad(v int) {
+	resultInt = v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v
 }
 
 type benchCase struct {
