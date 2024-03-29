@@ -835,6 +835,14 @@ func ConvAndReduce[From, To any](next func() (From, bool, error), converter func
 	return Reduce(Conv(next, converter), merger)
 }
 
+// Crank rertieves a next element from the 'next' function, returns the function, element, successfully flag.
+func Crank[T any](next func() (T, bool, error)) (n Loop[T], t T, ok bool, err error) {
+	if next != nil {
+		t, ok, err = next()
+	}
+	return next, t, ok, err
+}
+
 func brk(err error) error {
 	if errors.Is(err, c.Break) {
 		return nil

@@ -34,3 +34,8 @@ func (next Loop[K, V]) Filt(filter func(K, V) (bool, error)) Loop[K, V] {
 func (next Loop[K, V]) Filter(filter func(K, V) bool) Loop[K, V] {
 	return Filter(next, filter)
 }
+
+// Crank rertieves next key\value elements from the 'next' function, returns the function, element, successfully flag.
+func (next Loop[K, V]) Crank() (Loop[K, V], K, V, bool, error) {
+	return Crank(next)
+}

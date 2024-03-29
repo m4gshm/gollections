@@ -175,3 +175,11 @@ func ToSlice[K, V, T any](next func() (K, V, bool), converter func(K, V) T) []T 
 	}
 	return s
 }
+
+// Crank rertieves next key\value from the 'next' function, returns the function, element, successfully flag.
+func Crank[K, V any](next func() (K, V, bool)) (n Loop[K, V], k K, v V, ok bool) {
+	if next != nil {
+		k, v, ok = next()
+	}
+	return next, k, v, ok
+}

@@ -95,3 +95,8 @@ func (next Loop[K, V]) ConvertValue(converter func(V) V) Loop[K, V] {
 func (next Loop[K, V]) ConvValue(converter func(V) (V, error)) breakkvloop.Loop[K, V] {
 	return Conv(next, breakMapConvert.Value[K](converter))
 }
+
+// Crank rertieves a next element from the 'next' function, returns the function, element, successfully flag.
+func (next Loop[K, V]) Crank() (Loop[K, V], K, V, bool) {
+	return Crank(next)
+}

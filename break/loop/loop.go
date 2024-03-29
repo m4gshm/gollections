@@ -43,3 +43,8 @@ func (next Loop[T]) HasAny(predicate func(T) bool) (bool, error) {
 func (next Loop[T]) Filter(filter func(T) bool) Loop[T] {
 	return Filter(next, filter)
 }
+
+// Crank rertieves a next element from the 'next' function, returns the function, element, successfully flag.
+func (next Loop[T]) Crank() (Loop[T], T, bool, error) {
+	return Crank(next)
+}

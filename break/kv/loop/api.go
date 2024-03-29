@@ -210,6 +210,14 @@ func Track[I, T any](next func() (I, T, bool, error), consumer func(I, T) error)
 	}
 }
 
+// Crank rertieves a next element from the 'next' function, returns the function, element, successfully flag.
+func Crank[K, V any](next func() (K, V, bool, error)) (n Loop[K, V], k K, v V, ok bool, err error) {
+	if next != nil {
+		k, v, ok, err = next()
+	}
+	return next, k, v, ok, err
+}
+
 func brk(err error) error {
 	if errors.Is(err, c.Break) {
 		return nil
