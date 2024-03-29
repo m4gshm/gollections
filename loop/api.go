@@ -6,6 +6,7 @@ import (
 
 	"golang.org/x/exp/constraints"
 
+	breakkvloop "github.com/m4gshm/gollections/break/kv/loop"
 	breakloop "github.com/m4gshm/gollections/break/loop"
 	breakAlways "github.com/m4gshm/gollections/break/predicate/always"
 	"github.com/m4gshm/gollections/c"
@@ -444,12 +445,12 @@ func KeyValue[T any, K, V any](next func() (T, bool), keyExtractor func(T) K, va
 }
 
 // KeyValuee transforms a loop to the key/value loop based on applying key, value extractors to the elements
-func KeyValuee[T any, K, V any](next func() (T, bool), keyExtractor func(T) (K, error), valExtractor func(T) (V, error)) func() (K, V, bool, error) {
+func KeyValuee[T any, K, V any](next func() (T, bool), keyExtractor func(T) (K, error), valExtractor func(T) (V, error)) breakkvloop.Loop[K, V] {
 	return breakloop.KeyValuee(breakloop.From(next), keyExtractor, valExtractor)
 }
 
 // KeysValues transforms a loop to the key/value loop based on applying multiple keys, values extractor to the elements
-func KeysValues[T, K, V any](next func() (T, bool), keysExtractor func(T) []K, valsExtractor func(T) []V) func() (K, V, bool) {
+func KeysValues[T, K, V any](next func() (T, bool), keysExtractor func(T) []K, valsExtractor func(T) []V) kvloop.Loop[K, V] {
 	if next == nil {
 		return nil
 	}
@@ -495,22 +496,22 @@ func KeysValues[T, K, V any](next func() (T, bool), keysExtractor func(T) []K, v
 }
 
 // KeysValue transforms a loop to the key/value loop based on applying keys, value extractor to the elements
-func KeysValue[T, K, V any](next func() (T, bool), keysExtractor func(T) []K, valExtractor func(T) V) func() (K, V, bool) {
+func KeysValue[T, K, V any](next func() (T, bool), keysExtractor func(T) []K, valExtractor func(T) V) kvloop.Loop[K, V] {
 	return KeysValues(next, keysExtractor, func(t T) []V { return convert.AsSlice(valExtractor(t)) })
 }
 
 // KeysValuee transforms a loop to the key/value loop based on applying keys, value extractor to the elements
-func KeysValuee[T, K, V any](next func() (T, bool), keysExtractor func(T) ([]K, error), valExtractor func(T) (V, error)) func() (K, V, bool, error) {
+func KeysValuee[T, K, V any](next func() (T, bool), keysExtractor func(T) ([]K, error), valExtractor func(T) (V, error)) breakkvloop.Loop[K, V] {
 	return breakloop.KeysValuee(breakloop.From(next), keysExtractor, valExtractor)
 }
 
 // KeyValues transforms a loop to the key/value loop based on applying key, values extractor to the elements
-func KeyValues[T, K, V any](next func() (T, bool), keyExtractor func(T) K, valsExtractor func(T) []V) func() (K, V, bool) {
+func KeyValues[T, K, V any](next func() (T, bool), keyExtractor func(T) K, valsExtractor func(T) []V) kvloop.Loop[K, V] {
 	return KeysValues(next, func(t T) []K { return convert.AsSlice(keyExtractor(t)) }, valsExtractor)
 }
 
 // KeyValuess transforms a loop to the key/value loop based on applying key, values extractor to the elements
-func KeyValuess[T, K, V any](next func() (T, bool), keyExtractor func(T) (K, error), valsExtractor func(T) ([]V, error)) func() (K, V, bool, error) {
+func KeyValuess[T, K, V any](next func() (T, bool), keyExtractor func(T) (K, error), valsExtractor func(T) ([]V, error)) breakkvloop.Loop[K, V] {
 	return breakloop.KeyValuess(breakloop.From(next), keyExtractor, valsExtractor)
 }
 
@@ -520,7 +521,7 @@ func ExtraVals[T, V any](next func() (T, bool), valsExtractor func(T) []V) func(
 }
 
 // ExtraValss transforms a loop to the key/value loop based on applying values extractor to the elements
-func ExtraValss[T, V any](next func() (T, bool), valsExtractor func(T) ([]V, error)) func() (T, V, bool, error) {
+func ExtraValss[T, V any](next func() (T, bool), valsExtractor func(T) ([]V, error)) breakkvloop.Loop[T, V] {
 	return KeyValuess(next, as.ErrTail(as.Is[T]), valsExtractor)
 }
 
@@ -530,7 +531,7 @@ func ExtraKeys[T, K any](next func() (T, bool), keysExtractor func(T) []K) func(
 }
 
 // ExtraKeyss transforms a loop to the key/value loop based on applying key extractor to the elements
-func ExtraKeyss[T, K any](next func() (T, bool), keyExtractor func(T) (K, error)) func() (K, T, bool, error) {
+func ExtraKeyss[T, K any](next func() (T, bool), keyExtractor func(T) (K, error)) breakkvloop.Loop[K, T] {
 	return KeyValuess(next, keyExtractor, as.ErrTail(convert.AsSlice[T]))
 }
 
@@ -540,7 +541,7 @@ func ExtraKey[T, K any](next func() (T, bool), keysExtractor func(T) K) func() (
 }
 
 // ExtraKeyy transforms a loop to the key/value loop based on applying key extractor to the elements
-func ExtraKeyy[T, K any](next func() (T, bool), keyExtractor func(T) (K, error)) func() (K, T, bool, error) {
+func ExtraKeyy[T, K any](next func() (T, bool), keyExtractor func(T) (K, error)) breakkvloop.Loop[K, T] {
 	return breakloop.KeyValuee[T, K](breakloop.From(next), keyExtractor, as.ErrTail(as.Is[T]))
 }
 
@@ -550,7 +551,7 @@ func ExtraValue[T, V any](next func() (T, bool), valueExtractor func(T) V) func(
 }
 
 // ExtraValuee transforms a loop to the key/value loop based on applying value extractor to the elements
-func ExtraValuee[T, V any](next func() (T, bool), valExtractor func(T) (V, error)) func() (T, V, bool, error) {
+func ExtraValuee[T, V any](next func() (T, bool), valExtractor func(T) (V, error)) breakkvloop.Loop[T, V] {
 	return breakloop.KeyValuee[T, T, V](breakloop.From(next), as.ErrTail(as.Is[T]), valExtractor)
 }
 
