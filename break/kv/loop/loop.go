@@ -1,13 +1,12 @@
 package loop
 
-import "github.com/m4gshm/gollections/break/loop"
 
 // Loop is a function that returns the next key, value or false if there are no more elements.
 type Loop[K, V any] func() (K, V, bool, error)
 
 // Track applies the 'consumer' function to position/element pairs retrieved by the 'next' function until the consumer returns the c.Break to stop.
 func (next Loop[K, V]) Track(consumer func(K, V) error) error {
-	return loop.Track(next, consumer)
+	return Track(next, consumer)
 }
 
 // Deprecated: First is deprecated. Will be replaced by rance-over function iterator.

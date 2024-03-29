@@ -2,6 +2,9 @@
 package loop
 
 import (
+	"errors"
+
+	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/map_/resolv"
 )
 
@@ -191,4 +194,25 @@ func ToSlice[K, V, T any](next func() (K, V, bool, error), converter func(K, V) 
 			return s, err
 		}
 	}
+}
+
+// Track applies the 'consumer' function to position/element pairs retrieved by the 'next' function until the consumer returns the c.Break to stop.
+func Track[I, T any](next func() (I, T, bool, error), consumer func(I, T) error) error {
+	if next == nil {
+		return nil
+	}
+	for {
+		if p, v, ok, err := next(); err != nil || !ok {
+			return err
+		} else if err := consumer(p, v); err != nil {
+			return brk(err)
+		}
+	}
+}
+
+func brk(err error) error {
+	if errors.Is(err, c.Break) {
+		return nil
+	}
+	return err
 }

@@ -29,12 +29,12 @@ func (i *MapIter[K, V]) All(consumer func(key K, value V) bool) {
 
 // Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning Break
 func (i *MapIter[K, V]) Track(traker func(key K, value V) error) error {
-	return loop.Track(i.Next, traker)
+	return kvloop.Track(i.Next, traker)
 }
 
 // TrackEach takes all key, value pairs retrieved by the iterator
 func (i *MapIter[K, V]) TrackEach(traker func(key K, value V)) {
-	loop.TrackEach(i.Next, traker)
+	kvloop.TrackEach(i.Next, traker)
 }
 
 // Next returns the next key/value pair.
