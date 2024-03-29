@@ -3,11 +3,12 @@ package loop
 // Loop is a function that returns the next element, false if there are no more elements or error if something is wrong.
 type Loop[T any] func() (T, bool, error)
 
-// For applies the 'consumer' function for the elements retrieved by the 'next' function. Return the c.Break to stop
+// For applies the 'consumer' function for the elements retrieved by the 'next' function until the consumer returns the c.Break to stop.
 func (next Loop[T]) For(consumer func(T) error) error {
 	return For(next, consumer)
 }
 
+// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 // First returns the first element that satisfies the condition of the 'predicate' function
 func (next Loop[T]) First(predicate func(T) bool) (T, bool, error) {
 	return First(next, predicate)

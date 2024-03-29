@@ -33,6 +33,7 @@ var (
 	_ fmt.Stringer                    = (*Set[int])(nil)
 )
 
+// All is used to iterate through the collection using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
 func (s *Set[T]) All(consumer func(T) bool) {
 	for v := range s.elements {
 		if !consumer(v) {
@@ -41,7 +42,7 @@ func (s *Set[T]) All(consumer func(T) bool) {
 	}
 }
 
-// Loop creates a loop to iterating through elements.
+// Loop creates a loop to iterate through the collection.
 func (s *Set[T]) Loop() loop.Loop[T] {
 	h := s.Head()
 	return (&h).Next
@@ -53,7 +54,8 @@ func (s *Set[T]) IterEdit() c.DelIterator[T] {
 	return &h
 }
 
-// Head creates an iterator and returns as implementation type value
+// Deprecated: Head is deprecated. Will be replaced by rance-over function iterator.
+// Head creates an iterator to iterate through the collection.
 func (s *Set[T]) Head() SetIter[T] {
 	var elements map[T]struct{}
 	if s != nil {
@@ -62,6 +64,7 @@ func (s *Set[T]) Head() SetIter[T] {
 	return NewSetIter(elements, s.DeleteOne)
 }
 
+// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
 func (s *Set[T]) First() (SetIter[T], T, bool) {
@@ -222,7 +225,7 @@ func (s *Set[T]) DeleteActualOne(element T) (ok bool) {
 	return ok
 }
 
-// For applies the 'consumer' function for the elements. Return the c.Break to stop.
+// For applies the 'consumer' function for the elements until the consumer returns the c.Break to stop.
 func (s *Set[T]) For(consumer func(T) error) error {
 	if s == nil {
 		return nil

@@ -18,18 +18,19 @@ func New[S, K, V any](source S, hasNext func(S) bool, getNext func(S) (K, V)) Lo
 	}
 }
 
+// All is an adapter for the next function for iterating by `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
 func All[K, V any](next func() (K, V, bool), consumer func(K, V) bool) {
 	for k, v, ok := next(); ok && consumer(k, v); k, v, ok = next() {
 	}
 }
 
-// Track applies the 'tracker' function to position/element pairs retrieved by the 'next' function. Return the c.Break to stop tracking..
-func Track[I, T any](next func() (I, T, bool), tracker func(I, T) error) error {
+// Track applies the 'consumer' function to position/element pairs retrieved by the 'next' function until the consumer returns the c.Break to stop.
+func Track[I, T any](next func() (I, T, bool), consumer func(I, T) error) error {
 	if next == nil {
 		return nil
 	}
 	for p, v, ok := next(); ok; p, v, ok = next() {
-		if err := tracker(p, v); err == c.Break {
+		if err := consumer(p, v); err == c.Break {
 			return nil
 		} else if err != nil {
 			return err
@@ -38,13 +39,13 @@ func Track[I, T any](next func() (I, T, bool), tracker func(I, T) error) error {
 	return nil
 }
 
-// TrackEach applies the 'tracker' function to position/element pairs retrieved by the 'next' function
-func TrackEach[I, T any](next func() (I, T, bool), tracker func(I, T)) {
+// TrackEach applies the 'consumer' function to position/element pairs retrieved by the 'next' function
+func TrackEach[I, T any](next func() (I, T, bool), consumer func(I, T)) {
 	if next == nil {
 		return
 	}
 	for p, v, ok := next(); ok; p, v, ok = next() {
-		tracker(p, v)
+		consumer(p, v)
 	}
 }
 
@@ -94,6 +95,7 @@ func HasAnyy[K, V any](next func() (K, V, bool), predicate func(K, V) (bool, err
 	return ok, err
 }
 
+// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 // First returns the first key/value pair that satisfies the condition of the 'predicate' function
 func First[K, V any](next func() (K, V, bool), predicate func(K, V) bool) (K, V, bool) {
 	for {

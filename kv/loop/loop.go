@@ -11,15 +11,16 @@ import (
 // Loop is a function that returns the next key, value or false if there are no more elements.
 type Loop[K, V any] func() (K, V, bool)
 
-func (next Loop[K, V])  All(consumer func(key K, value V) bool) {
+func (next Loop[K, V]) All(consumer func(key K, value V) bool) {
 	All(next, consumer)
 }
 
-// Track applies the 'tracker' function to position/element pairs retrieved by the 'next' function. Return the c.Break to stop tracking..
-func (next Loop[K, V]) Track(tracker func(K, V) error) error {
-	return Track(next, tracker)
+// Track applies the 'consumer' function to position/element pairs retrieved by the 'next' function until the consumer returns the c.Break to stop.
+func (next Loop[K, V]) Track(consumer func(K, V) error) error {
+	return Track(next, consumer)
 }
 
+// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 // First returns the first element that satisfies the condition of the 'predicate' function
 func (next Loop[K, V]) First(predicate func(K, V) bool) (K, V, bool) {
 	return First(next, predicate)

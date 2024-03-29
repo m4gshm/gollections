@@ -27,16 +27,18 @@ var (
 	_ fmt.Stringer           = Vector[any]{}
 )
 
+// All is used to iterate through the collection using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
 func (v Vector[T]) All(consumer func(int, T) bool) {
 	slice.TrackWhile(v.elements, consumer)
 }
 
-// Loop creates a loop to iterating through elements.
+// Loop creates a loop to iterate through the collection.
 func (v Vector[T]) Loop() loop.Loop[T] {
 	return loop.Of(v.elements...)
 }
 
-// Head creates an iterator and returns as implementation type value
+// Deprecated: Head is deprecated. Will be replaced by rance-over function iterator.
+// Head creates an iterator to iterate through the collection.
 func (v Vector[T]) Head() *slice.Iter[T] {
 	return slice.NewHead(v.elements)
 }
@@ -46,6 +48,7 @@ func (v Vector[T]) Tail() *slice.Iter[T] {
 	return slice.NewTail(v.elements)
 }
 
+// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
 func (v Vector[T]) First() (*slice.Iter[T], T, bool) {
@@ -89,17 +92,17 @@ func (v Vector[T]) Get(index int) (out T, ok bool) {
 	return slice.Gett(v.elements, index)
 }
 
-// Track applies the 'tracker' function for elements. Return the c.Break to stop.
-func (v Vector[T]) Track(tracker func(int, T) error) error {
-	return slice.Track(v.elements, tracker)
+// Track applies the 'consumer' function for elements until the consumer returns the c.Break to stop.
+func (v Vector[T]) Track(consumer func(int, T) error) error {
+	return slice.Track(v.elements, consumer)
 }
 
-// TrackEach applies the 'tracker' function for every key/value pairs
-func (v Vector[T]) TrackEach(tracker func(int, T)) {
-	slice.TrackEach(v.elements, tracker)
+// TrackEach applies the 'consumer' function for every key/value pairs
+func (v Vector[T]) TrackEach(consumer func(int, T)) {
+	slice.TrackEach(v.elements, consumer)
 }
 
-// For applies the 'consumer' function for the elements. Return the c.Break to stop.
+// For applies the 'consumer' function for the elements until the consumer returns the c.Break to stop.
 func (v Vector[T]) For(consumer func(T) error) error {
 	return slice.For(v.elements, consumer)
 }

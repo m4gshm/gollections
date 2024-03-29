@@ -35,6 +35,7 @@ var (
 	_ fmt.Stringer                                     = Map[int, any]{}
 )
 
+// All is used to iterate through the collection using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
 func (m Map[K, V]) All(consumer func(k K, v V) bool) {
 	for k, v := range m.elements {
 		if !consumer(k, v) {
@@ -43,17 +44,19 @@ func (m Map[K, V]) All(consumer func(k K, v V) bool) {
 	}
 }
 
-// Loop creates a loop to iterating through elements.
+// Loop creates a loop to iterate through the collection.
 func (m Map[K, V]) Loop() loop.Loop[K, V] {
 	h := m.Head()
 	return h.Next
 }
 
-// Head creates an iterator and returns as implementation type value
+// Deprecated: Head is deprecated. Will be replaced by rance-over function iterator.
+// Head creates an iterator to iterate through the collection.
 func (m Map[K, V]) Head() map_.Iter[K, V] {
 	return map_.NewIter(m.elements)
 }
 
+// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 // First returns the first key/value pair of the map, an iterator to iterate over the remaining pair, and true\false marker of availability next pairs.
 // If no more then ok==false.
 func (m Map[K, V]) First() (map_.Iter[K, V], K, V, bool) {
@@ -134,14 +137,14 @@ func (m Map[K, V]) String() string {
 	return map_.ToString(m.elements)
 }
 
-// Track applies the 'tracker' function for key/value pairs. Return the c.Break to stop.
-func (m Map[K, V]) Track(tracker func(K, V) error) error {
-	return map_.Track(m.elements, tracker)
+// Track applies the 'consumer' function for all key/value pairs until the consumer returns the c.Break to stop.
+func (m Map[K, V]) Track(consumer func(K, V) error) error {
+	return map_.Track(m.elements, consumer)
 }
 
-// TrackEach applies the 'tracker' function for every key/value pairs
-func (m Map[K, V]) TrackEach(tracker func(K, V)) {
-	map_.TrackEach(m.elements, tracker)
+// TrackEach applies the 'consumer' function for every key/value pairs
+func (m Map[K, V]) TrackEach(consumer func(K, V)) {
+	map_.TrackEach(m.elements, consumer)
 }
 
 // FilterKey returns a loop consisting of key/value pairs where the key satisfies the condition of the 'predicate' function

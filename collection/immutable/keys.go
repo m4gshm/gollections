@@ -27,21 +27,24 @@ var (
 	_ fmt.Stringer               = MapKeys[int, any]{}
 )
 
+// All is used to iterate through the collection using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
 func (m MapKeys[K, V]) All(consumer func(K) bool) {
 	map_.TrackKeysWhile(m.elements, consumer)
 }
 
-// Loop creates a loop to iterating through elements.
+// Loop creates a loop to iterate through the collection.
 func (m MapKeys[K, V]) Loop() loop.Loop[K] {
 	h := m.Head()
 	return (&h).Next
 }
 
-// Head creates an iterator and returns as implementation type value
+// Deprecated: Head is deprecated. Will be replaced by rance-over function iterator.
+// Head creates an iterator to iterate through the collection.
 func (m MapKeys[K, V]) Head() map_.KeyIter[K, V] {
 	return map_.NewKeyIter(m.elements)
 }
 
+// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
 func (m MapKeys[K, V]) First() (map_.KeyIter[K, V], K, bool) {
@@ -72,7 +75,7 @@ func (m MapKeys[K, V]) Append(out []K) []K {
 	return map_.AppendKeys(m.elements, out)
 }
 
-// For applies the 'consumer' function for every key. Return the c.Break to stop.
+// For applies the 'consumer' function for every key until the consumer returns the c.Break to stop.
 func (m MapKeys[K, V]) For(consumer func(K) error) error {
 	return map_.ForKeys(m.elements, consumer)
 }

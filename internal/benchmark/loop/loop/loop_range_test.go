@@ -1,7 +1,6 @@
 package loop
 
 import (
-	"strconv"
 	"testing"
 
 	"github.com/m4gshm/gollections/loop"
@@ -10,16 +9,14 @@ import (
 
 var max = 10000
 
-var resultStr = ""
-
 func HighLoad(v int) {
-	resultStr = strconv.Itoa(v)
+	resultInt = v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v
 }
 
 var resultInt = 0
 
 func LowLoad(v int) {
-	resultInt = v * v
+	resultInt = v * v * v
 }
 
 func MidLoad(v int) {
@@ -68,6 +65,19 @@ func Benchmark_LoopRange_Iterating2(b *testing.B) {
 				for ok {
 					casee.load(v)
 					v, ok = next()
+				}
+			}
+		})
+	}
+}
+
+func Benchmark_Slice_Iter_Iterating(b *testing.B) {
+	integers := slice.Range(0, max)
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for it, v, ok := slice.NewHead(integers).Crank(); ok; v, ok = it.Next() {
+					casee.load(v)
 				}
 			}
 		})

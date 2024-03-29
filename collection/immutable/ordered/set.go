@@ -27,16 +27,18 @@ var (
 	_ fmt.Stringer        = Set[int]{}
 )
 
+// All is used to iterate through the collection using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
 func (s Set[T]) All(consumer func(T) bool) {
 	slice.WalkWhile(s.order, consumer)
 }
 
-// Loop creates a loop to iterating through elements.
+// Loop creates a loop to iterate through the collection.
 func (s Set[T]) Loop() loop.Loop[T] {
 	return loop.Of(s.order...)
 }
 
-// Head creates an iterator and returns as implementation type value
+// Deprecated: Head is deprecated. Will be replaced by rance-over function iterator.
+// Head creates an iterator to iterate through the collection.
 func (s Set[T]) Head() *slice.Iter[T] {
 	return slice.NewHead(s.order)
 }
@@ -46,6 +48,7 @@ func (s Set[T]) Tail() *slice.Iter[T] {
 	return slice.NewTail(s.order)
 }
 
+// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
 func (s Set[T]) First() (*slice.Iter[T], T, bool) {
@@ -86,7 +89,7 @@ func (s Set[T]) IsEmpty() bool {
 	return s.Len() == 0
 }
 
-// For applies the 'consumer' function for every element. Return the c.Break to stop.
+// For applies the 'consumer' function for every element until the consumer returns the c.Break to stop.
 func (s Set[T]) For(consumer func(T) error) error {
 	return slice.For(s.order, consumer)
 }

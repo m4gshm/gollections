@@ -27,21 +27,24 @@ var (
 	_ fmt.Stringer               = MapValues[int, any]{}
 )
 
+// All is used to iterate through the collection using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
 func (m MapValues[K, V]) All(consumer func(V) bool) {
 	map_.TrackValuesWhile(m.elements, consumer)
 }
 
-// Loop creates a loop to iterating through elements.
+// Loop creates a loop to iterate through the collection.
 func (m MapValues[K, V]) Loop() loop.Loop[V] {
 	h := m.Head()
 	return (&h).Next
 }
 
-// Head creates an iterator and returns as implementation type value
+// Deprecated: Head is deprecated. Will be replaced by rance-over function iterator.
+// Head creates an iterator to iterate through the collection.
 func (m MapValues[K, V]) Head() map_.ValIter[K, V] {
 	return map_.NewValIter(m.elements)
 }
 
+// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
 func (m MapValues[K, V]) First() (map_.ValIter[K, V], V, bool) {
@@ -72,7 +75,7 @@ func (m MapValues[K, V]) Append(out []V) []V {
 	return map_.AppendValues(m.elements, out)
 }
 
-// For applies the 'consumer' function for collection values. Return the c.Break to stop.
+// For applies the 'consumer' function for collection values until the consumer returns the c.Break to stop.
 func (m MapValues[K, V]) For(consumer func(V) error) error {
 	return map_.ForValues(m.elements, consumer)
 }

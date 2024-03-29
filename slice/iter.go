@@ -57,6 +57,7 @@ var (
 	_ c.PrevIterator[any] = (*Iter[any])(nil)
 )
 
+// All is used to iterate through the iterator using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
 func (i *Iter[T]) All(consumer func(element T) bool) {
 	loop.All(i.Next, consumer)
 }
@@ -157,7 +158,7 @@ func (i *Iter[T]) Crank() (it *Iter[T], t T, ok bool) {
 	return i, t, ok
 }
 
-// Crank rertieves a prev element, returns the iterator, element and successfully flag.
+// CrankPrev rertieves a prev element, returns the iterator, element and successfully flag.
 func (i *Iter[T]) CrankPrev() (it *Iter[T], t T, ok bool) {
 	if i != nil {
 		t, ok = i.Prev()

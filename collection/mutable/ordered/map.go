@@ -37,19 +37,21 @@ var (
 	_ fmt.Stringer                                                = (*Map[int, any])(nil)
 )
 
+// All is used to iterate through the collection using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
 func (m *Map[K, V]) All(consumer func(K, V) bool) {
 	if m != nil {
 		map_.TrackOrderedWhile(m.order, m.elements, consumer)
 	}
 }
 
-// Loop creates a loop to iterating through elements.
+// Loop creates a loop to iterate through the collection.
 func (m *Map[K, V]) Loop() loop.Loop[K, V] {
 	h := m.Head()
 	return h.Next
 }
 
-// Head creates an iterator and returns as implementation type value
+// Deprecated: Head is deprecated. Will be replaced by rance-over function iterator.
+// Head creates an iterator to iterate through the collection.
 func (m *Map[K, V]) Head() ordered.MapIter[K, V] {
 	var (
 		order    []K
@@ -75,6 +77,7 @@ func (m *Map[K, V]) Tail() ordered.MapIter[K, V] {
 	return ordered.NewMapIter(elements, *slice.NewTail(order))
 }
 
+// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 // First returns the first key/value pair of the map, an iterator to iterate over the remaining pair, and true\false marker of availability next pairs.
 // If no more then ok==false.
 func (m *Map[K, V]) First() (ordered.MapIter[K, V], K, V, bool) {
@@ -123,20 +126,20 @@ func (m *Map[K, V]) IsEmpty() bool {
 	return m.Len() == 0
 }
 
-// Track applies the 'tracker' function for key/value pairs. Return the c.Break to stop.
-func (m *Map[K, V]) Track(tracker func(K, V) error) error {
+// Track applies the 'consumer' function for all key/value pairs until the consumer returns the c.Break to stop.
+func (m *Map[K, V]) Track(consumer func(K, V) error) error {
 	if m == nil {
 		return nil
 	}
-	return map_.TrackOrdered(m.order, m.elements, tracker)
+	return map_.TrackOrdered(m.order, m.elements, consumer)
 }
 
-// TrackEach applies the 'tracker' function for every key/value pairs
-func (m *Map[K, V]) TrackEach(tracker func(K, V)) {
+// TrackEach applies the 'consumer' function for every key/value pairs
+func (m *Map[K, V]) TrackEach(consumer func(K, V)) {
 	if m == nil {
 		return
 	}
-	map_.TrackEachOrdered(m.order, m.elements, tracker)
+	map_.TrackEachOrdered(m.order, m.elements, consumer)
 }
 
 // Contains checks is the map contains a key

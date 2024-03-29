@@ -22,6 +22,7 @@ type MapIter[K comparable, V any] struct {
 
 var _ collection.Iterator[string, any] = (*MapIter[string, any])(nil)
 
+// All is used to iterate through the iterator using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
 func (i *MapIter[K, V]) All(consumer func(key K, value V) bool) {
 	kvloop.All(i.Next, consumer)
 }
@@ -70,6 +71,7 @@ var (
 	_ c.Sized         = (*ValIter[int, any])(nil)
 )
 
+// All is used to iterate through the iterator using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
 func (i *ValIter[K, V]) All(consumer func(element V) bool) {
 	loop.All(i.Next, consumer)
 }

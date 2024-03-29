@@ -32,13 +32,14 @@ var (
 	_ fmt.Stringer                 = (*Vector[any])(nil)
 )
 
+// All is used to iterate through the collection using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
 func (v *Vector[T]) All(consumer func(int, T) bool) {
 	if v != nil {
 		slice.TrackWhile(*v, consumer)
 	}
 }
 
-// Loop creates a loop to iterating through elements.
+// Loop creates a loop to iterate through the collection.
 func (v *Vector[T]) Loop() loop.Loop[T] {
 	if v == nil {
 		return nil
@@ -46,7 +47,8 @@ func (v *Vector[T]) Loop() loop.Loop[T] {
 	return loop.Of(*v...)
 }
 
-// Head creates an iterator and returns as implementation type value
+// Deprecated: Head is deprecated. Will be replaced by rance-over function iterator.
+// Head creates an iterator to iterate through the collection.
 func (v *Vector[T]) Head() *SliceIter[T] {
 	return NewHead(v, v.DeleteActualOne)
 }
@@ -56,6 +58,7 @@ func (v *Vector[T]) Tail() *SliceIter[T] {
 	return NewTail(v, v.DeleteActualOne)
 }
 
+// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
 func (v *Vector[T]) First() (*SliceIter[T], T, bool) {
@@ -110,22 +113,22 @@ func (v *Vector[T]) Len() int {
 	return notsafe.GetLen(*v)
 }
 
-// Track applies tracker to elements with error checking. Return the c.Break to stop tracking.
-func (v *Vector[T]) Track(tracker func(int, T) error) error {
+// Track applies consumer to elements with error checking until the consumer returns the c.Break to stop.tracking.
+func (v *Vector[T]) Track(consumer func(int, T) error) error {
 	if v == nil {
 		return nil
 	}
-	return slice.Track(*v, tracker)
+	return slice.Track(*v, consumer)
 }
 
-// TrackEach applies tracker to elements without error checking
-func (v *Vector[T]) TrackEach(tracker func(int, T)) {
+// TrackEach applies consumer to elements without error checking
+func (v *Vector[T]) TrackEach(consumer func(int, T)) {
 	if v != nil {
-		slice.TrackEach(*v, tracker)
+		slice.TrackEach(*v, consumer)
 	}
 }
 
-// For applies the 'consumer' function for the elements. Return the c.Break to stop.
+// For applies the 'consumer' function for the elements until the consumer returns the c.Break to stop.
 func (v *Vector[T]) For(consumer func(T) error) error {
 	if v == nil {
 		return nil

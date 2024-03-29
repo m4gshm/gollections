@@ -38,6 +38,7 @@ func Of[T any](elements ...T) Loop[T] {
 	}
 }
 
+// All is an adapter for the next function for iterating by `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
 func All[T any](next func() (T, bool), consumer func(T) bool) {
 	for v, ok := next(); ok && consumer(v); v, ok = next() {
 	}
@@ -53,7 +54,7 @@ func New[S, T any](source S, hasNext func(S) bool, getNext func(S) T) Loop[T] {
 	}
 }
 
-// For applies the 'consumer' function for the elements retrieved by the 'next' function. Return the c.Break to stop
+// For applies the 'consumer' function for the elements retrieved by the 'next' function until the consumer returns the c.Break to stop.
 func For[T any](next func() (T, bool), consumer func(T) error) error {
 	if next == nil {
 		return nil
@@ -90,6 +91,7 @@ func ForEachFiltered[T any](next func() (T, bool), predicate func(T) bool, consu
 	}
 }
 
+// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 // First returns the first element that satisfies the condition of the 'predicate' function
 func First[T any](next func() (T, bool), predicate func(T) bool) (v T, ok bool) {
 	if next == nil {
@@ -117,14 +119,14 @@ func Firstt[T any](next func() (T, bool), predicate func(T) (bool, error)) (v T,
 	}
 }
 
-// Track applies the 'tracker' function to position/element pairs retrieved by the 'next' function. Return the c.Break to stop tracking.
-func Track[I, T any](next func() (I, T, bool), tracker func(I, T) error) error {
-	return kvloop.Track(next, tracker)
+// Track applies the 'consumer' function to position/element pairs retrieved by the 'next' function until the consumer returns the c.Break to stop.tracking.
+func Track[I, T any](next func() (I, T, bool), consumer func(I, T) error) error {
+	return kvloop.Track(next, consumer)
 }
 
-// TrackEach applies the 'tracker' function to position/element pairs retrieved by the 'next' function
-func TrackEach[I, T any](next func() (I, T, bool), tracker func(I, T)) {
-	kvloop.TrackEach(next, tracker)
+// TrackEach applies the 'consumer' function to position/element pairs retrieved by the 'next' function
+func TrackEach[I, T any](next func() (I, T, bool), consumer func(I, T)) {
+	kvloop.TrackEach(next, consumer)
 }
 
 // Slice collects the elements retrieved by the 'next' function into a new slice

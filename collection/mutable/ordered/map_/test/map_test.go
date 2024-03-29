@@ -118,8 +118,8 @@ func Test_Map_Zero(t *testing.T) {
 	_, _, ok = head.Next()
 	assert.True(t, ok)
 
-	m.Track(func(k, v string) error { return nil })
-	m.TrackEach(func(k, v string) {})
+	m.Track(func(_, _ string) error { return nil })
+	m.TrackEach(func(_, _ string) {})
 
 	m.Reduce(func(k1, v1, k2, v2 string) (string, string) { return k1 + k2, v1 + v2 })
 	m.Convert(func(_, _ string) (string, string) { return k, v }).Track(func(_, _ string) error { return nil })
@@ -169,8 +169,8 @@ func Test_Map_new(t *testing.T) {
 	_, _, ok = head.Next()
 	assert.True(t, ok)
 
-	m.Track(func(k, v string) error { return nil })
-	m.TrackEach(func(k, v string) {})
+	m.Track(func(_, _ string) error { return nil })
+	m.TrackEach(func(_, _ string) {})
 
 	m.Reduce(func(k1, v1, k2, v2 string) (string, string) { return k1 + k2, v1 + v2 })
 	m.Convert(func(_, _ string) (string, string) { return k, v }).Track(func(_, _ string) error { return nil })

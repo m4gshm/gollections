@@ -69,7 +69,7 @@ func To[T any](next func() (T, bool, error), errConsumer func(error)) func() (T,
 	}
 }
 
-// For applies the 'consumer' function for the elements retrieved by the 'next' function. Return the c.Break to stop
+// For applies the 'consumer' function for the elements retrieved by the 'next' function until the consumer returns the c.Break to stop.
 func For[T any](next func() (T, bool, error), consumer func(T) error) error {
 	for {
 		if v, ok, err := next(); err != nil || !ok {
@@ -93,6 +93,7 @@ func ForFiltered[T any](next func() (T, bool, error), consumer func(T) error, pr
 	}
 }
 
+// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 // First returns the first element that satisfies the condition of the 'predicate' function
 func First[T any](next func() (T, bool, error), predicate func(T) bool) (T, bool, error) {
 	for {
@@ -115,12 +116,12 @@ func Firstt[T any](next func() (T, bool, error), predicate func(T) (bool, error)
 	}
 }
 
-// Track applies the 'tracker' function to position/element pairs retrieved by the 'next' function. Return the c.Break to stop tracking..
-func Track[I, T any](next func() (I, T, bool, error), tracker func(I, T) error) error {
+// Track applies the 'consumer' function to position/element pairs retrieved by the 'next' function until the consumer returns the c.Break to stop.
+func Track[I, T any](next func() (I, T, bool, error), consumer func(I, T) error) error {
 	for {
 		if p, v, ok, err := next(); err != nil || !ok {
 			return err
-		} else if err := tracker(p, v); err != nil {
+		} else if err := consumer(p, v); err != nil {
 			return brk(err)
 		}
 	}

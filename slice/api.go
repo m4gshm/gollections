@@ -626,6 +626,7 @@ func Sum[TS ~[]T, T c.Summable](elements TS) T {
 }
 
 // First returns the first element that satisfies requirements of the predicate 'by'
+// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 func First[TS ~[]T, T any](elements TS, by func(T) bool) (no T, ok bool) {
 	for _, e := range elements {
 		if by(e) {
@@ -669,7 +670,7 @@ func Lastt[TS ~[]T, T any](elements TS, by func(T) (bool, error)) (no T, ok bool
 	return no, false, nil
 }
 
-// Track applies the 'consumer' function to the elements. Return the c.Break to stop tracking
+// Track applies the 'consumer' function to the elements until the consumer returns the c.Break to stop.tracking
 func Track[TS ~[]T, T any](elements TS, consumer func(int, T) error) error {
 	for i, e := range elements {
 		if err := consumer(i, e); err == Break {
@@ -688,7 +689,7 @@ func TrackEach[TS ~[]T, T any](elements TS, consumer func(int, T)) {
 	}
 }
 
-// TrackEach applies the 'predicate' function to the elements while the fuction returns true.
+// TrackWhile applies the 'predicate' function to the elements while the fuction returns true.
 func TrackWhile[TS ~[]T, T any](elements TS, predicate func(int, T) bool) {
 	for i, e := range elements {
 		if !predicate(i, e) {
@@ -697,7 +698,7 @@ func TrackWhile[TS ~[]T, T any](elements TS, predicate func(int, T) bool) {
 	}
 }
 
-// For applies the 'consumer' function for the elements. Return the c.Break to stop
+// For applies the 'consumer' function for the elements until the consumer returns the c.Break to stop.
 func For[TS ~[]T, T any](elements TS, consumer func(T) error) error {
 	for _, e := range elements {
 		if err := consumer(e); err == Break {
@@ -709,6 +710,7 @@ func For[TS ~[]T, T any](elements TS, consumer func(T) error) error {
 	return nil
 }
 
+// WalkWhile applies the 'predicate' function for the elements until the predicate returns false to stop.
 func WalkWhile[TS ~[]T, T any](elements TS, predicate func(T) bool) {
 	for _, e := range elements {
 		if !predicate(e) {

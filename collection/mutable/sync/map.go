@@ -25,7 +25,7 @@ var (
 	_ c.Access[int, any]    = (*Map[int, any])(nil)
 )
 
-// TrackEach applies the 'tracker' function for every key/value pairs
+// TrackEach applies the 'consumer' function for every key/value pairs
 func (m *Map[K, V]) TrackEach(traker func(key K, value V)) {
 	m.m.Range(func(key, value any) bool {
 		traker(key.(K), value.(V))

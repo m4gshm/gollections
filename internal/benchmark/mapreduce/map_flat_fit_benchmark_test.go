@@ -166,7 +166,6 @@ func Benchmark_Flatt_Slice_PlainOld(b *testing.B) {
 	b.StopTimer()
 }
 
-
 //go:noinline
 func odds(v int) bool { return v%2 != 0 }
 

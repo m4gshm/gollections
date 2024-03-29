@@ -22,7 +22,7 @@ var (
 )
 
 func LowLoad(v int) {
-	resultInt = 0
+	resultInt = v * v * v
 }
 
 func HighLoad(v int) {
@@ -35,6 +35,17 @@ type benchCase struct {
 }
 
 var cases = []benchCase{{"high", HighLoad}, {"low", LowLoad}}
+
+func Benchmark_Loop_ImmutableOrderSet_ForEach(b *testing.B) {
+	c := oset.Of(values...)
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				c.ForEach(casee.load)
+			}
+		})
+	}
+}
 
 func Benchmark_Loop_ImmutableOrderSet_FirstNext(b *testing.B) {
 	c := oset.Of(values...)

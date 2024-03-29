@@ -17,7 +17,7 @@ var (
 	_ c.Convertable[any, Loop[any], loop.Loop[any]] = (Loop[any])(nil)
 )
 
-// For applies the 'consumer' function for the elements retrieved by the 'next' function. Return the c.Break to stop
+// For applies the 'consumer' function for the elements retrieved by the 'next' function until the consumer returns the c.Break to stop.
 func (next Loop[T]) For(consumer func(T) error) error {
 	return For(next, consumer)
 }
@@ -32,6 +32,7 @@ func (next Loop[T]) ForEachFiltered(predicate func(T) bool, consumer func(T)) {
 	ForEachFiltered(next, predicate, consumer)
 }
 
+// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 // First returns the first element that satisfies the condition of the 'predicate' function
 func (next Loop[T]) First(predicate func(T) bool) (T, bool) {
 	return First(next, predicate)

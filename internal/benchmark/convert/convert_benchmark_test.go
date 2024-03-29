@@ -14,7 +14,6 @@ import (
 	"github.com/m4gshm/gollections/slice/range_"
 )
 
-
 var (
 	toString = func(i int) string { return fmt.Sprintf("%d", i) }
 	addTail  = func(s string) string { return s + "_tail" }
@@ -116,7 +115,7 @@ func Benchmark_Convert_ImmutableVector_Head_Loop(b *testing.B) {
 	var s []string
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		s = loop.SliceCap( loop.Convert(items.Head().Next, concat), len(values))
+		s = loop.SliceCap(loop.Convert(items.Head().Next, concat), len(values))
 	}
 	_ = s
 	b.StopTimer()

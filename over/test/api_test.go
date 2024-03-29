@@ -4,8 +4,8 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/collection/immutable/ordered/set"
+	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/range_"
 )
