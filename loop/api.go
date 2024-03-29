@@ -516,7 +516,7 @@ func KeyValuess[T, K, V any](next func() (T, bool), keyExtractor func(T) (K, err
 }
 
 // ExtraVals transforms a loop to the key/value loop based on applying values extractor to the elements
-func ExtraVals[T, V any](next func() (T, bool), valsExtractor func(T) []V) func() (T, V, bool) {
+func ExtraVals[T, V any](next func() (T, bool), valsExtractor func(T) []V) kvloop.Loop[T, V] {
 	return KeyValues(next, as.Is[T], valsExtractor)
 }
 
@@ -526,7 +526,7 @@ func ExtraValss[T, V any](next func() (T, bool), valsExtractor func(T) ([]V, err
 }
 
 // ExtraKeys transforms a loop to the key/value loop based on applying key extractor to the elements
-func ExtraKeys[T, K any](next func() (T, bool), keysExtractor func(T) []K) func() (K, T, bool) {
+func ExtraKeys[T, K any](next func() (T, bool), keysExtractor func(T) []K) kvloop.Loop[K, T] {
 	return KeysValue(next, keysExtractor, as.Is[T])
 }
 
@@ -536,7 +536,7 @@ func ExtraKeyss[T, K any](next func() (T, bool), keyExtractor func(T) (K, error)
 }
 
 // ExtraKey transforms a loop to the key/value loop based on applying key extractor to the elements
-func ExtraKey[T, K any](next func() (T, bool), keysExtractor func(T) K) func() (K, T, bool) {
+func ExtraKey[T, K any](next func() (T, bool), keysExtractor func(T) K) kvloop.Loop[K, T] {
 	return KeyValue(next, keysExtractor, as.Is[T])
 }
 
@@ -546,7 +546,7 @@ func ExtraKeyy[T, K any](next func() (T, bool), keyExtractor func(T) (K, error))
 }
 
 // ExtraValue transforms a loop to the key/value loop based on applying value extractor to the elements
-func ExtraValue[T, V any](next func() (T, bool), valueExtractor func(T) V) func() (T, V, bool) {
+func ExtraValue[T, V any](next func() (T, bool), valueExtractor func(T) V) kvloop.Loop[T, V] {
 	return KeyValue(next, as.Is[T], valueExtractor)
 }
 
