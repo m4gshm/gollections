@@ -234,8 +234,8 @@ func Conv[From, To any](next func() (From, bool), converter func(From) (To, erro
 }
 
 // ConvS creates a loop that applies the 'converter' function to the 'elements' slice.
-func ConvS[From, To any](next func() (From, bool), converter func(From) (To, error)) breakloop.Loop[To] {
-	return breakloop.Conv(breakloop.From(next), converter)
+func ConvS[FS ~[]From, From, To any](elements FS, converter func(From) (To, error)) breakloop.Loop[To] {
+	return Conv(S(elements), converter)
 }
 
 // Convert creates a loop that applies the 'converter' function to iterable elements.
