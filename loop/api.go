@@ -23,7 +23,12 @@ import (
 // Break is the 'break' statement of the For, Track methods.
 var Break = c.Break
 
-// Of wrap the elements by loop function
+// S wrap the elements by loop function.
+func S[TS ~[]T, T any](elements TS) Loop[T] {
+	return Of(elements...)
+}
+
+// Of wrap the elements by loop function.
 func Of[T any](elements ...T) Loop[T] {
 	l := len(elements)
 	i := 0
