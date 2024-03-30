@@ -348,7 +348,7 @@ func ConvertAndFilter[From, To any](next func() (From, bool, error), converter f
 	return FilterConvertFilter(next, always.True[From], converter, filter)
 }
 
-// Flatt creates a loop that extracts slices of 'To' by a flattener from elements of 'From' and flattens as one iterable collection of 'To' elements.
+// Flatt creates a loop that extracts slices of 'To' by the 'flattener' function from iterable elements of 'From' and flattens as one iterable collection of 'To' elements.
 func Flatt[From, To any](next func() (From, bool, error), flattener func(From) ([]To, error)) Loop[To] {
 	if next == nil {
 		return nil
@@ -382,10 +382,9 @@ func Flatt[From, To any](next func() (From, bool, error), flattener func(From) (
 			}
 		}
 	}
-	// return &FlatIter[From, To]{next: next, flattener: flattener, elemSizeTo: notsafe.GetTypeSize[To]()}
 }
 
-// Flat creates a loop that extracts slices of 'To' by a flattener from elements of 'From' and flattens as one iterable collection of 'To' elements.
+// Flat creates a loop that extracts slices of 'To' by the 'flattener' function from iterable elements of 'From' and flattens as one iterable collection of 'To' elements.
 func Flat[From, To any](next func() (From, bool, error), flattener func(From) []To) Loop[To] {
 	if next == nil {
 		return nil

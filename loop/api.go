@@ -314,7 +314,6 @@ func FilterConvertFilter[From, To any](next func() (From, bool), filter func(Fro
 			}
 		}
 	}
-
 }
 
 // ConvertAndFilter additionally filters 'To' elements
@@ -322,12 +321,17 @@ func ConvertAndFilter[From, To any](next func() (From, bool), converter func(Fro
 	return FilterConvertFilter(next, always.True[From], converter, filter)
 }
 
-// Flatt creates a loop that extracts slices of 'To' by a flattener from elements of 'From' and flattens as one iterable collection of 'To' elements.
+// Flatt creates a loop that extracts slices of 'To' by the 'flattener' function from iterable elements of 'From' and flattens as one iterable collection of 'To' elements.
 func Flatt[From, To any](next func() (From, bool), flattener func(From) ([]To, error)) breakloop.Loop[To] {
 	return breakloop.Flatt(breakloop.From(next), flattener)
 }
 
-// Flat creates a loop that extracts slices of 'To' by a flattener from elements of 'From' and flattens as one iterable collection of 'To' elements.
+// FlattS creates a loop that extracts slices of 'To' by the 'flattener' function from the elements of 'From' and flattens as one iterable collection of 'To' elements.
+func FlattS[FS ~[]From, From, To any](elements FS, flattener func(From) ([]To, error)) breakloop.Loop[To] {
+	return Flatt(S(elements), flattener)
+}
+
+// Flat creates a loop that extracts slices of 'To' by the 'flattener' function from iterable elements of 'From' and flattens as one iterable collection of 'To' elements.
 func Flat[From, To any](next func() (From, bool), flattener func(From) []To) Loop[To] {
 	if next == nil {
 		return nil
@@ -361,6 +365,11 @@ func Flat[From, To any](next func() (From, bool), flattener func(From) []To) Loo
 			}
 		}
 	}
+}
+
+// FlatS creates a loop that extracts slices of 'To' by the 'flattener' function from the elements of 'From' and flattens as one iterable collection of 'To' elements.
+func FlatS[FS ~[]From, From, To any](elements FS, flattener func(From) []To) Loop[To] {
+	return Flat(S(elements), flattener)
 }
 
 // FiltAndFlat filters source elements and extracts slices of 'To' by the 'flattener' function
