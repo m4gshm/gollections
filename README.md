@@ -434,6 +434,17 @@ result but only return a loop provider. The loop provider is type with a
 
 #### Instantiators
 
+##### loop.Of, loop.S
+
+``` go
+import "github.com/m4gshm/gollections/loop"
+
+var (
+    ints    = loop.Of(1, 2, 3)
+    strings = loop.S([]string{"a", "b", "c"})
+)
+```
+
 ##### range\_.Of
 
 ``` go

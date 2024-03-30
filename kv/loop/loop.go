@@ -36,7 +36,6 @@ func (next Loop[K, V]) Reducee(merge func(K, K, V, V) (K, V, error)) (K, V, erro
 	return Reducee(next, merge)
 }
 
-
 // HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful
 func (next Loop[K, V]) HasAny(predicate func(K, V) bool) bool {
 	return HasAny(next, predicate)

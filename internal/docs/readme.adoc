@@ -250,6 +250,12 @@ The API in most cases is similar to the link:./slice/api.go[slice] API but with 
 
 ==== Main loop functions
 ===== Instantiators
+====== loop.Of, loop.S
+[source,go]
+----
+import "github.com/m4gshm/gollections/loop"
+include::../examples/loopexamples/loop_Of_loop_S_test.go[lines=12..17,indent=0]
+----
 ====== range_.Of
 [source,go]
 ----
