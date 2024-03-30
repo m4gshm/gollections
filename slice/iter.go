@@ -12,14 +12,14 @@ import (
 const IterNoStarted = -1
 
 // NewHead instantiates Iter based on elements slice
-func NewHead[TS ~[]T, T any](elements TS) *Iter[T] {
+func NewHead[TS ~[]T, T any](elements TS) Iter[T] {
 	var (
 		elementSize = notsafe.GetTypeSize[T]()
 		header      = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
 		array       = unsafe.Pointer(header.Data)
 		size        = header.Len
 	)
-	return &Iter[T]{
+	return Iter[T]{
 		array:       array,
 		elementSize: elementSize,
 		size:        size,
@@ -29,14 +29,14 @@ func NewHead[TS ~[]T, T any](elements TS) *Iter[T] {
 }
 
 // NewTail instantiates Iter based on elements slice for reverse iterating
-func NewTail[T any](elements []T) *Iter[T] {
+func NewTail[T any](elements []T) Iter[T] {
 	var (
 		elementSize = notsafe.GetTypeSize[T]()
 		header      = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
 		array       = unsafe.Pointer(header.Data)
 		size        = header.Len
 	)
-	return &Iter[T]{
+	return Iter[T]{
 		array:       array,
 		elementSize: elementSize,
 		size:        size,

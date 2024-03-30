@@ -38,7 +38,7 @@ func (m MapKeys[K]) Loop() loop.Loop[K] {
 
 // Deprecated: Head is deprecated. Will be replaced by rance-over function iterator.
 // Head creates an iterator to iterate through the collection.
-func (m MapKeys[K]) Head() *slice.Iter[K] {
+func (m MapKeys[K]) Head() slice.Iter[K] {
 	return slice.NewHead(m.keys)
 }
 
@@ -46,7 +46,8 @@ func (m MapKeys[K]) Head() *slice.Iter[K] {
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
 func (m MapKeys[K]) First() (*slice.Iter[K], K, bool) {
-	return m.Head().Crank()
+	h := m.Head()
+	return h.Crank()
 }
 
 // Len returns amount of elements

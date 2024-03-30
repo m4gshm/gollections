@@ -39,13 +39,13 @@ func (s Set[T]) Loop() loop.Loop[T] {
 
 // Deprecated: Head is deprecated. Will be replaced by rance-over function iterator.
 // Head creates an iterator to iterate through the collection.
-func (s Set[T]) Head() *slice.Iter[T] {
+func (s Set[T]) Head() slice.Iter[T] {
 	return slice.NewHead(s.order)
 }
 
 // Deprecated: Tail is deprecated. Will be replaced by rance-over function iterator.
 // Tail creates an iterator pointing to the end of the collection
-func (s Set[T]) Tail() *slice.Iter[T] {
+func (s Set[T]) Tail() slice.Iter[T] {
 	return slice.NewTail(s.order)
 }
 
@@ -53,21 +53,15 @@ func (s Set[T]) Tail() *slice.Iter[T] {
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
 func (s Set[T]) First() (*slice.Iter[T], T, bool) {
-	var (
-		iterator  = slice.NewHead(s.order)
-		first, ok = iterator.Next()
-	)
-	return iterator, first, ok
+	iterator := slice.NewHead(s.order)
+	return iterator.Crank()
 }
 
 // Last returns the latest element of the collection, an iterator to reverse iterate over the remaining elements, and true\false marker of availability previous elements.
 // If no more elements then ok==false.
 func (s Set[T]) Last() (*slice.Iter[T], T, bool) {
-	var (
-		iterator  = slice.NewTail(s.order)
-		first, ok = iterator.Prev()
-	)
-	return iterator, first, ok
+	iterator := slice.NewTail(s.order)
+	return iterator.CrankPrev()
 }
 
 // Slice collects the elements to a slice

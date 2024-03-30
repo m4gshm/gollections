@@ -49,7 +49,7 @@ func (m Map[K, V]) Loop() kvloop.Loop[K, V] {
 // Deprecated: Head is deprecated. Will be replaced by rance-over function iterator.
 // Head creates an iterator to iterate through the collection.
 func (m Map[K, V]) Head() MapIter[K, V] {
-	return NewMapIter(m.elements, *slice.NewHead(m.order))
+	return NewMapIter(m.elements, slice.NewHead(m.order))
 }
 
 // Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
@@ -66,7 +66,7 @@ func (m Map[K, V]) First() (MapIter[K, V], K, V, bool) {
 // Deprecated: Tail is deprecated. Will be replaced by rance-over function iterator.
 // Tail creates an iterator pointing to the end of the map
 func (m Map[K, V]) Tail() MapIter[K, V] {
-	return NewMapIter(m.elements, *slice.NewTail(m.order))
+	return NewMapIter(m.elements, slice.NewTail(m.order))
 }
 
 // Map collects the key/value pairs to a map

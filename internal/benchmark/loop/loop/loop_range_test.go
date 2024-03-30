@@ -3,6 +3,7 @@ package loop
 import (
 	"testing"
 
+	"github.com/m4gshm/gollections/convert/ptr"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/slice"
 )
@@ -76,8 +77,24 @@ func Benchmark_Slice_Iter_Iterating(b *testing.B) {
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				for it, v, ok := slice.NewHead(integers).Crank(); ok; v, ok = it.Next() {
+				for it, v, ok := ptr.Of(slice.NewHead(integers)).Crank(); ok; v, ok = it.Next() {
 					casee.load(v)
+				}
+			}
+		})
+	}
+}
+
+func Benchmark_Slice_Iter_Iterating2(b *testing.B) {
+	integers := slice.Range(0, max)
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				it := slice.NewHead(integers)
+				v, ok := it.Next()
+				for ok {
+					casee.load(v)
+					v, ok = it.Next()
 				}
 			}
 		})

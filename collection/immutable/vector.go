@@ -39,13 +39,13 @@ func (v Vector[T]) Loop() loop.Loop[T] {
 
 // Deprecated: Head is deprecated. Will be replaced by rance-over function iterator.
 // Head creates an iterator to iterate through the collection.
-func (v Vector[T]) Head() *slice.Iter[T] {
+func (v Vector[T]) Head() slice.Iter[T] {
 	return slice.NewHead(v.elements)
 }
 
 // Deprecated: Tail is deprecated. Will be replaced by rance-over function iterator.
 // Tail creates an iterator pointing to the end of the collection
-func (v Vector[T]) Tail() *slice.Iter[T] {
+func (v Vector[T]) Tail() slice.Iter[T] {
 	return slice.NewTail(v.elements)
 }
 
@@ -53,13 +53,15 @@ func (v Vector[T]) Tail() *slice.Iter[T] {
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
 func (v Vector[T]) First() (*slice.Iter[T], T, bool) {
-	return slice.NewHead(v.elements).Crank()
+	h := slice.NewHead(v.elements)
+	return h.Crank()
 }
 
 // Last returns the latest element of the collection, an iterator to reverse iterate over the remaining elements, and true\false marker of availability previous elements.
 // If no more elements then ok==false.
 func (v Vector[T]) Last() (*slice.Iter[T], T, bool) {
-	return slice.NewTail(v.elements).CrankPrev()
+	t := slice.NewTail(v.elements)
+	return t.CrankPrev()
 }
 
 // Slice collects the elements to a slice

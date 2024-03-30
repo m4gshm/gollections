@@ -5,14 +5,16 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/m4gshm/gollections/convert"
 	"github.com/m4gshm/gollections/convert/as"
+	"github.com/m4gshm/gollections/convert/ptr"
 	"github.com/m4gshm/gollections/loop"
 	sop "github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/op/check/not"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/range_"
-	"github.com/stretchr/testify/assert"
 )
 
 var (
@@ -72,7 +74,7 @@ func Benchmark_ConvertAndFilter_Slice_Loop(b *testing.B) {
 	var s []string
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		s = loop.Slice(loop.Convert(loop.Filter(slice.NewHead(items).Next, even), convert.And(toString, addTail)))
+		s = loop.Slice(loop.Convert(loop.Filter(ptr.Of(slice.NewHead(items)).Next, even), convert.And(toString, addTail)))
 	}
 	_ = s
 

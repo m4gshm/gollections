@@ -8,6 +8,7 @@ import (
 	"github.com/m4gshm/gollections/collection/immutable/vector"
 	moset "github.com/m4gshm/gollections/collection/mutable/ordered/set"
 	mvector "github.com/m4gshm/gollections/collection/mutable/vector"
+	"github.com/m4gshm/gollections/convert/ptr"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/slice"
@@ -471,7 +472,7 @@ func Benchmark_Loop_Slice_Head_Next(b *testing.B) {
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				for i, v, ok := slice.NewHead(values).Crank(); ok; v, ok = i.Next() {
+				for i, v, ok := ptr.Of(slice.NewHead(values)).Crank(); ok; v, ok = i.Next() {
 					casee.load(v)
 				}
 			}
