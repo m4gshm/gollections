@@ -233,6 +233,11 @@ func Conv[From, To any](next func() (From, bool), converter func(From) (To, erro
 	return breakloop.Conv(breakloop.From(next), converter)
 }
 
+// ConvS creates a loop that applies the 'converter' function to the 'elements' slice.
+func ConvS[From, To any](next func() (From, bool), converter func(From) (To, error)) breakloop.Loop[To] {
+	return breakloop.Conv(breakloop.From(next), converter)
+}
+
 // Convert creates a loop that applies the 'converter' function to iterable elements.
 func Convert[From, To any](next func() (From, bool), converter func(From) To) Loop[To] {
 	if next == nil {
@@ -245,6 +250,11 @@ func Convert[From, To any](next func() (From, bool), converter func(From) To) Lo
 		}
 		return t, false
 	}
+}
+
+// ConvertS creates a loop that applies the 'converter' function to the 'elements' slice.
+func ConvertS[FS ~[]From, From, To any](elements FS, converter func(From) To) Loop[To] {
+	return Convert(S(elements), converter)
 }
 
 // ConvCheck is similar to ConvertFilt, but it checks and transforms elements together
@@ -420,12 +430,16 @@ func FilterFlatFilter[From, To any](next func() (From, bool), filterFrom func(Fr
 			}
 		}
 	}
-	// return &FlatFilterIter[From, To]{next: next, filterFrom: filterFrom, flattener: flattener, filterTo: filterTo, elemSizeTo: notsafe.GetTypeSize[To]()}
 }
 
 // Filt creates a loop that checks elements by the 'filter' function and returns successful ones.
 func Filt[T any](next func() (T, bool), filter func(T) (bool, error)) breakloop.Loop[T] {
 	return breakloop.Filt(breakloop.From(next), filter)
+}
+
+// FiltS creates a loop that checks slice elements by the 'filter' function and returns successful ones.
+func FiltS[TS ~[]T, T any](elements TS, filter func(T) (bool, error)) breakloop.Loop[T] {
+	return Filt(S(elements), filter)
 }
 
 // Filter creates a loop that checks elements by the 'filter' function and returns successful ones.
@@ -436,7 +450,11 @@ func Filter[T any](next func() (T, bool), filter func(T) bool) Loop[T] {
 	return func() (T, bool) {
 		return First(next, filter)
 	}
-	// return FiltIter[T]{next: next, by: filter}
+}
+
+// FilterS creates a loop that checks slice elements by the 'filter' function and returns successful ones.
+func FilterS[TS ~[]T, T any](elements TS, filter func(T) bool) Loop[T] {
+	return Filter(S(elements), filter)
 }
 
 // NotNil creates a loop that filters nullable elements
