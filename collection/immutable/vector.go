@@ -43,6 +43,7 @@ func (v Vector[T]) Head() *slice.Iter[T] {
 	return slice.NewHead(v.elements)
 }
 
+// Deprecated: Tail is deprecated. Will be replaced by rance-over function iterator.
 // Tail creates an iterator pointing to the end of the collection
 func (v Vector[T]) Tail() *slice.Iter[T] {
 	return slice.NewTail(v.elements)

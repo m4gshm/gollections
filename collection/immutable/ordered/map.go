@@ -63,6 +63,7 @@ func (m Map[K, V]) First() (MapIter[K, V], K, V, bool) {
 	return iterator, firstK, firstV, ok
 }
 
+// Deprecated: Tail is deprecated. Will be replaced by rance-over function iterator.
 // Tail creates an iterator pointing to the end of the map
 func (m Map[K, V]) Tail() MapIter[K, V] {
 	return NewMapIter(m.elements, *slice.NewTail(m.order))

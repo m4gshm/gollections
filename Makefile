@@ -28,8 +28,8 @@ clean:
 .PHONY: build
 build:
 	$(info #Building...)
-	go env -w GOEXPERIMENT=rangefunc,newinliner	
-	# go env -w GOEXPERIMENT=rangefunc
+	# go env -w GOEXPERIMENT=rangefunc,newinliner	
+	go env -w GOEXPERIMENT=rangefunc
 	go build ./...
 
 .PHONY: builda
@@ -42,8 +42,8 @@ builda:
 bench:
 	$(info #Running benchmarks...)
 	# go test -gcflags=-d=loopvar=3 -benchtime 1s -bench . -benchmem ./...
-	go env -w GOEXPERIMENT=rangefunc,newinliner
-	# go env -w GOEXPERIMENT=rangefunc
+	# go env -w GOEXPERIMENT=rangefunc,newinliner
+	go env -w GOEXPERIMENT=rangefunc
 	go test -benchtime 1s -bench . -benchmem ./...
 
 .PHONY: update

@@ -43,6 +43,7 @@ func (s Set[T]) Head() *slice.Iter[T] {
 	return slice.NewHead(s.order)
 }
 
+// Deprecated: Tail is deprecated. Will be replaced by rance-over function iterator.
 // Tail creates an iterator pointing to the end of the collection
 func (s Set[T]) Tail() *slice.Iter[T] {
 	return slice.NewTail(s.order)

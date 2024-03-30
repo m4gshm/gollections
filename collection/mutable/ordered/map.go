@@ -64,6 +64,7 @@ func (m *Map[K, V]) Head() ordered.MapIter[K, V] {
 	return ordered.NewMapIter(elements, *slice.NewHead(order))
 }
 
+// Deprecated: Tail is deprecated. Will be replaced by rance-over function iterator.
 // Tail creates an iterator pointing to the end of the collection
 func (m *Map[K, V]) Tail() ordered.MapIter[K, V] {
 	var (
