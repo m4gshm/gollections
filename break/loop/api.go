@@ -183,7 +183,7 @@ func Append[T any, TS ~[]T](next func() (T, bool, error), out TS) (TS, error) {
 	return out, nil
 }
 
-// Reduce reduces the elements retrieved by the 'next' function into an one using the 'merge' function
+// Reduce reduces the elements retrieved by the 'next' function into an one using the 'merge' function.
 func Reduce[T any](next func() (T, bool, error), merger func(T, T) T) (out T, e error) {
 	if next == nil {
 		return out, nil

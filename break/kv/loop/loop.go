@@ -1,6 +1,5 @@
 package loop
 
-
 // Loop is a function that returns the next key, value or false if there are no more elements.
 type Loop[K, V any] func() (K, V, bool, error)
 
@@ -15,9 +14,14 @@ func (next Loop[K, V]) First(predicate func(K, V) bool) (K, V, bool, error) {
 	return First(next, predicate)
 }
 
-// Reduce reduces the elements retrieved by the 'next' function into an one using the 'merger' function
-func (next Loop[K, V]) Reduce(merger func(K, K, V, V) (K, V)) (K, V, error) {
-	return Reduce(next, merger)
+// Reduce reduces the elements retrieved by the 'next' function into an one using the 'merge' function.
+func (next Loop[K, V]) Reduce(merge func(K, K, V, V) (K, V)) (K, V, error) {
+	return Reduce(next, merge)
+}
+
+// Reduce2 reduces the elements retrieved by the 'next' function into an one using the 'merge' function.
+func (next Loop[K, V]) Reducee(merge func(K, K, V, V) (K, V, error)) (K, V, error) {
+	return Reducee(next, merge)
 }
 
 // HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful

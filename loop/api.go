@@ -46,6 +46,9 @@ func Of[T any](elements ...T) Loop[T] {
 
 // All is an adapter for the next function for iterating by `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
 func All[T any](next func() (T, bool), consumer func(T) bool) {
+	if next == nil {
+		return
+	}
 	for v, ok := next(); ok && consumer(v); v, ok = next() {
 	}
 }
@@ -166,8 +169,8 @@ func Append[T any, TS ~[]T](next func() (T, bool), out TS) TS {
 	return out
 }
 
-// Reduce reduces the elements retrieved by the 'next' function into an one using the 'merger' function
-func Reduce[T any](next func() (T, bool), merger func(T, T) T) (result T) {
+// Reduce reduces the elements retrieved by the 'next' function into an one using the 'merge' function.
+func Reduce[T any](next func() (T, bool), merge func(T, T) T) (result T) {
 	if next == nil {
 		return result
 	}
@@ -177,9 +180,28 @@ func Reduce[T any](next func() (T, bool), merger func(T, T) T) (result T) {
 		return result
 	}
 	for v, ok := next(); ok; v, ok = next() {
-		result = merger(result, v)
+		result = merge(result, v)
 	}
 	return result
+}
+
+// Reducee reduces the elements retrieved by the 'next' function into an one pair using the 'merge' function.
+func Reducee[T any](next func() (T, bool), merge func(T, T) (T, error)) (result T, err error) {
+	if next == nil {
+		return result, nil
+	}
+	if v, ok := next(); ok {
+		result = v
+	} else {
+		return result, nil
+	}
+	for v, ok := next(); ok; v, ok = next() {
+		result, err = merge(result, v)
+		if err != nil {
+			return result, err
+		}
+	}
+	return result, nil
 }
 
 // Sum returns the sum of all elements

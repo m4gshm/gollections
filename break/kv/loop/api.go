@@ -49,6 +49,9 @@ func Group[K comparable, V any](next func() (K, V, bool, error)) (map[K][]V, err
 
 // Reduce reduces the key/value pairs retrieved by the 'next' function into an one pair using the 'merge' function
 func Reduce[K, V any](next func() (K, V, bool, error), merge func(K, K, V, V) (K, V)) (rk K, rv V, err error) {
+	if next == nil {
+		return rk, rv, nil
+	}
 	k, v, ok, err := next()
 	if err != nil || !ok {
 		return rk, rv, err
@@ -65,6 +68,9 @@ func Reduce[K, V any](next func() (K, V, bool, error), merge func(K, K, V, V) (K
 
 // Reducee reduces the key/value pairs retrieved by the 'next' function into an one pair using the 'merge' function
 func Reducee[K, V any](next func() (K, V, bool, error), merge func(K, K, V, V) (K, V, error)) (rk K, rv V, err error) {
+	if next == nil {
+		return rk, rv, nil
+	}
 	k, v, ok, err := next()
 	if err != nil || !ok {
 		return rk, rv, err
@@ -184,6 +190,9 @@ func ToMap[K comparable, V any](next func() (K, V, bool, error)) (map[K]V, error
 
 // ToSlice collects key\value elements to a slice by iterating over the elements
 func ToSlice[K, V, T any](next func() (K, V, bool, error), converter func(K, V) T) ([]T, error) {
+	if next == nil {
+		return nil, nil
+	}
 	s := []T{}
 	for {
 		key, val, ok, err := next()

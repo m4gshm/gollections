@@ -53,9 +53,14 @@ func (next Loop[T]) Append(out []T) []T {
 	return Append(next, out)
 }
 
-// Reduce reduces the elements retrieved by the 'next' function into an one using the 'merger' function
-func (next Loop[T]) Reduce(merger func(T, T) T) T {
-	return Reduce(next, merger)
+// Reduce reduces the elements retrieved by the 'next' function into an one using the 'merge' function.
+func (next Loop[T]) Reduce(merge func(T, T) T) T {
+	return Reduce(next, merge)
+}
+
+// Reducee reduces the elements retrieved by the 'next' function into an one using the 'merge' function
+func (next Loop[T]) Reducee(merge func(T, T) (T, error)) (T, error) {
+	return Reducee(next, merge)
 }
 
 // HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful
