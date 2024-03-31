@@ -477,11 +477,11 @@ include::../examples/collection/mutable/oset.go[lines=10..11,indent=0]
 include::../examples/collection/mutable/omap.go[lines=11..15,indent=0]
 ----
 
-==== Immutable containers
+==== Immutable collections
 
 The same underlying interfaces but for read-only use cases.
 
-==== Iterating over containers
+==== Iterating over collections
 * (only for go 1.22) Using rangefunc `All` like:
 
 [source,go]

@@ -754,11 +754,11 @@ _ *ordered.Map[int, string] = ordered.NewMapOf(
 )
 ```
 
-### Immutable containers
+### Immutable collections
 
 The same underlying interfaces but for read-only use cases.
 
-### Iterating over containers
+### Iterating over collections
 
 - (only for go 1.22) Using rangefunc `All` like:
 
