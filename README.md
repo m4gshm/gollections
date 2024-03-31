@@ -87,8 +87,8 @@ find by exploring slices [subpackages](./slice).
 **Be careful** when use several slice functions subsequently like
 `slice.Filter(slice.Convert(…​))`. This can lead to unnecessary RAM
 consumption. Consider [chain functions](#operations-chain-functions)
-instead, [loop](#additional-api) or [collections](#collection-functions)
-for delayed operations.
+instead, [loop](#loop) or [collections](#collection-functions) for
+delayed operations.
 
 ### Main slice functions
 
