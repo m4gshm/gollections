@@ -37,7 +37,7 @@ func Test_Iterating_For(t *testing.T) {
 			return loop.Break
 		}
 		doOp(i)
-		return nil
+		return loop.Continue
 	})
 
 }

@@ -614,7 +614,7 @@ range_.Of(0, 100).For(func(i int) error {
         return loop.Break
     }
     doOp(i)
-    return nil
+    return loop.Continue
 })
 ```
 
@@ -805,6 +805,6 @@ uniques.For(func(i int) error {
         return loop.Break
     }
     doOp(i)
-    return nil
+    return loop.Continue
 })
 ```

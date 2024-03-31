@@ -23,6 +23,9 @@ import (
 // Break is the 'break' statement of the For, Track methods.
 var Break = c.Break
 
+// Continue is an alias of the nil value used to continue iterating by For, Track methods.
+var Continue = c.Continue
+
 // S wrap the elements by loop function.
 func S[TS ~[]T, T any](elements TS) Loop[T] {
 	return Of(elements...)

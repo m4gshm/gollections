@@ -21,6 +21,9 @@ import (
 // Break is the 'break' statement of the For, Track methods
 var Break = loop.Break
 
+// Continue is an alias of the nil value used to continue iterating by For, Track methods.
+var Continue = c.Continue
+
 // Of is generic slice constructor
 func Of[T any](elements ...T) []T { return elements }
 

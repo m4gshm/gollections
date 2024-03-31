@@ -10,6 +10,9 @@ import (
 // Break is the 'break' statement of the For, Track methods
 var Break = errors.New("Break")
 
+// Continue is an alias of the nil value used to continue iterating by For, Track methods.
+var Continue error = nil
+
 // Iterable is a loop supplier interface
 type Iterable[T any, Loop ~func() (T, bool)] interface {
 	Loop() Loop
@@ -63,7 +66,6 @@ type Iterator[T any] interface {
 
 	For[T]
 	ForEach[T]
-	All(consumer func(T) bool)
 }
 
 // Sized - storage interface with measurable size
@@ -95,6 +97,16 @@ type For[IT any] interface {
 type ForEach[T any] interface {
 	// ForEach takes all elements of the collection
 	ForEach(func(element T))
+}
+
+// All provides the `All` function used for iterating over a sequence of elements by `for e := range collection.All`. Supported since go 1.22.
+type All[T any] interface {
+	All(consumer func(T) bool)
+}
+
+// KVAll provides the `All` function used for iterating over a sequence of key\value pairs by `for k, v := range collection.All`. Supported since go 1.22.
+type KVAll[K, V any] interface {
+	All(consumer func(K, V) bool)
 }
 
 // Track is the interface of a collection that provides traversing of the elements with position tracking (index, key, coordinates, etc.).

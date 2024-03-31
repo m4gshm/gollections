@@ -32,7 +32,7 @@ type Vector[T any] interface {
 
 	c.Access[int, T]
 
-	All(consumer func(int, T) bool)
+	c.KVAll[int, T]
 }
 
 // Set - collection interface that ensures the uniqueness of elements (does not insert duplicate values).
@@ -40,7 +40,7 @@ type Set[T comparable] interface {
 	Collection[T]
 	c.Checkable[T]
 
-	All(consumer func(T) bool)
+	c.All[T]
 }
 
 // Map - collection interface that stores key/value pairs and provide access to an element by its key
@@ -50,9 +50,11 @@ type Map[K comparable, V any] interface {
 	kv.Convertable[K, V]
 	c.Checkable[K]
 	c.Access[K, V]
+	c.KVAll[K, V]
 
 	Len() int
 	IsEmpty() bool
 
 	HasAny(func(K, V) bool) bool
+
 }
