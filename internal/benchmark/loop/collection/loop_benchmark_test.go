@@ -1,4 +1,4 @@
-package benchmark
+package collection
 
 import (
 	"testing"
@@ -8,6 +8,7 @@ import (
 	"github.com/m4gshm/gollections/collection/immutable/vector"
 	moset "github.com/m4gshm/gollections/collection/mutable/ordered/set"
 	mvector "github.com/m4gshm/gollections/collection/mutable/vector"
+	"github.com/m4gshm/gollections/convert/ptr"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/slice"
@@ -17,22 +18,16 @@ import (
 var (
 	max        = 100000
 	values     = range_.Closed(1, max)
-	ResultInt  = 0
+	resultInt  = 0
 	threshhold = max / 2
 )
 
-func HighLoad(v int) {
-	ResultInt = v *
-		v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v *
-		v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v *
-		v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v *
-		v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v *
-		v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v *
-		v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v
+func LowLoad(v int) {
+	resultInt = v * v * v
 }
 
-func LowLoad(v int) {
-	ResultInt = v * v
+func HighLoad(v int) {
+	resultInt = v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v * v
 }
 
 type benchCase struct {
@@ -40,7 +35,18 @@ type benchCase struct {
 	load func(int)
 }
 
-var cases = []benchCase{ /*{"high", HighLoad}, */ {"low", LowLoad}}
+var cases = []benchCase{{"high", HighLoad}, {"low", LowLoad}}
+
+func Benchmark_Loop_ImmutableOrderSet_ForEach(b *testing.B) {
+	c := oset.Of(values...)
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				c.ForEach(casee.load)
+			}
+		})
+	}
+}
 
 func Benchmark_Loop_ImmutableOrderSet_FirstNext(b *testing.B) {
 	c := oset.Of(values...)
@@ -466,7 +472,7 @@ func Benchmark_Loop_Slice_Head_Next(b *testing.B) {
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				for i, v, ok := slice.NewHead(values).Crank(); ok; v, ok = i.Next() {
+				for i, v, ok := ptr.Of(slice.NewHead(values)).Crank(); ok; v, ok = i.Next() {
 					casee.load(v)
 				}
 			}

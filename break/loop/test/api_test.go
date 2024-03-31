@@ -24,6 +24,14 @@ func Test_ReduceSum(t *testing.T) {
 	assert.Equal(t, 1+3+5+7+9+11, r)
 }
 
+func Test_ReduceeSum(t *testing.T) {
+	s := loop.Of(1, 3, 5, 7, 9, 11)
+	r, _ := breakLoop.Reducee(breakLoop.From(s), func(i1, i2 int) (int, error) {
+		return i1 + i2, nil
+	})
+	assert.Equal(t, 1+3+5+7+9+11, r)
+}
+
 func Test_EmptyLoop(t *testing.T) {
 	s := breakLoop.Of[int]()
 	r, _ := breakLoop.Reduce(s, op.Sum[int])

@@ -35,17 +35,24 @@ var (
 	_ fmt.Stringer                                = Map[int, any]{}
 )
 
-// Loop creates a loop to iterating through elements.
+// All is used to iterate through the collection using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
+func (m Map[K, V]) All(consumer func(K, V) bool) {
+	map_.TrackOrderedWhile(m.order, m.elements, consumer)
+}
+
+// Loop creates a loop to iterate through the collection.
 func (m Map[K, V]) Loop() kvloop.Loop[K, V] {
 	h := m.Head()
 	return h.Next
 }
 
-// Head creates an iterator and returns as implementation type value
+// Deprecated: Head is deprecated. Will be replaced by rance-over function iterator.
+// Head creates an iterator to iterate through the collection.
 func (m Map[K, V]) Head() MapIter[K, V] {
-	return NewMapIter(m.elements, *slice.NewHead(m.order))
+	return NewMapIter(m.elements, slice.NewHead(m.order))
 }
 
+// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 // First returns the first key/value pair of the map, an iterator to iterate over the remaining pair, and true\false marker of availability next pairs.
 // If no more then ok==false.
 func (m Map[K, V]) First() (MapIter[K, V], K, V, bool) {
@@ -56,9 +63,10 @@ func (m Map[K, V]) First() (MapIter[K, V], K, V, bool) {
 	return iterator, firstK, firstV, ok
 }
 
+// Deprecated: Tail is deprecated. Will be replaced by rance-over function iterator.
 // Tail creates an iterator pointing to the end of the map
 func (m Map[K, V]) Tail() MapIter[K, V] {
-	return NewMapIter(m.elements, *slice.NewTail(m.order))
+	return NewMapIter(m.elements, slice.NewTail(m.order))
 }
 
 // Map collects the key/value pairs to a map
@@ -121,24 +129,14 @@ func (m Map[K, V]) String() string {
 	return map_.ToStringOrdered(m.order, m.elements)
 }
 
-// Track applies the 'tracker' function for key/value pairs. Return the c.Break to stop.
-func (m Map[K, V]) Track(tracker func(K, V) error) error {
-	return map_.TrackOrdered(m.order, m.elements, tracker)
+// Track applies the 'consumer' function for all key/value pairs until the consumer returns the c.Break to stop.
+func (m Map[K, V]) Track(consumer func(K, V) error) error {
+	return map_.TrackOrdered(m.order, m.elements, consumer)
 }
 
-// TrackEach applies the 'tracker' function for every key/value pairs
-func (m Map[K, V]) TrackEach(tracker func(K, V)) {
-	map_.TrackEachOrdered(m.order, m.elements, tracker)
-}
-
-// For applies the 'walker' function for key/value pairs. Return the c.Break to stop.
-func (m Map[K, V]) For(walker func(c.KV[K, V]) error) error {
-	return map_.ForOrdered(m.order, m.elements, walker)
-}
-
-// ForEach applies the 'walker' function for every key/value pair
-func (m Map[K, V]) ForEach(walker func(c.KV[K, V])) {
-	map_.ForEachOrdered(m.order, m.elements, walker)
+// TrackEach applies the 'consumer' function for every key/value pairs
+func (m Map[K, V]) TrackEach(consumer func(K, V)) {
+	map_.TrackEachOrdered(m.order, m.elements, consumer)
 }
 
 // FilterKey returns a loop consisting of key/value pairs where the key satisfies the condition of the 'predicate' function

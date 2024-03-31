@@ -5,6 +5,7 @@ import (
 	"errors"
 	"unsafe"
 
+	breakkvloop "github.com/m4gshm/gollections/break/kv/loop"
 	"github.com/m4gshm/gollections/break/predicate/always"
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/convert"
@@ -18,7 +19,12 @@ import (
 // Break is the 'break' statement of the For, Track methods.
 var Break = c.Break
 
-// Of wrap the elements by loop function
+// S wrap the elements by loop function.
+func S[TS ~[]T, T any](elements TS) Loop[T] {
+	return Of(elements...)
+}
+
+// Of wrap the elements by loop function.
 func Of[T any](elements ...T) func() (e T, ok bool, err error) {
 	l := len(elements)
 	i := 0
@@ -59,6 +65,9 @@ func From[T any](next func() (T, bool)) Loop[T] {
 // To transforms a breakable loop to a simple loop.
 // The errConsumer is a function that is called when an error occurs.
 func To[T any](next func() (T, bool, error), errConsumer func(error)) func() (T, bool) {
+	if next == nil {
+		return nil
+	}
 	return func() (T, bool) {
 		e, ok, err := next()
 		if err != nil {
@@ -69,34 +78,44 @@ func To[T any](next func() (T, bool, error), errConsumer func(error)) func() (T,
 	}
 }
 
-// For applies the 'walker' function for the elements retrieved by the 'next' function. Return the c.Break to stop
-func For[T any](next func() (T, bool, error), walker func(T) error) error {
+// For applies the 'consumer' function for the elements retrieved by the 'next' function until the consumer returns the c.Break to stop.
+func For[T any](next func() (T, bool, error), consumer func(T) error) error {
+	if next == nil {
+		return nil
+	}
 	for {
 		if v, ok, err := next(); err != nil || !ok {
 			return err
-		} else if err := walker(v); err != nil {
+		} else if err := consumer(v); err != nil {
 			return brk(err)
 		}
 	}
 }
 
-// ForFiltered applies the 'walker' function to the elements retrieved by the 'next' function that satisfy the 'predicate' function condition
-func ForFiltered[T any](next func() (T, bool, error), walker func(T) error, predicate func(T) bool) error {
+// ForFiltered applies the 'consumer' function to the elements retrieved by the 'next' function that satisfy the 'predicate' function condition
+func ForFiltered[T any](next func() (T, bool, error), consumer func(T) error, predicate func(T) bool) error {
+	if next == nil {
+		return nil
+	}
 	for {
 		if v, ok, err := next(); err != nil || !ok {
 			return err
 		} else if ok := predicate(v); ok {
-			if err := walker(v); err != nil {
+			if err := consumer(v); err != nil {
 				return brk(err)
 			}
 		}
 	}
 }
 
+// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 // First returns the first element that satisfies the condition of the 'predicate' function
-func First[T any](next func() (T, bool, error), predicate func(T) bool) (T, bool, error) {
+func First[T any](next func() (T, bool, error), predicate func(T) bool) (out T, ok bool, err error) {
+	if next == nil {
+		return out, false, nil
+	}
 	for {
-		if out, ok, err := next(); err != nil || !ok {
+		if out, ok, err = next(); err != nil || !ok {
 			return out, false, err
 		} else if ok := predicate(out); ok {
 			return out, true, nil
@@ -105,7 +124,10 @@ func First[T any](next func() (T, bool, error), predicate func(T) bool) (T, bool
 }
 
 // Firstt returns the first element that satisfies the condition of the 'predicate' function
-func Firstt[T any](next func() (T, bool, error), predicate func(T) (bool, error)) (T, bool, error) {
+func Firstt[T any](next func() (T, bool, error), predicate func(T) (bool, error)) (out T, ok bool, err error) {
+	if next == nil {
+		return out, false, nil
+	}
 	for {
 		if out, ok, err := next(); err != nil || !ok {
 			return out, false, err
@@ -115,15 +137,9 @@ func Firstt[T any](next func() (T, bool, error), predicate func(T) (bool, error)
 	}
 }
 
-// Track applies the 'tracker' function to position/element pairs retrieved by the 'next' function. Return the c.Break to stop tracking..
-func Track[I, T any](next func() (I, T, bool, error), tracker func(I, T) error) error {
-	for {
-		if p, v, ok, err := next(); err != nil || !ok {
-			return err
-		} else if err := tracker(p, v); err != nil {
-			return brk(err)
-		}
-	}
+// Track applies the 'consumer' function to position/element pairs retrieved by the 'next' function until the consumer returns the c.Break to stop.
+func Track[I, T any](next func() (I, T, bool, error), consumer func(I, T) error) error {
+	return breakkvloop.Track(next, consumer)
 }
 
 // Slice collects the elements retrieved by the 'next' function into a slice
@@ -144,6 +160,9 @@ func Slice[T any](next func() (T, bool, error)) (out []T, err error) {
 
 // SliceCap collects the elements retrieved by the 'next' function into a new slice with predefined capacity
 func SliceCap[T any](next func() (T, bool, error), cap int) (out []T, err error) {
+	if next == nil {
+		return nil, nil
+	}
 	if cap > 0 {
 		out = make([]T, 0, cap)
 	}
@@ -152,6 +171,9 @@ func SliceCap[T any](next func() (T, bool, error), cap int) (out []T, err error)
 
 // Append collects the elements retrieved by the 'next' function into the specified 'out' slice
 func Append[T any, TS ~[]T](next func() (T, bool, error), out TS) (TS, error) {
+	if next == nil {
+		return out, nil
+	}
 	for v, ok, err := next(); ok; v, ok, err = next() {
 		if err != nil {
 			return out, err
@@ -161,7 +183,7 @@ func Append[T any, TS ~[]T](next func() (T, bool, error), out TS) (TS, error) {
 	return out, nil
 }
 
-// Reduce reduces the elements retrieved by the 'next' function into an one using the 'merge' function
+// Reduce reduces the elements retrieved by the 'next' function into an one using the 'merge' function.
 func Reduce[T any](next func() (T, bool, error), merger func(T, T) T) (out T, e error) {
 	if next == nil {
 		return out, nil
@@ -182,6 +204,9 @@ func Reduce[T any](next func() (T, bool, error), merger func(T, T) T) (out T, e 
 
 // Reducee reduces the elements retrieved by the 'next' function into an one using the 'merge' function
 func Reducee[T any](next func() (T, bool, error), merger func(T, T) (T, error)) (out T, e error) {
+	if next == nil {
+		return out, nil
+	}
 	v, ok, err := next()
 	if err != nil || !ok {
 		return out, err
@@ -215,6 +240,9 @@ func HasAnyy[T any](next func() (T, bool, error), predicate func(T) (bool, error
 
 // Contains  finds the first element that equal to the example and returns true
 func Contains[T comparable](next func() (T, bool, error), example T) (bool, error) {
+	if next == nil {
+		return false, nil
+	}
 	for {
 		if one, ok, err := next(); err != nil || !ok {
 			return false, err
@@ -320,7 +348,7 @@ func ConvertAndFilter[From, To any](next func() (From, bool, error), converter f
 	return FilterConvertFilter(next, always.True[From], converter, filter)
 }
 
-// Flatt creates a loop that extracts slices of 'To' by a flattener from elements of 'From' and flattens as one iterable collection of 'To' elements.
+// Flatt creates a loop that extracts slices of 'To' by the 'flattener' function from iterable elements of 'From' and flattens as one iterable collection of 'To' elements.
 func Flatt[From, To any](next func() (From, bool, error), flattener func(From) ([]To, error)) Loop[To] {
 	if next == nil {
 		return nil
@@ -354,10 +382,9 @@ func Flatt[From, To any](next func() (From, bool, error), flattener func(From) (
 			}
 		}
 	}
-	// return &FlatIter[From, To]{next: next, flattener: flattener, elemSizeTo: notsafe.GetTypeSize[To]()}
 }
 
-// Flat creates a loop that extracts slices of 'To' by a flattener from elements of 'From' and flattens as one iterable collection of 'To' elements.
+// Flat creates a loop that extracts slices of 'To' by the 'flattener' function from iterable elements of 'From' and flattens as one iterable collection of 'To' elements.
 func Flat[From, To any](next func() (From, bool, error), flattener func(From) []To) Loop[To] {
 	if next == nil {
 		return nil
@@ -547,12 +574,12 @@ func NoNilPtrVal[T any](next func() (*T, bool, error)) Loop[T] {
 }
 
 // KeyValue transforms a loop to the key/value loop based on applying key, value extractors to the elements
-func KeyValue[T any, K, V any](next func() (T, bool, error), keyExtractor func(T) K, valExtractor func(T) V) func() (K, V, bool, error) {
+func KeyValue[T any, K, V any](next func() (T, bool, error), keyExtractor func(T) K, valExtractor func(T) V) breakkvloop.Loop[K, V] {
 	return KeyValuee(next, as.ErrTail(keyExtractor), as.ErrTail(valExtractor))
 }
 
 // KeyValuee transforms a loop to the key/value loop based on applying key, value extractors to the elements
-func KeyValuee[T any, K, V any](next func() (T, bool, error), keyExtractor func(T) (K, error), valExtractor func(T) (V, error)) func() (K, V, bool, error) {
+func KeyValuee[T any, K, V any](next func() (T, bool, error), keyExtractor func(T) (K, error), valExtractor func(T) (V, error)) breakkvloop.Loop[K, V] {
 	if next == nil {
 		return nil
 	}
@@ -568,7 +595,7 @@ func KeyValuee[T any, K, V any](next func() (T, bool, error), keyExtractor func(
 }
 
 // KeysValues transforms a loop to the key/value loop based on applying multiple keys, values extractor to the elements
-func KeysValues[T, K, V any](next func() (T, bool, error), keysExtractor func(T) ([]K, error), valsExtractor func(T) ([]V, error)) func() (K, V, bool, error) {
+func KeysValues[T, K, V any](next func() (T, bool, error), keysExtractor func(T) ([]K, error), valsExtractor func(T) ([]V, error)) breakkvloop.Loop[K, V] {
 	if next == nil {
 		return nil
 	}
@@ -622,62 +649,62 @@ func KeysValues[T, K, V any](next func() (T, bool, error), keysExtractor func(T)
 }
 
 // KeysValue transforms a loop to the key/value loop based on applying key, value extractor to the elements
-func KeysValue[T, K, V any](next func() (T, bool, error), keysExtractor func(T) []K, valExtractor func(T) V) func() (K, V, bool, error) {
+func KeysValue[T, K, V any](next func() (T, bool, error), keysExtractor func(T) []K, valExtractor func(T) V) breakkvloop.Loop[K, V] {
 	return KeysValues(next, as.ErrTail(keysExtractor), convSlice(as.ErrTail(valExtractor)))
 }
 
 // KeysValuee transforms a loop to the key/value loop based on applying key, value extractor to the elements
-func KeysValuee[T, K, V any](next func() (T, bool, error), keysExtractor func(T) ([]K, error), valExtractor func(T) (V, error)) func() (K, V, bool, error) {
+func KeysValuee[T, K, V any](next func() (T, bool, error), keysExtractor func(T) ([]K, error), valExtractor func(T) (V, error)) breakkvloop.Loop[K, V] {
 	return KeysValues(next, keysExtractor, convSlice(valExtractor))
 }
 
 // KeyValues transforms a loop to the key/value loop based on applying key, value extractor to the elements
-func KeyValues[T, K, V any](next func() (T, bool, error), keyExtractor func(T) K, valsExtractor func(T) []V) func() (K, V, bool, error) {
+func KeyValues[T, K, V any](next func() (T, bool, error), keyExtractor func(T) K, valsExtractor func(T) []V) breakkvloop.Loop[K, V] {
 	return KeysValues(next, convSlice(as.ErrTail(keyExtractor)), as.ErrTail(valsExtractor))
 }
 
 // KeyValuess transforms a loop to the key/value loop based on applying key, value extractor to the elements
-func KeyValuess[T, K, V any](next func() (T, bool, error), keyExtractor func(T) (K, error), valsExtractor func(T) ([]V, error)) func() (K, V, bool, error) {
+func KeyValuess[T, K, V any](next func() (T, bool, error), keyExtractor func(T) (K, error), valsExtractor func(T) ([]V, error)) breakkvloop.Loop[K, V] {
 	return KeysValues(next, convSlice(keyExtractor), valsExtractor)
 }
 
 // ExtraVals transforms a loop to the key/value loop based on applying value extractor to the elements
-func ExtraVals[T, V any](next func() (T, bool, error), valsExtractor func(T) []V) func() (T, V, bool, error) {
+func ExtraVals[T, V any](next func() (T, bool, error), valsExtractor func(T) []V) breakkvloop.Loop[T, V] {
 	return KeyValues(next, as.Is[T], valsExtractor)
 }
 
 // ExtraValss transforms a loop to the key/value loop based on applying values extractor to the elements
-func ExtraValss[T, V any](next func() (T, bool, error), valsExtractor func(T) ([]V, error)) func() (T, V, bool, error) {
+func ExtraValss[T, V any](next func() (T, bool, error), valsExtractor func(T) ([]V, error)) breakkvloop.Loop[T, V] {
 	return KeyValuess(next, as.ErrTail(as.Is[T]), valsExtractor)
 }
 
 // ExtraKeys transforms a loop to the key/value loop based on applying key extractor to the elements
-func ExtraKeys[T, K any](next func() (T, bool, error), keysExtractor func(T) []K) func() (K, T, bool, error) {
+func ExtraKeys[T, K any](next func() (T, bool, error), keysExtractor func(T) []K) breakkvloop.Loop[K, T] {
 	return KeysValue(next, keysExtractor, as.Is[T])
 }
 
 // ExtraKeyss transforms a loop to the key/value loop based on applying key extractor to the elements
-func ExtraKeyss[T, K any](next func() (T, bool, error), keyExtractor func(T) (K, error)) func() (K, T, bool, error) {
+func ExtraKeyss[T, K any](next func() (T, bool, error), keyExtractor func(T) (K, error)) breakkvloop.Loop[K, T] {
 	return KeyValuess(next, keyExtractor, as.ErrTail(convert.AsSlice[T]))
 }
 
 // ExtraKey transforms a loop to the key/value loop based on applying key extractor to the elements
-func ExtraKey[T, K any](next func() (T, bool, error), keysExtractor func(T) K) func() (K, T, bool, error) {
+func ExtraKey[T, K any](next func() (T, bool, error), keysExtractor func(T) K) breakkvloop.Loop[K, T] {
 	return KeyValue(next, keysExtractor, as.Is[T])
 }
 
 // ExtraKeyy transforms a loop to the key/value loop based on applying key extractor to the elements
-func ExtraKeyy[T, K any](next func() (T, bool, error), keyExtractor func(T) (K, error)) func() (K, T, bool, error) {
+func ExtraKeyy[T, K any](next func() (T, bool, error), keyExtractor func(T) (K, error)) breakkvloop.Loop[K, T] {
 	return KeyValuee[T, K](next, keyExtractor, as.ErrTail(as.Is[T]))
 }
 
 // ExtraValue transforms a loop to the key/value loop based on applying value extractor to the elements
-func ExtraValue[T, V any](next func() (T, bool, error), valueExtractor func(T) V) func() (T, V, bool, error) {
+func ExtraValue[T, V any](next func() (T, bool, error), valueExtractor func(T) V) breakkvloop.Loop[T, V] {
 	return KeyValue(next, as.Is[T], valueExtractor)
 }
 
 // ExtraValuee transforms a loop to the key/value loop based on applying value extractor to the elements
-func ExtraValuee[T, V any](next func() (T, bool, error), valExtractor func(T) (V, error)) func() (T, V, bool, error) {
+func ExtraValuee[T, V any](next func() (T, bool, error), valExtractor func(T) (V, error)) breakkvloop.Loop[T, V] {
 	return KeyValuee[T, T, V](next, as.ErrTail(as.Is[T]), valExtractor)
 }
 
@@ -810,6 +837,14 @@ func ConvertAndReduce[From, To any](next func() (From, bool, error), converter f
 // ConvAndReduce converts each elements and merges them into one
 func ConvAndReduce[From, To any](next func() (From, bool, error), converter func(From) (To, error), merger func(To, To) To) (out To, err error) {
 	return Reduce(Conv(next, converter), merger)
+}
+
+// Crank rertieves a next element from the 'next' function, returns the function, element, successfully flag.
+func Crank[T any](next func() (T, bool, error)) (n Loop[T], t T, ok bool, err error) {
+	if next != nil {
+		t, ok, err = next()
+	}
+	return next, t, ok, err
 }
 
 func brk(err error) error {

@@ -26,13 +26,14 @@ var (
 	_ fmt.Stringer               = (*MapValues[int, any])(nil)
 )
 
-// Loop creates a loop to iterating through elements.
+// Loop creates a loop to iterate through the collection.
 func (m MapValues[K, V]) Loop() loop.Loop[V] {
 	h := m.Head()
 	return h.Next
 }
 
-// Head creates an iterator and returns as implementation type value
+// Deprecated: Head is deprecated. Will be replaced by rance-over function iterator.
+// Head creates an iterator to iterate through the collection.
 func (m MapValues[K, V]) Head() *ValIter[K, V] {
 	var (
 		order    []K
@@ -45,6 +46,7 @@ func (m MapValues[K, V]) Head() *ValIter[K, V] {
 	return NewValIter(order, elements)
 }
 
+// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
 func (m MapValues[K, V]) First() (*ValIter[K, V], V, bool) {
@@ -79,14 +81,19 @@ func (m MapValues[K, V]) Append(out []V) (values []V) {
 	return out
 }
 
-// For applies the 'walker' function for every value. Return the c.Break to stop.
-func (m MapValues[K, V]) For(walker func(V) error) error {
-	return map_.ForOrderedValues(m.order, m.elements, walker)
+// All is used to iterate through the collection using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
+func (m MapValues[K, V]) All(consumer func(V) bool) {
+	map_.TrackOrderedValuesWhile(m.order, m.elements, consumer)
 }
 
-// ForEach applies the 'walker' function for every value
-func (m MapValues[K, V]) ForEach(walker func(V)) {
-	map_.ForEachOrderedValues(m.order, m.elements, walker)
+// For applies the 'consumer' function for every value until the consumer returns the c.Break to stop.
+func (m MapValues[K, V]) For(consumer func(V) error) error {
+	return map_.ForOrderedValues(m.order, m.elements, consumer)
+}
+
+// ForEach applies the 'consumer' function for every value
+func (m MapValues[K, V]) ForEach(consumer func(V)) {
+	map_.ForEachOrderedValues(m.order, m.elements, consumer)
 }
 
 // Get returns an element by the index, otherwise, if the provided index is ouf of the collection len, returns zero T and false in the second result

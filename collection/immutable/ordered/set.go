@@ -27,40 +27,41 @@ var (
 	_ fmt.Stringer        = Set[int]{}
 )
 
-// Loop creates a loop to iterating through elements.
-func (s Set[T]) Loop() loop.Loop[T] {
-	h := s.Head()
-	return h.Next
+// All is used to iterate through the collection using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
+func (s Set[T]) All(consumer func(T) bool) {
+	slice.WalkWhile(s.order, consumer)
 }
 
-// Head creates an iterator and returns as implementation type value
-func (s Set[T]) Head() *slice.Iter[T] {
+// Loop creates a loop to iterate through the collection.
+func (s Set[T]) Loop() loop.Loop[T] {
+	return loop.Of(s.order...)
+}
+
+// Deprecated: Head is deprecated. Will be replaced by rance-over function iterator.
+// Head creates an iterator to iterate through the collection.
+func (s Set[T]) Head() slice.Iter[T] {
 	return slice.NewHead(s.order)
 }
 
+// Deprecated: Tail is deprecated. Will be replaced by rance-over function iterator.
 // Tail creates an iterator pointing to the end of the collection
-func (s Set[T]) Tail() *slice.Iter[T] {
+func (s Set[T]) Tail() slice.Iter[T] {
 	return slice.NewTail(s.order)
 }
 
+// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
 func (s Set[T]) First() (*slice.Iter[T], T, bool) {
-	var (
-		iterator  = slice.NewHead(s.order)
-		first, ok = iterator.Next()
-	)
-	return iterator, first, ok
+	iterator := slice.NewHead(s.order)
+	return iterator.Crank()
 }
 
 // Last returns the latest element of the collection, an iterator to reverse iterate over the remaining elements, and true\false marker of availability previous elements.
 // If no more elements then ok==false.
 func (s Set[T]) Last() (*slice.Iter[T], T, bool) {
-	var (
-		iterator  = slice.NewTail(s.order)
-		first, ok = iterator.Prev()
-	)
-	return iterator, first, ok
+	iterator := slice.NewTail(s.order)
+	return iterator.CrankPrev()
 }
 
 // Slice collects the elements to a slice
@@ -83,14 +84,14 @@ func (s Set[T]) IsEmpty() bool {
 	return s.Len() == 0
 }
 
-// For applies the 'walker' function for every element. Return the c.Break to stop.
-func (s Set[T]) For(walker func(T) error) error {
-	return slice.For(s.order, walker)
+// For applies the 'consumer' function for every element until the consumer returns the c.Break to stop.
+func (s Set[T]) For(consumer func(T) error) error {
+	return slice.For(s.order, consumer)
 }
 
-// ForEach applies the 'walker' function for every element
-func (s Set[T]) ForEach(walker func(T)) {
-	slice.ForEach(s.order, walker)
+// ForEach applies the 'consumer' function for every element
+func (s Set[T]) ForEach(consumer func(T)) {
+	slice.ForEach(s.order, consumer)
 }
 
 // Filter returns a loop consisting of elements that satisfy the condition of the 'predicate' function

@@ -86,9 +86,9 @@ find by exploring slices [subpackages](./slice).
 
 **Be careful** when use several slice functions subsequently like
 `slice.Filter(slice.Convert(…​))`. This can lead to unnecessary RAM
-consumption. Consider [chain functions](#operations-chain-functions)
-instead, [loop](#additional-api) or [collections](#collection-functions)
-for delayed operations.
+consumption. Consider
+[loop](#loop-kvloop-and-breakable-versions-breakloop-breakkvloop)
+instead of slice API.
 
 ### Main slice functions
 
@@ -434,6 +434,17 @@ result but only return a loop provider. The loop provider is type with a
 
 #### Instantiators
 
+##### loop.Of, loop.S
+
+``` go
+import "github.com/m4gshm/gollections/loop"
+
+var (
+    ints    = loop.Of(1, 2, 3)
+    strings = loop.S([]string{"a", "b", "c"})
+)
+```
+
 ##### range\_.Of
 
 ``` go
@@ -561,6 +572,16 @@ These functions combine converters, filters and reducers.
 
 ### Iterating over loops
 
+- (only for go 1.22) Using rangefunc `All` like:
+
+``` go
+for i := range range_.Of(0, 100).All {
+    doOp(i)
+}
+```
+
+don’t forget exec `go env -w GOEXPERIMENT=rangefunc` before compile.
+
 - Using `for` statement like:
 
 ``` go
@@ -581,7 +602,7 @@ for next, i, ok := range_.Of(0, 100).Crank(); ok; i, ok = next() {
 - `ForEach` method
 
 ``` go
-range_.Of(0, 100).ForEach(func(i int) { doOp(i) })
+range_.Of(0, 100).ForEach(doOp)
 ```
 
 - or `For` method that can be aborted by returning `Break` for expected
@@ -733,11 +754,20 @@ _ *ordered.Map[int, string] = ordered.NewMapOf(
 )
 ```
 
-### Immutable containers
+### Immutable collections
 
 The same underlying interfaces but for read-only use cases.
 
-### Iterating over containers
+### Iterating over collections
+
+- (only for go 1.22) Using rangefunc `All` like:
+
+``` go
+uniques := set.From(range_.Of(0, 100))
+for i := range uniques.All {
+    doOp(i)
+}
+```
 
 - Using `for` statement like:
 
@@ -762,7 +792,7 @@ for iter, i, ok := uniques.First(); ok; i, ok = iter.Next() {
 
 ``` go
 uniques := set.From(range_.Of(0, 100))
-uniques.ForEach(func(i int) { doOp(i) })
+uniques.ForEach(doOp)
 ```
 
 - or `For` method that can be aborted by returning `Break` for expected

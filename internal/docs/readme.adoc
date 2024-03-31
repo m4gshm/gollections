@@ -51,7 +51,7 @@ include::../examples/boilerplate/slice_filter_convert_reduce_short_test.go[lines
 
 This is a shorter version of the previous example that used short aliases link:#sumof[sum.Of] and link:#operations-chain-functions[filter.AndConvert]. More shortcuts you can find by exploring slices link:./slice[subpackages].
 
-*Be careful* when use several slice functions subsequently like [source,go]`slice.Filter(slice.Convert(...))`. This can lead to unnecessary RAM consumption. Consider link:#operations-chain-functions[chain functions] instead, link:#additional-api[loop] or link:#collection-functions[collections] for delayed operations.
+*Be careful* when use several slice functions subsequently like [source,go]`slice.Filter(slice.Convert(...))`. This can lead to unnecessary RAM consumption. Consider link:#loop-kvloop-and-breakable-versions-breakloop-breakkvloop[loop] instead of slice API.
 
 ==== Main slice functions
 ===== Instantiators
@@ -250,6 +250,12 @@ The API in most cases is similar to the link:./slice/api.go[slice] API but with 
 
 ==== Main loop functions
 ===== Instantiators
+====== loop.Of, loop.S
+[source,go]
+----
+import "github.com/m4gshm/gollections/loop"
+include::../examples/loopexamples/loop_Of_loop_S_test.go[lines=12..17,indent=0]
+----
 ====== range_.Of
 [source,go]
 ----
@@ -333,6 +339,14 @@ include::../examples/loopexamples/loop_Flat_test.go[lines=13..16,indent=0]
 These functions combine converters, filters and reducers.
 
 ==== Iterating over loops
+* (only for go 1.22) Using rangefunc `All` like:
+
+[source,go]
+----
+include::../examples/loopexamples/loop_iterating_go_1_22_test.go[lines=12..16,indent=0]
+----
+don't forget exec `go env -w GOEXPERIMENT=rangefunc` before compile.
+
 * Using `for` statement like:
 
 [source,go]
@@ -463,11 +477,17 @@ include::../examples/collection/mutable/oset.go[lines=10..11,indent=0]
 include::../examples/collection/mutable/omap.go[lines=11..15,indent=0]
 ----
 
-==== Immutable containers
+==== Immutable collections
 
 The same underlying interfaces but for read-only use cases.
 
-==== Iterating over containers
+==== Iterating over collections
+* (only for go 1.22) Using rangefunc `All` like:
+
+[source,go]
+----
+include::../examples/collection/collection_iterating_go_1_22_test.go[lines=13..18,indent=0]
+----
 * Using `for` statement like:
 
 [source,go]

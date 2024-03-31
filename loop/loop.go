@@ -8,26 +8,32 @@ import (
 // Loop is a function that returns the next element or false if there are no more elements.
 type Loop[T any] func() (T, bool)
 
+// All is used to iterate through the loop using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
+func (next Loop[T]) All(consumer func(T) bool) {
+	All(next, consumer)
+}
+
 var (
 	_ c.Filterable[any, Loop[any], loop.Loop[any]]  = (Loop[any])(nil)
 	_ c.Convertable[any, Loop[any], loop.Loop[any]] = (Loop[any])(nil)
 )
 
-// For applies the 'walker' function for the elements retrieved by the 'next' function. Return the c.Break to stop
-func (next Loop[T]) For(walker func(T) error) error {
-	return For(next, walker)
+// For applies the 'consumer' function for the elements retrieved by the 'next' function until the consumer returns the c.Break to stop.
+func (next Loop[T]) For(consumer func(T) error) error {
+	return For(next, consumer)
 }
 
-// ForEach applies the 'walker' function to the elements retrieved by the 'next' function
-func (next Loop[T]) ForEach(walker func(T)) {
-	ForEach(next, walker)
+// ForEach applies the 'consumer' function to the elements retrieved by the 'next' function
+func (next Loop[T]) ForEach(consumer func(T)) {
+	ForEach(next, consumer)
 }
 
-// ForEachFiltered applies the 'walker' function to the elements retrieved by the 'next' function that satisfy the 'predicate' function condition
-func (next Loop[T]) ForEachFiltered(predicate func(T) bool, walker func(T)) {
-	ForEachFiltered(next, predicate, walker)
+// ForEachFiltered applies the 'consumer' function to the elements retrieved by the 'next' function that satisfy the 'predicate' function condition
+func (next Loop[T]) ForEachFiltered(predicate func(T) bool, consumer func(T)) {
+	ForEachFiltered(next, predicate, consumer)
 }
 
+// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 // First returns the first element that satisfies the condition of the 'predicate' function
 func (next Loop[T]) First(predicate func(T) bool) (T, bool) {
 	return First(next, predicate)
@@ -48,9 +54,14 @@ func (next Loop[T]) Append(out []T) []T {
 	return Append(next, out)
 }
 
-// Reduce reduces the elements retrieved by the 'next' function into an one using the 'merger' function
-func (next Loop[T]) Reduce(merger func(T, T) T) T {
-	return Reduce(next, merger)
+// Reduce reduces the elements retrieved by the 'next' function into an one using the 'merge' function.
+func (next Loop[T]) Reduce(merge func(T, T) T) T {
+	return Reduce(next, merge)
+}
+
+// Reducee reduces the elements retrieved by the 'next' function into an one using the 'merge' function
+func (next Loop[T]) Reducee(merge func(T, T) (T, error)) (T, error) {
+	return Reducee(next, merge)
 }
 
 // HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful

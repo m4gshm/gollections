@@ -38,13 +38,21 @@ var (
 	_ fmt.Stringer                                                         = (*Map[int, any])(nil)
 )
 
-// Loop creates a loop to iterating through elements.
+// All is used to iterate through the collection using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
+func (m *Map[K, V]) All(consumer func(K, V) bool) {
+	if m != nil {
+		map_.TrackWhile(*m, consumer)
+	}
+}
+
+// Loop creates a loop to iterate through the collection.
 func (m *Map[K, V]) Loop() loop.Loop[K, V] {
 	h := m.Head()
 	return h.Next
 }
 
-// Head creates an iterator and returns as implementation type value
+// Deprecated: Head is deprecated. Will be replaced by rance-over function iterator.
+// Head creates an iterator to iterate through the collection.
 func (m *Map[K, V]) Head() map_.Iter[K, V] {
 	var out map[K]V
 	if m != nil {
@@ -54,6 +62,7 @@ func (m *Map[K, V]) Head() map_.Iter[K, V] {
 }
 
 // First returns the first key/value pair of the map, an iterator to iterate over the remaining pair, and true\false marker of availability next pairs.
+// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 // If no more then ok==false.
 func (m *Map[K, V]) First() (map_.Iter[K, V], K, V, bool) {
 	var out map[K]V
@@ -105,33 +114,18 @@ func (m *Map[K, V]) IsEmpty() bool {
 	return m.Len() == 0
 }
 
-// For applies the 'walker' function for every key/value pair. Return the c.Break to stop.
-func (m *Map[K, V]) For(walker func(c.KV[K, V]) error) error {
+// Track applies the 'consumer' function for all key/value pairs until the consumer returns the c.Break to stop.
+func (m *Map[K, V]) Track(consumer func(K, V) error) error {
 	if m == nil {
 		return nil
 	}
-	return map_.For(*m, walker)
+	return map_.Track(*m, consumer)
 }
 
-// ForEach applies the 'walker' function for every element
-func (m *Map[K, V]) ForEach(walker func(c.KV[K, V])) {
+// TrackEach applies the 'consumer' function for every key/value pairs
+func (m *Map[K, V]) TrackEach(consumer func(K, V)) {
 	if m != nil {
-		map_.ForEach(*m, walker)
-	}
-}
-
-// Track applies the 'tracker' function for key/value pairs. Return the c.Break to stop.
-func (m *Map[K, V]) Track(tracker func(K, V) error) error {
-	if m == nil {
-		return nil
-	}
-	return map_.Track(*m, tracker)
-}
-
-// TrackEach applies the 'tracker' function for every key/value pairs
-func (m *Map[K, V]) TrackEach(tracker func(K, V)) {
-	if m != nil {
-		map_.TrackEach(*m, tracker)
+		map_.TrackEach(*m, consumer)
 	}
 }
 

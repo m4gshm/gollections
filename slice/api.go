@@ -626,6 +626,7 @@ func Sum[TS ~[]T, T c.Summable](elements TS) T {
 }
 
 // First returns the first element that satisfies requirements of the predicate 'by'
+// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 func First[TS ~[]T, T any](elements TS, by func(T) bool) (no T, ok bool) {
 	for _, e := range elements {
 		if by(e) {
@@ -669,10 +670,10 @@ func Lastt[TS ~[]T, T any](elements TS, by func(T) (bool, error)) (no T, ok bool
 	return no, false, nil
 }
 
-// Track applies the 'tracker' function to the elements. Return the c.Break to stop tracking
-func Track[TS ~[]T, T any](elements TS, tracker func(int, T) error) error {
+// Track applies the 'consumer' function to the elements until the consumer returns the c.Break to stop.tracking
+func Track[TS ~[]T, T any](elements TS, consumer func(int, T) error) error {
 	for i, e := range elements {
-		if err := tracker(i, e); err == Break {
+		if err := consumer(i, e); err == Break {
 			return nil
 		} else if err != nil {
 			return err
@@ -681,17 +682,26 @@ func Track[TS ~[]T, T any](elements TS, tracker func(int, T) error) error {
 	return nil
 }
 
-// TrackEach applies the 'tracker' function to the elements
-func TrackEach[TS ~[]T, T any](elements TS, tracker func(int, T)) {
+// TrackEach applies the 'consumer' function to the elements
+func TrackEach[TS ~[]T, T any](elements TS, consumer func(int, T)) {
 	for i, e := range elements {
-		tracker(i, e)
+		consumer(i, e)
 	}
 }
 
-// For applies the 'walker' function for the elements. Return the c.Break to stop
-func For[TS ~[]T, T any](elements TS, walker func(T) error) error {
+// TrackWhile applies the 'predicate' function to the elements while the fuction returns true.
+func TrackWhile[TS ~[]T, T any](elements TS, predicate func(int, T) bool) {
+	for i, e := range elements {
+		if !predicate(i, e) {
+			break
+		}
+	}
+}
+
+// For applies the 'consumer' function for the elements until the consumer returns the c.Break to stop.
+func For[TS ~[]T, T any](elements TS, consumer func(T) error) error {
 	for _, e := range elements {
-		if err := walker(e); err == Break {
+		if err := consumer(e); err == Break {
 			return nil
 		} else if err != nil {
 			return err
@@ -700,17 +710,19 @@ func For[TS ~[]T, T any](elements TS, walker func(T) error) error {
 	return nil
 }
 
-// ForEach applies the 'walker' function for the elements
-func ForEach[TS ~[]T, T any](elements TS, walker func(T)) {
+// WalkWhile applies the 'predicate' function for the elements until the predicate returns false to stop.
+func WalkWhile[TS ~[]T, T any](elements TS, predicate func(T) bool) {
 	for _, e := range elements {
-		walker(e)
+		if !predicate(e) {
+			break
+		}
 	}
 }
 
-// ForEachRef applies the 'walker' function for the references
-func ForEachRef[T any, TS ~[]*T](references TS, walker func(T)) {
-	for _, e := range references {
-		walker(*e)
+// ForEach applies the 'consumer' function for the elements
+func ForEach[TS ~[]T, T any](elements TS, consumer func(T)) {
+	for _, e := range elements {
+		consumer(e)
 	}
 }
 

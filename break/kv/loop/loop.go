@@ -1,23 +1,27 @@
 package loop
 
-import "github.com/m4gshm/gollections/break/loop"
-
 // Loop is a function that returns the next key, value or false if there are no more elements.
 type Loop[K, V any] func() (K, V, bool, error)
 
-// Track applies the 'tracker' function to position/element pairs retrieved by the 'next' function. Return the c.Break to stop tracking..
-func (next Loop[K, V]) Track(tracker func(K, V) error) error {
-	return loop.Track(next, tracker)
+// Track applies the 'consumer' function to position/element pairs retrieved by the 'next' function until the consumer returns the c.Break to stop.
+func (next Loop[K, V]) Track(consumer func(K, V) error) error {
+	return Track(next, consumer)
 }
 
+// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 // First returns the first element that satisfies the condition of the 'predicate' function
 func (next Loop[K, V]) First(predicate func(K, V) bool) (K, V, bool, error) {
 	return First(next, predicate)
 }
 
-// Reduce reduces the elements retrieved by the 'next' function into an one using the 'merger' function
-func (next Loop[K, V]) Reduce(merger func(K, K, V, V) (K, V)) (K, V, error) {
-	return Reduce(next, merger)
+// Reduce reduces the elements retrieved by the 'next' function into an one using the 'merge' function.
+func (next Loop[K, V]) Reduce(merge func(K, K, V, V) (K, V)) (K, V, error) {
+	return Reduce(next, merge)
+}
+
+// Reducee reduces the elements retrieved by the 'next' function into an one using the 'merge' function.
+func (next Loop[K, V]) Reducee(merge func(K, K, V, V) (K, V, error)) (K, V, error) {
+	return Reducee(next, merge)
 }
 
 // HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful
@@ -33,4 +37,9 @@ func (next Loop[K, V]) Filt(filter func(K, V) (bool, error)) Loop[K, V] {
 // Filter creates a loop that checks elements by the 'filter' function and returns successful ones.
 func (next Loop[K, V]) Filter(filter func(K, V) bool) Loop[K, V] {
 	return Filter(next, filter)
+}
+
+// Crank rertieves next key\value elements from the 'next' function, returns the function, element, successfully flag.
+func (next Loop[K, V]) Crank() (Loop[K, V], K, V, bool, error) {
+	return Crank(next)
 }

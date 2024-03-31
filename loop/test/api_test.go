@@ -32,8 +32,21 @@ func Test_ReduceSum(t *testing.T) {
 	assert.Equal(t, 1+3+5+7+9+11, r)
 }
 
+func Test_ReduceeSum(t *testing.T) {
+	s := loop.Of(1, 3, 5, 7, 9, 11)
+	r, err := loop.Reducee(s, func(i1, i2 int) (int, error) { return i1 + i2, nil })
+	assert.Equal(t, 1+3+5+7+9+11, r)
+	assert.Nil(t, err)
+}
+
 func Test_EmptyLoop(t *testing.T) {
 	s := loop.Of[int]()
+	r := loop.Reduce(s, op.Sum[int])
+	assert.Equal(t, 0, r)
+}
+
+func Test_NilLoop(t *testing.T) {
+	var s loop.Loop[int]
 	r := loop.Reduce(s, op.Sum[int])
 	assert.Equal(t, 0, r)
 }

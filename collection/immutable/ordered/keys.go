@@ -26,20 +26,28 @@ var (
 	_ fmt.Stringer               = MapKeys[int]{}
 )
 
-// Loop creates a loop to iterating through elements.
-func (m MapKeys[K]) Loop() loop.Loop[K] {
-	return m.Head().Next
+// All is used to iterate through the collection using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
+func (m MapKeys[K]) All(consumer func(K) bool) {
+	slice.WalkWhile(m.keys, consumer)
 }
 
-// Head creates an iterator and returns as implementation type value
-func (m MapKeys[K]) Head() *slice.Iter[K] {
+// Loop creates a loop to iterate through the collection.
+func (m MapKeys[K]) Loop() loop.Loop[K] {
+	return loop.Of(m.keys...)
+}
+
+// Deprecated: Head is deprecated. Will be replaced by rance-over function iterator.
+// Head creates an iterator to iterate through the collection.
+func (m MapKeys[K]) Head() slice.Iter[K] {
 	return slice.NewHead(m.keys)
 }
 
+// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
 func (m MapKeys[K]) First() (*slice.Iter[K], K, bool) {
-	return m.Head().Crank()
+	h := m.Head()
+	return h.Crank()
 }
 
 // Len returns amount of elements
@@ -68,14 +76,14 @@ func (m MapKeys[K]) Append(out []K) []K {
 	return out
 }
 
-// For applies the 'walker' function for every key. Return the c.Break to stop.
-func (m MapKeys[K]) For(walker func(K) error) error {
-	return slice.For(m.keys, walker)
+// For applies the 'consumer' function for every key until the consumer returns the c.Break to stop.
+func (m MapKeys[K]) For(consumer func(K) error) error {
+	return slice.For(m.keys, consumer)
 }
 
-// ForEach applies the 'walker' function for every element
-func (m MapKeys[K]) ForEach(walker func(K)) {
-	slice.ForEach(m.keys, walker)
+// ForEach applies the 'consumer' function for every element
+func (m MapKeys[K]) ForEach(consumer func(K)) {
+	slice.ForEach(m.keys, consumer)
 }
 
 // Filter returns a loop consisting of elements that satisfy the condition of the 'predicate' function

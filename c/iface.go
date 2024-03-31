@@ -63,6 +63,7 @@ type Iterator[T any] interface {
 
 	For[T]
 	ForEach[T]
+	All(consumer func(T) bool)
 }
 
 // Sized - storage interface with measurable size

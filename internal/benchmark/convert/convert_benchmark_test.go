@@ -1,6 +1,7 @@
-package benchmark
+package convert
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/m4gshm/gollections/collection"
@@ -8,9 +9,18 @@ import (
 	"github.com/m4gshm/gollections/collection/mutable"
 	mvector "github.com/m4gshm/gollections/collection/mutable/vector"
 	"github.com/m4gshm/gollections/convert"
-
+	"github.com/m4gshm/gollections/convert/ptr"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/slice"
+	"github.com/m4gshm/gollections/slice/range_"
+)
+
+var (
+	toString = func(i int) string { return fmt.Sprintf("%d", i) }
+	addTail  = func(s string) string { return s + "_tail" }
+	even     = func(v int) bool { return v%2 == 0 }
+	max      = 100000
+	values   = range_.Closed(1, max)
 )
 
 func Benchmark_Convert_Slice(b *testing.B) {
@@ -106,9 +116,7 @@ func Benchmark_Convert_ImmutableVector_Head_Loop(b *testing.B) {
 	var s []string
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		h := items.Loop()
-		c := loop.Convert(h, concat)
-		s = loop.SliceCap(c, len(values))
+		s = loop.SliceCap(loop.Convert(ptr.Of(items.Head()).Next, concat), len(values))
 	}
 	_ = s
 	b.StopTimer()

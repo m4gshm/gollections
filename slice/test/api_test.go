@@ -529,3 +529,16 @@ func Test_OfIndexed(t *testing.T) {
 	result := slice.OfIndexed(len(indexed), func(i int) string { return indexed[i] })
 	assert.Equal(t, indexed, result)
 }
+
+func Test_PeekWhile(t *testing.T) {
+	expected := slice.Of(1, 3, 5, 7, 9, 11)
+
+	s := []int{}
+
+	slice.WalkWhile(expected, func(e int) bool {
+		s = append(s, e)
+		return true
+	})
+
+	assert.Equal(t, expected, s)
+}

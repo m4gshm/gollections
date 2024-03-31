@@ -12,14 +12,14 @@ import (
 const IterNoStarted = -1
 
 // NewHead instantiates Iter based on elements slice
-func NewHead[TS ~[]T, T any](elements TS) *Iter[T] {
+func NewHead[TS ~[]T, T any](elements TS) Iter[T] {
 	var (
 		elementSize = notsafe.GetTypeSize[T]()
 		header      = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
 		array       = unsafe.Pointer(header.Data)
 		size        = header.Len
 	)
-	return &Iter[T]{
+	return Iter[T]{
 		array:       array,
 		elementSize: elementSize,
 		size:        size,
@@ -29,14 +29,14 @@ func NewHead[TS ~[]T, T any](elements TS) *Iter[T] {
 }
 
 // NewTail instantiates Iter based on elements slice for reverse iterating
-func NewTail[T any](elements []T) *Iter[T] {
+func NewTail[T any](elements []T) Iter[T] {
 	var (
 		elementSize = notsafe.GetTypeSize[T]()
 		header      = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
 		array       = unsafe.Pointer(header.Data)
 		size        = header.Len
 	)
-	return &Iter[T]{
+	return Iter[T]{
 		array:       array,
 		elementSize: elementSize,
 		size:        size,
@@ -57,14 +57,19 @@ var (
 	_ c.PrevIterator[any] = (*Iter[any])(nil)
 )
 
+// All is used to iterate through the iterator using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
+func (i *Iter[T]) All(consumer func(element T) bool) {
+	loop.All(i.Next, consumer)
+}
+
 // For takes elements retrieved by the iterator. Can be interrupt by returning Break
-func (i *Iter[T]) For(walker func(element T) error) error {
-	return loop.For(i.Next, walker)
+func (i *Iter[T]) For(consumer func(element T) error) error {
+	return loop.For(i.Next, consumer)
 }
 
 // ForEach takes all elements retrieved by the iterator.
-func (i *Iter[T]) ForEach(walker func(element T)) {
-	loop.ForEach(i.Next, walker)
+func (i *Iter[T]) ForEach(consumer func(element T)) {
+	loop.ForEach(i.Next, consumer)
 }
 
 // HasNext checks the next element existing
@@ -153,7 +158,7 @@ func (i *Iter[T]) Crank() (it *Iter[T], t T, ok bool) {
 	return i, t, ok
 }
 
-// Crank rertieves a prev element, returns the iterator, element and successfully flag.
+// CrankPrev rertieves a prev element, returns the iterator, element and successfully flag.
 func (i *Iter[T]) CrankPrev() (it *Iter[T], t T, ok bool) {
 	if i != nil {
 		t, ok = i.Prev()

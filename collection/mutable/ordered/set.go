@@ -33,10 +33,19 @@ var (
 	_ fmt.Stringer                    = (*Set[int])(nil)
 )
 
-// Loop creates a loop to iterating through elements.
+// All is used to iterate through the collection using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
+func (s *Set[T]) All(consumer func(T) bool) {
+	if s != nil {
+		slice.WalkWhile(*s.order, consumer)
+	}
+}
+
+// Loop creates a loop to iterate through the collection.
 func (s *Set[T]) Loop() loop.Loop[T] {
-	h := s.Head()
-	return (&h).Next
+	if s == nil {
+		return nil
+	}
+	return loop.Of((*s.order)...)
 }
 
 // IterEdit creates iterator that can delete iterable elements
@@ -45,7 +54,8 @@ func (s *Set[T]) IterEdit() c.DelIterator[T] {
 	return &h
 }
 
-// Head creates an iterator and returns as implementation type value
+// Deprecated: Head is deprecated. Will be replaced by rance-over function iterator.
+// Head creates an iterator to iterate through the collection.
 func (s *Set[T]) Head() SetIter[T] {
 	var elements *[]T
 	if s != nil {
@@ -54,6 +64,7 @@ func (s *Set[T]) Head() SetIter[T] {
 	return NewSetIter(elements, s.DeleteOne)
 }
 
+// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
 func (s *Set[T]) First() (SetIter[T], T, bool) {
@@ -221,8 +232,8 @@ func (s *Set[T]) DeleteActualOne(element T) bool {
 	return false
 }
 
-// For applies the 'walker' function for the elements. Return the c.Break to stop.
-func (s *Set[T]) For(walker func(T) error) error {
+// For applies the 'consumer' function for the elements until the consumer returns the c.Break to stop.
+func (s *Set[T]) For(consumer func(T) error) error {
 	if s == nil {
 		return nil
 	}
@@ -230,14 +241,14 @@ func (s *Set[T]) For(walker func(T) error) error {
 	if order == nil {
 		return nil
 	}
-	return slice.For(*order, walker)
+	return slice.For(*order, consumer)
 }
 
-// ForEach applies the 'walker' function for every element
-func (s *Set[T]) ForEach(walker func(T)) {
+// ForEach applies the 'consumer' function for every element
+func (s *Set[T]) ForEach(consumer func(T)) {
 	if s != nil {
 		if order := s.order; order != nil {
-			slice.ForEach(*order, walker)
+			slice.ForEach(*order, consumer)
 		}
 	}
 }

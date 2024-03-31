@@ -5,6 +5,7 @@ import (
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/kv/collection"
+	kvloop "github.com/m4gshm/gollections/kv/loop"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
 )
@@ -31,14 +32,19 @@ type Iter[K comparable, V any] struct {
 
 var _ collection.Iterator[int, any] = (*Iter[int, any])(nil)
 
+// All is used to iterate through the iterator using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
+func (i *Iter[K, V]) All(consumer func(key K, value V) bool) {
+	kvloop.All(i.Next, consumer)
+}
+
 // Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning Break
 func (i *Iter[K, V]) Track(traker func(key K, value V) error) error {
-	return loop.Track(i.Next, traker)
+	return kvloop.Track(i.Next, traker)
 }
 
 // TrackEach takes all key, value pairs retrieved by the iterator
 func (i *Iter[K, V]) TrackEach(traker func(key K, value V)) {
-	loop.TrackEach(i.Next, traker)
+	kvloop.TrackEach(i.Next, traker)
 }
 
 // Next returns the next element.
@@ -127,14 +133,19 @@ var (
 	_ c.Iterator[string] = KeyIter[string, any]{}
 )
 
+// All is used to iterate through the iterator using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
+func (i KeyIter[K, V]) All(consumer func(element K) bool) {
+	loop.All(i.Next, consumer)
+}
+
 // For takes elements retrieved by the iterator. Can be interrupt by returning Break
-func (i KeyIter[K, V]) For(walker func(element K) error) error {
-	return loop.For(i.Next, walker)
+func (i KeyIter[K, V]) For(consumer func(element K) error) error {
+	return loop.For(i.Next, consumer)
 }
 
 // ForEach FlatIter all elements retrieved by the iterator
-func (i KeyIter[K, V]) ForEach(walker func(element K)) {
-	loop.ForEach(i.Next, walker)
+func (i KeyIter[K, V]) ForEach(consumer func(element K)) {
+	loop.ForEach(i.Next, consumer)
 }
 
 // Next returns the next element.
@@ -165,14 +176,19 @@ var (
 	_ c.Iterator[any] = ValIter[int, any]{}
 )
 
+// All is used to iterate through the iterator using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
+func (i ValIter[K, V]) All(consumer func(element V) bool) {
+	loop.All(i.Next, consumer)
+}
+
 // For takes elements retrieved by the iterator. Can be interrupt by returning Break
-func (i ValIter[K, V]) For(walker func(element V) error) error {
-	return loop.For(i.Next, walker)
+func (i ValIter[K, V]) For(consumer func(element V) error) error {
+	return loop.For(i.Next, consumer)
 }
 
 // ForEach FlatIter all elements retrieved by the iterator
-func (i ValIter[K, V]) ForEach(walker func(element V)) {
-	loop.ForEach(i.Next, walker)
+func (i ValIter[K, V]) ForEach(consumer func(element V)) {
+	loop.ForEach(i.Next, consumer)
 }
 
 // Next returns the next element.
