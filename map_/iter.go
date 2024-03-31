@@ -133,6 +133,7 @@ var (
 	_ c.Iterator[string] = KeyIter[string, any]{}
 )
 
+// All is used to iterate through the iterator using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
 func (i KeyIter[K, V]) All(consumer func(element K) bool) {
 	loop.All(i.Next, consumer)
 }

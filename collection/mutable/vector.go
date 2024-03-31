@@ -76,7 +76,6 @@ func (v *Vector[T]) Last() (*SliceIter[T], T, bool) {
 	var (
 		iterator  = NewTail(v, v.DeleteActualOne)
 		first, ok = iterator.Prev()
-		
 	)
 	return iterator, first, ok
 }

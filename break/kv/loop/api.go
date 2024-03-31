@@ -150,7 +150,7 @@ func Conv[K, V any, KOUT, VOUT any](next func() (K, V, bool, error), converter f
 	}
 }
 
-// Filter creates a loop that checks elements by a filter and returns successful ones
+// Filter creates a loop that checks elements by the 'filter' function and returns successful ones.
 func Filter[K, V any](next func() (K, V, bool, error), filter func(K, V) bool) Loop[K, V] {
 	if next == nil {
 		return nil
@@ -160,7 +160,7 @@ func Filter[K, V any](next func() (K, V, bool, error), filter func(K, V) bool) L
 	}
 }
 
-// Filt creates a loop that checks elements by a filter and returns successful ones
+// Filt creates a loop that checks elements by the 'filter' function and returns successful ones.
 func Filt[K, V any](next func() (K, V, bool, error), filter func(K, V) (bool, error)) Loop[K, V] {
 	if next == nil {
 		return nil

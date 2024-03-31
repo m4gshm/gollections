@@ -8,6 +8,7 @@ import (
 // Loop is a function that returns the next element or false if there are no more elements.
 type Loop[T any] func() (T, bool)
 
+// All is used to iterate through the loop using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
 func (next Loop[T]) All(consumer func(T) bool) {
 	All(next, consumer)
 }

@@ -46,7 +46,7 @@ func Test_EmptyLoop(t *testing.T) {
 }
 
 func Test_NilLoop(t *testing.T) {
-	var s loop.Loop[int] = nil
+	var s loop.Loop[int]
 	r := loop.Reduce(s, op.Sum[int])
 	assert.Equal(t, 0, r)
 }

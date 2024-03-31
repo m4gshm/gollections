@@ -19,7 +19,7 @@ func (next Loop[K, V]) Reduce(merge func(K, K, V, V) (K, V)) (K, V, error) {
 	return Reduce(next, merge)
 }
 
-// Reduce2 reduces the elements retrieved by the 'next' function into an one using the 'merge' function.
+// Reducee reduces the elements retrieved by the 'next' function into an one using the 'merge' function.
 func (next Loop[K, V]) Reducee(merge func(K, K, V, V) (K, V, error)) (K, V, error) {
 	return Reducee(next, merge)
 }

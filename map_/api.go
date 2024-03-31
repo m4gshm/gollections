@@ -224,6 +224,7 @@ func TrackEach[M ~map[K]V, K comparable, V any](elements M, consumer func(K, V))
 	}
 }
 
+// TrackWhile applies the 'consumer' function for every key/value pairs from the 'elements' map until the consumer returns false.
 func TrackWhile[M ~map[K]V, K comparable, V any](elements M, consumer func(K, V) bool) {
 	for key, val := range elements {
 		if !consumer(key, val) {
@@ -251,6 +252,7 @@ func TrackEachOrdered[M ~map[K]V, K comparable, V any](order []K, uniques M, con
 	}
 }
 
+// TrackOrderedWhile applies the 'consumer' function for every key/value pairs from the 'elements' map in order of the 'order' slice until the consumer returns false.
 func TrackOrderedWhile[M ~map[K]V, K comparable, V any](order []K, elements M, consumer func(K, V) bool) {
 	for _, key := range order {
 		if !consumer(key, elements[key]) {
@@ -259,6 +261,7 @@ func TrackOrderedWhile[M ~map[K]V, K comparable, V any](order []K, elements M, c
 	}
 }
 
+// TrackOrderedValuesWhile applies the 'consumer' function for every value from the 'elements' map in order of the 'order' slice until the consumer returns false.
 func TrackOrderedValuesWhile[M ~map[K]V, K comparable, V any](order []K, elements M, consumer func(V) bool) {
 	for _, key := range order {
 		if !consumer(elements[key]) {
@@ -267,6 +270,7 @@ func TrackOrderedValuesWhile[M ~map[K]V, K comparable, V any](order []K, element
 	}
 }
 
+// TrackKeysWhile applies the 'consumer' function for every key from the 'elements' map until the consumer returns false.
 func TrackKeysWhile[M ~map[K]V, K comparable, V any](elements M, consumer func(K) bool) {
 	for key := range elements {
 		if !consumer(key) {
@@ -275,6 +279,7 @@ func TrackKeysWhile[M ~map[K]V, K comparable, V any](elements M, consumer func(K
 	}
 }
 
+// TrackValuesWhile applies the 'consumer' function for every value from the 'elements' map until the consumer returns false.
 func TrackValuesWhile[M ~map[K]V, K comparable, V any](elements M, consumer func(V) bool) {
 	for _, val := range elements {
 		if !consumer(val) {
