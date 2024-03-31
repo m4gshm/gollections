@@ -21,8 +21,7 @@ func (next Loop[K, V]) Track(consumer func(K, V) error) error {
 	return Track(next, consumer)
 }
 
-// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
-// First returns the first element that satisfies the condition of the 'predicate' function
+// First returns the first element that satisfies the condition of the 'predicate' function.
 func (next Loop[K, V]) First(predicate func(K, V) bool) (K, V, bool) {
 	return First(next, predicate)
 }

@@ -86,7 +86,6 @@ func KeyValue[T any, K comparable, V any, IT Iterable[T]](collection IT, keyExtr
 	return loop.KeyValue(h, keyExtractor, valExtractor)
 }
 
-// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 // First returns the first element that satisfies the condition of the 'predicate' function
 func First[T any, IT Iterable[T]](collection IT, predicate func(T) bool) (v T, ok bool) {
 	i := collection.Loop()

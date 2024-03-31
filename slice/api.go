@@ -626,7 +626,6 @@ func Sum[TS ~[]T, T c.Summable](elements TS) T {
 }
 
 // First returns the first element that satisfies requirements of the predicate 'by'
-// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 func First[TS ~[]T, T any](elements TS, by func(T) bool) (no T, ok bool) {
 	for _, e := range elements {
 		if by(e) {

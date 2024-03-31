@@ -108,7 +108,6 @@ func ForFiltered[T any](next func() (T, bool, error), consumer func(T) error, pr
 	}
 }
 
-// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 // First returns the first element that satisfies the condition of the 'predicate' function
 func First[T any](next func() (T, bool, error), predicate func(T) bool) (out T, ok bool, err error) {
 	if next == nil {

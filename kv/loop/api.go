@@ -95,7 +95,6 @@ func HasAnyy[K, V any](next func() (K, V, bool), predicate func(K, V) (bool, err
 	return ok, err
 }
 
-// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 // First returns the first key/value pair that satisfies the condition of the 'predicate' function
 func First[K, V any](next func() (K, V, bool), predicate func(K, V) bool) (K, V, bool) {
 	for {

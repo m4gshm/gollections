@@ -33,7 +33,6 @@ func (next Loop[T]) ForEachFiltered(predicate func(T) bool, consumer func(T)) {
 	ForEachFiltered(next, predicate, consumer)
 }
 
-// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 // First returns the first element that satisfies the condition of the 'predicate' function
 func (next Loop[T]) First(predicate func(T) bool) (T, bool) {
 	return First(next, predicate)

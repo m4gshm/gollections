@@ -100,7 +100,6 @@ func ForEachFiltered[T any](next func() (T, bool), predicate func(T) bool, consu
 	}
 }
 
-// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 // First returns the first element that satisfies the condition of the 'predicate' function
 func First[T any](next func() (T, bool), predicate func(T) bool) (v T, ok bool) {
 	if next == nil {

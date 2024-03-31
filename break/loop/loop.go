@@ -8,7 +8,6 @@ func (next Loop[T]) For(consumer func(T) error) error {
 	return For(next, consumer)
 }
 
-// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 // First returns the first element that satisfies the condition of the 'predicate' function
 func (next Loop[T]) First(predicate func(T) bool) (T, bool, error) {
 	return First(next, predicate)
