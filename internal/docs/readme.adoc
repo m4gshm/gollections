@@ -51,7 +51,7 @@ include::../examples/boilerplate/slice_filter_convert_reduce_short_test.go[lines
 
 This is a shorter version of the previous example that used short aliases link:#sumof[sum.Of] and link:#operations-chain-functions[filter.AndConvert]. More shortcuts you can find by exploring slices link:./slice[subpackages].
 
-*Be careful* when use several slice functions subsequently like [source,go]`slice.Filter(slice.Convert(...))`. This can lead to unnecessary RAM consumption. Consider link:#operations-chain-functions[chain functions] instead, link:#loop[loop] or link:#collection-functions[collections] for delayed operations.
+*Be careful* when use several slice functions subsequently like [source,go]`slice.Filter(slice.Convert(...))`. This can lead to unnecessary RAM consumption. Consider link:#operations-chain-functions[chain functions] instead, link:#loop-kvloop-and-breakable-versions-breakloop-breakkvloop[loop] or link:#collection-functions[collections] for delayed operations.
 
 ==== Main slice functions
 ===== Instantiators
