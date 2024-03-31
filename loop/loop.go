@@ -8,15 +8,15 @@ import (
 // Loop is a function that returns the next element or false if there are no more elements.
 type Loop[T any] func() (T, bool)
 
-// All is used to iterate through the loop using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
-func (next Loop[T]) All(consumer func(T) bool) {
-	All(next, consumer)
-}
-
 var (
 	_ c.Filterable[any, Loop[any], loop.Loop[any]]  = (Loop[any])(nil)
 	_ c.Convertable[any, Loop[any], loop.Loop[any]] = (Loop[any])(nil)
 )
+
+// All is used to iterate through the loop using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
+func (next Loop[T]) All(consumer func(T) bool) {
+	All(next, consumer)
+}
 
 // For applies the 'consumer' function for the elements retrieved by the 'next' function until the consumer returns the c.Break to stop.
 func (next Loop[T]) For(consumer func(T) error) error {

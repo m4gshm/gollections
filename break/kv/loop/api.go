@@ -205,7 +205,7 @@ func ToSlice[K, V, T any](next func() (K, V, bool, error), converter func(K, V) 
 }
 
 // Track applies the 'consumer' function to position/element pairs retrieved by the 'next' function until the consumer returns the c.Break to stop.
-func Track[I, T any](next func() (I, T, bool, error), consumer func(I, T) error) error {
+func Track[K, V any](next func() (K, V, bool, error), consumer func(K, V) error) error {
 	if next == nil {
 		return nil
 	}
