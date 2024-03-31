@@ -32,8 +32,21 @@ func Test_ReduceSum(t *testing.T) {
 	assert.Equal(t, 1+3+5+7+9+11, r)
 }
 
+func Test_ReduceeSum(t *testing.T) {
+	s := loop.Of(1, 3, 5, 7, 9, 11)
+	r, err := loop.Reducee(s, func(i1, i2 int) (int, error) { return i1 + i2, nil })
+	assert.Equal(t, 1+3+5+7+9+11, r)
+	assert.Nil(t, err)
+}
+
 func Test_EmptyLoop(t *testing.T) {
 	s := loop.Of[int]()
+	r := loop.Reduce(s, op.Sum[int])
+	assert.Equal(t, 0, r)
+}
+
+func Test_NilLoop(t *testing.T) {
+	var s loop.Loop[int]
 	r := loop.Reduce(s, op.Sum[int])
 	assert.Equal(t, 0, r)
 }
@@ -81,7 +94,7 @@ func Test_NotNil(t *testing.T) {
 		result   = loop.NotNil(source)
 		expected = []*entity{{"first"}, {"third"}, {"fifth"}}
 	)
-	assert.Equal(t, expected, loop.Slice(result.Next))
+	assert.Equal(t, expected, loop.Slice(result))
 }
 
 func Test_ConvertPointersToValues(t *testing.T) {
@@ -91,7 +104,7 @@ func Test_ConvertPointersToValues(t *testing.T) {
 		result   = loop.PtrVal(source)
 		expected = []entity{{"first"}, {}, {"third"}, {}, {"fifth"}}
 	)
-	assert.Equal(t, expected, loop.Slice(result.Next))
+	assert.Equal(t, expected, loop.Slice(result))
 }
 
 func Test_ConvertNotnilPointersToValues(t *testing.T) {
@@ -101,20 +114,25 @@ func Test_ConvertNotnilPointersToValues(t *testing.T) {
 		result   = loop.NoNilPtrVal(source)
 		expected = []entity{{"first"}, {"third"}, {"fifth"}}
 	)
-	assert.Equal(t, expected, loop.Slice(result.Next))
+	assert.Equal(t, expected, loop.Slice(result))
 }
 
 func Test_Convert(t *testing.T) {
 	s := loop.Of(1, 3, 5, 7, 9, 11)
 	r := loop.Convert(s, strconv.Itoa)
-	assert.Equal(t, []string{"1", "3", "5", "7", "9", "11"}, loop.Slice(r.Next))
+	assert.Equal(t, []string{"1", "3", "5", "7", "9", "11"}, loop.Slice(r))
 }
 
 func Test_IterWitErr(t *testing.T) {
 	s := loop.Of("1", "3", "5", "7eee", "9", "11")
 	r := []int{}
 	var outErr error
-	for it, i, ok, err := loop.Conv(s, strconv.Atoi).Start(); ok || err != nil; i, ok, err = it.Next() {
+	for {
+		it := loop.Conv(s, strconv.Atoi)
+		i, ok, err := it()
+		if !ok && err == nil {
+			break
+		}
 		if err != nil {
 			outErr = err
 			break
@@ -128,7 +146,12 @@ func Test_IterWitErr(t *testing.T) {
 	s = loop.Of("1", "3", "5", "7eee", "9", "11")
 	r = []int{}
 	//ignore err
-	for it, i, ok, err := loop.Conv(s, strconv.Atoi).Start(); ok || err != nil; i, ok, err = it.Next() {
+	for {
+		it := loop.Conv(s, strconv.Atoi)
+		i, ok, err := it()
+		if !ok && err == nil {
+			break
+		}
 		if err == nil {
 			r = append(r, i)
 		}
@@ -140,7 +163,11 @@ func Test_IterStart(t *testing.T) {
 	l := loop.Convert(loop.Of(1, 3, 5, 7, 9, 11), strconv.Itoa)
 	r := []string{}
 
-	for it, i, ok := l.Start(); ok; i, ok = it.Next() {
+	for {
+		i, ok := l()
+		if !ok {
+			break
+		}
 		r = append(r, i)
 	}
 	assert.Equal(t, []string{"1", "3", "5", "7", "9", "11"}, r)
@@ -153,7 +180,7 @@ func Test_ConvertNotNil(t *testing.T) {
 		result   = convert.NotNil(source, func(e *entity) string { return e.val })
 		expected = []string{"first", "third", "fifth"}
 	)
-	assert.Equal(t, expected, loop.Slice(result.Next))
+	assert.Equal(t, expected, loop.Slice(result))
 }
 
 func Test_ConvertToNotNil(t *testing.T) {
@@ -166,7 +193,7 @@ func Test_ConvertToNotNil(t *testing.T) {
 		result   = convert.ToNotNil(source, func(e entity) *string { return e.val })
 		expected = []*string{&first, &third, &fifth}
 	)
-	assert.Equal(t, expected, loop.Slice(result.Next))
+	assert.Equal(t, expected, loop.Slice(result))
 }
 
 func Test_ConvertNilSafe(t *testing.T) {
@@ -179,7 +206,7 @@ func Test_ConvertNilSafe(t *testing.T) {
 		result   = convert.NilSafe(source, func(e *entity) *string { return e.val })
 		expected = []*string{&first, &third, &fifth}
 	)
-	assert.Equal(t, expected, loop.Slice(result.Next))
+	assert.Equal(t, expected, loop.Slice(result))
 }
 
 var even = func(v int) bool { return v%2 == 0 }
@@ -187,66 +214,66 @@ var even = func(v int) bool { return v%2 == 0 }
 func Test_ConvertFiltered(t *testing.T) {
 	s := loop.Of(1, 3, 4, 5, 7, 8, 9, 11)
 	r := loop.FilterAndConvert(s, even, strconv.Itoa)
-	assert.Equal(t, []string{"4", "8"}, loop.Slice(r.Next))
+	assert.Equal(t, []string{"4", "8"}, loop.Slice(r))
 }
 
 func Test_ConvertFilteredInplace(t *testing.T) {
 	s := loop.Of(1, 3, 4, 5, 7, 8, 9, 11)
 	r := loop.ConvertCheck(s, func(i int) (string, bool) { return strconv.Itoa(i), even(i) })
-	assert.Equal(t, []string{"4", "8"}, loop.Slice(r.Next))
+	assert.Equal(t, []string{"4", "8"}, loop.Slice(r))
 }
 
 func Test_Flat(t *testing.T) {
 	md := loop.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...)
 	f := loop.Flat(md, func(i []int) []int { return i })
 	e := []int{1, 2, 3, 4, 5, 6}
-	assert.Equal(t, e, loop.Slice(f.Next))
+	assert.Equal(t, e, loop.Slice(f))
 }
 
 func Test_FlatAndConvert(t *testing.T) {
 	md := loop.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...)
 	f := flat.AndConvert(md, func(i []int) []int { return i }, strconv.Itoa)
 	e := []string{"1", "2", "3", "4", "5", "6"}
-	assert.Equal(t, e, loop.Slice(f.Next))
+	assert.Equal(t, e, loop.Slice(f))
 }
 
 func Test_FlatFilter(t *testing.T) {
 	md := loop.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...)
 	f := loop.FilterAndFlat(md, func(from []int) bool { return len(from) > 1 }, func(i []int) []int { return i })
 	e := []int{1, 2, 3, 5, 6}
-	assert.Equal(t, e, loop.Slice(f.Next))
+	assert.Equal(t, e, loop.Slice(f))
 }
 
 func Test_FlattElemFilter(t *testing.T) {
 	md := loop.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...)
 	f := loop.FlattAndFilter(md, func(i []int) []int { return i }, even)
 	e := []int{2, 4, 6}
-	assert.Equal(t, e, loop.Slice(f.Next))
+	assert.Equal(t, e, loop.Slice(f))
 }
 
 func Test_FilterAndFlattFilt(t *testing.T) {
 	md := loop.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...)
 	f := loop.FilterFlatFilter(md, func(from []int) bool { return len(from) > 1 }, func(i []int) []int { return i }, even)
 	e := []int{2, 6}
-	assert.Equal(t, e, loop.Slice(f.Next))
+	assert.Equal(t, e, loop.Slice(f))
 }
 
 func Test_Filter(t *testing.T) {
 	s := loop.Of(1, 3, 4, 5, 7, 8, 9, 11)
 	r := loop.Filter(s, even)
-	assert.Equal(t, slice.Of(4, 8), loop.Slice(r.Next))
+	assert.Equal(t, slice.Of(4, 8), loop.Slice(r))
 }
 
 func Test_FilterConvertFilter(t *testing.T) {
 	s := loop.Of(1, 3, 4, 5, 7, 8, 9, 11)
 	r := filter.ConvertFilter(s, even, func(i int) int { return i * 2 }, even)
-	assert.Equal(t, slice.Of(8, 16), loop.Slice(r.Next))
+	assert.Equal(t, slice.Of(8, 16), loop.Slice(r))
 }
 
 func Test_Filt(t *testing.T) {
 	s := loop.Of(1, 3, 4, 5, 7, 8, 9, 11)
 	l := loop.Filt(s, func(i int) (bool, error) { return even(i), op.IfElse(i > 7, errors.New("abort"), nil) })
-	r, err := breakLoop.Slice(l.Next)
+	r, err := breakLoop.Slice(l)
 	assert.Error(t, err)
 	assert.Equal(t, slice.Of(4, 8), r)
 }
@@ -257,7 +284,7 @@ func Test_Filt2(t *testing.T) {
 		ok := i <= 7
 		return ok && even(i), op.IfElse(ok, nil, errors.New("abort"))
 	})
-	r, err := breakLoop.Slice(l.Next)
+	r, err := breakLoop.Slice(l)
 	assert.Error(t, err)
 	assert.Equal(t, slice.Of(4), r)
 }
@@ -265,13 +292,13 @@ func Test_Filt2(t *testing.T) {
 func Test_FiltAndConv(t *testing.T) {
 	s := loop.Of(1, 3, 4, 5, 7, 8, 9, 11)
 	r := loop.FiltAndConv(s, func(v int) (bool, error) { return v%2 == 0, nil }, func(i int) (int, error) { return i * 2, nil })
-	o, _ := breakLoop.Slice(r.Next)
+	o, _ := breakLoop.Slice(r)
 	assert.Equal(t, slice.Of(8, 16), o)
 }
 
 func Test_Filtering(t *testing.T) {
 	r := loop.Filter(loop.Of(1, 2, 3, 4, 5, 6), func(i int) bool { return i%2 == 0 })
-	assert.Equal(t, []int{2, 4, 6}, loop.Slice(r.Next))
+	assert.Equal(t, []int{2, 4, 6}, loop.Slice(r))
 }
 
 type rows[T any] struct {
@@ -320,7 +347,7 @@ var users = []User{
 }
 
 func Test_KeyValuer(t *testing.T) {
-	m := kvloop.Group(loop.KeyValue(loop.Of(users...), User.Name, User.Age).Next)
+	m := kvloop.Group(loop.KeyValue(loop.Of(users...), User.Name, User.Age))
 
 	assert.Equal(t, m["Alice"], slice.Of(35))
 	assert.Equal(t, m["Bob"], slice.Of(26))
@@ -331,7 +358,7 @@ func Test_KeyValuer(t *testing.T) {
 }
 
 func Test_Keyer(t *testing.T) {
-	m := kvloop.Group(loop.ExtraKey(loop.Of(users...), User.Name).Next)
+	m := kvloop.Group(loop.ExtraKey(loop.Of(users...), User.Name))
 
 	assert.Equal(t, m["Alice"], slice.Of(users[1]))
 	assert.Equal(t, m["Bob"], slice.Of(users[0]))
@@ -342,7 +369,7 @@ func Test_Keyer(t *testing.T) {
 }
 
 func Test_Valuer(t *testing.T) {
-	bob, bobRoles, _ := loop.ExtraValue(loop.Of(users...), User.Roles).Next()
+	bob, bobRoles, _ := loop.ExtraValue(loop.Of(users...), User.Roles)()
 
 	assert.Equal(t, bob, users[0])
 	assert.Equal(t, bobRoles, users[0].roles)
@@ -350,8 +377,8 @@ func Test_Valuer(t *testing.T) {
 
 func Test_MultiValuer(t *testing.T) {
 	l := loop.ExtraVals(loop.Of(users...), User.Roles)
-	bob, bobRole, _ := l.Next()
-	bob2, bobRole2, _ := l.Next()
+	bob, bobRole, _ := l()
+	bob2, bobRole2, _ := l()
 
 	assert.Equal(t, bob, users[0])
 	assert.Equal(t, bob2, users[0])
@@ -365,7 +392,7 @@ func Test_MultipleKeyValuer(t *testing.T) {
 			return slice.Convert(u.roles, func(r Role) string { return strings.ToLower(r.name) })
 		},
 		func(u User) []string { return []string{u.name, strings.ToLower(u.name)} },
-	).Next)
+	))
 
 	assert.Equal(t, m["admin"], slice.Of("Bob", "bob"))
 	assert.Equal(t, m["manager"], slice.Of("Bob", "bob", "Alice", "alice"))
@@ -396,13 +423,13 @@ func Test_OfIndexed(t *testing.T) {
 
 func Test_ConvertIndexed(t *testing.T) {
 	indexed := slice.Of(10, 11, 12, 13, 14)
-	result := loop.Slice(convert.FromIndexed(len(indexed), func(i int) int { return indexed[i] }, strconv.Itoa).Next)
+	result := loop.Slice(convert.FromIndexed(len(indexed), func(i int) int { return indexed[i] }, strconv.Itoa))
 	assert.Equal(t, slice.Of("10", "11", "12", "13", "14"), result)
 }
 
 func Test_ConvIndexed(t *testing.T) {
 	indexed := slice.Of("10", "11", "12", "13", "14")
-	result, err := breakLoop.Slice(conv.FromIndexed(len(indexed), func(i int) string { return indexed[i] }, strconv.Atoi).Next)
+	result, err := breakLoop.Slice(conv.FromIndexed(len(indexed), func(i int) string { return indexed[i] }, strconv.Atoi))
 	assert.NoError(t, err)
 	assert.Equal(t, slice.Of(10, 11, 12, 13, 14), result)
 }
@@ -424,7 +451,7 @@ func Test_For(t *testing.T) {
 	var out []int
 	err := loop.For(loop.Of(1, 2, 3, 4), func(i int) error {
 		if i == 3 {
-			return c.ErrBreak
+			return c.Break
 		}
 		out = append(out, i)
 		return nil
@@ -440,12 +467,12 @@ func Test_ForEachFiltered(t *testing.T) {
 }
 
 func Test_FlatValues(t *testing.T) {
-	g := kvloopgroup.Of(loop.KeyValues(loop.Of(users...), func(u User) string { return u.name }, func(u User) []int { return slice.Of(u.age) }).Next)
+	g := kvloopgroup.Of(loop.KeyValues(loop.Of(users...), func(u User) string { return u.name }, func(u User) []int { return slice.Of(u.age) }))
 
 	assert.Equal(t, g["Bob"], slice.Of(26))
 }
 
 func Test_FlatKeys(t *testing.T) {
-	g := kvloopgroup.Of(loop.KeysValue(loop.Of(users...), func(u User) []string { return slice.Of(u.name) }, func(u User) int { return u.age }).Next)
+	g := kvloopgroup.Of(loop.KeysValue(loop.Of(users...), func(u User) []string { return slice.Of(u.name) }, func(u User) int { return u.age }))
 	assert.Equal(t, g["Alice"], slice.Of(35))
 }

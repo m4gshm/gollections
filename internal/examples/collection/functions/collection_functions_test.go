@@ -5,30 +5,28 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/m4gshm/gollections/collection/group"
 	"github.com/m4gshm/gollections/collection/immutable/ordered/set"
+	"github.com/m4gshm/gollections/convert/as"
+	"github.com/m4gshm/gollections/kv/loop/group"
+	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/predicate/more"
 )
 
 func Test_group_orderset_with_filtering_by_string_len(t *testing.T) {
-
-	var groupedByLength = group.Of(set.Of(
+	var groupedByLength = group.Of(loop.KeyValue(set.Of(
 		"seventh", "seventh", //duplicate
 		"first", "second", "third", "fourth",
 		"fifth", "sixth", "eighth",
 		"ninth", "tenth", "one", "two", "three", "1",
-		"second", //duplicate
-	), func(v string) int { return len(v) },
+	).Loop(), func(v string) int { return len(v) }, as.Is,
 	).FilterKey(
 		more.Than(3),
 	).ConvertValue(
 		func(v string) string { return v + "_" },
-	).Map()
+	))
 
-	assert.Equal(t, map[int][]string{
-		5: {"first_", "third_", "fifth_", "sixth_", "ninth_", "tenth_", "three_"},
-		6: {"second_", "fourth_", "eighth_"},
-		7: {"seventh_"},
-	}, groupedByLength)
+	assert.Equal(t, []string{"first_", "third_", "fifth_", "sixth_", "ninth_", "tenth_", "three_"}, groupedByLength[5])
+	assert.Equal(t, []string{"second_", "fourth_", "eighth_"}, groupedByLength[6])
+	assert.Equal(t, []string{"seventh_"}, groupedByLength[7])
 
 }

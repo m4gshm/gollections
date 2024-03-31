@@ -3,11 +3,10 @@ package ordered
 import (
 	"fmt"
 
-	breakStream "github.com/m4gshm/gollections/break/stream"
-	"github.com/m4gshm/gollections/c"
+	breakLoop "github.com/m4gshm/gollections/break/loop"
+	"github.com/m4gshm/gollections/collection"
+	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/slice"
-	"github.com/m4gshm/gollections/slice/iter"
-	"github.com/m4gshm/gollections/stream"
 )
 
 // WrapKeys instantiates MapKeys using the elements as internal storage
@@ -21,31 +20,34 @@ type MapKeys[K comparable] struct {
 }
 
 var (
-	_ c.Collection[int, *slice.Iter[int]] = (*MapKeys[int])(nil)
-	_ c.Collection[int, *slice.Iter[int]] = MapKeys[int]{}
-	_ fmt.Stringer                        = (*MapKeys[int])(nil)
-	_ fmt.Stringer                        = MapKeys[int]{}
+	_ collection.Collection[int] = (*MapKeys[int])(nil)
+	_ collection.Collection[int] = MapKeys[int]{}
+	_ fmt.Stringer               = (*MapKeys[int])(nil)
+	_ fmt.Stringer               = MapKeys[int]{}
 )
 
-// Iter creates an iterator and returns as interface
-func (m MapKeys[K]) Iter() *slice.Iter[K] {
-	h := m.Head()
-	return &h
+// All is used to iterate through the collection using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
+func (m MapKeys[K]) All(consumer func(K) bool) {
+	slice.WalkWhile(m.keys, consumer)
 }
 
-// Head creates an iterator and returns as implementation type value
+// Loop creates a loop to iterate through the collection.
+func (m MapKeys[K]) Loop() loop.Loop[K] {
+	return loop.Of(m.keys...)
+}
+
+// Deprecated: Head is deprecated. Will be replaced by rance-over function iterator.
+// Head creates an iterator to iterate through the collection.
 func (m MapKeys[K]) Head() slice.Iter[K] {
 	return slice.NewHead(m.keys)
 }
 
+// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
-func (m MapKeys[K]) First() (slice.Iter[K], K, bool) {
-	var (
-		iterator  = m.Head()
-		first, ok = iterator.Next()
-	)
-	return iterator, first, ok
+func (m MapKeys[K]) First() (*slice.Iter[K], K, bool) {
+	h := m.Head()
+	return h.Crank()
 }
 
 // Len returns amount of elements
@@ -74,38 +76,34 @@ func (m MapKeys[K]) Append(out []K) []K {
 	return out
 }
 
-// For applies the 'walker' function for every key. Return the c.ErrBreak to stop.
-func (m MapKeys[K]) For(walker func(K) error) error {
-	return slice.For(m.keys, walker)
+// For applies the 'consumer' function for every key until the consumer returns the c.Break to stop.
+func (m MapKeys[K]) For(consumer func(K) error) error {
+	return slice.For(m.keys, consumer)
 }
 
-// ForEach applies the 'walker' function for every element
-func (m MapKeys[K]) ForEach(walker func(K)) {
-	slice.ForEach(m.keys, walker)
+// ForEach applies the 'consumer' function for every element
+func (m MapKeys[K]) ForEach(consumer func(K)) {
+	slice.ForEach(m.keys, consumer)
 }
 
-// Filter returns a stream consisting of elements that satisfy the condition of the 'predicate' function
-func (m MapKeys[K]) Filter(filter func(K) bool) stream.Iter[K] {
-	f := iter.Filter(m.keys, filter)
-	return stream.New(f.Next)
+// Filter returns a loop consisting of elements that satisfy the condition of the 'predicate' function
+func (m MapKeys[K]) Filter(filter func(K) bool) loop.Loop[K] {
+	return loop.Filter(m.Loop(), filter)
 }
 
-// Filt returns a breakable stream consisting of elements that satisfy the condition of the 'predicate' function
-func (m MapKeys[K]) Filt(predicate func(K) (bool, error)) breakStream.Iter[K] {
-	f := iter.Filt(m.keys, predicate)
-	return breakStream.New(f.Next)
+// Filt returns a breakable loop consisting of elements that satisfy the condition of the 'predicate' function
+func (m MapKeys[K]) Filt(predicate func(K) (bool, error)) breakLoop.Loop[K] {
+	return loop.Filt(m.Loop(), predicate)
 }
 
-// Convert returns a stream that applies the 'converter' function to the collection elements
-func (m MapKeys[K]) Convert(converter func(K) K) stream.Iter[K] {
-	conv := iter.Convert(m.keys, converter)
-	return stream.New(conv.Next)
+// Convert returns a loop that applies the 'converter' function to the collection elements
+func (m MapKeys[K]) Convert(converter func(K) K) loop.Loop[K] {
+	return loop.Convert(m.Loop(), converter)
 }
 
-// Conv returns a breakable stream that applies the 'converter' function to the collection elements
-func (m MapKeys[K]) Conv(converter func(K) (K, error)) breakStream.Iter[K] {
-	conv := iter.Conv(m.keys, converter)
-	return breakStream.New(conv.Next)
+// Conv returns a breakable loop that applies the 'converter' function to the collection elements
+func (m MapKeys[K]) Conv(converter func(K) (K, error)) breakLoop.Loop[K] {
+	return loop.Conv(m.Loop(), converter)
 }
 
 // Reduce reduces the elements into an one using the 'merge' function

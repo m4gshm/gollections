@@ -23,16 +23,19 @@ var (
 	_ c.DelIterator[any] = (*SetIter[any])(nil)
 )
 
-var _ c.IterFor[int, *SetIter[int]] = (*SetIter[int])(nil)
+// All is used to iterate through the collection using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
+func (i *SetIter[T]) All(consumer func(element T) bool) {
+	loop.All(i.Next, consumer)
+}
 
-// For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
-func (i *SetIter[T]) For(walker func(element T) error) error {
-	return loop.For(i.Next, walker)
+// For takes elements retrieved by the iterator. Can be interrupt by returning Break
+func (i *SetIter[T]) For(consumer func(element T) error) error {
+	return loop.For(i.Next, consumer)
 }
 
 // ForEach takes all elements retrieved by the iterator.
-func (i *SetIter[T]) ForEach(walker func(element T)) {
-	loop.ForEach(i.Next, walker)
+func (i *SetIter[T]) ForEach(consumer func(element T)) {
+	loop.ForEach(i.Next, consumer)
 }
 
 // Next returns the next element.
@@ -48,8 +51,8 @@ func (i *SetIter[T]) Next() (t T, ok bool) {
 	return t, ok
 }
 
-// Cap returns the iterator capacity
-func (i *SetIter[T]) Cap() (capacity int) {
+// Size returns the iterator capacity
+func (i *SetIter[T]) Size() (capacity int) {
 	if !(i == nil || i.elements == nil) {
 		capacity = len(*i.elements)
 	}
@@ -64,10 +67,4 @@ func (i *SetIter[T]) Delete() {
 			i.del(v)
 		}
 	}
-}
-
-// Start is used with for loop construct like 'for i, val, ok := i.Start(); ok; val, ok = i.Next() { }'
-func (i *SetIter[T]) Start() (*SetIter[T], T, bool) {
-	n, ok := i.Next()
-	return i, n, ok
 }

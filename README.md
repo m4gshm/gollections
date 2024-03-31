@@ -86,9 +86,9 @@ find by exploring slices [subpackages](./slice).
 
 **Be careful** when use several slice functions subsequently like
 `slice.Filter(slice.Convert(…​))`. This can lead to unnecessary RAM
-consumption. Consider [chain functions](#operations-chain-functions)
-instead, [loop](#additional-api) or [collections](#collection-functions)
-for delayed operations.
+consumption. Consider
+[loop](#loop-kvloop-and-breakable-versions-breakloop-breakkvloop)
+instead of slice API.
 
 ### Main slice functions
 
@@ -409,9 +409,9 @@ The `KVLoop` behaves similar but returns a key/value pair.
 
 ``` go
 even := func(i int) bool { return i%2 == 0 }
-stringSeq := loop.Convert(loop.Filter(loop.Of(1, 2, 3, 4), even).Next, strconv.Itoa)
+stringSeq := loop.Convert(loop.Filter(loop.Of(1, 2, 3, 4), even), strconv.Itoa)
 
-assert.Equal(t, []string{"2", "4"}, loop.Slice(stringSeq.Next))
+assert.Equal(t, []string{"2", "4"}, stringSeq.Slice())
 ```
 
 `BreakLoop` and `BreakKVLoop` are used for sources that can issue an
@@ -419,7 +419,7 @@ error.
 
 ``` go
 intSeq := loop.Conv(loop.Of("1", "2", "3", "ddd4", "5"), strconv.Atoi)
-ints, err := loop.Slice(intSeq.Next)
+ints, err := loop.Slice(intSeq)
 
 assert.Equal(t, []int{1, 2, 3}, ints)
 assert.ErrorContains(t, err, "invalid syntax")
@@ -429,6 +429,194 @@ The API in most cases is similar to the [slice](./slice/api.go) API but
 with delayed computation which means that the methods don’t compute a
 result but only return a loop provider. The loop provider is type with a
 `Next` method that returns a next processed element.
+
+### Main loop functions
+
+#### Instantiators
+
+##### loop.Of, loop.S
+
+``` go
+import "github.com/m4gshm/gollections/loop"
+
+var (
+    ints    = loop.Of(1, 2, 3)
+    strings = loop.S([]string{"a", "b", "c"})
+)
+```
+
+##### range\_.Of
+
+``` go
+import "github.com/m4gshm/gollections/loop/range_"
+
+var increasing = range_.Of(-1, 3).Slice()    //[]int{-1, 0, 1, 2}
+var decreasing = range_.Of('e', 'a').Slice() //[]rune{'e', 'd', 'c', 'b'}
+var nothing = range_.Of(1, 1).Slice()        //nil
+```
+
+##### range\_.Closed
+
+``` go
+var increasing = range_.Closed(-1, 3).Slice()    //[]int{-1, 0, 1, 2, 3}
+var decreasing = range_.Closed('e', 'a').Slice() //[]rune{'e', 'd', 'c', 'b', 'a'}
+var one = range_.Closed(1, 1).Slice()            //[]int{1}
+```
+
+#### To map converters
+
+##### group.Of
+
+``` go
+import "github.com/m4gshm/gollections/convert/as"
+import "github.com/m4gshm/gollections/expr/use"
+import "github.com/m4gshm/gollections/loop/group"
+
+var ageGroups = group.Of(users, func(u User) string {
+    return use.If(u.age <= 20, "<=20").If(u.age <= 30, "<=30").Else(">30")
+}, as.Is)
+
+//map[<=20:[{Tom 18 []}] <=30:[{Bob 26 []}] >30:[{Alice 35 []} {Chris 41 []}]]
+```
+
+##### loop.ToMap, loop.ToMapResolv
+
+``` go
+import (
+    "github.com/m4gshm/gollections/map_/resolv"
+    "github.com/m4gshm/gollections/op"
+    "github.com/m4gshm/gollections/loop"
+)
+
+var ageGroupedSortedNames map[string][]string
+
+ageGroupedSortedNames = loop.ToMapResolv(loop.Of(users...), func(u User) string {
+    return op.IfElse(u.age <= 30, "<=30", ">30")
+}, User.Name, resolv.SortedSlice)
+
+//map[<=30:[Bob Tom] >30:[Alice Chris]]
+```
+
+#### Reducers
+
+##### sum.Of
+
+``` go
+import "github.com/m4gshm/gollections/op/sum"
+
+var sum = sum.Of(loop.Of(1, 2, 3, 4, 5, 6)) //21
+```
+
+##### loop.Reduce
+
+``` go
+var sum = loop.Reduce(loop.Of(1, 2, 3, 4, 5, 6), func(i1, i2 int) int { return i1 + i2 })
+//21
+```
+
+##### loop.First
+
+``` go
+import "github.com/m4gshm/gollections/predicate/more"
+import "github.com/m4gshm/gollections/loop"
+
+result, ok := loop.First(loop.Of(1, 3, 5, 7, 9, 11), more.Than(5)) //7, true
+```
+
+#### Converters
+
+##### loop.Convert
+
+``` go
+var s []string = loop.Convert(loop.Of(1, 3, 5, 7, 9, 11), strconv.Itoa).Slice()
+//[]string{"1", "3", "5", "7", "9", "11"}
+```
+
+##### loop.Conv
+
+``` go
+result, err := loop.Conv(loop.Of("1", "3", "5", "_7", "9", "11"), strconv.Atoi).Slice()
+//[]int{1, 3, 5}, ErrSyntax
+```
+
+##### loop.Filter
+
+``` go
+import "github.com/m4gshm/gollections/predicate/exclude"
+import "github.com/m4gshm/gollections/predicate/one"
+import "github.com/m4gshm/gollections/loop"
+
+var f1 = loop.Filter(loop.Of(1, 3, 5, 7, 9, 11), one.Of(1, 7).Or(one.Of(11))).Slice() //[]int{1, 7, 11}
+var f2 = loop.Filter(loop.Of(1, 3, 5, 7, 9, 11), exclude.All(1, 7, 11)).Slice()       //[]int{3, 5, 9}
+```
+
+##### loop.Flat
+
+``` go
+import "github.com/m4gshm/gollections/convert/as"
+import "github.com/m4gshm/gollections/loop"
+
+var i []int = loop.Flat(loop.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...), as.Is).Slice()
+//[]int{1, 2, 3, 4, 5, 6}
+```
+
+#### Operations chain functions
+
+- convert.AndReduce, conv.AndReduce
+
+- convert.AndFilter
+
+- filter.AndConvert
+
+These functions combine converters, filters and reducers.
+
+### Iterating over loops
+
+- (only for go 1.22) Using rangefunc `All` like:
+
+``` go
+for i := range range_.Of(0, 100).All {
+    doOp(i)
+}
+```
+
+don’t forget exec `go env -w GOEXPERIMENT=rangefunc` before compile.
+
+- Using `for` statement like:
+
+``` go
+next := range_.Of(0, 100)
+for i, ok := next(); ok; i, ok = next() {
+    doOp(i)
+}
+```
+
+- or
+
+``` go
+for next, i, ok := range_.Of(0, 100).Crank(); ok; i, ok = next() {
+    doOp(i)
+}
+```
+
+- `ForEach` method
+
+``` go
+range_.Of(0, 100).ForEach(doOp)
+```
+
+- or `For` method that can be aborted by returning `Break` for expected
+  completion, or another error otherwise.
+
+``` go
+range_.Of(0, 100).For(func(i int) error {
+    if i > 22 {
+        return loop.Break
+    }
+    doOp(i)
+    return nil
+})
+```
 
 ## Data structures
 
@@ -460,10 +648,11 @@ bob, _ := slice.First(users, where.Eq(User.Name, "Bob"))
 It is used for computations where an error may occur.
 
 ``` go
-   assert.Equal(t, []int{1, 2, 3}, ints)
-    assert.ErrorContains(t, err, "invalid syntax")
+intSeq := loop.Conv(loop.Of("1", "2", "3", "ddd4", "5"), strconv.Atoi)
+ints, err := loop.Slice(intSeq)
 
-}
+assert.Equal(t, []int{1, 2, 3}, ints)
+assert.ErrorContains(t, err, "invalid syntax")
 ```
 
 ### Expressions: [use.If](./expr/use/api.go), [get.If](./expr/get/api.go), [first.Of](#firstof), [last.Of](#lastof)
@@ -565,52 +754,57 @@ _ *ordered.Map[int, string] = ordered.NewMapOf(
 )
 ```
 
-### Immutable containers
+### Immutable collections
 
 The same underlying interfaces but for read-only use cases.
 
-## Collection functions
+### Iterating over collections
 
-There are three groups of operations:
-
-- Immediate - retrieves the result in place
-  ([Sort](./collection/mutable/vector.go#L322),
-  [Reduce](./collection/immutable/vector.go#L152),
-  [Track](./collection/immutable/vector.go#L109),
-  [TrackEach](./collection/mutable/ordered/map.go#L155),
-  [For](./collection/immutable/vector.go#L120),
-  [ForEach](./collection/immutable/ordered/map.go#L151))
-
-- Intermediate - only defines a computation
-  ([Convert](./collection/api.go#22),
-  [Filter](./collection/immutable/ordered/set.go#L108),
-  [Flat](./collection/api.go#L41), [Group](./collection/api.go#L182)).
-
-- Final - applies intermediates and retrieves a result
-  ([First](./collection/api.go#L188),
-  [Slice](./collection/immutable/ordered/set.go#L78),
-  [Reduce](./collection/stream/iter.go#L76)).
-
-Intermediates should wrap one by one to make a lazy computation chain
-that can be applied to the latest final operation.
+- (only for go 1.22) Using rangefunc `All` like:
 
 ``` go
-var groupedByLength = group.Of(set.Of(
-    "seventh", "seventh", //duplicate
-    "first", "second", "third", "fourth",
-    "fifth", "sixth", "eighth",
-    "ninth", "tenth", "one", "two", "three", "1",
-    "second", //duplicate
-), func(v string) int { return len(v) },
-).FilterKey(
-    more.Than(3),
-).ConvertValue(
-    func(v string) string { return v + "_" },
-).Map()
+uniques := set.From(range_.Of(0, 100))
+for i := range uniques.All {
+    doOp(i)
+}
+```
 
-assert.Equal(t, map[int][]string{
-    5: {"first_", "third_", "fifth_", "sixth_", "ninth_", "tenth_", "three_"},
-    6: {"second_", "fourth_", "eighth_"},
-    7: {"seventh_"},
-}, groupedByLength)
+- Using `for` statement like:
+
+``` go
+uniques := set.From(range_.Of(0, 100))
+next := uniques.Loop()
+for i, ok := next(); ok; i, ok = next() {
+    doOp(i)
+}
+```
+
+- or
+
+``` go
+uniques := set.From(range_.Of(0, 100))
+for iter, i, ok := uniques.First(); ok; i, ok = iter.Next() {
+    doOp(i)
+}
+```
+
+- `ForEach` method
+
+``` go
+uniques := set.From(range_.Of(0, 100))
+uniques.ForEach(doOp)
+```
+
+- or `For` method that can be aborted by returning `Break` for expected
+  completion, or another error otherwise.
+
+``` go
+uniques := set.From(range_.Of(0, 100))
+uniques.For(func(i int) error {
+    if i > 22 {
+        return loop.Break
+    }
+    doOp(i)
+    return nil
+})
 ```

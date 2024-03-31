@@ -18,8 +18,8 @@ import (
 	"github.com/m4gshm/gollections/op/check/not"
 )
 
-// ErrBreak is the 'break' statement of the For, Track methods
-var ErrBreak = loop.ErrBreak
+// Break is the 'break' statement of the For, Track methods
+var Break = loop.Break
 
 // Of is generic slice constructor
 func Of[T any](elements ...T) []T { return elements }
@@ -626,6 +626,7 @@ func Sum[TS ~[]T, T c.Summable](elements TS) T {
 }
 
 // First returns the first element that satisfies requirements of the predicate 'by'
+// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 func First[TS ~[]T, T any](elements TS, by func(T) bool) (no T, ok bool) {
 	for _, e := range elements {
 		if by(e) {
@@ -669,10 +670,10 @@ func Lastt[TS ~[]T, T any](elements TS, by func(T) (bool, error)) (no T, ok bool
 	return no, false, nil
 }
 
-// Track applies the 'tracker' function to the elements. Return the c.ErrBreak to stop tracking
-func Track[TS ~[]T, T any](elements TS, tracker func(int, T) error) error {
+// Track applies the 'consumer' function to the elements until the consumer returns the c.Break to stop.tracking
+func Track[TS ~[]T, T any](elements TS, consumer func(int, T) error) error {
 	for i, e := range elements {
-		if err := tracker(i, e); err == ErrBreak {
+		if err := consumer(i, e); err == Break {
 			return nil
 		} else if err != nil {
 			return err
@@ -681,17 +682,26 @@ func Track[TS ~[]T, T any](elements TS, tracker func(int, T) error) error {
 	return nil
 }
 
-// TrackEach applies the 'tracker' function to the elements
-func TrackEach[TS ~[]T, T any](elements TS, tracker func(int, T)) {
+// TrackEach applies the 'consumer' function to the elements
+func TrackEach[TS ~[]T, T any](elements TS, consumer func(int, T)) {
 	for i, e := range elements {
-		tracker(i, e)
+		consumer(i, e)
 	}
 }
 
-// For applies the 'walker' function for the elements. Return the c.ErrBreak to stop
-func For[TS ~[]T, T any](elements TS, walker func(T) error) error {
+// TrackWhile applies the 'predicate' function to the elements while the fuction returns true.
+func TrackWhile[TS ~[]T, T any](elements TS, predicate func(int, T) bool) {
+	for i, e := range elements {
+		if !predicate(i, e) {
+			break
+		}
+	}
+}
+
+// For applies the 'consumer' function for the elements until the consumer returns the c.Break to stop.
+func For[TS ~[]T, T any](elements TS, consumer func(T) error) error {
 	for _, e := range elements {
-		if err := walker(e); err == ErrBreak {
+		if err := consumer(e); err == Break {
 			return nil
 		} else if err != nil {
 			return err
@@ -700,17 +710,19 @@ func For[TS ~[]T, T any](elements TS, walker func(T) error) error {
 	return nil
 }
 
-// ForEach applies the 'walker' function for the elements
-func ForEach[TS ~[]T, T any](elements TS, walker func(T)) {
+// WalkWhile applies the 'predicate' function for the elements until the predicate returns false to stop.
+func WalkWhile[TS ~[]T, T any](elements TS, predicate func(T) bool) {
 	for _, e := range elements {
-		walker(e)
+		if !predicate(e) {
+			break
+		}
 	}
 }
 
-// ForEachRef applies the 'walker' function for the references
-func ForEachRef[T any, TS ~[]*T](references TS, walker func(T)) {
-	for _, e := range references {
-		walker(*e)
+// ForEach applies the 'consumer' function for the elements
+func ForEach[TS ~[]T, T any](elements TS, consumer func(T)) {
+	for _, e := range elements {
+		consumer(e)
 	}
 }
 
@@ -869,12 +881,12 @@ func KeysValues[TS ~[]T, T, K, V any](elements TS, keysExtractor func(T) []K, va
 	return Flat(elements, func(e T) []c.KV[K, V] { return convert.KeysValues(e, keysExtractor, valsExtractor) })
 }
 
-// ExtraVals transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
+// ExtraVals transforms slice elements to key/value slice based on applying key, value extractor to the elements.
 func ExtraVals[TS ~[]T, T, V any](elements TS, valsExtractor func(T) []V) []c.KV[T, V] {
 	return Flat(elements, func(e T) []c.KV[T, V] { return convert.ExtraVals(e, valsExtractor) })
 }
 
-// ExtraKeys transforms iterable elements to key/value iterator based on applying key, value extractor to the elements
+// ExtraKeys transforms slic elements to key/value slice based on applying key, value extractor to the elemen
 func ExtraKeys[TS ~[]T, T, K any](elements TS, keysExtractor func(T) []K) []c.KV[K, T] {
 	return Flat(elements, func(e T) []c.KV[K, T] { return convert.ExtraKeys(e, keysExtractor) })
 }

@@ -1,25 +1,39 @@
 package loop
 
-import "github.com/m4gshm/gollections/break/loop"
+import (
+	"github.com/m4gshm/gollections/break/loop"
+	"github.com/m4gshm/gollections/c"
+)
 
 // Loop is a function that returns the next element or false if there are no more elements.
 type Loop[T any] func() (T, bool)
 
-// For applies the 'walker' function for the elements retrieved by the 'next' function. Return the c.ErrBreak to stop
-func (next Loop[T]) For(walker func(T) error) error {
-	return For(next, walker)
+// All is used to iterate through the loop using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
+func (next Loop[T]) All(consumer func(T) bool) {
+	All(next, consumer)
 }
 
-// ForEach applies the 'walker' function to the elements retrieved by the 'next' function
-func (next Loop[T]) ForEach(walker func(T)) {
-	ForEach(next, walker)
+var (
+	_ c.Filterable[any, Loop[any], loop.Loop[any]]  = (Loop[any])(nil)
+	_ c.Convertable[any, Loop[any], loop.Loop[any]] = (Loop[any])(nil)
+)
+
+// For applies the 'consumer' function for the elements retrieved by the 'next' function until the consumer returns the c.Break to stop.
+func (next Loop[T]) For(consumer func(T) error) error {
+	return For(next, consumer)
 }
 
-// ForEachFiltered applies the 'walker' function to the elements retrieved by the 'next' function that satisfy the 'predicate' function condition
-func (next Loop[T]) ForEachFiltered(predicate func(T) bool, walker func(T)) {
-	ForEachFiltered(next, predicate, walker)
+// ForEach applies the 'consumer' function to the elements retrieved by the 'next' function
+func (next Loop[T]) ForEach(consumer func(T)) {
+	ForEach(next, consumer)
 }
 
+// ForEachFiltered applies the 'consumer' function to the elements retrieved by the 'next' function that satisfy the 'predicate' function condition
+func (next Loop[T]) ForEachFiltered(predicate func(T) bool, consumer func(T)) {
+	ForEachFiltered(next, predicate, consumer)
+}
+
+// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 // First returns the first element that satisfies the condition of the 'predicate' function
 func (next Loop[T]) First(predicate func(T) bool) (T, bool) {
 	return First(next, predicate)
@@ -40,9 +54,14 @@ func (next Loop[T]) Append(out []T) []T {
 	return Append(next, out)
 }
 
-// Reduce reduces the elements retrieved by the 'next' function into an one using the 'merger' function
-func (next Loop[T]) Reduce(merger func(T, T) T) T {
-	return Reduce(next, merger)
+// Reduce reduces the elements retrieved by the 'next' function into an one using the 'merge' function.
+func (next Loop[T]) Reduce(merge func(T, T) T) T {
+	return Reduce(next, merge)
+}
+
+// Reducee reduces the elements retrieved by the 'next' function into an one using the 'merge' function
+func (next Loop[T]) Reducee(merge func(T, T) (T, error)) (T, error) {
+	return Reducee(next, merge)
 }
 
 // HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful
@@ -50,12 +69,27 @@ func (next Loop[T]) HasAny(predicate func(T) bool) bool {
 	return HasAny(next, predicate)
 }
 
-// Filt creates an iterator that checks elements by the 'filter' function and returns successful ones.
-func (next Loop[T]) Filt(filter func(T) (bool, error)) loop.FiltIter[T] {
+// Filt creates a loop that checks elements by the 'filter' function and returns successful ones.
+func (next Loop[T]) Filt(filter func(T) (bool, error)) loop.Loop[T] {
 	return Filt(next, filter)
 }
 
-// Filter creates an iterator that checks elements by the 'filter' function and returns successful ones.
-func (next Loop[T]) Filter(filter func(T) bool) FiltIter[T] {
+// Filter creates a loop that checks elements by the 'filter' function and returns successful ones.
+func (next Loop[T]) Filter(filter func(T) bool) Loop[T] {
 	return Filter(next, filter)
+}
+
+// Convert creates a loop that applies the 'converter' function to iterable elements.
+func (next Loop[T]) Convert(converter func(T) T) Loop[T] {
+	return Convert(next, converter)
+}
+
+// Conv creates a loop that applies the 'converter' function to iterable elements.
+func (next Loop[T]) Conv(converter func(T) (T, error)) loop.Loop[T] {
+	return Conv(next, converter)
+}
+
+// Crank rertieves a next element from the 'next' function, returns the function, element, successfully flag.
+func (next Loop[T]) Crank() (Loop[T], T, bool) {
+	return Crank(next)
 }

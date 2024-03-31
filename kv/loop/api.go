@@ -3,6 +3,7 @@ package loop
 
 import (
 	"github.com/m4gshm/gollections/break/kv/loop"
+	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/map_/resolv"
 )
 
@@ -14,6 +15,37 @@ func New[S, K, V any](source S, hasNext func(S) bool, getNext func(S) (K, V)) Lo
 			return k, v, true
 		}
 		return k, v, false
+	}
+}
+
+// All is an adapter for the next function for iterating by `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
+func All[K, V any](next func() (K, V, bool), consumer func(K, V) bool) {
+	for k, v, ok := next(); ok && consumer(k, v); k, v, ok = next() {
+	}
+}
+
+// Track applies the 'consumer' function to position/element pairs retrieved by the 'next' function until the consumer returns the c.Break to stop.
+func Track[I, T any](next func() (I, T, bool), consumer func(I, T) error) error {
+	if next == nil {
+		return nil
+	}
+	for p, v, ok := next(); ok; p, v, ok = next() {
+		if err := consumer(p, v); err == c.Break {
+			return nil
+		} else if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// TrackEach applies the 'consumer' function to position/element pairs retrieved by the 'next' function
+func TrackEach[I, T any](next func() (I, T, bool), consumer func(I, T)) {
+	if next == nil {
+		return
+	}
+	for p, v, ok := next(); ok; p, v, ok = next() {
+		consumer(p, v)
 	}
 }
 
@@ -63,6 +95,7 @@ func HasAnyy[K, V any](next func() (K, V, bool), predicate func(K, V) (bool, err
 	return ok, err
 }
 
+// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 // First returns the first key/value pair that satisfies the condition of the 'predicate' function
 func First[K, V any](next func() (K, V, bool), predicate func(K, V) bool) (K, V, bool) {
 	for {
@@ -85,23 +118,37 @@ func Firstt[K, V any](next func() (K, V, bool), predicate func(K, V) (bool, erro
 	}
 }
 
-// Convert creates an iterator that applies a transformer to iterable key\values.
-func Convert[K, V any, k2, v2 any](next func() (K, V, bool), converter func(K, V) (k2, v2)) ConvertIter[K, V, k2, v2, func(K, V) (k2, v2)] {
-	return ConvertIter[K, V, k2, v2, func(K, V) (k2, v2)]{next: next, converter: converter}
+// Convert creates a loop that applies the 'converter' function to iterable key\values.
+func Convert[K, V any, KOUT, VOUT any](next func() (K, V, bool), converter func(K, V) (KOUT, VOUT)) Loop[KOUT, VOUT] {
+	if next == nil {
+		return nil
+	}
+	return func() (k2 KOUT, v2 VOUT, ok bool) {
+		if k, v, ok := next(); ok {
+			k2, v2 = converter(k, v)
+			return k2, v2, true
+		}
+		return k2, v2, false
+	}
 }
 
-// Conv creates an iterator that applies a transformer to iterable key\values.
-func Conv[K, V any, KOUT, VOUT any](next func() (K, V, bool), converter func(K, V) (KOUT, VOUT, error)) loop.ConvertIter[K, V, KOUT, VOUT] {
+// Conv creates a loop that applies the 'converter' function to iterable key\values.
+func Conv[K, V any, KOUT, VOUT any](next func() (K, V, bool), converter func(K, V) (KOUT, VOUT, error)) loop.Loop[KOUT, VOUT] {
 	return loop.Conv(loop.From(next), converter)
 }
 
-// Filter creates an iterator that checks elements by a filter and returns successful ones
-func Filter[K, V any](next func() (K, V, bool), filter func(K, V) bool) FilterIter[K, V] {
-	return FilterIter[K, V]{next: next, filter: filter}
+// Filter creates a loop that checks elements by the 'filter' function and returns successful ones.
+func Filter[K, V any](next func() (K, V, bool), filter func(K, V) bool) Loop[K, V] {
+	if next == nil {
+		return nil
+	}
+	return func() (K, V, bool) {
+		return First(next, filter)
+	}
 }
 
-// Filt creates an iterator that checks elements by a filter and returns successful ones
-func Filt[K, V any](next func() (K, V, bool), filter func(K, V) (bool, error)) loop.FiltIter[K, V] {
+// Filt creates a loop that checks elements by the 'filter' function and returns successful ones.
+func Filt[K, V any](next func() (K, V, bool), filter func(K, V) (bool, error)) loop.Loop[K, V] {
 	return loop.Filt(loop.From(next), filter)
 }
 
@@ -127,4 +174,12 @@ func ToSlice[K, V, T any](next func() (K, V, bool), converter func(K, V) T) []T 
 		s = append(s, converter(key, val))
 	}
 	return s
+}
+
+// Crank rertieves next key\value from the 'next' function, returns the function, element, successfully flag.
+func Crank[K, V any](next func() (K, V, bool)) (n Loop[K, V], k K, v V, ok bool) {
+	if next != nil {
+		k, v, ok = next()
+	}
+	return next, k, v, ok
 }

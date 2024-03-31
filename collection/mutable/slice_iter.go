@@ -7,16 +7,19 @@ import (
 )
 
 // NewHead instantiates Iter starting at the first element of a slice.
-func NewHead[TS ~[]T, T any](elements *TS, del func(int) bool) SliceIter[T] {
-	return SliceIter[T]{elements: slice.UpcastRef(elements), current: slice.IterNoStarted, del: del}
+func NewHead[TS ~[]T, T any](elements *TS, del func(int) bool) *SliceIter[T] {
+	if elements == nil {
+		return nil
+	}
+	return &SliceIter[T]{elements: slice.UpcastRef(elements), current: slice.IterNoStarted, del: del}
 }
 
 // NewTail instantiates Iter starting at the last element of a slice.
-func NewTail[TS ~[]T, T any](elements *TS, del func(int) bool) SliceIter[T] {
+func NewTail[TS ~[]T, T any](elements *TS, del func(int) bool) *SliceIter[T] {
 	if elements == nil {
-		return SliceIter[T]{}
+		return nil
 	}
-	return SliceIter[T]{elements: slice.UpcastRef(elements), current: len(*elements), del: del}
+	return &SliceIter[T]{elements: slice.UpcastRef(elements), current: len(*elements), del: del}
 }
 
 // SliceIter is the Iterator implementation for mutable containers.
@@ -32,16 +35,19 @@ var (
 	_ c.DelIterator[any]  = (*SliceIter[any])(nil)
 )
 
-var _ c.IterFor[int, *SliceIter[int]] = (*SliceIter[int])(nil)
+// All is used to iterate through the collection using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
+func (i *SliceIter[T]) All(consumer func(element T) bool) {
+	loop.All(i.Next, consumer)
+}
 
-// For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
-func (i *SliceIter[T]) For(walker func(element T) error) error {
-	return loop.For(i.Next, walker)
+// For takes elements retrieved by the iterator. Can be interrupt by returning Break
+func (i *SliceIter[T]) For(consumer func(element T) error) error {
+	return loop.For(i.Next, consumer)
 }
 
 // ForEach FlatIter all elements retrieved by the iterator
-func (i *SliceIter[T]) ForEach(walker func(element T)) {
-	loop.ForEach(i.Next, walker)
+func (i *SliceIter[T]) ForEach(consumer func(element T)) {
+	loop.ForEach(i.Next, consumer)
 }
 
 // HasNext checks the next element existing
@@ -117,8 +123,8 @@ func (i *SliceIter[T]) Get() (t T, ok bool) {
 	return t, ok
 }
 
-// Cap returns the iterator capacity
-func (i *SliceIter[T]) Cap() int {
+// Size returns the iterator capacity
+func (i *SliceIter[T]) Size() int {
 	if i == nil || i.elements == nil {
 		return 0
 	}
@@ -151,10 +157,4 @@ func (i *SliceIter[T]) DeletePrev() bool {
 		return true
 	}
 	return false
-}
-
-// Start is used with for loop construct like 'for i, val, ok := i.Start(); ok; val, ok = i.Next() { }'
-func (i *SliceIter[T]) Start() (*SliceIter[T], T, bool) {
-	n, ok := i.Next()
-	return i, n, ok
 }

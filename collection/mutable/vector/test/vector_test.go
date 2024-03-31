@@ -7,7 +7,8 @@ import (
 
 	"github.com/m4gshm/gollections/collection/mutable"
 	"github.com/m4gshm/gollections/collection/mutable/vector"
-	"github.com/m4gshm/gollections/iter"
+	"github.com/m4gshm/gollections/loop"
+
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/range_"
@@ -15,7 +16,7 @@ import (
 )
 
 func Test_Vector_From(t *testing.T) {
-	set := vector.From(iter.Of(1, 1, 2, 2, 3, 4, 3, 2, 1).Next)
+	set := vector.From(loop.Of(1, 1, 2, 2, 3, 4, 3, 2, 1))
 	assert.Equal(t, slice.Of(1, 1, 2, 2, 3, 4, 3, 2, 1), set.Slice())
 }
 
@@ -121,7 +122,7 @@ func Test_Vector_Nil(t *testing.T) {
 	assert.False(t, ok)
 	_, ok = head.Next()
 	assert.False(t, ok)
-	head.Cap()
+	head.Size()
 
 	tail := vec.Tail()
 	assert.False(t, tail.HasNext())
@@ -131,7 +132,7 @@ func Test_Vector_Nil(t *testing.T) {
 	assert.False(t, ok)
 	_, ok = tail.Next()
 	assert.False(t, ok)
-	tail.Cap()
+	tail.Size()
 }
 
 func Test_Vector_Zero(t *testing.T) {
@@ -154,10 +155,10 @@ func Test_Vector_Zero(t *testing.T) {
 	l := vec.Len()
 	assert.Equal(t, 4, l)
 
-	vec.For(func(s string) error { return nil })
-	vec.ForEach(func(s string) {})
-	vec.Track(func(i int, s string) error { return nil })
-	vec.TrackEach(func(i int, s string) {})
+	vec.For(func(_ string) error { return nil })
+	vec.ForEach(func(_ string) {})
+	vec.Track(func(_ int, _ string) error { return nil })
+	vec.TrackEach(func(_ int, _ string) {})
 
 	assert.Equal(t, slice.Of("a", "b", "c", "d"), vec.Slice())
 
@@ -170,7 +171,7 @@ func Test_Vector_Zero(t *testing.T) {
 	fv, ok := head.Next()
 	assert.True(t, ok)
 	assert.Equal(t, "a", fv)
-	c := head.Cap()
+	c := head.Size()
 	assert.Equal(t, 4, c)
 
 	tail := vec.Tail()
@@ -182,7 +183,7 @@ func Test_Vector_Zero(t *testing.T) {
 	tv, ok := tail.Prev()
 	assert.True(t, ok)
 	assert.Equal(t, "d", tv)
-	c = tail.Cap()
+	c = tail.Size()
 	assert.Equal(t, 4, c)
 }
 
@@ -206,10 +207,10 @@ func Test_Vector_new(t *testing.T) {
 	l := vec.Len()
 	assert.Equal(t, 4, l)
 
-	vec.For(func(s string) error { return nil })
-	vec.ForEach(func(s string) {})
-	vec.Track(func(i int, s string) error { return nil })
-	vec.TrackEach(func(i int, s string) {})
+	vec.For(func(_ string) error { return nil })
+	vec.ForEach(func(_ string) {})
+	vec.Track(func(_ int, _ string) error { return nil })
+	vec.TrackEach(func(_ int, _ string) {})
 
 	assert.Equal(t, slice.Of("a", "b", "c", "d"), vec.Slice())
 
@@ -222,7 +223,7 @@ func Test_Vector_new(t *testing.T) {
 	fv, ok := head.Next()
 	assert.True(t, ok)
 	assert.Equal(t, "a", fv)
-	c := head.Cap()
+	c := head.Size()
 	assert.Equal(t, 4, c)
 
 	tail := vec.Tail()
@@ -234,7 +235,7 @@ func Test_Vector_new(t *testing.T) {
 	tv, ok := tail.Prev()
 	assert.True(t, ok)
 	assert.Equal(t, "d", tv)
-	c = tail.Cap()
+	c = tail.Size()
 	assert.Equal(t, 4, c)
 }
 
@@ -429,7 +430,7 @@ func Test_Vector_Set(t *testing.T) {
 
 func Test_Vector_DeleteByIterator(t *testing.T) {
 	vec := vector.Of(1, 1, 2, 4, 3, 1)
-	iterator := vec.IterEdit()
+	iterator := vec.Head()
 
 	i := 0
 	var v int

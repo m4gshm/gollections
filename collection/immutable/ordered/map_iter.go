@@ -3,7 +3,8 @@ package ordered
 
 import (
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/kv"
+	"github.com/m4gshm/gollections/kv/collection"
+	kvloop "github.com/m4gshm/gollections/kv/loop"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/slice"
 )
@@ -19,17 +20,21 @@ type MapIter[K comparable, V any] struct {
 	uniques  map[K]V
 }
 
-var _ kv.Iterator[string, any] = (*MapIter[string, any])(nil)
-var _ kv.IterFor[int, string, *MapIter[int, string]] = (*MapIter[int, string])(nil)
+var _ collection.Iterator[string, any] = (*MapIter[string, any])(nil)
 
-// Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning ErrBreak
+// All is used to iterate through the iterator using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
+func (i *MapIter[K, V]) All(consumer func(key K, value V) bool) {
+	kvloop.All(i.Next, consumer)
+}
+
+// Track takes key, value pairs retrieved by the iterator. Can be interrupt by returning Break
 func (i *MapIter[K, V]) Track(traker func(key K, value V) error) error {
-	return loop.Track(i.Next, traker)
+	return kvloop.Track(i.Next, traker)
 }
 
 // TrackEach takes all key, value pairs retrieved by the iterator
 func (i *MapIter[K, V]) TrackEach(traker func(key K, value V)) {
-	loop.TrackEach(i.Next, traker)
+	kvloop.TrackEach(i.Next, traker)
 }
 
 // Next returns the next key/value pair.
@@ -44,20 +49,14 @@ func (i *MapIter[K, V]) Next() (key K, val V, ok bool) {
 	return key, val, ok
 }
 
-// Cap returns the iterator capacity
-func (i *MapIter[K, V]) Cap() int {
-	return i.elements.Cap()
-}
-
-// Start is used with for loop construct like 'for i, k, v, ok := i.Start(); ok; k, v, ok = i.Next() { }'
-func (i *MapIter[K, V]) Start() (*MapIter[K, V], K, V, bool) {
-	k, v, ok := i.Next()
-	return i, k, v, ok
+// Size returns the iterator capacity
+func (i *MapIter[K, V]) Size() int {
+	return i.elements.Size()
 }
 
 // NewValIter is default ValIter constructor
-func NewValIter[K comparable, V any](elements []K, uniques map[K]V) ValIter[K, V] {
-	return ValIter[K, V]{elements: elements, uniques: uniques, current: slice.IterNoStarted}
+func NewValIter[K comparable, V any](elements []K, uniques map[K]V) *ValIter[K, V] {
+	return &ValIter[K, V]{elements: elements, uniques: uniques, current: slice.IterNoStarted}
 }
 
 // ValIter is the Iteratoc over Map values
@@ -72,16 +71,19 @@ var (
 	_ c.Sized         = (*ValIter[int, any])(nil)
 )
 
-var _ c.IterFor[any, *ValIter[int, any]] = (*ValIter[int, any])(nil)
+// All is used to iterate through the iterator using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
+func (i *ValIter[K, V]) All(consumer func(element V) bool) {
+	loop.All(i.Next, consumer)
+}
 
-// For takes elements retrieved by the iterator. Can be interrupt by returning ErrBreak
-func (i *ValIter[K, V]) For(walker func(element V) error) error {
-	return loop.For(i.Next, walker)
+// For takes elements retrieved by the iterator. Can be interrupt by returning Break
+func (i *ValIter[K, V]) For(consumer func(element V) error) error {
+	return loop.For(i.Next, consumer)
 }
 
 // ForEach FlatIter all elements retrieved by the iterator
-func (i *ValIter[K, V]) ForEach(walker func(element V)) {
-	loop.ForEach(i.Next, walker)
+func (i *ValIter[K, V]) ForEach(consumer func(element V)) {
+	loop.ForEach(i.Next, consumer)
 }
 
 // Next returns the next element.
@@ -95,16 +97,10 @@ func (i *ValIter[K, V]) Next() (val V, ok bool) {
 	return val, false
 }
 
-// Cap returns the iterator capacity
-func (i *ValIter[K, V]) Cap() int {
+// Size returns the iterator capacity
+func (i *ValIter[K, V]) Size() int {
 	if i == nil {
 		return 0
 	}
 	return len(i.elements)
-}
-
-// Start is used with for loop construct like 'for i, val, ok := i.Start(); ok; val, ok = i.Next() { }'
-func (i *ValIter[K, V]) Start() (*ValIter[K, V], V, bool) {
-	v, ok := i.Next()
-	return i, v, ok
 }

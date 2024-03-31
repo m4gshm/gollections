@@ -5,7 +5,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/collection/mutable/map_"
 	"github.com/m4gshm/gollections/collection/mutable/ordered"
 	omap "github.com/m4gshm/gollections/collection/mutable/ordered/map_"
@@ -23,8 +22,8 @@ func Test_Map_Iterate(t *testing.T) {
 
 	keys := make([]int, 0)
 	values := make([]string, 0)
-	it := ordered.Iter()
-	for key, val, ok := it.Next(); ok; key, val, ok = it.Next() {
+	next := ordered.Loop()
+	for key, val, ok := next(); ok; key, val, ok = next() {
 		keys = append(keys, key)
 		values = append(values, val)
 	}
@@ -73,21 +72,15 @@ func Test_Map_Nil(t *testing.T) {
 	_, _, ok = head.Next()
 	assert.False(t, ok)
 
-	m.For(nil)
-	m.ForEach(nil)
 	m.Track(nil)
 	m.TrackEach(nil)
 
 	m.Reduce(nil)
 	m.Convert(nil).Track(nil)
-	m.ConvertKey(nil).Next()
+	m.ConvertKey(nil).FiltKey(nil)
 	m.ConvertKey(nil).Track(nil)
-	m.ConvertKey(nil).TrackEach(nil)
-	m.ConvertValue(nil).Next()
 	m.ConvertValue(nil).Track(nil)
-	m.ConvertValue(nil).TrackEach(nil)
 	m.Filter(nil).Convert(nil).Track(nil)
-	m.Filter(nil).Convert(nil).TrackEach(nil)
 
 	m.Keys().For(nil)
 	m.Keys().ForEach(nil)
@@ -125,35 +118,28 @@ func Test_Map_Zero(t *testing.T) {
 	_, _, ok = head.Next()
 	assert.True(t, ok)
 
-	m.For(func(kv c.KV[string, string]) error { return nil })
-	m.ForEach(func(kv c.KV[string, string]) {})
-	m.Track(func(k, v string) error { return nil })
-	m.TrackEach(func(k, v string) {})
+	m.Track(func(_, _ string) error { return nil })
+	m.TrackEach(func(_, _ string) {})
 
 	m.Reduce(func(k1, v1, k2, v2 string) (string, string) { return k1 + k2, v1 + v2 })
-	m.Convert(func(k, v string) (string, string) { return k, v }).Track(func(position, element string) error { return nil })
-	m.ConvertKey(func(s string) string { return s }).Next()
-	m.ConvertKey(func(s string) string { return s }).Track(func(position, element string) error { return nil })
-	m.ConvertKey(func(s string) string { return s }).TrackEach(func(position, element string) {})
-	m.ConvertValue(func(s string) string { return s }).Next()
-	m.ConvertValue(func(s string) string { return s }).Track(func(position, element string) error { return nil })
-	m.ConvertValue(func(s string) string { return s }).TrackEach(func(position, element string) {})
-	m.Filter(func(s1, s2 string) bool { return true }).Convert(func(s1, s2 string) (string, string) { return s1, s2 }).Track(func(position, element string) error { return nil })
-	m.Filter(func(s1, s2 string) bool { return true }).Convert(func(s1, s2 string) (string, string) { return s1, s2 }).TrackEach(func(position, element string) {})
+	m.Convert(func(_, _ string) (string, string) { return k, v }).Track(func(_, _ string) error { return nil })
+	m.ConvertKey(func(s string) string { return s }).Track(func(_, _ string) error { return nil })
+	m.ConvertValue(func(s string) string { return s }).Track(func(_, _ string) error { return nil })
+	m.Filter(func(_, _ string) bool { return true }).Convert(func(s1, s2 string) (string, string) { return s1, s2 }).Track(func(_, _ string) error { return nil })
 
-	m.Keys().For(func(element string) error { return nil })
-	m.Keys().ForEach(func(element string) {})
+	m.Keys().For(func(_ string) error { return nil })
+	m.Keys().ForEach(func(_ string) {})
 	m.Keys().Convert(func(s string) string { return s }).Slice()
-	m.Keys().Convert(func(s string) string { return s }).For(func(element string) error { return nil })
-	m.Keys().Filter(func(s string) bool { return true }).Slice()
-	m.Keys().Filter(func(s string) bool { return true }).ForEach(func(element string) {})
+	m.Keys().Convert(func(s string) string { return s }).For(func(_ string) error { return nil })
+	m.Keys().Filter(func(_ string) bool { return true }).Slice()
+	m.Keys().Filter(func(_ string) bool { return true }).ForEach(func(_ string) {})
 
-	m.Values().For(func(element string) error { return nil })
-	m.Values().ForEach(func(element string) {})
+	m.Values().For(func(_ string) error { return nil })
+	m.Values().ForEach(func(_ string) {})
 	m.Values().Convert(func(s string) string { return s }).Slice()
-	m.Values().Convert(func(s string) string { return s }).For(func(element string) error { return nil })
-	m.Values().Filter(func(s string) bool { return true }).Slice()
-	m.Values().Filter(func(s string) bool { return true }).ForEach(func(element string) {})
+	m.Values().Convert(func(s string) string { return s }).For(func(_ string) error { return nil })
+	m.Values().Filter(func(_ string) bool { return true }).Slice()
+	m.Values().Filter(func(_ string) bool { return true }).ForEach(func(_ string) {})
 }
 
 func Test_Map_new(t *testing.T) {
@@ -183,35 +169,28 @@ func Test_Map_new(t *testing.T) {
 	_, _, ok = head.Next()
 	assert.True(t, ok)
 
-	m.For(func(kv c.KV[string, string]) error { return nil })
-	m.ForEach(func(kv c.KV[string, string]) {})
-	m.Track(func(k, v string) error { return nil })
-	m.TrackEach(func(k, v string) {})
+	m.Track(func(_, _ string) error { return nil })
+	m.TrackEach(func(_, _ string) {})
 
 	m.Reduce(func(k1, v1, k2, v2 string) (string, string) { return k1 + k2, v1 + v2 })
-	m.Convert(func(k, v string) (string, string) { return k, v }).Track(func(position, element string) error { return nil })
-	m.ConvertKey(func(s string) string { return s }).Next()
-	m.ConvertKey(func(s string) string { return s }).Track(func(position, element string) error { return nil })
-	m.ConvertKey(func(s string) string { return s }).TrackEach(func(position, element string) {})
-	m.ConvertValue(func(s string) string { return s }).Next()
-	m.ConvertValue(func(s string) string { return s }).Track(func(position, element string) error { return nil })
-	m.ConvertValue(func(s string) string { return s }).TrackEach(func(position, element string) {})
-	m.Filter(func(s1, s2 string) bool { return true }).Convert(func(s1, s2 string) (string, string) { return s1, s2 }).Track(func(position, element string) error { return nil })
-	m.Filter(func(s1, s2 string) bool { return true }).Convert(func(s1, s2 string) (string, string) { return s1, s2 }).TrackEach(func(position, element string) {})
+	m.Convert(func(_, _ string) (string, string) { return k, v }).Track(func(_, _ string) error { return nil })
+	m.ConvertKey(func(s string) string { return s }).Track(func(_, _ string) error { return nil })
+	m.ConvertValue(func(s string) string { return s }).Track(func(_, _ string) error { return nil })
+	m.Filter(func(_, _ string) bool { return true }).Convert(func(s1, s2 string) (string, string) { return s1, s2 }).Track(func(_, _ string) error { return nil })
 
-	m.Keys().For(func(element string) error { return nil })
-	m.Keys().ForEach(func(element string) {})
+	m.Keys().For(func(_ string) error { return nil })
+	m.Keys().ForEach(func(_ string) {})
 	m.Keys().Convert(func(s string) string { return s }).Slice()
-	m.Keys().Convert(func(s string) string { return s }).For(func(element string) error { return nil })
-	m.Keys().Filter(func(s string) bool { return true }).Slice()
-	m.Keys().Filter(func(s string) bool { return true }).ForEach(func(element string) {})
+	m.Keys().Convert(func(s string) string { return s }).For(func(_ string) error { return nil })
+	m.Keys().Filter(func(_ string) bool { return true }).Slice()
+	m.Keys().Filter(func(_ string) bool { return true }).ForEach(func(_ string) {})
 
-	m.Values().For(func(element string) error { return nil })
-	m.Values().ForEach(func(element string) {})
+	m.Values().For(func(_ string) error { return nil })
+	m.Values().ForEach(func(_ string) {})
 	m.Values().Convert(func(s string) string { return s }).Slice()
-	m.Values().Convert(func(s string) string { return s }).For(func(element string) error { return nil })
-	m.Values().Filter(func(s string) bool { return true }).Slice()
-	m.Values().Filter(func(s string) bool { return true }).ForEach(func(element string) {})
+	m.Values().Convert(func(s string) string { return s }).For(func(_ string) error { return nil })
+	m.Values().Filter(func(_ string) bool { return true }).Slice()
+	m.Values().Filter(func(_ string) bool { return true }).ForEach(func(_ string) {})
 }
 
 func Test_Map_Sort(t *testing.T) {

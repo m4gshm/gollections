@@ -12,7 +12,7 @@ func Test_Key_Zero_Safety(t *testing.T) {
 
 	_, ok := it.Next()
 	assert.False(t, ok)
-	assert.Equal(t, 0, it.Cap())
+	assert.Equal(t, 0, it.Size())
 
 }
 
@@ -21,5 +21,5 @@ func Test_OrderedMapIter_Safety(t *testing.T) {
 
 	_, _, ok := it.Next()
 	assert.False(t, ok)
-	assert.Equal(t, 0, it.Cap())
+	assert.Equal(t, 0, it.Size())
 }

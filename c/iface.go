@@ -7,8 +7,13 @@ import (
 	"golang.org/x/exp/constraints"
 )
 
-// ErrBreak is the 'break' statement of the For, Track methods
-var ErrBreak = errors.New("Break")
+// Break is the 'break' statement of the For, Track methods
+var Break = errors.New("Break")
+
+// Iterable is a loop supplier interface
+type Iterable[T any, Loop ~func() (T, bool)] interface {
+	Loop() Loop
+}
 
 // KeyVal provides extracing of a keys or values collection from key/value pairs
 type KeyVal[Keys any, Vals any] interface {
@@ -17,25 +22,25 @@ type KeyVal[Keys any, Vals any] interface {
 }
 
 // Collection is the base interface of non-associative collections
-type Collection[T any, I Iterator[T]] interface {
-	Iterable[T, I]
-	ForLoop[T]
-	ForEachLoop[T]
+type Collection[T any] interface {
+	For[T]
+	ForEach[T]
 	SliceFactory[T]
 
 	Reduce(merger func(T, T) T) T
+	HasAny(func(T) bool) bool
 }
 
 // Filterable provides filtering content functionality
-type Filterable[T, Stream, StreamBreakable any] interface {
-	Filter(predicate func(T) bool) Stream
-	Filt(predicate func(T) (bool, error)) StreamBreakable
+type Filterable[T any, Loop ~func() (T, bool), LoopErr ~func() (T, bool, error)] interface {
+	Filter(predicate func(T) bool) Loop
+	Filt(predicate func(T) (bool, error)) LoopErr
 }
 
 // Convertable provides converaton of collection elements functionality
-type Convertable[T, Stream, StreamBreakable any] interface {
-	Convert(converter func(T) T) Stream
-	Conv(converter func(T) (T, error)) StreamBreakable
+type Convertable[T any, Loop ~func() (T, bool), LoopErr ~func() (T, bool, error)] interface {
+	Convert(converter func(T) T) Loop
+	Conv(converter func(T) (T, error)) LoopErr
 }
 
 // SliceFactory collects the elements of the collection into a slice
@@ -56,26 +61,15 @@ type Iterator[T any] interface {
 	// If ok == false, then the iteration must be completed.
 	Next() (out T, ok bool)
 
-	ForLoop[T]
-	ForEachLoop[T]
+	For[T]
+	ForEach[T]
+	All(consumer func(T) bool)
 }
 
-// IterFor extends an iterator type by a 'Start' function implementation
-type IterFor[T any, I Iterator[T]] interface {
-	// Start is used with for loop construct.
-	// Returns the iterator itself, the first element, and ok == false if the iteration must be completed.
-	//
-	// 	var i IterFor = ...
-	// 	for i, val, ok := i.Start(); ok; val, ok = i.Next() {
-	//  	_ = val
-	//	}
-	Start() (iterator I, val T, ok bool)
-}
-
-// Sized - storage interface with measurable capacity
+// Sized - storage interface with measurable size
 type Sized interface {
-	// returns an estimated internal storage capacity or -1 if the capacity cannot be calculated
-	Cap() int
+	// returns an estimated internal storage size or -1 if the size cannot be calculated
+	Size() int
 }
 
 // PrevIterator is the Iterator that provides reverse iteration over elements of a collection
@@ -91,31 +85,26 @@ type DelIterator[T any] interface {
 	Delete()
 }
 
-// Iterable is an iterator supplier interface
-type Iterable[T any, I Iterator[T]] interface {
-	Iter() I
-}
-
-// ForLoop is the interface of a collection that provides traversing of the elements.
-type ForLoop[IT any] interface {
-	//For takes elements of the collection. Can be interrupt by returning ErrBreak.
+// For is the interface of a collection that provides traversing of the elements.
+type For[IT any] interface {
+	//For takes elements of the collection. Can be interrupt by returning Break.
 	For(func(element IT) error) error
 }
 
-// ForEachLoop is the interface of a collection that provides traversing of the elements without error checking.
-type ForEachLoop[T any] interface {
+// ForEach is the interface of a collection that provides traversing of the elements without error checking.
+type ForEach[T any] interface {
 	// ForEach takes all elements of the collection
 	ForEach(func(element T))
 }
 
-// TrackLoop is the interface of a collection that provides traversing of the elements with position tracking (index, key, coordinates, etc.).
-type TrackLoop[P any, T any] interface {
-	// return ErrBreak for loop breaking
+// Track is the interface of a collection that provides traversing of the elements with position tracking (index, key, coordinates, etc.).
+type Track[P any, T any] interface {
+	// return Break for loop breaking
 	Track(func(position P, element T) error) error
 }
 
-// TrackEachLoop is the interface of a collection that provides traversing of the elements with position tracking (index, key, coordinates, etc.) without error checking
-type TrackEachLoop[P any, T any] interface {
+// TrackEach is the interface of a collection that provides traversing of the elements with position tracking (index, key, coordinates, etc.) without error checking
+type TrackEach[P any, T any] interface {
 	TrackEach(func(position P, element T))
 }
 

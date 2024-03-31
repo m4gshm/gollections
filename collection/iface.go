@@ -1,19 +1,21 @@
 package collection
 
 import (
-	breakKvstream "github.com/m4gshm/gollections/break/kv/stream"
-	breakStream "github.com/m4gshm/gollections/break/stream"
+	breakLoop "github.com/m4gshm/gollections/break/loop"
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/kv"
-	kvstream "github.com/m4gshm/gollections/kv/stream"
-	"github.com/m4gshm/gollections/stream"
+	kv "github.com/m4gshm/gollections/kv/collection"
+	"github.com/m4gshm/gollections/loop"
 )
 
+// Iterable is a loop supplier interface
+type Iterable[T any] c.Iterable[T, loop.Loop[T]]
+
 // Collection is the base interface for the Vector and the Set impelementations
-type Collection[T any, I c.Iterator[T]] interface {
-	c.Collection[T, I]
-	c.Filterable[T, stream.Iter[T], breakStream.Iter[T]]
-	c.Convertable[T, stream.Iter[T], breakStream.Iter[T]]
+type Collection[T any] interface {
+	Iterable[T]
+	c.Collection[T]
+	c.Filterable[T, loop.Loop[T], breakLoop.Loop[T]]
+	c.Convertable[T, loop.Loop[T], breakLoop.Loop[T]]
 
 	Len() int
 	IsEmpty() bool
@@ -22,26 +24,30 @@ type Collection[T any, I c.Iterator[T]] interface {
 }
 
 // Vector - collection interface that provides elements order and access by index to the elements.
-type Vector[T any, I c.Iterator[T]] interface {
-	Collection[T, I]
+type Vector[T any] interface {
+	Collection[T]
 
-	c.TrackLoop[int, T]
-	c.TrackEachLoop[int, T]
+	c.Track[int, T]
+	c.TrackEach[int, T]
 
 	c.Access[int, T]
+
+	All(consumer func(int, T) bool)
 }
 
 // Set - collection interface that ensures the uniqueness of elements (does not insert duplicate values).
-type Set[T comparable, I c.Iterator[T]] interface {
-	Collection[T, I]
+type Set[T comparable] interface {
+	Collection[T]
 	c.Checkable[T]
+
+	All(consumer func(T) bool)
 }
 
 // Map - collection interface that stores key/value pairs and provide access to an element by its key
-type Map[K comparable, V any, I kv.Iterator[K, V]] interface {
-	kv.Collection[K, V, I, map[K]V]
-	kv.Filterable[K, V, kvstream.Iter[K, V, map[K]V], breakKvstream.Iter[K, V, map[K]V]]
-	kv.Convertable[K, V, kvstream.Iter[K, V, map[K]V], breakKvstream.Iter[K, V, map[K]V]]
+type Map[K comparable, V any] interface {
+	kv.Collection[K, V, map[K]V]
+	kv.Filterable[K, V]
+	kv.Convertable[K, V]
 	c.Checkable[K]
 	c.Access[K, V]
 
