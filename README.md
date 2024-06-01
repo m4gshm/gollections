@@ -331,7 +331,7 @@ fmt.Printf("%v\n", copy)      //map[devops:map[name:Bob]]
 
 #### Keys, values exrtractors
 
-##### map\_.Keys, map\_.Values
+##### map\_.Keys, map\_.Values, map\_.KeysConvert, map\_.ValuesConvert
 
 ``` go
 var employers = map[string]map[string]string{

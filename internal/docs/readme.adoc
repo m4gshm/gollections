@@ -189,7 +189,7 @@ import "github.com/m4gshm/gollections/map_/clone"
 include::../examples/mapexamples/clone_Deep_test.go[lines=13..30,indent=0]
 ----
 ===== Keys, values exrtractors
-====== map_.Keys, map_.Values
+====== map_.Keys, map_.Values, map_.KeysConvert, map_.ValuesConvert
 [source,go]
 ----
 include::../examples/mapexamples/map_Keys_Values_test.go[lines=15..23,indent=0]
