@@ -172,12 +172,45 @@ func Keys[M ~map[K]V, K comparable, V any](elements M) []K {
 	return AppendKeys(elements, make([]K, 0, len(elements)))
 }
 
-// AppendKeys collects keys of the specified 'elements' map into the specified 'out' slice
+// KeysConvert gets keys of the 'elements' map, converts and returns as a slice
+func KeysConvert[M ~map[K]V, K comparable, V, T any](elements M, converter func(K) T) []T {
+	if elements == nil {
+		return nil
+	}
+	return AppendKeysConvert(elements, converter, make([]T, 0, len(elements)))
+}
+
+// KeysConv gets keys of the 'elements' map, converts and returns as a slice
+func KeysConv[M ~map[K]V, K comparable, V, T any](elements M, converter func(K) (T, error)) ([]T, error) {
+	if elements == nil {
+		return nil, nil
+	}
+	return AppendKeysConv(elements, converter, make([]T, 0, len(elements)))
+}
+
+// AppendKeys collects keys of the 'elements' map into the 'out' slice
 func AppendKeys[M ~map[K]V, K comparable, V any](elements M, out []K) []K {
+	return AppendKeysConvert(elements, as.Is, out)
+}
+
+// AppendKeysConvert gets keys of the 'elements' map, converts and appends into the 'out' slice
+func AppendKeysConvert[M ~map[K]V, K comparable, V, T any](elements M, converter func(K) T, out []T) []T {
 	for key := range elements {
-		out = append(out, key)
+		out = append(out, converter(key))
 	}
 	return out
+}
+
+// AppendKeysConv gets keys of the 'elements' map, converts and appends into the 'out' slice
+func AppendKeysConv[M ~map[K]V, K comparable, V, T any](elements M, converter func(K) (T, error), out []T) ([]T, error) {
+	for key := range elements {
+		ckey, err := converter(key)
+		if err != nil {
+			return out, err
+		}
+		out = append(out, ckey)
+	}
+	return out, nil
 }
 
 // Values returns values of the 'elements' map as a slice
@@ -188,12 +221,48 @@ func Values[M ~map[K]V, K comparable, V any](elements M) []V {
 	return AppendValues(elements, make([]V, 0, len(elements)))
 }
 
-// AppendValues collects values of the specified 'elements' map into the specified 'out' slice
+// ValuesConvert gets values of the 'elements' map, converts and returns as a slice
+func ValuesConvert[M ~map[K]V, K comparable, V, T any](elements M, converter func(V) T) []T {
+	if elements == nil {
+		return nil
+	}
+	return AppendValuesConvert(elements, converter, make([]T, 0, len(elements)))
+}
+
+// ValuesConv gets values of the 'elements' map, converts and returns as a slice
+func ValuesConv[M ~map[K]V, K comparable, V, T any](elements M, converter func(V) (T, error)) ([]T, error) {
+	if elements == nil {
+		return nil, nil
+	}
+	return AppendValuesConv(elements, converter, make([]T, 0, len(elements)))
+}
+
+// AppendValues collects values of the 'elements' map into the 'out' slice
 func AppendValues[M ~map[K]V, K comparable, V any](elements M, out []V) []V {
 	for _, val := range elements {
 		out = append(out, val)
 	}
 	return out
+}
+
+// AppendValuesConvert get values of the 'elements' map, converts and appends into the 'out' slice
+func AppendValuesConvert[M ~map[K]V, K comparable, V, T any](elements M, converter func(V) T, out []T) []T {
+	for _, val := range elements {
+		out = append(out, converter(val))
+	}
+	return out
+}
+
+// AppendValuesConv get values of the 'elements' map, converts and appends into the 'out' slice
+func AppendValuesConv[M ~map[K]V, K comparable, V, T any](elements M, converter func(V) (T, error), out []T) ([]T, error) {
+	for _, val := range elements {
+		cval, err := converter(val)
+		if err != nil {
+			return out, err
+		}
+		out = append(out, cval)
+	}
+	return out, nil
 }
 
 // ValuesConverted makes a slice of converted map values

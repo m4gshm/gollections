@@ -55,9 +55,31 @@ func Test_Keys(t *testing.T) {
 	assert.Equal(t, slice.Of(1, 2, 3), sort.Asc(keys))
 }
 
+func Test_KeysConvert(t *testing.T) {
+	keys := map_.KeysConvert(entities, strconv.Itoa)
+	assert.Equal(t, slice.Of("1", "2", "3"), sort.Asc(keys))
+}
+
+func Test_KeysConv(t *testing.T) {
+	keys, err := map_.KeysConv(map_.ConvertKeys(entities, strconv.Itoa), strconv.Atoi)
+	assert.NoError(t, err)
+	assert.Equal(t, slice.Of(1, 2, 3), sort.Asc(keys))
+}
+
 func Test_Values(t *testing.T) {
 	values := map_.Values(entities)
 	assert.Equal(t, slice.Of(&first, &second, &third), sort.By(values, func(e *entity) string { return e.val }))
+}
+
+func Test_ValuesConvert(t *testing.T) {
+	values := map_.ValuesConvert(entities, func(e *entity) string { return e.val })
+	assert.Equal(t, slice.Of("1_first", "2_second", "3_third"), sort.Asc(values))
+}
+
+func Test_ValuesConv(t *testing.T) {
+	values, err := map_.ValuesConv(entities, func(e *entity) (int, error) { return strconv.Atoi(string([]rune(e.val)[0])) })
+	assert.NoError(t, err)
+	assert.Equal(t, slice.Of(1, 2, 3), sort.Asc(values))
 }
 
 func Test_ConvertValues(t *testing.T) {

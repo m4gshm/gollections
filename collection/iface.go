@@ -56,5 +56,4 @@ type Map[K comparable, V any] interface {
 	IsEmpty() bool
 
 	HasAny(func(K, V) bool) bool
-
 }
