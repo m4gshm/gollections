@@ -119,3 +119,10 @@ func NoNilPtrVal[T any](pointer *T) (t T, ok bool) {
 	}
 	return t, false
 }
+
+// ToType converts I to T. If successful, returns the converted value and true.
+func ToType[T, I any](i I) (T, bool) {
+	var a any = i
+	t, ok := a.(T)
+	return t, ok
+}

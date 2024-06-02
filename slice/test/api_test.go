@@ -1,13 +1,16 @@
 package test
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"reflect"
 	"runtime"
 	"strconv"
+	"strings"
 	"testing"
 	"unsafe"
 
@@ -15,6 +18,7 @@ import (
 
 	_less "github.com/m4gshm/gollections/break/predicate/less"
 	_more "github.com/m4gshm/gollections/break/predicate/more"
+	opconv "github.com/m4gshm/gollections/convert"
 	"github.com/m4gshm/gollections/convert/as"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/op/delay/chain"
@@ -204,6 +208,13 @@ func Test_Convert(t *testing.T) {
 	s := slice.Of(1, 3, 5, 7, 9, 11)
 	r := slice.Convert(s, strconv.Itoa)
 	assert.Equal(t, []string{"1", "3", "5", "7", "9", "11"}, r)
+}
+
+func Test_ConvertFit(t *testing.T) {
+	sw := &strings.Builder{}
+	s := slice.Of[io.ByteWriter](sw, &bytes.Buffer{})
+	r := slice.ConvertFit(s, opconv.ToType[*strings.Builder])
+	assert.Equal(t, slice.Of(sw), r)
 }
 
 func Test_Conv(t *testing.T) {

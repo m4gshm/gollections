@@ -195,6 +195,22 @@ func Conv[FS ~[]From, From, To any](elements FS, converter func(From) (To, error
 	return result, nil
 }
 
+// ConvertFit creates a slice consisting of the transformed elements using the converter.
+// The converter returns the converted element and ok==true if successful.
+func ConvertFit[FS ~[]From, From, To any](elements FS, converter func(From) (To, bool)) []To {
+	if elements == nil {
+		return nil
+	}
+	result := make([]To, 0, len(elements))
+	for _, e := range elements {
+		c, ok := converter(e)
+		if ok {
+			result = append(result, c)
+		}
+	}
+	return result
+}
+
 // FilterAndConvert selects elements that match the filter, converts and places them into a new slice.
 func FilterAndConvert[FS ~[]From, From, To any](elements FS, filter func(From) bool, converter func(From) To) []To {
 	if elements == nil {
