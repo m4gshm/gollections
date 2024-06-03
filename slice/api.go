@@ -880,13 +880,28 @@ func ToMap[TS ~[]T, T any, K comparable, V any](elements TS, keyExtractor func(T
 
 // ToMapResolv collects key\value elements to a map by iterating over the elements with resolving of duplicated key values
 func ToMapResolv[TS ~[]T, T any, K comparable, V, VR any](elements TS, keyExtractor func(T) K, valExtractor func(T) V, resolver func(bool, K, VR, V) VR) map[K]VR {
-	m := make(map[K]VR, len(elements))
+	m := map[K]VR{}
 	for _, e := range elements {
 		k, v := keyExtractor(e), valExtractor(e)
 		exists, ok := m[k]
 		m[k] = resolver(ok, k, exists, v)
 	}
 	return m
+}
+
+// ToMapResolvOrder collects key\value elements to a map by iterating over the elements with resolving of duplicated key values
+func ToMapResolvOrder[TS ~[]T, T any, K comparable, V, VR any](elements TS, keyExtractor func(T) K, valExtractor func(T) V, resolver func(bool, K, VR, V) VR) ([]K, map[K]VR) {
+	m := map[K]VR{}
+	order := []K{}
+	for _, e := range elements {
+		k, v := keyExtractor(e), valExtractor(e)
+		exists, ok := m[k]
+		if !ok {
+			order = append(order, k)
+		}
+		m[k] = resolver(ok, k, exists, v)
+	}
+	return order, m
 }
 
 // KeyValue transforms slice elements to key/value pairs slice. One pair per one element
