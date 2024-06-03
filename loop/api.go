@@ -613,14 +613,14 @@ func ExtraValuee[T, V any](next func() (T, bool), valExtractor func(T) (V, error
 
 // Group converts elements retrieved by the 'next' function into a map, extracting a key for each element applying the converter 'keyExtractor'.
 // The keyExtractor converts an element to a key.
-// The valExtractor converts an element to an value.
+// The valExtractor converts an element to a value.
 func Group[T any, K comparable, V any](next func() (T, bool), keyExtractor func(T) K, valExtractor func(T) V) map[K][]V {
 	return ToMapResolv(next, keyExtractor, valExtractor, resolv.Slice[K, V])
 }
 
 // Groupp converts elements retrieved by the 'next' function into a map, extracting a key for each element applying the converter 'keyExtractor'.
 // The keyExtractor converts an element to a key.
-// The valExtractor converts an element to an value.
+// The valExtractor converts an element to a value.
 func Groupp[T any, K comparable, V any](next func() (T, bool), keyExtractor func(T) (K, error), valExtractor func(T) (V, error)) (map[K][]V, error) {
 	return breakloop.Groupp(breakloop.From(next), keyExtractor, valExtractor)
 }

@@ -83,7 +83,7 @@ func Delete[TS ~[]T, T any](elements TS, index int) TS {
 
 // Group converts the 'elements' slice into a map, extracting a key for each element applying the converter 'keyExtractor'.
 // The keyExtractor converts an element to a key.
-// The valExtractor converts an element to an value.
+// The valExtractor converts an element to a value.
 func Group[TS ~[]T, T any, K comparable, V any](elements TS, keyExtractor func(T) K, valExtractor func(T) V) map[K][]V {
 	if elements == nil {
 		return nil

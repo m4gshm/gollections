@@ -178,7 +178,7 @@ func (m *Map[K, V]) Delete(keys ...K) {
 	}
 }
 
-// DeleteOne removes an value by the key from the map
+// DeleteOne removes a value by the key from the map
 func (m *Map[K, V]) DeleteOne(key K) {
 	if m != nil {
 		delete(*m, key)
