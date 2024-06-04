@@ -95,7 +95,7 @@ func Group[TS ~[]T, T any, K comparable, V any](elements TS, keyExtractor func(T
 // The keyExtractor converts an element to a key.
 // The valExtractor converts an element to an value.
 // Returns a slice with the keys ordered by the time they were added and the map with values grouped by key.
-func GroupOrder[TS ~[]T, T any, K comparable, V any](elements TS, keyExtractor func(T) K, valExtractor func(T) V) ([]K,map[K][]V) {
+func GroupOrder[TS ~[]T, T any, K comparable, V any](elements TS, keyExtractor func(T) K, valExtractor func(T) V) ([]K, map[K][]V) {
 	if elements == nil {
 		return nil, nil
 	}
