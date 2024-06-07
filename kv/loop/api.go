@@ -151,7 +151,7 @@ func Filt[K, V any](next func() (K, V, bool), filter func(K, V) (bool, error)) l
 	return loop.Filt(loop.From(next), filter)
 }
 
-// ToMapResolv collects key\value elements to a map by iterating over the elements with resolving of duplicated key values
+// ToMapResolv collects key\value elements into a new map by iterating over the elements with resolving of duplicated key values
 func ToMapResolv[K comparable, V, VR any](next func() (K, V, bool), resolver func(bool, K, VR, V) VR) map[K]VR {
 	m := map[K]VR{}
 	for k, v, ok := next(); ok; k, v, ok = next() {
@@ -161,7 +161,7 @@ func ToMapResolv[K comparable, V, VR any](next func() (K, V, bool), resolver fun
 	return m
 }
 
-// ToMap collects key\value elements to a map by iterating over the elements
+// ToMap collects key\value elements into a new map by iterating over the elements
 func ToMap[K comparable, V any](next func() (K, V, bool)) map[K]V {
 	return ToMapResolv(next, resolv.First[K, V])
 }

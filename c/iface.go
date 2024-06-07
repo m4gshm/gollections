@@ -52,7 +52,7 @@ type SliceFactory[T any] interface {
 	Append([]T) []T
 }
 
-// MapFactory collects the key/value pairs of the collection into a map
+// MapFactory collects the key/value pairs of the collection into a new map
 type MapFactory[K comparable, V any, Map map[K]V | map[K][]V] interface {
 	Map() Map
 }

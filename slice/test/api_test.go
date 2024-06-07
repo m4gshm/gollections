@@ -20,6 +20,7 @@ import (
 	_more "github.com/m4gshm/gollections/break/predicate/more"
 	opconv "github.com/m4gshm/gollections/convert"
 	"github.com/m4gshm/gollections/convert/as"
+	"github.com/m4gshm/gollections/map_/resolv"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/op/delay/chain"
 	"github.com/m4gshm/gollections/op/delay/string_/wrap"
@@ -552,4 +553,38 @@ func Test_PeekWhile(t *testing.T) {
 	})
 
 	assert.Equal(t, expected, s)
+}
+
+func Test_Slice_ToMapResolvOrder(t *testing.T) {
+	var (
+		even          = func(v int) bool { return v%2 == 0 }
+		order, groups = slice.ToMapResolvOrder(slice.Of(2, 1, 1, 2, 4, 3, 1), even, as.Is[int], resolv.Slice)
+	)
+	assert.Equal(t, []int{1, 1, 3, 1}, groups[false])
+	assert.Equal(t, []int{2, 2, 4}, groups[true])
+	assert.Equal(t, []bool{true, false}, order)
+}
+
+func Test_Slice_AppendMapResolv(t *testing.T) {
+	var (
+		even   = func(v int) bool { return v%2 == 0 }
+		groups = slice.AppendMapResolv(slice.Of(2, 1, 1, 2, 4, 3, 1), even, as.Is[int], resolv.Slice, nil)
+	)
+	assert.Equal(t, []int{1, 1, 3, 1}, groups[false])
+	assert.Equal(t, []int{2, 2, 4}, groups[true])
+}
+
+func Test_Slice_AppendMapResolvOrderr(t *testing.T) {
+	var (
+		even               = func(v int) bool { return v%2 == 0 }
+		order, groups, err = slice.AppendMapResolvOrderr(slice.Of("2", "1", "1", "2", "4", "3", "_1"), func(val string) (bool, int, error) {
+			i, err := strconv.Atoi(val)
+			return even(i), i, err
+		}, func(exists bool, k bool, vr []int, v int) ([]int, error) { return resolv.Slice(exists, k, vr, v), nil }, nil, nil)
+	)
+
+	assert.Equal(t, []int{1, 1, 3}, groups[false])
+	assert.Equal(t, []int{2, 2, 4}, groups[true])
+	assert.Equal(t, []bool{true, false}, order)
+	assert.EqualError(t, err, "strconv.Atoi: parsing \"_1\": invalid syntax")
 }
