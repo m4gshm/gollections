@@ -39,7 +39,7 @@ go get -u github.com/m4gshm/gollections
 
 [source,go]
 ----
-include::../examples/boilerplate/slice_filter_convert_reduce_test.go[lines=14..19,indent=0]
+include::../examples/boilerplate/slice_filter_convert_reduce_test.go[lines=14..20,indent=0]
 ----
 
 In the example is used only small set of slice functions as link:#slicefilter[slice.Filter], link:#sliceconv[slice.Conv] link:#sliceconvert#[slice.Convert], and link:#slicereduce[slice.Reduce]. More you can look in the link:./slice/api.go[slice] package.

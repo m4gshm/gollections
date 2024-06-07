@@ -62,7 +62,8 @@ go get -u github.com/m4gshm/gollections
 ## Slices
 
 ``` go
-data, err := slice.Conv(slice.Of("1", "2", "3", "4", "_", "6"), strconv.Atoi) //[1 2 3 4], invalid syntax
+data, err := slice.Conv(slice.Of("1", "2", "3", "4", "_", "6"), strconv.Atoi) 
+//[1 2 3 4], invalid syntax
 
 even := func(i int) bool { return i%2 == 0 }
 result := slice.Reduce(slice.Convert(slice.Filter(data, even), strconv.Itoa), op.Sum) //24
@@ -783,8 +784,6 @@ _ *mutable.Set[int] = &mutable.Set[int]{}
 
 - [Map](./collection/mutable/map_/api.go) - built-in map wrapper that
   supports [stream functions](#stream-functions).
-
-
 
 ``` go
 _ *mutable.Map[int, string] = map_.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
