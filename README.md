@@ -784,7 +784,6 @@ _ *mutable.Set[int] = &mutable.Set[int]{}
 - [Map](./collection/mutable/map_/api.go) - built-in map wrapper that
   supports [stream functions](#stream-functions).
 
-
 ``` go
 _ *mutable.Map[int, string] = map_.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3"))
 _ *mutable.Map[int, string] = mutable.NewMapOf(map[int]string{1: "2", 2: "2", 3: "3"})
