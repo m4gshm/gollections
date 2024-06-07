@@ -21,9 +21,11 @@ include::../examples/boilerplate/slice_namesbyRole_old_test.go[lines=11..26,inde
 Or you can write more compact code using the collections API, like:
 [source,go]
 ----
-import "github.com/m4gshm/gollections/slice/convert"
-import "github.com/m4gshm/gollections/slice/group"
-include::../examples/boilerplate/slice_namesbyRole_new_test.go[lines=14..19,indent=0]
+import (
+    "github.com/m4gshm/gollections/slice/convert"
+    "github.com/m4gshm/gollections/slice/group"
+)
+include::../examples/boilerplate/slice_namesbyRole_new_test.go[lines=14..20,indent=0]
 ----
 
 === Installation
@@ -37,7 +39,7 @@ go get -u github.com/m4gshm/gollections
 
 [source,go]
 ----
-include::../examples/boilerplate/slice_filter_convert_reduce_test.go[lines=15..22,indent=0]
+include::../examples/boilerplate/slice_filter_convert_reduce_test.go[lines=14..20,indent=0]
 ----
 
 In the example is used only small set of slice functions as link:#slicefilter[slice.Filter], link:#sliceconv[slice.Conv] link:#sliceconvert#[slice.Convert], and link:#slicereduce[slice.Reduce]. More you can look in the link:./slice/api.go[slice] package.
@@ -92,19 +94,45 @@ include::../examples/sliceexamples/clone_sort_By_test.go[lines=12..18,indent=0]
 ====== group.Of
 [source,go]
 ----
-import "github.com/m4gshm/gollections/convert/as"
-import "github.com/m4gshm/gollections/expr/use"
-import "github.com/m4gshm/gollections/slice/group"
+import (
+    "github.com/m4gshm/gollections/convert/as"
+    "github.com/m4gshm/gollections/expr/use"
+    "github.com/m4gshm/gollections/slice/group"
+)
 include::../examples/sliceexamples/group_Of_test.go[lines=16..22,indent=0]
+----
+====== group.Order
+[source,go]
+----
+import (
+    "github.com/m4gshm/gollections/convert/as"
+    "github.com/m4gshm/gollections/expr/use"
+    "github.com/m4gshm/gollections/slice/group"
+)
+include::../examples/sliceexamples/group_Order_test.go[lines=16..23,indent=0]
 ----
 ====== group.ByMultipleKeys
 [source,go]
 ----
-import "github.com/m4gshm/gollections/slice/convert"
-import "github.com/m4gshm/gollections/slice/group"
+import (
+    "github.com/m4gshm/gollections/slice/convert"
+    "github.com/m4gshm/gollections/slice/group"
+)
 include::../examples/boilerplate/slice_namesbyRole_new_test.go[lines=14..19,indent=0]
 ----
-====== slice.ToMap, slice.ToMapResolv
+====== slice.ToMap, slice.AppendMap
+[source,go]
+----
+import "github.com/m4gshm/gollections/slice"
+include::../examples/sliceexamples/slice_ToMap_test.go[lines=11..15,indent=0]
+----
+====== slice.ToMapOrder, slice.AppendMapOrder
+[source,go]
+----
+import "github.com/m4gshm/gollections/slice"
+include::../examples/sliceexamples/slice_ToMapOrder_test.go[lines=12..17,indent=0]
+----
+====== slice.ToMapResolv, slice.AppendMapResolv
 [source,go]
 ----
 import (
@@ -129,15 +157,19 @@ include::../examples/sliceexamples/slice_Reduce_test.go[lines=12..15,indent=0]
 ====== slice.First
 [source,go]
 ----
-import "github.com/m4gshm/gollections/predicate/more"
-import "github.com/m4gshm/gollections/slice"
+import (
+    "github.com/m4gshm/gollections/predicate/more"
+    "github.com/m4gshm/gollections/slice"
+)
 include::../examples/sliceexamples/slice_First_test.go[lines=13..15,indent=0]
 ----
 ====== slice.Last
 [source,go]
 ----
-import "github.com/m4gshm/gollections/predicate/less"
-import "github.com/m4gshm/gollections/slice"
+import (
+    "github.com/m4gshm/gollections/predicate/less"
+    "github.com/m4gshm/gollections/slice"
+)
 include::../examples/sliceexamples/slice_Last_test.go[lines=13..15,indent=0]
 ----
 ===== Converters
@@ -154,16 +186,20 @@ include::../examples/sliceexamples/slice_Conv_test.go[lines=13..16,indent=0]
 ====== slice.Filter
 [source,go]
 ----
-import "github.com/m4gshm/gollections/predicate/exclude"
-import "github.com/m4gshm/gollections/predicate/one"
-import "github.com/m4gshm/gollections/slice"
+import (
+    "github.com/m4gshm/gollections/predicate/exclude"
+    "github.com/m4gshm/gollections/predicate/one"
+    "github.com/m4gshm/gollections/slice"
+)
 include::../examples/sliceexamples/slice_Filter.go[lines=14..17,indent=0]
 ----
 ====== slice.Flat
 [source,go]
 ----
-import "github.com/m4gshm/gollections/convert/as"
-import "github.com/m4gshm/gollections/slice"
+import (
+    "github.com/m4gshm/gollections/convert/as"
+    "github.com/m4gshm/gollections/slice"
+)
 include::../examples/sliceexamples/slice_Flat_test.go[lines=13..16,indent=0]
 ----
 ===== Operations chain functions
@@ -236,14 +272,14 @@ The `KVLoop` behaves similar but returns a key/value pair. +
 
 [source,go]
 ----
-include::../examples/loopexamples/loop_filter_convert_reduce_test.go[lines=13..18,indent=0]
+include::../examples/loopexamples/loop_filter_convert_reduce_test.go[lines=13..17,indent=0]
 ----
 
 `BreakLoop` and `BreakKVLoop` are used for sources that can issue an error.
 
 [source,go]
 ----
-include::../examples/loopexamples/breakloop/loop_filter_convert_reduce_test.go[lines=13..19,indent=0]
+include::../examples/loopexamples/breakloop/loop_filter_convert_reduce_test.go[lines=13..16,indent=0]
 ----
 
 The API in most cases is similar to the link:./slice/api.go[slice] API but with delayed computation which means that the methods don't compute a result but only return a loop provider. The loop provider is type with a ``Next`` method that returns a next processed element.
@@ -271,9 +307,11 @@ include::../examples/loopexamples/range_Closed_test.go[lines=12..16,indent=0]
 ====== group.Of
 [source,go]
 ----
-import "github.com/m4gshm/gollections/convert/as"
-import "github.com/m4gshm/gollections/expr/use"
-import "github.com/m4gshm/gollections/loop/group"
+import (
+    "github.com/m4gshm/gollections/convert/as"
+    "github.com/m4gshm/gollections/expr/use"
+    "github.com/m4gshm/gollections/loop/group"
+)
 include::../examples/loopexamples/group_Of_test.go[lines=16..22,indent=0]
 ----
 ====== loop.ToMap, loop.ToMapResolv
@@ -301,8 +339,10 @@ include::../examples/loopexamples/loop_Reduce_test.go[lines=12..15,indent=0]
 ====== loop.First
 [source,go]
 ----
-import "github.com/m4gshm/gollections/predicate/more"
-import "github.com/m4gshm/gollections/loop"
+import (
+    "github.com/m4gshm/gollections/predicate/more"
+    "github.com/m4gshm/gollections/loop"
+)
 include::../examples/loopexamples/loop_First_test.go[lines=13..15,indent=0]
 ----
 ===== Converters
@@ -319,16 +359,20 @@ include::../examples/loopexamples/loop_Conv_test.go[lines=13..16,indent=0]
 ====== loop.Filter
 [source,go]
 ----
-import "github.com/m4gshm/gollections/predicate/exclude"
-import "github.com/m4gshm/gollections/predicate/one"
-import "github.com/m4gshm/gollections/loop"
-include::../examples/loopexamples/loop_Filter.go[lines=14..17,indent=0]
+import (
+    "github.com/m4gshm/gollections/predicate/exclude"
+    "github.com/m4gshm/gollections/predicate/one"
+    "github.com/m4gshm/gollections/loop"
+)
+include::../examples/loopexamples/loop_Filter.go[lines=14..20,indent=0]
 ----
 ====== loop.Flat
 [source,go]
 ----
-import "github.com/m4gshm/gollections/convert/as"
-import "github.com/m4gshm/gollections/loop"
+import (
+    "github.com/m4gshm/gollections/convert/as"
+    "github.com/m4gshm/gollections/loop"
+)
 include::../examples/loopexamples/loop_Flat_test.go[lines=13..16,indent=0]
 ----
 ===== Operations chain functions
@@ -393,16 +437,11 @@ Provides predicate builder api that used for filtering collection elements.
 
 [source,go]
 ----
-import "github.com/m4gshm/gollections/predicate/where"
-import "github.com/m4gshm/gollections/slice"
+import (
+    "github.com/m4gshm/gollections/predicate/where"
+    "github.com/m4gshm/gollections/slice"
+)
 include::../examples/boilerplate/predicate_test.go[lines=16..18,indent=0]
-----
-
-It is used for computations where an error may occur.
-
-[source,go]
-----
-include::../examples/loopexamples/breakloop/loop_filter_convert_reduce_test.go[lines=13..19,indent=0]
 ----
 
 ==== Expressions: link:./expr/use/api.go[use.If], link:./expr/get/api.go[get.If], link:#firstof[first.Of], link:#lastof[last.Of]
@@ -426,15 +465,19 @@ include::../examples/boilerplate/expr_use_test.go[lines=27..38,indent=0]
 ===== first.Of
 [source,go]
 ----
-import "github.com/m4gshm/gollections/expr/first"
-import "github.com/m4gshm/gollections/predicate/more"
+import (
+    "github.com/m4gshm/gollections/expr/first"
+    "github.com/m4gshm/gollections/predicate/more"
+)
 include::../examples/expressionexamples/first_Of_test.go[lines=13..15,indent=0]
 ----
 ===== last.Of
 [source,go]
 ----
-import "github.com/m4gshm/gollections/expr/last"
-import "github.com/m4gshm/gollections/predicate/less"
+import (
+    "github.com/m4gshm/gollections/expr/last"
+    "github.com/m4gshm/gollections/predicate/less"
+)
 include::../examples/expressionexamples/last_Of_test.go[lines=13..15,indent=0]
 ----
 

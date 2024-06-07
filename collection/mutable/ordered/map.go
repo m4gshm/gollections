@@ -89,7 +89,7 @@ func (m *Map[K, V]) First() (ordered.MapIter[K, V], K, V, bool) {
 	return iterator, firstK, firstV, ok
 }
 
-// Map collects the key/value pairs to a map
+// Map collects the key/value pairs into a new map
 func (m *Map[K, V]) Map() map[K]V {
 	if m == nil {
 		return nil

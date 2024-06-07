@@ -12,7 +12,7 @@ func Of[K comparable, V any](pairs ...c.KV[K, V]) ordered.Map[K, V] {
 }
 
 // New instantiates a map and copies the elements to it
-func New[K comparable, V any](elements map[K]V, order []K) ordered.Map[K, V] {
+func New[K comparable, V any](order []K, elements map[K]V) ordered.Map[K, V] {
 	return ordered.NewMapOf(order, elements)
 }
 

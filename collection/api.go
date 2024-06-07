@@ -103,3 +103,13 @@ func Sort[SC any, Cmp ~func(T, T) int, C interface {
 }, T any, O constraints.Ordered](collection C, order func(T) O) SC {
 	return collection.Sort(comparer.Of(order))
 }
+
+// Reduce reduces the 'collection' elements into an one using the 'merge' function.
+func Reduce[T any, IT Iterable[T]](collection IT, merge func(T, T) T) T {
+	return loop.Reduce(collection.Loop(), merge)
+}
+
+// Reducee reduces the 'collection' elements into an one using the 'merge' function.
+func Reducee[T any, IT Iterable[T]](collection IT, merge func(T, T) (T, error)) (T, error) {
+	return loop.Reducee(collection.Loop(), merge)
+}

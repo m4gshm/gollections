@@ -69,7 +69,7 @@ func (m Map[K, V]) Tail() MapIter[K, V] {
 	return NewMapIter(m.elements, slice.NewTail(m.order))
 }
 
-// Map collects the key/value pairs to a map
+// Map collects the key/value pairs into a new map
 func (m Map[K, V]) Map() map[K]V {
 	return map_.Clone(m.elements)
 }

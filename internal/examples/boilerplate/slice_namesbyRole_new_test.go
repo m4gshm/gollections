@@ -15,6 +15,7 @@ func Test_NamesByRole_New(t *testing.T) {
 	var namesByRole = group.ByMultipleKeys(users, func(u User) []string {
 		return convert.AndConvert(u.Roles(), Role.Name, strings.ToLower)
 	}, User.Name)
+
 	// map[:[Tom] admin:[Bob] manager:[Bob Alice]]
 
 	assert.Equal(t, namesByRole[""], []string{"Tom"})

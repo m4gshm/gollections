@@ -41,12 +41,15 @@ for _, u := range users {
 Or you can write more compact code using the collections API, like:
 
 ``` go
-import "github.com/m4gshm/gollections/slice/convert"
-import "github.com/m4gshm/gollections/slice/group"
+import (
+    "github.com/m4gshm/gollections/slice/convert"
+    "github.com/m4gshm/gollections/slice/group"
+)
 
 var namesByRole = group.ByMultipleKeys(users, func(u User) []string {
     return convert.AndConvert(u.Roles(), Role.Name, strings.ToLower)
 }, User.Name)
+
 // map[:[Tom] admin:[Bob] manager:[Bob Alice]]
 ```
 
@@ -59,13 +62,11 @@ go get -u github.com/m4gshm/gollections
 ## Slices
 
 ``` go
-data, err := slice.Conv(slice.Of("1", "2", "3", "4", "_", "6"), strconv.Atoi)
+data, err := slice.Conv(slice.Of("1", "2", "3", "4", "_", "6"), strconv.Atoi) 
+//[1 2 3 4], invalid syntax
+
 even := func(i int) bool { return i%2 == 0 }
-
-result := slice.Reduce(slice.Convert(slice.Filter(data, even), strconv.Itoa), op.Sum)
-
-assert.ErrorIs(t, err, strconv.ErrSyntax)
-assert.Equal(t, "24", result)
+result := slice.Reduce(slice.Convert(slice.Filter(data, even), strconv.Itoa), op.Sum) //24
 ```
 
 In the example is used only small set of slice functions as
@@ -156,9 +157,11 @@ var byAgeReverse = sort.DescBy(users, User.Age)
 ##### group.Of
 
 ``` go
-import "github.com/m4gshm/gollections/convert/as"
-import "github.com/m4gshm/gollections/expr/use"
-import "github.com/m4gshm/gollections/slice/group"
+import (
+    "github.com/m4gshm/gollections/convert/as"
+    "github.com/m4gshm/gollections/expr/use"
+    "github.com/m4gshm/gollections/slice/group"
+)
 
 var ageGroups = group.Of(users, func(u User) string {
     return use.If(u.age <= 20, "<=20").If(u.age <= 30, "<=30").Else(">30")
@@ -167,19 +170,60 @@ var ageGroups = group.Of(users, func(u User) string {
 //map[<=20:[{Tom 18 []}] <=30:[{Bob 26 []}] >30:[{Alice 35 []} {Chris 41 []}]]
 ```
 
+##### group.Order
+
+``` go
+import (
+    "github.com/m4gshm/gollections/convert/as"
+    "github.com/m4gshm/gollections/expr/use"
+    "github.com/m4gshm/gollections/slice/group"
+)
+
+var order, ageGroups = group.Order(users, func(u User) string {
+    return use.If(u.age <= 20, "<=20").If(u.age <= 30, "<=30").Else(">30")
+}, as.Is)
+
+//order     [<=30 >30 <=20]
+//ageGroups map[<=20:[{Tom 18 []}] <=30:[{Bob 26 []}] >30:[{Alice 35 []} {Chris 41 []}]]
+```
+
 ##### group.ByMultipleKeys
 
 ``` go
-import "github.com/m4gshm/gollections/slice/convert"
-import "github.com/m4gshm/gollections/slice/group"
+import (
+    "github.com/m4gshm/gollections/slice/convert"
+    "github.com/m4gshm/gollections/slice/group"
+)
 
 var namesByRole = group.ByMultipleKeys(users, func(u User) []string {
     return convert.AndConvert(u.Roles(), Role.Name, strings.ToLower)
 }, User.Name)
+
 // map[:[Tom] admin:[Bob] manager:[Bob Alice]]
 ```
 
-##### slice.ToMap, slice.ToMapResolv
+##### slice.ToMap, slice.AppendMap
+
+``` go
+import "github.com/m4gshm/gollections/slice"
+
+var agePerGroup = slice.ToMap(users, User.Name, User.Age)
+
+//"map[Alice:35 Bob:26 Chris:41 Tom:18]"
+```
+
+##### slice.ToMapOrder, slice.AppendMapOrder
+
+``` go
+import "github.com/m4gshm/gollections/slice"
+
+var names, agePerName = slice.ToMapOrder(users, User.Name, User.Age)
+
+//"[Bob Alice Tom Chris]"
+//"map[Alice:35 Bob:26 Chris:41 Tom:18]"
+```
+
+##### slice.ToMapResolv, slice.AppendMapResolv
 
 ``` go
 import (
@@ -217,8 +261,10 @@ var sum = slice.Reduce([]int{1, 2, 3, 4, 5, 6}, func(i1, i2 int) int { return i1
 ##### slice.First
 
 ``` go
-import "github.com/m4gshm/gollections/predicate/more"
-import "github.com/m4gshm/gollections/slice"
+import (
+    "github.com/m4gshm/gollections/predicate/more"
+    "github.com/m4gshm/gollections/slice"
+)
 
 result, ok := slice.First([]int{1, 3, 5, 7, 9, 11}, more.Than(5)) //7, true
 ```
@@ -226,8 +272,10 @@ result, ok := slice.First([]int{1, 3, 5, 7, 9, 11}, more.Than(5)) //7, true
 ##### slice.Last
 
 ``` go
-import "github.com/m4gshm/gollections/predicate/less"
-import "github.com/m4gshm/gollections/slice"
+import (
+    "github.com/m4gshm/gollections/predicate/less"
+    "github.com/m4gshm/gollections/slice"
+)
 
 result, ok := slice.Last([]int{1, 3, 5, 7, 9, 11}, less.Than(9)) //7, true
 ```
@@ -251,9 +299,11 @@ result, err := slice.Conv(slice.Of("1", "3", "5", "_7", "9", "11"), strconv.Atoi
 ##### slice.Filter
 
 ``` go
-import "github.com/m4gshm/gollections/predicate/exclude"
-import "github.com/m4gshm/gollections/predicate/one"
-import "github.com/m4gshm/gollections/slice"
+import (
+    "github.com/m4gshm/gollections/predicate/exclude"
+    "github.com/m4gshm/gollections/predicate/one"
+    "github.com/m4gshm/gollections/slice"
+)
 
 var f1 = slice.Filter([]int{1, 3, 5, 7, 9, 11}, one.Of(1, 7).Or(one.Of(11))) //[]int{1, 7, 11}
 var f2 = slice.Filter([]int{1, 3, 5, 7, 9, 11}, exclude.All(1, 7, 11))       //[]int{3, 5, 9}
@@ -262,8 +312,10 @@ var f2 = slice.Filter([]int{1, 3, 5, 7, 9, 11}, exclude.All(1, 7, 11))       //[
 ##### slice.Flat
 
 ``` go
-import "github.com/m4gshm/gollections/convert/as"
-import "github.com/m4gshm/gollections/slice"
+import (
+    "github.com/m4gshm/gollections/convert/as"
+    "github.com/m4gshm/gollections/slice"
+)
 
 var i []int = slice.Flat([][]int{{1, 2, 3}, {4}, {5, 6}}, as.Is)
 //[]int{1, 2, 3, 4, 5, 6}
@@ -409,9 +461,8 @@ The `KVLoop` behaves similar but returns a key/value pair.
 
 ``` go
 even := func(i int) bool { return i%2 == 0 }
-stringSeq := loop.Convert(loop.Filter(loop.Of(1, 2, 3, 4), even), strconv.Itoa)
-
-assert.Equal(t, []string{"2", "4"}, stringSeq.Slice())
+seq := loop.Convert(loop.Filter(loop.Of(1, 2, 3, 4), even), strconv.Itoa)
+var result []string = seq.Slice() //[2 4]
 ```
 
 `BreakLoop` and `BreakKVLoop` are used for sources that can issue an
@@ -419,10 +470,7 @@ error.
 
 ``` go
 intSeq := loop.Conv(loop.Of("1", "2", "3", "ddd4", "5"), strconv.Atoi)
-ints, err := loop.Slice(intSeq)
-
-assert.Equal(t, []int{1, 2, 3}, ints)
-assert.ErrorContains(t, err, "invalid syntax")
+ints, err := loop.Slice(intSeq) //[1 2 3], invalid syntax
 ```
 
 The API in most cases is similar to the [slice](./slice/api.go) API but
@@ -468,9 +516,11 @@ var one = range_.Closed(1, 1).Slice()            //[]int{1}
 ##### group.Of
 
 ``` go
-import "github.com/m4gshm/gollections/convert/as"
-import "github.com/m4gshm/gollections/expr/use"
-import "github.com/m4gshm/gollections/loop/group"
+import (
+    "github.com/m4gshm/gollections/convert/as"
+    "github.com/m4gshm/gollections/expr/use"
+    "github.com/m4gshm/gollections/loop/group"
+)
 
 var ageGroups = group.Of(users, func(u User) string {
     return use.If(u.age <= 20, "<=20").If(u.age <= 30, "<=30").Else(">30")
@@ -517,8 +567,10 @@ var sum = loop.Reduce(loop.Of(1, 2, 3, 4, 5, 6), func(i1, i2 int) int { return i
 ##### loop.First
 
 ``` go
-import "github.com/m4gshm/gollections/predicate/more"
-import "github.com/m4gshm/gollections/loop"
+import (
+    "github.com/m4gshm/gollections/predicate/more"
+    "github.com/m4gshm/gollections/loop"
+)
 
 result, ok := loop.First(loop.Of(1, 3, 5, 7, 9, 11), more.Than(5)) //7, true
 ```
@@ -542,19 +594,26 @@ result, err := loop.Conv(loop.Of("1", "3", "5", "_7", "9", "11"), strconv.Atoi).
 ##### loop.Filter
 
 ``` go
-import "github.com/m4gshm/gollections/predicate/exclude"
-import "github.com/m4gshm/gollections/predicate/one"
-import "github.com/m4gshm/gollections/loop"
+import (
+    "github.com/m4gshm/gollections/predicate/exclude"
+    "github.com/m4gshm/gollections/predicate/one"
+    "github.com/m4gshm/gollections/loop"
+)
 
-var f1 = loop.Filter(loop.Of(1, 3, 5, 7, 9, 11), one.Of(1, 7).Or(one.Of(11))).Slice() //[]int{1, 7, 11}
-var f2 = loop.Filter(loop.Of(1, 3, 5, 7, 9, 11), exclude.All(1, 7, 11)).Slice()       //[]int{3, 5, 9}
+var f1 = loop.Filter(loop.Of(1, 3, 5, 7, 9, 11), one.Of(1, 7).Or(one.Of(11))).Slice()
+//[]int{1, 7, 11}
+
+var f2 = loop.Filter(loop.Of(1, 3, 5, 7, 9, 11), exclude.All(1, 7, 11)).Slice()
+//[]int{3, 5, 9}
 ```
 
 ##### loop.Flat
 
 ``` go
-import "github.com/m4gshm/gollections/convert/as"
-import "github.com/m4gshm/gollections/loop"
+import (
+    "github.com/m4gshm/gollections/convert/as"
+    "github.com/m4gshm/gollections/loop"
+)
 
 var i []int = loop.Flat(loop.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...), as.Is).Slice()
 //[]int{1, 2, 3, 4, 5, 6}
@@ -639,20 +698,12 @@ Provides predicate builder api that used for filtering collection
 elements.
 
 ``` go
-import "github.com/m4gshm/gollections/predicate/where"
-import "github.com/m4gshm/gollections/slice"
+import (
+    "github.com/m4gshm/gollections/predicate/where"
+    "github.com/m4gshm/gollections/slice"
+)
 
 bob, _ := slice.First(users, where.Eq(User.Name, "Bob"))
-```
-
-It is used for computations where an error may occur.
-
-``` go
-intSeq := loop.Conv(loop.Of("1", "2", "3", "ddd4", "5"), strconv.Atoi)
-ints, err := loop.Slice(intSeq)
-
-assert.Equal(t, []int{1, 2, 3}, ints)
-assert.ErrorContains(t, err, "invalid syntax")
 ```
 
 ### Expressions: [use.If](./expr/use/api.go), [get.If](./expr/get/api.go), [first.Of](#firstof), [last.Of](#lastof)
@@ -692,8 +743,10 @@ assert.Equal(t, "Bob Smith", fullName)
 #### first.Of
 
 ``` go
-import "github.com/m4gshm/gollections/expr/first"
-import "github.com/m4gshm/gollections/predicate/more"
+import (
+    "github.com/m4gshm/gollections/expr/first"
+    "github.com/m4gshm/gollections/predicate/more"
+)
 
 result, ok := first.Of(1, 3, 5, 7, 9, 11).By(more.Than(5)) //7, true
 ```
@@ -701,8 +754,10 @@ result, ok := first.Of(1, 3, 5, 7, 9, 11).By(more.Than(5)) //7, true
 #### last.Of
 
 ``` go
-import "github.com/m4gshm/gollections/expr/last"
-import "github.com/m4gshm/gollections/predicate/less"
+import (
+    "github.com/m4gshm/gollections/expr/last"
+    "github.com/m4gshm/gollections/predicate/less"
+)
 
 result, ok := last.Of(1, 3, 5, 7, 9, 11).By(less.Than(9)) //7, true
 ```

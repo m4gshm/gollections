@@ -12,8 +12,9 @@ import (
 func Test_Slice_Vs_Loop(t *testing.T) {
 
 	even := func(i int) bool { return i%2 == 0 }
-	stringSeq := loop.Convert(loop.Filter(loop.Of(1, 2, 3, 4), even), strconv.Itoa)
+	seq := loop.Convert(loop.Filter(loop.Of(1, 2, 3, 4), even), strconv.Itoa)
+	var result []string = seq.Slice() //[2 4]
 
-	assert.Equal(t, []string{"2", "4"}, stringSeq.Slice())
+	assert.Equal(t, []string{"2", "4"}, result)
 
 }
