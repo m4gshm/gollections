@@ -1,16 +1,13 @@
 package test
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 	"reflect"
 	"runtime"
 	"strconv"
-	"strings"
 	"testing"
 	"unsafe"
 
@@ -18,7 +15,6 @@ import (
 
 	_less "github.com/m4gshm/gollections/break/predicate/less"
 	_more "github.com/m4gshm/gollections/break/predicate/more"
-	opconv "github.com/m4gshm/gollections/convert"
 	"github.com/m4gshm/gollections/convert/as"
 	"github.com/m4gshm/gollections/map_/resolv"
 	"github.com/m4gshm/gollections/op"
@@ -211,11 +207,19 @@ func Test_Convert(t *testing.T) {
 	assert.Equal(t, []string{"1", "3", "5", "7", "9", "11"}, r)
 }
 
-func Test_ConvertOK(t *testing.T) {
-	sw := &strings.Builder{}
-	s := slice.Of[io.ByteWriter](sw, &bytes.Buffer{})
-	r := slice.ConvertOK(s, opconv.ToType[*strings.Builder])
-	assert.Equal(t, slice.Of(sw), r)
+func Test_ConvOK(t *testing.T) {
+	s := slice.Of("1", "3", "4", "5", "7", "8", "_9", "11", "12")
+	r, err := slice.ConvOK(s, func(v string) (int, bool, error) {
+		i, err := strconv.Atoi(v)
+		if err != nil {
+			return i, false, err
+		}
+		return i, even(i), nil
+
+	})
+	var expected *strconv.NumError
+	assert.ErrorAs(t, err, &expected)
+	assert.Equal(t, []int{4, 8}, r)
 }
 
 func Test_Conv(t *testing.T) {

@@ -260,14 +260,14 @@ func ConvertS[FS ~[]From, From, To any](elements FS, converter func(From) To) Lo
 }
 
 // ConvOK creates a loop that applies the 'converter' function to iterable elements.
-// The converter may returns a converted value or ok=false if convertation is not possible. This value will not be included in the results loop.
+// The converter may returns a value or ok=false to exclude the value from the loop.
 // It may also return an error to abort the loop.
 func ConvOK[From, To any](next func() (From, bool), converter func(from From) (To, bool, error)) breakloop.Loop[To] {
 	return breakloop.ConvOK(breakloop.From(next), converter)
 }
 
 // ConvertOK creates a loop that applies the 'converter' function to iterable elements.
-// The converter may returns a converted value or ok=false if convertation is not possible. This value will not be included in the results loop.
+// The converter may returns a value or ok=false to exclude the value from the loop.
 func ConvertOK[From, To any](next func() (From, bool), converter func(from From) (To, bool)) Loop[To] {
 	if next == nil {
 		return nil

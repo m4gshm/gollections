@@ -299,7 +299,7 @@ func Convert[From, To any](next func() (From, bool, error), converter func(From)
 }
 
 // ConvOK creates a loop that applies the 'converter' function to iterable elements.
-// The converter may returns converted value or ok=false if convertation is not possible. This value will not be included in the results loop.
+// The converter may returns converted value or ok=false to exclude the value from the loop.
 // It may also return an error to abort the loop.
 func ConvOK[From, To any](next func() (From, bool, error), converter func(from From) (to To, ok bool, err error)) Loop[To] {
 	if next == nil {
@@ -317,7 +317,7 @@ func ConvOK[From, To any](next func() (From, bool, error), converter func(from F
 }
 
 // ConvertOK creates a loop that applies the 'converter' function to iterable elements.
-// The converter may returns converted value or ok=false if convertation is not possible. This value will not be included in the results loop.
+// The converter may returns a value or ok=false to exclude the value from the loop.
 func ConvertOK[From, To any](next func() (From, bool, error), converter func(from From) (To, bool)) Loop[To] {
 	if next == nil {
 		return nil

@@ -316,9 +316,8 @@ func AppendFilterAndConvertIndexed[FS ~[]From, DS ~[]To, From, To any](src FS, d
 	return dest
 }
 
-// ConvertOK creates a slice that applies the 'converter' function to iterable elements.
-// The converter may returns a converted value or ok=false if convertation is not possible.
-// This value will not be included in the results slice.
+// ConvertOK creates a slice consisting of the transformed elements using the converter.
+// The converter may returns a value or ok=false to exclude the value from the result.
 func ConvertOK[FS ~[]From, From, To any](elements FS, by func(from From) (To, bool)) []To {
 	if elements == nil {
 		return nil
@@ -330,6 +329,25 @@ func ConvertOK[FS ~[]From, From, To any](elements FS, by func(from From) (To, bo
 		}
 	}
 	return result
+}
+
+// ConvOK creates a slice consisting of the transformed elements using the converter.
+// The converter may returns a converted value or ok=false if convertation is not possible.
+// This value will not be included in the results slice.
+func ConvOK[FS ~[]From, From, To any](elements FS, by func(from From) (To, bool, error)) ([]To, error) {
+	if elements == nil {
+		return nil, nil
+	}
+	var result = make([]To, 0, len(elements))
+	for _, e := range elements {
+		to, ok, err := by(e)
+		if err != nil {
+			return result, err
+		} else if ok {
+			result = append(result, to)
+		}
+	}
+	return result, nil
 }
 
 // ConvertCheckIndexed additionally filters 'From' elements
