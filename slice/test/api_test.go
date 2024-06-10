@@ -211,10 +211,10 @@ func Test_Convert(t *testing.T) {
 	assert.Equal(t, []string{"1", "3", "5", "7", "9", "11"}, r)
 }
 
-func Test_ConvertFit(t *testing.T) {
+func Test_ConvertOK(t *testing.T) {
 	sw := &strings.Builder{}
 	s := slice.Of[io.ByteWriter](sw, &bytes.Buffer{})
-	r := slice.ConvertFit(s, opconv.ToType[*strings.Builder])
+	r := slice.ConvertOK(s, opconv.ToType[*strings.Builder])
 	assert.Equal(t, slice.Of(sw), r)
 }
 
