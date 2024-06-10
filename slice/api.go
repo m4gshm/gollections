@@ -332,8 +332,10 @@ func AppendFilterAndConvertIndexed[FS ~[]From, DS ~[]To, From, To any](src FS, d
 	return dest
 }
 
-// ConvertCheck is similar to ConvertFilt, but it checks and transforms elements together
-func ConvertCheck[FS ~[]From, From, To any](elements FS, by func(from From) (To, bool)) []To {
+// ConvertOK creates a slice that applies the 'converter' function to iterable elements.
+// The converter may returns a converted value or ok=false if convertation is not possible.
+// This value will not be included in the results slice.
+func ConvertOK[FS ~[]From, From, To any](elements FS, by func(from From) (To, bool)) []To {
 	if elements == nil {
 		return nil
 	}
@@ -478,7 +480,7 @@ func ToValues[TS ~[]*T, T any](pointers TS) []T {
 // GetValues returns values referenced by the pointers.
 // All nil pointers are excluded from the final result.
 func GetValues[TS ~[]*T, T any](elements TS) []T {
-	return ConvertCheck(elements, convert.NoNilPtrVal[T])
+	return ConvertOK(elements, convert.NoNilPtrVal[T])
 }
 
 // Filter filters elements that match the filter condition and returns them.

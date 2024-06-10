@@ -165,7 +165,7 @@ func Test_ConvertFiltered(t *testing.T) {
 
 func Test_ConvertFilteredInplace(t *testing.T) {
 	s := loop.Of(1, 3, 4, 5, 7, 8, 9, 11)
-	r := breakLoop.ConvCheck(breakLoop.From(s), func(i int) (string, bool, error) { return strconv.Itoa(i), even(i), nil })
+	r := breakLoop.ConvOK(breakLoop.From(s), func(i int) (string, bool, error) { return strconv.Itoa(i), even(i), nil })
 	o, _ := breakLoop.Slice(r)
 	assert.Equal(t, []string{"4", "8"}, o)
 }

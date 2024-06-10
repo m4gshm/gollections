@@ -294,7 +294,7 @@ func Test_ConvertFilteredWithIndex(t *testing.T) {
 
 func Test_ConvertFilteredInplace(t *testing.T) {
 	s := slice.Of(1, 3, 4, 5, 7, 8, 9, 11)
-	r := slice.ConvertCheck(s, func(i int) (string, bool) { return strconv.Itoa(i), even(i) })
+	r := slice.ConvertOK(s, func(i int) (string, bool) { return strconv.Itoa(i), even(i) })
 	assert.Equal(t, []string{"4", "8"}, r)
 }
 
