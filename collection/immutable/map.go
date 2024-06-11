@@ -101,21 +101,11 @@ func (m Map[K, V]) Get(key K) (element V, ok bool) {
 
 // Keys resutrns keys collection
 func (m Map[K, V]) Keys() MapKeys[K, V] {
-	return m.K()
-}
-
-// K resutrns keys collection impl
-func (m Map[K, V]) K() MapKeys[K, V] {
 	return WrapKeys(m.elements)
 }
 
 // Values resutrns values collection
 func (m Map[K, V]) Values() MapValues[K, V] {
-	return m.V()
-}
-
-// V resutrns values collection impl
-func (m Map[K, V]) V() MapValues[K, V] {
 	return WrapVal(m.elements)
 }
 
