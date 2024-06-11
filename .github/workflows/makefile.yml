@@ -10,15 +10,15 @@ on:
       - "releases/**"
       - "feature/**"
       - "bugfix/**"
-  pull_request:
-    branches:
-      - master
-      - main
-      - dev
-      - "dev**"
-      - "releases/**"
-      - "feature/**"
-      - "bugfix/**"
+  # pull_request:
+  #   branches:
+  #     - master
+  #     - main
+  #     - dev
+  #     - "dev**"
+  #     - "releases/**"
+  #     - "feature/**"
+  #     - "bugfix/**"
 
 jobs:
   build:
