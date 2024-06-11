@@ -259,13 +259,16 @@ func ConvertS[FS ~[]From, From, To any](elements FS, converter func(From) To) Lo
 	return Convert(S(elements), converter)
 }
 
-// ConvCheck is similar to ConvertFilt, but it checks and transforms elements together
-func ConvCheck[From, To any](next func() (From, bool), converter func(from From) (To, bool, error)) breakloop.Loop[To] {
-	return breakloop.ConvCheck(breakloop.From(next), converter)
+// ConvOK creates a loop that applies the 'converter' function to iterable elements.
+// The converter may returns a value or ok=false to exclude the value from the loop.
+// It may also return an error to abort the loop.
+func ConvOK[From, To any](next func() (From, bool), converter func(from From) (To, bool, error)) breakloop.Loop[To] {
+	return breakloop.ConvOK(breakloop.From(next), converter)
 }
 
-// ConvertCheck is similar to ConvertFilt, but it checks and transforms elements together
-func ConvertCheck[From, To any](next func() (From, bool), converter func(from From) (To, bool)) Loop[To] {
+// ConvertOK creates a loop that applies the 'converter' function to iterable elements.
+// The converter may returns a value or ok=false to exclude the value from the loop.
+func ConvertOK[From, To any](next func() (From, bool), converter func(from From) (To, bool)) Loop[To] {
 	if next == nil {
 		return nil
 	}
@@ -482,7 +485,7 @@ func PtrVal[T any](next func() (*T, bool)) Loop[T] {
 // NoNilPtrVal creates a loop that transform only not nil pointers to the values referenced referenced by those pointers.
 // Nil pointers are ignored.
 func NoNilPtrVal[T any](next func() (*T, bool)) Loop[T] {
-	return ConvertCheck(next, convert.NoNilPtrVal[T])
+	return ConvertOK(next, convert.NoNilPtrVal[T])
 }
 
 // KeyValue transforms a loop to the key/value loop based on applying key, value extractors to the elements

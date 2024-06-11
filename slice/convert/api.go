@@ -23,7 +23,7 @@ func NotNil[FS ~[]*From, From, To any](elements FS, converter func(*From) To) []
 
 // ToNotNil - convert.ToNotNil converts elements and returns only not nil converted elements
 func ToNotNil[FS ~[]From, From, To any](elements FS, converter func(From) *To) []*To {
-	return slice.ConvertCheck(elements, func(f From) (*To, bool) {
+	return slice.ConvertOK(elements, func(f From) (*To, bool) {
 		if t := converter(f); t != nil {
 			return t, true
 		}
@@ -33,7 +33,7 @@ func ToNotNil[FS ~[]From, From, To any](elements FS, converter func(From) *To) [
 
 // NilSafe - convert.NilSafe filters not nil elements, converts that ones, filters not nils after converting and returns them
 func NilSafe[FS ~[]*From, From, To any](elements FS, converter func(*From) *To) []*To {
-	return slice.ConvertCheck(elements, func(f *From) (*To, bool) {
+	return slice.ConvertOK(elements, func(f *From) (*To, bool) {
 		if f != nil {
 			if t := converter(f); t != nil {
 				return t, true
@@ -43,9 +43,9 @@ func NilSafe[FS ~[]*From, From, To any](elements FS, converter func(*From) *To) 
 	})
 }
 
-// Check - convert.Check is a short alias of slice.ConvertCheck
+// Check - convert.Check is a short alias of slice.ConvertOK
 func Check[FS ~[]From, From, To any](elements FS, converter func(from From) (To, bool)) []To {
-	return slice.ConvertCheck(elements, converter)
+	return slice.ConvertOK(elements, converter)
 }
 
 // CheckIndexed - convert.CheckIndexed is a short alias of slice.ConvertCheckIndexed

@@ -23,7 +23,7 @@ func NotNil[From, To any](next func() (*From, bool), converter func(*From) To) l
 
 // ToNotNil - convert.ToNotNil converts elements and returns only not nil converted elements
 func ToNotNil[From, To any](next func() (From, bool), converter func(From) *To) loop.Loop[*To] {
-	return loop.ConvertCheck(next, func(f From) (*To, bool) {
+	return loop.ConvertOK(next, func(f From) (*To, bool) {
 		if t := converter(f); t != nil {
 			return t, true
 		}
@@ -33,7 +33,7 @@ func ToNotNil[From, To any](next func() (From, bool), converter func(From) *To) 
 
 // NilSafe - convert.NilSafe filters not nil next, converts that ones, filters not nils after converting and returns them
 func NilSafe[From, To any](next func() (*From, bool), converter func(*From) *To) loop.Loop[*To] {
-	return loop.ConvertCheck(next, func(f *From) (*To, bool) {
+	return loop.ConvertOK(next, func(f *From) (*To, bool) {
 		if f != nil {
 			if t := converter(f); t != nil {
 				return t, true
@@ -43,9 +43,9 @@ func NilSafe[From, To any](next func() (*From, bool), converter func(*From) *To)
 	})
 }
 
-// Check - convert.Check is a short alias of loop.ConvertCheck
+// Check - convert.Check is a short alias of loop.ConvertOK
 func Check[From, To any](next func() (From, bool), converter func(from From) (To, bool)) loop.Loop[To] {
-	return loop.ConvertCheck(next, converter)
+	return loop.ConvertOK(next, converter)
 }
 
 // FromIndexed - convert.FromIndexed retrieves elements from a indexed source and converts them

@@ -219,7 +219,7 @@ func Test_ConvertFiltered(t *testing.T) {
 
 func Test_ConvertFilteredInplace(t *testing.T) {
 	s := loop.Of(1, 3, 4, 5, 7, 8, 9, 11)
-	r := loop.ConvertCheck(s, func(i int) (string, bool) { return strconv.Itoa(i), even(i) })
+	r := loop.ConvertOK(s, func(i int) (string, bool) { return strconv.Itoa(i), even(i) })
 	assert.Equal(t, []string{"4", "8"}, loop.Slice(r))
 }
 

@@ -18,10 +18,20 @@ type Iterable[T any, Loop ~func() (T, bool)] interface {
 	Loop() Loop
 }
 
-// KeyVal provides extracing of a keys or values collection from key/value pairs
-type KeyVal[Keys any, Vals any] interface {
-	Keys() Keys
-	Values() Vals
+// KeyVal provides access to all keys and values of a key/value based collection.
+type KeyVal[K, V any] interface {
+	Keys[K]
+	Values[V]
+}
+
+// Keys provides access to all keys of a key/value based collection.
+type Keys[K any] interface {
+	Keys() K
+}
+
+// Values provides access to all values of a key/value based collection.
+type Values[V any] interface {
+	Values() V
 }
 
 // Collection is the base interface of non-associative collections
