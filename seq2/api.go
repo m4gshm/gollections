@@ -3,12 +3,37 @@ package seq2
 
 import "iter"
 
-// Filtered creates a rangefunc that iterates only those elements for which the 'filter' function returns true.
-func Filter[I, T any](all iter.Seq2[I, T], filter func(I, T) bool) iter.Seq2[I, T] {
-	return func(consumer func(I, T) bool) {
-		all(func(i I, e T) bool {
-			if filter(i, e) {
-				return consumer(i, e)
+// Of creates an index/value pairs iterator over the elements.
+func Of[T any](elements ...T) iter.Seq2[int, T] {
+	return func(yield func(int, T) bool) {
+		for i, v := range elements {
+			if ok := yield(i, v); !ok {
+				break
+			}
+		}
+	}
+}
+
+// OfMap creates an key/value pairs iterator over the elements map.
+func OfMap[K comparable, V any](elements map[K]V) iter.Seq2[K, V] {
+	return func(yield func(K, V) bool) {
+		for k, v := range elements {
+			if ok := yield(k, v); !ok {
+				break
+			}
+		}
+	}
+}
+
+// Filter creates a rangefunc that iterates only those elements for which the 'filter' function returns true.
+func Filter[K, V any](seq iter.Seq2[K, V], filter func(K, V) bool) iter.Seq2[K, V] {
+	return func(consumer func(K, V) bool) {
+		if seq == nil {
+			return
+		}
+		seq(func(k K, v V) bool {
+			if filter(k, v) {
+				return consumer(k, v)
 			}
 			return true
 		})
@@ -16,18 +41,37 @@ func Filter[I, T any](all iter.Seq2[I, T], filter func(I, T) bool) iter.Seq2[I, 
 }
 
 // Convert creates a rangefunc that applies the 'converter' function to each iterable element.
-func Convert[I, From, To any](all iter.Seq2[I, From], converter func(I, From) To) iter.Seq2[I, To] {
-	return func(consumer func(I, To) bool) {
-		all(func(i I, from From) bool {
-			return consumer(i, converter(i, from))
+func Convert[Kfrom, Vfrom, Kto, Vto any](seq iter.Seq2[Kfrom, Vfrom], converter func(Kfrom, Vfrom) (Kto, Vto)) iter.Seq2[Kto, Vto] {
+	return func(consumer func(Kto, Vto) bool) {
+		if seq == nil {
+			return
+		}
+		seq(func(k Kfrom, v Vfrom) bool {
+			return consumer(converter(k, v))
 		})
 	}
 }
 
-func ToSeq[I, T any](all iter.Seq2[I, T]) iter.Seq[T] {
-	return func(yield func(T) bool) {
-		all(func(i I, e T) bool {
-			return yield(e)
+// Values converts a key/value pairs iterator to an iterator of just values.
+func Values[K, V any](seq iter.Seq2[K, V]) iter.Seq[V] {
+	return func(yield func(V) bool) {
+		if seq == nil {
+			return
+		}
+		seq(func(_ K, v V) bool {
+			return yield(v)
+		})
+	}
+}
+
+// Keys converts a key/value pairs iterator to an iterator of just keys.
+func Keys[K, V any](seq iter.Seq2[K, V]) iter.Seq[K] {
+	return func(yield func(K) bool) {
+		if seq == nil {
+			return
+		}
+		seq(func(k K, _ V) bool {
+			return yield(k)
 		})
 	}
 }

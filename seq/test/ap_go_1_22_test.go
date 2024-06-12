@@ -3,15 +3,44 @@
 package test
 
 import (
+	"iter"
 	"strconv"
 	"testing"
 
 	"github.com/m4gshm/gollections/collection/immutable/ordered/set"
+	"github.com/m4gshm/gollections/convert/as"
 	"github.com/m4gshm/gollections/seq"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/sort"
 	"github.com/stretchr/testify/assert"
 )
+
+func Test_SeqOfNil(t *testing.T) {
+	var in, out []int = nil, nil
+
+	iter := false
+	for e := range seq.Of(in...) {
+		iter = true
+		out = append(out, e)
+	}
+
+	assert.Nil(t, out)
+	assert.False(t, iter)
+}
+
+func Test_ConvertNilSeq(t *testing.T) {
+	var in iter.Seq[int] = nil
+	var out []int = nil
+
+	iter := false
+	for e := range seq.Convert(in, as.Is) {
+		iter = true
+		out = append(out, e)
+	}
+
+	assert.Nil(t, out)
+	assert.False(t, iter)
+}
 
 func Test_AllFiltered(t *testing.T) {
 	from := set.Of(1, 2, 3, 5, 7, 8, 9, 11)
