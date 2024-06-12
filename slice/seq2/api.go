@@ -1,5 +1,5 @@
-// Package over provides helpers for rangefunc feature introduced in go 1.22.
-package over
+// Package seq2 provides helpers for rangefunc feature introduced in go 1.22.
+package seq2
 
 // Filtered creates a rangefunc that iterates only those elements for which the 'filter' function returns true.
 func Filtered[TS ~[]T, T any](elements TS, filter func(T) bool) func(func(int, T) bool) {

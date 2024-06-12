@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/m4gshm/gollections/slice"
-	"github.com/m4gshm/gollections/slice/over"
+	"github.com/m4gshm/gollections/slice/seq2"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -16,7 +16,7 @@ func Test_OverFiltered(t *testing.T) {
 
 	s := []int{}
 
-	for _, e := range over.Filtered(integers, func(e int) bool { return e%2 == 0 }) {
+	for _, e := range seq2.Filtered(integers, func(e int) bool { return e%2 == 0 }) {
 		s = append(s, e)
 	}
 
@@ -27,7 +27,7 @@ func Test_OverConverted(t *testing.T) {
 	integers := slice.Of(1, 2, 3, 5, 7, 8, 9, 11)
 	s := []string{}
 
-	for _, e := range over.Converted(integers, strconv.Itoa) {
+	for _, e := range seq2.Converted(integers, strconv.Itoa) {
 		s = append(s, e)
 	}
 
