@@ -7,14 +7,15 @@ import (
 
 	"github.com/m4gshm/gollections/convert/as"
 	"github.com/m4gshm/gollections/expr/use"
+	"github.com/m4gshm/gollections/loop"
+	"github.com/m4gshm/gollections/loop/group"
 	"github.com/m4gshm/gollections/slice"
-	"github.com/m4gshm/gollections/slice/group"
 	"github.com/m4gshm/gollections/slice/sort"
 )
 
 func Test_Group(t *testing.T) {
 
-	var ageGroups = group.Of(users, func(u User) string {
+	var ageGroups map[string][]User = group.Of(loop.Of(users...), func(u User) string {
 		return use.If(u.age <= 20, "<=20").If(u.age <= 30, "<=30").Else(">30")
 	}, as.Is)
 
