@@ -310,9 +310,10 @@ include::../examples/loopexamples/range_Closed_test.go[lines=12..16,indent=0]
 import (
     "github.com/m4gshm/gollections/convert/as"
     "github.com/m4gshm/gollections/expr/use"
+    "github.com/m4gshm/gollections/loop"
     "github.com/m4gshm/gollections/loop/group"
 )
-include::../examples/loopexamples/group_Of_test.go[lines=16..22,indent=0]
+include::../examples/loopexamples/group_Of_test.go[lines=17..23,indent=0]
 ----
 ====== loop.ToMap, loop.ToMapResolv
 [source,go]

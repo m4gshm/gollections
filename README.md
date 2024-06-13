@@ -163,7 +163,7 @@ import (
     "github.com/m4gshm/gollections/slice/group"
 )
 
-var ageGroups = group.Of(users, func(u User) string {
+var ageGroups map[string][]User = group.Of(users, func(u User) string {
     return use.If(u.age <= 20, "<=20").If(u.age <= 30, "<=30").Else(">30")
 }, as.Is)
 
@@ -519,10 +519,11 @@ var one = range_.Closed(1, 1).Slice()            //[]int{1}
 import (
     "github.com/m4gshm/gollections/convert/as"
     "github.com/m4gshm/gollections/expr/use"
+    "github.com/m4gshm/gollections/loop"
     "github.com/m4gshm/gollections/loop/group"
 )
 
-var ageGroups = group.Of(users, func(u User) string {
+var ageGroups map[string][]User = group.Of(loop.Of(users...), func(u User) string {
     return use.If(u.age <= 20, "<=20").If(u.age <= 30, "<=30").Else(">30")
 }, as.Is)
 
