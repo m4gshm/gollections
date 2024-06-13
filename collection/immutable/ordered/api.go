@@ -22,6 +22,9 @@ func NewSet[T comparable](elements ...T) Set[T] {
 // SetFromLoop creates a set with elements retrieved by the 'next' function.
 // The next returns an element with true or zero value with false if there are no more elements.
 func SetFromLoop[T comparable](next func() (T, bool)) Set[T] {
+	if next == nil {
+		return Set[T]{}
+	}
 	var (
 		uniques = map[T]struct{}{}
 		order   []T
@@ -56,6 +59,9 @@ func NewMapOf[K comparable, V any](order []K, elements map[K]V) Map[K, V] {
 
 // MapFromLoop creates a map with elements retrieved converter the 'next' function
 func MapFromLoop[K comparable, V any](next func() (K, V, bool)) Map[K, V] {
+	if next == nil {
+		return Map[K, V]{}
+	}
 	var (
 		uniques = map[K]V{}
 		order   = []K{}

@@ -561,8 +561,8 @@ var sum = sum.Of(loop.Of(1, 2, 3, 4, 5, 6)) //21
 ##### loop.Reduce
 
 ``` go
-var sum = loop.Reduce(loop.Of(1, 2, 3, 4, 5, 6), func(i1, i2 int) int { return i1 + i2 })
-//21
+var sum, ok = loop.Reduce(loop.Of(1, 2, 3, 4, 5, 6), func(i1, i2 int) int { return i1 + i2 })
+//21, true
 ```
 
 ##### loop.First

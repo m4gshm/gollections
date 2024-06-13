@@ -117,7 +117,7 @@ func Test_PointerClone(t *testing.T) {
 
 func Test_ReduceSum(t *testing.T) {
 	s := slice.Of(1, 3, 5, 7, 9, 11)
-	r := slice.Reduce(s, op.Sum[int])
+	r := slice.Accum(s, 0, op.Sum[int])
 	assert.Equal(t, 1+3+5+7+9+11, r)
 }
 

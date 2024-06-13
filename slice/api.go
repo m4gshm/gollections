@@ -640,23 +640,30 @@ func sort[TS ~[]T, T any](elements TS, sorter Sorter[TS, T], comparer Comparer[T
 	return elements
 }
 
-// Reduce reduces the elements into an one using the 'merge' function
+// Reduce reduces the elements into an one using the 'merge' function.
+// If the 'elements' slice is empty, the zero value of 'T' type is returned.
 func Reduce[TS ~[]T, T any](elements TS, merge func(T, T) T) (out T) {
+	return Accum(elements, out, merge)
+}
+
+// Accum accumulates a value by using the 'first' argument to initialize the accumulator and sequentially applying the 'merge' functon to the accumulator and each element.
+func Accum[TS ~[]T, T any](elements TS, first T, merge func(accumulator T, element T) T) T {
+	accumulator := first
 	l := len(elements)
 	if l >= 1 {
-		out = elements[0]
+		accumulator = elements[0]
 	}
 	if l > 1 {
 		for _, v := range elements[1:] {
-			out = merge(out, v)
+			accumulator = merge(accumulator, v)
 		}
 	}
-	return out
+	return accumulator
 }
 
 // Sum returns the sum of all elements
-func Sum[TS ~[]T, T c.Summable](elements TS) T {
-	return Reduce(elements, op.Sum[T])
+func Sum[TS ~[]T, T c.Summable](elements TS) (out T) {
+	return Accum(elements, out, op.Sum[T])
 }
 
 // First returns the first element that satisfies requirements of the predicate 'by'

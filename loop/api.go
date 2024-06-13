@@ -172,43 +172,62 @@ func Append[T any, TS ~[]T](next func() (T, bool), out TS) TS {
 }
 
 // Reduce reduces the elements retrieved by the 'next' function into an one using the 'merge' function.
-func Reduce[T any](next func() (T, bool), merge func(T, T) T) (result T) {
+// If the 'next' function returns ok=false at the first call, the zero value of 'T' type is returned.
+func Reduce[T any](next func() (T, bool), merge func(T, T) T) (result T, ok bool) {
 	if next == nil {
-		return result
+		return result, false
 	}
-	if v, ok := next(); ok {
-		result = v
-	} else {
-		return result
+	result, ok = next()
+	if !ok {
+		return result, false
+	}
+	return Accum(next, result, merge), true
+}
+
+// Accum accumulates a value by using the 'first' argument to initialize the accumulator and sequentially applying the 'merge' functon to the accumulator and each element retrieved by the 'next' function.
+func Accum[T any](next func() (T, bool), first T, merge func(accumulator T, element T) T) T {
+	accumulator := first
+	if next == nil {
+		return accumulator
 	}
 	for v, ok := next(); ok; v, ok = next() {
-		result = merge(result, v)
+		accumulator = merge(accumulator, v)
 	}
-	return result
+	return accumulator
 }
 
 // Reducee reduces the elements retrieved by the 'next' function into an one pair using the 'merge' function.
-func Reducee[T any](next func() (T, bool), merge func(T, T) (T, error)) (result T, err error) {
+// If the 'next' function returns ok=false at the first call, the zero value of 'T' type is returned.
+func Reducee[T any](next func() (T, bool), merge func(T, T) (T, error)) (result T, ok bool, err error) {
 	if next == nil {
-		return result, nil
+		return result, false, nil
 	}
-	if v, ok := next(); ok {
-		result = v
-	} else {
-		return result, nil
+	result, ok = next()
+	if !ok {
+		return result, false, nil
+	}
+	result, err = Accumm(next, result, merge)
+	return result, err == nil, err
+}
+
+// Accum accumulates a value by using the 'first' argument to initialize the accumulator and sequentially applying the 'merge' functon to the accumulator and each element retrieved by the 'next' function.
+func Accumm[T any](next func() (T, bool), first T, merge func(accumulator T, element T) (T, error)) (accumulator T, err error) {
+	accumulator = first
+	if next == nil {
+		return accumulator, nil
 	}
 	for v, ok := next(); ok; v, ok = next() {
-		result, err = merge(result, v)
+		accumulator, err = merge(accumulator, v)
 		if err != nil {
-			return result, err
+			return accumulator, err
 		}
 	}
-	return result, nil
+	return accumulator, nil
 }
 
 // Sum returns the sum of all elements
-func Sum[T c.Summable](next func() (T, bool)) T {
-	return Reduce(next, op.Sum[T])
+func Sum[T c.Summable](next func() (T, bool)) (out T) {
+	return Accum(next, out, op.Sum[T])
 }
 
 // HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful

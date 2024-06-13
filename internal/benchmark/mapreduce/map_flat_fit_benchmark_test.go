@@ -178,7 +178,7 @@ func Benchmark_ReduceSum_Loop(b *testing.B) {
 	b.ResetTimer()
 	result := 0
 	for i := 0; i < b.N; i++ {
-		result = loop.Reduce(loop.Filter(loop.Flat(loop.Flat(loop.Of(multiDimension...), as.Is), as.Is), odds), sop.Sum)
+		result, _ = loop.Reduce(loop.Filter(loop.Flat(loop.Flat(loop.Of(multiDimension...), as.Is), as.Is), odds), sop.Sum)
 	}
 	b.StopTimer()
 	if result != expected {

@@ -201,6 +201,7 @@ func Append[T any, TS ~[]T](next func() (T, bool, error), out TS) (TS, error) {
 }
 
 // Reduce reduces the elements retrieved by the 'next' function into an one using the 'merge' function.
+// If the 'next' function returns ok=false at the first call, the zero value of 'T' type is returned.
 func Reduce[T any](next func() (T, bool, error), merger func(T, T) T) (out T, e error) {
 	if next == nil {
 		return out, nil

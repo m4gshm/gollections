@@ -105,11 +105,23 @@ func Sort[SC any, Cmp ~func(T, T) int, C interface {
 }
 
 // Reduce reduces the 'collection' elements into an one using the 'merge' function.
-func Reduce[T any, IT Iterable[T]](collection IT, merge func(T, T) T) T {
+// If the 'collection' is empty, the zero value of 'T' type is returned.
+func Reduce[T any, IT Iterable[T]](collection IT, merge func(T, T) T) (T, bool) {
 	return loop.Reduce(collection.Loop(), merge)
 }
 
+// Accum accumulates a value by using the 'first' argument to initialize the accumulator and sequentially applying the 'merge' functon to the accumulator and each element of the 'collection'.
+func Accum[T any, IT Iterable[T]](collection IT, first T, merge func(T, T) T) T {
+	return loop.Accum(collection.Loop(), first, merge)
+}
+
 // Reducee reduces the 'collection' elements into an one using the 'merge' function.
-func Reducee[T any, IT Iterable[T]](collection IT, merge func(T, T) (T, error)) (T, error) {
+// If the 'collection' is empty, the zero value of 'T' type is returned.
+func Reducee[T any, IT Iterable[T]](collection IT, merge func(T, T) (T, error)) (T, bool, error) {
 	return loop.Reducee(collection.Loop(), merge)
+}
+
+// Accumm accumulates a value by using the 'first' argument to initialize the accumulator and sequentially applying the 'merge' functon to the accumulator and each element of the 'collection'.
+func Accumm[T any, IT Iterable[T]](collection IT, first T, merge func(T, T) (T, error)) (T, error) {
+	return loop.Accumm(collection.Loop(), first, merge)
 }

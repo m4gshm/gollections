@@ -54,31 +54,39 @@ func Group[K comparable, V any](next func() (K, V, bool)) map[K][]V {
 	return ToMapResolv(next, resolv.Slice[K, V])
 }
 
-// Reduce reduces the key/value pairs retrieved by the 'next' function into an one pair using the 'merge' function
-func Reduce[K, V any](next func() (K, V, bool), merge func(K, K, V, V) (K, V)) (rk K, rv V) {
+// Reduce reduces the key/value pairs retrieved by the 'next' function into an one pair using the 'merge' function.
+// If the 'next' function returns ok=false at the first call, the zero values of 'K', 'V' types are returned.
+func Reduce[K, V any](next func() (K, V, bool), merge func(K, K, V, V) (K, V)) (rk K, rv V, ok bool) {
+	if next == nil {
+		return rk, rv, false
+	}
 	if k, v, ok := next(); ok {
 		rk, rv = k, v
 	} else {
-		return rk, rv
+		return rk, rv, false
 	}
 	for k, v, ok := next(); ok; k, v, ok = next() {
 		rk, rv = merge(rk, k, rv, v)
 	}
-	return rk, rv
+	return rk, rv, true
 }
 
-// Reducee reduces the key/value pairs retrieved by the 'next' function into an one pair using the 'merge' function
-func Reducee[K, V any](next func() (K, V, bool), merge func(K, K, V, V) (K, V, error)) (rk K, rv V, err error) {
+// Reducee reduces the key/value pairs retrieved by the 'next' function into an one pair using the 'merge' function.
+// If the 'next' function returns ok=false at the first call, the zero values of 'K', 'V' types are returned.
+func Reducee[K, V any](next func() (K, V, bool), merge func(K, K, V, V) (K, V, error)) (rk K, rv V, ok bool, err error) {
+	if next == nil {
+		return rk, rv, false, nil
+	}
 	k, v, ok := next()
 	if !ok {
-		return rk, rv, nil
+		return rk, rv, false, nil
 	}
 	rk, rv = k, v
 	for {
 		if k, v, ok := next(); !ok {
-			return rk, rv, nil
+			return rk, rv, true, nil
 		} else if rk, rv, err = merge(rk, k, rv, v); err != nil {
-			return rk, rv, err
+			return rk, rv, err == nil, err
 		}
 	}
 }
@@ -153,6 +161,9 @@ func Filt[K, V any](next func() (K, V, bool), filter func(K, V) (bool, error)) l
 
 // ToMapResolv collects key\value elements into a new map by iterating over the elements with resolving of duplicated key values
 func ToMapResolv[K comparable, V, VR any](next func() (K, V, bool), resolver func(bool, K, VR, V) VR) map[K]VR {
+	if next == nil {
+		return nil
+	}
 	m := map[K]VR{}
 	for k, v, ok := next(); ok; k, v, ok = next() {
 		exists, ok := m[k]
@@ -168,6 +179,9 @@ func ToMap[K comparable, V any](next func() (K, V, bool)) map[K]V {
 
 // ToSlice collects key\value elements to a slice by iterating over the elements
 func ToSlice[K, V, T any](next func() (K, V, bool), converter func(K, V) T) []T {
+	if next == nil {
+		return nil
+	}
 	s := []T{}
 	for key, val, ok := next(); ok; key, val, ok = next() {
 		s = append(s, converter(key, val))
