@@ -19,6 +19,25 @@ import (
 	"github.com/m4gshm/gollections/slice"
 )
 
+func Test_AccumSum(t *testing.T) {
+	s := breakLoop.Of(1, 3, 5, 7, 9, 11)
+	r, err := breakLoop.Accum(s, 100, op.Sum[int])
+	assert.Equal(t, 100+1+3+5+7+9+11, r)
+	assert.NoError(t, err)
+}
+
+func Test_AccummSum(t *testing.T) {
+	s := loop.Of(1, 3, 5, 7, 9, 11)
+	r, err := loop.Accumm(s, 100, func(i1, i2 int) (int, error) {
+		if i2 == 11 {
+			return 0, errors.New("stop")
+		}
+		return i1 + i2, nil
+	})
+	assert.Equal(t, 100+1+3+5+7+9, r)
+	assert.ErrorContains(t, err, "stop")
+}
+
 func Test_ReduceSum(t *testing.T) {
 	s := loop.Of(1, 3, 5, 7, 9, 11)
 	r, ok, err := breakLoop.ReduceOK(breakLoop.From(s), op.Sum[int])
