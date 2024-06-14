@@ -56,15 +56,22 @@ func Group[K comparable, V any](next func() (K, V, bool)) map[K][]V {
 
 // Reduce reduces the key/value pairs retrieved by the 'next' function into an one pair using the 'merge' function.
 // If the 'next' function returns ok=false at the first call, the zero values of 'K', 'V' types are returned.
-func Reduce[K, V any](next func() (K, V, bool), merge func(K, K, V, V) (K, V)) (rk K, rv V, ok bool) {
+func Reduce[K, V any](next func() (K, V, bool), merge func(K, K, V, V) (K, V)) (rk K, rv V) {
+	rk, rv, _ = ReduceOK(next, merge)
+	return rk, rv
+}
+
+// ReduceOK reduces the key/value pairs retrieved by the 'next' function into an one pair using the 'merge' function.
+// Returns ok==false if the 'next' function returns ok=false at the first call (no more elements).
+func ReduceOK[K, V any](next func() (K, V, bool), merge func(K, K, V, V) (K, V)) (rk K, rv V, ok bool) {
 	if next == nil {
 		return rk, rv, false
 	}
-	if k, v, ok := next(); ok {
-		rk, rv = k, v
-	} else {
-		return rk, rv, false
+	k, v, ok := next()
+	if !ok {
+		return k, v, false
 	}
+	rk, rv = k, v
 	for k, v, ok := next(); ok; k, v, ok = next() {
 		rk, rv = merge(rk, k, rv, v)
 	}
@@ -73,7 +80,14 @@ func Reduce[K, V any](next func() (K, V, bool), merge func(K, K, V, V) (K, V)) (
 
 // Reducee reduces the key/value pairs retrieved by the 'next' function into an one pair using the 'merge' function.
 // If the 'next' function returns ok=false at the first call, the zero values of 'K', 'V' types are returned.
-func Reducee[K, V any](next func() (K, V, bool), merge func(K, K, V, V) (K, V, error)) (rk K, rv V, ok bool, err error) {
+func Reducee[K, V any](next func() (K, V, bool), merge func(K, K, V, V) (K, V, error)) (rk K, rv V, err error) {
+	rk, rv, _, err = ReduceeOK(next, merge)
+	return rk, rv, err
+}
+
+// ReduceeOK reduces the key/value pairs retrieved by the 'next' function into an one pair using the 'merge' function.
+// Returns ok==false if the 'next' function returns ok=false at the first call (no more elements).
+func ReduceeOK[K, V any](next func() (K, V, bool), merge func(K, K, V, V) (K, V, error)) (rk K, rv V, ok bool, err error) {
 	if next == nil {
 		return rk, rv, false, nil
 	}
@@ -86,7 +100,7 @@ func Reducee[K, V any](next func() (K, V, bool), merge func(K, K, V, V) (K, V, e
 		if k, v, ok := next(); !ok {
 			return rk, rv, true, nil
 		} else if rk, rv, err = merge(rk, k, rv, v); err != nil {
-			return rk, rv, err == nil, err
+			return rk, rv, true, err
 		}
 	}
 }

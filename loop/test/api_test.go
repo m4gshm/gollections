@@ -26,32 +26,64 @@ import (
 	"github.com/m4gshm/gollections/slice"
 )
 
+func Test_AccumSum(t *testing.T) {
+	s := loop.Of(1, 3, 5, 7, 9, 11)
+	r := loop.Accum(s, 100, op.Sum[int])
+	assert.Equal(t, 100+1+3+5+7+9+11, r)
+}
+
+func Test_AccummSum(t *testing.T) {
+	s := loop.Of(1, 3, 5, 7, 9, 11)
+	r, err := loop.Accumm(s, 100, func(i1, i2 int) (int, error) {
+		if i2 == 11 {
+			return 0, errors.New("stop")
+		}
+		return i1 + i2, nil
+	})
+	assert.Equal(t, 100+1+3+5+7+9, r)
+	assert.ErrorContains(t, err, "stop")
+}
+
 func Test_ReduceSum(t *testing.T) {
 	s := loop.Of(1, 3, 5, 7, 9, 11)
-	r, ok := loop.Reduce(s, op.Sum[int])
-
+	r, ok := loop.ReduceOK(s, op.Sum[int])
 	assert.True(t, ok)
 	assert.Equal(t, 1+3+5+7+9+11, r)
 }
 
 func Test_ReduceeSum(t *testing.T) {
 	s := loop.Of(1, 3, 5, 7, 9, 11)
-	r, ok, err := loop.Reducee(s, func(i1, i2 int) (int, error) { return i1 + i2, nil })
+	r, ok, err := loop.ReduceeOK(s, func(i1, i2 int) (int, error) {
+		if i2 == 11 {
+			return 0, errors.New("stop")
+		}
+		return i1 + i2, nil
+	})
 	assert.True(t, ok)
-	assert.Equal(t, 1+3+5+7+9+11, r)
-	assert.Nil(t, err)
+	assert.Equal(t, 1+3+5+7+9, r)
+	assert.ErrorContains(t, err, "stop")
 }
 
-func Test_EmptyLoop(t *testing.T) {
+func Test_ReduceeSumFirstErr(t *testing.T) {
+	s := loop.Of(1, 3, 5, 7, 9, 11)
+	r, ok, err := loop.ReduceeOK(s, func(i1, i2 int) (int, error) {
+		return 0, errors.New("stop")
+	})
+	assert.True(t, ok)
+	assert.Equal(t, 1, r)
+	assert.ErrorContains(t, err, "stop")
+}
+
+func Test_ReduceeEmptyLoop(t *testing.T) {
 	s := loop.Of[int]()
-	r, ok := loop.Reduce(s, op.Sum[int])
+	r, ok := loop.ReduceOK(s, op.Sum[int])
 	assert.False(t, ok)
 	assert.Equal(t, 0, r)
 }
 
-func Test_NilLoop(t *testing.T) {
+func Test_ReduceeNilLoop(t *testing.T) {
 	var s loop.Loop[int]
-	r, ok := loop.Reduce(s, op.Sum[int])
+	r, ok := loop.ReduceOK(s, op.Sum[int])
 	assert.False(t, ok)
 	assert.Equal(t, 0, r)
 }

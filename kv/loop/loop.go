@@ -28,12 +28,12 @@ func (next Loop[K, V]) First(predicate func(K, V) bool) (K, V, bool) {
 
 // Reduce reduces the elements retrieved by the 'next' function into an one using the 'merge' function.
 func (next Loop[K, V]) Reduce(merge func(K, K, V, V) (K, V)) (K, V, bool) {
-	return Reduce(next, merge)
+	return ReduceOK(next, merge)
 }
 
 // Reducee reduces the elements retrieved by the 'next' function into an one using the 'merge' function.
 func (next Loop[K, V]) Reducee(merge func(K, K, V, V) (K, V, error)) (K, V, bool, error) {
-	return Reducee(next, merge)
+	return ReduceeOK(next, merge)
 }
 
 // HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful

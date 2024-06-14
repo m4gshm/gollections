@@ -33,14 +33,28 @@ func (next Loop[T]) Append(out []T) ([]T, error) {
 	return Append(next, out)
 }
 
-// Reduce reduces the elements retrieved by the 'next' function into an one using the 'merge' function.
+// ReduceOK reduces the elements retrieved by the 'next' function into an one using the 'merge' function.
+// If the 'next' function returns ok=false at the first call, the zero value of 'T' type is returned.
 func (next Loop[T]) Reduce(merge func(T, T) T) (T, error) {
 	return Reduce(next, merge)
 }
 
+// ReduceOK reduces the elements retrieved by the 'next' function into an one using the 'merge' function.
+// Returns ok==false if the 'next' function returns ok=false at the first call (no more elements).
+func (next Loop[T]) ReduceOK(merge func(T, T) T) (T, bool, error) {
+	return ReduceOK(next, merge)
+}
+
 // Reducee reduces the elements retrieved by the 'next' function into an one using the 'merge' function.
+// If the 'next' function returns ok=false at the first call, the zero value of 'T' type is returned.
 func (next Loop[T]) Reducee(merge func(T, T) (T, error)) (T, error) {
 	return Reducee(next, merge)
+}
+
+// ReduceeOK reduces the elements retrieved by the 'next' function into an one using the 'merge' function.
+// Returns ok==false if the 'next' function returns ok=false at the first call (no more elements).
+func (next Loop[T]) ReduceeOK(merge func(T, T) (T, error)) (T, bool, error) {
+	return ReduceeOK(next, merge)
 }
 
 // HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful

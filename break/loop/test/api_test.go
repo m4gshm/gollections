@@ -1,6 +1,7 @@
 package test
 
 import (
+	"errors"
 	"strconv"
 	"strings"
 	"testing"
@@ -20,21 +21,61 @@ import (
 
 func Test_ReduceSum(t *testing.T) {
 	s := loop.Of(1, 3, 5, 7, 9, 11)
-	r, _ := breakLoop.Reduce(breakLoop.From(s), op.Sum[int])
+	r, ok, err := breakLoop.ReduceOK(breakLoop.From(s), op.Sum[int])
+	assert.NoError(t, err)
+	assert.True(t, ok)
 	assert.Equal(t, 1+3+5+7+9+11, r)
 }
 
 func Test_ReduceeSum(t *testing.T) {
 	s := loop.Of(1, 3, 5, 7, 9, 11)
-	r, _ := breakLoop.Reducee(breakLoop.From(s), func(i1, i2 int) (int, error) {
+	r, ok, err := breakLoop.ReduceeOK(breakLoop.From(s), func(i1, i2 int) (int, error) {
+		if i2 == 11 {
+			return 0, errors.New("stop")
+		}
 		return i1 + i2, nil
 	})
-	assert.Equal(t, 1+3+5+7+9+11, r)
+	assert.ErrorContains(t, err, "stop")
+	assert.True(t, ok)
+	assert.Equal(t, 1+3+5+7+9, r)
 }
 
-func Test_EmptyLoop(t *testing.T) {
+func Test_ReduceeSumFirstErr(t *testing.T) {
+	var tru breakLoop.Loop[int] = func() (int, bool, error) {
+		return 1, true, errors.New("first-err")
+	}
+	r, ok, err := breakLoop.ReduceeOK(tru, func(i1, i2 int) (int, error) {
+		return i1 + i2, nil
+	})
+	assert.ErrorContains(t, err, "first-err")
+	assert.True(t, ok)
+	assert.Equal(t, 1, r)
+
+	var fals breakLoop.Loop[int] = func() (int, bool, error) {
+		return 2, false, errors.New("first-err")
+	}
+
+	r, ok, err = breakLoop.ReduceeOK(fals, func(i1, i2 int) (int, error) {
+		return i1 + i2, nil
+	})
+	assert.ErrorContains(t, err, "first-err")
+	assert.False(t, ok)
+	assert.Equal(t, 2, r)
+}
+
+func Test_ReduceeEmptyLoop(t *testing.T) {
 	s := breakLoop.Of[int]()
-	r, _ := breakLoop.Reduce(s, op.Sum[int])
+	r, ok, err := breakLoop.ReduceOK(s, op.Sum[int])
+	assert.NoError(t, err)
+	assert.False(t, ok)
+	assert.Equal(t, 0, r)
+}
+
+func Test_ReduceeNilLoop(t *testing.T) {
+	var s breakLoop.Loop[int]
+	r, ok, err := breakLoop.ReduceOK(s, op.Sum[int])
+	assert.NoError(t, err)
+	assert.False(t, ok)
 	assert.Equal(t, 0, r)
 }
 

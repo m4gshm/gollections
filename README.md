@@ -553,16 +553,19 @@ ageGroupedSortedNames = loop.ToMapResolv(loop.Of(users...), func(u User) string 
 ##### sum.Of
 
 ``` go
-import "github.com/m4gshm/gollections/op/sum"
+import (
+    "github.com/m4gshm/gollections/loop"
+    "github.com/m4gshm/gollections/loop/sum"
+)
 
 var sum = sum.Of(loop.Of(1, 2, 3, 4, 5, 6)) //21
 ```
 
-##### loop.Reduce
+##### loop.Reduce, loop.ReduceOK, loop.Accum
 
 ``` go
-var sum, ok = loop.Reduce(loop.Of(1, 2, 3, 4, 5, 6), func(i1, i2 int) int { return i1 + i2 })
-//21, true
+var sum = loop.Reduce(loop.Of(1, 2, 3, 4, 5, 6), func(i1, i2 int) int { return i1 + i2 })
+//21
 ```
 
 ##### loop.First

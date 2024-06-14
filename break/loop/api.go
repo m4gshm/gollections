@@ -200,41 +200,76 @@ func Append[T any, TS ~[]T](next func() (T, bool, error), out TS) (TS, error) {
 	return out, nil
 }
 
-// Reduce reduces the elements retrieved by the 'next' function into an one using the 'merge' function.
+// ReduceOK reduces the elements retrieved by the 'next' function into an one using the 'merge' function.
 // If the 'next' function returns ok=false at the first call, the zero value of 'T' type is returned.
-func Reduce[T any](next func() (T, bool, error), merger func(T, T) T) (out T, e error) {
+func Reduce[T any](next func() (T, bool, error), merge func(T, T) T) (T, error) {
+	result, _, err := ReduceOK(next, merge)
+	return result, err
+}
+
+// ReduceOK reduces the elements retrieved by the 'next' function into an one using the 'merge' function.
+// Returns ok==false if the 'next' function returns ok=false at the first call (no more elements).
+func ReduceOK[T any](next func() (T, bool, error), merge func(T, T) T) (result T, ok bool, err error) {
 	if next == nil {
-		return out, nil
+		return result, false, nil
 	}
-	v, ok, err := next()
-	if err != nil || !ok {
-		return out, err
+	if result, ok, err = next(); err != nil || !ok {
+		return result, ok, err
 	}
-	out = v
+	result, err = Accum(next, result, merge)
+	return result, true, err
+}
+
+// Reducee reduces the elements retrieved by the 'next' function into an one using the 'merge' function.
+// If the 'next' function returns ok=false at the first call, the zero value of 'T' type is returned.
+func Reducee[T any](next func() (T, bool, error), merge func(T, T) (T, error)) (T, error) {
+	result, _, err := ReduceeOK(next, merge)
+	return result, err
+}
+
+// ReduceeOK reduces the elements retrieved by the 'next' function into an one using the 'merge' function.
+// Returns ok==false if the 'next' function returns ok=false at the first call (no more elements).
+func ReduceeOK[T any](next func() (T, bool, error), merge func(T, T) (T, error)) (result T, ok bool, err error) {
+	if next == nil {
+		return result, false, nil
+	}
+	if result, ok, err = next(); err != nil || !ok {
+		return result, ok, err
+	}
+	result, err = Accumm(next, result, merge)
+	return result, true, err
+}
+
+// Accum accumulates a value by using the 'first' argument to initialize the accumulator and sequentially applying the 'merge' functon to the accumulator and each element retrieved by the 'next' function.
+func Accum[T any](next func() (T, bool, error), first T, merge func(T, T) T) (accumulator T, err error) {
+	accumulator = first
+	if next == nil {
+		return accumulator, nil
+	}
 	for {
 		v, ok, err := next()
-		if err != nil || !ok {
-			return out, err
+		if err != nil {
+			return accumulator, err
+		} else if !ok {
+			return accumulator, nil
 		}
-		out = merger(out, v)
+		accumulator = merge(accumulator, v)
 	}
 }
 
-// Reducee reduces the elements retrieved by the 'next' function into an one using the 'merge' function
-func Reducee[T any](next func() (T, bool, error), merger func(T, T) (T, error)) (out T, e error) {
+// Accumm accumulates a value by using the 'first' argument to initialize the accumulator and sequentially applying the 'merge' functon to the accumulator and each element retrieved by the 'next' function.
+func Accumm[T any](next func() (T, bool, error), first T, merge func(T, T) (T, error)) (accumulator T, err error) {
+	accumulator = first
 	if next == nil {
-		return out, nil
+		return accumulator, nil
 	}
-	v, ok, err := next()
-	if err != nil || !ok {
-		return out, err
-	}
-	out = v
 	for {
 		if v, ok, err := next(); err != nil || !ok {
-			return out, err
-		} else if out, err = merger(out, v); err != nil {
-			return out, err
+			return accumulator, err
+		} else if v, err = merge(accumulator, v); err != nil {
+			return accumulator, err
+		} else {
+			accumulator = v
 		}
 	}
 }
@@ -609,7 +644,7 @@ func KeyValuee[T any, K, V any](next func() (T, bool, error), keyExtractor func(
 			return key, value, false, err
 		} else if key, err = keyExtractor(elem); err == nil {
 			value, err = valExtractor(elem)
-			return key, value, err == nil, err
+			return key, value, true, err
 		}
 		return key, value, false, nil
 	}
@@ -851,13 +886,13 @@ func ToMapResolvv[T any, K comparable, V, VR any](
 }
 
 // ConvertAndReduce converts each elements and merges them into one
-func ConvertAndReduce[From, To any](next func() (From, bool, error), converter func(From) To, merger func(To, To) To) (out To, err error) {
-	return Reduce(Convert(next, converter), merger)
+func ConvertAndReduce[From, To any](next func() (From, bool, error), converter func(From) To, merge func(To, To) To) (out To, err error) {
+	return Reduce(Convert(next, converter), merge)
 }
 
 // ConvAndReduce converts each elements and merges them into one
-func ConvAndReduce[From, To any](next func() (From, bool, error), converter func(From) (To, error), merger func(To, To) To) (out To, err error) {
-	return Reduce(Conv(next, converter), merger)
+func ConvAndReduce[From, To any](next func() (From, bool, error), converter func(From) (To, error), merge func(To, To) To) (out To, err error) {
+	return Reduce(Conv(next, converter), merge)
 }
 
 // Crank rertieves a next element from the 'next' function, returns the function, element, successfully flag.

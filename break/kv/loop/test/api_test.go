@@ -44,7 +44,7 @@ func Test_Firstt(t *testing.T) {
 func Test_Reduce(t *testing.T) {
 	kvl := breakkvloop.From(loop.KeyValue(loop.Of(k.V(1, "one"), k.V(2, "two"), k.V(3, "three")), c.KV[int, string].Key, c.KV[int, string].Value))
 
-	k, v, ok, _ := breakkvloop.Reduce(kvl, func(kl, kr int, vl, vr string) (int, string) { return kl + kr, vl + vr })
+	k, v, ok, _ := breakkvloop.ReduceOK(kvl, func(kl, kr int, vl, vr string) (int, string) { return kl + kr, vl + vr })
 
 	assert.True(t, ok)
 	assert.Equal(t, 1+2+3, k)
@@ -54,7 +54,7 @@ func Test_Reduce(t *testing.T) {
 func Test_Reduce_Empty(t *testing.T) {
 	kvl := breakkvloop.From(loop.KeyValue(loop.Of[c.KV[int, string]](), c.KV[int, string].Key, c.KV[int, string].Value))
 
-	_, _, ok, _ := breakkvloop.Reduce(kvl, func(kl, kr int, vl, vr string) (int, string) { return kl + kr, vl + vr })
+	_, _, ok, _ := breakkvloop.ReduceOK(kvl, func(kl, kr int, vl, vr string) (int, string) { return kl + kr, vl + vr })
 
 	assert.False(t, ok)
 }
@@ -63,7 +63,7 @@ func Test_Reduce_Nil(t *testing.T) {
 	var l loop.Loop[c.KV[int, string]] = nil
 	kvl := breakkvloop.From(loop.KeyValue(l, c.KV[int, string].Key, c.KV[int, string].Value))
 
-	_, _, ok, _ := breakkvloop.Reduce(kvl, func(kl, kr int, vl, vr string) (int, string) { return kl + kr, vl + vr })
+	_, _, ok, _ := breakkvloop.ReduceOK(kvl, func(kl, kr int, vl, vr string) (int, string) { return kl + kr, vl + vr })
 
 	assert.False(t, ok)
 }
@@ -71,7 +71,7 @@ func Test_Reduce_Nil(t *testing.T) {
 func Test_Reducee(t *testing.T) {
 	kvl := breakkvloop.From(loop.KeyValue(loop.Of(k.V(1, "one"), k.V(2, "two"), k.V(3, "three")), c.KV[int, string].Key, c.KV[int, string].Value))
 
-	k, v, ok, _ := breakkvloop.Reducee(kvl, func(kl, kr int, vl, vr string) (int, string, error) { return kl + kr, vl + vr, nil })
+	k, v, ok, _ := breakkvloop.ReduceeOK(kvl, func(kl, kr int, vl, vr string) (int, string, error) { return kl + kr, vl + vr, nil })
 
 	assert.True(t, ok)
 	assert.Equal(t, 1+2+3, k)
@@ -81,7 +81,7 @@ func Test_Reducee(t *testing.T) {
 func Test_Reducee_Empty(t *testing.T) {
 	kvl := breakkvloop.From(loop.KeyValue(loop.Of[c.KV[int, string]](), c.KV[int, string].Key, c.KV[int, string].Value))
 
-	_, _, ok, _ := breakkvloop.Reducee(kvl, func(kl, kr int, vl, vr string) (int, string, error) { return kl + kr, vl + vr, nil })
+	_, _, ok, _ := breakkvloop.ReduceeOK(kvl, func(kl, kr int, vl, vr string) (int, string, error) { return kl + kr, vl + vr, nil })
 
 	assert.False(t, ok)
 }
@@ -90,7 +90,7 @@ func Test_Reducee_Nil(t *testing.T) {
 	var l loop.Loop[c.KV[int, string]] = nil
 	kvl := breakkvloop.From(loop.KeyValue(l, c.KV[int, string].Key, c.KV[int, string].Value))
 
-	_, _, ok, _ := breakkvloop.Reducee(kvl, func(kl, kr int, vl, vr string) (int, string, error) { return kl + kr, vl + vr, nil })
+	_, _, ok, _ := breakkvloop.ReduceeOK(kvl, func(kl, kr int, vl, vr string) (int, string, error) { return kl + kr, vl + vr, nil })
 
 	assert.False(t, ok)
 }

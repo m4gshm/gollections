@@ -643,22 +643,50 @@ func sort[TS ~[]T, T any](elements TS, sorter Sorter[TS, T], comparer Comparer[T
 // Reduce reduces the elements into an one using the 'merge' function.
 // If the 'elements' slice is empty, the zero value of 'T' type is returned.
 func Reduce[TS ~[]T, T any](elements TS, merge func(T, T) T) (out T) {
-	return Accum(elements, out, merge)
+	l := len(elements)
+	if l > 0 {
+		out = elements[0]
+	}
+	if l > 1 {
+		out = Accum(elements[1:], out, merge)
+	}
+	return out
+}
+
+// Reducee reduces the elements into an one using the 'merge' function.
+// If the 'elements' slice is empty, the zero value of 'T' type is returned.
+func Reducee[TS ~[]T, T any](elements TS, merge func(T, T) (T, error)) (out T, err error) {
+	l := len(elements)
+	if l > 0 {
+		out = elements[0]
+	}
+	if l > 1 {
+		if out, err = Accumm(elements[1:], out, merge); err != nil {
+			return out, err
+		}
+	}
+	return out, nil
 }
 
 // Accum accumulates a value by using the 'first' argument to initialize the accumulator and sequentially applying the 'merge' functon to the accumulator and each element.
-func Accum[TS ~[]T, T any](elements TS, first T, merge func(accumulator T, element T) T) T {
+func Accum[TS ~[]T, T any](elements TS, first T, merge func(T, T) T) T {
 	accumulator := first
-	l := len(elements)
-	if l >= 1 {
-		accumulator = elements[0]
-	}
-	if l > 1 {
-		for _, v := range elements[1:] {
-			accumulator = merge(accumulator, v)
-		}
+	for _, v := range elements {
+		accumulator = merge(accumulator, v)
 	}
 	return accumulator
+}
+
+// Accumm accumulates a value by using the 'first' argument to initialize the accumulator and sequentially applying the 'merge' functon to the accumulator and each element.
+func Accumm[TS ~[]T, T any](elements TS, first T, merge func(T, T) (T, error)) (accumulator T, err error) {
+	accumulator = first
+	for _, v := range elements {
+		accumulator, err = merge(accumulator, v)
+		if err != nil {
+			return accumulator, err
+		}
+	}
+	return accumulator, nil
 }
 
 // Sum returns the sum of all elements
@@ -1066,21 +1094,21 @@ func SplitAndReduceTwo[TS ~[]T, T, F, S any](elements TS, splitter func(T) (F, S
 }
 
 // ConvertAndReduce converts each elements and merges them into one
-func ConvertAndReduce[FS ~[]From, From, To any](elements FS, converter func(From) To, merger func(To, To) To) (out To) {
+func ConvertAndReduce[FS ~[]From, From, To any](elements FS, converter func(From) To, merge func(To, To) To) (out To) {
 	l := len(elements)
 	if l >= 1 {
 		out = converter(elements[0])
 	}
 	if l > 1 {
 		for _, e := range elements[1:] {
-			out = merger(out, converter(e))
+			out = merge(out, converter(e))
 		}
 	}
 	return out
 }
 
 // ConvAndReduce converts each elements and merges them into one
-func ConvAndReduce[FS ~[]From, From, To any](elements FS, converter func(From) (To, error), merger func(To, To) To) (out To, err error) {
+func ConvAndReduce[FS ~[]From, From, To any](elements FS, converter func(From) (To, error), merge func(To, To) To) (out To, err error) {
 	l := len(elements)
 	if l >= 1 {
 		if out, err = converter(elements[0]); err != nil {
@@ -1093,7 +1121,7 @@ func ConvAndReduce[FS ~[]From, From, To any](elements FS, converter func(From) (
 			if err != nil {
 				return out, err
 			}
-			out = merger(out, c)
+			out = merge(out, c)
 		}
 	}
 	return out, nil
