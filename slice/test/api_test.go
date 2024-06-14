@@ -129,13 +129,13 @@ func Test_ReduceeSum(t *testing.T) {
 
 func Test_AccumSum(t *testing.T) {
 	s := slice.Of(1, 3, 5, 7, 9, 11)
-	r := slice.Accum(s, 100, op.Sum[int])
+	r := slice.Accum(100, s, op.Sum[int])
 	assert.Equal(t, 100+1+3+5+7+9+11, r)
 }
 
 func Test_AccummSum(t *testing.T) {
 	s := slice.Of(1, 3, 5, 7, 9, 11)
-	r, _ := slice.Accumm(s, 100, func(i1, i2 int) (int, error) { return i1 + i2, nil })
+	r, _ := slice.Accumm(100, s, func(i1, i2 int) (int, error) { return i1 + i2, nil })
 	assert.Equal(t, 100+1+3+5+7+9+11, r)
 }
 

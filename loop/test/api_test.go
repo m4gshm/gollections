@@ -28,13 +28,13 @@ import (
 
 func Test_AccumSum(t *testing.T) {
 	s := loop.Of(1, 3, 5, 7, 9, 11)
-	r := loop.Accum(s, 100, op.Sum[int])
+	r := loop.Accum(100, s, op.Sum[int])
 	assert.Equal(t, 100+1+3+5+7+9+11, r)
 }
 
 func Test_AccummSum(t *testing.T) {
 	s := loop.Of(1, 3, 5, 7, 9, 11)
-	r, err := loop.Accumm(s, 100, func(i1, i2 int) (int, error) {
+	r, err := loop.Accumm(100, s, func(i1, i2 int) (int, error) {
 		if i2 == 11 {
 			return 0, errors.New("stop")
 		}

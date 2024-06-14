@@ -187,7 +187,7 @@ func ReduceOK[T any](next func() (T, bool), merge func(T, T) T) (result T, ok bo
 	if result, ok = next(); !ok {
 		return result, false
 	}
-	return Accum(next, result, merge), true
+	return Accum(result, next, merge), true
 }
 
 // Reducee reduces the elements retrieved by the 'next' function into an one pair using the 'merge' function.
@@ -206,12 +206,12 @@ func ReduceeOK[T any](next func() (T, bool), merge func(T, T) (T, error)) (resul
 	if result, ok = next(); !ok {
 		return result, false, nil
 	}
-	result, err = Accumm(next, result, merge)
+	result, err = Accumm(result, next, merge)
 	return result, true, err
 }
 
 // Accum accumulates a value by using the 'first' argument to initialize the accumulator and sequentially applying the 'merge' functon to the accumulator and each element retrieved by the 'next' function.
-func Accum[T any](next func() (T, bool), first T, merge func(T, T) T) T {
+func Accum[T any](first T, next func() (T, bool), merge func(T, T) T) T {
 	accumulator := first
 	if next == nil {
 		return accumulator
@@ -223,7 +223,7 @@ func Accum[T any](next func() (T, bool), first T, merge func(T, T) T) T {
 }
 
 // Accumm accumulates a value by using the 'first' argument to initialize the accumulator and sequentially applying the 'merge' functon to the accumulator and each element retrieved by the 'next' function.
-func Accumm[T any](next func() (T, bool), first T, merge func(T, T) (T, error)) (accumulator T, err error) {
+func Accumm[T any](first T, next func() (T, bool), merge func(T, T) (T, error)) (accumulator T, err error) {
 	accumulator = first
 	if next == nil {
 		return accumulator, nil
@@ -240,7 +240,7 @@ func Accumm[T any](next func() (T, bool), first T, merge func(T, T) (T, error)) 
 
 // Sum returns the sum of all elements
 func Sum[T c.Summable](next func() (T, bool)) (out T) {
-	return Accum(next, out, op.Sum[T])
+	return Accum(out, next, op.Sum[T])
 }
 
 // HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful

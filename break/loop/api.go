@@ -216,7 +216,7 @@ func ReduceOK[T any](next func() (T, bool, error), merge func(T, T) T) (result T
 	if result, ok, err = next(); err != nil || !ok {
 		return result, ok, err
 	}
-	result, err = Accum(next, result, merge)
+	result, err = Accum(result, next, merge)
 	return result, true, err
 }
 
@@ -236,12 +236,12 @@ func ReduceeOK[T any](next func() (T, bool, error), merge func(T, T) (T, error))
 	if result, ok, err = next(); err != nil || !ok {
 		return result, ok, err
 	}
-	result, err = Accumm(next, result, merge)
+	result, err = Accumm(result, next, merge)
 	return result, true, err
 }
 
 // Accum accumulates a value by using the 'first' argument to initialize the accumulator and sequentially applying the 'merge' functon to the accumulator and each element retrieved by the 'next' function.
-func Accum[T any](next func() (T, bool, error), first T, merge func(T, T) T) (accumulator T, err error) {
+func Accum[T any](first T, next func() (T, bool, error), merge func(T, T) T) (accumulator T, err error) {
 	accumulator = first
 	if next == nil {
 		return accumulator, nil
@@ -258,7 +258,7 @@ func Accum[T any](next func() (T, bool, error), first T, merge func(T, T) T) (ac
 }
 
 // Accumm accumulates a value by using the 'first' argument to initialize the accumulator and sequentially applying the 'merge' functon to the accumulator and each element retrieved by the 'next' function.
-func Accumm[T any](next func() (T, bool, error), first T, merge func(T, T) (T, error)) (accumulator T, err error) {
+func Accumm[T any](first T, next func() (T, bool, error), merge func(T, T) (T, error)) (accumulator T, err error) {
 	accumulator = first
 	if next == nil {
 		return accumulator, nil

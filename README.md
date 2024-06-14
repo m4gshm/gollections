@@ -258,6 +258,18 @@ var sum = slice.Reduce([]int{1, 2, 3, 4, 5, 6}, func(i1, i2 int) int { return i1
 //21
 ```
 
+##### slice.Accum
+
+``` go
+import (
+    "github.com/m4gshm/gollections/op/delay/string_/join"
+    "github.com/m4gshm/gollections/slice"
+)
+
+var sum = slice.Accum("Steady", slice.Of("Ready", "Go"), join.NonEmpty(", "))
+//"Steady, Ready, Go"
+```
+
 ##### slice.First
 
 ``` go
@@ -561,11 +573,36 @@ import (
 var sum = sum.Of(loop.Of(1, 2, 3, 4, 5, 6)) //21
 ```
 
-##### loop.Reduce, loop.ReduceOK, loop.Accum
+##### loop.Reduce
 
 ``` go
 var sum = loop.Reduce(loop.Of(1, 2, 3, 4, 5, 6), func(i1, i2 int) int { return i1 + i2 })
 //21
+```
+
+##### loop.ReduceOK
+
+``` go
+adder := func(i1, i2 int) int { return i1 + i2 }
+
+sum, ok := loop.ReduceOK(loop.Of(1, 2, 3, 4, 5, 6), adder)
+//21, true
+
+emptyLoop := loop.Of[int]()
+sum, ok = loop.ReduceOK(emptyLoop, adder)
+//0, false
+```
+
+##### loop.Accum
+
+``` go
+import (
+    "github.com/m4gshm/gollections/loop"
+    "github.com/m4gshm/gollections/op/delay/string_/join"
+)
+
+var sum = loop.Accum("Steady", loop.Of("Ready", "Go"), join.NonEmpty(", "))
+//"Steady, Ready, Go"
 ```
 
 ##### loop.First

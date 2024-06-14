@@ -648,7 +648,7 @@ func Reduce[TS ~[]T, T any](elements TS, merge func(T, T) T) (out T) {
 		out = elements[0]
 	}
 	if l > 1 {
-		out = Accum(elements[1:], out, merge)
+		out = Accum(out, elements[1:], merge)
 	}
 	return out
 }
@@ -661,7 +661,7 @@ func Reducee[TS ~[]T, T any](elements TS, merge func(T, T) (T, error)) (out T, e
 		out = elements[0]
 	}
 	if l > 1 {
-		if out, err = Accumm(elements[1:], out, merge); err != nil {
+		if out, err = Accumm(out, elements[1:], merge); err != nil {
 			return out, err
 		}
 	}
@@ -669,7 +669,7 @@ func Reducee[TS ~[]T, T any](elements TS, merge func(T, T) (T, error)) (out T, e
 }
 
 // Accum accumulates a value by using the 'first' argument to initialize the accumulator and sequentially applying the 'merge' functon to the accumulator and each element.
-func Accum[TS ~[]T, T any](elements TS, first T, merge func(T, T) T) T {
+func Accum[TS ~[]T, T any](first T, elements TS, merge func(T, T) T) T {
 	accumulator := first
 	for _, v := range elements {
 		accumulator = merge(accumulator, v)
@@ -678,7 +678,7 @@ func Accum[TS ~[]T, T any](elements TS, first T, merge func(T, T) T) T {
 }
 
 // Accumm accumulates a value by using the 'first' argument to initialize the accumulator and sequentially applying the 'merge' functon to the accumulator and each element.
-func Accumm[TS ~[]T, T any](elements TS, first T, merge func(T, T) (T, error)) (accumulator T, err error) {
+func Accumm[TS ~[]T, T any](first T, elements TS, merge func(T, T) (T, error)) (accumulator T, err error) {
 	accumulator = first
 	for _, v := range elements {
 		accumulator, err = merge(accumulator, v)
@@ -691,7 +691,7 @@ func Accumm[TS ~[]T, T any](elements TS, first T, merge func(T, T) (T, error)) (
 
 // Sum returns the sum of all elements
 func Sum[TS ~[]T, T c.Summable](elements TS) (out T) {
-	return Accum(elements, out, op.Sum[T])
+	return Accum(out, elements, op.Sum[T])
 }
 
 // First returns the first element that satisfies requirements of the predicate 'by'
