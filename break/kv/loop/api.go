@@ -95,7 +95,7 @@ func ReduceeOK[K, V any](next func() (K, V, bool, error), merge func(K, K, V, V)
 	}
 	k, v, ok, err := next()
 	if err != nil || !ok {
-		return rk, rv, false, err
+		return rk, rv, ok, err
 	}
 	rk, rv = k, v
 	for {
