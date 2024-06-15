@@ -467,9 +467,10 @@ type (
 )
 ```
 
-The `Loop` function retrieves a next element from a dataset and returns
-`ok==true` if successful.  
-The `KVLoop` behaves similar but returns a key/value pair.  
+The `Loop` function returns a next element from a dataset and returns
+`ok==true` on success. `ok==false` means there are no more elements in
+the dataset.  
+The `KVLoop` behaves similar but returns key/value pairs.  
 
 ``` go
 even := func(i int) bool { return i%2 == 0 }

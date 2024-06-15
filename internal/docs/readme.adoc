@@ -276,8 +276,8 @@ Low-level API for iteration based on next functions:
 include::../examples/loopexamples/type.go[lines=2..9,indent=0]
 ----
 
-The `Loop` function retrieves a next element from a dataset and returns ``ok==true`` if successful. +
-The `KVLoop` behaves similar but returns a key/value pair. +
+The `Loop` function returns a next element from a dataset and returns ``ok==true`` on success. ``ok==false`` means there are no more elements in the dataset. +
+The `KVLoop` behaves similar but returns key/value pairs. +
 
 [source,go]
 ----
