@@ -53,7 +53,7 @@ func Group[K comparable, V any](next func() (K, V, bool, error)) (map[K][]V, err
 	return ToMapResolv(next, resolv.Slice[K, V])
 }
 
-// ReduceOK reduces the key/value pairs retrieved by the 'next' function into an one pair using the 'merge' function.
+// Reduce reduces the key/value pairs retrieved by the 'next' function into an one pair using the 'merge' function.
 // If the 'next' function returns ok=false at the first call, the zero values of 'K', 'V' types are returned.
 func Reduce[K, V any](next func() (K, V, bool, error), merge func(K, K, V, V) (K, V)) (K, V, error) {
 	rk, rv, _, err := ReduceOK(next, merge)
@@ -80,7 +80,7 @@ func ReduceOK[K, V any](next func() (K, V, bool, error), merge func(K, K, V, V) 
 	}
 }
 
-// ReduceeOK reduces the key/value pairs retrieved by the 'next' function into an one pair using the 'merge' function.
+// Reducee reduces the key/value pairs retrieved by the 'next' function into an one pair using the 'merge' function.
 // If the 'next' function returns ok=false at the first call, the zero values of 'K', 'V' types are returned.
 func Reducee[K, V any](next func() (K, V, bool, error), merge func(K, K, V, V) (K, V, error)) (K, V, error) {
 	rk, rv, _, err := ReduceeOK(next, merge)

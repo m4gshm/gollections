@@ -43,6 +43,26 @@ func Test_Reduce(t *testing.T) {
 	assert.Equal(t, "one"+"two"+"three", v)
 }
 
+func Test_Reduce_Empty(t *testing.T) {
+	kvl := loop.KeyValue(loop.Of[c.KV[int, string]](), c.KV[int, string].Key, c.KV[int, string].Value)
+
+	k, v, ok := kvloop.ReduceOK(kvl, func(kl, kr int, vl, vr string) (int, string) { return kl + kr, vl + vr })
+
+	assert.False(t, ok)
+	assert.Equal(t, 0, k)
+	assert.Equal(t, "", v)
+}
+
+func Test_Reduce_Nil(t *testing.T) {
+	var kvl kvloop.Loop[int, string]
+
+	k, v, ok := kvloop.ReduceOK(kvl, func(kl, kr int, vl, vr string) (int, string) { return kl + kr, vl + vr })
+
+	assert.False(t, ok)
+	assert.Equal(t, 0, k)
+	assert.Equal(t, "", v)
+}
+
 func Test_Reducee(t *testing.T) {
 	kvl := loop.KeyValue(loop.Of(k.V(1, "one"), k.V(2, "two"), k.V(3, "three")), c.KV[int, string].Key, c.KV[int, string].Value)
 
@@ -51,6 +71,26 @@ func Test_Reducee(t *testing.T) {
 	assert.True(t, ok)
 	assert.Equal(t, 1+2+3, k)
 	assert.Equal(t, "one"+"two"+"three", v)
+}
+
+func Test_Reducee_EMpty(t *testing.T) {
+	kvl := loop.KeyValue(loop.Of[c.KV[int, string]](), c.KV[int, string].Key, c.KV[int, string].Value)
+
+	k, v, ok, _ := kvloop.ReduceeOK(kvl, func(kl, kr int, vl, vr string) (int, string, error) { return kl + kr, vl + vr, nil })
+
+	assert.False(t, ok)
+	assert.Equal(t, 0, k)
+	assert.Equal(t, "", v)
+}
+
+func Test_Reducee_Nil(t *testing.T) {
+	var kvl kvloop.Loop[int, string]
+
+	k, v, ok, _ := kvloop.ReduceeOK(kvl, func(kl, kr int, vl, vr string) (int, string, error) { return kl + kr, vl + vr, nil })
+
+	assert.False(t, ok)
+	assert.Equal(t, 0, k)
+	assert.Equal(t, "", v)
 }
 
 func Test_Convert(t *testing.T) {

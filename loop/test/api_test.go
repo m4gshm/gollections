@@ -66,7 +66,7 @@ func Test_ReduceeSum(t *testing.T) {
 
 func Test_ReduceeSumFirstErr(t *testing.T) {
 	s := loop.Of(1, 3, 5, 7, 9, 11)
-	r, ok, err := loop.ReduceeOK(s, func(i1, i2 int) (int, error) {
+	r, ok, err := loop.ReduceeOK(s, func(_, _ int) (int, error) {
 		return 0, errors.New("stop")
 	})
 	assert.True(t, ok)

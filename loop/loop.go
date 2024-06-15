@@ -77,6 +77,16 @@ func (next Loop[T]) ReduceeOK(merge func(T, T) (T, error)) (T, bool, error) {
 	return ReduceeOK(next, merge)
 }
 
+// Accum accumulates a value by using the 'first' argument to initialize the accumulator and sequentially applying the 'merge' functon to the accumulator and each element retrieved by the 'next' function.
+func (next Loop[T]) Accum(first T, merge func(T, T) T) T {
+	return Accum(first, next, merge)
+}
+
+// Accumm accumulates a value by using the 'first' argument to initialize the accumulator and sequentially applying the 'merge' functon to the accumulator and each element retrieved by the 'next' function.
+func (next Loop[T]) Accumm(first T, merge func(T, T) (T, error)) (T, error) {
+	return Accumm(first, next, merge)
+}
+
 // HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful
 func (next Loop[T]) HasAny(predicate func(T) bool) bool {
 	return HasAny(next, predicate)

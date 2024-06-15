@@ -60,7 +60,7 @@ func Test_Reduce_Empty(t *testing.T) {
 }
 
 func Test_Reduce_Nil(t *testing.T) {
-	var l loop.Loop[c.KV[int, string]] = nil
+	var l loop.Loop[c.KV[int, string]]
 	kvl := breakkvloop.From(loop.KeyValue(l, c.KV[int, string].Key, c.KV[int, string].Value))
 
 	_, _, ok, _ := breakkvloop.ReduceOK(kvl, func(kl, kr int, vl, vr string) (int, string) { return kl + kr, vl + vr })
@@ -87,7 +87,7 @@ func Test_Reducee_Empty(t *testing.T) {
 }
 
 func Test_Reducee_Nil(t *testing.T) {
-	var l loop.Loop[c.KV[int, string]] = nil
+	var l loop.Loop[c.KV[int, string]]
 	kvl := breakkvloop.From(loop.KeyValue(l, c.KV[int, string].Key, c.KV[int, string].Value))
 
 	_, _, ok, _ := breakkvloop.ReduceeOK(kvl, func(kl, kr int, vl, vr string) (int, string, error) { return kl + kr, vl + vr, nil })
