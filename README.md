@@ -262,12 +262,12 @@ var sum = slice.Reduce([]int{1, 2, 3, 4, 5, 6}, func(i1, i2 int) int { return i1
 
 ``` go
 import (
-    "github.com/m4gshm/gollections/op/delay/string_/join"
+    "github.com/m4gshm/gollections/op"
     "github.com/m4gshm/gollections/slice"
 )
 
-var sum = slice.Accum("Steady", slice.Of("Ready", "Go"), join.NonEmpty(", "))
-//"Steady, Ready, Go"
+var sum = slice.Accum(100, slice.Of(1, 2, 3, 4, 5, 6), op.Sum)
+//121
 ```
 
 ##### slice.First
@@ -598,11 +598,11 @@ sum, ok = loop.ReduceOK(emptyLoop, adder)
 ``` go
 import (
     "github.com/m4gshm/gollections/loop"
-    "github.com/m4gshm/gollections/op/delay/string_/join"
+    "github.com/m4gshm/gollections/op"
 )
 
-var sum = loop.Accum("Steady", loop.Of("Ready", "Go"), join.NonEmpty(", "))
-//"Steady, Ready, Go"
+var sum = loop.Accum(100, loop.Of(1, 2, 3, 4, 5, 6), op.Sum)
+//121
 ```
 
 ##### loop.First

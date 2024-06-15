@@ -158,7 +158,7 @@ include::../examples/sliceexamples/slice_Reduce_test.go[lines=12..15,indent=0]
 [source,go]
 ----
 import (
-    "github.com/m4gshm/gollections/op/delay/string_/join"
+	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
 )
 include::../examples/sliceexamples/slice_Accum_test.go[lines=13..16,indent=0]
@@ -359,7 +359,7 @@ include::../examples/loopexamples/loop_ReduceOK_test.go[lines=12..21,indent=0]
 ----
 import (
 	"github.com/m4gshm/gollections/loop"
-	"github.com/m4gshm/gollections/op/delay/string_/join"
+	"github.com/m4gshm/gollections/op"
 )
 include::../examples/loopexamples/loop_Accum_test.go[lines=13..16,indent=0]
 ----
