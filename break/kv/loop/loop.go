@@ -13,14 +13,28 @@ func (next Loop[K, V]) First(predicate func(K, V) bool) (K, V, bool, error) {
 	return First(next, predicate)
 }
 
-// Reduce reduces the elements retrieved by the 'next' function into an one using the 'merge' function.
+// Reduce reduces the key/value pairs retrieved by the 'next' function into an one pair using the 'merge' function.
+// If the 'next' function returns ok=false at the first call, the zero values of 'K', 'V' types are returned.
 func (next Loop[K, V]) Reduce(merge func(K, K, V, V) (K, V)) (K, V, error) {
 	return Reduce(next, merge)
 }
 
-// Reducee reduces the elements retrieved by the 'next' function into an one using the 'merge' function.
+// ReduceOK reduces the key/value pairs retrieved by the 'next' function into an one pair using the 'merge' function.
+// Returns ok==false if the 'next' function returns ok=false at the first call (no more elements).
+func (next Loop[K, V]) ReduceOK(merge func(K, K, V, V) (K, V)) (K, V, bool, error) {
+	return ReduceOK(next, merge)
+}
+
+// Reducee reduces the key/value pairs retrieved by the 'next' function into an one pair using the 'merge' function.
+// If the 'next' function returns ok=false at the first call, the zero values of 'K', 'V' types are returned.
 func (next Loop[K, V]) Reducee(merge func(K, K, V, V) (K, V, error)) (K, V, error) {
 	return Reducee(next, merge)
+}
+
+// ReduceeOK reduces the key/value pairs retrieved by the 'next' function into an one pair using the 'merge' function.
+// Returns ok==false if the 'next' function returns ok=false at the first call (no more elements).
+func (next Loop[K, V]) ReduceeOK(merge func(K, K, V, V) (K, V, error)) (K, V, bool, error) {
+	return ReduceeOK(next, merge)
 }
 
 // HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful

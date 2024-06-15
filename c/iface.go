@@ -40,7 +40,7 @@ type Collection[T any] interface {
 	ForEach[T]
 	SliceFactory[T]
 
-	Reduce(merger func(T, T) T) T
+	Reduce(merge func(T, T) T) T
 	HasAny(func(T) bool) bool
 }
 

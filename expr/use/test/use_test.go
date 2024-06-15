@@ -4,8 +4,11 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/m4gshm/gollections/expr/use"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/m4gshm/gollections/expr/use"
+	"github.com/m4gshm/gollections/loop"
+	"github.com/m4gshm/gollections/op"
 )
 
 var (
@@ -26,6 +29,17 @@ func Test_UseIfElse(t *testing.T) {
 	assert.Equal(t, 1, result)
 
 	result = use.If(false, 1).Else(2)
+	assert.Equal(t, 2, result)
+}
+
+func Test_UseIfOKElse(t *testing.T) {
+	var nilSeq loop.Loop[int]
+	var seq = loop.Of(1)
+
+	result := use.IfOK(seq.ReduceOK(op.Sum)).Else(2)
+	assert.Equal(t, 1, result)
+
+	result = use.IfOK(nilSeq.ReduceOK(op.Sum)).Else(2)
 	assert.Equal(t, 2, result)
 }
 

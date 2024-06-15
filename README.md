@@ -258,6 +258,18 @@ var sum = slice.Reduce([]int{1, 2, 3, 4, 5, 6}, func(i1, i2 int) int { return i1
 //21
 ```
 
+##### slice.Accum
+
+``` go
+import (
+    "github.com/m4gshm/gollections/op"
+    "github.com/m4gshm/gollections/slice"
+)
+
+var sum = slice.Accum(100, slice.Of(1, 2, 3, 4, 5, 6), op.Sum)
+//121
+```
+
 ##### slice.First
 
 ``` go
@@ -455,9 +467,10 @@ type (
 )
 ```
 
-The `Loop` function retrieves a next element from a dataset and returns
-`ok==true` if successful.  
-The `KVLoop` behaves similar but returns a key/value pair.  
+The `Loop` function returns a next element from a dataset and returns
+`ok==true` on success. `ok==false` means there are no more elements in
+the dataset.  
+The `KVLoop` behaves similar but returns key/value pairs.  
 
 ``` go
 even := func(i int) bool { return i%2 == 0 }
@@ -553,7 +566,10 @@ ageGroupedSortedNames = loop.ToMapResolv(loop.Of(users...), func(u User) string 
 ##### sum.Of
 
 ``` go
-import "github.com/m4gshm/gollections/op/sum"
+import (
+    "github.com/m4gshm/gollections/loop"
+    "github.com/m4gshm/gollections/loop/sum"
+)
 
 var sum = sum.Of(loop.Of(1, 2, 3, 4, 5, 6)) //21
 ```
@@ -563,6 +579,31 @@ var sum = sum.Of(loop.Of(1, 2, 3, 4, 5, 6)) //21
 ``` go
 var sum = loop.Reduce(loop.Of(1, 2, 3, 4, 5, 6), func(i1, i2 int) int { return i1 + i2 })
 //21
+```
+
+##### loop.ReduceOK
+
+``` go
+adder := func(i1, i2 int) int { return i1 + i2 }
+
+sum, ok := loop.ReduceOK(loop.Of(1, 2, 3, 4, 5, 6), adder)
+//21, true
+
+emptyLoop := loop.Of[int]()
+sum, ok = loop.ReduceOK(emptyLoop, adder)
+//0, false
+```
+
+##### loop.Accum
+
+``` go
+import (
+    "github.com/m4gshm/gollections/loop"
+    "github.com/m4gshm/gollections/op"
+)
+
+var sum = loop.Accum(100, loop.Of(1, 2, 3, 4, 5, 6), op.Sum)
+//121
 ```
 
 ##### loop.First

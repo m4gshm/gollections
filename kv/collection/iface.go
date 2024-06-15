@@ -28,7 +28,7 @@ type Collection[K comparable, V any, M map[K]V | map[K][]V] interface {
 	Iterable[K, V]
 	c.MapFactory[K, V, M]
 
-	Reduce(merger func(K, K, V, V) (K, V)) (K, V)
+	Reduce(merge func(K, K, V, V) (K, V)) (K, V)
 	HasAny(func(K, V) bool) bool
 	All(consumer func(K, V) bool)
 }
