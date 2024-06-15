@@ -154,6 +154,15 @@ include::../examples/sliceexamples/sum_Of_test.go[lines=12..14,indent=0]
 ----
 include::../examples/sliceexamples/slice_Reduce_test.go[lines=12..15,indent=0]
 ----
+====== slice.Accum
+[source,go]
+----
+import (
+	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/slice"
+)
+include::../examples/sliceexamples/slice_Accum_test.go[lines=13..16,indent=0]
+----
 ====== slice.First
 [source,go]
 ----
@@ -267,8 +276,8 @@ Low-level API for iteration based on next functions:
 include::../examples/loopexamples/type.go[lines=2..9,indent=0]
 ----
 
-The `Loop` function retrieves a next element from a dataset and returns ``ok==true`` if successful. +
-The `KVLoop` behaves similar but returns a key/value pair. +
+The `Loop` function returns a next element from a dataset and returns ``ok==true`` on success. ``ok==false`` means there are no more elements in the dataset. +
+The `KVLoop` behaves similar but returns key/value pairs. +
 
 [source,go]
 ----
@@ -329,13 +338,30 @@ include::../examples/loopexamples/loop_ToMapResolv_test.go[lines=14..22,indent=0
 ====== sum.Of
 [source,go]
 ----
-import "github.com/m4gshm/gollections/op/sum"
+import (
+    "github.com/m4gshm/gollections/loop"
+	"github.com/m4gshm/gollections/loop/sum"
+)
 include::../examples/loopexamples/sum_Of_test.go[lines=13..15,indent=0]
 ----
 ====== loop.Reduce
 [source,go]
 ----
 include::../examples/loopexamples/loop_Reduce_test.go[lines=12..15,indent=0]
+----
+====== loop.ReduceOK
+[source,go]
+----
+include::../examples/loopexamples/loop_ReduceOK_test.go[lines=12..21,indent=0]
+----
+====== loop.Accum
+[source,go]
+----
+import (
+	"github.com/m4gshm/gollections/loop"
+	"github.com/m4gshm/gollections/op"
+)
+include::../examples/loopexamples/loop_Accum_test.go[lines=13..16,indent=0]
 ----
 ====== loop.First
 [source,go]

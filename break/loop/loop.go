@@ -34,13 +34,37 @@ func (next Loop[T]) Append(out []T) ([]T, error) {
 }
 
 // Reduce reduces the elements retrieved by the 'next' function into an one using the 'merge' function.
+// If the 'next' function returns ok=false at the first call, the zero value of 'T' type is returned.
 func (next Loop[T]) Reduce(merge func(T, T) T) (T, error) {
 	return Reduce(next, merge)
 }
 
+// ReduceOK reduces the elements retrieved by the 'next' function into an one using the 'merge' function.
+// Returns ok==false if the 'next' function returns ok=false at the first call (no more elements).
+func (next Loop[T]) ReduceOK(merge func(T, T) T) (result T, ok bool, err error) {
+	return ReduceOK(next, merge)
+}
+
 // Reducee reduces the elements retrieved by the 'next' function into an one using the 'merge' function.
+// If the 'next' function returns ok=false at the first call, the zero value of 'T' type is returned.
 func (next Loop[T]) Reducee(merge func(T, T) (T, error)) (T, error) {
 	return Reducee(next, merge)
+}
+
+// ReduceeOK reduces the elements retrieved by the 'next' function into an one using the 'merge' function.
+// Returns ok==false if the 'next' function returns ok=false at the first call (no more elements).
+func (next Loop[T]) ReduceeOK(merge func(T, T) (T, error)) (result T, ok bool, err error) {
+	return ReduceeOK(next, merge)
+}
+
+// Accum accumulates a value by using the 'first' argument to initialize the accumulator and sequentially applying the 'merge' functon to the accumulator and each element retrieved by the 'next' function.
+func (next Loop[T]) Accum(first T, merge func(T, T) T) (T, error) {
+	return Accum(first, next, merge)
+}
+
+// Accumm accumulates a value by using the 'first' argument to initialize the accumulator and sequentially applying the 'merge' functon to the accumulator and each element retrieved by the 'next' function.
+func (next Loop[T]) Accumm(first T, merge func(T, T) (T, error)) (T, error) {
+	return Accumm(first, next, merge)
 }
 
 // HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful

@@ -23,6 +23,9 @@ func New[S, K, V any](source S, hasNext func(S) bool, getNext func(S) (K, V, err
 
 // From wrap the next loop to a breakable loop
 func From[K, V any](next func() (K, V, bool)) func() (K, V, bool, error) {
+	if next == nil {
+		return nil
+	}
 	return func() (K, V, bool, error) {
 		k, v, ok := next()
 		return k, v, ok, nil
@@ -32,6 +35,9 @@ func From[K, V any](next func() (K, V, bool)) func() (K, V, bool, error) {
 // To transforms a breakable loop to a simple loop.
 // The errConsumer is a function that is called when an error occurs.
 func To[K, V any](next func() (K, V, bool, error), errConsumer func(error)) func() (K, V, bool) {
+	if next == nil {
+		return nil
+	}
 	return func() (K, V, bool) {
 		k, v, ok, err := next()
 		if err != nil {
@@ -47,40 +53,56 @@ func Group[K comparable, V any](next func() (K, V, bool, error)) (map[K][]V, err
 	return ToMapResolv(next, resolv.Slice[K, V])
 }
 
-// Reduce reduces the key/value pairs retrieved by the 'next' function into an one pair using the 'merge' function
-func Reduce[K, V any](next func() (K, V, bool, error), merge func(K, K, V, V) (K, V)) (rk K, rv V, err error) {
+// Reduce reduces the key/value pairs retrieved by the 'next' function into an one pair using the 'merge' function.
+// If the 'next' function returns ok=false at the first call, the zero values of 'K', 'V' types are returned.
+func Reduce[K, V any](next func() (K, V, bool, error), merge func(K, K, V, V) (K, V)) (K, V, error) {
+	rk, rv, _, err := ReduceOK(next, merge)
+	return rk, rv, err
+}
+
+// ReduceOK reduces the key/value pairs retrieved by the 'next' function into an one pair using the 'merge' function.
+// Returns ok==false if the 'next' function returns ok=false at the first call (no more elements).
+func ReduceOK[K, V any](next func() (K, V, bool, error), merge func(K, K, V, V) (K, V)) (rk K, rv V, ok bool, err error) {
 	if next == nil {
-		return rk, rv, nil
+		return rk, rv, false, nil
 	}
 	k, v, ok, err := next()
 	if err != nil || !ok {
-		return rk, rv, err
+		return k, v, ok, err
 	}
 	rk, rv = k, v
 	for {
 		k, v, ok, err := next()
 		if err != nil || !ok {
-			return rk, rv, err
+			return rk, rv, true, err
 		}
 		rk, rv = merge(rk, k, rv, v)
 	}
 }
 
-// Reducee reduces the key/value pairs retrieved by the 'next' function into an one pair using the 'merge' function
-func Reducee[K, V any](next func() (K, V, bool, error), merge func(K, K, V, V) (K, V, error)) (rk K, rv V, err error) {
+// Reducee reduces the key/value pairs retrieved by the 'next' function into an one pair using the 'merge' function.
+// If the 'next' function returns ok=false at the first call, the zero values of 'K', 'V' types are returned.
+func Reducee[K, V any](next func() (K, V, bool, error), merge func(K, K, V, V) (K, V, error)) (K, V, error) {
+	rk, rv, _, err := ReduceeOK(next, merge)
+	return rk, rv, err
+}
+
+// ReduceeOK reduces the key/value pairs retrieved by the 'next' function into an one pair using the 'merge' function.
+// Returns ok==false if the 'next' function returns ok=false at the first call (no more elements).
+func ReduceeOK[K, V any](next func() (K, V, bool, error), merge func(K, K, V, V) (K, V, error)) (rk K, rv V, ok bool, err error) {
 	if next == nil {
-		return rk, rv, nil
+		return rk, rv, false, nil
 	}
 	k, v, ok, err := next()
 	if err != nil || !ok {
-		return rk, rv, err
+		return rk, rv, ok, err
 	}
 	rk, rv = k, v
 	for {
 		if k, v, ok, err := next(); err != nil || !ok {
-			return rk, rv, err
+			return rk, rv, true, err
 		} else if rk, rv, err = merge(rk, k, rv, v); err != nil {
-			return rk, rv, err
+			return rk, rv, true, err
 		}
 	}
 }
@@ -145,7 +167,7 @@ func Conv[K, V any, KOUT, VOUT any](next func() (K, V, bool, error), converter f
 			return k2, v2, false, err
 		}
 		k2, v2, err = converter(k, v)
-		return k2, v2, err == nil, err
+		return k2, v2, true, err
 	}
 }
 

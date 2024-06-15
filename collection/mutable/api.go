@@ -25,6 +25,9 @@ func NewSetCap[T comparable](capacity int) *Set[T] {
 // SetFromLoop creates a set with elements retrieved by the 'next' function.
 // The next returns an element with true or zero value with false if there are no more elements.
 func SetFromLoop[T comparable](next func() (T, bool)) *Set[T] {
+	if next == nil {
+		return nil
+	}
 	uniques := map[T]struct{}{}
 	for e, ok := next(); ok; e, ok = next() {
 		uniques[e] = struct{}{}
@@ -53,6 +56,9 @@ func NewMapOf[K comparable, V any](elements map[K]V) *Map[K, V] {
 
 // MapFromLoop creates a map with elements retrieved converter the 'next' function
 func MapFromLoop[K comparable, V any](next func() (K, V, bool)) *Map[K, V] {
+	if next == nil {
+		return nil
+	}
 	uniques := map[K]V{}
 	for key, val, ok := next(); ok; key, val, ok = next() {
 		uniques[key] = val

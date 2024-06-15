@@ -29,3 +29,9 @@ func IfGetErr[T any](condition bool, tru func() (T, error)) WhenErr[T] {
 func If_[T any](condition bool, tru func() (T, error)) WhenErr[T] {
 	return IfGetErr(condition, tru)
 }
+
+// IfOK like If but with reverse arguments order.
+// It is useful for wrapping calls of methods that return a value and a bool validity indicator.
+func IfOK[T any](val T, ok bool) When[T] {
+	return newWhen(ok, val)
+}

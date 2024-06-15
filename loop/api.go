@@ -172,43 +172,75 @@ func Append[T any, TS ~[]T](next func() (T, bool), out TS) TS {
 }
 
 // Reduce reduces the elements retrieved by the 'next' function into an one using the 'merge' function.
-func Reduce[T any](next func() (T, bool), merge func(T, T) T) (result T) {
-	if next == nil {
-		return result
-	}
-	if v, ok := next(); ok {
-		result = v
-	} else {
-		return result
-	}
-	for v, ok := next(); ok; v, ok = next() {
-		result = merge(result, v)
-	}
+// If the 'next' function returns ok=false at the first call, the zero value of 'T' type is returned.
+func Reduce[T any](next func() (T, bool), merge func(T, T) T) T {
+	result, _ := ReduceOK(next, merge)
 	return result
 }
 
-// Reducee reduces the elements retrieved by the 'next' function into an one pair using the 'merge' function.
-func Reducee[T any](next func() (T, bool), merge func(T, T) (T, error)) (result T, err error) {
+// ReduceOK reduces the elements retrieved by the 'next' function into an one using the 'merge' function.
+// Returns ok==false if the 'next' function returns ok=false at the first call (no more elements).
+func ReduceOK[T any](next func() (T, bool), merge func(T, T) T) (result T, ok bool) {
 	if next == nil {
-		return result, nil
+		return result, false
 	}
-	if v, ok := next(); ok {
-		result = v
-	} else {
-		return result, nil
+	if result, ok = next(); !ok {
+		return result, false
+	}
+	return Accum(result, next, merge), true
+}
+
+// Reducee reduces the elements retrieved by the 'next' function into an one pair using the 'merge' function.
+// If the 'next' function returns ok=false at the first call, the zero value of 'T' type is returned.
+func Reducee[T any](next func() (T, bool), merge func(T, T) (T, error)) (T, error) {
+	result, _, err := ReduceeOK(next, merge)
+	return result, err
+}
+
+// ReduceeOK reduces the elements retrieved by the 'next' function into an one pair using the 'merge' function.
+// Returns ok==false if the 'next' function returns ok=false at the first call (no more elements).
+func ReduceeOK[T any](next func() (T, bool), merge func(T, T) (T, error)) (result T, ok bool, err error) {
+	if next == nil {
+		return result, false, nil
+	}
+	if result, ok = next(); !ok {
+		return result, false, nil
+	}
+	result, err = Accumm(result, next, merge)
+	return result, true, err
+}
+
+// Accum accumulates a value by using the 'first' argument to initialize the accumulator and sequentially applying the 'merge' functon to the accumulator and each element retrieved by the 'next' function.
+func Accum[T any](first T, next func() (T, bool), merge func(T, T) T) T {
+	accumulator := first
+	if next == nil {
+		return accumulator
 	}
 	for v, ok := next(); ok; v, ok = next() {
-		result, err = merge(result, v)
-		if err != nil {
-			return result, err
-		}
+		accumulator = merge(accumulator, v)
 	}
-	return result, nil
+	return accumulator
+}
+
+// Accumm accumulates a value by using the 'first' argument to initialize the accumulator and sequentially applying the 'merge' functon to the accumulator and each element retrieved by the 'next' function.
+func Accumm[T any](first T, next func() (T, bool), merge func(T, T) (T, error)) (accumulator T, err error) {
+	accumulator = first
+	if next == nil {
+		return accumulator, nil
+	}
+	for v, ok := next(); ok; v, ok = next() {
+		r, err := merge(accumulator, v)
+		if err != nil {
+			return accumulator, err
+		}
+		accumulator = r
+	}
+	return accumulator, nil
 }
 
 // Sum returns the sum of all elements
-func Sum[T c.Summable](next func() (T, bool)) T {
-	return Reduce(next, op.Sum[T])
+func Sum[T c.Summable](next func() (T, bool)) (out T) {
+	return Accum(out, next, op.Sum[T])
 }
 
 // HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful
@@ -839,7 +871,7 @@ func OfIndexed[T any](len int, next func(int) T) Loop[T] {
 }
 
 // ConvertAndReduce converts each elements and merges them into one
-func ConvertAndReduce[From, To any](next func() (From, bool), converter func(From) To, merger func(To, To) To) (out To) {
+func ConvertAndReduce[From, To any](next func() (From, bool), converter func(From) To, merge func(To, To) To) (out To) {
 	if next == nil {
 		return out
 	}
@@ -849,13 +881,13 @@ func ConvertAndReduce[From, To any](next func() (From, bool), converter func(Fro
 		return out
 	}
 	for v, ok := next(); ok; v, ok = next() {
-		out = merger(out, converter(v))
+		out = merge(out, converter(v))
 	}
 	return out
 }
 
 // ConvAndReduce converts each elements and merges them into one
-func ConvAndReduce[From, To any](next func() (From, bool), converter func(From) (To, error), merger func(To, To) To) (out To, err error) {
+func ConvAndReduce[From, To any](next func() (From, bool), converter func(From) (To, error), merge func(To, To) To) (out To, err error) {
 	if next == nil {
 		return out, nil
 	}
@@ -872,7 +904,7 @@ func ConvAndReduce[From, To any](next func() (From, bool), converter func(From) 
 		if err != nil {
 			return out, err
 		}
-		out = merger(out, c)
+		out = merge(out, c)
 	}
 	return out, nil
 }

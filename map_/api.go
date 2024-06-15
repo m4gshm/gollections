@@ -456,7 +456,8 @@ func ToStringf[M ~map[K]V, K comparable, V any](elements M, kvFormat, delim stri
 	return str.String()
 }
 
-// Reduce reduces the key/value pairs by the 'next' function into an one pair using the 'merge' function
+// Reduce reduces the key/value pairs by the 'next' function into an one pair using the 'merge' function.
+// If the 'elements' map is empty, the zero values of 'K', 'V' types are returned.
 func Reduce[M ~map[K]V, K comparable, V any](elements M, merge func(K, K, V, V) (K, V)) (rk K, rv V) {
 	first := true
 	for k, v := range elements {
