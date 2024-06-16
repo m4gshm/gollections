@@ -5,8 +5,8 @@ import (
 	"github.com/m4gshm/gollections/c"
 )
 
-// Loop is a function that returns the next element or false if there are no more elements.
-type Loop[T any] func() (T, bool)
+// Loop is a function that returns the next element or ok=false if there are no more elements.
+type Loop[T any] func() (element T, ok bool)
 
 var (
 	_ c.Filterable[any, Loop[any], loop.Loop[any]]  = (Loop[any])(nil)
