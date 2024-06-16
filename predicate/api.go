@@ -22,7 +22,7 @@ func Eq[T comparable](v T) Predicate[T] {
 	return func(c T) bool { return v == c }
 }
 
-// Not negates the 'p' predicate
+// Not creates a 'not p' predicate
 func Not[T any](p Predicate[T]) Predicate[T] {
 	return func(v T) bool { return !p(v) }
 }
