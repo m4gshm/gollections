@@ -200,7 +200,7 @@ func Append[T any, TS ~[]T](next func() (T, bool, error), out TS) (TS, error) {
 	return out, nil
 }
 
-// ReduceOK reduces the elements retrieved by the 'next' function into an one using the 'merge' function.
+// Reduce reduces the elements retrieved by the 'next' function into an one using the 'merge' function.
 // If the 'next' function returns ok=false at the first call, the zero value of 'T' type is returned.
 func Reduce[T any](next func() (T, bool, error), merge func(T, T) T) (T, error) {
 	result, _, err := ReduceOK(next, merge)

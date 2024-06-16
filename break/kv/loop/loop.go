@@ -1,7 +1,7 @@
 package loop
 
-// Loop is a function that returns the next key, value or false if there are no more elements.
-type Loop[K, V any] func() (K, V, bool, error)
+// Loop is a function that returns the next key\value or ok==false if there are no more elements.
+type Loop[K, V any] func() (key K, value V, ok bool, error error)
 
 // Track applies the 'consumer' function to position/element pairs retrieved by the 'next' function until the consumer returns the c.Break to stop.
 func (next Loop[K, V]) Track(consumer func(K, V) error) error {
