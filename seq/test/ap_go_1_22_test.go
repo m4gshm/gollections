@@ -43,11 +43,11 @@ func Test_ConvertNilSeq(t *testing.T) {
 }
 
 func Test_AllFiltered(t *testing.T) {
-	from := set.Of(1, 2, 3, 5, 7, 8, 9, 11)
+	from := seq.Of(1, 2, 3, 5, 7, 8, 9, 11)
 
 	s := []int{}
 
-	for e := range seq.Filter(from.All, func(e int) bool { return e%2 == 0 }) {
+	for e := range seq.Filter(from, func(e int) bool { return e%2 == 0 }) {
 		s = append(s, e)
 	}
 
@@ -86,6 +86,20 @@ func Benchmark_OrderedSet_Filter_Convert_go1_22(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		for e := range seq.Convert(seq.Filter(c.All, func(e int) bool { return e%2 == 0 }), strconv.Itoa) {
+			s = append(s, e)
+		}
+	}
+	b.StopTimer()
+
+	_ = s
+}
+
+func Benchmark_Seq_Filter_Convert_go1_22(b *testing.B) {
+	var s []string
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		for e := range seq.Convert(seq.Filter(seq.Of(values...), func(e int) bool { return e%2 == 0 }), strconv.Itoa) {
 			s = append(s, e)
 		}
 	}

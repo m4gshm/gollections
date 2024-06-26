@@ -74,3 +74,36 @@ func ToSeq2[T, K, V any](seq iter.Seq[T], converter func(T) (K, V)) iter.Seq2[K,
 func KeyValue[T, K, V any](seq iter.Seq[T], keyExtractor func(T) K, valExtractor func(T) V) iter.Seq2[K, V] {
 	return ToSeq2(seq, func(t T) (K, V) { return keyExtractor(t), valExtractor(t) })
 }
+
+// Reduce reduces the elements retrieved by the 'seq' iterator into an one using the 'merge' function.
+func Reduce[T any](seq iter.Seq[T], merge func(T, T) T) (result T, ok bool) {
+	if seq == nil {
+		return result, false
+	}
+	seq(func(v T) bool { result = v; return true })
+	for v := range seq {
+		result = merge(result, v)
+	}
+	return result, true
+}
+
+// Sum returns the sum of all elements
+func Sum[T c.Summable](next func() (T, bool)) T {
+	return Reduce(next, op.Sum[T])
+}
+
+// HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful
+func HasAny[T any](next func() (T, bool), predicate func(T) bool) bool {
+	_, ok := First(next, predicate)
+	return ok
+}
+
+// Contains finds the first element that equal to the example and returns true
+func Contains[T comparable](seq iter.Seq[T], example T) bool {
+	for v:= range seq {
+		if v == example {
+			return true
+		}
+	}
+	return false
+}
