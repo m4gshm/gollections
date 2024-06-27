@@ -316,7 +316,7 @@ include::../examples/loopexamples/range_Closed_test.go[lines=12..16,indent=0]
 ====== loop.Slice
 [source,go]
 ----
-include::../examples/loopexamples/loop_Slice_test.go[lines=12..15,indent=0]
+include::../examples/loopexamples/loop_Slice_test.go[lines=12..16,indent=0]
 ----
 ====== group.Of
 [source,go]

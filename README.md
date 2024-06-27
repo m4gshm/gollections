@@ -529,7 +529,8 @@ var one = range_.Closed(1, 1).Slice()            //[]int{1}
 ##### loop.Slice
 
 ``` go
-names := loop.Slice(loop.Convert(loop.Filter(loop.Of(users...), func(u User) bool { return u.age <= 30 }), User.Name))
+filter := func(u User) bool { return u.age <= 30 }
+names := loop.Slice(loop.Convert(loop.Filter(loop.Of(users...), filter), User.Name))
 //[Bob Tom]
 ```
 
