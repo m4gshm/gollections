@@ -393,7 +393,16 @@ fmt.Printf("%v\n", employers) //map[devops:map[name:Superbob] jun:map[name:Tom]]
 fmt.Printf("%v\n", copy)      //map[devops:map[name:Bob]]
 ```
 
-#### Keys, values exrtractors
+#### Collectors
+
+##### map\_.Slice
+
+``` go
+var users = map_.Slice(employers, func(title string, employer map[string]string) User {
+    return User{name: employer["name"], roles: []Role{{name: title}}}
+})
+//[{name:Bob age:0 roles:[{name:devops}]} {name:Tom age:0 roles:[{name:jun}]}]
+```
 
 ##### map\_.Keys, map\_.Values, map\_.KeysConvert, map\_.ValuesConvert
 
@@ -443,17 +452,6 @@ var all, err = map_.Conv(employers, func(title string, employer map[string]strin
     return string([]rune(title)[0]), employer["name"], nil
 })
 //map[d:Bob j:Tom], nil
-```
-
-#### Collectors
-
-##### map\_.Slice
-
-``` go
-var users = map_.Slice(employers, func(title string, employer map[string]string) User {
-    return User{name: employer["name"], roles: []Role{{name: title}}}
-})
-//[{name:Bob age:0 roles:[{name:devops}]} {name:Tom age:0 roles:[{name:jun}]}]
 ```
 
 ## [loop](./loop/api.go), [kv/loop](./kv/loop/api.go) and breakable versions [break/loop](./break/loop/api.go), [break/kv/loop](./break/kv/loop/api.go)

@@ -233,7 +233,12 @@ include::../examples/mapexamples/clone_Of_test.go[lines=13..28,indent=0]
 import "github.com/m4gshm/gollections/map_/clone"
 include::../examples/mapexamples/clone_Deep_test.go[lines=13..30,indent=0]
 ----
-===== Keys, values exrtractors
+===== Collectors
+====== map_.Slice
+[source,go]
+----
+include::../examples/mapexamples/map_ToSlice_test.go[lines=19..24,indent=0]
+----
 ====== map_.Keys, map_.Values, map_.KeysConvert, map_.ValuesConvert
 [source,go]
 ----
@@ -259,12 +264,6 @@ include::../examples/mapexamples/map_Convert_test.go[lines=17..22,indent=0]
 [source,go]
 ----
 include::../examples/mapexamples/map_Conv_test.go[lines=17..22,indent=0]
-----
-===== Collectors
-====== map_.Slice
-[source,go]
-----
-include::../examples/mapexamples/map_ToSlice_test.go[lines=19..24,indent=0]
 ----
 
 [#loop]
