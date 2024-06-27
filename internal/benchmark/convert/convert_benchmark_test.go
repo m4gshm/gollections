@@ -54,7 +54,7 @@ func Benchmark_Convert_Loop(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		it := slice.NewHead(values)
-		s = loop.SliceCap(loop.Convert(it.Next, op), len(values))
+		s = loop.ToSliceCap(loop.Convert(it.Next, op), len(values))
 	}
 	_ = s
 	b.StopTimer()
@@ -116,7 +116,7 @@ func Benchmark_Convert_ImmutableVector_Head_Loop(b *testing.B) {
 	var s []string
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		s = loop.SliceCap(loop.Convert(ptr.Of(items.Head()).Next, concat), len(values))
+		s = loop.ToSliceCap(loop.Convert(ptr.Of(items.Head()).Next, concat), len(values))
 	}
 	_ = s
 	b.StopTimer()

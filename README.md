@@ -454,9 +454,27 @@ var users = map_.ToSlice(employers, func(title string, employer map[string]strin
 //[{name:Bob age:0 roles:[{name:devops}]} {name:Tom age:0 roles:[{name:jun}]}]
 ```
 
+## [seq](./seq/api.go), [seq2](./seq2/api.go)
+
+API extends rangefunc iterator types seq.Seq\[V\], seq.Seq2\[K,V\] with
+functions kit: Convert, Filter, Reduce.
+
+``` go
+even := func(i int) bool { return i%2 == 0 }
+sequence := seq.Convert(seq.Filter(seq.Of(1, 2, 3, 4), even), strconv.Itoa)
+var result []string = seq.ToSlice(sequence) //[2 4]
+```
+
+or
+
+``` go
+intSeq := seq.Conv(seq.Of("1", "2", "3", "ddd4", "5"), strconv.Atoi)
+ints, err := seq2.ToSlice(intSeq) //[1 2 3], invalid syntax
+```
+
 ## [loop](./loop/api.go), [kv/loop](./kv/loop/api.go) and breakable versions [break/loop](./break/loop/api.go), [break/kv/loop](./break/kv/loop/api.go)
 
-Low-level API for iteration based on next functions:
+Iterators API based on the following functions:
 
 ``` go
 type (

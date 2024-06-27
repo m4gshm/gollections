@@ -75,3 +75,36 @@ func Keys[K, V any](seq iter.Seq2[K, V]) iter.Seq[K] {
 		})
 	}
 }
+
+// ToSlice collects the elements of the 'seq' sequence into a new slice
+func ToSlice[T any](seq iter.Seq2[T, error]) ([]T, error) {
+	return ToSliceCap(seq, 0)
+}
+
+// ToSliceCap collects the elements of the 'seq' sequence into a new slice with predefined capacity
+func ToSliceCap[T any](seq iter.Seq2[T, error], cap int) (out []T, e error) {
+	if seq == nil {
+		return nil, nil
+	}
+	if cap > 0 {
+		out = make([]T, 0, cap)
+	}
+	return Append(seq, out)
+}
+
+// Append collects the elements of the 'seq' sequence into the specified 'out' slice
+func Append[T any, TS ~[]T](seq iter.Seq2[T, error], out TS) (TS, error) {
+	if seq == nil {
+		return nil, nil
+	}
+	var errOur error
+	seq(func(v T, e error) bool {
+		if e != nil {
+			errOur = e
+			return false
+		}
+		out = append(out, v)
+		return true
+	})
+	return out, errOur
+}

@@ -3,6 +3,9 @@ package seq
 
 import (
 	"iter"
+
+	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/op"
 )
 
 // Of creates an iterator over the elements.
@@ -75,6 +78,34 @@ func KeyValue[T, K, V any](seq iter.Seq[T], keyExtractor func(T) K, valExtractor
 	return ToSeq2(seq, func(t T) (K, V) { return keyExtractor(t), valExtractor(t) })
 }
 
+// ToSlice collects the elements of the 'seq' sequence into a new slice
+func ToSlice[T any](seq iter.Seq[T]) []T {
+	return ToSliceCap(seq, 0)
+}
+
+// ToSliceCap collects the elements of the 'seq' sequence into a new slice with predefined capacity
+func ToSliceCap[T any](seq iter.Seq[T], cap int) (out []T) {
+	if seq == nil {
+		return nil
+	}
+	if cap > 0 {
+		out = make([]T, 0, cap)
+	}
+	return Append(seq, out)
+}
+
+// Append collects the elements of the 'seq' sequence into the specified 'out' slice
+func Append[T any, TS ~[]T](seq iter.Seq[T], out TS) TS {
+	if seq == nil {
+		return nil
+	}
+	seq(func(v T) bool {
+		out = append(out, v)
+		return true
+	})
+	return out
+}
+
 // Reduce reduces the elements retrieved by the 'seq' iterator into an one using the 'merge' function.
 func Reduce[T any](seq iter.Seq[T], merge func(T, T) T) (result T, ok bool) {
 	if seq == nil {
@@ -87,20 +118,36 @@ func Reduce[T any](seq iter.Seq[T], merge func(T, T) T) (result T, ok bool) {
 	return result, true
 }
 
+// First returns the first element that satisfies the condition of the 'predicate' function
+func First[T any](seq iter.Seq[T], predicate func(T) bool) (v T, ok bool) {
+	if seq == nil {
+		return
+	}
+	seq(func(one T) bool {
+		if predicate(one) {
+			v = one
+			ok = true
+			return false
+		}
+		return true
+	})
+	return
+}
+
 // Sum returns the sum of all elements
-func Sum[T c.Summable](next func() (T, bool)) T {
-	return Reduce(next, op.Sum[T])
+func Sum[T c.Summable](seq iter.Seq[T]) (T, bool) {
+	return Reduce(seq, op.Sum[T])
 }
 
 // HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful
-func HasAny[T any](next func() (T, bool), predicate func(T) bool) bool {
-	_, ok := First(next, predicate)
+func HasAny[T any](seq iter.Seq[T], predicate func(T) bool) bool {
+	_, ok := First(seq, predicate)
 	return ok
 }
 
 // Contains finds the first element that equal to the example and returns true
 func Contains[T comparable](seq iter.Seq[T], example T) bool {
-	for v:= range seq {
+	for v := range seq {
 		if v == example {
 			return true
 		}

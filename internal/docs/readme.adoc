@@ -266,10 +266,25 @@ include::../examples/mapexamples/map_Conv_test.go[lines=17..22,indent=0]
 include::../examples/mapexamples/map_ToSlice_test.go[lines=19..24,indent=0]
 ----
 
+[#seq]
+=== link:./seq/api.go[seq], link:./seq2/api.go[seq2]
+
+API extends rangefunc iterator types seq.Seq[V], seq.Seq2[K,V] with functions kit: Convert, Filter, Reduce.
+
+[source,go]
+----
+include::../examples/seqexamples/seq_filter_convert_reduce_test.go[lines=13..17,indent=0]
+----
+or
+[source,go]
+----
+include::../examples/seqexamples/seq2_filter_convert_reduce_test.go[lines=14..17,indent=0]
+----
+
 [#loop]
 === link:./loop/api.go[loop], link:./kv/loop/api.go[kv/loop] and breakable versions link:./break/loop/api.go[break/loop], link:./break/kv/loop/api.go[break/kv/loop]
 
-Low-level API for iteration based on next functions:
+Iterators API based on the following functions:
 
 [source,go]
 ----
