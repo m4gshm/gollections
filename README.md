@@ -526,6 +526,13 @@ var one = range_.Closed(1, 1).Slice()            //[]int{1}
 
 #### Collectors
 
+##### loop.Slice
+
+``` go
+names := loop.Slice(loop.Convert(loop.Filter(loop.Of(users...), func(u User) bool { return u.age <= 30 }), User.Name))
+//[Bob Tom]
+```
+
 ##### group.Of
 
 ``` go
