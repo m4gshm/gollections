@@ -9,7 +9,7 @@ import (
 
 func Test_Slice_ToMap(t *testing.T) {
 
-	var agePerGroup = slice.Map(users, User.Name, User.Age)
+	var agePerGroup map[string]int = slice.Map(users, User.Name, User.Age)
 
 	//"map[Alice:35 Bob:26 Chris:41 Tom:18]"
 

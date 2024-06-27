@@ -259,10 +259,8 @@ include::../examples/mapexamples/map_Convert_test.go[lines=17..22,indent=0]
 [source,go]
 ----
 include::../examples/mapexamples/map_Conv_test.go[lines=17..22,indent=0]
-
-===== Collectors
-
 ----
+===== Collectors
 ====== map_.Slice
 [source,go]
 ----

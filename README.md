@@ -207,7 +207,7 @@ var namesByRole = group.ByMultipleKeys(users, func(u User) []string {
 ``` go
 import "github.com/m4gshm/gollections/slice"
 
-var agePerGroup = slice.Map(users, User.Name, User.Age)
+var agePerGroup map[string]int = slice.Map(users, User.Name, User.Age)
 
 //"map[Alice:35 Bob:26 Chris:41 Tom:18]"
 ```
@@ -443,10 +443,9 @@ var all, err = map_.Conv(employers, func(title string, employer map[string]strin
     return string([]rune(title)[0]), employer["name"], nil
 })
 //map[d:Bob j:Tom], nil
-
-
-===== Collectors
 ```
+
+#### Collectors
 
 ##### map\_.Slice
 
