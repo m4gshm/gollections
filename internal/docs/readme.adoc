@@ -90,7 +90,7 @@ import "github.com/m4gshm/gollections/slice/clone/sort"
 include::../examples/sliceexamples/data_users_test.go[lines=3..10,indent=0]
 include::../examples/sliceexamples/clone_sort_By_test.go[lines=12..18,indent=0]
 ----
-===== To map converters
+===== Collectors
 ====== group.Of
 [source,go]
 ----
@@ -120,19 +120,19 @@ import (
 )
 include::../examples/boilerplate/slice_namesbyRole_new_test.go[lines=14..19,indent=0]
 ----
-====== slice.ToMap, slice.AppendMap
+====== slice.Map, slice.AppendMap
 [source,go]
 ----
 import "github.com/m4gshm/gollections/slice"
 include::../examples/sliceexamples/slice_ToMap_test.go[lines=11..15,indent=0]
 ----
-====== slice.ToMapOrder, slice.AppendMapOrder
+====== slice.MapOrder, slice.AppendMapOrder
 [source,go]
 ----
 import "github.com/m4gshm/gollections/slice"
 include::../examples/sliceexamples/slice_ToMapOrder_test.go[lines=12..17,indent=0]
 ----
-====== slice.ToMapResolv, slice.AppendMapResolv
+====== slice.MapResolv, slice.AppendMapResolv
 [source,go]
 ----
 import (
@@ -181,7 +181,7 @@ import (
 )
 include::../examples/sliceexamples/slice_Last_test.go[lines=13..15,indent=0]
 ----
-===== Converters
+===== Element converters
 ====== slice.Convert
 [source,go]
 ----
@@ -239,7 +239,7 @@ include::../examples/mapexamples/clone_Deep_test.go[lines=13..30,indent=0]
 ----
 include::../examples/mapexamples/map_Keys_Values_test.go[lines=15..23,indent=0]
 ----
-===== Converters
+===== Element converters
 ====== map_.ConvertKeys
 [source,go]
 ----
@@ -259,8 +259,11 @@ include::../examples/mapexamples/map_Convert_test.go[lines=17..22,indent=0]
 [source,go]
 ----
 include::../examples/mapexamples/map_Conv_test.go[lines=17..22,indent=0]
+
+===== Collectors
+
 ----
-====== map_.ToSlice
+====== map_.Slice
 [source,go]
 ----
 include::../examples/mapexamples/map_ToSlice_test.go[lines=19..24,indent=0]
@@ -312,7 +315,7 @@ include::../examples/loopexamples/range_Of_test.go[lines=11..15,indent=0]
 ----
 include::../examples/loopexamples/range_Closed_test.go[lines=12..16,indent=0]
 ----
-===== To map converters
+===== Collectors
 ====== group.Of
 [source,go]
 ----
@@ -324,7 +327,7 @@ import (
 )
 include::../examples/loopexamples/group_Of_test.go[lines=17..23,indent=0]
 ----
-====== loop.ToMap, loop.ToMapResolv
+====== loop.Map, loop.MapResolv
 [source,go]
 ----
 import (
@@ -372,7 +375,7 @@ import (
 )
 include::../examples/loopexamples/loop_First_test.go[lines=13..15,indent=0]
 ----
-===== Converters
+===== Element converters
 ====== loop.Convert
 [source,go]
 ----

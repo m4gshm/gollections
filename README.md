@@ -152,7 +152,7 @@ var byAgeReverse = sort.DescBy(users, User.Age)
 //[{Chris 41 []} {Alice 35 []} {Bob 26 []} {Tom 18 []}]
 ```
 
-#### To map converters
+#### Collectors
 
 ##### group.Of
 
@@ -202,28 +202,28 @@ var namesByRole = group.ByMultipleKeys(users, func(u User) []string {
 // map[:[Tom] admin:[Bob] manager:[Bob Alice]]
 ```
 
-##### slice.ToMap, slice.AppendMap
+##### slice.Map, slice.AppendMap
 
 ``` go
 import "github.com/m4gshm/gollections/slice"
 
-var agePerGroup = slice.ToMap(users, User.Name, User.Age)
+var agePerGroup = slice.Map(users, User.Name, User.Age)
 
 //"map[Alice:35 Bob:26 Chris:41 Tom:18]"
 ```
 
-##### slice.ToMapOrder, slice.AppendMapOrder
+##### slice.MapOrder, slice.AppendMapOrder
 
 ``` go
 import "github.com/m4gshm/gollections/slice"
 
-var names, agePerName = slice.ToMapOrder(users, User.Name, User.Age)
+var names, agePerName = slice.MapOrder(users, User.Name, User.Age)
 
 //"[Bob Alice Tom Chris]"
 //"map[Alice:35 Bob:26 Chris:41 Tom:18]"
 ```
 
-##### slice.ToMapResolv, slice.AppendMapResolv
+##### slice.MapResolv, slice.AppendMapResolv
 
 ``` go
 import (
@@ -234,7 +234,7 @@ import (
 
 var ageGroupedSortedNames map[string][]string
 
-ageGroupedSortedNames = slice.ToMapResolv(users, func(u User) string {
+ageGroupedSortedNames = slice.MapResolv(users, func(u User) string {
     return op.IfElse(u.age <= 30, "<=30", ">30")
 }, User.Name, resolv.SortedSlice)
 
@@ -292,7 +292,7 @@ import (
 result, ok := slice.Last([]int{1, 3, 5, 7, 9, 11}, less.Than(9)) //7, true
 ```
 
-#### Converters
+#### Element converters
 
 ##### slice.Convert
 
@@ -407,7 +407,7 @@ keys := map_.Keys(employers)     //[devops jun]
 values := map_.Values(employers) //[map[name:Bob] map[name:Tom]]
 ```
 
-#### Converters
+#### Element converters
 
 ##### map\_.ConvertKeys
 
@@ -443,12 +443,15 @@ var all, err = map_.Conv(employers, func(title string, employer map[string]strin
     return string([]rune(title)[0]), employer["name"], nil
 })
 //map[d:Bob j:Tom], nil
+
+
+===== Collectors
 ```
 
-##### map\_.ToSlice
+##### map\_.Slice
 
 ``` go
-var users = map_.ToSlice(employers, func(title string, employer map[string]string) User {
+var users = map_.Slice(employers, func(title string, employer map[string]string) User {
     return User{name: employer["name"], roles: []Role{{name: title}}}
 })
 //[{name:Bob age:0 roles:[{name:devops}]} {name:Tom age:0 roles:[{name:jun}]}]
@@ -524,7 +527,7 @@ var decreasing = range_.Closed('e', 'a').Slice() //[]rune{'e', 'd', 'c', 'b', 'a
 var one = range_.Closed(1, 1).Slice()            //[]int{1}
 ```
 
-#### To map converters
+#### Collectors
 
 ##### group.Of
 
@@ -543,7 +546,7 @@ var ageGroups map[string][]User = group.Of(loop.Of(users...), func(u User) strin
 //map[<=20:[{Tom 18 []}] <=30:[{Bob 26 []}] >30:[{Alice 35 []} {Chris 41 []}]]
 ```
 
-##### loop.ToMap, loop.ToMapResolv
+##### loop.Map, loop.MapResolv
 
 ``` go
 import (
@@ -554,7 +557,7 @@ import (
 
 var ageGroupedSortedNames map[string][]string
 
-ageGroupedSortedNames = loop.ToMapResolv(loop.Of(users...), func(u User) string {
+ageGroupedSortedNames = loop.MapResolv(loop.Of(users...), func(u User) string {
     return op.IfElse(u.age <= 30, "<=30", ">30")
 }, User.Name, resolv.SortedSlice)
 
@@ -617,7 +620,7 @@ import (
 result, ok := loop.First(loop.Of(1, 3, 5, 7, 9, 11), more.Than(5)) //7, true
 ```
 
-#### Converters
+#### Element converters
 
 ##### loop.Convert
 

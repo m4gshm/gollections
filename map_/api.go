@@ -481,8 +481,8 @@ func HasAny[M ~map[K]V, K comparable, V any](elements M, predicate func(K, V) bo
 	return false
 }
 
-// ToSlice collects key\value elements to a slice by applying the specified converter to evety element
-func ToSlice[M ~map[K]V, K comparable, V any, T any](elements M, converter func(key K, val V) T) []T {
+// Slice collects key\value elements to a slice by applying the specified converter to evety element
+func Slice[M ~map[K]V, K comparable, V any, T any](elements M, converter func(key K, val V) T) []T {
 	out := make([]T, 0, len(elements))
 	for key, val := range elements {
 		out = append(out, converter(key, val))
@@ -490,8 +490,8 @@ func ToSlice[M ~map[K]V, K comparable, V any, T any](elements M, converter func(
 	return out
 }
 
-// ToSlicee collects key\value elements to a slice by applying the specified erroreable converter to evety element
-func ToSlicee[M ~map[K]V, K comparable, V any, T any](elements M, converter func(key K, val V) (T, error)) ([]T, error) {
+// Slicee collects key\value elements to a slice by applying the specified erroreable converter to evety element
+func Slicee[M ~map[K]V, K comparable, V any, T any](elements M, converter func(key K, val V) (T, error)) ([]T, error) {
 	out := make([]T, 0, len(elements))
 	for key, val := range elements {
 		t, err := converter(key, val)
