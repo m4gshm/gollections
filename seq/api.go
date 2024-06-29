@@ -111,10 +111,16 @@ func Reduce[T any](seq iter.Seq[T], merge func(T, T) T) (result T, ok bool) {
 	if seq == nil {
 		return result, false
 	}
-	seq(func(v T) bool { result = v; return true })
-	for v := range seq {
-		result = merge(result, v)
-	}
+	first := true
+	seq(func(v T) bool {
+		if first {
+			result = v
+		} else {
+			result = merge(result, v)
+		}
+		first = false
+		return true
+	})
 	return result, true
 }
 
