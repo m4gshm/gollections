@@ -10,7 +10,7 @@ import (
 
 func Test_Slice_ToMapOrder(t *testing.T) {
 
-	var names, agePerName = slice.ToMapOrder(users, User.Name, User.Age)
+	var names, agePerName = slice.MapOrder(users, User.Name, User.Age)
 
 	//"[Bob Alice Tom Chris]"
 	//"map[Alice:35 Bob:26 Chris:41 Tom:18]"

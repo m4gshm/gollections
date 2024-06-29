@@ -88,7 +88,7 @@ func Group[TS ~[]T, T any, K comparable, V any](elements TS, keyExtractor func(T
 	if elements == nil {
 		return nil
 	}
-	return ToMapResolv(elements, keyExtractor, valExtractor, resolv.Slice[K, V])
+	return MapResolv(elements, keyExtractor, valExtractor, resolv.Slice[K, V])
 }
 
 // GroupOrder converts the 'elements' slice into a new map, extracting a key for each element applying the converter 'keyExtractor'.
@@ -99,7 +99,7 @@ func GroupOrder[TS ~[]T, T any, K comparable, V any](elements TS, keyExtractor f
 	if elements == nil {
 		return nil, nil
 	}
-	return ToMapResolvOrder(elements, keyExtractor, valExtractor, resolv.Slice[K, V])
+	return MapResolvOrder(elements, keyExtractor, valExtractor, resolv.Slice[K, V])
 }
 
 // GroupByMultiple converts the 'elements' slice into a new map, extracting multiple keys, values per each element applying the 'keysExtractor' and 'valsExtractor' functions.
@@ -923,14 +923,14 @@ func NotEmpty[TS ~[]T, T any](elements TS) bool {
 	return !IsEmpty(elements)
 }
 
-// ToMap collects key\value elements into a new map by iterating over the elements
-func ToMap[TS ~[]T, T any, K comparable, V any](elements TS, keyExtractor func(T) K, valExtractor func(T) V) map[K]V {
+// Map collects key\value elements into a new map by iterating over the elements
+func Map[TS ~[]T, T any, K comparable, V any](elements TS, keyExtractor func(T) K, valExtractor func(T) V) map[K]V {
 	return AppendMap(elements, keyExtractor, valExtractor, nil)
 }
 
-// ToMapOrder collects key\value elements into a new map by iterating over the elements.
+// MapOrder collects key\value elements into a new map by iterating over the elements.
 // Returns a slice with the keys ordered by the time they were added and the resolved key\value map.
-func ToMapOrder[TS ~[]T, T any, K comparable, V any](elements TS, keyExtractor func(T) K, valExtractor func(T) V) ([]K, map[K]V) {
+func MapOrder[TS ~[]T, T any, K comparable, V any](elements TS, keyExtractor func(T) K, valExtractor func(T) V) ([]K, map[K]V) {
 	return AppendMapOrder(elements, keyExtractor, valExtractor, nil, nil)
 }
 
@@ -945,14 +945,14 @@ func AppendMapOrder[TS ~[]T, T any, K comparable, V any](elements TS, keyExtract
 	return AppendMapResolvOrder(elements, keyExtractor, valExtractor, resolv.First[K, V], order, dest)
 }
 
-// ToMapResolv collects key\value elements into a new map by iterating over the elements with resolving of duplicated key values
-func ToMapResolv[TS ~[]T, T any, K comparable, V, VR any](elements TS, keyExtractor func(T) K, valExtractor func(T) V, resolver func(bool, K, VR, V) VR) map[K]VR {
+// MapResolv collects key\value elements into a new map by iterating over the elements with resolving of duplicated key values
+func MapResolv[TS ~[]T, T any, K comparable, V, VR any](elements TS, keyExtractor func(T) K, valExtractor func(T) V, resolver func(bool, K, VR, V) VR) map[K]VR {
 	return AppendMapResolv(elements, keyExtractor, valExtractor, resolver, nil)
 }
 
-// ToMapResolvOrder collects key\value elements into a new map by iterating over the elements with resolving of duplicated key values.
+// MapResolvOrder collects key\value elements into a new map by iterating over the elements with resolving of duplicated key values.
 // Returns a slice with the keys ordered by the time they were added and the resolved key\value map.
-func ToMapResolvOrder[TS ~[]T, T any, K comparable, V, VR any](elements TS, keyExtractor func(T) K, valExtractor func(T) V, resolver func(bool, K, VR, V) VR) ([]K, map[K]VR) {
+func MapResolvOrder[TS ~[]T, T any, K comparable, V, VR any](elements TS, keyExtractor func(T) K, valExtractor func(T) V, resolver func(bool, K, VR, V) VR) ([]K, map[K]VR) {
 	return AppendMapResolvOrder(elements, keyExtractor, valExtractor, resolver, nil, nil)
 }
 

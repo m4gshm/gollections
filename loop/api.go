@@ -650,7 +650,7 @@ func ExtraValuee[T, V any](next func() (T, bool), valExtractor func(T) (V, error
 // The keyExtractor converts an element to a key.
 // The valExtractor converts an element to a value.
 func Group[T any, K comparable, V any](next func() (T, bool), keyExtractor func(T) K, valExtractor func(T) V) map[K][]V {
-	return ToMapResolv(next, keyExtractor, valExtractor, resolv.Slice[K, V])
+	return MapResolv(next, keyExtractor, valExtractor, resolv.Slice[K, V])
 }
 
 // Groupp converts elements retrieved by the 'next' function into a new map, extracting a key for each element applying the converter 'keyExtractor'.
@@ -736,24 +736,24 @@ func initGroup[T any, K comparable, TS ~[]T](key K, e T, groups map[K]TS) {
 	groups[key] = append(groups[key], e)
 }
 
-// ToMap collects key\value elements into a new map by iterating over the elements
-func ToMap[T any, K comparable, V any](next func() (T, bool), keyExtractor func(T) K, valExtractor func(T) V) map[K]V {
-	return ToMapResolv(next, keyExtractor, valExtractor, resolv.First[K, V])
+// Map collects key\value elements into a new map by iterating over the elements
+func Map[T any, K comparable, V any](next func() (T, bool), keyExtractor func(T) K, valExtractor func(T) V) map[K]V {
+	return MapResolv(next, keyExtractor, valExtractor, resolv.First[K, V])
 }
 
-// ToMapp collects key\value elements into a new map by iterating over the elements
-func ToMapp[T any, K comparable, V any](next func() (T, bool), keyExtractor func(T) (K, error), valExtractor func(T) (V, error)) (map[K]V, error) {
-	return breakloop.ToMapp(breakloop.From(next), keyExtractor, valExtractor)
+// Mapp collects key\value elements into a new map by iterating over the elements
+func Mapp[T any, K comparable, V any](next func() (T, bool), keyExtractor func(T) (K, error), valExtractor func(T) (V, error)) (map[K]V, error) {
+	return breakloop.Mapp(breakloop.From(next), keyExtractor, valExtractor)
 }
 
-// ToMapResolv collects key\value elements into a new map by iterating over the elements with resolving of duplicated key values
-func ToMapResolv[T any, K comparable, V, VR any](next func() (T, bool), keyExtractor func(T) K, valExtractor func(T) V, resolver func(bool, K, VR, V) VR) map[K]VR {
+// MapResolv collects key\value elements into a new map by iterating over the elements with resolving of duplicated key values
+func MapResolv[T any, K comparable, V, VR any](next func() (T, bool), keyExtractor func(T) K, valExtractor func(T) V, resolver func(bool, K, VR, V) VR) map[K]VR {
 	return AppendMapResolv(next, keyExtractor, valExtractor, resolver, map[K]VR{})
 }
 
-// ToMapResolvOrder collects key\value elements into a new map by iterating over the elements with resolving of duplicated key values.
+// MapResolvOrder collects key\value elements into a new map by iterating over the elements with resolving of duplicated key values.
 // Returns a slice with the keys ordered by the time they were added and the resolved key\value map.
-func ToMapResolvOrder[TS ~[]T, T any, K comparable, V, VR any](next func() (T, bool), keyExtractor func(T) K, valExtractor func(T) V, resolver func(bool, K, VR, V) VR) ([]K, map[K]VR) {
+func MapResolvOrder[TS ~[]T, T any, K comparable, V, VR any](next func() (T, bool), keyExtractor func(T) K, valExtractor func(T) V, resolver func(bool, K, VR, V) VR) ([]K, map[K]VR) {
 	return AppendMapResolvOrder(next, keyExtractor, valExtractor, resolver, nil, nil)
 }
 

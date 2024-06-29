@@ -14,7 +14,7 @@ func Test_ToMapResolv(t *testing.T) {
 
 	var ageGroupedSortedNames map[string][]string
 
-	ageGroupedSortedNames = loop.ToMapResolv(loop.Of(users...), func(u User) string {
+	ageGroupedSortedNames = loop.MapResolv(loop.Of(users...), func(u User) string {
 		return op.IfElse(u.age <= 30, "<=30", ">30")
 	}, User.Name, resolv.SortedSlice)
 

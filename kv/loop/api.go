@@ -51,7 +51,7 @@ func TrackEach[I, T any](next func() (I, T, bool), consumer func(I, T)) {
 
 // Group collects sets of values grouped by keys obtained by passing a key/value iterator
 func Group[K comparable, V any](next func() (K, V, bool)) map[K][]V {
-	return ToMapResolv(next, resolv.Slice[K, V])
+	return MapResolv(next, resolv.Slice[K, V])
 }
 
 // Reduce reduces the key/value pairs retrieved by the 'next' function into an one pair using the 'merge' function.
@@ -173,8 +173,8 @@ func Filt[K, V any](next func() (K, V, bool), filter func(K, V) (bool, error)) l
 	return loop.Filt(loop.From(next), filter)
 }
 
-// ToMapResolv collects key\value elements into a new map by iterating over the elements with resolving of duplicated key values
-func ToMapResolv[K comparable, V, VR any](next func() (K, V, bool), resolver func(bool, K, VR, V) VR) map[K]VR {
+// MapResolv collects key\value elements into a new map by iterating over the elements with resolving of duplicated key values
+func MapResolv[K comparable, V, VR any](next func() (K, V, bool), resolver func(bool, K, VR, V) VR) map[K]VR {
 	if next == nil {
 		return nil
 	}
@@ -186,13 +186,13 @@ func ToMapResolv[K comparable, V, VR any](next func() (K, V, bool), resolver fun
 	return m
 }
 
-// ToMap collects key\value elements into a new map by iterating over the elements
-func ToMap[K comparable, V any](next func() (K, V, bool)) map[K]V {
-	return ToMapResolv(next, resolv.First[K, V])
+// Map collects key\value elements into a new map by iterating over the elements
+func Map[K comparable, V any](next func() (K, V, bool)) map[K]V {
+	return MapResolv(next, resolv.First[K, V])
 }
 
-// ToSlice collects key\value elements to a slice by iterating over the elements
-func ToSlice[K, V, T any](next func() (K, V, bool), converter func(K, V) T) []T {
+// Slice collects key\value elements to a slice by iterating over the elements
+func Slice[K, V, T any](next func() (K, V, bool), converter func(K, V) T) []T {
 	if next == nil {
 		return nil
 	}
