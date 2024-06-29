@@ -51,7 +51,7 @@ var (
 )
 
 func (i *Iter[T]) maxHasNext() int {
-	return i.size - 1
+	return i.size - 2
 }
 
 // All is used to iterate through the iterator using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
