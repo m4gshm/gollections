@@ -14,48 +14,45 @@ const IterNoStarted = -1
 // NewHead instantiates Iter based on elements slice
 func NewHead[TS ~[]T, T any](elements TS) Iter[T] {
 	var (
-		elementSize = notsafe.GetTypeSize[T]()
-		header      = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
-		array       = unsafe.Pointer(header.Data)
-		size        = header.Len
+		header = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
+		array  = unsafe.Pointer(header.Data)
+		size   = header.Len
 	)
 	return Iter[T]{
-		array:       array,
-		elementSize: elementSize,
-		size:        size,
-		maxHasNext:  size - 2,
-		current:     IterNoStarted,
+		array:   array,
+		size:    size,
+		current: IterNoStarted,
 	}
 }
 
 // NewTail instantiates Iter based on elements slice for reverse iterating
 func NewTail[T any](elements []T) Iter[T] {
 	var (
-		elementSize = notsafe.GetTypeSize[T]()
-		header      = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
-		array       = unsafe.Pointer(header.Data)
-		size        = header.Len
+		header = notsafe.GetSliceHeaderByRef(unsafe.Pointer(&elements))
+		array  = unsafe.Pointer(header.Data)
+		size   = header.Len
 	)
 	return Iter[T]{
-		array:       array,
-		elementSize: elementSize,
-		size:        size,
-		maxHasNext:  size - 2,
-		current:     size,
+		array:   array,
+		size:    size,
+		current: size,
 	}
 }
 
 // Iter is the Iterator implementation.
 type Iter[T any] struct {
-	array                     unsafe.Pointer
-	elementSize               uintptr
-	size, maxHasNext, current int
+	array         unsafe.Pointer
+	size, current int
 }
 
 var (
 	_ c.Iterator[any]     = (*Iter[any])(nil)
 	_ c.PrevIterator[any] = (*Iter[any])(nil)
 )
+
+func (i *Iter[T]) maxHasNext() int {
+	return i.size - 1
+}
 
 // All is used to iterate through the iterator using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
 func (i *Iter[T]) All(consumer func(element T) bool) {
@@ -77,7 +74,7 @@ func (i *Iter[T]) HasNext() bool {
 	if i == nil {
 		return false
 	}
-	return CanIterateByRange(IterNoStarted, i.maxHasNext, i.current)
+	return CanIterateByRange(IterNoStarted, i.maxHasNext(), i.current)
 }
 
 // HasPrev checks the previous element existing
@@ -105,10 +102,10 @@ func (i *Iter[T]) GetPrev() T {
 // If ok == false, then the iteration must be completed.
 func (i *Iter[T]) Next() (v T, ok bool) {
 	if !(i == nil || i.array == nil) {
-		if current := i.current; CanIterateByRange(IterNoStarted, i.maxHasNext, current) {
+		if current := i.current; CanIterateByRange(IterNoStarted, i.maxHasNext(), current) {
 			current++
 			i.current = current
-			return *(*T)(notsafe.GetArrayElemRef(i.array, current, i.elementSize)), true
+			return *(*T)(notsafe.GetArrayElemRef(i.array, current, unsafe.Sizeof(v))), true
 		}
 	}
 	return v, ok
@@ -119,11 +116,10 @@ func (i *Iter[T]) Next() (v T, ok bool) {
 // If ok == false, then the iteration must be completed.
 func (i *Iter[T]) Prev() (v T, ok bool) {
 	if !(i == nil || i.array == nil) {
-		current := i.current
-		if CanIterateByRange(1, i.size, current) {
+		if current := i.current; CanIterateByRange(1, i.size, current) {
 			current--
 			i.current = current
-			return *(*T)(notsafe.GetArrayElemRef(i.array, current, i.elementSize)), true
+			return *(*T)(notsafe.GetArrayElemRef(i.array, current, unsafe.Sizeof(v))), true
 		}
 	}
 	return v, ok
@@ -136,7 +132,7 @@ func (i *Iter[T]) Get() (v T, ok bool) {
 	if !(i == nil || i.array == nil) {
 		current := i.current
 		if IsValidIndex(i.size, current) {
-			return *(*T)(notsafe.GetArrayElemRef(i.array, current, i.elementSize)), true
+			return *(*T)(notsafe.GetArrayElemRef(i.array, current, unsafe.Sizeof(v))), true
 		}
 	}
 	return v, ok
