@@ -580,7 +580,7 @@ func Test_PeekWhile(t *testing.T) {
 func Test_Slice_ToMapResolvOrder(t *testing.T) {
 	var (
 		even          = func(v int) bool { return v%2 == 0 }
-		order, groups = slice.ToMapResolvOrder(slice.Of(2, 1, 1, 2, 4, 3, 1), even, as.Is[int], resolv.Slice)
+		order, groups = slice.MapResolvOrder(slice.Of(2, 1, 1, 2, 4, 3, 1), even, as.Is[int], resolv.Slice)
 	)
 	assert.Equal(t, []int{1, 1, 3, 1}, groups[false])
 	assert.Equal(t, []int{2, 2, 4}, groups[true])

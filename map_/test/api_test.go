@@ -191,12 +191,12 @@ func Test_MatchAny(t *testing.T) {
 }
 
 func Test_ToSlice(t *testing.T) {
-	result := map_.ToSlice(entities, func(key int, val *entity) string { return strconv.Itoa(key) + ":" + val.val })
+	result := map_.Slice(entities, func(key int, val *entity) string { return strconv.Itoa(key) + ":" + val.val })
 	assert.Equal(t, slice.Of("1:1_first", "2:2_second", "3:3_third"), sort.Asc(result))
 }
 
 func Test_ToSliceErrorable(t *testing.T) {
-	result, _ := map_.ToSlicee(entities, func(key int, val *entity) (int, error) {
+	result, _ := map_.Slicee(entities, func(key int, val *entity) (int, error) {
 		v, err := strconv.Atoi(string(val.val[0]))
 		return v + key, err
 	})

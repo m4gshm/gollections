@@ -96,7 +96,7 @@ func Test_Reducee_Nil(t *testing.T) {
 func Test_Convert(t *testing.T) {
 	kvl := loop.KeyValue(loop.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3")), c.KV[int, string].Key, c.KV[int, string].Value)
 
-	out := kvloop.ToSlice(kvloop.Convert(kvl, func(k int, v string) (int, string) { return k * k, v + v }), k.V[int, string])
+	out := kvloop.Slice(kvloop.Convert(kvl, func(k int, v string) (int, string) { return k * k, v + v }), k.V[int, string])
 
 	assert.Equal(t, slice.Of(k.V(1, "11"), k.V(4, "22"), k.V(9, "33")), out)
 }
@@ -104,7 +104,7 @@ func Test_Convert(t *testing.T) {
 func Test_Conv(t *testing.T) {
 	kvl := loop.KeyValue(loop.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3")), c.KV[int, string].Key, c.KV[int, string].Value)
 
-	out, _ := breakkvloop.ToSlice(kvloop.Conv(kvl, func(k int, v string) (int, string, error) { return k * k, v + v, nil }), k.V[int, string])
+	out, _ := breakkvloop.Slice(kvloop.Conv(kvl, func(k int, v string) (int, string, error) { return k * k, v + v, nil }), k.V[int, string])
 
 	assert.Equal(t, slice.Of(k.V(1, "11"), k.V(4, "22"), k.V(9, "33")), out)
 }
@@ -112,7 +112,7 @@ func Test_Conv(t *testing.T) {
 func Test_Filter(t *testing.T) {
 	kvl := loop.KeyValue(loop.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3")), c.KV[int, string].Key, c.KV[int, string].Value)
 
-	out := kvloop.ToSlice(kvloop.Filter(kvl, func(key int, _ string) bool { return key != 2 }), k.V[int, string])
+	out := kvloop.Slice(kvloop.Filter(kvl, func(key int, _ string) bool { return key != 2 }), k.V[int, string])
 
 	assert.Equal(t, slice.Of(k.V(1, "1"), k.V(3, "3")), out)
 }
@@ -120,7 +120,7 @@ func Test_Filter(t *testing.T) {
 func Test_Filt(t *testing.T) {
 	kvl := loop.KeyValue(loop.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3")), c.KV[int, string].Key, c.KV[int, string].Value)
 
-	out, _ := breakkvloop.ToSlice(kvloop.Filt(kvl, func(key int, _ string) (bool, error) { return key != 2, nil }), k.V[int, string])
+	out, _ := breakkvloop.Slice(kvloop.Filt(kvl, func(key int, _ string) (bool, error) { return key != 2, nil }), k.V[int, string])
 
 	assert.Equal(t, slice.Of(k.V(1, "1"), k.V(3, "3")), out)
 }
@@ -128,7 +128,7 @@ func Test_Filt(t *testing.T) {
 func Test_Filt2(t *testing.T) {
 	kvl := loop.KeyValue(loop.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3")), c.KV[int, string].Key, c.KV[int, string].Value)
 
-	out, err := breakkvloop.ToSlice(kvloop.Filt(kvl, func(key int, _ string) (bool, error) {
+	out, err := breakkvloop.Slice(kvloop.Filt(kvl, func(key int, _ string) (bool, error) {
 		ok := key <= 2
 		return ok, op.IfElse(key == 2, errors.New("abort"), nil)
 	}), k.V[int, string])
@@ -146,6 +146,6 @@ func Test_NewIter(t *testing.T) {
 		return n.K, n.V
 	})
 
-	out := kvloop.ToSlice(loop, k.V[int, string])
+	out := kvloop.Slice(loop, k.V[int, string])
 	assert.Equal(t, slice.Of(k.V(1, "1"), k.V(2, "2"), k.V(3, "3")), out)
 }
