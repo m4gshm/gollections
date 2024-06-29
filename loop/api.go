@@ -34,16 +34,18 @@ func S[TS ~[]T, T any](elements TS) Loop[T] {
 // Of wrap the elements by loop function.
 func Of[T any](elements ...T) Loop[T] {
 	l := len(elements)
-	i := 0
 	if l == 0 {
 		return nil
 	}
-	return func() (e T, ok bool) {
+	i := 0
+	return func() (T, bool) {
 		if i < l {
-			e, ok = elements[i], true
+			e, ok := elements[i], true
 			i++
+			return e, ok
 		}
-		return e, ok
+		var e T
+		return e, false
 	}
 }
 
