@@ -30,7 +30,7 @@ func Test_AccummSum(t *testing.T) {
 	s := loop.Of(1, 3, 5, 7, 9, 11)
 	r, err := loop.Accumm(100, s, func(i1, i2 int) (int, error) {
 		if i2 == 11 {
-			return 0, errors.New("stop")
+			return i1, errors.New("stop")
 		}
 		return i1 + i2, nil
 	})
@@ -50,7 +50,7 @@ func Test_ReduceeSum(t *testing.T) {
 	s := loop.Of(1, 3, 5, 7, 9, 11)
 	r, ok, err := breakLoop.ReduceeOK(breakLoop.From(s), func(i1, i2 int) (int, error) {
 		if i2 == 11 {
-			return 0, errors.New("stop")
+			return i1, errors.New("stop")
 		}
 		return i1 + i2, nil
 	})

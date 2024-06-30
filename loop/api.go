@@ -231,11 +231,10 @@ func Accumm[T any](first T, next func() (T, bool), merge func(T, T) (T, error)) 
 		return accumulator, nil
 	}
 	for v, ok := next(); ok; v, ok = next() {
-		r, err := merge(accumulator, v)
+		accumulator, err = merge(accumulator, v)
 		if err != nil {
 			return accumulator, err
 		}
-		accumulator = r
 	}
 	return accumulator, nil
 }

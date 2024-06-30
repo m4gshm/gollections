@@ -36,7 +36,7 @@ func Test_AccummSum(t *testing.T) {
 	s := loop.Of(1, 3, 5, 7, 9, 11)
 	r, err := loop.Accumm(100, s, func(i1, i2 int) (int, error) {
 		if i2 == 11 {
-			return 0, errors.New("stop")
+			return i1, errors.New("stop")
 		}
 		return i1 + i2, nil
 	})
@@ -55,7 +55,7 @@ func Test_ReduceeSum(t *testing.T) {
 	s := loop.Of(1, 3, 5, 7, 9, 11)
 	r, ok, err := loop.ReduceeOK(s, func(i1, i2 int) (int, error) {
 		if i2 == 11 {
-			return 0, errors.New("stop")
+			return i1, errors.New("stop")
 		}
 		return i1 + i2, nil
 	})
@@ -70,7 +70,7 @@ func Test_ReduceeSumFirstErr(t *testing.T) {
 		return 0, errors.New("stop")
 	})
 	assert.True(t, ok)
-	assert.Equal(t, 1, r)
+	assert.Equal(t, 0, r)
 	assert.ErrorContains(t, err, "stop")
 }
 
