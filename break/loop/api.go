@@ -236,7 +236,7 @@ func ReduceeOK[T any](next func() (T, bool, error), merge func(T, T) (T, error))
 	if result, ok, err = next(); err != nil || !ok {
 		return result, ok, err
 	}
-	result, err = Accumm(result, next, merge)
+ 	result, err = Accumm(result, next, merge)
 	return result, true, err
 }
 
@@ -266,10 +266,8 @@ func Accumm[T any](first T, next func() (T, bool, error), merge func(T, T) (T, e
 	for {
 		if v, ok, err := next(); err != nil || !ok {
 			return accumulator, err
-		} else if v, err = merge(accumulator, v); err != nil {
+		} else if accumulator, err = merge(accumulator, v); err != nil {
 			return accumulator, err
-		} else {
-			accumulator = v
 		}
 	}
 }
