@@ -282,9 +282,12 @@ or
 include::../examples/seqexamples/seq2_filter_convert_reduce_test.go[lines=14..17,indent=0]
 ----
 ==== Sequence API
-===== Instantiators
+
 To use any collection or loop as a rangefunc sequecne just call `link:#iterating-over-loops[All]` method of that one.
+
 In many cases the API likes the link:#loop-kvloop-and-breakable-versions-breakloop-breakkvloop[loop] API.
+
+===== Instantiators
 ====== seq.Of, seq2.Of, seq2.OfMap
 [source,go]
 ----

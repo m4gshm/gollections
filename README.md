@@ -476,12 +476,15 @@ ints, err := seq2.Slice(intSeq) //[1 2 3], invalid syntax
 
 ### Sequence API
 
+To use any collection or loop as a rangefunc sequecne just call `All`
+method of that one.
+
+In many cases the API likes the
+[loop](#loop-kvloop-and-breakable-versions-breakloop-breakkvloop) API.
+
 #### Instantiators
 
-To use any collection or loop as a rangefunc sequecne just call `All`
-method of that one. In many cases the API likes the
-[loop](#loop-kvloop-and-breakable-versions-breakloop-breakkvloop) API.
-====== seq.Of, seq2.Of, seq2.OfMap
+##### seq.Of, seq2.Of, seq2.OfMap
 
 ``` go
 import(
