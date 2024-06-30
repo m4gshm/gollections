@@ -3,8 +3,10 @@ package test
 import (
 	"errors"
 	"iter"
+	"strconv"
 	"testing"
 
+	"github.com/m4gshm/gollections/convert/as"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/predicate/more"
 	"github.com/m4gshm/gollections/seq"
@@ -77,13 +79,6 @@ func Test_ReduceNil(t *testing.T) {
 	assert.Equal(t, 0, sum)
 }
 
-func Test_Contains(t *testing.T) {
-
-	ok := seq.Contains(seq.Of(1, 2, 3, 4, 5, 6), 5)
-
-	assert.True(t, ok)
-}
-
 func Test_First(t *testing.T) {
 
 	result, ok := seq.First(seq.Of(1, 2, 3, 4, 5, 6), more.Than(5)) //7, true
@@ -114,4 +109,30 @@ func Test_Filt(t *testing.T) {
 	r, err := seq2.Slice(l)
 	assert.Error(t, err)
 	assert.Equal(t, slice.Of(4, 8), r)
+}
+
+func Test_Filt2(t *testing.T) {
+	s := seq.Of(1, 3, 4, 5, 7, 8, 9, 11)
+	l := seq.Filt(s, func(i int) (bool, error) {
+		ok := i <= 7
+		return ok && even(i), op.IfElse(ok, nil, errors.New("abort"))
+	})
+	r, err := seq2.Slice(l)
+	assert.Error(t, err)
+	assert.Equal(t, slice.Of(4), r)
+}
+
+func Test_Contains(t *testing.T) {
+	assert.True(t, seq.Contains(seq.Of(1, 2, 3), 3))
+	assert.False(t, seq.Contains(seq.Of(1, 2, 3), 0))
+}
+
+func Test_KeyValue(t *testing.T) {
+	s := seq.Of(1, 2, 3)
+	s2 := seq.KeyValue(s, as.Is, strconv.Itoa)
+	k := seq.Slice(seq2.Keys(s2))
+	v := seq.Slice(seq2.Values(s2))
+
+	assert.Equal(t, slice.Of(1, 2, 3), k)
+	assert.Equal(t, slice.Of("1", "2", "3"), v)
 }

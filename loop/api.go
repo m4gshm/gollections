@@ -749,7 +749,7 @@ func Mapp[T any, K comparable, V any](next func() (T, bool), keyExtractor func(T
 
 // MapResolv collects key\value elements into a new map by iterating over the elements with resolving of duplicated key values
 func MapResolv[T any, K comparable, V, VR any](next func() (T, bool), keyExtractor func(T) K, valExtractor func(T) V, resolver func(bool, K, VR, V) VR) map[K]VR {
-	return AppendMapResolv(next, keyExtractor, valExtractor, resolver, map[K]VR{})
+	return AppendMapResolv(next, keyExtractor, valExtractor, resolver, nil)
 }
 
 // MapResolvOrder collects key\value elements into a new map by iterating over the elements with resolving of duplicated key values.

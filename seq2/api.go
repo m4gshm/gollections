@@ -1,7 +1,11 @@
 // Package seq2 provides helpers for  “range-over-func” feature introduced in go 1.22.
 package seq2
 
-import "iter"
+import (
+	"iter"
+
+	"github.com/m4gshm/gollections/map_/resolv"
+)
 
 // Of creates an index/value pairs iterator over the elements.
 func Of[T any](elements ...T) iter.Seq2[int, T] {
@@ -107,4 +111,61 @@ func Append[T any, TS ~[]T](seq iter.Seq2[T, error], out TS) (TS, error) {
 		return true
 	})
 	return out, errOur
+}
+
+// Group converts elements retrieved by the 'next' function into a new map, extracting a key for each element applying the converter 'keyExtractor'.
+func Group[K comparable, V any](seq iter.Seq2[K, V]) map[K][]V {
+	return MapResolv(seq, resolv.Slice[K, V])
+}
+
+// Map collects key\value elements into a new map by iterating over the elements
+func Map[K comparable, V any](seq iter.Seq2[K, V]) map[K]V {
+	return MapResolv(seq, resolv.First[K, V])
+}
+
+// MapResolv collects key\value elements into a new map by iterating over the elements with resolving of duplicated key values
+func MapResolv[K comparable, V, VR any](seq iter.Seq2[K, V], resolver func(bool, K, VR, V) VR) map[K]VR {
+	return AppendMapResolv(seq, resolver, nil)
+}
+
+// MapResolvOrder collects key\value elements into a new map by iterating over the elements with resolving of duplicated key values.
+// Returns a slice with the keys ordered by the time they were added and the resolved key\value map.
+func MapResolvOrder[K comparable, V, VR any](seq iter.Seq2[K, V], resolver func(bool, K, VR, V) VR) ([]K, map[K]VR) {
+	return AppendMapResolvOrder(seq, resolver, nil, nil)
+}
+
+// AppendMapResolv collects key\value elements into the 'dest' map by iterating over the elements with resolving of duplicated key values
+func AppendMapResolv[K comparable, V, VR any](seq iter.Seq2[K, V], resolver func(bool, K, VR, V) VR, dest map[K]VR) map[K]VR {
+	if seq == nil {
+		return nil
+	}
+	if dest == nil {
+		dest = map[K]VR{}
+	}
+	seq(func(k K, v V) bool {
+		exists, ok := dest[k]
+		dest[k] = resolver(ok, k, exists, v)
+		return true
+	})
+	return dest
+}
+
+// AppendMapResolvOrder collects key\value elements into the 'dest' map by iterating over the elements with resolving of duplicated key values
+// Additionaly populates the 'order' slice by the keys ordered by the time they were added and the resolved key\value map.
+func AppendMapResolvOrder[K comparable, V, VR any](seq iter.Seq2[K, V], resolver func(bool, K, VR, V) VR, order []K, dest map[K]VR) ([]K, map[K]VR) {
+	if seq == nil {
+		return nil, nil
+	}
+	if dest == nil {
+		dest = map[K]VR{}
+	}
+	seq(func(k K, v V) bool {
+		exists, ok := dest[k]
+		dest[k] = resolver(ok, k, exists, v)
+		if !ok {
+			order = append(order, k)
+		}
+		return true
+	})
+	return order, dest
 }
