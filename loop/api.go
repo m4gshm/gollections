@@ -235,7 +235,6 @@ func Accumm[T any](first T, next func() (T, bool), merge func(T, T) (T, error)) 
 		if err != nil {
 			return accumulator, err
 		}
-		accumulator = r
 	}
 	return accumulator, nil
 }
