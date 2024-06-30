@@ -27,10 +27,10 @@ func OfMap[K comparable, V any](elements map[K]V) iter.Seq2[K, V] {
 
 // Filter creates a rangefunc that iterates only those elements for which the 'filter' function returns true.
 func Filter[K, V any](seq iter.Seq2[K, V], filter func(K, V) bool) iter.Seq2[K, V] {
+	if seq == nil {
+		return func(yield func(K, V) bool) {}
+	}
 	return func(consumer func(K, V) bool) {
-		if seq == nil {
-			return
-		}
 		seq(func(k K, v V) bool {
 			if filter(k, v) {
 				return consumer(k, v)
@@ -42,10 +42,10 @@ func Filter[K, V any](seq iter.Seq2[K, V], filter func(K, V) bool) iter.Seq2[K, 
 
 // Convert creates a rangefunc that applies the 'converter' function to each iterable element.
 func Convert[Kfrom, Vfrom, Kto, Vto any](seq iter.Seq2[Kfrom, Vfrom], converter func(Kfrom, Vfrom) (Kto, Vto)) iter.Seq2[Kto, Vto] {
+	if seq == nil {
+		return func(yield func(Kto, Vto) bool) {}
+	}
 	return func(consumer func(Kto, Vto) bool) {
-		if seq == nil {
-			return
-		}
 		seq(func(k Kfrom, v Vfrom) bool {
 			return consumer(converter(k, v))
 		})
@@ -54,10 +54,10 @@ func Convert[Kfrom, Vfrom, Kto, Vto any](seq iter.Seq2[Kfrom, Vfrom], converter 
 
 // Values converts a key/value pairs iterator to an iterator of just values.
 func Values[K, V any](seq iter.Seq2[K, V]) iter.Seq[V] {
+	if seq == nil {
+		return func(yield func(V) bool) {}
+	}
 	return func(yield func(V) bool) {
-		if seq == nil {
-			return
-		}
 		seq(func(_ K, v V) bool {
 			return yield(v)
 		})
@@ -66,23 +66,23 @@ func Values[K, V any](seq iter.Seq2[K, V]) iter.Seq[V] {
 
 // Keys converts a key/value pairs iterator to an iterator of just keys.
 func Keys[K, V any](seq iter.Seq2[K, V]) iter.Seq[K] {
+	if seq == nil {
+		return func(yield func(K) bool) {}
+	}
 	return func(yield func(K) bool) {
-		if seq == nil {
-			return
-		}
 		seq(func(k K, _ V) bool {
 			return yield(k)
 		})
 	}
 }
 
-// ToSlice collects the elements of the 'seq' sequence into a new slice
-func ToSlice[T any](seq iter.Seq2[T, error]) ([]T, error) {
-	return ToSliceCap(seq, 0)
+// Slice collects the elements of the 'seq' sequence into a new slice
+func Slice[T any](seq iter.Seq2[T, error]) ([]T, error) {
+	return SliceCap(seq, 0)
 }
 
-// ToSliceCap collects the elements of the 'seq' sequence into a new slice with predefined capacity
-func ToSliceCap[T any](seq iter.Seq2[T, error], cap int) (out []T, e error) {
+// SliceCap collects the elements of the 'seq' sequence into a new slice with predefined capacity
+func SliceCap[T any](seq iter.Seq2[T, error], cap int) (out []T, e error) {
 	if seq == nil {
 		return nil, nil
 	}

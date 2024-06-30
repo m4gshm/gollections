@@ -454,15 +454,6 @@ var all, err = map_.Conv(employers, func(title string, employer map[string]strin
 //map[d:Bob j:Tom], nil
 ```
 
-##### map\_.ToSlice
-
-``` go
-var users = map_.ToSlice(employers, func(title string, employer map[string]string) User {
-    return User{name: employer["name"], roles: []Role{{name: title}}}
-})
-//[{name:Bob age:0 roles:[{name:devops}]} {name:Tom age:0 roles:[{name:jun}]}]
-```
-
 ## [seq](./seq/api.go), [seq2](./seq2/api.go)
 
 API extends rangefunc iterator types seq.Seq\[V\], seq.Seq2\[K,V\] with

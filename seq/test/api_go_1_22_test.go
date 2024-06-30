@@ -77,33 +77,3 @@ func Test_AllConv(t *testing.T) {
 
 	assert.Equal(t, slice.Of(1, 2, 3, 5, 8, 9, 11), i)
 }
-
-func Benchmark_OrderedSet_Filter_Convert_go1_22(b *testing.B) {
-	c := set.Of(values...)
-
-	var s []string
-
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		for e := range seq.Convert(seq.Filter(c.All, func(e int) bool { return e%2 == 0 }), strconv.Itoa) {
-			s = append(s, e)
-		}
-	}
-	b.StopTimer()
-
-	_ = s
-}
-
-func Benchmark_Seq_Filter_Convert_go1_22(b *testing.B) {
-	var s []string
-
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		for e := range seq.Convert(seq.Filter(seq.Of(values...), func(e int) bool { return e%2 == 0 }), strconv.Itoa) {
-			s = append(s, e)
-		}
-	}
-	b.StopTimer()
-
-	_ = s
-}

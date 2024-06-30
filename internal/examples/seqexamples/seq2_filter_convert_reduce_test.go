@@ -13,7 +13,7 @@ import (
 func Test_Usage_Seq2_Errorable(t *testing.T) {
 
 	intSeq := seq.Conv(seq.Of("1", "2", "3", "ddd4", "5"), strconv.Atoi)
-	ints, err := seq2.ToSlice(intSeq) //[1 2 3], invalid syntax
+	ints, err := seq2.Slice(intSeq) //[1 2 3], invalid syntax
 
 	assert.Equal(t, []int{1, 2, 3}, ints)
 	assert.ErrorContains(t, err, "invalid syntax")

@@ -144,11 +144,11 @@ func TrackEach[I, T any](next func() (I, T, bool), consumer func(I, T)) {
 
 // Slice collects the elements retrieved by the 'next' function into a new slice
 func Slice[T any](next func() (T, bool)) []T {
-	return ToSliceCap(next, 0)
+	return SliceCap(next, 0)
 }
 
-// ToSliceCap collects the elements retrieved by the 'next' function into a new slice with predefined capacity
-func ToSliceCap[T any](next func() (T, bool), cap int) (out []T) {
+// SliceCap collects the elements retrieved by the 'next' function into a new slice with predefined capacity
+func SliceCap[T any](next func() (T, bool), cap int) (out []T) {
 	if next == nil {
 		return nil
 	}

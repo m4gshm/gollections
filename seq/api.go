@@ -6,6 +6,7 @@ import (
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/op"
+	"google.golang.org/genproto/googleapis/cloud/functions/v1"
 )
 
 // Of creates an iterator over the elements.
@@ -21,10 +22,10 @@ func Of[T any](elements ...T) iter.Seq[T] {
 
 // Filter creates an iterator that iterates only those elements for which the 'filter' function returns true.
 func Filter[T any](seq iter.Seq[T], filter func(T) bool) iter.Seq[T] {
+	if seq == nil {
+		return nil
+	}
 	return func(consumer func(T) bool) {
-		if seq == nil {
-			return
-		}
 		seq(func(e T) bool {
 			if filter(e) {
 				return consumer(e)
@@ -36,10 +37,10 @@ func Filter[T any](seq iter.Seq[T], filter func(T) bool) iter.Seq[T] {
 
 // Convert creates an iterator that applies the 'converter' function to each iterable element.
 func Convert[From, To any](seq iter.Seq[From], converter func(From) To) iter.Seq[To] {
+	if seq == nil {
+		return func(yield func(To) bool) {}
+	}
 	return func(consumer func(To) bool) {
-		if seq == nil {
-			return
-		}
 		seq(func(from From) bool {
 			return consumer(converter(from))
 		})
@@ -63,10 +64,10 @@ func Conv[From, To any](seq iter.Seq[From], converter func(From) (To, error)) it
 
 // ToSeq2 converts an iterator of single elements to an iterator of key/value pairs by applying the 'converter' function to each iterable element.
 func ToSeq2[T, K, V any](seq iter.Seq[T], converter func(T) (K, V)) iter.Seq2[K, V] {
+	if seq == nil {
+		return func(yield func(K, V) bool) {}
+	}
 	return func(yield func(K, V) bool) {
-		if seq == nil {
-			return
-		}
 		seq(func(v T) bool {
 			return yield(converter(v))
 		})
@@ -78,13 +79,13 @@ func KeyValue[T, K, V any](seq iter.Seq[T], keyExtractor func(T) K, valExtractor
 	return ToSeq2(seq, func(t T) (K, V) { return keyExtractor(t), valExtractor(t) })
 }
 
-// ToSlice collects the elements of the 'seq' sequence into a new slice
-func ToSlice[T any](seq iter.Seq[T]) []T {
-	return ToSliceCap(seq, 0)
+// Slice collects the elements of the 'seq' sequence into a new slice
+func Slice[T any](seq iter.Seq[T]) []T {
+	return SliceCap(seq, 0)
 }
 
-// ToSliceCap collects the elements of the 'seq' sequence into a new slice with predefined capacity
-func ToSliceCap[T any](seq iter.Seq[T], cap int) (out []T) {
+// SliceCap collects the elements of the 'seq' sequence into a new slice with predefined capacity
+func SliceCap[T any](seq iter.Seq[T], cap int) (out []T) {
 	if seq == nil {
 		return nil
 	}
@@ -106,8 +107,14 @@ func Append[T any, TS ~[]T](seq iter.Seq[T], out TS) TS {
 	return out
 }
 
-// Reduce reduces the elements retrieved by the 'seq' iterator into an one using the 'merge' function.
-func Reduce[T any](seq iter.Seq[T], merge func(T, T) T) (result T, ok bool) {
+
+func Reduce[T any](seq iter.Seq[T], merge func(T, T) T) T {
+	result, _ := ReduceOK(seq, merge)
+	return result
+}
+
+// ReduceOK reduces the elements retrieved by the 'seq' iterator into an one using the 'merge' function.
+func ReduceOK[T any](seq iter.Seq[T], merge func(T, T) T) (result T, ok bool) {
 	if seq == nil {
 		return result, false
 	}
@@ -122,6 +129,19 @@ func Reduce[T any](seq iter.Seq[T], merge func(T, T) T) (result T, ok bool) {
 		return true
 	})
 	return result, true
+}
+
+func Accum[T any](first T, seq iter.Seq[T], merge func(T, T) T) T {
+	accumulator := first
+	if seq == nil {
+		return accumulator
+	}
+
+	seq(func (v T) bool {
+		accumulator = merge(accumulator, v)
+		return true
+	})
+	return accumulator
 }
 
 // First returns the first element that satisfies the condition of the 'predicate' function
@@ -142,7 +162,7 @@ func First[T any](seq iter.Seq[T], predicate func(T) bool) (v T, ok bool) {
 
 // Sum returns the sum of all elements
 func Sum[T c.Summable](seq iter.Seq[T]) (T, bool) {
-	return Reduce(seq, op.Sum[T])
+	return ReduceOK(seq, op.Sum[T])
 }
 
 // HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful
@@ -153,10 +173,13 @@ func HasAny[T any](seq iter.Seq[T], predicate func(T) bool) bool {
 
 // Contains finds the first element that equal to the example and returns true
 func Contains[T comparable](seq iter.Seq[T], example T) bool {
-	for v := range seq {
-		if v == example {
-			return true
-		}
+	if seq == nil {
+		return false
 	}
-	return false
+	contains := false
+	seq(func(v T) bool {
+		contains = v == example
+		return !contains
+	})
+	return contains
 }
