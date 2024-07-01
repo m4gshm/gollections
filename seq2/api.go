@@ -32,7 +32,7 @@ func OfMap[K comparable, V any](elements map[K]V) iter.Seq2[K, V] {
 // Filter creates a rangefunc that iterates only those elements for which the 'filter' function returns true.
 func Filter[K, V any](seq iter.Seq2[K, V], filter func(K, V) bool) iter.Seq2[K, V] {
 	if seq == nil {
-		return func(yield func(K, V) bool) {}
+		return func(_ func(K, V) bool) {}
 	}
 	return func(consumer func(K, V) bool) {
 		seq(func(k K, v V) bool {
@@ -47,7 +47,7 @@ func Filter[K, V any](seq iter.Seq2[K, V], filter func(K, V) bool) iter.Seq2[K, 
 // Convert creates a rangefunc that applies the 'converter' function to each iterable element.
 func Convert[Kfrom, Vfrom, Kto, Vto any](seq iter.Seq2[Kfrom, Vfrom], converter func(Kfrom, Vfrom) (Kto, Vto)) iter.Seq2[Kto, Vto] {
 	if seq == nil {
-		return func(yield func(Kto, Vto) bool) {}
+		return func(_ func(Kto, Vto) bool) {}
 	}
 	return func(consumer func(Kto, Vto) bool) {
 		seq(func(k Kfrom, v Vfrom) bool {
@@ -59,7 +59,7 @@ func Convert[Kfrom, Vfrom, Kto, Vto any](seq iter.Seq2[Kfrom, Vfrom], converter 
 // Values converts a key/value pairs iterator to an iterator of just values.
 func Values[K, V any](seq iter.Seq2[K, V]) iter.Seq[V] {
 	if seq == nil {
-		return func(yield func(V) bool) {}
+		return func(_ func(V) bool) {}
 	}
 	return func(yield func(V) bool) {
 		seq(func(_ K, v V) bool {
@@ -71,7 +71,7 @@ func Values[K, V any](seq iter.Seq2[K, V]) iter.Seq[V] {
 // Keys converts a key/value pairs iterator to an iterator of just keys.
 func Keys[K, V any](seq iter.Seq2[K, V]) iter.Seq[K] {
 	if seq == nil {
-		return func(yield func(K) bool) {}
+		return func(_ func(K) bool) {}
 	}
 	return func(yield func(K) bool) {
 		seq(func(k K, _ V) bool {
@@ -80,12 +80,12 @@ func Keys[K, V any](seq iter.Seq2[K, V]) iter.Seq[K] {
 	}
 }
 
-// Slice collects the elements of the 'seq' sequence into a new slice
+// Slice collects the elements of the 'seq' sequence into a new slice.
 func Slice[T any](seq iter.Seq2[T, error]) ([]T, error) {
 	return SliceCap(seq, 0)
 }
 
-// SliceCap collects the elements of the 'seq' sequence into a new slice with predefined capacity
+// SliceCap collects the elements of the 'seq' sequence into a new slice with predefined capacity.
 func SliceCap[T any](seq iter.Seq2[T, error], cap int) (out []T, e error) {
 	if seq == nil {
 		return nil, nil
@@ -96,7 +96,7 @@ func SliceCap[T any](seq iter.Seq2[T, error], cap int) (out []T, e error) {
 	return Append(seq, out)
 }
 
-// Append collects the elements of the 'seq' sequence into the specified 'out' slice
+// Append collects the elements of the 'seq' sequence into the specified 'out' slice.
 func Append[T any, TS ~[]T](seq iter.Seq2[T, error], out TS) (TS, error) {
 	if seq == nil {
 		return nil, nil
@@ -113,17 +113,17 @@ func Append[T any, TS ~[]T](seq iter.Seq2[T, error], out TS) (TS, error) {
 	return out, errOur
 }
 
-// Group converts elements retrieved by the 'next' function into a new map, extracting a key for each element applying the converter 'keyExtractor'.
+// Group converts the elements of the 'seq' sequence into a new map, extracting a key for each element applying the converter 'keyExtractor'.
 func Group[K comparable, V any](seq iter.Seq2[K, V]) map[K][]V {
 	return MapResolv(seq, resolv.Slice[K, V])
 }
 
-// Map collects key\value elements into a new map by iterating over the elements
+// Map collects key\value elements into a new map by iterating over the elements.
 func Map[K comparable, V any](seq iter.Seq2[K, V]) map[K]V {
 	return MapResolv(seq, resolv.First[K, V])
 }
 
-// MapResolv collects key\value elements into a new map by iterating over the elements with resolving of duplicated key values
+// MapResolv collects key\value elements into a new map by iterating over the elements with resolving of duplicated key values.
 func MapResolv[K comparable, V, VR any](seq iter.Seq2[K, V], resolver func(bool, K, VR, V) VR) map[K]VR {
 	return AppendMapResolv(seq, resolver, nil)
 }
@@ -134,7 +134,7 @@ func MapResolvOrder[K comparable, V, VR any](seq iter.Seq2[K, V], resolver func(
 	return AppendMapResolvOrder(seq, resolver, nil, nil)
 }
 
-// AppendMapResolv collects key\value elements into the 'dest' map by iterating over the elements with resolving of duplicated key values
+// AppendMapResolv collects key\value elements into the 'dest' map by iterating over the elements with resolving of duplicated key values.
 func AppendMapResolv[K comparable, V, VR any](seq iter.Seq2[K, V], resolver func(bool, K, VR, V) VR, dest map[K]VR) map[K]VR {
 	if seq == nil {
 		return nil

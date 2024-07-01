@@ -22,7 +22,7 @@ func Of[T any](elements ...T) iter.Seq[T] {
 // ToSeq2 converts an iterator of single elements to an iterator of key/value pairs by applying the 'converter' function to each iterable element.
 func ToSeq2[T, K, V any](seq iter.Seq[T], converter func(T) (K, V)) iter.Seq2[K, V] {
 	if seq == nil {
-		return func(yield func(K, V) bool) {}
+		return func(_ func(K, V) bool) {}
 	}
 	return func(yield func(K, V) bool) {
 		seq(func(v T) bool {
@@ -31,7 +31,7 @@ func ToSeq2[T, K, V any](seq iter.Seq[T], converter func(T) (K, V)) iter.Seq2[K,
 	}
 }
 
-// First returns the first element that satisfies the condition of the 'predicate' function
+// First returns the first element that satisfies the condition of the 'predicate' function.
 func First[T any](seq iter.Seq[T], predicate func(T) bool) (v T, ok bool) {
 	if seq == nil {
 		return
@@ -47,7 +47,7 @@ func First[T any](seq iter.Seq[T], predicate func(T) bool) (v T, ok bool) {
 	return
 }
 
-// Firstt returns the first element that satisfies the condition of the 'predicate' function
+// Firstt returns the first element that satisfies the condition of the 'predicate' function.
 func Firstt[T any](seq iter.Seq[T], predicate func(T) (bool, error)) (v T, ok bool, err error) {
 	if seq == nil {
 		return v, false, nil
@@ -67,12 +67,12 @@ func Firstt[T any](seq iter.Seq[T], predicate func(T) (bool, error)) (v T, ok bo
 	return v, ok, err
 }
 
-// Slice collects the elements of the 'seq' sequence into a new slice
+// Slice collects the elements of the 'seq' sequence into a new slice.
 func Slice[T any](seq iter.Seq[T]) []T {
 	return SliceCap(seq, 0)
 }
 
-// SliceCap collects the elements of the 'seq' sequence into a new slice with predefined capacity
+// SliceCap collects the elements of the 'seq' sequence into a new slice with predefined capacity.
 func SliceCap[T any](seq iter.Seq[T], cap int) (out []T) {
 	if seq == nil {
 		return nil
@@ -83,7 +83,7 @@ func SliceCap[T any](seq iter.Seq[T], cap int) (out []T) {
 	return Append(seq, out)
 }
 
-// Append collects the elements of the 'seq' sequence into the specified 'out' slice
+// Append collects the elements of the 'seq' sequence into the specified 'out' slice.
 func Append[T any, TS ~[]T](seq iter.Seq[T], out TS) TS {
 	if seq == nil {
 		return nil
@@ -95,12 +95,13 @@ func Append[T any, TS ~[]T](seq iter.Seq[T], out TS) TS {
 	return out
 }
 
+// Reduce reduces the elements of the 'seq' sequence an one using the 'merge' function.
 func Reduce[T any](seq iter.Seq[T], merge func(T, T) T) T {
 	result, _ := ReduceOK(seq, merge)
 	return result
 }
 
-// ReduceOK reduces the elements retrieved by the 'seq' iterator into an one using the 'merge' function.
+// ReduceOK reduces the elements of the 'seq' sequence an one using the 'merge' function.
 // Returns ok==false if the seq returns ok=false at the first call (no more elements).
 func ReduceOK[T any](seq iter.Seq[T], merge func(T, T) T) (result T, ok bool) {
 	if seq == nil {
@@ -119,13 +120,13 @@ func ReduceOK[T any](seq iter.Seq[T], merge func(T, T) T) (result T, ok bool) {
 	return result, started
 }
 
-// Reducee reduces the elements retrieved by the 'next' function into an one pair using the 'merge' function.
+// Reducee reduces the elements of the 'seq' sequence an one using the 'merge' function.
 func Reducee[T any](seq iter.Seq[T], merge func(T, T) (T, error)) (T, error) {
 	result, _, err := ReduceeOK(seq, merge)
 	return result, err
 }
 
-// ReduceeOK reduces the elements retrieved by the 'seq' iterator into an one using the 'merge' function.
+// ReduceeOK reduces the elements of the 'seq' sequence an one using the 'merge' function.
 // Returns ok==false if the seq returns ok=false at the first call (no more elements).
 func ReduceeOK[T any](seq iter.Seq[T], merge func(T, T) (T, error)) (result T, ok bool, err error) {
 	if seq == nil {
@@ -147,6 +148,7 @@ func ReduceeOK[T any](seq iter.Seq[T], merge func(T, T) (T, error)) (result T, o
 	return result, started, err
 }
 
+// Accum accumulates a value by using the 'first' argument to initialize the accumulator and sequentially applying the 'merge' functon to the accumulator and each element of the 'seq' sequence.
 func Accum[T any](first T, seq iter.Seq[T], merge func(T, T) T) T {
 	accumulator := first
 	if seq == nil {
@@ -160,6 +162,7 @@ func Accum[T any](first T, seq iter.Seq[T], merge func(T, T) T) T {
 	return accumulator
 }
 
+// Accumm accumulates a value by using the 'first' argument to initialize the accumulator and sequentially applying the 'merge' functon to the accumulator and each element of the 'seq' sequence.
 func Accumm[T any](first T, seq iter.Seq[T], merge func(T, T) (T, error)) (accumulator T, err error) {
 	accumulator = first
 	if seq == nil {
@@ -173,18 +176,18 @@ func Accumm[T any](first T, seq iter.Seq[T], merge func(T, T) (T, error)) (accum
 
 }
 
-// Sum returns the sum of all elements
+// Sum returns the sum of all elements.
 func Sum[T c.Summable](seq iter.Seq[T]) (out T) {
 	return Accum(out, seq, op.Sum[T])
 }
 
-// HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful
+// HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful.
 func HasAny[T any](seq iter.Seq[T], predicate func(T) bool) bool {
 	_, ok := First(seq, predicate)
 	return ok
 }
 
-// Contains finds the first element that equal to the example and returns true
+// Contains finds the first element that equal to the example and returns true.
 func Contains[T comparable](seq iter.Seq[T], example T) bool {
 	if seq == nil {
 		return false
@@ -215,7 +218,7 @@ func Conv[From, To any](seq iter.Seq[From], converter func(From) (To, error)) it
 // Convert creates an iterator that applies the 'converter' function to each iterable element.
 func Convert[From, To any](seq iter.Seq[From], converter func(From) To) iter.Seq[To] {
 	if seq == nil {
-		return func(yield func(To) bool) {}
+		return func(_ func(To) bool) {}
 	}
 	return func(consumer func(To) bool) {
 		seq(func(from From) bool {
@@ -224,7 +227,7 @@ func Convert[From, To any](seq iter.Seq[From], converter func(From) To) iter.Seq
 	}
 }
 
-// Flat is used to iterate ove multidimension sequences in single dimension form, like:
+// Flat is used to iterate over a two-dimensional sequence in single dimension form, like:
 //
 //	var arrays iter.Seq[[]int]
 //	...
@@ -233,7 +236,7 @@ func Convert[From, To any](seq iter.Seq[From], converter func(From) To) iter.Seq
 //	}
 func Flat[From, To any](seq iter.Seq[From], flattener func(From) []To) iter.Seq[To] {
 	if seq == nil {
-		return func(yield func(To) bool) {}
+		return func(_ func(To) bool) {}
 	}
 	return func(yield func(To) bool) {
 		seq(func(v From) bool {
@@ -251,7 +254,7 @@ func Flat[From, To any](seq iter.Seq[From], flattener func(From) []To) iter.Seq[
 // Filter creates an iterator that iterates only those elements for which the 'filter' function returns true.
 func Filter[T any](seq iter.Seq[T], filter func(T) bool) iter.Seq[T] {
 	if seq == nil {
-		return func(yield func(T) bool) {}
+		return func(_ func(T) bool) {}
 	}
 	return func(consumer func(T) bool) {
 		seq(func(e T) bool {
@@ -263,9 +266,10 @@ func Filter[T any](seq iter.Seq[T], filter func(T) bool) iter.Seq[T] {
 	}
 }
 
+// Filt creates an erroreable iterator that iterates only those elements for which the 'filter' function returns true.
 func Filt[T any](seq iter.Seq[T], filter func(T) (bool, error)) iter.Seq2[T, error] {
 	if seq == nil {
-		return func(yield func(T, error) bool) {}
+		return func(_ func(T, error) bool) {}
 	}
 	var err error
 	return func(yield func(T, error) bool) {

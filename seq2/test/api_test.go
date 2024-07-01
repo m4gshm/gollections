@@ -36,7 +36,7 @@ func Test_Group(t *testing.T) {
 }
 
 func Test_Filter(t *testing.T) {
-	s := seq2.Filter(seq2.Of("first", "second", "third"), func(i int, s string) bool { return i%2 == 0 })
+	s := seq2.Filter(seq2.Of("first", "second", "third"), func(i int, _ string) bool { return i%2 == 0 })
 	k := seq.Slice(seq2.Keys(s))
 	v := seq.Slice(seq2.Values(s))
 

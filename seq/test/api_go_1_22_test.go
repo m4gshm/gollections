@@ -16,7 +16,7 @@ import (
 )
 
 func Test_SeqOfNil(t *testing.T) {
-	var in, out []int = nil, nil
+	var in, out []int
 
 	iter := false
 	for e := range seq.Of(in...) {
@@ -29,8 +29,8 @@ func Test_SeqOfNil(t *testing.T) {
 }
 
 func Test_ConvertNilSeq(t *testing.T) {
-	var in iter.Seq[int] = nil
-	var out []int = nil
+	var in iter.Seq[int]
+	var out []int
 
 	iter := false
 	for e := range seq.Convert(in, as.Is) {

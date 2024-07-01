@@ -270,7 +270,7 @@ include::../examples/mapexamples/map_Conv_test.go[lines=17..22,indent=0]
 [#seq]
 === link:./seq/api.go[seq], link:./seq2/api.go[seq2]
 
-API extends rangefunc iterator types `seq.Seq[V]`, `seq.Seq2[K,V]` with functions kit: Convert, Filter, Reduce.
+API extends rangefunc iterator types `seq.Seq[V]`, `seq.Seq2[K,V]` with utility functions kit.
 
 [source,go]
 ----

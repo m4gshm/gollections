@@ -459,7 +459,7 @@ var all, err = map_.Conv(employers, func(title string, employer map[string]strin
 ## [seq](./seq/api.go), [seq2](./seq2/api.go)
 
 API extends rangefunc iterator types `seq.Seq[V]`, `seq.Seq2[K,V]` with
-functions kit: Convert, Filter, Reduce.
+utility functions kit.
 
 ``` go
 even := func(i int) bool { return i%2 == 0 }
