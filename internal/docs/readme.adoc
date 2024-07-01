@@ -192,6 +192,7 @@ include::../examples/sliceexamples/slice_Convert_test.go[lines=13..16,indent=0]
 ----
 include::../examples/sliceexamples/slice_Conv_test.go[lines=13..16,indent=0]
 ----
+===== Slice converters
 ====== slice.Filter
 [source,go]
 ----
@@ -266,10 +267,112 @@ include::../examples/mapexamples/map_Convert_test.go[lines=17..22,indent=0]
 include::../examples/mapexamples/map_Conv_test.go[lines=17..22,indent=0]
 ----
 
+[#seq]
+=== link:./seq/api.go[seq], link:./seq2/api.go[seq2]
+
+API extends rangefunc iterator types `seq.Seq[V]`, `seq.Seq2[K,V]` with utility functions kit.
+
+[source,go]
+----
+include::../examples/seqexamples/seq_filter_convert_reduce_test.go[lines=13..17,indent=0]
+----
+or
+[source,go]
+----
+include::../examples/seqexamples/seq2_filter_convert_reduce_test.go[lines=14..17,indent=0]
+----
+==== Sequence API
+
+To use any collection or loop as a rangefunc sequecne just call `link:#iterating-over-loops[All]` method of that one.
+
+In many cases the API likes the link:#loop-kvloop-and-breakable-versions-breakloop-breakkvloop[loop] API.
+
+===== Instantiators
+====== seq.Of, seq2.Of, seq2.OfMap
+[source,go]
+----
+import(
+    "github.com/m4gshm/gollections/seq"
+    "github.com/m4gshm/gollections/seq2"
+)
+include::../examples/seqexamples/seq_Of_test.go[lines=14..19,indent=0]
+----
+===== Collectors
+====== seq.Slice
+[source,go]
+----
+include::../examples/seqexamples/seq_Slice_test.go[lines=12..16,indent=0]
+----
+====== seq2.Group, seq2.Map
+[source,go]
+----
+import (
+    "iter"
+
+	"github.com/m4gshm/gollections/expr/use"
+	"github.com/m4gshm/gollections/seq"
+	"github.com/m4gshm/gollections/seq2"
+	"github.com/m4gshm/gollections/slice"
+	"github.com/m4gshm/gollections/slice/sort"
+)
+include::../examples/seqexamples/seq2_Group_test.go[lines=17..25,indent=0]
+----
+===== Reducers
+====== seq.Reduce
+[source,go]
+----
+include::../examples/seqexamples/seq_Reduce_test.go[lines=12..15,indent=0]
+----
+====== seq.ReduceOK
+[source,go]
+----
+include::../examples/seqexamples/seq_ReduceOK_test.go[lines=12..21,indent=0]
+----
+====== seq.First
+[source,go]
+----
+import (
+    "github.com/m4gshm/gollections/predicate/more"
+    "github.com/m4gshm/gollections/seq"
+)
+include::../examples/seqexamples/seq_First_test.go[lines=13..15,indent=0]
+----
+===== Element converters
+====== seq.Convert
+[source,go]
+----
+include::../examples/seqexamples/seq_Convert_test.go[lines=12..15,indent=0]
+----
+====== seq.Conv
+[source,go]
+----
+include::../examples/seqexamples/seq_Conv_test.go[lines=14..17,indent=0]
+----
+===== Sequence converters
+====== seq.Filter
+[source,go]
+----
+import (
+    "github.com/m4gshm/gollections/predicate/exclude"
+    "github.com/m4gshm/gollections/predicate/one"
+    "github.com/m4gshm/gollections/seq"
+)
+include::../examples/seqexamples/seq_Filter.go[lines=14..20,indent=0]
+----
+====== seq.Flat
+[source,go]
+----
+import (
+    "github.com/m4gshm/gollections/convert/as"
+    "github.com/m4gshm/gollections/seq"
+)
+include::../examples/seqexamples/seq_Flat_test.go[lines=13..16,indent=0]
+----
+
 [#loop]
 === link:./loop/api.go[loop], link:./kv/loop/api.go[kv/loop] and breakable versions link:./break/loop/api.go[break/loop], link:./break/kv/loop/api.go[break/kv/loop]
 
-Low-level API for iteration based on next functions:
+Legacy iterators API based on the following functions:
 
 [source,go]
 ----
@@ -388,6 +491,7 @@ include::../examples/loopexamples/loop_Convert_test.go[lines=12..15,indent=0]
 ----
 include::../examples/loopexamples/loop_Conv_test.go[lines=13..16,indent=0]
 ----
+===== Loop converters
 ====== loop.Filter
 [source,go]
 ----

@@ -308,6 +308,8 @@ result, err := slice.Conv(slice.Of("1", "3", "5", "_7", "9", "11"), strconv.Atoi
 //[]int{1, 3, 5}, ErrSyntax
 ```
 
+#### Slice converters
+
 ##### slice.Filter
 
 ``` go
@@ -454,9 +456,162 @@ var all, err = map_.Conv(employers, func(title string, employer map[string]strin
 //map[d:Bob j:Tom], nil
 ```
 
+## [seq](./seq/api.go), [seq2](./seq2/api.go)
+
+API extends rangefunc iterator types `seq.Seq[V]`, `seq.Seq2[K,V]` with
+utility functions kit.
+
+``` go
+even := func(i int) bool { return i%2 == 0 }
+sequence := seq.Convert(seq.Filter(seq.Of(1, 2, 3, 4), even), strconv.Itoa)
+var result []string = seq.Slice(sequence) //[2 4]
+```
+
+or
+
+``` go
+intSeq := seq.Conv(seq.Of("1", "2", "3", "ddd4", "5"), strconv.Atoi)
+ints, err := seq2.Slice(intSeq) //[1 2 3], invalid syntax
+```
+
+### Sequence API
+
+To use any collection or loop as a rangefunc sequecne just call `All`
+method of that one.
+
+In many cases the API likes the
+[loop](#loop-kvloop-and-breakable-versions-breakloop-breakkvloop) API.
+
+#### Instantiators
+
+##### seq.Of, seq2.Of, seq2.OfMap
+
+``` go
+import(
+    "github.com/m4gshm/gollections/seq"
+    "github.com/m4gshm/gollections/seq2"
+)
+
+var (
+    ints  iter.Seq[int]          = seq.Of(1, 2, 3)
+    pairs iter.Seq2[string, int] = seq2.OfMap(map[string]int{"first": 1, "second": 2, "third": 3})
+)
+```
+
+#### Collectors
+
+##### seq.Slice
+
+``` go
+filter := func(u User) bool { return u.age <= 30 }
+names := seq.Slice(seq.Convert(seq.Filter(seq.Of(users...), filter), User.Name))
+//[Bob Tom]
+```
+
+##### seq2.Group, seq2.Map
+
+``` go
+import (
+    "iter"
+
+    "github.com/m4gshm/gollections/expr/use"
+    "github.com/m4gshm/gollections/seq"
+    "github.com/m4gshm/gollections/seq2"
+    "github.com/m4gshm/gollections/slice"
+    "github.com/m4gshm/gollections/slice/sort"
+)
+
+var users iter.Seq[User] = seq.Of(users...)
+var groups iter.Seq2[string, User] = seq.ToSeq2(users, func(u User) (string, User) {
+    return use.If(u.age <= 20, "<=20").If(u.age <= 30, "<=30").Else(">30"), u
+})
+var ageGroups map[string][]User = seq2.Group(groups)
+
+//map[<=20:[{Tom 18 []}] <=30:[{Bob 26 []}] >30:[{Alice 35 []} {Chris 41 []}]]
+```
+
+#### Reducers
+
+##### seq.Reduce
+
+``` go
+var sum = seq.Reduce(seq.Of(1, 2, 3, 4, 5, 6), func(i1, i2 int) int { return i1 + i2 })
+//21
+```
+
+##### seq.ReduceOK
+
+``` go
+adder := func(i1, i2 int) int { return i1 + i2 }
+
+sum, ok := seq.ReduceOK(seq.Of(1, 2, 3, 4, 5, 6), adder)
+//21, true
+
+emptyLoop := seq.Of[int]()
+sum, ok = seq.ReduceOK(emptyLoop, adder)
+//0, false
+```
+
+##### seq.First
+
+``` go
+import (
+    "github.com/m4gshm/gollections/predicate/more"
+    "github.com/m4gshm/gollections/seq"
+)
+
+result, ok := seq.First(seq.Of(1, 3, 5, 7, 9, 11), more.Than(5)) //7, true
+```
+
+#### Element converters
+
+##### seq.Convert
+
+``` go
+var s []string = seq.Slice(seq.Convert(seq.Of(1, 3, 5, 7, 9, 11), strconv.Itoa))
+//[]string{"1", "3", "5", "7", "9", "11"}
+```
+
+##### seq.Conv
+
+``` go
+result, err := seq2.Slice(seq.Conv(seq.Of("1", "3", "5", "_7", "9", "11"), strconv.Atoi))
+//[]int{1, 3, 5}, ErrSyntax
+```
+
+#### Sequence converters
+
+##### seq.Filter
+
+``` go
+import (
+    "github.com/m4gshm/gollections/predicate/exclude"
+    "github.com/m4gshm/gollections/predicate/one"
+    "github.com/m4gshm/gollections/seq"
+)
+
+var f1 = seq.Slice(seq.Filter(seq.Of(1, 3, 5, 7, 9, 11), one.Of(1, 7).Or(one.Of(11))))
+//[]int{1, 7, 11}
+
+var f2 = seq.Slice(seq.Filter(seq.Of(1, 3, 5, 7, 9, 11), exclude.All(1, 7, 11)))
+//[]int{3, 5, 9}
+```
+
+##### seq.Flat
+
+``` go
+import (
+    "github.com/m4gshm/gollections/convert/as"
+    "github.com/m4gshm/gollections/seq"
+)
+
+var i []int = seq.Slice(seq.Flat(seq.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...), as.Is))
+//[]int{1, 2, 3, 4, 5, 6}
+```
+
 ## [loop](./loop/api.go), [kv/loop](./kv/loop/api.go) and breakable versions [break/loop](./break/loop/api.go), [break/kv/loop](./break/kv/loop/api.go)
 
-Low-level API for iteration based on next functions:
+Legacy iterators API based on the following functions:
 
 ``` go
 type (
@@ -640,6 +795,8 @@ var s []string = loop.Convert(loop.Of(1, 3, 5, 7, 9, 11), strconv.Itoa).Slice()
 result, err := loop.Conv(loop.Of("1", "3", "5", "_7", "9", "11"), strconv.Atoi).Slice()
 //[]int{1, 3, 5}, ErrSyntax
 ```
+
+#### Loop converters
 
 ##### loop.Filter
 

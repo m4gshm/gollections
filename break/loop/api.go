@@ -236,7 +236,7 @@ func ReduceeOK[T any](next func() (T, bool, error), merge func(T, T) (T, error))
 	if result, ok, err = next(); err != nil || !ok {
 		return result, ok, err
 	}
- 	result, err = Accumm(result, next, merge)
+	result, err = Accumm(result, next, merge)
 	return result, true, err
 }
 
@@ -402,7 +402,7 @@ func ConvertAndFilter[From, To any](next func() (From, bool, error), converter f
 	return FilterConvertFilter(next, always.True[From], converter, filter)
 }
 
-// Flatt creates a loop that extracts slices of 'To' by the 'flattener' function from iterable elements of 'From' and flattens as one iterable collection of 'To' elements.
+// Flatt converts a two-dimensional loop in an one-dimensional one.
 func Flatt[From, To any](next func() (From, bool, error), flattener func(From) ([]To, error)) Loop[To] {
 	if next == nil {
 		return nil
@@ -438,7 +438,7 @@ func Flatt[From, To any](next func() (From, bool, error), flattener func(From) (
 	}
 }
 
-// Flat creates a loop that extracts slices of 'To' by the 'flattener' function from iterable elements of 'From' and flattens as one iterable collection of 'To' elements.
+// Flat converts a two-dimensional loop in an one-dimensional one.
 func Flat[From, To any](next func() (From, bool, error), flattener func(From) []To) Loop[To] {
 	if next == nil {
 		return nil

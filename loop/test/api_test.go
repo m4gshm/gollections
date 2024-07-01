@@ -333,11 +333,6 @@ func Test_FiltAndConv(t *testing.T) {
 	assert.Equal(t, slice.Of(8, 16), o)
 }
 
-func Test_Filtering(t *testing.T) {
-	r := loop.Filter(loop.Of(1, 2, 3, 4, 5, 6), func(i int) bool { return i%2 == 0 })
-	assert.Equal(t, []int{2, 4, 6}, loop.Slice(r))
-}
-
 type rows[T any] struct {
 	row    []T
 	cursor int
@@ -471,7 +466,7 @@ func Test_ConvIndexed(t *testing.T) {
 	assert.Equal(t, slice.Of(10, 11, 12, 13, 14), result)
 }
 
-func Test_Containt(t *testing.T) {
+func Test_Contains(t *testing.T) {
 	assert.True(t, loop.Contains(loop.Of(1, 2, 3), 3))
 	assert.False(t, loop.Contains(loop.Of(1, 2, 3), 0))
 }

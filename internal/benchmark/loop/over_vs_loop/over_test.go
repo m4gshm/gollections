@@ -8,7 +8,7 @@ import (
 
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/loop/range_"
-	"github.com/m4gshm/gollections/over"
+	"github.com/m4gshm/gollections/seq"
 )
 
 var max = 100000
@@ -36,7 +36,7 @@ func Benchmark_loop_Converted_All(b *testing.B) {
 func Benchmark_over_Converted(b *testing.B) {
 	integers := range_.Of(0, max)
 	for i := 0; i < b.N; i++ {
-		for element := range over.Converted(integers.All, strconv.Itoa) {
+		for element := range seq.Convert(integers.All, strconv.Itoa) {
 			resultStr = element
 		}
 	}
@@ -45,7 +45,7 @@ func Benchmark_over_Converted(b *testing.B) {
 func Benchmark_over_Converted_direct(b *testing.B) {
 	integers := range_.Of(0, max)
 	for i := 0; i < b.N; i++ {
-		over.Converted(integers.All, strconv.Itoa)(func(element string) bool {
+		seq.Convert(integers.All, strconv.Itoa)(func(element string) bool {
 			resultStr = element
 			return true
 		})
@@ -77,7 +77,7 @@ func Benchmark_loop_Convert_Filtered_rangefunc(b *testing.B) {
 func Benchmark_over_Convert_Filtered(b *testing.B) {
 	integers := range_.Of(0, max)
 	for i := 0; i < b.N; i++ {
-		for element := range over.Converted(over.Filtered(integers.All, even), strconv.Itoa) {
+		for element := range seq.Convert(seq.Filter(integers.All, even), strconv.Itoa) {
 			resultStr = element
 		}
 	}

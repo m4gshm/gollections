@@ -102,7 +102,6 @@ func Benchmark_Slice_Iter_Iterating2(b *testing.B) {
 	}
 }
 
-
 func Benchmark_Slice_Mutable_Iter_Iterating(b *testing.B) {
 	integers := slice.Range(0, max)
 	for _, casee := range cases {

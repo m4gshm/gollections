@@ -359,17 +359,20 @@ func ConvertAndFilter[From, To any](next func() (From, bool), converter func(Fro
 	return FilterConvertFilter(next, always.True[From], converter, filter)
 }
 
-// Flatt creates a loop that extracts slices of 'To' by the 'flattener' function from iterable elements of 'From' and flattens as one iterable collection of 'To' elements.
+// Flatt converts a two-dimensional loop in an one-dimensional one.
 func Flatt[From, To any](next func() (From, bool), flattener func(From) ([]To, error)) breakloop.Loop[To] {
 	return breakloop.Flatt(breakloop.From(next), flattener)
 }
 
-// FlattS creates a loop that extracts slices of 'To' by the 'flattener' function from the elements of 'From' and flattens as one iterable collection of 'To' elements.
+// FlattS transforms the n-dimensional 'elements' slice to a n-1 dimensional loop.
 func FlattS[FS ~[]From, From, To any](elements FS, flattener func(From) ([]To, error)) breakloop.Loop[To] {
 	return Flatt(S(elements), flattener)
 }
 
-// Flat creates a loop that extracts slices of 'To' by the 'flattener' function from iterable elements of 'From' and flattens as one iterable collection of 'To' elements.
+// Flat converts a two-dimensional loop in a one-dimensional one, like:
+//
+//	var arrays func() ([]int, boot) = ...
+//	var ints func() (int, boot) = loop.Flat(arrays, as.Is)
 func Flat[From, To any](next func() (From, bool), flattener func(From) []To) Loop[To] {
 	if next == nil {
 		return nil
@@ -749,7 +752,7 @@ func Mapp[T any, K comparable, V any](next func() (T, bool), keyExtractor func(T
 
 // MapResolv collects key\value elements into a new map by iterating over the elements with resolving of duplicated key values
 func MapResolv[T any, K comparable, V, VR any](next func() (T, bool), keyExtractor func(T) K, valExtractor func(T) V, resolver func(bool, K, VR, V) VR) map[K]VR {
-	return AppendMapResolv(next, keyExtractor, valExtractor, resolver, map[K]VR{})
+	return AppendMapResolv(next, keyExtractor, valExtractor, resolver, nil)
 }
 
 // MapResolvOrder collects key\value elements into a new map by iterating over the elements with resolving of duplicated key values.

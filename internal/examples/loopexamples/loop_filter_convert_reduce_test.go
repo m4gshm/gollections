@@ -9,7 +9,7 @@ import (
 	"github.com/m4gshm/gollections/loop"
 )
 
-func Test_Slice_Vs_Loop(t *testing.T) {
+func Test_Usage_Loop(t *testing.T) {
 
 	even := func(i int) bool { return i%2 == 0 }
 	seq := loop.Convert(loop.Filter(loop.Of(1, 2, 3, 4), even), strconv.Itoa)
