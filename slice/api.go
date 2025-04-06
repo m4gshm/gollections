@@ -15,6 +15,7 @@ import (
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_/resolv"
 	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/op/check"
 	"github.com/m4gshm/gollections/op/check/not"
 )
 
@@ -949,7 +950,7 @@ func Has[TS ~[]T, T any](elements TS, condition func(T) bool) bool {
 
 // IsEmpty checks whether the specified slice is empty
 func IsEmpty[TS ~[]T, T any](elements TS) bool {
-	return len(elements) == 0
+	return check.Empty(elements)
 }
 
 // NotEmpty checks whether the specified slice is not empty

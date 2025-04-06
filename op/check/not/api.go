@@ -7,3 +7,11 @@ import "github.com/m4gshm/gollections/op/check"
 func Nil[T any](reference *T) bool {
 	return check.NotNil(reference)
 }
+
+func Empty[TS ~[]T, T any](elements TS) bool {
+	return check.NotEmpty(elements)
+}
+
+func EmptyStr(s string) bool {
+	return check.NotEmptyStr(s)
+}
