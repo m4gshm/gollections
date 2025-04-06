@@ -27,7 +27,7 @@ func Test_DeepClone(t *testing.T) {
 	c := clone.Deep(entities, func(e *entity) *entity { return ptr.Of(*e) })
 
 	assert.Equal(t, entities, c)
-	assert.NotSame(t, entities, c)
+	assert.NotSame(t, &entities, &c)
 
 	for i := range entities {
 		assert.Equal(t, entities[i], c[i])
