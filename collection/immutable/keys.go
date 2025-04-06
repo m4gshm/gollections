@@ -62,7 +62,7 @@ func (m MapKeys[K, V]) Len() int {
 
 // IsEmpty returns true if the collection is empty
 func (m MapKeys[K, V]) IsEmpty() bool {
-	return m.Len() == 0
+	return collection.IsEmpty(m)
 }
 
 // Slice collects the elements to a slice

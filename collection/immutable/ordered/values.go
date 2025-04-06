@@ -64,7 +64,7 @@ func (m MapValues[K, V]) Len() int {
 
 // IsEmpty returns true if the collection is empty
 func (m MapValues[K, V]) IsEmpty() bool {
-	return m.Len() == 0
+	return collection.IsEmpty(m)
 }
 
 // Slice collects the values to a slice

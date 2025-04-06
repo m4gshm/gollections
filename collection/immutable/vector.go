@@ -87,7 +87,7 @@ func (v Vector[T]) Len() int {
 
 // IsEmpty returns true if the collection is empty
 func (v Vector[T]) IsEmpty() bool {
-	return v.Len() == 0
+	return collection.IsEmpty(v)
 }
 
 // Get returns an element by the index, otherwise, if the provided index is ouf of the vector len, returns zero T and false in the second result

@@ -79,7 +79,7 @@ func (m Map[K, V]) Len() int {
 
 // IsEmpty returns true if the map is empty
 func (m Map[K, V]) IsEmpty() bool {
-	return m.Len() == 0
+	return collection.IsEmpty(m)
 }
 
 // Contains checks is the map contains a key

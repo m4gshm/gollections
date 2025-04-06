@@ -106,7 +106,7 @@ func (s *Set[T]) Clone() *Set[T] {
 
 // IsEmpty returns true if the collection is empty
 func (s *Set[T]) IsEmpty() bool {
-	return s.Len() == 0
+	return collection.IsEmpty(s)
 }
 
 // Len returns amount of the elements

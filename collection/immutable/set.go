@@ -73,7 +73,7 @@ func (s Set[T]) Len() int {
 
 // IsEmpty returns true if the collection is empty
 func (s Set[T]) IsEmpty() bool {
-	return s.Len() == 0
+	return collection.IsEmpty(s)
 }
 
 // For applies the 'consumer' function for the elements until the consumer returns the c.Break to stop.

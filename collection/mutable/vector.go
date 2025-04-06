@@ -103,7 +103,7 @@ func (v *Vector[T]) Clone() *Vector[T] {
 
 // IsEmpty returns true if the collection is empty
 func (v *Vector[T]) IsEmpty() bool {
-	return v.Len() == 0
+	return collection.IsEmpty(v)
 }
 
 // Len returns amount of elements

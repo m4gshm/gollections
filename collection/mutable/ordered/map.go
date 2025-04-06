@@ -124,7 +124,7 @@ func (m *Map[K, V]) Len() int {
 
 // IsEmpty returns true if the map is empty
 func (m *Map[K, V]) IsEmpty() bool {
-	return m.Len() == 0
+	return collection.IsEmpty(m)
 }
 
 // Track applies the 'consumer' function for all key/value pairs until the consumer returns the c.Break to stop.
