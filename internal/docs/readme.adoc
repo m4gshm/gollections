@@ -172,6 +172,14 @@ import (
 )
 include::../examples/sliceexamples/slice_First_test.go[lines=13..15,indent=0]
 ----
+====== slice.Head
+[source,go]
+----
+import (
+    "github.com/m4gshm/gollections/slice"
+)
+include::../examples/sliceexamples/slice_Head_test.go[lines=12..14,indent=0]
+----
 ====== slice.Last
 [source,go]
 ----
@@ -180,6 +188,14 @@ import (
     "github.com/m4gshm/gollections/slice"
 )
 include::../examples/sliceexamples/slice_Last_test.go[lines=13..15,indent=0]
+----
+====== slice.Tail
+[source,go]
+----
+import (
+    "github.com/m4gshm/gollections/slice"
+)
+include::../examples/sliceexamples/slice_Tail_test.go[lines=12..14,indent=0]
 ----
 ===== Element converters
 ====== slice.Convert

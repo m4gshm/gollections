@@ -694,48 +694,82 @@ func Sum[TS ~[]T, T c.Summable](elements TS) (out T) {
 	return Accum(out, elements, op.Sum[T])
 }
 
-// First returns the first element that satisfies requirements of the predicate 'by'
-func First[TS ~[]T, T any](elements TS, by func(T) bool) (no T, ok bool) {
-	for _, e := range elements {
-		if by(e) {
-			return e, true
-		}
+func Head[TS ~[]T, T any](elements TS) (no T, ok bool) {
+	if len(elements) > 0 {
+		return elements[0], true
 	}
 	return no, false
+}
+
+func Tail[TS ~[]T, T any](elements TS) (no T, ok bool) {
+	if l := len(elements); l > 0 {
+		return elements[l-1], true
+	}
+	return no, false
+}
+
+// First returns the first element that satisfies requirements of the predicate 'by'
+func First[TS ~[]T, T any](elements TS, by func(T) bool) (no T, ok bool) {
+	e, i := FirstI(elements, by)
+	return e, i != -1
 }
 
 // Firstt returns the first element that satisfies the condition of the 'by' function
 func Firstt[TS ~[]T, T any](elements TS, by func(T) (bool, error)) (no T, ok bool, err error) {
-	for _, e := range elements {
-		if ok, err = by(e); err != nil || ok {
-			return e, ok, err
+	e, i, err := FirsttI(elements, by)
+	return e, i != -1, err
+}
+
+func FirstI[TS ~[]T, T any](elements TS, by func(T) bool) (no T, index int) {
+	for i, e := range elements {
+		if by(e) {
+			return e, i
 		}
 	}
-	return no, false, nil
+	return no, -1
+}
+
+func FirsttI[TS ~[]T, T any](elements TS, by func(T) (bool, error)) (no T, index int, err error) {
+	for i, e := range elements {
+		if ok, err := by(e); err != nil || ok {
+			return e, i, err
+		}
+	}
+	return no, -1, nil
 }
 
 // Last returns the latest element that satisfies requirements of the predicate 'filter'
 func Last[TS ~[]T, T any](elements TS, by func(T) bool) (no T, ok bool) {
-	for i := len(elements) - 1; i >= 0; i-- {
-		e := elements[i]
-		if by(e) {
-			return e, true
-		}
-	}
-	return no, false
+	e, i := LastI(elements, by)
+	return e, i != -1
 }
 
 // Lastt returns the latest element that satisfies requirements of the predicate 'filter'
 func Lastt[TS ~[]T, T any](elements TS, by func(T) (bool, error)) (no T, ok bool, err error) {
+	e, i, err := LasttI(elements, by)
+	return e, i != -1, err
+}
+
+func LastI[TS ~[]T, T any](elements TS, by func(T) bool) (no T, index int) {
 	for i := len(elements) - 1; i >= 0; i-- {
 		e := elements[i]
-		if ok, err = by(e); err != nil {
-			return no, false, err
-		} else if ok {
-			return e, true, nil
+		if by(e) {
+			return e, i
 		}
 	}
-	return no, false, nil
+	return no, -1
+}
+
+func LasttI[TS ~[]T, T any](elements TS, by func(T) (bool, error)) (no T, index int, err error) {
+	for i := len(elements) - 1; i >= 0; i-- {
+		e := elements[i]
+		if ok, err := by(e); err != nil {
+			return no, i, err
+		} else if ok {
+			return e, i, nil
+		}
+	}
+	return no, -1, nil
 }
 
 // Track applies the 'consumer' function to the elements until the consumer returns the c.Break to stop.tracking

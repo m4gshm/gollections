@@ -42,6 +42,26 @@ func Benchmark_First_PlainOld(b *testing.B) {
 	assert.Equal(b, threshhold+1, f)
 }
 
+func Benchmark_Head_Slice(b *testing.B) {
+	var f int
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		f, _ = slice.Head(values)
+	}
+	b.StopTimer()
+	assert.Equal(b, 1, f)
+}
+
+func Benchmark_Tail_Slice(b *testing.B) {
+	var f int
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		f, _ = slice.Tail(values)
+	}
+	b.StopTimer()
+	assert.Equal(b, max, f)
+}
+
 func Benchmark_First_Slice(b *testing.B) {
 	op := func(i int) bool { return i > threshhold }
 	var f int
@@ -53,6 +73,18 @@ func Benchmark_First_Slice(b *testing.B) {
 	assert.Equal(b, threshhold+1, f)
 }
 
+func Benchmark_FirstI_Slice(b *testing.B) {
+	op := func(i int) bool { return i > threshhold }
+	var f, ind int
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		f, ind = slice.FirstI(values, op)
+	}
+	b.StopTimer()
+	assert.Equal(b, threshhold+1, f)
+	assert.Equal(b, threshhold, ind)
+}
+
 func Benchmark_Last_Slice(b *testing.B) {
 	op := func(i int) bool { return i < 50000 }
 	var f int
@@ -62,6 +94,18 @@ func Benchmark_Last_Slice(b *testing.B) {
 	}
 	b.StopTimer()
 	assert.Equal(b, threshhold-1, f)
+}
+
+func Benchmark_LastI_Slice(b *testing.B) {
+	op := func(i int) bool { return i < 50000 }
+	var f, ind int
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		f, ind = slice.LastI(values, op)
+	}
+	b.StopTimer()
+	assert.Equal(b, threshhold-1, f)
+	assert.Equal(b, threshhold-2, ind)
 }
 
 func Benchmark_ConvertAndFilter_Slice_Loop(b *testing.B) {

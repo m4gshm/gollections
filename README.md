@@ -281,6 +281,16 @@ import (
 result, ok := slice.First([]int{1, 3, 5, 7, 9, 11}, more.Than(5)) //7, true
 ```
 
+##### slice.Head
+
+``` go
+import (
+    "github.com/m4gshm/gollections/slice"
+)
+
+result, ok := slice.Head([]int{1, 3, 5, 7, 9, 11}) //1, true
+```
+
 ##### slice.Last
 
 ``` go
@@ -290,6 +300,16 @@ import (
 )
 
 result, ok := slice.Last([]int{1, 3, 5, 7, 9, 11}, less.Than(9)) //7, true
+```
+
+##### slice.Tail
+
+``` go
+import (
+    "github.com/m4gshm/gollections/slice"
+)
+
+result, ok := slice.Tail([]int{1, 3, 5, 7, 9, 11}) //11, true
 ```
 
 #### Element converters
