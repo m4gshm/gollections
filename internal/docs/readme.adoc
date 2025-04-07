@@ -4,7 +4,7 @@
 
 Gollections is set of functions for link:#slices[slices], link:#maps[maps] and additional implementations of data structures such as link:#mutable-collections[ordered map] or link:#mutable-collections[set] aimed to reduce boilerplate code.
 
-Supports Go version 1.22.
+Supports Go version 1.23.
 
 For example, it's need to group some link:./internal/examples/boilerplate/user_type.go[users] by their role names converted to lowercase:
 [source,go]
