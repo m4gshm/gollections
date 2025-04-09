@@ -37,3 +37,11 @@ func EmptyStr(s string) bool {
 func NotEmptyStr(s string) bool {
 	return !EmptyStr(s)
 }
+
+func EmptyMap[M ~map[K]V, K comparable, V any](elements M) bool {
+	return len(elements) == 0
+}
+
+func NotEmptyMap[M ~map[K]V, K comparable, V any](elements M) bool {
+	return !EmptyMap(elements)
+}
