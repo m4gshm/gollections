@@ -5,7 +5,7 @@ additional implementations of data structures such as [ordered
 map](#mutable-collections) or [set](#mutable-collections) aimed to
 reduce boilerplate code.
 
-Supports Go version 1.22.
+Supports Go version 1.23.
 
 For example, it’s need to group some
 [users](./internal/examples/boilerplate/user_type.go) by their role
