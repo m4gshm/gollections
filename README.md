@@ -291,6 +291,16 @@ import (
 result, ok := slice.Head([]int{1, 3, 5, 7, 9, 11}) //1, true
 ```
 
+##### slice.Top
+
+``` go
+import (
+    "github.com/m4gshm/gollections/slice"
+)
+
+result := slice.Top(3, []int{1, 3, 5, 7, 9, 11}) //[]int{1, 3, 5}
+```
+
 ##### slice.Last
 
 ``` go

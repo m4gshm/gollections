@@ -703,6 +703,14 @@ func Head[TS ~[]T, T any](elements TS) (no T, ok bool) {
 	return no, false
 }
 
+// Top returns the top n elements
+func Top[TS ~[]T, T any](n int, elements TS) TS {
+	if len(elements) > n {
+		return elements[0:n]
+	}
+	return elements
+}
+
 // Tail returns the latest element
 func Tail[TS ~[]T, T any](elements TS) (no T, ok bool) {
 	if l := len(elements); l > 0 {

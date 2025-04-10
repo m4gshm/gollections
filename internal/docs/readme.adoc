@@ -180,6 +180,14 @@ import (
 )
 include::../examples/sliceexamples/slice_Head_test.go[lines=12..14,indent=0]
 ----
+====== slice.Top
+[source,go]
+----
+import (
+    "github.com/m4gshm/gollections/slice"
+)
+include::../examples/sliceexamples/slice_Top_test.go[lines=12..13,indent=0]
+----
 ====== slice.Last
 [source,go]
 ----
