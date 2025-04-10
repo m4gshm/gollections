@@ -38,15 +38,15 @@ func (m MapValues[K, V]) Loop() loop.Loop[V] {
 	return (&h).Next
 }
 
-// Deprecated: Head is deprecated. Will be replaced by rance-over function iterator.
 // Head creates an iterator to iterate through the collection.
+// Deprecated: Head is deprecated. Will be replaced by rance-over function iterator.
 func (m MapValues[K, V]) Head() map_.ValIter[K, V] {
 	return map_.NewValIter(m.elements)
 }
 
-// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
+// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 func (m MapValues[K, V]) First() (map_.ValIter[K, V], V, bool) {
 	var (
 		iterator  = m.Head()

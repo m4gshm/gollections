@@ -47,21 +47,21 @@ func (v *Vector[T]) Loop() loop.Loop[T] {
 	return loop.Of(*v...)
 }
 
-// Deprecated: Head is deprecated. Will be replaced by rance-over function iterator.
 // Head creates an iterator to iterate through the collection.
+// Deprecated: Head is deprecated. Will be replaced by rance-over function iterator.
 func (v *Vector[T]) Head() *SliceIter[T] {
 	return NewHead(v, v.DeleteActualOne)
 }
 
-// Deprecated: Tail is deprecated. Will be replaced by rance-over function iterator.
 // Tail creates an iterator pointing to the end of the collection
+// Deprecated: Tail is deprecated. Will be replaced by rance-over function iterator.
 func (v *Vector[T]) Tail() *SliceIter[T] {
 	return NewTail(v, v.DeleteActualOne)
 }
 
-// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
+// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 func (v *Vector[T]) First() (*SliceIter[T], T, bool) {
 	var (
 		iterator  = NewHead(v, v.DeleteActualOne)

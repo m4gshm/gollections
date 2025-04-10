@@ -695,6 +695,7 @@ func Sum[TS ~[]T, T c.Summable](elements TS) (out T) {
 	return Accum(out, elements, op.Sum[T])
 }
 
+// Head returns the first element
 func Head[TS ~[]T, T any](elements TS) (no T, ok bool) {
 	if len(elements) > 0 {
 		return elements[0], true
@@ -702,6 +703,7 @@ func Head[TS ~[]T, T any](elements TS) (no T, ok bool) {
 	return no, false
 }
 
+// Tail returns the latest element
 func Tail[TS ~[]T, T any](elements TS) (no T, ok bool) {
 	if l := len(elements); l > 0 {
 		return elements[l-1], true
@@ -721,6 +723,7 @@ func Firstt[TS ~[]T, T any](elements TS, by func(T) (bool, error)) (no T, ok boo
 	return e, i != -1, err
 }
 
+// FirstI returns the first element index that satisfies requirements of the predicate 'by'
 func FirstI[TS ~[]T, T any](elements TS, by func(T) bool) (no T, index int) {
 	for i, e := range elements {
 		if by(e) {
@@ -730,6 +733,7 @@ func FirstI[TS ~[]T, T any](elements TS, by func(T) bool) (no T, index int) {
 	return no, -1
 }
 
+// FirsttI returns the first element index that satisfies requirements of the predicate 'by'
 func FirsttI[TS ~[]T, T any](elements TS, by func(T) (bool, error)) (no T, index int, err error) {
 	for i, e := range elements {
 		if ok, err := by(e); err != nil || ok {
@@ -739,18 +743,19 @@ func FirsttI[TS ~[]T, T any](elements TS, by func(T) (bool, error)) (no T, index
 	return no, -1, nil
 }
 
-// Last returns the latest element that satisfies requirements of the predicate 'filter'
+// Last returns the latest element that satisfies requirements of the predicate 'by'
 func Last[TS ~[]T, T any](elements TS, by func(T) bool) (no T, ok bool) {
 	e, i := LastI(elements, by)
 	return e, i != -1
 }
 
-// Lastt returns the latest element that satisfies requirements of the predicate 'filter'
+// Lastt returns the latest element that satisfies requirements of the predicate 'by'
 func Lastt[TS ~[]T, T any](elements TS, by func(T) (bool, error)) (no T, ok bool, err error) {
 	e, i, err := LasttI(elements, by)
 	return e, i != -1, err
 }
 
+// LastI returns the latest element index that satisfies requirements of the predicate 'by'
 func LastI[TS ~[]T, T any](elements TS, by func(T) bool) (no T, index int) {
 	for i := len(elements) - 1; i >= 0; i-- {
 		e := elements[i]
@@ -761,6 +766,7 @@ func LastI[TS ~[]T, T any](elements TS, by func(T) bool) (no T, index int) {
 	return no, -1
 }
 
+// LasttI returns the latest element index that satisfies requirements of the predicate 'by'
 func LasttI[TS ~[]T, T any](elements TS, by func(T) (bool, error)) (no T, index int, err error) {
 	for i := len(elements) - 1; i >= 0; i-- {
 		e := elements[i]
