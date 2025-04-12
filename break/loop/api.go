@@ -78,7 +78,7 @@ func To[T any](next func() (T, bool, error), errConsumer func(error)) func() (T,
 	}
 }
 
-// All is an adapter for the next function for iterating by `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
+// All is an adapter for the next function for iterating by `for ... range`.
 func All[T any](next func() (T, bool, error), consumer func(T, error) bool) {
 	if next == nil {
 		return

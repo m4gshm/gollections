@@ -11,7 +11,7 @@ import (
 // Loop is a function that returns the next key\value or ok==false if there are no more elements.
 type Loop[K, V any] func() (key K, value V, ok bool)
 
-// All is used to iterate through the loop using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
+// All is used to iterate through the loop using `for ... range`.
 func (next Loop[K, V]) All(consumer func(key K, value V) bool) {
 	All(next, consumer)
 }

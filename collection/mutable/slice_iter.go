@@ -35,7 +35,7 @@ var (
 	_ c.DelIterator[any]  = (*SliceIter[any])(nil)
 )
 
-// All is used to iterate through the collection using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
+// All is used to iterate through the collection using `for e := range`.
 func (i *SliceIter[T]) All(consumer func(element T) bool) {
 	loop.All(i.Next, consumer)
 }

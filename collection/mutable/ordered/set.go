@@ -29,14 +29,22 @@ var (
 	_ c.AddableAllNew[c.ForEach[int]] = (*Set[int])(nil)
 	_ c.Deleteable[int]               = (*Set[int])(nil)
 	_ c.DeleteableVerify[int]         = (*Set[int])(nil)
+	_ c.OrderedAll[int]               = (*Set[int])(nil)
 	_ collection.Set[int]             = (*Set[int])(nil)
 	_ fmt.Stringer                    = (*Set[int])(nil)
 )
 
-// All is used to iterate through the collection using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
+// All is used to iterate through the collection using `for e := range`.
 func (s *Set[T]) All(consumer func(T) bool) {
 	if s != nil {
 		slice.WalkWhile(*s.order, consumer)
+	}
+}
+
+// IAll is used to iterate through the collection using `for i, e := range`.
+func (s *Set[T]) IAll(consumer func(int, T) bool) {
+	if s != nil {
+		slice.TrackWhile(*s.order, consumer)
 	}
 }
 

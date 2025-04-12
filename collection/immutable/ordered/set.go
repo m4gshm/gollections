@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	breakLoop "github.com/m4gshm/gollections/break/loop"
+	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/slice"
@@ -23,13 +24,19 @@ type Set[T comparable] struct {
 var (
 	_ collection.Set[int] = (*Set[int])(nil)
 	_ collection.Set[int] = Set[int]{}
+	_ c.OrderedAll[int]   = Set[int]{}
 	_ fmt.Stringer        = (*Set[int])(nil)
 	_ fmt.Stringer        = Set[int]{}
 )
 
-// All is used to iterate through the collection using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
+// All is used to iterate through the collection using `for e := range`.
 func (s Set[T]) All(consumer func(T) bool) {
 	slice.WalkWhile(s.order, consumer)
+}
+
+// IAll is used to iterate through the collection using `for i, e := range`.
+func (s Set[T]) IAll(consumer func(int, T) bool) {
+	slice.TrackWhile(s.order, consumer)
 }
 
 // Loop creates a loop to iterate through the collection.

@@ -33,7 +33,7 @@ var (
 	_ fmt.Stringer                    = (*Set[int])(nil)
 )
 
-// All is used to iterate through the collection using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
+// All is used to iterate through the collection using `for e := range`.
 func (s *Set[T]) All(consumer func(T) bool) {
 	for v := range s.elements {
 		if !consumer(v) {

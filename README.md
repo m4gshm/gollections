@@ -868,15 +868,13 @@ These functions combine converters, filters and reducers.
 
 ### Iterating over loops
 
-- (only for go 1.22) Using rangefunc `All` like:
+- Using rangefunc `All` like:
 
 ``` go
 for i := range range_.Of(0, 100).All {
     doOp(i)
 }
 ```
-
-don’t forget exec `go env -w GOEXPERIMENT=rangefunc` before compile.
 
 - Using `for` statement like:
 
@@ -1052,7 +1050,7 @@ The same underlying interfaces but for read-only use cases.
 
 ### Iterating over collections
 
-- (only for go 1.22) Using rangefunc `All` like:
+- Using rangefunc `All` like:
 
 ``` go
 uniques := set.From(range_.Of(0, 100))

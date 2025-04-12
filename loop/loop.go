@@ -13,7 +13,7 @@ var (
 	_ c.Convertable[any, Loop[any], loop.Loop[any]] = (Loop[any])(nil)
 )
 
-// All is used to iterate through the loop using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
+// All is used to iterate through the loop using `for ... range`.
 func (next Loop[T]) All(consumer func(T) bool) {
 	All(next, consumer)
 }

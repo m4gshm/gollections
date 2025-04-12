@@ -27,7 +27,7 @@ var (
 	_ fmt.Stringer               = MapKeys[int, any]{}
 )
 
-// All is used to iterate through the collection using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
+// All is used to iterate through the collection using `for key := range`.
 func (m MapKeys[K, V]) All(consumer func(K) bool) {
 	map_.TrackKeysWhile(m.elements, consumer)
 }

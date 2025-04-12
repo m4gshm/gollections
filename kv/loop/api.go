@@ -18,7 +18,7 @@ func New[S, K, V any](source S, hasNext func(S) bool, getNext func(S) (K, V)) Lo
 	}
 }
 
-// All is an adapter for the next function for iterating by `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
+// All is an adapter for the next function for iterating by `for ... range`.
 func All[K, V any](next func() (K, V, bool), consumer func(K, V) bool) {
 	for k, v, ok := next(); ok && consumer(k, v); k, v, ok = next() {
 	}

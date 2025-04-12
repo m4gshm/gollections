@@ -3,7 +3,7 @@ package loop
 // Loop is a function that returns the next element, ok==false if there are no more elements or an error if something is wrong.
 type Loop[T any] func() (element T, ok bool, err error)
 
-// All is used to iterate through the loop using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
+// All is used to iterate through the loop using `for ... range`.
 func (next Loop[T]) All(consumer func(T, error) bool) {
 	All(next, consumer)
 }

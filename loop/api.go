@@ -49,7 +49,7 @@ func Of[T any](elements ...T) Loop[T] {
 	}
 }
 
-// All is an adapter for the next function for iterating by `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
+// All is an adapter for the next function for iterating by `for ... range`.
 func All[T any](next func() (T, bool), consumer func(T) bool) {
 	if next == nil {
 		return

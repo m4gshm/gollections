@@ -35,7 +35,7 @@ var (
 	_ fmt.Stringer                                     = Map[int, any]{}
 )
 
-// All is used to iterate through the collection using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
+// All is used to iterate through the collection using `for key, val := range`.
 func (m Map[K, V]) All(consumer func(k K, v V) bool) {
 	for k, v := range m.elements {
 		if !consumer(k, v) {

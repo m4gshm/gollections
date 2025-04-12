@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	breakLoop "github.com/m4gshm/gollections/break/loop"
+	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/notsafe"
@@ -23,12 +24,18 @@ type Vector[T any] struct {
 var (
 	_ collection.Vector[any] = (*Vector[any])(nil)
 	_ collection.Vector[any] = Vector[any]{}
+	_ c.OrderedAll[any]      = Vector[any]{}
 	_ fmt.Stringer           = (*Vector[any])(nil)
 	_ fmt.Stringer           = Vector[any]{}
 )
 
-// All is used to iterate through the collection using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
-func (v Vector[T]) All(consumer func(int, T) bool) {
+// All is used to iterate through the collection using `for e := range`.
+func (v Vector[T]) All(consumer func(T) bool) {
+	slice.WalkWhile(v.elements, consumer)
+}
+
+// IAll is used to iterate through the collection using `for i, e := range`.
+func (v Vector[T]) IAll(consumer func(int, T) bool) {
 	slice.TrackWhile(v.elements, consumer)
 }
 

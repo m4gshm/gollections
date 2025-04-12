@@ -21,6 +21,8 @@ type Collection[T any] interface {
 	IsEmpty() bool
 
 	HasAny(func(T) bool) bool
+
+	c.All[T]
 }
 
 // Vector - collection interface that provides elements order and access by index to the elements.
@@ -31,16 +33,12 @@ type Vector[T any] interface {
 	c.TrackEach[int, T]
 
 	c.Access[int, T]
-
-	c.KVAll[int, T]
 }
 
 // Set - collection interface that ensures the uniqueness of elements (does not insert duplicate values).
 type Set[T comparable] interface {
 	Collection[T]
 	c.Checkable[T]
-
-	c.All[T]
 }
 
 // Map - collection interface that stores key/value pairs and provide access to an element by its key

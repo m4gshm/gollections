@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	breakLoop "github.com/m4gshm/gollections/break/loop"
+	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_"
@@ -23,6 +24,7 @@ type MapValues[K comparable, V any] struct {
 
 var (
 	_ collection.Collection[any] = (*MapValues[int, any])(nil)
+	_ c.OrderedAll[any]          = (*MapValues[int, any])(nil)
 	_ fmt.Stringer               = (*MapValues[int, any])(nil)
 )
 
@@ -81,8 +83,13 @@ func (m MapValues[K, V]) Append(out []V) (values []V) {
 	return out
 }
 
-// All is used to iterate through the collection using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
+// All is used to iterate through the collection using `for val := range`.
 func (m MapValues[K, V]) All(consumer func(V) bool) {
+	m.IAll(func(i int, v V) bool { return consumer(v) })
+}
+
+// IAll is used to iterate through the collection using `for index, val := range`.
+func (m MapValues[K, V]) IAll(consumer func(int, V) bool) {
 	map_.TrackOrderedValuesWhile(m.order, m.elements, consumer)
 }
 

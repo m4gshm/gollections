@@ -126,6 +126,7 @@ func Accumm[T any, IT Iterable[T]](first T, collection IT, merge func(T, T) (T, 
 	return loop.Accumm(first, collection.Loop(), merge)
 }
 
+// IsEmpty returns true if the collection is empty
 func IsEmpty[C interface{ Len() int }](collection C) bool {
 	return collection.Len() == 0
 }

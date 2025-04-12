@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	breakLoop "github.com/m4gshm/gollections/break/loop"
+	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/slice"
@@ -22,13 +23,19 @@ type MapKeys[K comparable] struct {
 var (
 	_ collection.Collection[int] = (*MapKeys[int])(nil)
 	_ collection.Collection[int] = MapKeys[int]{}
+	_ c.OrderedAll[int]          = MapKeys[int]{}
 	_ fmt.Stringer               = (*MapKeys[int])(nil)
 	_ fmt.Stringer               = MapKeys[int]{}
 )
 
-// All is used to iterate through the collection using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
+// All is used to iterate through the collection using `for key := range`.
 func (m MapKeys[K]) All(consumer func(K) bool) {
 	slice.WalkWhile(m.keys, consumer)
+}
+
+// IAll is used to iterate through the collection using `for index, key := range`.
+func (m MapKeys[K]) IAll(consumer func(int, K) bool) {
+	slice.TrackWhile(m.keys, consumer)
 }
 
 // Loop creates a loop to iterate through the collection.

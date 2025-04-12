@@ -543,13 +543,12 @@ include::../examples/loopexamples/loop_Flat_test.go[lines=13..16,indent=0]
 These functions combine converters, filters and reducers.
 
 ==== Iterating over loops
-* (only for go 1.22) Using rangefunc `All` like:
+* Using rangefunc `All` like:
 
 [source,go]
 ----
 include::../examples/loopexamples/loop_iterating_go_1_22_test.go[lines=12..16,indent=0]
 ----
-don't forget exec `go env -w GOEXPERIMENT=rangefunc` before compile.
 
 * Using `for` statement like:
 
@@ -685,7 +684,7 @@ include::../examples/collection/mutable/omap.go[lines=11..15,indent=0]
 The same underlying interfaces but for read-only use cases.
 
 ==== Iterating over collections
-* (only for go 1.22) Using rangefunc `All` like:
+* Using rangefunc `All` like:
 
 [source,go]
 ----

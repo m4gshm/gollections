@@ -109,12 +109,17 @@ type ForEach[T any] interface {
 	ForEach(func(element T))
 }
 
-// All provides the `All` function used for iterating over a sequence of elements by `for e := range collection.All`. Supported since go 1.22.
+// All provides the `All` function used for iterating over a sequence of elements by `for e := range collection.All`.
 type All[T any] interface {
 	All(consumer func(T) bool)
 }
 
-// KVAll provides the `All` function used for iterating over a sequence of key\value pairs by `for k, v := range collection.All`. Supported since go 1.22.
+// OrderedAll provides the `All` function used for iterating over an ordered sequence of elements by `for i, e := range collection.IAll`.
+type OrderedAll[T any] interface {
+	IAll(consumer func(int, T) bool)
+}
+
+// KVAll provides the `All` function used for iterating over a sequence of key\value pairs by `for k, v := range collection.All`.
 type KVAll[K, V any] interface {
 	All(consumer func(K, V) bool)
 }
