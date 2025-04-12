@@ -21,8 +21,6 @@ type Collection[T any] interface {
 	IsEmpty() bool
 
 	HasAny(func(T) bool) bool
-
-	c.All[T]
 }
 
 // Vector - collection interface that provides elements order and access by index to the elements.

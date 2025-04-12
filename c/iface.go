@@ -16,6 +16,7 @@ var Continue error = nil
 // Iterable is a loop supplier interface
 type Iterable[T any, Loop ~func() (T, bool)] interface {
 	Loop() Loop
+	All[T]
 }
 
 // KeyVal provides access to all keys and values of a key/value based collection.
