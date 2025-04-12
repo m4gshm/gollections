@@ -46,7 +46,7 @@ type Map[K comparable, V any] interface {
 	kv.Convertable[K, V]
 	c.Checkable[K]
 	c.Access[K, V]
-	c.KVAll[K, V]
+	c.KVRange[K, V]
 
 	Len() int
 	IsEmpty() bool

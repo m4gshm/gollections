@@ -29,7 +29,7 @@ var (
 	_ c.AddableAllNew[c.ForEach[int]] = (*Set[int])(nil)
 	_ c.Deleteable[int]               = (*Set[int])(nil)
 	_ c.DeleteableVerify[int]         = (*Set[int])(nil)
-	_ c.OrderedAll[int]               = (*Set[int])(nil)
+	_ c.OrderedRange[int]             = (*Set[int])(nil)
 	_ collection.Set[int]             = (*Set[int])(nil)
 	_ fmt.Stringer                    = (*Set[int])(nil)
 )

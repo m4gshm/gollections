@@ -13,10 +13,24 @@ var Break = errors.New("Break")
 // Continue is an alias of the nil value used to continue iterating by For, Track methods.
 var Continue error = nil
 
+// Range provides the `Range` function used for iterating over a sequence of elements by `for e := range collection.Range`.
+type Range[T any] interface {
+	All(consumer func(T) bool)
+}
+
+// OrderedRange provides the `All` function used for iterating over an ordered sequence of elements by `for i, e := range collection.IAll`.
+type OrderedRange[T any] interface {
+	IAll(consumer func(int, T) bool)
+}
+
+// KVRange provides the `All` function used for iterating over a sequence of key\value pairs by `for k, v := range collection.All`.
+type KVRange[K, V any] interface {
+	All(consumer func(K, V) bool)
+}
+
 // Iterable is a loop supplier interface
 type Iterable[T any, Loop ~func() (T, bool)] interface {
 	Loop() Loop
-	All[T]
 }
 
 // KeyVal provides access to all keys and values of a key/value based collection.
@@ -37,6 +51,7 @@ type Values[V any] interface {
 
 // Collection is the base interface of non-associative collections
 type Collection[T any] interface {
+	Range[T]
 	For[T]
 	ForEach[T]
 	SliceFactory[T]
@@ -108,21 +123,6 @@ type For[IT any] interface {
 type ForEach[T any] interface {
 	// ForEach takes all elements of the collection
 	ForEach(func(element T))
-}
-
-// All provides the `All` function used for iterating over a sequence of elements by `for e := range collection.All`.
-type All[T any] interface {
-	All(consumer func(T) bool)
-}
-
-// OrderedAll provides the `All` function used for iterating over an ordered sequence of elements by `for i, e := range collection.IAll`.
-type OrderedAll[T any] interface {
-	IAll(consumer func(int, T) bool)
-}
-
-// KVAll provides the `All` function used for iterating over a sequence of key\value pairs by `for k, v := range collection.All`.
-type KVAll[K, V any] interface {
-	All(consumer func(K, V) bool)
 }
 
 // Track is the interface of a collection that provides traversing of the elements with position tracking (index, key, coordinates, etc.).

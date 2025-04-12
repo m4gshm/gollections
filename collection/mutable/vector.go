@@ -28,7 +28,7 @@ var (
 	_ c.DeleteableVerify[int]      = (*Vector[any])(nil)
 	_ c.Settable[int, any]         = (*Vector[any])(nil)
 	_ c.SettableNew[int, any]      = (*Vector[any])(nil)
-	_ c.OrderedAll[any]            = (*Vector[any])(nil)
+	_ c.OrderedRange[any]          = (*Vector[any])(nil)
 	_ collection.Vector[any]       = (*Vector[any])(nil)
 	_ fmt.Stringer                 = (*Vector[any])(nil)
 )

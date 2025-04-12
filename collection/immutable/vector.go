@@ -24,7 +24,7 @@ type Vector[T any] struct {
 var (
 	_ collection.Vector[any] = (*Vector[any])(nil)
 	_ collection.Vector[any] = Vector[any]{}
-	_ c.OrderedAll[any]      = Vector[any]{}
+	_ c.OrderedRange[any]    = Vector[any]{}
 	_ fmt.Stringer           = (*Vector[any])(nil)
 	_ fmt.Stringer           = Vector[any]{}
 )

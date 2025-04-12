@@ -23,7 +23,7 @@ type MapKeys[K comparable] struct {
 var (
 	_ collection.Collection[int] = (*MapKeys[int])(nil)
 	_ collection.Collection[int] = MapKeys[int]{}
-	_ c.OrderedAll[int]          = MapKeys[int]{}
+	_ c.OrderedRange[int]        = MapKeys[int]{}
 	_ fmt.Stringer               = (*MapKeys[int])(nil)
 	_ fmt.Stringer               = MapKeys[int]{}
 )

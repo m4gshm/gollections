@@ -24,7 +24,7 @@ type MapValues[K comparable, V any] struct {
 
 var (
 	_ collection.Collection[any] = (*MapValues[int, any])(nil)
-	_ c.OrderedAll[any]          = (*MapValues[int, any])(nil)
+	_ c.OrderedRange[any]        = (*MapValues[int, any])(nil)
 	_ fmt.Stringer               = (*MapValues[int, any])(nil)
 )
 

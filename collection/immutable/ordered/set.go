@@ -24,7 +24,7 @@ type Set[T comparable] struct {
 var (
 	_ collection.Set[int] = (*Set[int])(nil)
 	_ collection.Set[int] = Set[int]{}
-	_ c.OrderedAll[int]   = Set[int]{}
+	_ c.OrderedRange[int] = Set[int]{}
 	_ fmt.Stringer        = (*Set[int])(nil)
 	_ fmt.Stringer        = Set[int]{}
 )
