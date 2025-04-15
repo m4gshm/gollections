@@ -1,4 +1,4 @@
-// Package seq2 provides helpers for  “range-over-func” feature introduced in go 1.22.
+// Package seq2 provides helpers for “range-over-func” feature introduced in go 1.22.
 package seq2
 
 import (

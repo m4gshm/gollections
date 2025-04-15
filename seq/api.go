@@ -234,7 +234,7 @@ func Convert[From, To any](seq iter.Seq[From], converter func(From) To) iter.Seq
 //	for e := range seq.Flat(arrays, as.Is) {
 //	    ...
 //	}
-func Flat[From, To any](seq iter.Seq[From], flattener func(From) []To) iter.Seq[To] {
+func Flat[From any, TS ~[]To, To any](seq iter.Seq[From], flattener func(From) TS) iter.Seq[To] {
 	if seq == nil {
 		return func(_ func(To) bool) {}
 	}
