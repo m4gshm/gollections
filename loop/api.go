@@ -860,14 +860,14 @@ func Range[T constraints.Integer | rune](from T, toExclusive T) Loop[T] {
 // OfIndexed builds a loop by extracting elements from an indexed soruce.
 // the len is length ot the source.
 // the getAt retrieves an element by its index from the source.
-func OfIndexed[T any](len int, next func(int) T) Loop[T] {
-	if next == nil {
+func OfIndexed[T any](len int, getAt func(int) T) Loop[T] {
+	if getAt == nil {
 		return nil
 	}
 	i := 0
 	return func() (out T, ok bool) {
 		if ok = i < len; ok {
-			out = next(i)
+			out = getAt(i)
 			i++
 		}
 		return out, ok

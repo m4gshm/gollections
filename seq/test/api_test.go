@@ -3,6 +3,7 @@ package test
 import (
 	"errors"
 	"iter"
+	"slices"
 	"strconv"
 	"testing"
 
@@ -11,6 +12,7 @@ import (
 	"github.com/m4gshm/gollections/predicate/more"
 	"github.com/m4gshm/gollections/seq"
 	"github.com/m4gshm/gollections/seq2"
+	"github.com/m4gshm/gollections/seqe"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/stretchr/testify/assert"
 )
@@ -92,7 +94,7 @@ var even = func(v int) bool { return v%2 == 0 }
 
 func Test_Flat(t *testing.T) {
 	md := seq.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...)
-	f := seq.Flat(md, func(i []int) []int { return i })
+	f := seq.Flat(md, slices.Values)
 	e := []int{1, 2, 3, 4, 5, 6}
 	assert.Equal(t, e, seq.Slice(f))
 }
@@ -106,7 +108,7 @@ func Test_Filter(t *testing.T) {
 func Test_Filt(t *testing.T) {
 	s := seq.Of(1, 3, 4, 5, 7, 8, 9, 11)
 	l := seq.Filt(s, func(i int) (bool, error) { return even(i), op.IfElse(i > 7, errors.New("abort"), nil) })
-	r, err := seq2.Slice(l)
+	r, err := seqe.Slice(l)
 	assert.Error(t, err)
 	assert.Equal(t, slice.Of(4, 8), r)
 }
@@ -117,7 +119,7 @@ func Test_Filt2(t *testing.T) {
 		ok := i <= 7
 		return ok && even(i), op.IfElse(ok, nil, errors.New("abort"))
 	})
-	r, err := seq2.Slice(l)
+	r, err := seqe.Slice(l)
 	assert.Error(t, err)
 	assert.Equal(t, slice.Of(4), r)
 }
@@ -135,4 +137,14 @@ func Test_KeyValue(t *testing.T) {
 
 	assert.Equal(t, slice.Of(1, 2, 3), k)
 	assert.Equal(t, slice.Of("1", "2", "3"), v)
+}
+
+func Test_KeyValues(t *testing.T) {
+	s := seq.Of([]int{1, 2}, []int{3})
+	s2 := seq.KeyValues(s, slice.Len, as.Is)
+	k := seq.Slice(seq2.Keys(s2))
+	v := seq.Slice(seq2.Values(s2))
+
+	assert.Equal(t, slice.Of(2, 2, 1), k)
+	assert.Equal(t, slice.Of(1, 2, 3), v)
 }

@@ -1,7 +1,6 @@
 package seqexamples
 
 import (
-	"iter"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -15,8 +14,8 @@ import (
 
 func Test_Group(t *testing.T) {
 
-	var users iter.Seq[User] = seq.Of(users...)
-	var groups iter.Seq2[string, User] = seq.ToSeq2(users, func(u User) (string, User) {
+	var users seq.Seq[User] = seq.Of(users...)
+	var groups seq.Seq2[string, User] = seq.ToSeq2(users, func(u User) (string, User) {
 		return use.If(u.age <= 20, "<=20").If(u.age <= 30, "<=30").Else(">30"), u
 	})
 	var ageGroups map[string][]User = seq2.Group(groups)
