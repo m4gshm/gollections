@@ -3,10 +3,11 @@ package seq2
 
 import (
 	"github.com/m4gshm/gollections/map_/resolv"
+	"github.com/m4gshm/gollections/seq"
 )
 
-type Seq[T any] = func(yield func(T) bool)
-type Seq2[K, V any] = func(yield func(K, V) bool)
+type Seq[T any] = seq.Seq[T]
+type Seq2[K, V any] = seq.Seq2[K, V]
 
 // Of creates an index/value pairs iterator over the elements.
 func Of[T any](elements ...T) Seq2[int, T] {

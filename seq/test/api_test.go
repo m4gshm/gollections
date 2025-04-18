@@ -14,8 +14,15 @@ import (
 	"github.com/m4gshm/gollections/seq2"
 	"github.com/m4gshm/gollections/seqe"
 	"github.com/m4gshm/gollections/slice"
+	"github.com/m4gshm/gollections/slice/sort"
 	"github.com/stretchr/testify/assert"
 )
+
+func Test_OfIndexed(t *testing.T) {
+	indexed := slice.Of("0", "1", "2", "3", "4")
+	result := seq.OfIndexed(len(indexed), func(i int) string { return indexed[i] })
+	assert.Equal(t, indexed, seq.Slice(result))
+}
 
 func Test_AccumSum(t *testing.T) {
 	s := seq.Of(1, 3, 5, 7, 9, 11)
@@ -83,11 +90,29 @@ func Test_ReduceNil(t *testing.T) {
 
 func Test_First(t *testing.T) {
 
-	result, ok := seq.First(seq.Of(1, 2, 3, 4, 5, 6), more.Than(5)) //7, true
+	result, ok := seq.First(seq.Of(1, 2, 3, 4, 5, 6), more.Than(5))
 
 	assert.True(t, ok)
 	assert.Equal(t, 6, result)
 
+}
+
+func Test_Firstt(t *testing.T) {
+	result, ok, err := seq.Firstt(seq.Of(1, 2, 3, 4, 5, 6), func(i int) (bool, error) {
+		return more.Than(5)(i), nil
+	})
+
+	assert.True(t, ok)
+	assert.Equal(t, 6, result)
+	assert.NoError(t, err)
+
+	result, ok, err = seq.Firstt(seq.Of(1, 2, 3, 4, 5, 6), func(i int) (bool, error) {
+		return true, errors.New("abort")
+	})
+
+	assert.False(t, ok)
+	assert.Equal(t, 0, result)
+	assert.ErrorContains(t, err, "abort")
 }
 
 var even = func(v int) bool { return v%2 == 0 }
@@ -147,4 +172,80 @@ func Test_KeyValues(t *testing.T) {
 
 	assert.Equal(t, slice.Of(2, 2, 1), k)
 	assert.Equal(t, slice.Of(1, 2, 3), v)
+}
+
+func Test_SeqOfNil(t *testing.T) {
+	var in, out []int
+
+	iter := false
+	for e := range seq.Of(in...) {
+		iter = true
+		out = append(out, e)
+	}
+
+	assert.Nil(t, out)
+	assert.False(t, iter)
+}
+
+func Test_ConvertNilSeq(t *testing.T) {
+	var in iter.Seq[int]
+	var out []int
+
+	iter := false
+	for e := range seq.Convert(in, as.Is) {
+		iter = true
+		out = append(out, e)
+	}
+
+	assert.Nil(t, out)
+	assert.False(t, iter)
+}
+
+func Test_AllFiltered(t *testing.T) {
+	from := seq.Of(1, 2, 3, 5, 7, 8, 9, 11)
+
+	s := []int{}
+
+	for e := range seq.Filter(from, func(e int) bool { return e%2 == 0 }) {
+		s = append(s, e)
+	}
+
+	assert.Equal(t, slice.Of(2, 8), sort.Asc(s))
+}
+
+func Test_AllConverted(t *testing.T) {
+	from := seq.Of(1, 2, 3, 5, 7, 8, 9, 11)
+	s := []string{}
+
+	for e := range seq.Convert(from, strconv.Itoa) {
+		s = append(s, e)
+	}
+
+	assert.Equal(t, slice.Of("1", "2", "3", "5", "7", "8", "9", "11"), s)
+}
+
+func Test_AllConv(t *testing.T) {
+	from := seq.Of("1", "2", "3", "5", "_7", "8", "9", "11")
+	i := []int{}
+
+	for v, err := range seq.Conv(from, strconv.Atoi) {
+		if err == nil {
+			i = append(i, v)
+		}
+	}
+
+	assert.Equal(t, slice.Of(1, 2, 3, 5, 8, 9, 11), i)
+}
+
+func Test_ConvertFilteredInplace(t *testing.T) {
+	s := seq.Of(1, 3, 4, 5, 7, 8, 9, 11)
+	r := seq.ConvertOK(s, func(i int) (string, bool) { return strconv.Itoa(i), even(i) })
+	assert.Equal(t, []string{"4", "8"}, seq.Slice(r))
+}
+
+func Test_ConvFilteredInplace(t *testing.T) {
+	s := seq.Of(1, 3, 4, 5, 7, 8, 9, 11)
+	r := seq.ConvOK(s, func(i int) (string, bool, error) { return strconv.Itoa(i), even(i), nil })
+	o, _ := seqe.Slice(r)
+	assert.Equal(t, []string{"4", "8"}, o)
 }

@@ -1,8 +1,14 @@
 package seqe
 
-type Seq[T any] = func(yield func(T) bool)
-type SeqE[T any] = Seq2[T, error]
-type Seq2[K, V any] = func(yield func(K, V) bool)
+import (
+	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/seq"
+)
+
+type Seq[T any] = seq.Seq[T]
+type SeqE[T any] = seq.SeqE[T]
+type Seq2[K, V any] = seq.Seq2[K, V]
 
 func OfIndexed[T any](max int, getAt func(int) (T, error)) Seq2[T, error] {
 	if getAt == nil {
@@ -46,7 +52,6 @@ func Firstt[S ~SeqE[T], T any](seq S, predicate func(T) (bool, error)) (v T, ok 
 	seq(func(one T, e error) bool {
 		if e != nil {
 			err = e
-			ok = false
 			return false
 		} else if p, e := predicate(one); e != nil {
 			err = e
@@ -153,6 +158,66 @@ func ReduceeOK[S ~SeqE[T], T any](seq S, merge func(T, T) (T, error)) (result T,
 	return result, started, err
 }
 
+// Accum accumulates a value by using the 'first' argument to initialize the accumulator and sequentially applying the 'merge' functon to the accumulator and each element of the 'seq' sequence.
+func Accum[T any, S ~SeqE[T]](first T, seq S, merge func(T, T) T) (accumulator T, err error) {
+	accumulator = first
+	if seq == nil {
+		return
+	}
+	seq(func(v T, e error) bool {
+		err = e
+		if err != nil {
+			return false
+		}
+		accumulator = merge(accumulator, v)
+		return true
+	})
+	return
+}
+
+// Accumm accumulates a value by using the 'first' argument to initialize the accumulator and sequentially applying the 'merge' functon to the accumulator and each element of the 'seq' sequence.
+func Accumm[T any, S ~SeqE[T]](first T, seq S, merge func(T, T) (T, error)) (accumulator T, err error) {
+	accumulator = first
+	if seq == nil {
+		return accumulator, nil
+	}
+	seq(func(v T, e error) bool {
+		err = e
+		if err == nil {
+			accumulator, err = merge(accumulator, v)
+		}
+		return err == nil
+	})
+	return accumulator, err
+}
+
+// Sum returns the sum of all elements.
+func Sum[S ~SeqE[T], T c.Summable](seq S) (out T, err error) {
+	return Accum(out, seq, op.Sum[T])
+}
+
+// HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful.
+func HasAny[S ~SeqE[T], T any](seq S, predicate func(T) bool) (bool, error) {
+	_, ok, err := First(seq, predicate)
+	return ok, err
+}
+
+// Contains finds the first element that equal to the example and returns true.
+func Contains[S ~SeqE[T], T comparable](seq S, example T) (contains bool, err error) {
+	if seq == nil {
+		return
+	}
+	seq(func(v T, e error) bool {
+		err = e
+		if err != nil {
+			return false
+		}
+		contains = v == example
+		return !contains
+	})
+	return
+}
+
 // Conv creates an iterator that applies the 'converter' function to each iterable element and returns value-error pairs.
 // The error should be checked at every iteration step, like:
 //
@@ -220,6 +285,34 @@ func ConvOK[S ~SeqE[From], From, To any](seq S, converter func(from From) (To, b
 		seq(func(from From, e error) bool {
 			if to, ok, err := converter(from); ok || err != nil {
 				return yield(to, err)
+			}
+			return true
+		})
+	}
+}
+
+// Flat is used to iterate over a two-dimensional sequence in single dimension form, like:
+//
+//	var arrays seq.SeqE[[]int]
+//	...
+//	for e, err := range seqe.Flat(arrays, slices.Values) {
+//	    ...
+//	}
+func Flat[S ~SeqE[From], STo ~Seq[To], From any, To any](seq S, flattener func(From) STo) SeqE[To] {
+	if seq == nil {
+		return empty2
+	}
+	return func(yield func(To, error) bool) {
+		seq(func(v From, err error) bool {
+			if err != nil {
+				var t To
+				return yield(t, err)
+			}
+			elementsTo := flattener(v)
+			for e := range elementsTo {
+				if !yield(e, err) {
+					return false
+				}
 			}
 			return true
 		})
