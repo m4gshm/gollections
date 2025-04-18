@@ -141,7 +141,7 @@ func Test_Firstt(t *testing.T) {
 	assert.Equal(t, 6, result)
 	assert.NoError(t, err)
 
-	result, ok, err = seq.Firstt(seq.Of(1, 2, 3, 4, 5, 6), func(i int) (bool, error) {
+	result, ok, err = seq.Firstt(seq.Of(1, 2, 3, 4, 5, 6), func(_ int) (bool, error) {
 		return true, errors.New("abort")
 	})
 

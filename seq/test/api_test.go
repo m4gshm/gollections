@@ -106,7 +106,7 @@ func Test_Firstt(t *testing.T) {
 	assert.Equal(t, 6, result)
 	assert.NoError(t, err)
 
-	result, ok, err = seq.Firstt(seq.Of(1, 2, 3, 4, 5, 6), func(i int) (bool, error) {
+	result, ok, err = seq.Firstt(seq.Of(1, 2, 3, 4, 5, 6), func(_ int) (bool, error) {
 		return true, errors.New("abort")
 	})
 
@@ -120,8 +120,31 @@ var even = func(v int) bool { return v%2 == 0 }
 func Test_Flat(t *testing.T) {
 	md := seq.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...)
 	f := seq.Flat(md, slices.Values)
+
 	e := []int{1, 2, 3, 4, 5, 6}
 	assert.Equal(t, e, seq.Slice(f))
+}
+
+func Test_Flatt(t *testing.T) {
+	var (
+		input     iter.Seq[[]string]
+		flattener func([]string) seq.SeqE[int]
+		out       seq.SeqE[int]
+	)
+	out = seq.Flatt(input, flattener)
+	for i, err := range out {
+		if err != nil {
+			panic(err)
+		}
+		_ = i
+	}
+
+	s := seq.Of([][]string{{"1", "2", "3"}, {"4"}, {"_5", "6"}}...)
+	f := func(strInteger []string) seq.SeqE[int] { return seq.Conv(seq.Of(strInteger...), strconv.Atoi) }
+	i, err := seqe.Slice(seq.Flatt(s, f))
+
+	assert.Equal(t, []int{1, 2, 3, 4}, i)
+	assert.ErrorContains(t, err, "parsing \"_5\"")
 }
 
 func Test_Filter(t *testing.T) {

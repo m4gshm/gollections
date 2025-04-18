@@ -235,11 +235,12 @@ func Conv[S ~SeqE[From], From, To any](seq S, converter func(From) (To, error)) 
 	}
 	return func(yield func(To, error) bool) {
 		seq(func(from From, err error) bool {
-			var to To
-			if err == nil {
-				to, err = converter(from)
+			if err != nil {
+				var to To
+				yield(to, err)
+				return false
 			}
-			return yield(to, err)
+			return yield(converter(from))
 		})
 	}
 }
@@ -251,11 +252,12 @@ func Convert[S ~SeqE[From], From, To any](seq S, converter func(From) To) SeqE[T
 	}
 	return func(consumer func(To, error) bool) {
 		seq(func(from From, err error) bool {
-			var to To
-			if err == nil {
-				to = converter(from)
+			if err != nil {
+				var to To
+				consumer(to, err)
+				return false
 			}
-			return consumer(to, err)
+			return consumer(converter(from), err)
 		})
 	}
 }
@@ -265,12 +267,12 @@ func ConvertOK[S ~SeqE[From], From, To any](seq S, converter func(from From) (To
 		return empty2
 	}
 	return func(consumer func(To, error) bool) {
-		seq(func(from From, e error) bool {
-			if e != nil {
+		seq(func(from From, err error) bool {
+			if err != nil {
 				var to To
-				return consumer(to, e)
+				return consumer(to, err)
 			} else if to, ok := converter(from); ok {
-				return consumer(to, nil)
+				return consumer(to, err)
 			}
 			return true
 		})
@@ -296,7 +298,9 @@ func ConvOK[S ~SeqE[From], From, To any](seq S, converter func(from From) (To, b
 //	var arrays seq.SeqE[[]int]
 //	...
 //	for e, err := range seqe.Flat(arrays, slices.Values) {
-//	    ...
+//		if err != nil {
+//			panic(err)
+//		}
 //	}
 func Flat[S ~SeqE[From], STo ~Seq[To], From any, To any](seq S, flattener func(From) STo) SeqE[To] {
 	if seq == nil {
@@ -311,6 +315,45 @@ func Flat[S ~SeqE[From], STo ~Seq[To], From any, To any](seq S, flattener func(F
 			elementsTo := flattener(v)
 			for e := range elementsTo {
 				if !yield(e, err) {
+					return false
+				}
+			}
+			return true
+		})
+	}
+}
+
+// Flatt is used to iterate over a two-dimensional sequence in single dimension form, like:
+//
+//	var (
+//		input     iter.Seq[[]string]
+//		flattener func([]string) seq.SeqE[int]
+//		out       seq.SeqE[int]
+//
+//	)
+//
+//	flattener = convertEveryBy(strconv.Atoi)
+//	out = seq.Flatt(input, flattener)
+//	for i, err := range out {
+//		if err != nil {
+//			panic(err)
+//		}
+//		...
+//	}
+func Flatt[S ~SeqE[From], STo ~SeqE[To], From any, To any](seq S, flattener func(From) STo) SeqE[To] {
+	if seq == nil {
+		return empty2
+	}
+	return func(yield func(To, error) bool) {
+		seq(func(v From, err error) bool {
+			if err != nil {
+				var to To
+				yield(to, err)
+				return false
+			}
+			elementsTo := flattener(v)
+			for to, err := range elementsTo {
+				if !yield(to, err) {
 					return false
 				}
 			}

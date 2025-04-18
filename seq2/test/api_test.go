@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/m4gshm/gollections/k"
 	"github.com/m4gshm/gollections/collection/immutable/ordered/map_"
+	"github.com/m4gshm/gollections/k"
 	"github.com/m4gshm/gollections/seq"
 	"github.com/m4gshm/gollections/seq2"
 	"github.com/m4gshm/gollections/slice"
@@ -73,7 +73,7 @@ func Test_Seq2OfMap_NilMap(t *testing.T) {
 	var in map[int]int
 
 	iter := false
-	for _, _ = range seq2.OfMap(in) {
+	for _ = range seq2.OfMap(in) {
 		iter = true
 	}
 
@@ -97,7 +97,7 @@ func Test_ConvertNilSeq(t *testing.T) {
 func Test_AllFiltered(t *testing.T) {
 	s := []string{}
 
-	for _, v := range seq2.Filter(testMap.All, func(k int, v string) bool { return k%2 == 0 }) {
+	for _, v := range seq2.Filter(testMap.All, func(k int, _ string) bool { return k%2 == 0 }) {
 		s = append(s, v)
 	}
 

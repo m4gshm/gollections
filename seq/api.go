@@ -258,7 +258,7 @@ func ConvertOK[S ~Seq[From], From, To any](seq S, converter func(from From) (To,
 
 func ConvOK[S ~Seq[From], From, To any](seq S, converter func(from From) (To, bool, error)) SeqE[To] {
 	if seq == nil {
-		return empty2
+		return emptyE
 	}
 	return func(yield func(To, error) bool) {
 		seq(func(from From) bool {
@@ -294,6 +294,40 @@ func Flat[S ~Seq[From], STo ~Seq[To], From any, To any](seq S, flattener func(Fr
 	}
 }
 
+// Flat is used to iterate over a two-dimensional sequence in single dimension form, like:
+//
+//	var (
+//		input     iter.Seq[[]string]
+//		flattener func([]string) seq.SeqE[int]
+//		out       seq.SeqE[int]
+//
+// )
+//
+//	flattener = convertEveryBy(strconv.Atoi)
+//	out = seq.Flatt(input, flattener)
+//	for i, err := range out {
+//		if err != nil {
+//			panic(err)
+//		}
+//		...
+//	}
+func Flatt[S ~Seq[From], STo ~SeqE[To], From any, To any](seq S, flattener func(From) STo) SeqE[To] {
+	if seq == nil {
+		return emptyE
+	}
+	return func(yield func(To, error) bool) {
+		seq(func(v From) bool {
+			elementsTo := flattener(v)
+			for e, err := range elementsTo {
+				if !yield(e, err) {
+					return false
+				}
+			}
+			return true
+		})
+	}
+}
+
 // Filter creates an iterator that iterates only those elements for which the 'filter' function returns true.
 func Filter[S ~Seq[T], T any](seq S, filter func(T) bool) Seq[T] {
 	if seq == nil {
@@ -312,8 +346,9 @@ func Filter[S ~Seq[T], T any](seq S, filter func(T) bool) Seq[T] {
 // Filt creates an erroreable iterator that iterates only those elements for which the 'filter' function returns true.
 func Filt[S ~Seq[T], T any](seq S, filter func(T) (bool, error)) SeqE[T] {
 	if seq == nil {
-		return empty2
+		return emptyE
 	}
+	//delayed on next iteration step error
 	var err error
 	return func(yield func(T, error) bool) {
 		seq(func(e T) bool {
