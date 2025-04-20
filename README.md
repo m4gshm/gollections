@@ -2,8 +2,7 @@
 
 Gollections is set of functions for [slices](#slices), [maps](#maps),
 [iter.Seq, iter.Seq2](#seq-seq2-seqe) and additional implementations of
-[iterator](#loop-kvloop-and-breakable-versions-breakloop-breakkvloop)
-and data structures such as [ordered map](#mutable-collections) or
+data structures such as [ordered map](#mutable-collections) or
 [set](#mutable-collections) aimed to reduce boilerplate code.
 
 Supports Go version 1.24.

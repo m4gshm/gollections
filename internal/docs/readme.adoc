@@ -2,7 +2,7 @@
 
 == Gollections
 
-Gollections is set of functions for link:#slices[slices], link:#maps[maps], link:#seq-seq2-seqe[iter.Seq, iter.Seq2] and additional implementations of link:#loop-kvloop-and-breakable-versions-breakloop-breakkvloop[iterator] and data structures such as link:#mutable-collections[ordered map] or link:#mutable-collections[set] aimed to reduce boilerplate code.
+Gollections is set of functions for link:#slices[slices], link:#maps[maps], link:#seq-seq2-seqe[iter.Seq, iter.Seq2] and additional implementations of data structures such as link:#mutable-collections[ordered map] or link:#mutable-collections[set] aimed to reduce boilerplate code.
 
 Supports Go version 1.24.
 
