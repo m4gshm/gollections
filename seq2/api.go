@@ -1,4 +1,4 @@
-// Package seq2 provides helpers for “range-over-func” feature introduced in go 1.22.
+// Package seq2 extends the iter.Seq2 interface with convering, filtering, and reducing functionality.
 package seq2
 
 import (
@@ -38,12 +38,12 @@ func OfMap[K comparable, V any](elements map[K]V) Seq2[K, V] {
 // OfIndexed builds an indexed Seq2 iterator by extracting elements from an indexed soruce.
 // the len is length ot the source.
 // the getAt retrieves an element by its index from the source.
-func OfIndexed[T any](max int, getAt func(int) T) Seq2[int, T] {
+func OfIndexed[T any](amount int, getAt func(int) T) Seq2[int, T] {
 	return func(yield func(int, T) bool) {
 		if getAt == nil {
 			return
 		}
-		for i := range max {
+		for i := range amount {
 			if ok := yield(i, getAt(i)); !ok {
 				break
 			}

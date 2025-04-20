@@ -1,3 +1,4 @@
+// Package is provides predicate short aliases
 package is
 
 import (

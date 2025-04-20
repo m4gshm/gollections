@@ -31,7 +31,7 @@ type benchCase struct {
 	load func(int)
 }
 
-var cases = []benchCase{{"high", HighLoad}, {"mid", MidLoad}, {"low", LowLoad}}
+var cases = []benchCase{ /*{"high", HighLoad}, {"mid", MidLoad},*/ {"low", LowLoad}}
 
 func Benchmark_SliceRange_Iterating(b *testing.B) {
 	integers := slice.Range(0, max)

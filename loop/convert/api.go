@@ -49,8 +49,8 @@ func Check[From, To any](next func() (From, bool), converter func(from From) (To
 }
 
 // FromIndexed - convert.FromIndexed retrieves elements from a indexed source and converts them
-func FromIndexed[From, To any](len int, next func(int) From, converter func(from From) To) loop.Loop[To] {
-	return loop.Convert(loop.OfIndexed(len, next), converter)
+func FromIndexed[From, To any](amount int, next func(int) From, converter func(from From) To) loop.Loop[To] {
+	return loop.Convert(loop.OfIndexed(amount, next), converter)
 }
 
 // AndReduce - convert.AndReduce converts elements and merge them into one

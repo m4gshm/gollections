@@ -138,8 +138,8 @@ func Test_GenerateResolv(t *testing.T) {
 	result, _ := map_.GenerateResolv(func() (bool, int, bool, error) {
 		counter++
 		return counter%2 == 0, counter, counter < 5, nil
-	}, func(exists bool, k bool, old, new int) int {
-		return op.IfElse(exists, op.IfElse(k, new, old), new)
+	}, func(exists bool, k bool, oldVal, newVal int) int {
+		return op.IfElse(exists, op.IfElse(k, newVal, oldVal), newVal)
 	})
 
 	assert.Equal(t, 4, result[true])

@@ -2,6 +2,7 @@ package test
 
 import (
 	"errors"
+	"iter"
 	"slices"
 	"strconv"
 	"testing"
@@ -17,12 +18,12 @@ import (
 )
 
 func noErr[T any](t T) (T, error) { return t, nil }
-func errOn(max int) func(int) (int, error) {
-	return func(i int) (int, error) {
-		if i == max {
-			return i, errors.New("abort")
+func errOn[T comparable](errVal T) func(T) (T, error) {
+	return func(val T) (T, error) {
+		if val == errVal {
+			return val, errors.New("abort")
 		}
-		return i, nil
+		return val, nil
 	}
 }
 
@@ -170,6 +171,50 @@ func Test_FlatSeq(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+func Test_Flatt(t *testing.T) {
+	var (
+		input     iter.Seq2[[]string, error]
+		flattener func([]string) ([]int, error)
+		out       seq.SeqE[int]
+	)
+	out = seqe.Flatt(input, flattener)
+	for i, err := range out {
+		if err != nil {
+			panic(err)
+		}
+		_ = i
+	}
+
+	s := seq.ToSeq2(seq.Of([][]string{{"1", "2", "3"}, {"4"}, {"_5", "6"}}...), noErr)
+	f := func(strInteger []string) ([]int, error) { return slice.Conv(strInteger, strconv.Atoi) }
+	i, err := seqe.Slice(seqe.Flatt(s, f))
+
+	assert.Equal(t, []int{1, 2, 3, 4}, i)
+	assert.ErrorContains(t, err, "parsing \"_5\"")
+}
+
+func Test_FlattSeq(t *testing.T) {
+	var (
+		input     iter.Seq2[[]string, error]
+		flattener func([]string) seq.SeqE[int]
+		out       seq.SeqE[int]
+	)
+	out = seqe.FlattSeq(input, flattener)
+	for i, err := range out {
+		if err != nil {
+			panic(err)
+		}
+		_ = i
+	}
+
+	s := seq.ToSeq2(seq.Of([][]string{{"1", "2", "3"}, {"4"}, {"_5", "6"}}...), noErr)
+	f := func(strInteger []string) seq.SeqE[int] { return seq.Conv(seq.Of(strInteger...), strconv.Atoi) }
+	i, err := seqe.Slice(seqe.FlattSeq(s, f))
+
+	assert.Equal(t, []int{1, 2, 3, 4}, i)
+	assert.ErrorContains(t, err, "parsing \"_5\"")
+}
+
 func Test_Filter(t *testing.T) {
 	s := seq.Of(1, 3, 4, 5, 7, 8, 9, 11)
 	r := seq.Filter(s, even)
@@ -211,25 +256,6 @@ func Test_Contains(t *testing.T) {
 	assert.ErrorContains(t, err, "abort")
 }
 
-// func Test_KeyValue(t *testing.T) {
-// 	s := seq.Of(1, 2, 3)
-// 	s2 := seqe.KeyValue(s, as.Is, strconv.Itoa)
-// 	k := seq.Slice(seq2.Keys(s2))
-// 	v := seq.Slice(seq2.Values(s2))
-
-// 	assert.Equal(t, slice.Of(1, 2, 3), k)
-// 	assert.Equal(t, slice.Of("1", "2", "3"), v)
-// }
-
-// func Test_KeyValues(t *testing.T) {
-// 	s := seq.Of([]int{1, 2}, []int{3})
-// 	s2 := seq.KeyValues(s, slice.Len, as.Is)
-// 	k := seq.Slice(seq2.Keys(s2))
-// 	v := seq.Slice(seq2.Values(s2))
-
-//		assert.Equal(t, slice.Of(2, 2, 1), k)
-//		assert.Equal(t, slice.Of(1, 2, 3), v)
-//	}
 func Test_SeqOfNil(t *testing.T) {
 	var in, out []int
 

@@ -51,9 +51,9 @@ func OfLoop[S, T any](source S, hasNext func(S) bool, getNext func(S) (T, error)
 // OfIndexed builds a slice by extracting elements from an indexed soruce.
 // the len is length ot the source.
 // the getAt retrieves an element by its index from the source.
-func OfIndexed[T any](len int, getAt func(int) T) []T {
-	r := make([]T, len)
-	for i := 0; i < len; i++ {
+func OfIndexed[T any](amount int, getAt func(int) T) []T {
+	r := make([]T, amount)
+	for i := 0; i < amount; i++ {
 		r[i] = getAt(i)
 	}
 	return r

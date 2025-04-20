@@ -86,7 +86,7 @@ func (m MapValues[K, V]) Append(out []V) (values []V) {
 
 // All is used to iterate through the collection using `for val := range`.
 func (m MapValues[K, V]) All(consumer func(V) bool) {
-	m.IAll(func(i int, v V) bool { return consumer(v) })
+	m.IAll(func(_ int, v V) bool { return consumer(v) })
 }
 
 // IAll is used to iterate through the collection using `for index, val := range`.

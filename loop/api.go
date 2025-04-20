@@ -149,12 +149,12 @@ func Slice[T any](next func() (T, bool)) []T {
 }
 
 // SliceCap collects the elements retrieved by the 'next' function into a new slice with predefined capacity
-func SliceCap[T any](next func() (T, bool), cap int) (out []T) {
+func SliceCap[T any](next func() (T, bool), capacity int) (out []T) {
 	if next == nil {
 		return nil
 	}
-	if cap > 0 {
-		out = make([]T, 0, cap)
+	if capacity > 0 {
+		out = make([]T, 0, capacity)
 	}
 	return Append(next, out)
 }
@@ -861,13 +861,13 @@ func Range[T constraints.Integer | rune](from T, toExclusive T) Loop[T] {
 // OfIndexed builds a loop by extracting elements from an indexed soruce.
 // the len is length ot the source.
 // the getAt retrieves an element by its index from the source.
-func OfIndexed[T any](len int, getAt func(int) T) Loop[T] {
+func OfIndexed[T any](amount int, getAt func(int) T) Loop[T] {
 	if getAt == nil {
 		return nil
 	}
 	i := 0
 	return func() (out T, ok bool) {
-		if ok = i < len; ok {
+		if ok = i < amount; ok {
 			out = getAt(i)
 			i++
 		}

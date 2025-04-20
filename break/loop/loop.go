@@ -24,8 +24,8 @@ func (next Loop[T]) Slice() ([]T, error) {
 }
 
 // SliceCap collects the elements retrieved by the 'next' function into a new slice with predefined capacity
-func (next Loop[T]) SliceCap(cap int) ([]T, error) {
-	return SliceCap(next, cap)
+func (next Loop[T]) SliceCap(capacity int) ([]T, error) {
+	return SliceCap(next, capacity)
 }
 
 // Append collects the elements retrieved by the 'next' function into the specified 'out' slice

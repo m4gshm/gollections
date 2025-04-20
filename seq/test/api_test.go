@@ -89,7 +89,6 @@ func Test_ReduceNil(t *testing.T) {
 }
 
 func Test_First(t *testing.T) {
-
 	result, ok := seq.First(seq.Of(1, 2, 3, 4, 5, 6), more.Than(5))
 
 	assert.True(t, ok)
@@ -136,7 +135,7 @@ func Test_FlatSeq(t *testing.T) {
 func Test_Flatt(t *testing.T) {
 	var (
 		input     iter.Seq[[]string]
-		flattener func([]string) seq.SeqE[int]
+		flattener func([]string) ([]int, error)
 		out       seq.SeqE[int]
 	)
 	out = seq.Flatt(input, flattener)
@@ -148,8 +147,30 @@ func Test_Flatt(t *testing.T) {
 	}
 
 	s := seq.Of([][]string{{"1", "2", "3"}, {"4"}, {"_5", "6"}}...)
-	f := func(strInteger []string) seq.SeqE[int] { return seq.Conv(seq.Of(strInteger...), strconv.Atoi) }
+	f := func(strInteger []string) ([]int, error) { return slice.Conv(strInteger, strconv.Atoi) }
 	i, err := seqe.Slice(seq.Flatt(s, f))
+
+	assert.Equal(t, []int{1, 2, 3, 4}, i)
+	assert.ErrorContains(t, err, "parsing \"_5\"")
+}
+
+func Test_FlattSeq(t *testing.T) {
+	var (
+		input     iter.Seq[[]string]
+		flattener func([]string) seq.SeqE[int]
+		out       seq.SeqE[int]
+	)
+	out = seq.FlattSeq(input, flattener)
+	for i, err := range out {
+		if err != nil {
+			panic(err)
+		}
+		_ = i
+	}
+
+	s := seq.Of([][]string{{"1", "2", "3"}, {"4"}, {"_5", "6"}}...)
+	f := func(strInteger []string) seq.SeqE[int] { return seq.Conv(seq.Of(strInteger...), strconv.Atoi) }
+	i, err := seqe.Slice(seq.FlattSeq(s, f))
 
 	assert.Equal(t, []int{1, 2, 3, 4}, i)
 	assert.ErrorContains(t, err, "parsing \"_5\"")

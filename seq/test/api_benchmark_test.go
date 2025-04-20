@@ -9,8 +9,8 @@ import (
 )
 
 var (
-	max    = 100000
-	values = range_.Closed(1, max)
+	maxValue = 100000
+	values   = range_.Closed(1, maxValue)
 )
 
 func Benchmark_Loop_Slice_Filter_plainOld(b *testing.B) {

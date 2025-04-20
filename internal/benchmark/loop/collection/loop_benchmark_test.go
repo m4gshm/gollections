@@ -36,7 +36,7 @@ type benchCase struct {
 	load func(int)
 }
 
-var cases = []benchCase{{"high", HighLoad}, {"low", LowLoad}}
+var cases = []benchCase{ /*{"high", HighLoad},*/ {"low", LowLoad}}
 
 func Benchmark_Loop_ImmutableOrderSet_ForEach(b *testing.B) {
 	c := oset.Of(values...)

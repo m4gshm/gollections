@@ -1,3 +1,4 @@
+// Package seqe extends the seq.SeqE interface with convering, filtering, and reducing functionality.
 package seqe
 
 import (
@@ -9,7 +10,7 @@ import (
 // Seq is an alias of an iterator-function that allows to iterate over elements of a sequence, such as slice.
 type Seq[T any] = seq.Seq[T]
 
-// SeqE is a specific iterator form tha allows to retrieve a value with an error as second parameter of the iterator.
+// SeqE is a specific iterator form that allows to retrieve a value with an error as second parameter of the iterator.
 // It is used as a result of applying functions like seq.Conv, which may throw an error during iteration.
 type SeqE[T any] = seq.SeqE[T]
 
@@ -20,12 +21,12 @@ type Seq2[K, V any] = seq.Seq2[K, V]
 // OfIndexed builds a SeqE iterator by extracting elements from an indexed soruce.
 // the len is length ot the source.
 // the getAt retrieves an element by its index from the source.
-func OfIndexed[T any](max int, getAt func(int) (T, error)) Seq2[T, error] {
+func OfIndexed[T any](amount int, getAt func(int) (T, error)) Seq2[T, error] {
 	return func(yield func(T, error) bool) {
 		if getAt == nil {
 			return
 		}
-		for i := range max {
+		for i := range amount {
 			v, err := getAt(i)
 			if ok := yield(v, err); !ok {
 				break
@@ -82,12 +83,12 @@ func Slice[S ~SeqE[T], T any](seq S) ([]T, error) {
 }
 
 // SliceCap collects the elements of the 'seq' sequence into a new slice with predefined capacity.
-func SliceCap[S ~SeqE[T], T any](seq S, cap int) (out []T, e error) {
+func SliceCap[S ~SeqE[T], T any](seq S, capacity int) (out []T, e error) {
 	if seq == nil {
 		return nil, nil
 	}
-	if cap > 0 {
-		out = make([]T, 0, cap)
+	if capacity > 0 {
+		out = make([]T, 0, capacity)
 	}
 	return Append(seq, out)
 }
@@ -372,6 +373,50 @@ func FlatSeq[S ~SeqE[From], STo ~Seq[To], From any, To any](seq S, flattener fun
 //
 //	var (
 //		input     iter.Seq[[]string]
+//		flattener func([]string) ([]int, error)
+//		out       seq.SeqE[int]
+//
+//	)
+//
+//	flattener = convertEveryBy(strconv.Atoi)
+//	out = seq.Flatt(input, flattener)
+//	for i, err := range out {
+//		if err != nil {
+//			panic(err)
+//		}
+//		...
+//	}
+func Flatt[S ~SeqE[From], STo ~[]To, From any, To any](seq S, flattener func(From) (STo, error)) SeqE[To] {
+	return func(yield func(To, error) bool) {
+		if seq == nil {
+			return
+		}
+		seq(func(v From, err error) bool {
+			if err != nil {
+				var to To
+				yield(to, err)
+				return false
+			}
+			elementsTo, err := flattener(v)
+			if err != nil {
+				var t To
+				yield(t, err)
+				return false
+			}
+			for _, e := range elementsTo {
+				if !yield(e, nil) {
+					return false
+				}
+			}
+			return true
+		})
+	}
+}
+
+// FlattSeq is used to iterate over a two-dimensional sequence in single dimension form, like:
+//
+//	var (
+//		input     iter.Seq[[]string]
 //		flattener func([]string) seq.SeqE[int]
 //		out       seq.SeqE[int]
 //
@@ -385,7 +430,7 @@ func FlatSeq[S ~SeqE[From], STo ~Seq[To], From any, To any](seq S, flattener fun
 //		}
 //		...
 //	}
-func Flatt[S ~SeqE[From], STo ~SeqE[To], From any, To any](seq S, flattener func(From) STo) SeqE[To] {
+func FlattSeq[S ~SeqE[From], STo ~SeqE[To], From any, To any](seq S, flattener func(From) STo) SeqE[To] {
 	return func(yield func(To, error) bool) {
 		if seq == nil {
 			return

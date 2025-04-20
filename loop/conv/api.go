@@ -7,8 +7,8 @@ import (
 )
 
 // FromIndexed - conv.FromIndexed retrieves elements from a indexed source and converts them
-func FromIndexed[From, To any](len int, next func(int) From, converter func(from From) (To, error)) breakLoop.Loop[To] {
-	return loop.Conv(loop.OfIndexed(len, next), converter)
+func FromIndexed[From, To any](amount int, next func(int) From, converter func(from From) (To, error)) breakLoop.Loop[To] {
+	return loop.Conv(loop.OfIndexed(amount, next), converter)
 }
 
 // AndReduce - convert.AndReduce converts elements and merge them into one
