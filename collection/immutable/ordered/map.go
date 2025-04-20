@@ -40,21 +40,19 @@ func (m Map[K, V]) All(consumer func(K, V) bool) {
 	map_.TrackOrderedWhile(m.order, m.elements, consumer)
 }
 
-// Loop creates a loop to iterate through the collection.
+// Loop creates a loop to iterate through the collection
 func (m Map[K, V]) Loop() kvloop.Loop[K, V] {
 	h := m.Head()
 	return h.Next
 }
 
 // Head creates an iterator to iterate through the collection.
-// Deprecated: Head is deprecated. Will be replaced by rance-over function iterator.
 func (m Map[K, V]) Head() MapIter[K, V] {
 	return NewMapIter(m.elements, slice.NewHead(m.order))
 }
 
 // First returns the first key/value pair of the map, an iterator to iterate over the remaining pair, and true\false marker of availability next pairs.
 // If no more then ok==false.
-// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 func (m Map[K, V]) First() (MapIter[K, V], K, V, bool) {
 	var (
 		iterator           = m.Head()
@@ -64,7 +62,6 @@ func (m Map[K, V]) First() (MapIter[K, V], K, V, bool) {
 }
 
 // Tail creates an iterator pointing to the end of the map
-// Deprecated: Tail is deprecated. Will be replaced by rance-over function iterator.
 func (m Map[K, V]) Tail() MapIter[K, V] {
 	return NewMapIter(m.elements, slice.NewTail(m.order))
 }

@@ -13,19 +13,19 @@ var Break = errors.New("Break")
 // Continue is an alias of the nil value used to continue iterating by For, Track methods.
 var Continue error = nil
 
-// Range provides the `Range` function used for iterating over a sequence of elements by `for e := range collection.Range`.
+// Range provides the `Range` function used for iterating over a sequence of elements by `for e := range collection.All`.
 type Range[T any] interface {
-	All(consumer func(T) bool)
+	All(yield func(T) bool)
 }
 
 // OrderedRange provides the `All` function used for iterating over an ordered sequence of elements by `for i, e := range collection.IAll`.
 type OrderedRange[T any] interface {
-	IAll(consumer func(int, T) bool)
+	IAll(yield func(int, T) bool)
 }
 
 // KVRange provides the `All` function used for iterating over a sequence of key\value pairs by `for k, v := range collection.All`.
 type KVRange[K, V any] interface {
-	All(consumer func(K, V) bool)
+	All(yield func(K, V) bool)
 }
 
 // Iterable is a loop supplier interface

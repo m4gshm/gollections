@@ -23,7 +23,7 @@ func Benchmark_Loop_ImmutableOrderSet_All_direct(b *testing.B) {
 	}
 }
 
-func Benchmark_Loop_ImmutableOrderSet_All(b *testing.B) {
+func Benchmark_Loop_ImmutableOrderSet_All2(b *testing.B) {
 	c := oset.Of(values...)
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {

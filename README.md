@@ -87,9 +87,7 @@ find by exploring slices [subpackages](./slice).
 
 **Be careful** when use several slice functions subsequently like
 `slice.Filter(slice.Convert(…​))`. This can lead to unnecessary RAM
-consumption. Consider
-[loop](#loop-kvloop-and-breakable-versions-breakloop-breakkvloop)
-instead of slice API.
+consumption. Consider [seq](#seq) instead of slice API.
 
 ### Main slice functions
 
@@ -486,10 +484,10 @@ var all, err = map_.Conv(employers, func(title string, employer map[string]strin
 //map[d:Bob j:Tom], nil
 ```
 
-## [seq](./seq/api.go), [seq2](./seq2/api.go)
+## [seq](./seq/api.go), [seq2](./seq2/api.go), [seqe](./seqe/api.go)
 
-API extends rangefunc iterator types `seq.Seq[V]`, `seq.Seq2[K,V]` with
-utility functions kit.
+API extends rangefunc iterator types `iter.Seq[V]`, `iter.Seq2[K,V]`
+with utility functions kit.
 
 ``` go
 even := func(i int) bool { return i%2 == 0 }
@@ -501,7 +499,7 @@ or
 
 ``` go
 intSeq := seq.Conv(seq.Of("1", "2", "3", "ddd4", "5"), strconv.Atoi)
-ints, err := seq2.Slice(intSeq) //[1 2 3], invalid syntax
+ints, err := seqe.Slice(intSeq) //[1 2 3], invalid syntax
 ```
 
 ### Sequence API
@@ -510,7 +508,8 @@ To use any collection or loop as a rangefunc sequecne just call
 [All](#iterating-over-collections) method of that one.
 
 In many cases the API likes the
-[loop](#loop-kvloop-and-breakable-versions-breakloop-breakkvloop) API.
+~\\[loop](#loop-kvloop-and-breakable-versions-breakloop-breakkvloop)~\\
+API.
 
 #### Instantiators
 
@@ -521,11 +520,12 @@ import(
     "github.com/m4gshm/gollections/seq"
     "github.com/m4gshm/gollections/seq2"
 )
-
 var (
-    ints  iter.Seq[int]          = seq.Of(1, 2, 3)
-    pairs iter.Seq2[string, int] = seq2.OfMap(map[string]int{"first": 1, "second": 2, "third": 3})
+    ints  seq.Seq[int]          = seq.Of(1, 2, 3)
+    pairs seq.Seq2[string, int] = seq2.OfMap(map[string]int{"first": 1, "second": 2, "third": 3})
 )
+
+assert.Equal(t, []int{3, 2, 1}, sort.Desc(seq.Slice(seq2.Values(pairs))))
 ```
 
 #### Collectors
@@ -550,14 +550,15 @@ import (
     "github.com/m4gshm/gollections/slice"
     "github.com/m4gshm/gollections/slice/sort"
 )
-
-var users iter.Seq[User] = seq.Of(users...)
-var groups iter.Seq2[string, User] = seq.ToSeq2(users, func(u User) (string, User) {
+var users seq.Seq[User] = seq.Of(users...)
+var groups seq.Seq2[string, User] = seq.ToSeq2(users, func(u User) (string, User) {
     return use.If(u.age <= 20, "<=20").If(u.age <= 30, "<=30").Else(">30"), u
 })
 var ageGroups map[string][]User = seq2.Group(groups)
 
 //map[<=20:[{Tom 18 []}] <=30:[{Bob 26 []}] >30:[{Alice 35 []} {Chris 41 []}]]
+
+assert.Equal(t, slice.Of("Alice", "Chris"), sort.Asc(slice.Convert(ageGroups[">30"], User.Name)))
 ```
 
 #### Reducers
@@ -605,7 +606,7 @@ var s []string = seq.Slice(seq.Convert(seq.Of(1, 3, 5, 7, 9, 11), strconv.Itoa))
 ##### seq.Conv
 
 ``` go
-result, err := seq2.Slice(seq.Conv(seq.Of("1", "3", "5", "_7", "9", "11"), strconv.Atoi))
+result, err := seqe.Slice(seq.Conv(seq.Of("1", "3", "5", "_7", "9", "11"), strconv.Atoi))
 //[]int{1, 3, 5}, ErrSyntax
 ```
 
@@ -635,11 +636,11 @@ import (
     "github.com/m4gshm/gollections/seq"
 )
 
-var i []int = seq.Slice(seq.Flat(seq.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...), as.Is))
+var i []int = seq.Slice(seq.Flat(seq.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...), slices.Values))
 //[]int{1, 2, 3, 4, 5, 6}
 ```
 
-## [loop](./loop/api.go), [kv/loop](./kv/loop/api.go) and breakable versions [break/loop](./break/loop/api.go), [break/kv/loop](./break/kv/loop/api.go)
+## DEPRECATED: [loop](./loop/api.go), [kv/loop](./kv/loop/api.go) and breakable versions [break/loop](./break/loop/api.go), [break/kv/loop](./break/kv/loop/api.go)
 
 Legacy iterators API based on the following functions:
 

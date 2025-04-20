@@ -4,7 +4,7 @@
 
 Gollections is set of functions for link:#slices[slices], link:#maps[maps] and additional implementations of data structures such as link:#mutable-collections[ordered map] or link:#mutable-collections[set] aimed to reduce boilerplate code.
 
-Supports Go version 1.23.
+Supports Go version 1.24.
 
 For example, it's need to group some link:./internal/examples/boilerplate/user_type.go[users] by their role names converted to lowercase:
 [source,go]
@@ -53,7 +53,7 @@ include::../examples/boilerplate/slice_filter_convert_reduce_short_test.go[lines
 
 This is a shorter version of the previous example that used short aliases link:#sumof[sum.Of] and link:#operations-chain-functions[filter.AndConvert]. More shortcuts you can find by exploring slices link:./slice[subpackages].
 
-*Be careful* when use several slice functions subsequently like [source,go]`slice.Filter(slice.Convert(...))`. This can lead to unnecessary RAM consumption. Consider link:#loop-kvloop-and-breakable-versions-breakloop-breakkvloop[loop] instead of slice API.
+*Be careful* when use several slice functions subsequently like [source,go]`slice.Filter(slice.Convert(...))`. This can lead to unnecessary RAM consumption. Consider link:#seq[seq] instead of slice API.
 
 ==== Main slice functions
 ===== Instantiators
@@ -292,9 +292,9 @@ include::../examples/mapexamples/map_Conv_test.go[lines=17..22,indent=0]
 ----
 
 [#seq]
-=== link:./seq/api.go[seq], link:./seq2/api.go[seq2]
+=== link:./seq/api.go[seq], link:./seq2/api.go[seq2], link:./seqe/api.go[seqe]
 
-API extends rangefunc iterator types `seq.Seq[V]`, `seq.Seq2[K,V]` with utility functions kit.
+API extends rangefunc iterator types `iter.Seq[V]`, `iter.Seq2[K,V]` with utility functions kit.
 
 [source,go]
 ----

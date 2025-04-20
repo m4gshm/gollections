@@ -6,7 +6,11 @@ import (
 	"github.com/m4gshm/gollections/seq"
 )
 
+// Seq is an alias of an iterator-function that allows to iterate over elements of a sequence, such as slice.
 type Seq[T any] = seq.Seq[T]
+
+// Seq2 is an alias of an iterator-function that allows to iterate over key/value pairs of a sequence, such as slice or map.
+// It is used to iterate over slice index/value pairs or map key/value pairs.
 type Seq2[K, V any] = seq.Seq2[K, V]
 
 // Of creates an index/value pairs iterator over the elements.
@@ -31,6 +35,9 @@ func OfMap[K comparable, V any](elements map[K]V) Seq2[K, V] {
 	}
 }
 
+// OfIndexed builds an indexed Seq2 iterator by extracting elements from an indexed soruce.
+// the len is length ot the source.
+// the getAt retrieves an element by its index from the source.
 func OfIndexed[T any](max int, getAt func(int) T) Seq2[int, T] {
 	if getAt == nil {
 		return empty2

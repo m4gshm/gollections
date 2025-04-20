@@ -6,10 +6,20 @@ import (
 	"github.com/m4gshm/gollections/seq"
 )
 
+// Seq is an alias of an iterator-function that allows to iterate over elements of a sequence, such as slice.
 type Seq[T any] = seq.Seq[T]
+
+// SeqE is a specific iterator form tha allows to retrieve a value with an error as second parameter of the iterator.
+// It is used as a result of applying functions like seq.Conv, which may throw an error during iteration.
 type SeqE[T any] = seq.SeqE[T]
+
+// Seq2 is an alias of an iterator-function that allows to iterate over key/value pairs of a sequence, such as slice or map.
+// It is used to iterate over slice index/value pairs or map key/value pairs.
 type Seq2[K, V any] = seq.Seq2[K, V]
 
+// OfIndexed builds a SeqE iterator by extracting elements from an indexed soruce.
+// the len is length ot the source.
+// the getAt retrieves an element by its index from the source.
 func OfIndexed[T any](max int, getAt func(int) (T, error)) Seq2[T, error] {
 	if getAt == nil {
 		return empty2
@@ -262,6 +272,8 @@ func Convert[S ~SeqE[From], From, To any](seq S, converter func(From) To) SeqE[T
 	}
 }
 
+// ConvertOK creates an iterator that applies the 'converter' function to each iterable element.
+// The converter may returns a value or ok=false to exclude the value from the loop.
 func ConvertOK[S ~SeqE[From], From, To any](seq S, converter func(from From) (To, bool)) SeqE[To] {
 	if seq == nil {
 		return empty2
@@ -279,6 +291,9 @@ func ConvertOK[S ~SeqE[From], From, To any](seq S, converter func(from From) (To
 	}
 }
 
+// ConvOK creates a iterator that applies the 'converter' function to each iterable element.
+// The converter may returns a value or ok=false to exclude the value from iteration.
+// It may also return an error to abort the iteration.
 func ConvOK[S ~SeqE[From], From, To any](seq S, converter func(from From) (To, bool, error)) SeqE[To] {
 	if seq == nil {
 		return empty2
@@ -297,12 +312,42 @@ func ConvOK[S ~SeqE[From], From, To any](seq S, converter func(from From) (To, b
 //
 //	var arrays seq.SeqE[[]int]
 //	...
-//	for e, err := range seqe.Flat(arrays, slices.Values) {
+//	for e, err := range seqe.Flat(arrays, as.Is) {
 //		if err != nil {
 //			panic(err)
 //		}
 //	}
-func Flat[S ~SeqE[From], STo ~Seq[To], From any, To any](seq S, flattener func(From) STo) SeqE[To] {
+func Flat[S ~SeqE[From], STo ~[]To, From any, To any](seq S, flattener func(From) STo) SeqE[To] {
+	if seq == nil {
+		return empty2
+	}
+	return func(yield func(To, error) bool) {
+		seq(func(v From, err error) bool {
+			if err != nil {
+				var t To
+				return yield(t, err)
+			}
+			elementsTo := flattener(v)
+			for _, e := range elementsTo {
+				if !yield(e, err) {
+					return false
+				}
+			}
+			return true
+		})
+	}
+}
+
+// Flat is used to iterate over a two-dimensional sequence in single dimension form, like:
+//
+//	var arrays seq.SeqE[[]int]
+//	...
+//	for e, err := range seqe.FlatSeq(arrays, slices.Values) {
+//		if err != nil {
+//			panic(err)
+//		}
+//	}
+func FlatSeq[S ~SeqE[From], STo ~Seq[To], From any, To any](seq S, flattener func(From) STo) SeqE[To] {
 	if seq == nil {
 		return empty2
 	}
@@ -322,6 +367,7 @@ func Flat[S ~SeqE[From], STo ~Seq[To], From any, To any](seq S, flattener func(F
 		})
 	}
 }
+
 
 // Flatt is used to iterate over a two-dimensional sequence in single dimension form, like:
 //

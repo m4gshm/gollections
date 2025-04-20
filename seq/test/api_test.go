@@ -119,7 +119,15 @@ var even = func(v int) bool { return v%2 == 0 }
 
 func Test_Flat(t *testing.T) {
 	md := seq.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...)
-	f := seq.Flat(md, slices.Values)
+	f := seq.Flat(md, as.Is)
+
+	e := []int{1, 2, 3, 4, 5, 6}
+	assert.Equal(t, e, seq.Slice(f))
+}
+
+func Test_FlatSeq(t *testing.T) {
+	md := seq.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...)
+	f := seq.FlatSeq(md, slices.Values)
 
 	e := []int{1, 2, 3, 4, 5, 6}
 	assert.Equal(t, e, seq.Slice(f))

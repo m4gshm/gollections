@@ -4,10 +4,18 @@ package seq
 import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/op"
+	"golang.org/x/exp/constraints"
 )
 
+// Seq is an alias of an iterator-function that allows to iterate over elements of a sequence, such as slice.
 type Seq[V any] = func(yield func(V) bool)
+
+// SeqE is a specific iterator form tha allows to retrieve a value with an error as second parameter of the iterator.
+// It is used as a result of applying functions like seq.Conv, which may throw an error during iteration.
 type SeqE[T any] = Seq2[T, error]
+
+// Seq2 is an alias of an iterator-function that allows to iterate over key/value pairs of a sequence, such as slice or map.
+// It is used to iterate over slice index/value pairs or map key/value pairs.
 type Seq2[K, V any] = func(yield func(K, V) bool)
 
 // Of creates an iterator over the elements.
@@ -21,6 +29,9 @@ func Of[T any](elements ...T) Seq[T] {
 	}
 }
 
+// OfIndexed builds a Seq iterator by extracting elements from an indexed soruce.
+// the len is length ot the source.
+// the getAt retrieves an element by its index from the source.
 func OfIndexed[T any](max int, getAt func(int) T) Seq[T] {
 	if getAt == nil {
 		return empty
@@ -31,6 +42,49 @@ func OfIndexed[T any](max int, getAt func(int) T) Seq[T] {
 				break
 			}
 		}
+	}
+}
+
+// RangeClosed creates a loop that generates integers in the range defined by from and to inclusive
+func RangeClosed[T constraints.Integer | rune](from T, toInclusive T) Seq[T] {
+	amount := toInclusive - from
+	delta := T(1)
+	if amount < 0 {
+		amount = -amount
+		delta = -delta
+	}
+	amount++
+	nextElement := from
+	i := T(0)
+	return func(yield func(T) bool) {
+		if ok := i < amount; ok {
+			out := nextElement
+			i++
+			nextElement = nextElement + delta
+			if !yield(out) {
+				return
+			}
+		}
+	}
+}
+
+// Range creates a loop that generates integers in the range defined by from and to exclusive
+func Range[T constraints.Integer | rune](from T, toExclusive T) Seq[T] {
+	amount := toExclusive - from
+	delta := T(1)
+	if amount < 0 {
+		amount = -amount
+		delta = -delta
+	}
+	return func(yield func(T) bool) {
+		e := from
+		for i := 0; i < int(amount); i++ {
+			if !yield(e) {
+				return
+			}
+			e = e + delta
+		}
+
 	}
 }
 
@@ -235,27 +289,32 @@ func Convert[S ~Seq[From], From, To any](seq S, converter func(From) To) Seq[To]
 	if seq == nil {
 		return empty
 	}
-	return func(consumer func(To) bool) {
+	return func(yield func(To) bool) {
 		seq(func(from From) bool {
-			return consumer(converter(from))
+			return yield(converter(from))
 		})
 	}
 }
 
+// ConvertOK creates an iterator that applies the 'converter' function to each iterable element.
+// The converter may returns a value or ok=false to exclude the value from the loop.
 func ConvertOK[S ~Seq[From], From, To any](seq S, converter func(from From) (To, bool)) Seq[To] {
 	if seq == nil {
 		return empty
 	}
-	return func(consumer func(To) bool) {
+	return func(yield func(To) bool) {
 		seq(func(from From) bool {
 			if to, ok := converter(from); ok {
-				return consumer(to)
+				return yield(to)
 			}
 			return true
 		})
 	}
 }
 
+// ConvOK creates a iterator that applies the 'converter' function to each iterable element.
+// The converter may returns a value or ok=false to exclude the value from iteration.
+// It may also return an error to abort the iteration.
 func ConvOK[S ~Seq[From], From, To any](seq S, converter func(from From) (To, bool, error)) SeqE[To] {
 	if seq == nil {
 		return emptyE
@@ -274,10 +333,34 @@ func ConvOK[S ~Seq[From], From, To any](seq S, converter func(from From) (To, bo
 //
 //	var arrays iter.Seq[[]int]
 //	...
-//	for e := range seq.Flat(arrays, slices.Values) {
+//	for e := range seq.Flat(arrays, as.Is) {
 //	    ...
 //	}
-func Flat[S ~Seq[From], STo ~Seq[To], From any, To any](seq S, flattener func(From) STo) Seq[To] {
+func Flat[S ~Seq[From], STo ~[]To, From any, To any](seq S, flattener func(From) STo) Seq[To] {
+	if seq == nil {
+		return empty
+	}
+	return func(yield func(To) bool) {
+		seq(func(v From) bool {
+			elementsTo := flattener(v)
+			for _, e := range elementsTo {
+				if !yield(e) {
+					return false
+				}
+			}
+			return true
+		})
+	}
+}
+
+// FlatSeq is used to iterate over a two-dimensional sequence in single dimension form, like:
+//
+//	var arrays iter.Seq[[]int]
+//	...
+//	for e := range seq.FlatSeq(arrays, slices.Values) {
+//	    ...
+//	}
+func FlatSeq[S ~Seq[From], STo ~Seq[To], From any, To any](seq S, flattener func(From) STo) Seq[To] {
 	if seq == nil {
 		return empty
 	}
@@ -294,14 +377,14 @@ func Flat[S ~Seq[From], STo ~Seq[To], From any, To any](seq S, flattener func(Fr
 	}
 }
 
-// Flat is used to iterate over a two-dimensional sequence in single dimension form, like:
+// Flatt is used to iterate over a two-dimensional sequence in single dimension form, like:
 //
 //	var (
 //		input     iter.Seq[[]string]
 //		flattener func([]string) seq.SeqE[int]
 //		out       seq.SeqE[int]
 //
-// )
+//	)
 //
 //	flattener = convertEveryBy(strconv.Atoi)
 //	out = seq.Flatt(input, flattener)
@@ -315,17 +398,36 @@ func Flatt[S ~Seq[From], STo ~SeqE[To], From any, To any](seq S, flattener func(
 	if seq == nil {
 		return emptyE
 	}
+
+	f := flatt[STo, From, To]{flattener: flattener}
 	return func(yield func(To, error) bool) {
-		seq(func(v From) bool {
-			elementsTo := flattener(v)
-			for e, err := range elementsTo {
-				if !yield(e, err) {
-					return false
-				}
-			}
-			return true
-		})
+		f.yield = yield
+		seq(f.do)
+		// seq(func(v From) bool {
+		// 	elementsTo := flattener(v)
+		// 	for e, err := range elementsTo {
+		// 		if !yield(e, err) {
+		// 			return false
+		// 		}
+		// 	}
+		// 	return true
+		// })
 	}
+}
+
+type flatt[STo ~SeqE[To], From, To any] struct {
+	flattener func(From) STo
+	yield     func(To, error) bool
+}
+
+func (s flatt[STo, From, To]) do(v From) bool {
+	elementsTo := s.flattener(v)
+	for e, err := range elementsTo {
+		if !s.yield(e, err) {
+			return false
+		}
+	}
+	return true
 }
 
 // Filter creates an iterator that iterates only those elements for which the 'filter' function returns true.
@@ -333,10 +435,10 @@ func Filter[S ~Seq[T], T any](seq S, filter func(T) bool) Seq[T] {
 	if seq == nil {
 		return empty
 	}
-	return func(consumer func(T) bool) {
+	return func(yield func(T) bool) {
 		seq(func(e T) bool {
 			if filter(e) {
-				return consumer(e)
+				return yield(e)
 			}
 			return true
 		})

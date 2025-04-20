@@ -13,6 +13,7 @@ import (
 	"github.com/m4gshm/gollections/loop"
 	sop "github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/op/check/not"
+	"github.com/m4gshm/gollections/seq"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/range_"
 )
@@ -121,7 +122,22 @@ func Benchmark_ConvertAndFilter_Slice_Loop(b *testing.B) {
 		s = loop.Slice(loop.Convert(loop.Filter(ptr.Of(slice.NewHead(items)).Next, even), convert.And(toString, addTail)))
 	}
 	_ = s
+	b.StopTimer()
+}
 
+func Benchmark_ConvertAndFilter_Slice_Seq(b *testing.B) {
+	var (
+		toString = func(i int) string { return fmt.Sprintf("%d", i) }
+		addTail  = func(s string) string { return s + "_tail" }
+		even     = func(v int) bool { return v%2 == 0 }
+	)
+	items := slice.Of(1, 2, 3, 4, 5)
+	var s []string
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		s = seq.Slice(seq.Convert(seq.Filter(seq.Of(items...), even), convert.And(toString, addTail)))
+	}
+	_ = s
 	b.StopTimer()
 }
 
@@ -194,6 +210,18 @@ func Benchmark_Flatt_Loop(b *testing.B) {
 	b.StopTimer()
 }
 
+func Benchmark_Flatt_Seq(b *testing.B) {
+	odds := func(v int) bool { return v%2 != 0 }
+	multiDimension := [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		next := seq.Of(multiDimension...)
+		oneDimension := seq.Slice(seq.Filter(seq.Flat(seq.Flat(next, as.Is), as.Is), odds))
+		_ = oneDimension
+	}
+	b.StopTimer()
+}
+
 func Benchmark_Flatt_Slice_PlainOld(b *testing.B) {
 	multiDimension := [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
 	b.ResetTimer()
@@ -223,6 +251,21 @@ func Benchmark_ReduceSum_Loop(b *testing.B) {
 	result := 0
 	for i := 0; i < b.N; i++ {
 		result = loop.Reduce(loop.Filter(loop.Flat(loop.Flat(loop.Of(multiDimension...), as.Is), as.Is), odds), sop.Sum)
+	}
+	b.StopTimer()
+	if result != expected {
+		b.Fatalf("must be %d, but %d", expected, result)
+	}
+}
+
+func Benchmark_ReduceSum_Seq(b *testing.B) {
+	odds := func(v int) bool { return v%2 != 0 }
+	multiDimension := [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
+	expected := 1 + 3 + 5 + 7
+	b.ResetTimer()
+	result := 0
+	for i := 0; i < b.N; i++ {
+		result = seq.Reduce(seq.Filter(seq.Flat(seq.Flat(seq.Of(multiDimension...), as.Is), as.Is), odds), sop.Sum)
 	}
 	b.StopTimer()
 	if result != expected {

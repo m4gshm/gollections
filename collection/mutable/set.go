@@ -55,7 +55,6 @@ func (s *Set[T]) IterEdit() c.DelIterator[T] {
 }
 
 // Head creates an iterator to iterate through the collection.
-// Deprecated: Head is deprecated. Will be replaced by rance-over function iterator.
 func (s *Set[T]) Head() SetIter[T] {
 	var elements map[T]struct{}
 	if s != nil {
@@ -66,7 +65,6 @@ func (s *Set[T]) Head() SetIter[T] {
 
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
-// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 func (s *Set[T]) First() (SetIter[T], T, bool) {
 	var (
 		iterator  = s.Head()

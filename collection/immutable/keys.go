@@ -39,14 +39,12 @@ func (m MapKeys[K, V]) Loop() loop.Loop[K] {
 }
 
 // Head creates an iterator to iterate through the collection.
-// Deprecated: Head is deprecated. Will be replaced by rance-over function iterator.
 func (m MapKeys[K, V]) Head() map_.KeyIter[K, V] {
 	return map_.NewKeyIter(m.elements)
 }
 
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
-// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 func (m MapKeys[K, V]) First() (map_.KeyIter[K, V], K, bool) {
 	var (
 		iterator  = m.Head()
