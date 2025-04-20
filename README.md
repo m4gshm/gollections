@@ -87,7 +87,9 @@ find by exploring slices [subpackages](./slice).
 
 **Be careful** when use several slice functions subsequently like
 `slice.Filter(slice.Convert(…​))`. This can lead to unnecessary RAM
-consumption. Consider [seq](#seq) instead of slice API.
+consumption. Consider
+[loop](#loop-kvloop-and-breakable-versions-breakloop-breakkvloop)
+instead of slice API.
 
 ### Main slice functions
 
