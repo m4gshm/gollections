@@ -338,7 +338,7 @@ func Flat[S ~SeqE[From], STo ~[]To, From any, To any](seq S, flattener func(From
 	}
 }
 
-// Flat is used to iterate over a two-dimensional sequence in single dimension form, like:
+// FlatSeq is used to iterate over a two-dimensional sequence in single dimension form, like:
 //
 //	var arrays seq.SeqE[[]int]
 //	...
@@ -367,7 +367,6 @@ func FlatSeq[S ~SeqE[From], STo ~Seq[To], From any, To any](seq S, flattener fun
 		})
 	}
 }
-
 
 // Flatt is used to iterate over a two-dimensional sequence in single dimension form, like:
 //

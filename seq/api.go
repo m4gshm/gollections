@@ -457,7 +457,7 @@ func KeyValue[S ~Seq[T], T, K, V any](seq S, keyExtractor func(T) K, valExtracto
 func KeyValues[S ~Seq[T], T, K, V any](seq S, keyExtractor func(T) K, valsExtractor func(T) []V) Seq2[K, V] {
 	return func(yield func(K, V) bool) {
 		if seq == nil {
-			return 
+			return
 		}
 		for t := range seq {
 			k := keyExtractor(t)

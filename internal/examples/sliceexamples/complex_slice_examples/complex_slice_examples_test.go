@@ -229,7 +229,7 @@ func Benchmark_AggregateFilteredRoles_Loop(b *testing.B) {
 
 func Benchmark_AggregateFilteredRoles_Seq_FlatSeq(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		roles := seq.FlatSeq(seq.Of(users...), func(u User) seq.Seq[Role] { return seq.Of(u.roles...)})
+		roles := seq.FlatSeq(seq.Of(users...), func(u User) seq.Seq[Role] { return seq.Of(u.roles...) })
 		roleNamesExceptManager := seq.Filter(seq.Convert(roles, Role.Name), not.Eq("Manager"))
 		_ = seq.Slice(roleNamesExceptManager)
 	}

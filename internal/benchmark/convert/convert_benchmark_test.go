@@ -61,7 +61,6 @@ func Benchmark_Convert_Seq(b *testing.B) {
 	b.StopTimer()
 }
 
-
 func Benchmark_Convert_Loop(b *testing.B) {
 	op := convert.And(toString, addTail)
 	var s []string
