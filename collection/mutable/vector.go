@@ -48,6 +48,7 @@ func (v *Vector[T]) IAll(consumer func(int, T) bool) {
 }
 
 // Loop creates a loop to iterate through the collection.
+// Deprecated: replaced by the All.
 func (v *Vector[T]) Loop() loop.Loop[T] {
 	if v == nil {
 		return nil
@@ -56,20 +57,20 @@ func (v *Vector[T]) Loop() loop.Loop[T] {
 }
 
 // Head creates an iterator to iterate through the collection.
-// Deprecated: Head is deprecated. Will be replaced by rance-over function iterator.
+// Deprecated: replaced by the All.
 func (v *Vector[T]) Head() *SliceIter[T] {
 	return NewHead(v, v.DeleteActualOne)
 }
 
 // Tail creates an iterator pointing to the end of the collection
-// Deprecated: Tail is deprecated. Will be replaced by rance-over function iterator.
+// Deprecated: Tail is deprecated. Will be replaced by a rance-over function iterator.
 func (v *Vector[T]) Tail() *SliceIter[T] {
 	return NewTail(v, v.DeleteActualOne)
 }
 
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
-// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
+// Deprecated: replaced by the All.
 func (v *Vector[T]) First() (*SliceIter[T], T, bool) {
 	var (
 		iterator  = NewHead(v, v.DeleteActualOne)
