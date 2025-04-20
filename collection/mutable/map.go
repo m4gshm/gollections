@@ -52,6 +52,7 @@ func (m *Map[K, V]) Loop() loop.Loop[K, V] {
 }
 
 // Head creates an iterator to iterate through the collection.
+// Deprecated: Head is deprecated. Will be replaced by rance-over function iterator.
 func (m *Map[K, V]) Head() map_.Iter[K, V] {
 	var out map[K]V
 	if m != nil {
@@ -62,6 +63,7 @@ func (m *Map[K, V]) Head() map_.Iter[K, V] {
 
 // First returns the first key/value pair of the map, an iterator to iterate over the remaining pair, and true\false marker of availability next pairs.
 // If no more then ok==false.
+// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 func (m *Map[K, V]) First() (map_.Iter[K, V], K, V, bool) {
 	var out map[K]V
 	if m != nil {
