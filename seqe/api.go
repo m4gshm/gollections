@@ -21,10 +21,10 @@ type Seq2[K, V any] = seq.Seq2[K, V]
 // the len is length ot the source.
 // the getAt retrieves an element by its index from the source.
 func OfIndexed[T any](max int, getAt func(int) (T, error)) Seq2[T, error] {
-	if getAt == nil {
-		return empty2
-	}
 	return func(yield func(T, error) bool) {
+		if getAt == nil {
+			return
+		}
 		for i := range max {
 			v, err := getAt(i)
 			if ok := yield(v, err); !ok {
@@ -240,10 +240,10 @@ func Contains[S ~SeqE[T], T comparable](seq S, example T) (contains bool, err er
 //	    ...
 //	}
 func Conv[S ~SeqE[From], From, To any](seq S, converter func(From) (To, error)) SeqE[To] {
-	if seq == nil {
-		return empty2
-	}
 	return func(yield func(To, error) bool) {
+		if seq == nil {
+			return
+		}
 		seq(func(from From, err error) bool {
 			if err != nil {
 				var to To
@@ -257,10 +257,10 @@ func Conv[S ~SeqE[From], From, To any](seq S, converter func(From) (To, error)) 
 
 // Convert creates an iterator that applies the 'converter' function to each iterable element.
 func Convert[S ~SeqE[From], From, To any](seq S, converter func(From) To) SeqE[To] {
-	if seq == nil {
-		return empty2
-	}
 	return func(consumer func(To, error) bool) {
+		if seq == nil {
+			return
+		}
 		seq(func(from From, err error) bool {
 			if err != nil {
 				var to To
@@ -275,10 +275,10 @@ func Convert[S ~SeqE[From], From, To any](seq S, converter func(From) To) SeqE[T
 // ConvertOK creates an iterator that applies the 'converter' function to each iterable element.
 // The converter may returns a value or ok=false to exclude the value from the loop.
 func ConvertOK[S ~SeqE[From], From, To any](seq S, converter func(from From) (To, bool)) SeqE[To] {
-	if seq == nil {
-		return empty2
-	}
 	return func(consumer func(To, error) bool) {
+		if seq == nil {
+			return
+		}
 		seq(func(from From, err error) bool {
 			if err != nil {
 				var to To
@@ -295,10 +295,10 @@ func ConvertOK[S ~SeqE[From], From, To any](seq S, converter func(from From) (To
 // The converter may returns a value or ok=false to exclude the value from iteration.
 // It may also return an error to abort the iteration.
 func ConvOK[S ~SeqE[From], From, To any](seq S, converter func(from From) (To, bool, error)) SeqE[To] {
-	if seq == nil {
-		return empty2
-	}
 	return func(yield func(To, error) bool) {
+		if seq == nil {
+			return
+		}
 		seq(func(from From, e error) bool {
 			if to, ok, err := converter(from); ok || err != nil {
 				return yield(to, err)
@@ -318,10 +318,10 @@ func ConvOK[S ~SeqE[From], From, To any](seq S, converter func(from From) (To, b
 //		}
 //	}
 func Flat[S ~SeqE[From], STo ~[]To, From any, To any](seq S, flattener func(From) STo) SeqE[To] {
-	if seq == nil {
-		return empty2
-	}
 	return func(yield func(To, error) bool) {
+		if seq == nil {
+			return
+		}
 		seq(func(v From, err error) bool {
 			if err != nil {
 				var t To
@@ -348,10 +348,10 @@ func Flat[S ~SeqE[From], STo ~[]To, From any, To any](seq S, flattener func(From
 //		}
 //	}
 func FlatSeq[S ~SeqE[From], STo ~Seq[To], From any, To any](seq S, flattener func(From) STo) SeqE[To] {
-	if seq == nil {
-		return empty2
-	}
 	return func(yield func(To, error) bool) {
+		if seq == nil {
+			return
+		}
 		seq(func(v From, err error) bool {
 			if err != nil {
 				var t To
@@ -387,10 +387,10 @@ func FlatSeq[S ~SeqE[From], STo ~Seq[To], From any, To any](seq S, flattener fun
 //		...
 //	}
 func Flatt[S ~SeqE[From], STo ~SeqE[To], From any, To any](seq S, flattener func(From) STo) SeqE[To] {
-	if seq == nil {
-		return empty2
-	}
 	return func(yield func(To, error) bool) {
+		if seq == nil {
+			return
+		}
 		seq(func(v From, err error) bool {
 			if err != nil {
 				var to To
@@ -410,10 +410,10 @@ func Flatt[S ~SeqE[From], STo ~SeqE[To], From any, To any](seq S, flattener func
 
 // Filter creates an iterator that iterates only those elements for which the 'filter' function returns true.
 func Filter[S ~SeqE[T], T any](seq S, filter func(T) bool) SeqE[T] {
-	if seq == nil {
-		return empty2
-	}
 	return func(consumer func(T, error) bool) {
+		if seq == nil {
+			return
+		}
 		seq(func(t T, err error) bool {
 			if err != nil {
 				return consumer(t, err)
@@ -427,10 +427,10 @@ func Filter[S ~SeqE[T], T any](seq S, filter func(T) bool) SeqE[T] {
 
 // Filt creates an erroreable iterator that iterates only those elements for which the 'filter' function returns true.
 func Filt[S ~SeqE[T], T any](seq S, filter func(T) (bool, error)) SeqE[T] {
-	if seq == nil {
-		return empty2
-	}
 	return func(yield func(T, error) bool) {
+		if seq == nil {
+			return
+		}
 		seq(func(t T, err error) bool {
 			if err != nil {
 				return yield(t, err)

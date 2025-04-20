@@ -33,10 +33,10 @@ func Of[T any](elements ...T) Seq[T] {
 // the len is length ot the source.
 // the getAt retrieves an element by its index from the source.
 func OfIndexed[T any](max int, getAt func(int) T) Seq[T] {
-	if getAt == nil {
-		return empty
-	}
 	return func(yield func(T) bool) {
+		if getAt == nil {
+			return
+		}
 		for i := range max {
 			if ok := yield(getAt(i)); !ok {
 				break
@@ -90,10 +90,10 @@ func Range[T constraints.Integer | rune](from T, toExclusive T) Seq[T] {
 
 // ToSeq2 converts an iterator of single elements to an iterator of key/value pairs by applying the 'converter' function to each iterable element.
 func ToSeq2[S ~Seq[T], T, K, V any](seq S, converter func(T) (K, V)) Seq2[K, V] {
-	if seq == nil {
-		return empty2
-	}
 	return func(yield func(K, V) bool) {
+		if seq == nil {
+			return
+		}
 		seq(func(v T) bool {
 			return yield(converter(v))
 		})
@@ -286,10 +286,10 @@ func Conv[S ~Seq[From], From, To any](seq S, converter func(From) (To, error)) S
 
 // Convert creates an iterator that applies the 'converter' function to each iterable element.
 func Convert[S ~Seq[From], From, To any](seq S, converter func(From) To) Seq[To] {
-	if seq == nil {
-		return empty
-	}
 	return func(yield func(To) bool) {
+		if seq == nil {
+			return
+		}
 		seq(func(from From) bool {
 			return yield(converter(from))
 		})
@@ -299,10 +299,10 @@ func Convert[S ~Seq[From], From, To any](seq S, converter func(From) To) Seq[To]
 // ConvertOK creates an iterator that applies the 'converter' function to each iterable element.
 // The converter may returns a value or ok=false to exclude the value from the loop.
 func ConvertOK[S ~Seq[From], From, To any](seq S, converter func(from From) (To, bool)) Seq[To] {
-	if seq == nil {
-		return empty
-	}
 	return func(yield func(To) bool) {
+		if seq == nil {
+			return
+		}
 		seq(func(from From) bool {
 			if to, ok := converter(from); ok {
 				return yield(to)
@@ -316,10 +316,10 @@ func ConvertOK[S ~Seq[From], From, To any](seq S, converter func(from From) (To,
 // The converter may returns a value or ok=false to exclude the value from iteration.
 // It may also return an error to abort the iteration.
 func ConvOK[S ~Seq[From], From, To any](seq S, converter func(from From) (To, bool, error)) SeqE[To] {
-	if seq == nil {
-		return emptyE
-	}
 	return func(yield func(To, error) bool) {
+		if seq == nil {
+			return
+		}
 		seq(func(from From) bool {
 			if to, ok, err := converter(from); ok || err != nil {
 				return yield(to, err)
@@ -337,10 +337,10 @@ func ConvOK[S ~Seq[From], From, To any](seq S, converter func(from From) (To, bo
 //	    ...
 //	}
 func Flat[S ~Seq[From], STo ~[]To, From any, To any](seq S, flattener func(From) STo) Seq[To] {
-	if seq == nil {
-		return empty
-	}
 	return func(yield func(To) bool) {
+		if seq == nil {
+			return
+		}
 		seq(func(v From) bool {
 			elementsTo := flattener(v)
 			for _, e := range elementsTo {
@@ -361,10 +361,10 @@ func Flat[S ~Seq[From], STo ~[]To, From any, To any](seq S, flattener func(From)
 //	    ...
 //	}
 func FlatSeq[S ~Seq[From], STo ~Seq[To], From any, To any](seq S, flattener func(From) STo) Seq[To] {
-	if seq == nil {
-		return empty
-	}
 	return func(yield func(To) bool) {
+		if seq == nil {
+			return
+		}
 		seq(func(v From) bool {
 			elementsTo := flattener(v)
 			for e := range elementsTo {
@@ -395,47 +395,28 @@ func FlatSeq[S ~Seq[From], STo ~Seq[To], From any, To any](seq S, flattener func
 //		...
 //	}
 func Flatt[S ~Seq[From], STo ~SeqE[To], From any, To any](seq S, flattener func(From) STo) SeqE[To] {
-	if seq == nil {
-		return emptyE
-	}
-
-	f := flatt[STo, From, To]{flattener: flattener}
 	return func(yield func(To, error) bool) {
-		f.yield = yield
-		seq(f.do)
-		// seq(func(v From) bool {
-		// 	elementsTo := flattener(v)
-		// 	for e, err := range elementsTo {
-		// 		if !yield(e, err) {
-		// 			return false
-		// 		}
-		// 	}
-		// 	return true
-		// })
-	}
-}
-
-type flatt[STo ~SeqE[To], From, To any] struct {
-	flattener func(From) STo
-	yield     func(To, error) bool
-}
-
-func (s flatt[STo, From, To]) do(v From) bool {
-	elementsTo := s.flattener(v)
-	for e, err := range elementsTo {
-		if !s.yield(e, err) {
-			return false
+		if seq == nil {
+			return
 		}
+		seq(func(v From) bool {
+			elementsTo := flattener(v)
+			for e, err := range elementsTo {
+				if !yield(e, err) {
+					return false
+				}
+			}
+			return true
+		})
 	}
-	return true
 }
 
 // Filter creates an iterator that iterates only those elements for which the 'filter' function returns true.
 func Filter[S ~Seq[T], T any](seq S, filter func(T) bool) Seq[T] {
-	if seq == nil {
-		return empty
-	}
 	return func(yield func(T) bool) {
+		if seq == nil {
+			return
+		}
 		seq(func(e T) bool {
 			if filter(e) {
 				return yield(e)
@@ -447,12 +428,12 @@ func Filter[S ~Seq[T], T any](seq S, filter func(T) bool) Seq[T] {
 
 // Filt creates an erroreable iterator that iterates only those elements for which the 'filter' function returns true.
 func Filt[S ~Seq[T], T any](seq S, filter func(T) (bool, error)) SeqE[T] {
-	if seq == nil {
-		return emptyE
-	}
 	//delayed on next iteration step error
 	var err error
 	return func(yield func(T, error) bool) {
+		if seq == nil {
+			return
+		}
 		seq(func(e T) bool {
 			if err != nil {
 				return yield(e, err)
@@ -474,10 +455,10 @@ func KeyValue[S ~Seq[T], T, K, V any](seq S, keyExtractor func(T) K, valExtracto
 
 // KeyValues converts the seq iterator to a key/value pairs iterator by applying the key, values extractors to each iterable element.
 func KeyValues[S ~Seq[T], T, K, V any](seq S, keyExtractor func(T) K, valsExtractor func(T) []V) Seq2[K, V] {
-	if seq == nil {
-		return empty2
-	}
 	return func(yield func(K, V) bool) {
+		if seq == nil {
+			return 
+		}
 		for t := range seq {
 			k := keyExtractor(t)
 			values := valsExtractor(t)

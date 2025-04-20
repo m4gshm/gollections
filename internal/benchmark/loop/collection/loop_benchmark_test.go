@@ -54,14 +54,13 @@ func Benchmark_Loop_ImmutableOrderSet_All(b *testing.B) {
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				for v:=range c.All {
+				for v := range c.All {
 					casee.load(v)
 				}
 			}
 		})
 	}
 }
-
 
 func Benchmark_Loop_ImmutableOrderSet_FirstNext(b *testing.B) {
 	c := oset.Of(values...)
@@ -286,7 +285,7 @@ func Benchmark_Loop_Slice_Loop_All(b *testing.B) {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				l := loop.Of(values...)
-				for v:= range l.All {
+				for v := range l.All {
 					casee.load(v)
 				}
 			}

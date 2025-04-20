@@ -39,10 +39,10 @@ func OfMap[K comparable, V any](elements map[K]V) Seq2[K, V] {
 // the len is length ot the source.
 // the getAt retrieves an element by its index from the source.
 func OfIndexed[T any](max int, getAt func(int) T) Seq2[int, T] {
-	if getAt == nil {
-		return empty2
-	}
 	return func(yield func(int, T) bool) {
+		if getAt == nil {
+			return
+		}
 		for i := range max {
 			if ok := yield(i, getAt(i)); !ok {
 				break
@@ -53,10 +53,10 @@ func OfIndexed[T any](max int, getAt func(int) T) Seq2[int, T] {
 
 // Filter creates a rangefunc that iterates only those elements for which the 'filter' function returns true.
 func Filter[S ~Seq2[K, V], K, V any](seq S, filter func(K, V) bool) Seq2[K, V] {
-	if seq == nil {
-		return empty2
-	}
 	return func(consumer func(K, V) bool) {
+		if seq == nil {
+			return
+		}
 		seq(func(k K, v V) bool {
 			if filter(k, v) {
 				return consumer(k, v)
@@ -68,10 +68,10 @@ func Filter[S ~Seq2[K, V], K, V any](seq S, filter func(K, V) bool) Seq2[K, V] {
 
 // Convert creates a rangefunc that applies the 'converter' function to each iterable element.
 func Convert[S ~Seq2[Kfrom, Vfrom], Kfrom, Vfrom, Kto, Vto any](seq S, converter func(Kfrom, Vfrom) (Kto, Vto)) Seq2[Kto, Vto] {
-	if seq == nil {
-		return empty2
-	}
 	return func(consumer func(Kto, Vto) bool) {
+		if seq == nil {
+			return
+		}
 		seq(func(k Kfrom, v Vfrom) bool {
 			return consumer(converter(k, v))
 		})
@@ -80,10 +80,10 @@ func Convert[S ~Seq2[Kfrom, Vfrom], Kfrom, Vfrom, Kto, Vto any](seq S, converter
 
 // Values converts a key/value pairs iterator to an iterator of just values.
 func Values[S ~Seq2[K, V], K, V any](seq S) Seq[V] {
-	if seq == nil {
-		return empty
-	}
 	return func(yield func(V) bool) {
+		if seq == nil {
+			return
+		}
 		seq(func(_ K, v V) bool {
 			return yield(v)
 		})
@@ -92,10 +92,10 @@ func Values[S ~Seq2[K, V], K, V any](seq S) Seq[V] {
 
 // Keys converts a key/value pairs iterator to an iterator of just keys.
 func Keys[S ~Seq2[K, V], K, V any](seq S) Seq[K] {
-	if seq == nil {
-		return empty
-	}
 	return func(yield func(K) bool) {
+		if seq == nil {
+			return
+		}
 		seq(func(k K, _ V) bool {
 			return yield(k)
 		})

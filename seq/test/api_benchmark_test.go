@@ -1,12 +1,10 @@
 package test
 
 import (
-	"strconv"
 	"testing"
 
-	"github.com/m4gshm/gollections/collection/immutable/ordered/set"
 	"github.com/m4gshm/gollections/loop"
-	"github.com/m4gshm/gollections/slice"
+	"github.com/m4gshm/gollections/seq"
 	"github.com/m4gshm/gollections/slice/range_"
 )
 
@@ -15,69 +13,41 @@ var (
 	values = range_.Closed(1, max)
 )
 
-func Benchmark_OrderedSet_Filter_Convert(b *testing.B) {
-	c := set.Of(values...)
-
-	var s []string
-
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		s = loop.Convert(c.Filter(func(i int) bool { return i%2 == 0 }), strconv.Itoa).Slice()
-	}
-	b.StopTimer()
-
-	_ = s
-}
-
-func Benchmark_Slice_Filter_Convert(b *testing.B) {
-	c := slice.Of(values...)
-
-	var s []string
-
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		s = slice.Convert(slice.Filter(c, func(i int) bool { return i%2 == 0 }), strconv.Itoa)
-	}
-	b.StopTimer()
-
-	_ = s
-}
-
-func Benchmark_Slice_Filter_Convert_plainOld(b *testing.B) {
+func Benchmark_Loop_Slice_Filter_plainOld(b *testing.B) {
 	c := values
 
-	var s []string
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		for _, e := range c {
-			if e%2 == 0 {
-				s = append(s, strconv.Itoa(e))
+			if even(e) {
+				_ = e
 			}
 		}
 	}
 	b.StopTimer()
-
-	_ = s
 }
 
-func Benchmark_Slice_Filter_Convert_plainOld2(b *testing.B) {
-	c := values
-
-	var s []string
+func Benchmark_Loop_Seq_Filter_Seq(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		f := make([]int, 0, len(s)/2)
-		for _, e := range c {
-			if e%2 == 0 {
-				f = append(f, e)
-			}
-		}
-		s = make([]string, len(f))
-		for i := range f {
-			s[i] = strconv.Itoa(f[i])
+		for e := range seq.Filter(seq.Of(values...), even) {
+			_ = e
 		}
 	}
 	b.StopTimer()
+}
 
-	_ = s
+func Benchmark_Loop_Loop_Filter_Seq(b *testing.B) {
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		next := loop.Filter(loop.Of(values...), even)
+		for {
+			e, ok := next()
+			if !ok {
+				break
+			}
+			_ = e
+		}
+	}
+	b.StopTimer()
 }
