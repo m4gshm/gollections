@@ -88,9 +88,7 @@ find by exploring slices [subpackages](./slice).
 
 **Be careful** when use several slice functions subsequently like
 `slice.Filter(slice.Convert(…​))`. This can lead to unnecessary RAM
-consumption. Consider
-[loop](#loop-kvloop-and-breakable-versions-breakloop-breakkvloop)
-instead of slice API.
+consumption. Consider [seq](#seq) instead of slice API.
 
 ### Main slice functions
 
@@ -640,7 +638,7 @@ var i []int = seq.Slice(seq.Flat(seq.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...), as.
 //[]int{1, 2, 3, 4, 5, 6}
 ```
 
-## [loop](./loop/api.go), [kv/loop](./kv/loop/api.go) and breakable versions [break/loop](./break/loop/api.go), [break/kv/loop](./break/kv/loop/api.go)
+## Deprecated: [loop](./loop/api.go), [kv/loop](./kv/loop/api.go) and breakable versions [break/loop](./break/loop/api.go), [break/kv/loop](./break/kv/loop/api.go)
 
 Legacy iterators API based on the following functions:
 

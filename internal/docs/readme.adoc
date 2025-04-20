@@ -394,7 +394,7 @@ include::../examples/seqexamples/seq_Flat_test.go[lines=13..16,indent=0]
 ----
 
 [#loop]
-=== link:./loop/api.go[loop], link:./kv/loop/api.go[kv/loop] and breakable versions link:./break/loop/api.go[break/loop], link:./break/kv/loop/api.go[break/kv/loop]
+=== Deprecated: link:./loop/api.go[loop], link:./kv/loop/api.go[kv/loop] and breakable versions link:./break/loop/api.go[break/loop], link:./break/kv/loop/api.go[break/kv/loop]
 
 Legacy iterators API based on the following functions:
 
