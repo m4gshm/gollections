@@ -5,7 +5,7 @@ additional implementations of data structures such as [ordered
 map](#mutable-collections) or [set](#mutable-collections) aimed to
 reduce boilerplate code.
 
-Supports Go version 1.23.
+Supports Go version 1.24.
 
 For example, it’s need to group some
 [users](./internal/examples/boilerplate/user_type.go) by their role
@@ -508,8 +508,7 @@ To use any collection or loop as a rangefunc sequecne just call
 [All](#iterating-over-collections) method of that one.
 
 In many cases the API likes the
-~\\[loop](#loop-kvloop-and-breakable-versions-breakloop-breakkvloop)~\\
-API.
+[loop](#loop-kvloop-and-breakable-versions-breakloop-breakkvloop) API.
 
 #### Instantiators
 
@@ -636,11 +635,11 @@ import (
     "github.com/m4gshm/gollections/seq"
 )
 
-var i []int = seq.Slice(seq.Flat(seq.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...), slices.Values))
+var i []int = seq.Slice(seq.Flat(seq.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...), as.Is))
 //[]int{1, 2, 3, 4, 5, 6}
 ```
 
-## DEPRECATED: [loop](./loop/api.go), [kv/loop](./kv/loop/api.go) and breakable versions [break/loop](./break/loop/api.go), [break/kv/loop](./break/kv/loop/api.go)
+## [loop](./loop/api.go), [kv/loop](./kv/loop/api.go) and breakable versions [break/loop](./break/loop/api.go), [break/kv/loop](./break/kv/loop/api.go)
 
 Legacy iterators API based on the following functions:
 

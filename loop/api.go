@@ -1,5 +1,4 @@
 // Package loop provides helpers for loop operation and iterator implementations
-// Deprecated: use the seq, seq, seq2 packages API instead
 package loop
 
 import (
