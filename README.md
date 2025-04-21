@@ -637,9 +637,10 @@ var i []int = seq.Slice(seq.Flat(seq.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...), as.
 //[]int{1, 2, 3, 4, 5, 6}
 ```
 
-## Deprecated: [loop](./loop/api.go), [kv/loop](./kv/loop/api.go) and breakable versions [break/loop](./break/loop/api.go), [break/kv/loop](./break/kv/loop/api.go)
+## [loop](./loop/api.go), [kv/loop](./kv/loop/api.go) and breakable versions [break/loop](./break/loop/api.go), [break/kv/loop](./break/kv/loop/api.go)
 
-Legacy iterators API based on the following functions:
+Deprecated: will be replaced by [seq](#seq-seq2-seqe) API. Legacy
+iterators API based on the following functions:
 
 ``` go
 type (
@@ -1053,25 +1054,6 @@ The same underlying interfaces but for read-only use cases.
 ``` go
 uniques := set.From(range_.Of(0, 100))
 for i := range uniques.All {
-    doOp(i)
-}
-```
-
-- Using `for` statement like:
-
-``` go
-uniques := set.From(range_.Of(0, 100))
-next := uniques.Loop()
-for i, ok := next(); ok; i, ok = next() {
-    doOp(i)
-}
-```
-
-- or
-
-``` go
-uniques := set.From(range_.Of(0, 100))
-for iter, i, ok := uniques.First(); ok; i, ok = iter.Next() {
     doOp(i)
 }
 ```

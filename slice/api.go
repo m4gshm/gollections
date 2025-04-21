@@ -17,6 +17,7 @@ import (
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/op/check"
 	"github.com/m4gshm/gollections/op/check/not"
+	"github.com/m4gshm/gollections/seq"
 )
 
 // Break is the 'break' statement of the For, Track methods
@@ -365,7 +366,11 @@ func ConvertCheckIndexed[FS ~[]From, From, To any](elements FS, by func(index in
 	return result
 }
 
-// Flat unfolds the n-dimensional slice 'elements' into a n-1 dimensional slice.
+// Flat unfolds the n-dimensional slice 'elements' into a n-1 dimensional slice like:
+//
+//	var arrays [][]int
+//	var integers []int = slice.Flat(arrays, as.Is)
+//
 func Flat[FS ~[]From, From any, TS ~[]To, To any](elements FS, flattener func(From) TS) []To {
 	if elements == nil {
 		return nil
@@ -378,7 +383,31 @@ func Flat[FS ~[]From, From any, TS ~[]To, To any](elements FS, flattener func(Fr
 	return result
 }
 
-// Flatt unfolds the n-dimensional slice 'elements' into a n-1 dimensional slice.
+// FlatSeq unfolds the n-dimensional slice 'elements' into a n-1 dimensional slice like:
+//
+//	var arrays [][]int
+//	var integers []int = slice.Flat(arrays, slices.Values)
+//
+func FlatSeq[FS ~[]From, From any, STo ~seq.Seq[To], To any](elements FS, flattener func(From) STo) []To {
+	if elements == nil {
+		return nil
+	}
+	var result = make([]To, 0, int(float32(len(elements))*1.618))
+	for _, e := range elements {
+		for f := range flattener(e) {
+			result = append(result, f)
+		}
+
+	}
+	return result
+}
+
+// Flatt unfolds the n-dimensional slice 'elements' into a n-1 dimensional slice like:
+//
+//	var strings [][]string
+//	var parse = func(f []string) (iter.Seq[int], error) { ... }
+//	integers, err := Flatt(strings, parse)
+//
 func Flatt[FS ~[]From, From, To any](elements FS, flattener func(From) ([]To, error)) ([]To, error) {
 	if elements == nil {
 		return nil, nil
@@ -391,6 +420,30 @@ func Flatt[FS ~[]From, From, To any](elements FS, flattener func(From) ([]To, er
 		}
 		result = append(result, f...)
 
+	}
+	return result, nil
+}
+
+// FlattSeq unfolds the n-dimensional slice 'elements' into a n-1 dimensional slice like:
+//
+//	var strings [][]string
+//	var parse = func(f []string) ([]int, error) { ... }
+//	integers, err := Flatt(strings, parse)
+//
+func FlattSeq[FS ~[]From, From any, STo ~seq.SeqE[To], To any](elements FS, flattener func(From) STo) ([]To, error) {
+
+	if elements == nil {
+		return nil, nil
+	}
+	var result = make([]To, 0, int(float32(len(elements))*1.618))
+	for _, e := range elements {
+		f := flattener(e)
+		for t, err := range f {
+			if err != nil {
+				return result, err
+			}
+			result = append(result, t)
+		}
 	}
 	return result, nil
 }

@@ -394,8 +394,9 @@ include::../examples/seqexamples/seq_Flat_test.go[lines=13..16,indent=0]
 ----
 
 [#loop]
-=== Deprecated: link:./loop/api.go[loop], link:./kv/loop/api.go[kv/loop] and breakable versions link:./break/loop/api.go[break/loop], link:./break/kv/loop/api.go[break/kv/loop]
+=== link:./loop/api.go[loop], link:./kv/loop/api.go[kv/loop] and breakable versions link:./break/loop/api.go[break/loop], link:./break/kv/loop/api.go[break/kv/loop]
 
+Deprecated: will be replaced by link:#seq-seq2-seqe[seq] API.
 Legacy iterators API based on the following functions:
 
 [source,go]
@@ -689,19 +690,6 @@ The same underlying interfaces but for read-only use cases.
 [source,go]
 ----
 include::../examples/collection/collection_iterating_go_1_22_test.go[lines=13..18,indent=0]
-----
-* Using `for` statement like:
-
-[source,go]
-----
-include::../examples/collection/collection_iterating_test.go[lines=12..18,indent=0]
-----
-
-* or
-
-[source,go]
-----
-include::../examples/collection/collection_iterating_test.go[lines=22..27,indent=0]
 ----
 
 * `ForEach` method

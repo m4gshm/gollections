@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"runtime"
+	"slices"
 	"strconv"
 	"testing"
 	"unsafe"
@@ -22,6 +23,7 @@ import (
 	"github.com/m4gshm/gollections/op/delay/string_/wrap"
 	"github.com/m4gshm/gollections/predicate/eq"
 	"github.com/m4gshm/gollections/predicate/more"
+	"github.com/m4gshm/gollections/seq"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/clone"
 	"github.com/m4gshm/gollections/slice/clone/reverse"
@@ -328,7 +330,14 @@ func Test_ConvertFilteredWithIndexInPlace(t *testing.T) {
 
 func Test_Flatt(t *testing.T) {
 	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
-	f := slice.Flat(md, func(i []int) []int { return i })
+	f := slice.Flat(md, as.Is)
+	e := []int{1, 2, 3, 4, 5, 6}
+	assert.Equal(t, e, f)
+}
+
+func Test_FlattSeq(t *testing.T) {
+	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
+	f := slice.FlatSeq(md, slices.Values)
 	e := []int{1, 2, 3, 4, 5, 6}
 	assert.Equal(t, e, f)
 }
@@ -336,6 +345,17 @@ func Test_Flatt(t *testing.T) {
 func Test_Flat(t *testing.T) {
 	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
 	f, err := slice.Flatt(md, func(i []int) ([]int, error) { return i, op.IfElse(len(i) == 2, errors.New("abort"), nil) })
+	assert.Error(t, err)
+	e := []int{1, 2, 3, 4}
+	assert.Equal(t, e, f)
+}
+
+func Test_FlatSeq(t *testing.T) {
+	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
+	transform := func(i int) (int, error) {
+		return i, op.IfElse(i == 5, errors.New("abort"), nil)
+	}
+	f, err := slice.FlattSeq(md, func(i []int) seq.SeqE[int] { return seq.ToSeq2(seq.Of(i...), transform) })
 	assert.Error(t, err)
 	e := []int{1, 2, 3, 4}
 	assert.Equal(t, e, f)
