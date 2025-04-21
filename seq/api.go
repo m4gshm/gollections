@@ -62,16 +62,13 @@ func RangeClosed[T constraints.Integer | rune](from T, toInclusive T) Seq[T] {
 		delta = -delta
 	}
 	amount++
-	nextElement := from
-	i := T(0)
 	return func(yield func(T) bool) {
-		if ok := i < amount; ok {
-			out := nextElement
-			i++
-			nextElement = nextElement + delta
-			if !yield(out) {
+		e := from
+		for i := 0; i < int(amount); i++ {
+			if !yield(e) {
 				return
 			}
+			e = e + delta
 		}
 	}
 }
