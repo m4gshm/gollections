@@ -370,7 +370,6 @@ func ConvertCheckIndexed[FS ~[]From, From, To any](elements FS, by func(index in
 //
 //	var arrays [][]int
 //	var integers []int = slice.Flat(arrays, as.Is)
-//
 func Flat[FS ~[]From, From any, TS ~[]To, To any](elements FS, flattener func(From) TS) []To {
 	if elements == nil {
 		return nil
@@ -387,7 +386,6 @@ func Flat[FS ~[]From, From any, TS ~[]To, To any](elements FS, flattener func(Fr
 //
 //	var arrays [][]int
 //	var integers []int = slice.Flat(arrays, slices.Values)
-//
 func FlatSeq[FS ~[]From, From any, STo ~seq.Seq[To], To any](elements FS, flattener func(From) STo) []To {
 	if elements == nil {
 		return nil
@@ -407,7 +405,6 @@ func FlatSeq[FS ~[]From, From any, STo ~seq.Seq[To], To any](elements FS, flatte
 //	var strings [][]string
 //	var parse = func(f []string) (iter.Seq[int], error) { ... }
 //	integers, err := Flatt(strings, parse)
-//
 func Flatt[FS ~[]From, From, To any](elements FS, flattener func(From) ([]To, error)) ([]To, error) {
 	if elements == nil {
 		return nil, nil
@@ -429,7 +426,6 @@ func Flatt[FS ~[]From, From, To any](elements FS, flattener func(From) ([]To, er
 //	var strings [][]string
 //	var parse = func(f []string) ([]int, error) { ... }
 //	integers, err := Flatt(strings, parse)
-//
 func FlattSeq[FS ~[]From, From any, STo ~seq.SeqE[To], To any](elements FS, flattener func(From) STo) ([]To, error) {
 
 	if elements == nil {
