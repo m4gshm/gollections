@@ -79,7 +79,7 @@ func Benchmark_UseOtherElseGet(b *testing.B) {
 	assert.Equal(b, "Bob Smith", fullName)
 }
 
-func Benchmark_UseOtherElseGet_Wit_String_Wrapper(b *testing.B) {
+func Benchmark_UseOtherElseGet_With_String_Wrapper(b *testing.B) {
 	user := User{name: "Bob", surname: "Smith"}
 	fullName := ""
 	for i := 0; i < b.N; i++ {

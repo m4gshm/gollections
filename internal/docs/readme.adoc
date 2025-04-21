@@ -53,7 +53,7 @@ include::../examples/boilerplate/slice_filter_convert_reduce_short_test.go[lines
 
 This is a shorter version of the previous example that used short aliases link:#sumof[sum.Of] and link:#operations-chain-functions[filter.AndConvert]. More shortcuts you can find by exploring slices link:./slice[subpackages].
 
-*Be careful* when use several slice functions subsequently like [source,go]`slice.Filter(slice.Convert(...))`. This can lead to unnecessary RAM consumption. Consider link:#seq[seq] instead of slice API.
+*Be careful* when use several slice functions subsequently like [source,go]`slice.Filter(slice.Convert(...))`. This can lead to unnecessary RAM consumption. Consider link:#seq-seq2-seqe[seq] instead of slice API.
 
 ==== Main slice functions
 ===== Instantiators
@@ -298,7 +298,7 @@ API extends rangefunc iterator types `iter.Seq[V]`, `iter.Seq2[K,V]` with utilit
 
 [source,go]
 ----
-include::../examples/seqexamples/seq_filter_convert_reduce_test.go[lines=13..17,indent=0]
+include::../examples/seqexamples/seq_filter_convert_reduce_test.go[lines=14..28,indent=0]
 ----
 or
 [source,go]

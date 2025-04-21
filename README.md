@@ -87,7 +87,7 @@ find by exploring slices [subpackages](./slice).
 
 **Be careful** when use several slice functions subsequently like
 `slice.Filter(slice.Convert(…​))`. This can lead to unnecessary RAM
-consumption. Consider [seq](#seq) instead of slice API.
+consumption. Consider [seq](#seq-seq2-seqe) instead of slice API.
 
 ### Main slice functions
 
@@ -491,8 +491,18 @@ with utility functions kit.
 
 ``` go
 even := func(i int) bool { return i%2 == 0 }
-sequence := seq.Convert(seq.Filter(seq.Of(1, 2, 3, 4), even), strconv.Itoa)
-var result []string = seq.Slice(sequence) //[2 4]
+strSeq := seq.Convert(seq.Filter(seq.Of(1, 2, 3, 4), even), strconv.Itoa)
+
+// iterate over sequence
+for s := range strSeq {
+    fmt.Println(s)
+}
+
+// or reduce
+var oneString string = seq.Sum(strSeq) // 24
+
+// or collect
+var strings []string = seq.Slice(strSeq) //[2 4]
 ```
 
 or
