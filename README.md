@@ -639,8 +639,9 @@ var i []int = seq.Slice(seq.Flat(seq.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...), as.
 
 ## [loop](./loop/api.go), [kv/loop](./kv/loop/api.go) and breakable versions [break/loop](./break/loop/api.go), [break/kv/loop](./break/kv/loop/api.go)
 
-Deprecated: will be replaced by [seq](#seq-seq2-seqe) API. Legacy
-iterators API based on the following functions:
+Deprecated: will be replaced by [seq](#seq-seq2-seqe) API.
+
+Legacy iterators API based on the following functions:
 
 ``` go
 type (

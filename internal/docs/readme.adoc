@@ -397,6 +397,7 @@ include::../examples/seqexamples/seq_Flat_test.go[lines=13..16,indent=0]
 === link:./loop/api.go[loop], link:./kv/loop/api.go[kv/loop] and breakable versions link:./break/loop/api.go[break/loop], link:./break/kv/loop/api.go[break/kv/loop]
 
 Deprecated: will be replaced by link:#seq-seq2-seqe[seq] API.
+
 Legacy iterators API based on the following functions:
 
 [source,go]
