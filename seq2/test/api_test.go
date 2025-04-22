@@ -113,3 +113,17 @@ func Test_AllConverted(t *testing.T) {
 
 	assert.Equal(t, slice.Of(10, 20, 30, 50, 70, 80, 90, 110), i)
 }
+
+func Test_Slice_ToMapResolvOrder(t *testing.T) {
+	var (
+		even          = func(v int) bool { return v%2 == 0 }
+		order, groups = seq2.MapResolvOrder(seq.ToSeq2(seq.Of(2, 1, 1, 2, 4, 3, 1), func(i int) (bool, int) {
+			return even(i), i
+		}), func(exists bool, key bool, valResov []int, val int) []int {
+			return append(valResov, val)
+		})
+	)
+	assert.Equal(t, []int{1, 1, 3, 1}, groups[false])
+	assert.Equal(t, []int{2, 2, 4}, groups[true])
+	assert.Equal(t, []bool{true, false}, order)
+}

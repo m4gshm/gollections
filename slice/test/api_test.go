@@ -361,7 +361,14 @@ func Test_FlatSeq(t *testing.T) {
 	assert.Equal(t, e, f)
 }
 
-func Benchmark_Flatt(b *testing.B) {
+func Test_FlatAndConvert(t *testing.T) {
+	md := slice.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...)
+	f := slice.FlatAndConvert(md, func(i []int) []int { return i }, strconv.Itoa)
+	e := []string{"1", "2", "3", "4", "5", "6"}
+	assert.Equal(t, e, f)
+}
+
+func Benchmark_Flat(b *testing.B) {
 	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
 
 	for i := 0; i < b.N; i++ {
@@ -369,7 +376,7 @@ func Benchmark_Flatt(b *testing.B) {
 	}
 }
 
-func Benchmark_Flatt_Convert_AsIs(b *testing.B) {
+func Benchmark_Flat_Convert_AsIs(b *testing.B) {
 	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
 
 	for i := 0; i < b.N; i++ {
@@ -584,6 +591,10 @@ func Test_OfIndexed(t *testing.T) {
 	assert.Equal(t, indexed, result)
 }
 
+func Test_Series(t *testing.T) {
+	assert.Equal(t, slice.Of(-1, 0, 1, 2, 3), slice.Series(-1, func(prev int) (int, bool) { return prev + 1, prev < 3 }))
+}
+
 func Test_PeekWhile(t *testing.T) {
 	expected := slice.Of(1, 3, 5, 7, 9, 11)
 
@@ -614,6 +625,19 @@ func Test_Slice_AppendMapResolv(t *testing.T) {
 	)
 	assert.Equal(t, []int{1, 1, 3, 1}, groups[false])
 	assert.Equal(t, []int{2, 2, 4}, groups[true])
+}
+
+func Test_Slice_AppendMapResolvv(t *testing.T) {
+	even := func(v int) bool { return v%2 == 0 }
+	groups, err := slice.AppendMapResolvv(slice.Of(2, 1, 1, 2, 4, 3, 1), func(i int) (bool, int, error) {
+		return even(i), i, nil
+	}, func(ok bool, k bool, e []int, v int) ([]int, error) {
+		return append(e, v), nil
+	}, nil)
+
+	assert.Equal(t, []int{1, 1, 3, 1}, groups[false])
+	assert.Equal(t, []int{2, 2, 4}, groups[true])
+	assert.NoError(t, err)
 }
 
 func Test_Slice_AppendMapResolvOrderr(t *testing.T) {

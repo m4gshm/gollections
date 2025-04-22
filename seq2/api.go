@@ -54,7 +54,7 @@ func OfIndexed[T any](amount int, getAt func(int) T) Seq2[int, T] {
 // Filter creates a rangefunc that iterates only those elements for which the 'filter' function returns true.
 func Filter[S ~Seq2[K, V], K, V any](seq S, filter func(K, V) bool) Seq2[K, V] {
 	return func(consumer func(K, V) bool) {
-		if seq == nil {
+		if seq == nil || filter == nil {
 			return
 		}
 		seq(func(k K, v V) bool {
@@ -69,7 +69,7 @@ func Filter[S ~Seq2[K, V], K, V any](seq S, filter func(K, V) bool) Seq2[K, V] {
 // Convert creates a rangefunc that applies the 'converter' function to each iterable element.
 func Convert[S ~Seq2[Kfrom, Vfrom], Kfrom, Vfrom, Kto, Vto any](seq S, converter func(Kfrom, Vfrom) (Kto, Vto)) Seq2[Kto, Vto] {
 	return func(consumer func(Kto, Vto) bool) {
-		if seq == nil {
+		if seq == nil || converter == nil {
 			return
 		}
 		seq(func(k Kfrom, v Vfrom) bool {
@@ -113,19 +113,19 @@ func Map[S ~Seq2[K, V], K comparable, V any](seq S) map[K]V {
 }
 
 // MapResolv collects key\value elements into a new map by iterating over the elements with resolving of duplicated key values.
-func MapResolv[S ~Seq2[K, V], K comparable, V, VR any](seq S, resolver func(bool, K, VR, V) VR) map[K]VR {
+func MapResolv[S ~Seq2[K, V], K comparable, V, VR any](seq S, resolver func(exists bool, key K, valResolv VR, val V) VR) map[K]VR {
 	return AppendMapResolv(seq, resolver, nil)
 }
 
 // MapResolvOrder collects key\value elements into a new map by iterating over the elements with resolving of duplicated key values.
 // Returns a slice with the keys ordered by the time they were added and the resolved key\value map.
-func MapResolvOrder[S ~Seq2[K, V], K comparable, V, VR any](seq S, resolver func(bool, K, VR, V) VR) ([]K, map[K]VR) {
+func MapResolvOrder[S ~Seq2[K, V], K comparable, V, VR any](seq S, resolver func(exists bool, key K, valResolv VR, val V) VR) ([]K, map[K]VR) {
 	return AppendMapResolvOrder(seq, resolver, nil, nil)
 }
 
 // AppendMapResolv collects key\value elements into the 'dest' map by iterating over the elements with resolving of duplicated key values.
-func AppendMapResolv[S ~Seq2[K, V], K comparable, V, VR any](seq S, resolver func(bool, K, VR, V) VR, dest map[K]VR) map[K]VR {
-	if seq == nil {
+func AppendMapResolv[S ~Seq2[K, V], K comparable, V, VR any](seq S, resolver func(exists bool, key K, valResolv VR, val V) VR, dest map[K]VR) map[K]VR {
+	if seq == nil || resolver == nil {
 		return nil
 	}
 	if dest == nil {
@@ -141,8 +141,8 @@ func AppendMapResolv[S ~Seq2[K, V], K comparable, V, VR any](seq S, resolver fun
 
 // AppendMapResolvOrder collects key\value elements into the 'dest' map by iterating over the elements with resolving of duplicated key values
 // Additionaly populates the 'order' slice by the keys ordered by the time they were added and the resolved key\value map.
-func AppendMapResolvOrder[S ~Seq2[K, V], K comparable, V, VR any](seq S, resolver func(bool, K, VR, V) VR, order []K, dest map[K]VR) ([]K, map[K]VR) {
-	if seq == nil {
+func AppendMapResolvOrder[S ~Seq2[K, V], K comparable, V, VR any](seq S, resolver func(exists bool, key K, valResolv VR, val V) VR, order []K, dest map[K]VR) ([]K, map[K]VR) {
+	if seq == nil || resolver == nil {
 		return nil, nil
 	}
 	if dest == nil {

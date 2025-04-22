@@ -2,6 +2,8 @@
 package seqe
 
 import (
+	"errors"
+
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/seq"
@@ -37,7 +39,7 @@ func OfIndexed[T any](amount int, getAt func(int) (T, error)) Seq2[T, error] {
 
 // First returns the first element that satisfies the condition of the 'predicate' function.
 func First[S ~SeqE[T], T any](seq S, predicate func(T) bool) (v T, ok bool, err error) {
-	if seq == nil {
+	if seq == nil || predicate == nil {
 		return
 	}
 	seq(func(one T, e error) bool {
@@ -57,7 +59,7 @@ func First[S ~SeqE[T], T any](seq S, predicate func(T) bool) (v T, ok bool, err 
 
 // Firstt returns the first element that satisfies the condition of the 'predicate' function.
 func Firstt[S ~SeqE[T], T any](seq S, predicate func(T) (bool, error)) (v T, ok bool, err error) {
-	if seq == nil {
+	if seq == nil || predicate == nil {
 		return v, false, nil
 	}
 	seq(func(one T, e error) bool {
@@ -119,7 +121,7 @@ func Reduce[S ~SeqE[T], T any](seq S, merge func(T, T) T) (T, error) {
 // ReduceOK reduces the elements of the 'seq' sequence an one using the 'merge' function.
 // Returns ok==false if the seq returns ok=false at the first call (no more elements).
 func ReduceOK[S ~SeqE[T], T any](seq S, merge func(T, T) T) (result T, ok bool, err error) {
-	if seq == nil {
+	if seq == nil || merge == nil {
 		return result, false, nil
 	}
 	started := false
@@ -147,7 +149,7 @@ func Reducee[S ~SeqE[T], T any](seq S, merge func(T, T) (T, error)) (T, error) {
 // ReduceeOK reduces the elements of the 'seq' sequence an one using the 'merge' function.
 // Returns ok==false if the seq returns ok=false at the first call (no more elements).
 func ReduceeOK[S ~SeqE[T], T any](seq S, merge func(T, T) (T, error)) (result T, ok bool, err error) {
-	if seq == nil {
+	if seq == nil || merge == nil {
 		return result, false, nil
 	}
 	started := false
@@ -172,7 +174,7 @@ func ReduceeOK[S ~SeqE[T], T any](seq S, merge func(T, T) (T, error)) (result T,
 // Accum accumulates a value by using the 'first' argument to initialize the accumulator and sequentially applying the 'merge' functon to the accumulator and each element of the 'seq' sequence.
 func Accum[T any, S ~SeqE[T]](first T, seq S, merge func(T, T) T) (accumulator T, err error) {
 	accumulator = first
-	if seq == nil {
+	if seq == nil || merge == nil {
 		return
 	}
 	seq(func(v T, e error) bool {
@@ -189,7 +191,7 @@ func Accum[T any, S ~SeqE[T]](first T, seq S, merge func(T, T) T) (accumulator T
 // Accumm accumulates a value by using the 'first' argument to initialize the accumulator and sequentially applying the 'merge' functon to the accumulator and each element of the 'seq' sequence.
 func Accumm[T any, S ~SeqE[T]](first T, seq S, merge func(T, T) (T, error)) (accumulator T, err error) {
 	accumulator = first
-	if seq == nil {
+	if seq == nil || merge == nil {
 		return accumulator, nil
 	}
 	seq(func(v T, e error) bool {
@@ -242,7 +244,7 @@ func Contains[S ~SeqE[T], T comparable](seq S, example T) (contains bool, err er
 //	}
 func Conv[S ~SeqE[From], From, To any](seq S, converter func(From) (To, error)) SeqE[To] {
 	return func(yield func(To, error) bool) {
-		if seq == nil {
+		if seq == nil || converter == nil {
 			return
 		}
 		seq(func(from From, err error) bool {
@@ -259,7 +261,7 @@ func Conv[S ~SeqE[From], From, To any](seq S, converter func(From) (To, error)) 
 // Convert creates an iterator that applies the 'converter' function to each iterable element.
 func Convert[S ~SeqE[From], From, To any](seq S, converter func(From) To) SeqE[To] {
 	return func(consumer func(To, error) bool) {
-		if seq == nil {
+		if seq == nil || converter == nil {
 			return
 		}
 		seq(func(from From, err error) bool {
@@ -277,7 +279,7 @@ func Convert[S ~SeqE[From], From, To any](seq S, converter func(From) To) SeqE[T
 // The converter may returns a value or ok=false to exclude the value from the loop.
 func ConvertOK[S ~SeqE[From], From, To any](seq S, converter func(from From) (To, bool)) SeqE[To] {
 	return func(consumer func(To, error) bool) {
-		if seq == nil {
+		if seq == nil || converter == nil {
 			return
 		}
 		seq(func(from From, err error) bool {
@@ -297,7 +299,7 @@ func ConvertOK[S ~SeqE[From], From, To any](seq S, converter func(from From) (To
 // It may also return an error to abort the iteration.
 func ConvOK[S ~SeqE[From], From, To any](seq S, converter func(from From) (To, bool, error)) SeqE[To] {
 	return func(yield func(To, error) bool) {
-		if seq == nil {
+		if seq == nil || converter == nil {
 			return
 		}
 		seq(func(from From, e error) bool {
@@ -320,7 +322,7 @@ func ConvOK[S ~SeqE[From], From, To any](seq S, converter func(from From) (To, b
 //	}
 func Flat[S ~SeqE[From], STo ~[]To, From any, To any](seq S, flattener func(From) STo) SeqE[To] {
 	return func(yield func(To, error) bool) {
-		if seq == nil {
+		if seq == nil || flattener == nil {
 			return
 		}
 		seq(func(v From, err error) bool {
@@ -350,7 +352,7 @@ func Flat[S ~SeqE[From], STo ~[]To, From any, To any](seq S, flattener func(From
 //	}
 func FlatSeq[S ~SeqE[From], STo ~Seq[To], From any, To any](seq S, flattener func(From) STo) SeqE[To] {
 	return func(yield func(To, error) bool) {
-		if seq == nil {
+		if seq == nil || flattener == nil {
 			return
 		}
 		seq(func(v From, err error) bool {
@@ -388,7 +390,7 @@ func FlatSeq[S ~SeqE[From], STo ~Seq[To], From any, To any](seq S, flattener fun
 //	}
 func Flatt[S ~SeqE[From], STo ~[]To, From any, To any](seq S, flattener func(From) (STo, error)) SeqE[To] {
 	return func(yield func(To, error) bool) {
-		if seq == nil {
+		if seq == nil || flattener == nil {
 			return
 		}
 		seq(func(v From, err error) bool {
@@ -432,7 +434,7 @@ func Flatt[S ~SeqE[From], STo ~[]To, From any, To any](seq S, flattener func(Fro
 //	}
 func FlattSeq[S ~SeqE[From], STo ~SeqE[To], From any, To any](seq S, flattener func(From) STo) SeqE[To] {
 	return func(yield func(To, error) bool) {
-		if seq == nil {
+		if seq == nil || flattener == nil {
 			return
 		}
 		seq(func(v From, err error) bool {
@@ -455,7 +457,7 @@ func FlattSeq[S ~SeqE[From], STo ~SeqE[To], From any, To any](seq S, flattener f
 // Filter creates an iterator that iterates only those elements for which the 'filter' function returns true.
 func Filter[S ~SeqE[T], T any](seq S, filter func(T) bool) SeqE[T] {
 	return func(consumer func(T, error) bool) {
-		if seq == nil {
+		if seq == nil || filter == nil {
 			return
 		}
 		seq(func(t T, err error) bool {
@@ -471,14 +473,26 @@ func Filter[S ~SeqE[T], T any](seq S, filter func(T) bool) SeqE[T] {
 
 // Filt creates an erroreable iterator that iterates only those elements for which the 'filter' function returns true.
 func Filt[S ~SeqE[T], T any](seq S, filter func(T) (bool, error)) SeqE[T] {
+	//delayed on next iteration step error
+	var err error
 	return func(yield func(T, error) bool) {
-		if seq == nil {
+		if seq == nil || filter == nil {
 			return
 		}
-		seq(func(t T, err error) bool {
+		seq(func(t T, e error) bool {
+			if err == nil {
+				err = e
+			} else if e != nil {
+				err = errors.Join(err, e)
+			}
 			if err != nil {
-				return yield(t, err)
-			} else if ok, err := filter(t); ok || err != nil {
+				yield(t, err)
+				return false
+			}
+			ok := false
+			if ok, err = filter(t); ok {
+				return yield(t, nil)
+			} else if err != nil {
 				return yield(t, err)
 			}
 			return true

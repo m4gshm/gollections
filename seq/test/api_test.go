@@ -22,12 +22,23 @@ func Test_OfIndexed(t *testing.T) {
 	indexed := slice.Of("0", "1", "2", "3", "4")
 	result := seq.OfIndexed(len(indexed), func(i int) string { return indexed[i] })
 	assert.Equal(t, indexed, seq.Slice(result))
+
+	result = seq.OfIndexed(len(indexed), (func(i int) string)(nil))
+
+	assert.Empty(t, seq.Slice(result))
+}
+
+func Test_Series(t *testing.T) {
+	assert.Equal(t, slice.Of(-1, 0, 1, 2, 3), seq.Slice(seq.Series(-1, func(prev int) (int, bool) { return prev + 1, prev < 3 })))
+	assert.Empty(t, seq.Slice(seq.Series(-1, (func(prev int) (int, bool))(nil))))
 }
 
 func Test_AccumSum(t *testing.T) {
 	s := seq.Of(1, 3, 5, 7, 9, 11)
 	r := seq.Accum(100, s, op.Sum[int])
 	assert.Equal(t, 100+1+3+5+7+9+11, r)
+	r = seq.Accum(100, s, (func(a int, b int) int)(nil))
+	assert.Equal(t, 100, r)
 }
 
 func Test_AccummSum(t *testing.T) {
@@ -184,10 +195,18 @@ func Test_Filter(t *testing.T) {
 
 func Test_Filt(t *testing.T) {
 	s := seq.Of(1, 3, 4, 5, 7, 8, 9, 11)
-	l := seq.Filt(s, func(i int) (bool, error) { return even(i), op.IfElse(i > 7, errors.New("abort"), nil) })
+	filter := func(i int) (bool, error) { return even(i), op.IfElse(i > 7, errors.New("abort"), nil) }
+	l := seq.Filt(s, filter)
 	r, err := seqe.Slice(l)
+
 	assert.Error(t, err)
 	assert.Equal(t, slice.Of(4, 8), r)
+
+	l = seq.Filt(s, nil)
+	r, err = seqe.Slice(l)
+
+	assert.NoError(t, err)
+	assert.Empty(t, r)
 }
 
 func Test_Filt2(t *testing.T) {
@@ -258,11 +277,19 @@ func Test_AllFiltered(t *testing.T) {
 
 	s := []int{}
 
-	for e := range seq.Filter(from, func(e int) bool { return e%2 == 0 }) {
+	filter := func(e int) bool { return e%2 == 0 }
+	for e := range seq.Filter(from, filter) {
 		s = append(s, e)
+		if e == 11 {
+			break
+		}
 	}
 
 	assert.Equal(t, slice.Of(2, 8), sort.Asc(s))
+	assert.Equal(t, slice.Of(2, 8), sort.Asc(seq.Slice(seq.Filter(from, filter))))
+
+	assert.Empty(t, seq.Slice(seq.Filter(from, nil)))
+	assert.Empty(t, seq.Slice(seq.Filter[seq.Seq[int]](nil, filter)))
 }
 
 func Test_AllConverted(t *testing.T) {
@@ -273,7 +300,12 @@ func Test_AllConverted(t *testing.T) {
 		s = append(s, e)
 	}
 
-	assert.Equal(t, slice.Of("1", "2", "3", "5", "7", "8", "9", "11"), s)
+	expected := slice.Of("1", "2", "3", "5", "7", "8", "9", "11")
+	assert.Equal(t, expected, s)
+	assert.Equal(t, expected, seq.Slice(seq.Convert(from, strconv.Itoa)))
+
+	assert.Empty(t, seq.Slice(seq.Convert[seq.Seq[int], int, int](from, nil)))
+	assert.Empty(t, seq.Slice(seq.Convert[seq.Seq[int]](nil, strconv.Itoa)))
 }
 
 func Test_AllConv(t *testing.T) {
@@ -284,6 +316,9 @@ func Test_AllConv(t *testing.T) {
 		if err == nil {
 			i = append(i, v)
 		}
+		if v == 11 {
+			break
+		}
 	}
 
 	assert.Equal(t, slice.Of(1, 2, 3, 5, 8, 9, 11), i)
@@ -291,25 +326,70 @@ func Test_AllConv(t *testing.T) {
 
 func Test_ConvertFilteredInplace(t *testing.T) {
 	s := seq.Of(1, 3, 4, 5, 7, 8, 9, 11)
-	r := seq.ConvertOK(s, func(i int) (string, bool) { return strconv.Itoa(i), even(i) })
+	converter := func(i int) (string, bool) { return strconv.Itoa(i), even(i) }
+	r := seq.ConvertOK(s, converter)
 	assert.Equal(t, []string{"4", "8"}, seq.Slice(r))
+	r = seq.ConvertOK(iter.Seq[int](nil), converter)
+	assert.Empty(t, seq.Slice(r))
+	r = seq.ConvertOK(s, (func(i int) (string, bool))(nil))
+	assert.Empty(t, seq.Slice(r))
 }
 
 func Test_ConvFilteredInplace(t *testing.T) {
 	s := seq.Of(1, 3, 4, 5, 7, 8, 9, 11)
-	r := seq.ConvOK(s, func(i int) (string, bool, error) { return strconv.Itoa(i), even(i), nil })
-	o, _ := seqe.Slice(r)
+	converter := func(i int) (string, bool, error) { return strconv.Itoa(i), even(i), nil }
+	r := seq.ConvOK(s, converter)
+	o, err := seqe.Slice(r)
 	assert.Equal(t, []string{"4", "8"}, o)
+	assert.NoError(t, err)
+
+	r = seq.ConvOK(iter.Seq[int](nil), converter)
+	o, _ = seqe.Slice(r)
+	assert.Empty(t, o)
+
+	r = seq.ConvOK(s, (func(i int) (string, bool, error))(nil))
+	o, _ = seqe.Slice(r)
+	assert.Empty(t, o)
 }
 
 func Test_Range(t *testing.T) {
 	assert.Equal(t, slice.Of(-1, 0, 1, 2, 3), seq.Slice(seq.Range(-1, 4)))
 	assert.Equal(t, slice.Of(3, 2, 1, 0, -1), seq.Slice(seq.Range(3, -2)))
 	assert.Nil(t, seq.Slice(seq.Range(1, 1)))
+
+	var out []int
+	for i := range seq.Range(-1, 3) {
+		if i == 2 {
+			break
+		}
+		out = append(out, i)
+	}
+	assert.Equal(t, slice.Of(-1, 0, 1), out)
 }
 
 func Test_RangeClosed(t *testing.T) {
 	assert.Equal(t, slice.Of(-1, 0, 1, 2, 3), seq.Slice(seq.RangeClosed(-1, 3)))
 	assert.Equal(t, slice.Of(3, 2, 1, 0, -1), seq.Slice(seq.RangeClosed(3, -1)))
 	assert.Equal(t, slice.Of(1), seq.Slice(seq.RangeClosed(1, 1)))
+
+	var out []int
+	for i := range seq.RangeClosed(-1, 3) {
+		if i == 2 {
+			break
+		}
+		out = append(out, i)
+	}
+	assert.Equal(t, slice.Of(-1, 0, 1), out)
+}
+
+func Test_ToSeq2(t *testing.T) {
+	s, err := seqe.Slice(seq.ToSeq2[seq.Seq[int], int, int, error](seq.Of(1), nil))
+
+	assert.NoError(t, err)
+	assert.Empty(t, s)
+
+	s, err = seqe.Slice(seq.ToSeq2[seq.Seq[int]](nil, func(i int) (int, error) { return 0, errors.New("abort") }))
+
+	assert.NoError(t, err)
+	assert.Empty(t, s)
 }

@@ -798,8 +798,8 @@ func AppendMapResolvOrder[T any, K comparable, V, VR any](next func() (T, bool),
 	return order, dest
 }
 
-// Sequence makes a sequence by applying the 'next' function to the previous step generated value.
-func Sequence[T any](first T, next func(T) (T, bool)) Loop[T] {
+// Series makes a sequence by applying the 'next' function to the previous step generated value.
+func Series[T any](first T, next func(T) (T, bool)) Loop[T] {
 	if next == nil {
 		return nil
 	}

@@ -443,8 +443,8 @@ func Test_RangeClosed(t *testing.T) {
 	assert.Equal(t, slice.Of(1), loop.Slice(range_.Closed(1, 1)))
 }
 
-func Test_Sequence(t *testing.T) {
-	assert.Equal(t, slice.Of(-1, 0, 1, 2, 3), loop.Slice(loop.Sequence(-1, func(prev int) (int, bool) { return prev + 1, prev < 3 })))
+func Test_Series(t *testing.T) {
+	assert.Equal(t, slice.Of(-1, 0, 1, 2, 3), loop.Slice(loop.Series(-1, func(prev int) (int, bool) { return prev + 1, prev < 3 })))
 }
 
 func Test_OfIndexed(t *testing.T) {

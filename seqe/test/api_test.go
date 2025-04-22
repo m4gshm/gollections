@@ -27,6 +27,21 @@ func errOn[T comparable](errVal T) func(T) (T, error) {
 	}
 }
 
+func Test_OfIndexed(t *testing.T) {
+	indexed := slice.Of("0", "1", "2", "3", "4")
+	result := seqe.OfIndexed(len(indexed), func(i int) (string, error) { return indexed[i], nil })
+	out, err := seqe.Slice(result)
+
+	assert.Equal(t, indexed, out)
+	assert.NoError(t, err)
+
+	result = seqe.OfIndexed(len(indexed), func(i int) (string, error) { return indexed[i], op.IfElse(i == 3, errors.New("abort"), nil) })
+	out, err = seqe.Slice(result)
+
+	assert.Equal(t, slice.Of("0", "1", "2"), out)
+	assert.ErrorContains(t, err, "abort")
+}
+
 func Test_AccumSum(t *testing.T) {
 	s := seq.ToSeq2(seq.Of(1, 3, 5, 7, 9, 11), noErr)
 	r, err := seqe.Accum(100, s, op.Sum[int])
@@ -134,7 +149,7 @@ func Test_First(t *testing.T) {
 }
 
 func Test_Firstt(t *testing.T) {
-	result, ok, err := seq.Firstt(seq.Of(1, 2, 3, 4, 5, 6), func(i int) (bool, error) {
+	result, ok, err := seqe.Firstt(seq.ToSeq2(seq.Of(1, 2, 3, 4, 5, 6), noErr), func(i int) (bool, error) {
 		return more.Than(5)(i), nil
 	})
 
@@ -142,7 +157,7 @@ func Test_Firstt(t *testing.T) {
 	assert.Equal(t, 6, result)
 	assert.NoError(t, err)
 
-	result, ok, err = seq.Firstt(seq.Of(1, 2, 3, 4, 5, 6), func(_ int) (bool, error) {
+	result, ok, err = seqe.Firstt(seq.ToSeq2(seq.Of(1, 2, 3, 4, 5, 6), noErr), func(_ int) (bool, error) {
 		return true, errors.New("abort")
 	})
 
@@ -216,22 +231,35 @@ func Test_FlattSeq(t *testing.T) {
 }
 
 func Test_Filter(t *testing.T) {
-	s := seq.Of(1, 3, 4, 5, 7, 8, 9, 11)
-	r := seq.Filter(s, even)
-	assert.Equal(t, slice.Of(4, 8), seq.Slice(r))
+	s := seq.ToSeq2(seq.Of(1, 3, 4, 5, 7, 8, 9, 11), noErr)
+	f := seqe.Filter(s, even)
+	r, err := seqe.Slice(f)
+	assert.Equal(t, slice.Of(4, 8), r)
+	assert.NoError(t, err)
 }
 
 func Test_Filt(t *testing.T) {
-	s := seq.Of(1, 3, 4, 5, 7, 8, 9, 11)
-	l := seq.Filt(s, func(i int) (bool, error) { return even(i), op.IfElse(i > 7, errors.New("abort"), nil) })
+	s := seq.ToSeq2(seq.Of(1, 3, 4, 5, 7, 8, 9, 11), noErr)
+	filter := func(i int) (bool, error) { return even(i), op.IfElse(i > 7, errors.New("abort"), nil) }
+	l := seqe.Filt(s, filter)
 	r, err := seqe.Slice(l)
 	assert.Error(t, err)
 	assert.Equal(t, slice.Of(4, 8), r)
+
+	l = seqe.Filt(s, nil)
+	r, err = seqe.Slice(l)
+	assert.NoError(t, err)
+	assert.Empty(t, r)
+
+	l = seqe.Filt[seq.SeqE[int]](nil, filter)
+	r, err = seqe.Slice(l)
+	assert.NoError(t, err)
+	assert.Empty(t, r)
 }
 
 func Test_Filt2(t *testing.T) {
-	s := seq.Of(1, 3, 4, 5, 7, 8, 9, 11)
-	l := seq.Filt(s, func(i int) (bool, error) {
+	s := seq.ToSeq2(seq.Of(1, 3, 4, 5, 7, 8, 9, 11), noErr)
+	l := seqe.Filt(s, func(i int) (bool, error) {
 		ok := i <= 7
 		return ok && even(i), op.IfElse(ok, nil, errors.New("abort"))
 	})
@@ -322,14 +350,25 @@ func Test_AllConv(t *testing.T) {
 }
 
 func Test_ConvertFilteredInplace(t *testing.T) {
-	s := seq.Of(1, 3, 4, 5, 7, 8, 9, 11)
-	r := seq.ConvertOK(s, func(i int) (string, bool) { return strconv.Itoa(i), even(i) })
-	assert.Equal(t, []string{"4", "8"}, seq.Slice(r))
+	s := seq.ToSeq2(seq.Of(1, 3, 4, 5, 7, 8, 9, 11), noErr)
+	r := seqe.ConvertOK(s, func(i int) (string, bool) { return strconv.Itoa(i), even(i) })
+	out, err := seqe.Slice(r)
+	assert.Equal(t, []string{"4", "8"}, out)
+	assert.NoError(t, err)
 }
 
 func Test_ConvFilteredInplace(t *testing.T) {
-	s := seq.Of(1, 3, 4, 5, 7, 8, 9, 11)
-	r := seq.ConvOK(s, func(i int) (string, bool, error) { return strconv.Itoa(i), even(i), nil })
-	o, _ := seqe.Slice(r)
+	s := seq.ToSeq2(seq.Of(1, 3, 4, 5, 7, 8, 9, 11), noErr)
+	r := seqe.ConvOK(s, func(i int) (string, bool, error) { return strconv.Itoa(i), even(i), nil })
+	o, err := seqe.Slice(r)
 	assert.Equal(t, []string{"4", "8"}, o)
+	assert.NoError(t, err)
+
+	r = seqe.ConvOK(s, func(i int) (string, bool, error) {
+		return strconv.Itoa(i), even(i), op.IfElse(i == 9, errors.New("abort"), nil)
+	})
+	o, err = seqe.Slice(r)
+
+	assert.Equal(t, []string{"4", "8"}, o)
+	assert.ErrorContains(t, err, "abort")
 }
