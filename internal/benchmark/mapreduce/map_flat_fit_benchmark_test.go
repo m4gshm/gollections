@@ -395,6 +395,16 @@ func Benchmark_ConvertFlattStructure_Loop(b *testing.B) {
 	b.StopTimer()
 }
 
+func Benchmark_ConvertFlattStructure_Seq(b *testing.B) {
+	items := []*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		attr := seq.Flat(seq.Filter(seq.Of(items...), not.Nil), (*Participant).GetAttributes)
+		_ = seq.Slice(seq.Convert(seq.Filter(attr, not.Nil), (*Attributes).GetName))
+	}
+	b.StopTimer()
+}
+
 func Benchmark_ConvertFlattStructure_Slice_PlainOld(b *testing.B) {
 	items := []*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil}
 
