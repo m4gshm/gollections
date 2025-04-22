@@ -30,7 +30,7 @@ func OfIndexed[T any](amount int, getAt func(int) (T, error)) Seq2[T, error] {
 		}
 		for i := range amount {
 			v, err := getAt(i)
-			if ok := yield(v, err); !ok {
+			if !yield(v, err) {
 				break
 			}
 		}
@@ -98,7 +98,7 @@ func SliceCap[S ~SeqE[T], T any](seq S, capacity int) (out []T, e error) {
 // Append collects the elements of the 'seq' sequence into the specified 'out' slice.
 func Append[S ~SeqE[T], T any, TS ~[]T](seq S, out TS) (TS, error) {
 	if seq == nil {
-		return nil, nil
+		return out, nil
 	}
 	var errOur error
 	seq(func(v T, e error) bool {

@@ -17,7 +17,7 @@ type Seq2[K, V any] = seq.Seq2[K, V]
 func Of[T any](elements ...T) Seq2[int, T] {
 	return func(yield func(int, T) bool) {
 		for i, v := range elements {
-			if ok := yield(i, v); !ok {
+			if !yield(i, v) {
 				break
 			}
 		}
@@ -28,7 +28,7 @@ func Of[T any](elements ...T) Seq2[int, T] {
 func OfMap[K comparable, V any](elements map[K]V) Seq2[K, V] {
 	return func(yield func(K, V) bool) {
 		for k, v := range elements {
-			if ok := yield(k, v); !ok {
+			if !yield(k, v) {
 				break
 			}
 		}
@@ -44,7 +44,7 @@ func OfIndexed[T any](amount int, getAt func(int) T) Seq2[int, T] {
 			return
 		}
 		for i := range amount {
-			if ok := yield(i, getAt(i)); !ok {
+			if !yield(i, getAt(i)) {
 				break
 			}
 		}

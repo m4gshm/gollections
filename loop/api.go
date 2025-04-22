@@ -162,7 +162,7 @@ func SliceCap[T any](next func() (T, bool), capacity int) (out []T) {
 // Append collects the elements retrieved by the 'next' function into the specified 'out' slice
 func Append[T any, TS ~[]T](next func() (T, bool), out TS) TS {
 	if next == nil {
-		return nil
+		return out
 	}
 	for {
 		v, ok := next()

@@ -30,7 +30,7 @@ type Seq2[K, V any] = func(yield func(K, V) bool)
 func Of[T any](elements ...T) Seq[T] {
 	return func(yield func(T) bool) {
 		for _, v := range elements {
-			if ok := yield(v); !ok {
+			if !yield(v) {
 				break
 			}
 		}
@@ -46,7 +46,7 @@ func OfIndexed[T any](amount int, getAt func(int) T) Seq[T] {
 			return
 		}
 		for i := range amount {
-			if ok := yield(getAt(i)); !ok {
+			if !yield(getAt(i)) {
 				break
 			}
 		}
@@ -181,9 +181,9 @@ func SliceCap[S ~Seq[T], T any](seq S, capacity int) (out []T) {
 }
 
 // Append collects the elements of the 'seq' sequence into the specified 'out' slice.
-func Append[T any, TS ~[]T, S ~Seq[T]](seq S, out TS) TS {
+func Append[S ~Seq[T], TS ~[]T, T any](seq S, out TS) TS {
 	if seq == nil {
-		return nil
+		return out
 	}
 	seq(func(v T) bool {
 		out = append(out, v)
@@ -532,7 +532,7 @@ func KeyValues[S ~Seq[T], T, K, V any](seq S, keyExtractor func(T) K, valsExtrac
 			k := keyExtractor(t)
 			values := valsExtractor(t)
 			for _, v := range values {
-				if ok := yield(k, v); !ok {
+				if !yield(k, v) {
 					return
 				}
 			}
