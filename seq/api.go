@@ -494,7 +494,6 @@ func Filter[S ~Seq[T], T any](seq S, filter func(T) bool) Seq[T] {
 
 // Filt creates an erroreable iterator that iterates only those elements for which the 'filter' function returns true.
 func Filt[S ~Seq[T], T any](seq S, filter func(T) (bool, error)) SeqE[T] {
-	//delayed on next iteration step error
 	return func(yield func(T, error) bool) {
 		if seq == nil || filter == nil {
 			return
