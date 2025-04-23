@@ -591,11 +591,10 @@ func AppendFilt[TS ~[]T, DS ~[]T, T any](src TS, dest DS, filter func(T) (bool, 
 	}
 	for _, e := range src {
 		ok, err := filter(e)
-		if ok {
-			dest = append(dest, e)
-		}
 		if err != nil {
 			return dest, err
+		} else if ok {
+			dest = append(dest, e)
 		}
 	}
 	return dest, nil
@@ -1000,7 +999,7 @@ func DowncastRef[TS ~[]T, T any](elements *[]T) *TS {
 
 // Filled returns the 'ifEmpty' if the 'elements' slise is empty
 func Filled[TS ~[]T, T any](elements TS, ifEmpty []T) TS {
-	if IsEmpty(elements) {
+	if !IsEmpty(elements) {
 		return elements
 	}
 	return ifEmpty

@@ -312,7 +312,7 @@ func Test_Filt(t *testing.T) {
 	l := loop.Filt(s, func(i int) (bool, error) { return even(i), op.IfElse(i > 7, errors.New("abort"), nil) })
 	r, err := breakLoop.Slice(l)
 	assert.Error(t, err)
-	assert.Equal(t, slice.Of(4, 8), r)
+	assert.Equal(t, slice.Of(4), r)
 }
 
 func Test_Filt2(t *testing.T) {

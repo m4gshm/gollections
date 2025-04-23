@@ -452,7 +452,7 @@ func Test_Filt(t *testing.T) {
 	s := slice.Of(1, 3, 4, 5, 7, 8, 9, 12)
 	r, err := slice.Filt(s, func(i int) (bool, error) { return even(i), op.IfElse(i > 7, errors.New("abort"), nil) })
 	assert.Error(t, err)
-	assert.Equal(t, slice.Of(4, 8), r)
+	assert.Equal(t, slice.Of(4), r)
 
 	r, err = slice.Filt(s, func(i int) (bool, error) { return even(i), nil })
 	assert.NoError(t, err)
@@ -602,6 +602,14 @@ func Test_SplitTwo(t *testing.T) {
 	assert.Equal(t, slice.Of("a", "b", "c"), second)
 }
 
+func Test_SplitThree(t *testing.T) {
+	first, second, third := slice.SplitThree(slice.Of("1a#", "2b$", "3c%"), func(s string) (string, string, string) { return string(s[0]), string(s[1]), string(s[2]) })
+
+	assert.Equal(t, slice.Of("1", "2", "3"), first)
+	assert.Equal(t, slice.Of("a", "b", "c"), second)
+	assert.Equal(t, slice.Of("#", "$", "%"), third)
+}
+
 func Test_SplitTwo2(t *testing.T) {
 	byIndex := func(i int) func(string) string { return func(s string) string { return string(s[i]) } }
 
@@ -704,4 +712,53 @@ func Test_Slice_AppendMapResolvOrderr(t *testing.T) {
 	assert.Equal(t, []bool{true, false}, order)
 	assert.EqualError(t, err, "abort")
 
+}
+
+func Test_Slice_Filled(t *testing.T) {
+	assert.Nil(t, slice.Filled[[]int](nil, nil))
+	assert.Equal(t, slice.Of(1, 2, 3), slice.Filled[[]int](nil, slice.Of(1, 2, 3)))
+	assert.Equal(t, slice.Of(1, 2, 3), slice.Filled(slice.Of(1, 2, 3), slice.Of(1, 2)))
+}
+
+func Test_Head(t *testing.T) {
+	result, ok := slice.Head([]int{1, 3, 5, 7, 9, 11})
+
+	assert.True(t, ok)
+	assert.Equal(t, 1, result)
+
+	_, ok = slice.Head[[]int](nil)
+	assert.False(t, ok)
+}
+
+func Test_Tail(t *testing.T) {
+	result, ok := slice.Tail([]int{1, 3, 5, 7, 9, 11})
+
+	assert.True(t, ok)
+	assert.Equal(t, 11, result)
+
+	_, ok = slice.Tail[[]int](nil)
+	assert.False(t, ok)
+}
+
+func Test_Contains(t *testing.T) {
+	s := []int{1, 3, 5, 7, 9, 11}
+
+	assert.True(t, slice.Contains(s, 5))
+	assert.False(t, slice.Contains(s, 12))
+	assert.False(t, slice.Contains(([]int)(nil), 12))
+
+}
+
+func Test_Upcast(t *testing.T) {
+	type names []string
+	n := names{"Alice"}
+	strings := slice.Upcast(n)
+	assert.Equal(t, []string{"Alice"}, strings)
+}
+
+func Test_Downcast(t *testing.T) {
+	type names []string
+	s := []string{"Alice"}
+	n := slice.Downcast[names](s)
+	assert.Equal(t, names{"Alice"}, n)
 }

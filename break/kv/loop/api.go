@@ -136,7 +136,7 @@ func Firstt[K, V any](next func() (K, V, bool, error), predicate func(K, V) (boo
 		if k, v, ok, err := next(); err != nil || !ok {
 			return k, v, false, err
 		} else if ok, err := predicate(k, v); err != nil || ok {
-			return k, v, ok, err
+			return k, v, ok && err == nil, err
 		}
 	}
 }

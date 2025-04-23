@@ -2,8 +2,6 @@
 package seqe
 
 import (
-	"errors"
-
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/seq"
@@ -456,15 +454,16 @@ func FlattSeq[S ~SeqE[From], STo ~SeqE[To], From any, To any](seq S, flattener f
 
 // Filter creates an iterator that iterates only those elements for which the 'filter' function returns true.
 func Filter[S ~SeqE[T], T any](seq S, filter func(T) bool) SeqE[T] {
-	return func(consumer func(T, error) bool) {
+	return func(yield func(T, error) bool) {
 		if seq == nil || filter == nil {
 			return
 		}
 		seq(func(t T, err error) bool {
 			if err != nil {
-				return consumer(t, err)
+				yield(t, err)
+				return false
 			} else if filter(t) {
-				return consumer(t, err)
+				return yield(t, err)
 			}
 			return true
 		})
@@ -474,25 +473,15 @@ func Filter[S ~SeqE[T], T any](seq S, filter func(T) bool) SeqE[T] {
 // Filt creates an erroreable iterator that iterates only those elements for which the 'filter' function returns true.
 func Filt[S ~SeqE[T], T any](seq S, filter func(T) (bool, error)) SeqE[T] {
 	//delayed on next iteration step error
-	var err error
 	return func(yield func(T, error) bool) {
 		if seq == nil || filter == nil {
 			return
 		}
-		seq(func(t T, e error) bool {
-			if err == nil {
-				err = e
-			} else if e != nil {
-				err = errors.Join(err, e)
-			}
+		seq(func(t T, err error) bool {
 			if err != nil {
-				yield(t, err)
-				return false
+				return yield(t, err)
 			}
-			ok := false
-			if ok, err = filter(t); ok {
-				return yield(t, nil)
-			} else if err != nil {
+			if ok, err := filter(t); ok || err != nil {
 				return yield(t, err)
 			}
 			return true

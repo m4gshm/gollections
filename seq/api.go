@@ -431,8 +431,7 @@ func Flatt[S ~Seq[From], STo ~[]To, From any, To any](seq S, flattener func(From
 			elementsTo, err := flattener(v)
 			if err != nil {
 				var t To
-				yield(t, err)
-				return false
+				return yield(t, err)
 			}
 			for _, e := range elementsTo {
 				if !yield(e, nil) {
@@ -496,20 +495,12 @@ func Filter[S ~Seq[T], T any](seq S, filter func(T) bool) Seq[T] {
 // Filt creates an erroreable iterator that iterates only those elements for which the 'filter' function returns true.
 func Filt[S ~Seq[T], T any](seq S, filter func(T) (bool, error)) SeqE[T] {
 	//delayed on next iteration step error
-	var err error
 	return func(yield func(T, error) bool) {
 		if seq == nil || filter == nil {
 			return
 		}
 		seq(func(t T) bool {
-			if err != nil {
-				yield(t, err)
-				return false
-			}
-			ok := false
-			if ok, err = filter(t); ok {
-				return yield(t, nil)
-			} else if err != nil {
+			if ok, err := filter(t); ok || err != nil {
 				return yield(t, err)
 			}
 			return true

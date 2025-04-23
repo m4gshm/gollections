@@ -136,7 +136,7 @@ func Test_Filt2(t *testing.T) {
 	}), k.V[int, string])
 
 	assert.Error(t, err)
-	assert.Equal(t, slice.Of(k.V(1, "1"), k.V(2, "2")), out)
+	assert.Equal(t, slice.Of(k.V(1, "1")), out)
 }
 
 func Test_To(t *testing.T) {

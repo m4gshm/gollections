@@ -27,6 +27,15 @@ func errOn[T comparable](errVal T) func(T) (T, error) {
 	}
 }
 
+func errIfContains[T comparable](errVal T) func([]T) ([]T, error) {
+	return func(val []T) ([]T, error) {
+		if slice.Contains(val, errVal) {
+			return val, errors.New("abort")
+		}
+		return val, nil
+	}
+}
+
 func Test_OfIndexed(t *testing.T) {
 	indexed := slice.Of("0", "1", "2", "3", "4")
 	result := seqe.OfIndexed(len(indexed), func(i int) (string, error) { return indexed[i], nil })
@@ -172,9 +181,14 @@ func Test_Flat(t *testing.T) {
 	md := seq.ToSeq2(seq.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...), noErr)
 	f := seqe.Flat(md, as.Is)
 	s, err := seqe.Slice(f)
-	e := []int{1, 2, 3, 4, 5, 6}
-	assert.Equal(t, e, s)
+	assert.Equal(t, []int{1, 2, 3, 4, 5, 6}, s)
 	assert.NoError(t, err)
+
+	md = seq.ToSeq2(seq.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...), errIfContains(5))
+	f = seqe.Flat(md, as.Is)
+	s, err = seqe.Slice(f)
+	assert.Equal(t, []int{1, 2, 3, 4}, s)
+	assert.ErrorContains(t, err, "abort")
 }
 
 func Test_FlatSeq(t *testing.T) {
@@ -184,6 +198,13 @@ func Test_FlatSeq(t *testing.T) {
 	e := []int{1, 2, 3, 4, 5, 6}
 	assert.Equal(t, e, s)
 	assert.NoError(t, err)
+
+	md = seq.ToSeq2(seq.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...), errIfContains(5))
+	f = seqe.FlatSeq(md, slices.Values)
+	s, err = seqe.Slice(f)
+	assert.Equal(t, []int{1, 2, 3, 4}, s)
+	assert.ErrorContains(t, err, "abort")
+
 }
 
 func Test_Flatt(t *testing.T) {
@@ -206,6 +227,13 @@ func Test_Flatt(t *testing.T) {
 
 	assert.Equal(t, []int{1, 2, 3, 4}, i)
 	assert.ErrorContains(t, err, "parsing \"_5\"")
+
+	s = seq.ToSeq2(seq.Of([][]string{{"1", "2", "3"}, {"4"}, {"_5", "6"}}...), errIfContains("_5"))
+	f = func(strInteger []string) ([]int, error) { return slice.Conv(strInteger, strconv.Atoi) }
+	i, err = seqe.Slice(seqe.Flatt(s, f))
+
+	assert.Equal(t, []int{1, 2, 3, 4}, i)
+	assert.ErrorContains(t, err, "abort")
 }
 
 func Test_FlattSeq(t *testing.T) {
@@ -228,6 +256,15 @@ func Test_FlattSeq(t *testing.T) {
 
 	assert.Equal(t, []int{1, 2, 3, 4}, i)
 	assert.ErrorContains(t, err, "parsing \"_5\"")
+
+	s = seq.ToSeq2(seq.Of([][]string{{"1", "2", "3"}, {"4"}, {"_5", "6"}}...), func(s []string) ([]string, error) {
+		return s, op.IfElse(slice.Contains(s, "_5"), errors.New("abort"), nil)
+	})
+	f = func(strInteger []string) seq.SeqE[int] { return seq.Conv(seq.Of(strInteger...), strconv.Atoi) }
+	i, err = seqe.Slice(seqe.FlattSeq(s, f))
+
+	assert.Equal(t, []int{1, 2, 3, 4}, i)
+	assert.ErrorContains(t, err, "abort")
 }
 
 func Test_Filter(t *testing.T) {
@@ -244,7 +281,7 @@ func Test_Filt(t *testing.T) {
 	l := seqe.Filt(s, filter)
 	r, err := seqe.Slice(l)
 	assert.Error(t, err)
-	assert.Equal(t, slice.Of(4, 8), r)
+	assert.Equal(t, slice.Of(4), r)
 
 	l = seqe.Filt(s, nil)
 	r, err = seqe.Slice(l)

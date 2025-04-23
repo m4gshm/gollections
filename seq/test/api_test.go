@@ -292,7 +292,7 @@ func Test_Filt(t *testing.T) {
 	r, err := seqe.Slice(l)
 
 	assert.Error(t, err)
-	assert.Equal(t, slice.Of(4, 8), r)
+	assert.Equal(t, slice.Of(4), r)
 
 	l = seq.Filt(s, nil)
 	r, err = seqe.Slice(l)
