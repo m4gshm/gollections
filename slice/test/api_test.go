@@ -252,6 +252,16 @@ func Test_ConvOK(t *testing.T) {
 	var expected *strconv.NumError
 	assert.ErrorAs(t, err, &expected)
 	assert.Equal(t, []int{4, 8}, r)
+
+	s = slice.Of("1", "3", "4", "5", "7", "8", "9", "11", "12")
+	r, err = slice.ConvOK(s, func(v string) (int, bool, error) {
+		i, err := strconv.Atoi(v)
+		return i, true, err
+
+	})
+	assert.NoError(t, err)
+	assert.Equal(t, []int{1, 3, 4, 5, 7, 8, 9, 11, 12}, r)
+
 }
 
 func Test_Conv(t *testing.T) {
@@ -340,37 +350,46 @@ func Test_ConvertFilteredWithIndexInPlace(t *testing.T) {
 	assert.Equal(t, []string{"6", "13"}, r)
 }
 
-func Test_Flatt(t *testing.T) {
+func Test_Flat(t *testing.T) {
 	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
 	f := slice.Flat(md, as.Is)
 	e := []int{1, 2, 3, 4, 5, 6}
 	assert.Equal(t, e, f)
 }
 
-func Test_FlattSeq(t *testing.T) {
+func Test_FlatSeq(t *testing.T) {
 	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
 	f := slice.FlatSeq(md, slices.Values)
 	e := []int{1, 2, 3, 4, 5, 6}
 	assert.Equal(t, e, f)
 }
 
-func Test_Flat(t *testing.T) {
+func Test_Flatt(t *testing.T) {
 	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
 	f, err := slice.Flatt(md, func(i []int) ([]int, error) { return i, op.IfElse(len(i) == 2, errors.New("abort"), nil) })
 	assert.Error(t, err)
-	e := []int{1, 2, 3, 4}
-	assert.Equal(t, e, f)
+	assert.Equal(t, []int{1, 2, 3, 4}, f)
+
+	f, err = slice.Flatt(md, func(i []int) ([]int, error) { return i, nil })
+	assert.NoError(t, err)
+	assert.Equal(t, []int{1, 2, 3, 4, 5, 6}, f)
 }
 
-func Test_FlatSeq(t *testing.T) {
+func Test_FlattSeq(t *testing.T) {
 	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
 	transform := func(i int) (int, error) {
 		return i, op.IfElse(i == 5, errors.New("abort"), nil)
 	}
 	f, err := slice.FlattSeq(md, func(i []int) seq.SeqE[int] { return seq.ToSeq2(seq.Of(i...), transform) })
 	assert.Error(t, err)
-	e := []int{1, 2, 3, 4}
-	assert.Equal(t, e, f)
+	assert.Equal(t, []int{1, 2, 3, 4}, f)
+
+	f, err = slice.FlattSeq(md, func(i []int) seq.SeqE[int] {
+		return seq.ToSeq2(seq.Of(i...), func(i int) (int, error) { return i, nil })
+	})
+	assert.NoError(t, err)
+	assert.Equal(t, []int{1, 2, 3, 4, 5, 6}, f)
+
 }
 
 func Test_FlatAndConvert(t *testing.T) {
@@ -430,10 +449,14 @@ func Test_FilterConvertFilter(t *testing.T) {
 }
 
 func Test_Filt(t *testing.T) {
-	s := slice.Of(1, 3, 4, 5, 7, 8, 9, 11)
+	s := slice.Of(1, 3, 4, 5, 7, 8, 9, 12)
 	r, err := slice.Filt(s, func(i int) (bool, error) { return even(i), op.IfElse(i > 7, errors.New("abort"), nil) })
 	assert.Error(t, err)
 	assert.Equal(t, slice.Of(4, 8), r)
+
+	r, err = slice.Filt(s, func(i int) (bool, error) { return even(i), nil })
+	assert.NoError(t, err)
+	assert.Equal(t, slice.Of(4, 8, 12), r)
 }
 
 func Test_Filt2(t *testing.T) {
@@ -672,7 +695,9 @@ func Test_Slice_AppendMapResolvOrderr(t *testing.T) {
 	assert.Equal(t, []bool{true, false}, order)
 	assert.NoError(t, err)
 
-	resolver = func(exists bool, k bool, vr []int, v int) ([]int, error) { return resolv.Slice(exists, k, vr, v), op.IfElse(v == 5, errors.New("abort"), nil) }
+	resolver = func(exists bool, k bool, vr []int, v int) ([]int, error) {
+		return resolv.Slice(exists, k, vr, v), op.IfElse(v == 5, errors.New("abort"), nil)
+	}
 	order, groups, err = slice.AppendMapResolvOrderr(slice.Of("2", "1", "1", "2", "4", "3", "5"), kvExtractor, resolver, nil, nil)
 	assert.Equal(t, []int{1, 1, 3}, groups[false])
 	assert.Equal(t, []int{2, 2, 4}, groups[true])
