@@ -248,8 +248,7 @@ func Conv[S ~SeqE[From], From, To any](seq S, converter func(From) (To, error)) 
 		seq(func(from From, err error) bool {
 			if err != nil {
 				var to To
-				yield(to, err)
-				return false
+				return yield(to, err)
 			}
 			return yield(converter(from))
 		})

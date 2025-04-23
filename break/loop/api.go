@@ -311,7 +311,7 @@ func Conv[From, To any](next func() (From, bool, error), converter func(From) (T
 	return func() (t To, ok bool, err error) {
 		v, ok, err := next()
 		if err != nil || !ok {
-			return t, ok, err
+			return t, false, err
 		}
 		vc, err := converter(v)
 		return vc, err == nil, err

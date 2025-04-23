@@ -78,6 +78,10 @@ func Test_ReduceSum(t *testing.T) {
 	assert.Equal(t, 21, sum)
 	assert.NoError(t, err)
 
+	sum, err = seqe.Reduce(s, op.Sum)
+	assert.Equal(t, 21, sum)
+	assert.NoError(t, err)
+
 	s = seq.ToSeq2(seq.Of(1, 2, 3, 4, 5, 6), errOn(4))
 	sum, ok, err = seqe.ReduceOK(s, op.Sum)
 
@@ -109,6 +113,10 @@ func Test_ReduceeSum(t *testing.T) {
 	r, ok, err = seqe.ReduceeOK(s, func(i1, i2 int) (int, error) { return i1 + i2, nil })
 
 	assert.True(t, ok)
+	assert.Equal(t, 1+3, r)
+	assert.ErrorContains(t, err, "abort")
+
+	r, err = seqe.Reducee(s, func(i1, i2 int) (int, error) { return i1 + i2, nil })
 	assert.Equal(t, 1+3, r)
 	assert.ErrorContains(t, err, "abort")
 
@@ -149,12 +157,16 @@ func Test_ReduceNil(t *testing.T) {
 }
 
 func Test_First(t *testing.T) {
-	result, ok, err := seqe.First(seq.ToSeq2(seq.Of(1, 2, 3, 4, 5, 6), noErr), more.Than(5)) //7, true
+	result, ok, err := seqe.First(seq.ToSeq2(seq.Of(1, 2, 3, 4, 5, 6), noErr), more.Than(5))
 
 	assert.True(t, ok)
 	assert.Equal(t, 6, result)
 	assert.NoError(t, err)
 
+	_, ok, err = seqe.First(seq.ToSeq2(seq.Of(1, 2, 3, 4, 5, 6), errOn(1)), more.Than(5))
+
+	assert.False(t, ok)
+	assert.ErrorContains(t, err, "abort")
 }
 
 func Test_Firstt(t *testing.T) {
@@ -172,6 +184,13 @@ func Test_Firstt(t *testing.T) {
 
 	assert.False(t, ok)
 	assert.Equal(t, 0, result)
+	assert.ErrorContains(t, err, "abort")
+
+	_, ok, err = seqe.Firstt(seq.ToSeq2(seq.Of(1, 2, 3, 4, 5, 6), errOn(1)), func(i int) (bool, error) {
+		return more.Than(5)(i), nil
+	})
+
+	assert.False(t, ok)
 	assert.ErrorContains(t, err, "abort")
 }
 

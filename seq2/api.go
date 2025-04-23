@@ -53,13 +53,13 @@ func OfIndexed[T any](amount int, getAt func(int) T) Seq2[int, T] {
 
 // Filter creates a rangefunc that iterates only those elements for which the 'filter' function returns true.
 func Filter[S ~Seq2[K, V], K, V any](seq S, filter func(K, V) bool) Seq2[K, V] {
-	return func(consumer func(K, V) bool) {
+	return func(yield func(K, V) bool) {
 		if seq == nil || filter == nil {
 			return
 		}
 		seq(func(k K, v V) bool {
 			if filter(k, v) {
-				return consumer(k, v)
+				return yield(k, v)
 			}
 			return true
 		})

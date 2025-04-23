@@ -102,13 +102,22 @@ func Test_ReduceSum(t *testing.T) {
 
 func Test_ReduceeSum(t *testing.T) {
 	s := seq.Of(1, 3, 5, 7, 9, 11)
-	r, ok, err := seq.ReduceeOK(s, func(i1, i2 int) (int, error) {
+	reducer := func(i1, i2 int) (int, error) {
 		if i2 == 11 {
 			return i1, errors.New("stop")
 		}
 		return i1 + i2, nil
-	})
+	}
+	r, ok, err := seq.ReduceeOK(s, reducer)
 	assert.True(t, ok)
+	assert.Equal(t, 1+3+5+7+9, r)
+	assert.ErrorContains(t, err, "stop")
+
+	_, ok, err = seq.ReduceeOK[seq.Seq[int]](nil, reducer)
+	assert.False(t, ok)
+	assert.NoError(t, err)
+
+	r, err = seq.Reducee(s, reducer)
 	assert.Equal(t, 1+3+5+7+9, r)
 	assert.ErrorContains(t, err, "stop")
 }
@@ -145,6 +154,8 @@ func Test_First(t *testing.T) {
 
 	assert.True(t, ok)
 	assert.Equal(t, 6, result)
+
+	assert.True(t, seq.HasAny(sequence, more.Than(5)))
 
 	_, ok = seq.First[seq.Seq[int]](nil, more.Than(5))
 	assert.False(t, ok)
