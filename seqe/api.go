@@ -257,17 +257,16 @@ func Conv[S ~SeqE[From], From, To any](seq S, converter func(From) (To, error)) 
 
 // Convert creates an iterator that applies the 'converter' function to each iterable element.
 func Convert[S ~SeqE[From], From, To any](seq S, converter func(From) To) SeqE[To] {
-	return func(consumer func(To, error) bool) {
+	return func(yield func(To, error) bool) {
 		if seq == nil || converter == nil {
 			return
 		}
 		seq(func(from From, err error) bool {
 			if err != nil {
 				var to To
-				consumer(to, err)
-				return false
+				return yield(to, err)
 			}
-			return consumer(converter(from), err)
+			return yield(converter(from), err)
 		})
 	}
 }
@@ -275,16 +274,16 @@ func Convert[S ~SeqE[From], From, To any](seq S, converter func(From) To) SeqE[T
 // ConvertOK creates an iterator that applies the 'converter' function to each iterable element.
 // The converter may returns a value or ok=false to exclude the value from the loop.
 func ConvertOK[S ~SeqE[From], From, To any](seq S, converter func(from From) (To, bool)) SeqE[To] {
-	return func(consumer func(To, error) bool) {
+	return func(yield func(To, error) bool) {
 		if seq == nil || converter == nil {
 			return
 		}
 		seq(func(from From, err error) bool {
 			if err != nil {
 				var to To
-				return consumer(to, err)
+				return yield(to, err)
 			} else if to, ok := converter(from); ok {
-				return consumer(to, err)
+				return yield(to, err)
 			}
 			return true
 		})
@@ -325,7 +324,9 @@ func Flat[S ~SeqE[From], STo ~[]To, From any, To any](seq S, flattener func(From
 		seq(func(v From, err error) bool {
 			if err != nil {
 				var t To
-				return yield(t, err)
+				if !yield(t, err) {
+					return false
+				}
 			}
 			elementsTo := flattener(v)
 			for _, e := range elementsTo {
@@ -396,12 +397,12 @@ func Flatt[S ~SeqE[From], STo ~[]To, From any, To any](seq S, flattener func(Fro
 				return yield(to, err)
 			}
 			elementsTo, err := flattener(v)
-			if err != nil {
+			if err != nil && len(elementsTo) == 0 {
 				var t To
 				return yield(t, err)
 			}
 			for _, e := range elementsTo {
-				if !yield(e, nil) {
+				if !yield(e, err) {
 					return false
 				}
 			}

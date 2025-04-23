@@ -429,12 +429,12 @@ func Flatt[S ~Seq[From], STo ~[]To, From any, To any](seq S, flattener func(From
 		}
 		seq(func(v From) bool {
 			elementsTo, err := flattener(v)
-			if err != nil {
+			if err != nil && len(elementsTo) == 0 {
 				var t To
 				return yield(t, err)
 			}
 			for _, e := range elementsTo {
-				if !yield(e, nil) {
+				if !yield(e, err) {
 					return false
 				}
 			}

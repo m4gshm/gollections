@@ -14,10 +14,81 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func Test_Of(t *testing.T) {
+	sequence := seq2.Of(0, 1, 2, 3, 4)
+	var out []int
+	var ind []int
+	for i, v := range sequence {
+		out = append(out, v)
+		ind = append(ind, i)
+	}
+	assert.Equal(t, slice.Of(0, 1, 2, 3, 4), out)
+	assert.Equal(t, slice.Of(0, 1, 2, 3, 4), ind)
+	out = nil
+	for _, v := range sequence {
+		if v == 1 {
+			break
+		}
+		out = append(out, v)
+	}
+	assert.Equal(t, slice.Of(0), out)
+
+	out = nil
+	var iter = false
+	for _, v := range sequence {
+		iter = true
+		_ = v
+		break
+	}
+	assert.True(t, iter)
+	assert.Nil(t, out)
+}
+
 func Test_OfIndexed(t *testing.T) {
 	indexed := slice.Of("0", "1", "2", "3", "4")
-	result := seq2.OfIndexed(len(indexed), func(i int) string { return indexed[i] })
-	assert.Equal(t, indexed, seq.Slice(seq2.Values(result)))
+	getAt := func(i int) string { return indexed[i] }
+	sequence := seq2.OfIndexed(len(indexed), getAt)
+	assert.Equal(t, indexed, seq.Slice(seq2.Values(sequence)))
+
+	var out []string
+	var iter = false
+	for _, v := range sequence {
+		iter = true
+		if v == "3" {
+			break
+		}
+		out = append(out, v)
+	}
+	assert.True(t, iter)
+	assert.Equal(t, slice.Of("0", "1", "2"), out)
+
+	sequence = seq2.OfIndexed(len(indexed), (func(i int) string)(nil))
+	assert.Nil(t, seq.Slice(seq2.Values(sequence)))
+}
+
+func Test_Series(t *testing.T) {
+	generator := func(prev int) (int, bool) { return prev + 1, prev < 3 }
+	sequence := seq2.Series(-1, generator)
+	assert.Equal(t, slice.Of(-1, 0, 1, 2, 3), seq.Slice(seq2.Values(sequence)))
+	assert.Equal(t, slice.Of(0, 1, 2, 3, 4), seq.Slice(seq2.Keys(sequence)))
+
+	var out []int
+	for _, v := range sequence {
+		out = append(out, v)
+		break
+	}
+	assert.Equal(t, slice.Of(-1), out)
+
+	out = nil
+	for _, v := range sequence {
+		out = append(out, v)
+		if v == 2 {
+			break
+		}
+	}
+	assert.Equal(t, slice.Of(-1, 0, 1, 2), out)
+
+	assert.Nil(t, seq.Slice(seq2.Values(seq2.Series(-1, (func(prev int) (int, bool))(nil)))))
 }
 
 func Test_Map(t *testing.T) {
@@ -69,15 +140,28 @@ func Test_SeqOfNil(t *testing.T) {
 	assert.False(t, iter)
 }
 
-func Test_Seq2OfMap_NilMap(t *testing.T) {
-	var in map[int]int
+func Test_OfMap(t *testing.T) {
+	in := map[int]int{}
 
 	iter := false
 	for _ = range seq2.OfMap(in) {
 		iter = true
 	}
-
 	assert.False(t, iter)
+
+	in[0] = 1
+	for _ = range seq2.OfMap(in) {
+		iter = true
+	}
+	assert.True(t, iter)
+
+	ignoreBreak := false
+	for _ = range seq2.OfMap(in) {
+		break
+		ignoreBreak = true
+	}
+	assert.False(t, ignoreBreak)
+
 }
 
 func Test_ConvertNilSeq(t *testing.T) {

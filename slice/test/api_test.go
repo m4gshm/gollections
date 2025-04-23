@@ -127,6 +127,10 @@ func Test_ReduceeSum(t *testing.T) {
 	s := slice.Of(1, 3, 5, 7, 9, 11)
 	r, _ := slice.Reducee(s, func(i1, i2 int) (int, error) { return i1 + i2, nil })
 	assert.Equal(t, 1+3+5+7+9+11, r)
+
+	r2, err := slice.Reducee(s, func(i1, i2 int) (int, error) { return i1 + i2, op.IfElse(i2 == 7, errors.New("abort"), nil) })
+	assert.Error(t, err)
+	assert.Equal(t, 1+3+5+7, r2)
 }
 
 func Test_AccumSum(t *testing.T) {
@@ -139,6 +143,9 @@ func Test_AccummSum(t *testing.T) {
 	s := slice.Of(1, 3, 5, 7, 9, 11)
 	r, _ := slice.Accumm(100, s, func(i1, i2 int) (int, error) { return i1 + i2, nil })
 	assert.Equal(t, 100+1+3+5+7+9+11, r)
+	r2, err := slice.Accumm(100, s, func(i1, i2 int) (int, error) { return i1 + i2, op.IfElse(i2 == 7, errors.New("abort"), nil) })
+	assert.Error(t, err)
+	assert.Equal(t, 100+1+3+5+7, r2)
 }
 
 func Test_ConvertAndReduce(t *testing.T) {
@@ -338,7 +345,7 @@ func Test_ConvertFilteredWithIndex(t *testing.T) {
 	assert.Equal(t, []string{"6", "13"}, r)
 }
 
-func Test_ConvertFilteredInplace(t *testing.T) {
+func Test_ConvertOK(t *testing.T) {
 	s := slice.Of(1, 3, 4, 5, 7, 8, 9, 11)
 	r := slice.ConvertOK(s, func(i int) (string, bool) { return strconv.Itoa(i), even(i) })
 	assert.Equal(t, []string{"4", "8"}, r)

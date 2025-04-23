@@ -51,6 +51,31 @@ func OfIndexed[T any](amount int, getAt func(int) T) Seq2[int, T] {
 	}
 }
 
+// Series makes a sequence by applying the 'next' function to the previous step generated value.
+func Series[T any](first T, next func(T) (T, bool)) Seq2[int, T] {
+	return func(yield func(int, T) bool) {
+		if next == nil {
+			return
+		}
+		i := 0
+		current := first
+		if !yield(i, current) {
+			return
+		}
+		for {
+			i++
+			next, ok := next(current)
+			if !ok {
+				break
+			}
+			if !yield(i, next) {
+				break
+			}
+			current = next
+		}
+	}
+}
+
 // Filter creates a rangefunc that iterates only those elements for which the 'filter' function returns true.
 func Filter[S ~Seq2[K, V], K, V any](seq S, filter func(K, V) bool) Seq2[K, V] {
 	return func(yield func(K, V) bool) {

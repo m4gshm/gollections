@@ -18,6 +18,30 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func Test_Of(t *testing.T) {
+	sequence := seq.Of(0, 1, 2, 3, 4)
+	var out []int
+	for v := range sequence {
+		out = append(out, v)
+	}
+	assert.Equal(t, slice.Of(0, 1, 2, 3, 4), out)
+	out = nil
+	for v := range sequence {
+		if v == 1 {
+			break
+		}
+		out = append(out, v)
+	}
+	assert.Equal(t, slice.Of(0), out)
+
+	out = nil
+	for v := range sequence {
+		_ = v
+		break
+	}
+	assert.Nil(t, out)
+}
+
 func Test_OfIndexed(t *testing.T) {
 	indexed := slice.Of("0", "1", "2", "3", "4")
 
@@ -26,18 +50,20 @@ func Test_OfIndexed(t *testing.T) {
 	assert.Equal(t, indexed, seq.Slice(sequence))
 
 	var out []string
+	var iter = false
 	for v := range sequence {
+		iter = true
 		if v == "3" {
 			break
 		}
 		out = append(out, v)
 	}
-
+	assert.True(t, iter)
 	assert.Equal(t, slice.Of("0", "1", "2"), out)
 
 	sequence = seq.OfIndexed(len(indexed), (func(i int) string)(nil))
 
-	assert.Empty(t, seq.Slice(sequence))
+	assert.Nil(t, seq.Slice(sequence))
 }
 
 func Test_Series(t *testing.T) {
@@ -61,7 +87,7 @@ func Test_Series(t *testing.T) {
 	}
 	assert.Equal(t, slice.Of(-1, 0, 1, 2), out)
 
-	assert.Empty(t, seq.Slice(seq.Series(-1, (func(prev int) (int, bool))(nil))))
+	assert.Nil(t, seq.Slice(seq.Series(-1, (func(prev int) (int, bool))(nil))))
 }
 
 func Test_Append(t *testing.T) {
@@ -237,14 +263,14 @@ func Test_Flatt(t *testing.T) {
 		}
 	}
 
-	s := seq.Of([][]string{{"1", "2", "3"}, {"4"}, {"_5", "6"}}...)
+	s := seq.Of([][]string{{"1", "2", "3"}, {"4"}, {"_5"}, {"6"}}...)
 	f := func(strInteger []string) ([]int, error) { return slice.Conv(strInteger, strconv.Atoi) }
-	i, err := seqe.Slice(seq.Flatt(s, f))
+	out, err := seqe.Slice(seq.Flatt(s, f))
 
-	assert.Equal(t, []int{1, 2, 3, 4}, i)
+	assert.Equal(t, []int{1, 2, 3, 4}, out)
 	assert.ErrorContains(t, err, "parsing \"_5\"")
 
-	var out []int
+	out = nil
 	for v, err := range seq.Flatt(s, f) {
 		if err != nil {
 			panic(err)
@@ -254,7 +280,14 @@ func Test_Flatt(t *testing.T) {
 			break
 		}
 	}
-	assert.Equal(t, []int{1, 2, 3, 4}, i)
+	assert.Equal(t, []int{1, 2, 3, 4}, out)
+
+	out = nil
+	for v, err := range seq.Flatt(s, f) {
+		_ = err
+		out = append(out, v)
+	}
+	assert.Equal(t, []int{1, 2, 3, 4, 0, 6}, out)
 }
 
 func Test_FlattSeq(t *testing.T) {
@@ -341,11 +374,23 @@ func Test_KeyValue(t *testing.T) {
 func Test_KeyValues(t *testing.T) {
 	s := seq.Of([]int{1, 2}, []int{3})
 	s2 := seq.KeyValues(s, slice.Len, as.Is)
-	k := seq.Slice(seq2.Keys(s2))
-	v := seq.Slice(seq2.Values(s2))
+	keys := seq.Slice(seq2.Keys(s2))
+	vals := seq.Slice(seq2.Values(s2))
 
-	assert.Equal(t, slice.Of(2, 2, 1), k)
-	assert.Equal(t, slice.Of(1, 2, 3), v)
+	assert.Equal(t, slice.Of(2, 2, 1), keys)
+	assert.Equal(t, slice.Of(1, 2, 3), vals)
+
+	keys = nil
+	vals = nil
+	for k, v := range s2 {
+		if v == 3 {
+			break
+		}
+		keys = append(keys, k)
+		vals = append(vals, v)
+	}
+	assert.Equal(t, slice.Of(2, 2), keys)
+	assert.Equal(t, slice.Of(1, 2), vals)
 }
 
 func Test_SeqOfNil(t *testing.T) {
@@ -411,7 +456,7 @@ func Test_AllConverted(t *testing.T) {
 	assert.Empty(t, seq.Slice(seq.Convert[seq.Seq[int]](nil, strconv.Itoa)))
 }
 
-func Test_AllConv(t *testing.T) {
+func Test_Conv(t *testing.T) {
 	from := seq.Of("1", "2", "3", "5", "_7", "8", "9", "11")
 	i := []int{}
 
@@ -427,7 +472,7 @@ func Test_AllConv(t *testing.T) {
 	assert.Equal(t, slice.Of(1, 2, 3, 5, 8, 9, 11), i)
 }
 
-func Test_ConvertFilteredInplace(t *testing.T) {
+func Test_ConvertOK(t *testing.T) {
 	s := seq.Of(1, 3, 4, 5, 7, 8, 9, 11)
 	converter := func(i int) (string, bool) { return strconv.Itoa(i), even(i) }
 	r := seq.ConvertOK(s, converter)
@@ -438,7 +483,7 @@ func Test_ConvertFilteredInplace(t *testing.T) {
 	assert.Empty(t, seq.Slice(r))
 }
 
-func Test_ConvFilteredInplace(t *testing.T) {
+func Test_ConvOK(t *testing.T) {
 	s := seq.Of(1, 3, 4, 5, 7, 8, 9, 11)
 	converter := func(i int) (string, bool, error) { return strconv.Itoa(i), even(i), nil }
 	r := seq.ConvOK(s, converter)

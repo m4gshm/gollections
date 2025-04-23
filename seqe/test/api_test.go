@@ -311,6 +311,12 @@ func Test_Filt(t *testing.T) {
 	r, err = seqe.Slice(l)
 	assert.NoError(t, err)
 	assert.Empty(t, r)
+
+	s = seq.ToSeq2(seq.Of(1, 3, 4, 5, 7, 8, 9, 11), errOn(4))
+	l = seqe.Filt(s, filter)
+	r, err = seqe.Slice(l)
+	assert.Error(t, err)
+	assert.Nil(t, r)
 }
 
 func Test_Filt2(t *testing.T) {
@@ -390,35 +396,88 @@ func Test_AllConverted(t *testing.T) {
 	}
 
 	assert.Equal(t, slice.Of("1", "2", "3", "5", "7", "8", "9", "11"), s)
+
+	from = seq.ToSeq2(seq.Of(1, 2, 3, 5, 7, 8, 9, 11), errOn((7)))
+
+	s = nil
+	for e, err := range seqe.Convert(from, strconv.Itoa) {
+		//ignore err
+		_ = err
+		s = append(s, e)
+	}
+
+	assert.Equal(t, slice.Of("1", "2", "3", "5", "", "8", "9", "11"), s)
 }
 
-func Test_AllConv(t *testing.T) {
+func Test_Conv(t *testing.T) {
 	from := seq.ToSeq2(seq.Of("1", "2", "3", "5", "_7", "8", "9", "11"), noErr)
-	i := []int{}
+	out := []int{}
 
 	for v, err := range seqe.Conv(from, strconv.Atoi) {
 		if err == nil {
-			i = append(i, v)
+			out = append(out, v)
 		}
 	}
 
-	assert.Equal(t, slice.Of(1, 2, 3, 5, 8, 9, 11), i)
+	assert.Equal(t, slice.Of(1, 2, 3, 5, 8, 9, 11), out)
+
+	from = seq.ToSeq2(seq.Of("1", "2", "3", "5", "_7", "8", "9", "11"), errOn("_7"))
+	out = nil
+	for v, err := range seqe.Conv(from, strconv.Atoi) {
+		if err != nil {
+			break
+		}
+		out = append(out, v)
+	}
+	assert.Equal(t, slice.Of(1, 2, 3, 5), out)
 }
 
-func Test_ConvertFilteredInplace(t *testing.T) {
+func Test_ConvertOK(t *testing.T) {
 	s := seq.ToSeq2(seq.Of(1, 3, 4, 5, 7, 8, 9, 11), noErr)
-	r := seqe.ConvertOK(s, func(i int) (string, bool) { return strconv.Itoa(i), even(i) })
+	converter := func(i int) (string, bool) { return strconv.Itoa(i), even(i) }
+	r := seqe.ConvertOK(s, converter)
 	out, err := seqe.Slice(r)
 	assert.Equal(t, []string{"4", "8"}, out)
 	assert.NoError(t, err)
+
+	r = seqe.ConvertOK(seq.SeqE[int](nil), converter)
+	out, err = seqe.Slice(r)
+	assert.NoError(t, err)
+	assert.Empty(t, out)
+	r = seqe.ConvertOK(s, (func(i int) (string, bool))(nil))
+	out, err = seqe.Slice(r)
+	assert.NoError(t, err)
+	assert.Empty(t, out)
+
+	s = seq.ToSeq2(seq.Of(1, 3, 4, 5, 7, 8, 9, 11, 12), errOn(9))
+	r = seqe.ConvertOK(s, converter)
+	out, err = seqe.Slice(r)
+	assert.Equal(t, []string{"4", "8"}, out)
+	assert.ErrorContains(t, err, "abort")
+
+	out = nil
+	for s, err := range r {
+		_ = err
+		out = append(out, s)
+	}
+	assert.Equal(t, []string{"4", "8", "", "12"}, out)
 }
 
-func Test_ConvFilteredInplace(t *testing.T) {
+func Test_ConvOK(t *testing.T) {
 	s := seq.ToSeq2(seq.Of(1, 3, 4, 5, 7, 8, 9, 11), noErr)
-	r := seqe.ConvOK(s, func(i int) (string, bool, error) { return strconv.Itoa(i), even(i), nil })
+	converter := func(i int) (string, bool, error) { return strconv.Itoa(i), even(i), nil }
+	r := seqe.ConvOK(s, converter)
 	o, err := seqe.Slice(r)
 	assert.Equal(t, []string{"4", "8"}, o)
 	assert.NoError(t, err)
+
+	r = seqe.ConvOK(seq.SeqE[int](nil), converter)
+	o, _ = seqe.Slice(r)
+	assert.Empty(t, o)
+
+	r = seqe.ConvOK(s, (func(i int) (string, bool, error))(nil))
+	o, _ = seqe.Slice(r)
+	assert.Empty(t, o)
 
 	r = seqe.ConvOK(s, func(i int) (string, bool, error) {
 		return strconv.Itoa(i), even(i), op.IfElse(i == 9, errors.New("abort"), nil)
