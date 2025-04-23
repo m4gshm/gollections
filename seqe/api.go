@@ -393,14 +393,12 @@ func Flatt[S ~SeqE[From], STo ~[]To, From any, To any](seq S, flattener func(Fro
 		seq(func(v From, err error) bool {
 			if err != nil {
 				var to To
-				yield(to, err)
-				return false
+				return yield(to, err)
 			}
 			elementsTo, err := flattener(v)
 			if err != nil {
 				var t To
-				yield(t, err)
-				return false
+				return yield(t, err)
 			}
 			for _, e := range elementsTo {
 				if !yield(e, nil) {
@@ -437,8 +435,7 @@ func FlattSeq[S ~SeqE[From], STo ~SeqE[To], From any, To any](seq S, flattener f
 		seq(func(v From, err error) bool {
 			if err != nil {
 				var to To
-				yield(to, err)
-				return false
+				return yield(to, err)
 			}
 			elementsTo := flattener(v)
 			for to, err := range elementsTo {
@@ -458,10 +455,7 @@ func Filter[S ~SeqE[T], T any](seq S, filter func(T) bool) SeqE[T] {
 			return
 		}
 		seq(func(t T, err error) bool {
-			if err != nil {
-				yield(t, err)
-				return false
-			} else if filter(t) {
+			if err != nil || filter(t) {
 				return yield(t, err)
 			}
 			return true
