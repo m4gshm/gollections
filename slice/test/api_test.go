@@ -152,6 +152,18 @@ func Test_ConvAndReduce(t *testing.T) {
 	r, err := conv.AndReduce(s, strconv.Atoi, op.Sum[int])
 	assert.NoError(t, err)
 	assert.Equal(t, 1+3+5+7+9+11, r)
+
+	s = slice.Of("1", "3", "5", "_7", "9", "11")
+
+	r, err = conv.AndReduce(s, strconv.Atoi, op.Sum[int])
+	assert.ErrorContains(t, err, "parsing \"_7\": invalid syntax")
+	assert.Equal(t, 1+3+5, r)
+
+	s = slice.Of("_1")
+
+	r, err = conv.AndReduce(s, strconv.Atoi, op.Sum[int])
+	assert.ErrorContains(t, err, "parsing \"_1\": invalid syntax")
+	assert.Equal(t, 0, r)
 }
 
 func Test_Sum(t *testing.T) {
@@ -641,16 +653,30 @@ func Test_Slice_AppendMapResolvv(t *testing.T) {
 }
 
 func Test_Slice_AppendMapResolvOrderr(t *testing.T) {
-	var (
-		even               = func(v int) bool { return v%2 == 0 }
-		order, groups, err = slice.AppendMapResolvOrderr(slice.Of("2", "1", "1", "2", "4", "3", "_1"), func(val string) (bool, int, error) {
-			i, err := strconv.Atoi(val)
-			return even(i), i, err
-		}, func(exists bool, k bool, vr []int, v int) ([]int, error) { return resolv.Slice(exists, k, vr, v), nil }, nil, nil)
-	)
+	kvExtractor := func(val string) (bool, int, error) {
+		i, err := strconv.Atoi(val)
+		return even(i), i, err
+	}
+	resolver := func(exists bool, k bool, vr []int, v int) ([]int, error) { return resolv.Slice(exists, k, vr, v), nil }
+
+	order, groups, err := slice.AppendMapResolvOrderr(slice.Of("2", "1", "1", "2", "4", "3", "_1"), kvExtractor, resolver, nil, nil)
 
 	assert.Equal(t, []int{1, 1, 3}, groups[false])
 	assert.Equal(t, []int{2, 2, 4}, groups[true])
 	assert.Equal(t, []bool{true, false}, order)
 	assert.EqualError(t, err, "strconv.Atoi: parsing \"_1\": invalid syntax")
+
+	order, groups, err = slice.AppendMapResolvOrderr(slice.Of("2", "1", "1", "2", "4", "3", "1"), kvExtractor, resolver, nil, nil)
+	assert.Equal(t, []int{1, 1, 3, 1}, groups[false])
+	assert.Equal(t, []int{2, 2, 4}, groups[true])
+	assert.Equal(t, []bool{true, false}, order)
+	assert.NoError(t, err)
+
+	resolver = func(exists bool, k bool, vr []int, v int) ([]int, error) { return resolv.Slice(exists, k, vr, v), op.IfElse(v == 5, errors.New("abort"), nil) }
+	order, groups, err = slice.AppendMapResolvOrderr(slice.Of("2", "1", "1", "2", "4", "3", "5"), kvExtractor, resolver, nil, nil)
+	assert.Equal(t, []int{1, 1, 3}, groups[false])
+	assert.Equal(t, []int{2, 2, 4}, groups[true])
+	assert.Equal(t, []bool{true, false}, order)
+	assert.EqualError(t, err, "abort")
+
 }
