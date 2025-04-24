@@ -394,10 +394,11 @@ func FlatSeq[S ~Seq[From], STo ~Seq[To], From any, To any](seq S, flattener func
 			return
 		}
 		seq(func(v From) bool {
-			elementsTo := flattener(v)
-			for e := range elementsTo {
-				if !yield(e) {
-					return false
+			if elementsTo := flattener(v); elementsTo != nil {
+				for e := range elementsTo {
+					if !yield(e) {
+						return false
+					}
 				}
 			}
 			return true
@@ -466,10 +467,11 @@ func FlattSeq[S ~Seq[From], STo ~SeqE[To], From any, To any](seq S, flattener fu
 			return
 		}
 		seq(func(v From) bool {
-			elementsTo := flattener(v)
-			for e, err := range elementsTo {
-				if !yield(e, err) {
-					return false
+			if elementsTo := flattener(v); elementsTo != nil {
+				for e, err := range elementsTo {
+					if !yield(e, err) {
+						return false
+					}
 				}
 			}
 			return true

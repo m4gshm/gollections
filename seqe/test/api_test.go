@@ -56,6 +56,9 @@ func Test_AccumSum(t *testing.T) {
 	r, err := seqe.Accum(100, s, op.Sum[int])
 	assert.Equal(t, 100+1+3+5+7+9+11, r)
 	assert.NoError(t, err)
+
+	r, _ = seqe.Sum(s)
+	assert.Equal(t, 1+3+5+7+9+11, r)
 }
 
 func Test_AccummSum(t *testing.T) {
@@ -157,16 +160,21 @@ func Test_ReduceNil(t *testing.T) {
 }
 
 func Test_First(t *testing.T) {
-	result, ok, err := seqe.First(seq.ToSeq2(seq.Of(1, 2, 3, 4, 5, 6), noErr), more.Than(5))
+	sequence := seq.Of(1, 2, 3, 4, 5, 6)
+	result, ok, err := seqe.First(seq.ToSeq2(sequence, noErr), more.Than(5))
 
 	assert.True(t, ok)
 	assert.Equal(t, 6, result)
 	assert.NoError(t, err)
 
-	_, ok, err = seqe.First(seq.ToSeq2(seq.Of(1, 2, 3, 4, 5, 6), errOn(1)), more.Than(5))
+	_, ok, err = seqe.First(seq.ToSeq2(sequence, errOn(1)), more.Than(5))
 
 	assert.False(t, ok)
 	assert.ErrorContains(t, err, "abort")
+
+	ok, err = seqe.HasAny(seq.ToSeq2(sequence, noErr), more.Than(5))
+	assert.True(t, ok)
+	assert.NoError(t, err)
 }
 
 func Test_Firstt(t *testing.T) {
@@ -203,6 +211,18 @@ func Test_Flat(t *testing.T) {
 	assert.Equal(t, []int{1, 2, 3, 4, 5, 6}, s)
 	assert.NoError(t, err)
 
+	var out []int
+	for v, err := range f {
+		if err != nil {
+			panic(err)
+		}
+		out = append(out, v)
+		if v == 5 {
+			break
+		}
+	}
+	assert.Equal(t, []int{1, 2, 3, 4, 5}, out)
+
 	md = seq.ToSeq2(seq.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...), errIfContains(5))
 	f = seqe.Flat(md, as.Is)
 	s, err = seqe.Slice(f)
@@ -211,79 +231,110 @@ func Test_Flat(t *testing.T) {
 }
 
 func Test_FlatSeq(t *testing.T) {
-	md := seq.ToSeq2(seq.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...), noErr)
+	md := seq.ToSeq2(seq.Of([][]int{{1, 2, 3}, {4}, {5}, {6}}...), noErr)
 	f := seqe.FlatSeq(md, slices.Values)
 	s, err := seqe.Slice(f)
-	e := []int{1, 2, 3, 4, 5, 6}
-	assert.Equal(t, e, s)
+	assert.Equal(t, []int{1, 2, 3, 4, 5, 6}, s)
 	assert.NoError(t, err)
 
-	md = seq.ToSeq2(seq.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...), errIfContains(5))
+	var out []int
+	for v, err := range f {
+		if err != nil {
+			panic(err)
+		}
+		out = append(out, v)
+		if v == 5 {
+			break
+		}
+	}
+	assert.Equal(t, []int{1, 2, 3, 4, 5}, out)
+
+	md = seq.ToSeq2(seq.Of([][]int{{1, 2, 3}, {4}, {5}, {6}}...), errIfContains(5))
 	f = seqe.FlatSeq(md, slices.Values)
 	s, err = seqe.Slice(f)
 	assert.Equal(t, []int{1, 2, 3, 4}, s)
 	assert.ErrorContains(t, err, "abort")
 
+	out = nil
+	for i, err := range seqe.FlatSeq(md, func(i []int) seq.Seq[int] {
+		if len(i) == 1 {
+			return nil
+		}
+		return seq.Of(i[0:1]...)
+	}) {
+		if err == nil {
+			out = append(out, i)
+		}
+	}
+	assert.Equal(t, []int{1}, out)
 }
 
 func Test_Flatt(t *testing.T) {
 	var (
 		input     iter.Seq2[[]string, error]
 		flattener func([]string) ([]int, error)
-		out       seq.SeqE[int]
 	)
-	out = seqe.Flatt(input, flattener)
-	for i, err := range out {
+
+	for _, err := range seqe.Flatt(input, flattener) {
 		if err != nil {
 			panic(err)
 		}
-		_ = i
 	}
 
-	s := seq.ToSeq2(seq.Of([][]string{{"1", "2", "3"}, {"4"}, {"_5", "6"}}...), noErr)
+	s := seq.ToSeq2(seq.Of([][]string{{"1", "2", "3"}, {"4"}, {"_5"}, {"6"}}...), noErr)
 	f := func(strInteger []string) ([]int, error) { return slice.Conv(strInteger, strconv.Atoi) }
-	i, err := seqe.Slice(seqe.Flatt(s, f))
+	out, err := seqe.Slice(seqe.Flatt(s, f))
 
-	assert.Equal(t, []int{1, 2, 3, 4}, i)
+	assert.Equal(t, []int{1, 2, 3, 4}, out)
 	assert.ErrorContains(t, err, "parsing \"_5\"")
 
-	s = seq.ToSeq2(seq.Of([][]string{{"1", "2", "3"}, {"4"}, {"_5", "6"}}...), errIfContains("_5"))
-	f = func(strInteger []string) ([]int, error) { return slice.Conv(strInteger, strconv.Atoi) }
-	i, err = seqe.Slice(seqe.Flatt(s, f))
+	s = seq.ToSeq2(seq.Of([][]string{{"1", "2", "3"}, {"4"}, {"_5"}, {"6"}}...), errIfContains("_5"))
+	out, err = seqe.Slice(seqe.Flatt(s, f))
 
-	assert.Equal(t, []int{1, 2, 3, 4}, i)
+	assert.Equal(t, []int{1, 2, 3, 4}, out)
 	assert.ErrorContains(t, err, "abort")
+
+	out = nil
+	for v, err := range seqe.Flatt(s, f) {
+		_ = err
+		out = append(out, v)
+	}
+	assert.Equal(t, []int{1, 2, 3, 4, 0, 6}, out)
 }
 
 func Test_FlattSeq(t *testing.T) {
 	var (
 		input     iter.Seq2[[]string, error]
 		flattener func([]string) seq.SeqE[int]
-		out       seq.SeqE[int]
 	)
-	out = seqe.FlattSeq(input, flattener)
-	for i, err := range out {
+	for i, err := range seqe.FlattSeq(input, flattener) {
 		if err != nil {
 			panic(err)
 		}
 		_ = i
 	}
 
-	s := seq.ToSeq2(seq.Of([][]string{{"1", "2", "3"}, {"4"}, {"_5", "6"}}...), noErr)
+	s := seq.ToSeq2(seq.Of([][]string{{"1", "2", "3"}, {"4"}, {"_5"}, {"6"}}...), noErr)
 	f := func(strInteger []string) seq.SeqE[int] { return seq.Conv(seq.Of(strInteger...), strconv.Atoi) }
 	i, err := seqe.Slice(seqe.FlattSeq(s, f))
 
 	assert.Equal(t, []int{1, 2, 3, 4}, i)
 	assert.ErrorContains(t, err, "parsing \"_5\"")
 
-	s = seq.ToSeq2(seq.Of([][]string{{"1", "2", "3"}, {"4"}, {"_5", "6"}}...), func(s []string) ([]string, error) {
+	s = seq.ToSeq2(seq.Of([][]string{{"1", "2", "3"}, {"4"}, {"_5"}, {"6"}}...), func(s []string) ([]string, error) {
 		return s, op.IfElse(slice.Contains(s, "_5"), errors.New("abort"), nil)
 	})
-	f = func(strInteger []string) seq.SeqE[int] { return seq.Conv(seq.Of(strInteger...), strconv.Atoi) }
 	i, err = seqe.Slice(seqe.FlattSeq(s, f))
 
 	assert.Equal(t, []int{1, 2, 3, 4}, i)
 	assert.ErrorContains(t, err, "abort")
+
+	var out []int
+	for v, err := range seqe.FlattSeq(s, f) {
+		_ = err
+		out = append(out, v)
+	}
+	assert.Equal(t, []int{1, 2, 3, 4, 0, 6}, out)
 }
 
 func Test_Filter(t *testing.T) {

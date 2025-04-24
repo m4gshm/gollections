@@ -105,6 +105,9 @@ func Test_AccumSum(t *testing.T) {
 	assert.Equal(t, 100+1+3+5+7+9+11, r)
 	r = seq.Accum(100, s, (func(a int, b int) int)(nil))
 	assert.Equal(t, 100, r)
+
+	r = seq.Sum(s)
+	assert.Equal(t, 1+3+5+7+9+11, r)
 }
 
 func Test_AccummSum(t *testing.T) {
@@ -189,6 +192,8 @@ func Test_First(t *testing.T) {
 	_, ok = seq.First(sequence, nil)
 	assert.False(t, ok)
 
+	ok = seq.HasAny(sequence, more.Than(5))
+	assert.True(t, ok)
 }
 
 func Test_Firstt(t *testing.T) {
@@ -221,8 +226,8 @@ var even = func(v int) bool { return v%2 == 0 }
 func Test_Flat(t *testing.T) {
 	md := seq.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...)
 	f := seq.Flat(md, as.Is)
-
-	assert.Equal(t, []int{1, 2, 3, 4, 5, 6}, seq.Slice(f))
+	s := seq.Slice(f)
+	assert.Equal(t, []int{1, 2, 3, 4, 5, 6}, s)
 
 	var out []int
 	for v := range f {
@@ -236,12 +241,32 @@ func Test_Flat(t *testing.T) {
 }
 
 func Test_FlatSeq(t *testing.T) {
-	md := seq.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...)
+	md := seq.Of([][]int{{1, 2, 3}, {4}, {5}, {6}}...)
 	f := seq.FlatSeq(md, slices.Values)
-
-	assert.Equal(t, []int{1, 2, 3, 4, 5, 6}, seq.Slice(f))
+	s := seq.Slice(f)
+	assert.Equal(t, []int{1, 2, 3, 4, 5, 6}, s)
 
 	var out []int
+	for v := range f {
+		out = append(out, v)
+		if v == 5 {
+			break
+		}
+	}
+	assert.Equal(t, []int{1, 2, 3, 4, 5}, out)
+
+	out = nil
+	for i := range seq.FlatSeq(md, func(i []int) seq.Seq[int] {
+		if len(i) == 1 {
+			return nil
+		}
+		return seq.Of(i[0:1]...)
+	}) {
+		out = append(out, i)
+	}
+	assert.Equal(t, []int{1}, out)
+
+	out = nil
 	for v := range f {
 		out = append(out, v)
 		if v == 5 {
@@ -302,16 +327,15 @@ func Test_FlattSeq(t *testing.T) {
 		_ = i
 	}
 
-	s := seq.Of([][]string{{"1", "2", "3"}, {"4"}, {"_5", "6"}}...)
+	s := seq.Of([][]string{{"1", "2", "3"}, {"4"}, {"_5"}, {"6"}}...)
 	f := func(strInteger []string) seq.SeqE[int] { return seq.Conv(seq.Of(strInteger...), strconv.Atoi) }
-	flatSeq := seq.FlattSeq(s, f)
-	i, err := seqe.Slice(flatSeq)
+	i, err := seqe.Slice(seq.FlattSeq(s, f))
 
 	assert.Equal(t, []int{1, 2, 3, 4}, i)
 	assert.ErrorContains(t, err, "parsing \"_5\"")
 
 	var out []int
-	for v, err := range flatSeq {
+	for v, err := range seq.FlattSeq(s, f) {
 		if err != nil {
 			panic(err)
 		}
@@ -321,6 +345,13 @@ func Test_FlattSeq(t *testing.T) {
 		}
 	}
 	assert.Equal(t, []int{1, 2, 3, 4}, i)
+
+	out = nil
+	for v, err := range seq.FlattSeq(s, f) {
+		_ = err
+		out = append(out, v)
+	}
+	assert.Equal(t, []int{1, 2, 3, 4, 0, 6}, out)
 }
 
 func Test_Filter(t *testing.T) {
