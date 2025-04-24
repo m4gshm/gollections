@@ -141,7 +141,7 @@ func Test_SeqOfNil(t *testing.T) {
 }
 
 func Test_OfMap(t *testing.T) {
-	in := map[int]int{}
+	in := map[int]string{}
 
 	iter := false
 	for _ = range seq2.OfMap(in) {
@@ -149,19 +149,20 @@ func Test_OfMap(t *testing.T) {
 	}
 	assert.False(t, iter)
 
-	in[0] = 1
+	in[0] = "1"
 	for _ = range seq2.OfMap(in) {
 		iter = true
 	}
 	assert.True(t, iter)
 
 	ignoreBreak := false
-	for _ = range seq2.OfMap(in) {
-		break
+	for key := range seq2.OfMap(in) {
+		if key == 0 {
+			break
+		}
 		ignoreBreak = true
 	}
 	assert.False(t, ignoreBreak)
-
 }
 
 func Test_ConvertNilSeq(t *testing.T) {

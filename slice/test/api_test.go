@@ -483,6 +483,23 @@ func Test_FiltAndConv(t *testing.T) {
 	assert.Equal(t, slice.Of(8, 16), r)
 }
 
+func Test_AppendFiltAndConv(t *testing.T) {
+	s := slice.Of(1, 3, 4, 5, 7, 8, 9, 11)
+	r, err := slice.AppendFiltAndConv(s, []int{}, func(v int) (bool, error) { return v%2 == 0, nil }, func(i int) (int, error) { return i * 2, nil })
+	assert.Equal(t, slice.Of(8, 16), r)
+	assert.NoError(t, err)
+
+	r, err = slice.AppendFiltAndConv(s, []int{}, func(v int) (bool, error) { return v%2 == 0, op.IfElse(v == 9, errors.New("abort"), nil) }, func(i int) (int, error) { return i * 2, nil })
+
+	assert.Equal(t, slice.Of(8, 16), r)
+	assert.ErrorContains(t, err, "abort")
+
+	r, err = slice.AppendFiltAndConv(s, []int{}, func(v int) (bool, error) { return v%2 == 0, nil }, func(i int) (int, error) { return i * 2, op.IfElse(i == 8, errors.New("abort"), nil) })
+
+	assert.Equal(t, slice.Of(8), r)
+	assert.ErrorContains(t, err, "abort")
+}
+
 func Test_StringRepresentation(t *testing.T) {
 	var (
 		expected = fmt.Sprint(slice.Of(1, 2, 3, 4))
