@@ -128,7 +128,7 @@ func Firstt[T any](next func() (T, bool), predicate func(T) (bool, error)) (v T,
 		if out, ok := next(); !ok {
 			return out, false, nil
 		} else if ok, err := predicate(out); err != nil || ok {
-			return out, ok, err
+			return out, ok && err == nil, err
 		}
 	}
 }
