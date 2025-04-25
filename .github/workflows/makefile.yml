@@ -3,6 +3,7 @@ name: Run Tests
 on:
   push:
     branches:
+      - master**
       - master
       - main
       - dev
@@ -27,7 +28,7 @@ jobs:
       - name: checkout
         uses: actions/checkout@v3
       - name: run tests
-        uses: docker://golang:1.22-bullseye
+        uses: docker://golang:1.24-bullseye
         with:
           args: make build lint bench cover-console-out
 

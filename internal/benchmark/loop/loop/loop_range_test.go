@@ -6,6 +6,7 @@ import (
 	"github.com/m4gshm/gollections/collection/mutable"
 	"github.com/m4gshm/gollections/convert/ptr"
 	"github.com/m4gshm/gollections/loop"
+	"github.com/m4gshm/gollections/seq"
 	"github.com/m4gshm/gollections/slice"
 )
 
@@ -30,7 +31,7 @@ type benchCase struct {
 	load func(int)
 }
 
-var cases = []benchCase{{"high", HighLoad}, {"mid", MidLoad}, {"low", LowLoad}}
+var cases = []benchCase{ /*{"high", HighLoad}, {"mid", MidLoad},*/ {"low", LowLoad}}
 
 func Benchmark_SliceRange_Iterating(b *testing.B) {
 	integers := slice.Range(0, max)
@@ -38,6 +39,18 @@ func Benchmark_SliceRange_Iterating(b *testing.B) {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				for _, v := range integers {
+					casee.load(v)
+				}
+			}
+		})
+	}
+}
+
+func Benchmark_SeqRange_Iterating(b *testing.B) {
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for v := range seq.Range(0, max) {
 					casee.load(v)
 				}
 			}
@@ -67,6 +80,19 @@ func Benchmark_LoopRange_Iterating2(b *testing.B) {
 				for ok {
 					casee.load(v)
 					v, ok = next()
+				}
+			}
+		})
+	}
+}
+
+func Benchmark_LoopRange_Iterating3(b *testing.B) {
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				next := loop.Range(0, max)
+				for v := range next.All {
+					casee.load(v)
 				}
 			}
 		})

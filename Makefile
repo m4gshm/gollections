@@ -28,8 +28,7 @@ clean:
 .PHONY: build
 build:
 	$(info #Building...)
-	# go env -w GOEXPERIMENT=rangefunc,newinliner	
-	go env -w GOEXPERIMENT=rangefunc
+	go env -w GOEXPERIMENT=newinliner
 	go build ./...
 
 .PHONY: builda
@@ -42,8 +41,7 @@ builda:
 bench:
 	$(info #Running benchmarks...)
 	# go test -gcflags=-d=loopvar=3 -benchtime 1s -bench . -benchmem ./...
-	# go env -w GOEXPERIMENT=rangefunc,newinliner
-	go env -w GOEXPERIMENT=rangefunc
+	go env -w GOEXPERIMENT=newinliner
 	go test -benchtime 1s -bench . -benchmem ./...
 
 .PHONY: update
@@ -57,11 +55,11 @@ lint:
 	$(info #Lints...)
 	go install golang.org/x/tools/cmd/goimports@latest
 	goimports -w .
-	# go vet ./...
+	go vet ./...
 	# go install github.com/tetafro/godot/cmd/godot@latest
 	# godot .
-	go install github.com/kisielk/errcheck@latest
-	errcheck -ignoretests ./...
+	# go install github.com/kisielk/errcheck@latest
+	# errcheck -ignoretests ./...
 	# go install github.com/alexkohler/nakedret/cmd/nakedret@latest
 	# nakedret ./...
 	# go install golang.org/x/lint/golint@latest
@@ -76,3 +74,7 @@ readme:
 	$(info #README.md...)
 	asciidoctor -b docbook internal/docs/readme.adoc 
 	pandoc -f docbook -t gfm internal/docs/readme.xml -o README.md	
+
+.PHONY: pkgsite
+pkgsite:
+	go install golang.org/x/pkgsite/cmd/pkgsite@latest && pkgsite 

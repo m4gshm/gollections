@@ -8,8 +8,8 @@ import (
 
 	"github.com/m4gshm/gollections/collection/mutable/ordered"
 	"github.com/m4gshm/gollections/collection/mutable/ordered/set"
-	"github.com/m4gshm/gollections/collection/mutable/vector"
 	"github.com/m4gshm/gollections/convert/ptr"
+	"github.com/m4gshm/gollections/seq"
 
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
@@ -23,6 +23,11 @@ func Test_Set_From(t *testing.T) {
 	assert.Equal(t, slice.Of(1, 2, 3, 4), set.Slice())
 }
 
+func Test_Set_FromSeq(t *testing.T) {
+	set := set.FromSeq(seq.Of(1, 1, 2, 2, 3, 4, 3, 2, 1))
+	assert.Equal(t, slice.Of(1, 2, 3, 4), set.Slice())
+}
+
 func Test_Set_Iterate(t *testing.T) {
 	set := set.Of(1, 1, 2, 4, 3, 1)
 	values := set.Slice()
@@ -32,7 +37,7 @@ func Test_Set_Iterate(t *testing.T) {
 	expected := slice.Of(1, 2, 4, 3)
 	assert.Equal(t, expected, values)
 
-	iterSlice := loop.Slice[int](set.Loop())
+	iterSlice := loop.Slice(set.Loop())
 	assert.Equal(t, expected, iterSlice)
 
 	loopSlice := loop.Slice(ptr.Of(set.Head()).Next)
@@ -63,8 +68,8 @@ func Test_Set_AddVerify(t *testing.T) {
 
 func Test_Set_AddAll(t *testing.T) {
 	set := set.NewCap[int](0)
-	set.AddAll(vector.Of(1, 2))
-	set.AddAll(vector.Of(4, 3))
+	set.AddAll(seq.Of(1, 2))
+	set.AddAll(seq.Of(4, 3))
 
 	values := set.Slice()
 
@@ -73,12 +78,12 @@ func Test_Set_AddAll(t *testing.T) {
 
 func Test_Set_AddAllNew(t *testing.T) {
 	set := set.NewCap[int](0)
-	added := set.AddAllNew(vector.Of(1, 2))
+	added := set.AddAllNew(seq.Of(1, 2))
 	assert.True(t, added)
 	//4, 3 are new
-	added = set.AddAllNew(vector.Of(1, 4, 3))
+	added = set.AddAllNew(seq.Of(1, 4, 3))
 	assert.True(t, added)
-	added = set.AddAllNew(vector.Of(2, 4, 3))
+	added = set.AddAllNew(seq.Of(2, 4, 3))
 	assert.False(t, added)
 
 	values := set.Slice()
@@ -161,7 +166,7 @@ func Test_Set_Nil(t *testing.T) {
 	set.Add(1, 2, 3)
 	set.Add(nils...)
 	set.AddOne(4)
-	set.AddAll(set)
+	set.AddAll(set.All)
 
 	set.Delete(1, 2, 3)
 	set.Delete(nils...)
@@ -188,7 +193,7 @@ func Test_Set_Zero(t *testing.T) {
 	assert.False(t, mset.IsEmpty())
 	mset.Add(nils...)
 	mset.AddOne(4)
-	mset.AddAll(&mset)
+	mset.AddAll(mset.All)
 
 	assert.Equal(t, slice.Of(1, 2, 3, 4), mset.Slice())
 
@@ -215,7 +220,7 @@ func Test_Set_new(t *testing.T) {
 	assert.False(t, mset.IsEmpty())
 	mset.Add(nils...)
 	mset.AddOne(4)
-	mset.AddAll(mset)
+	mset.AddAll(mset.All)
 
 	s := mset.Slice()
 	assert.Equal(t, slice.Of(1, 2, 3, 4), s)

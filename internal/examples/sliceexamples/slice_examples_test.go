@@ -85,7 +85,7 @@ func Test_Clone(t *testing.T) {
 	)
 
 	assert.Equal(t, entities, c)
-	assert.NotSame(t, entities, c)
+	assert.NotSame(t, &entities, &c)
 
 	for i := range entities {
 		assert.Same(t, entities[i], c[i])
@@ -100,7 +100,7 @@ func Test_DeepClone(t *testing.T) {
 	)
 
 	assert.Equal(t, entities, c)
-	assert.NotSame(t, entities, c)
+	assert.NotSame(t, &entities, &c)
 
 	for i := range entities {
 		assert.Equal(t, entities[i], c[i])

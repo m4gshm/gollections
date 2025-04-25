@@ -8,6 +8,7 @@ import (
 	"github.com/m4gshm/gollections/collection/mutable"
 	"github.com/m4gshm/gollections/collection/mutable/vector"
 	"github.com/m4gshm/gollections/loop"
+	"github.com/m4gshm/gollections/seq"
 
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
@@ -98,7 +99,7 @@ func Test_Vector_Nil(t *testing.T) {
 	vec.Add(1, 2, 3)
 	vec.Add(nils...)
 	vec.AddOne(4)
-	vec.AddAll(vec)
+	vec.AddAll(vec.All)
 
 	vec.Delete(1, 2, 3)
 	vec.Delete(nils...)
@@ -142,7 +143,7 @@ func Test_Vector_Zero(t *testing.T) {
 	vec.Add("a", "b", "c")
 	vec.Add(nilValues...)
 	vec.AddOne("d")
-	vec.AddAll(&vec)
+	vec.AddAll(vec.All)
 
 	vec.Delete(0, 1, 2)
 	var nilIndexes []int
@@ -194,7 +195,7 @@ func Test_Vector_new(t *testing.T) {
 	vec.Add("a", "b", "c")
 	vec.Add(nilValues...)
 	vec.AddOne("d")
-	vec.AddAll(vec)
+	vec.AddAll(vec.All)
 
 	vec.Delete(0, 1, 2)
 	var nilIndexes []int
@@ -241,7 +242,7 @@ func Test_Vector_new(t *testing.T) {
 
 func Test_Vector_AddAllOfSelf(t *testing.T) {
 	vec := vector.Of(1, 2, 3)
-	vec.AddAll(vec)
+	vec.AddAll(vec.All)
 	assert.Equal(t, vector.Of(1, 2, 3, 1, 2, 3), vec)
 }
 
@@ -281,9 +282,9 @@ func Test_Vector_Add(t *testing.T) {
 
 func Test_Vector_AddAll(t *testing.T) {
 	vec := vector.NewCap[int](0)
-	vec.AddAll(vector.Of(1, 1, 2, 4, 3, 1))
+	vec.AddAll(seq.Of(1, 1, 2, 4, 3, 1))
 	assert.Equal(t, slice.Of(1, 1, 2, 4, 3, 1), vec.Slice())
-	vec.AddAll(vector.Of(1))
+	vec.AddAll(seq.Of(1))
 	assert.Equal(t, slice.Of(1, 1, 2, 4, 3, 1, 1), vec.Slice())
 }
 

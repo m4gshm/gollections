@@ -331,9 +331,9 @@ func TrackOrderedWhile[M ~map[K]V, K comparable, V any](order []K, elements M, c
 }
 
 // TrackOrderedValuesWhile applies the 'consumer' function for every value from the 'elements' map in order of the 'order' slice until the consumer returns false.
-func TrackOrderedValuesWhile[M ~map[K]V, K comparable, V any](order []K, elements M, consumer func(V) bool) {
-	for _, key := range order {
-		if !consumer(elements[key]) {
+func TrackOrderedValuesWhile[M ~map[K]V, K comparable, V any](order []K, elements M, consumer func(int, V) bool) {
+	for i, key := range order {
+		if !consumer(i, elements[key]) {
 			return
 		}
 	}

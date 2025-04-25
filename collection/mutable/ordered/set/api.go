@@ -1,4 +1,4 @@
-// Package set provides mutable ordered.Set constructors and helpers
+// Package set provides mutable [github.com/m4gshm/gollections/collection/ordered.Set] constructors and helpers
 package set
 
 import (
@@ -8,6 +8,7 @@ import (
 	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/collection/mutable/ordered"
 	"github.com/m4gshm/gollections/loop"
+	"github.com/m4gshm/gollections/seq"
 )
 
 // Of instantiates Set with predefined elements.
@@ -18,6 +19,11 @@ func Of[T comparable](elements ...T) *ordered.Set[T] {
 // From instantiates a set with elements retrieved by the 'next' function
 func From[T comparable](next func() (T, bool)) *ordered.Set[T] {
 	return ordered.SetFromLoop(next)
+}
+
+// FromSeq creates a set with elements retrieved by the seq.
+func FromSeq[T comparable](seq seq.Seq[T]) *ordered.Set[T] {
+	return ordered.SetFromSeq(seq)
 }
 
 // Empty instantiates Set with zero capacity.
@@ -32,7 +38,7 @@ func NewCap[T comparable](capacity int) *ordered.Set[T] {
 
 // Sort copy the specified set with sorted elements
 func Sort[T comparable, O constraints.Ordered](s *ordered.Set[T], by func(T) O) *ordered.Set[T] {
-	return collection.Sort[*ordered.Set[T]](s, by)
+	return collection.Sort(s, by)
 }
 
 // Convert returns a loop that applies the 'converter' function to the collection elements

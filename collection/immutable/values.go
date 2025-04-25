@@ -27,26 +27,27 @@ var (
 	_ fmt.Stringer               = MapValues[int, any]{}
 )
 
-// All is used to iterate through the collection using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
+// All is used to iterate through the collection using `for val := range`.
 func (m MapValues[K, V]) All(consumer func(V) bool) {
 	map_.TrackValuesWhile(m.elements, consumer)
 }
 
 // Loop creates a loop to iterate through the collection.
+// Deprecated: replaced by [MapValues.All].
 func (m MapValues[K, V]) Loop() loop.Loop[V] {
 	h := m.Head()
 	return (&h).Next
 }
 
-// Deprecated: Head is deprecated. Will be replaced by rance-over function iterator.
 // Head creates an iterator to iterate through the collection.
+// Deprecated: replaced by [MapValues.All].
 func (m MapValues[K, V]) Head() map_.ValIter[K, V] {
 	return map_.NewValIter(m.elements)
 }
 
-// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
+// Deprecated: replaced by [MapValues.All].
 func (m MapValues[K, V]) First() (map_.ValIter[K, V], V, bool) {
 	var (
 		iterator  = m.Head()
@@ -62,7 +63,7 @@ func (m MapValues[K, V]) Len() int {
 
 // IsEmpty returns true if the collection is empty
 func (m MapValues[K, V]) IsEmpty() bool {
-	return m.Len() == 0
+	return collection.IsEmpty(m)
 }
 
 // Slice collects the values to a slice

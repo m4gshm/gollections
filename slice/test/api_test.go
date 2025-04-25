@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"runtime"
+	"slices"
 	"strconv"
 	"testing"
 	"unsafe"
@@ -22,6 +23,7 @@ import (
 	"github.com/m4gshm/gollections/op/delay/string_/wrap"
 	"github.com/m4gshm/gollections/predicate/eq"
 	"github.com/m4gshm/gollections/predicate/more"
+	"github.com/m4gshm/gollections/seq"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/clone"
 	"github.com/m4gshm/gollections/slice/clone/reverse"
@@ -77,7 +79,7 @@ func Test_Clone(t *testing.T) {
 	)
 
 	assert.Equal(t, entities, c)
-	assert.NotSame(t, entities, c)
+	assert.NotSame(t, &entities, &c)
 
 	for i := range entities {
 		assert.Same(t, entities[i], c[i])
@@ -96,7 +98,7 @@ func Test_DeepClone(t *testing.T) {
 	)
 
 	assert.Equal(t, entities, c)
-	assert.NotSame(t, entities, c)
+	assert.NotSame(t, &entities, &c)
 
 	for i := range entities {
 		assert.Equal(t, entities[i], c[i])
@@ -125,6 +127,10 @@ func Test_ReduceeSum(t *testing.T) {
 	s := slice.Of(1, 3, 5, 7, 9, 11)
 	r, _ := slice.Reducee(s, func(i1, i2 int) (int, error) { return i1 + i2, nil })
 	assert.Equal(t, 1+3+5+7+9+11, r)
+
+	r2, err := slice.Reducee(s, func(i1, i2 int) (int, error) { return i1 + i2, op.IfElse(i2 == 7, errors.New("abort"), nil) })
+	assert.Error(t, err)
+	assert.Equal(t, 1+3+5+7, r2)
 }
 
 func Test_AccumSum(t *testing.T) {
@@ -137,6 +143,9 @@ func Test_AccummSum(t *testing.T) {
 	s := slice.Of(1, 3, 5, 7, 9, 11)
 	r, _ := slice.Accumm(100, s, func(i1, i2 int) (int, error) { return i1 + i2, nil })
 	assert.Equal(t, 100+1+3+5+7+9+11, r)
+	r2, err := slice.Accumm(100, s, func(i1, i2 int) (int, error) { return i1 + i2, op.IfElse(i2 == 7, errors.New("abort"), nil) })
+	assert.Error(t, err)
+	assert.Equal(t, 100+1+3+5+7, r2)
 }
 
 func Test_ConvertAndReduce(t *testing.T) {
@@ -150,6 +159,18 @@ func Test_ConvAndReduce(t *testing.T) {
 	r, err := conv.AndReduce(s, strconv.Atoi, op.Sum[int])
 	assert.NoError(t, err)
 	assert.Equal(t, 1+3+5+7+9+11, r)
+
+	s = slice.Of("1", "3", "5", "_7", "9", "11")
+
+	r, err = conv.AndReduce(s, strconv.Atoi, op.Sum[int])
+	assert.ErrorContains(t, err, "parsing \"_7\": invalid syntax")
+	assert.Equal(t, 1+3+5, r)
+
+	s = slice.Of("_1")
+
+	r, err = conv.AndReduce(s, strconv.Atoi, op.Sum[int])
+	assert.ErrorContains(t, err, "parsing \"_1\": invalid syntax")
+	assert.Equal(t, 0, r)
 }
 
 func Test_Sum(t *testing.T) {
@@ -238,6 +259,16 @@ func Test_ConvOK(t *testing.T) {
 	var expected *strconv.NumError
 	assert.ErrorAs(t, err, &expected)
 	assert.Equal(t, []int{4, 8}, r)
+
+	s = slice.Of("1", "3", "4", "5", "7", "8", "9", "11", "12")
+	r, err = slice.ConvOK(s, func(v string) (int, bool, error) {
+		i, err := strconv.Atoi(v)
+		return i, true, err
+
+	})
+	assert.NoError(t, err)
+	assert.Equal(t, []int{1, 3, 4, 5, 7, 8, 9, 11, 12}, r)
+
 }
 
 func Test_Conv(t *testing.T) {
@@ -314,7 +345,7 @@ func Test_ConvertFilteredWithIndex(t *testing.T) {
 	assert.Equal(t, []string{"6", "13"}, r)
 }
 
-func Test_ConvertFilteredInplace(t *testing.T) {
+func Test_ConvertOK(t *testing.T) {
 	s := slice.Of(1, 3, 4, 5, 7, 8, 9, 11)
 	r := slice.ConvertOK(s, func(i int) (string, bool) { return strconv.Itoa(i), even(i) })
 	assert.Equal(t, []string{"4", "8"}, r)
@@ -326,34 +357,68 @@ func Test_ConvertFilteredWithIndexInPlace(t *testing.T) {
 	assert.Equal(t, []string{"6", "13"}, r)
 }
 
-func Test_Flatt(t *testing.T) {
+func Test_Flat(t *testing.T) {
 	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
-	f := slice.Flat(md, func(i []int) []int { return i })
+	f := slice.Flat(md, as.Is)
 	e := []int{1, 2, 3, 4, 5, 6}
 	assert.Equal(t, e, f)
 }
 
-func Test_Flat(t *testing.T) {
+func Test_FlatSeq(t *testing.T) {
 	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
-	f, err := slice.Flatt(md, func(i []int) ([]int, error) { return i, op.IfElse(len(i) == 2, errors.New("abort"), nil) })
-	assert.Error(t, err)
-	e := []int{1, 2, 3, 4}
+	f := slice.FlatSeq(md, slices.Values)
+	e := []int{1, 2, 3, 4, 5, 6}
 	assert.Equal(t, e, f)
 }
 
-func Benchmark_Flatt(b *testing.B) {
+func Test_Flatt(t *testing.T) {
+	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
+	f, err := slice.Flatt(md, func(i []int) ([]int, error) { return i, op.IfElse(len(i) == 2, errors.New("abort"), nil) })
+	assert.Error(t, err)
+	assert.Equal(t, []int{1, 2, 3, 4}, f)
+
+	f, err = slice.Flatt(md, func(i []int) ([]int, error) { return i, nil })
+	assert.NoError(t, err)
+	assert.Equal(t, []int{1, 2, 3, 4, 5, 6}, f)
+}
+
+func Test_FlattSeq(t *testing.T) {
+	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
+	transform := func(i int) (int, error) {
+		return i, op.IfElse(i == 5, errors.New("abort"), nil)
+	}
+	f, err := slice.FlattSeq(md, func(i []int) seq.SeqE[int] { return seq.ToSeq2(seq.Of(i...), transform) })
+	assert.Error(t, err)
+	assert.Equal(t, []int{1, 2, 3, 4}, f)
+
+	f, err = slice.FlattSeq(md, func(i []int) seq.SeqE[int] {
+		return seq.ToSeq2(seq.Of(i...), func(i int) (int, error) { return i, nil })
+	})
+	assert.NoError(t, err)
+	assert.Equal(t, []int{1, 2, 3, 4, 5, 6}, f)
+
+}
+
+func Test_FlatAndConvert(t *testing.T) {
+	md := slice.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...)
+	f := slice.FlatAndConvert(md, func(i []int) []int { return i }, strconv.Itoa)
+	e := []string{"1", "2", "3", "4", "5", "6"}
+	assert.Equal(t, e, f)
+}
+
+func Benchmark_Flat(b *testing.B) {
 	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
 
 	for i := 0; i < b.N; i++ {
-		_ = slice.Flat(md, func(i []int) []int { return i })
+		_ = slice.Flat(md, as.Is)
 	}
 }
 
-func Benchmark_Flatt_Convert_AsIs(b *testing.B) {
+func Benchmark_Flat_Convert_AsIs(b *testing.B) {
 	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
 
 	for i := 0; i < b.N; i++ {
-		_ = slice.FlatAndConvert(md, func(i []int) []int { return i }, as.Is[int])
+		_ = slice.FlatAndConvert(md, as.Is, as.Is)
 	}
 }
 
@@ -391,10 +456,14 @@ func Test_FilterConvertFilter(t *testing.T) {
 }
 
 func Test_Filt(t *testing.T) {
-	s := slice.Of(1, 3, 4, 5, 7, 8, 9, 11)
+	s := slice.Of(1, 3, 4, 5, 7, 8, 9, 12)
 	r, err := slice.Filt(s, func(i int) (bool, error) { return even(i), op.IfElse(i > 7, errors.New("abort"), nil) })
 	assert.Error(t, err)
-	assert.Equal(t, slice.Of(4, 8), r)
+	assert.Equal(t, slice.Of(4), r)
+
+	r, err = slice.Filt(s, func(i int) (bool, error) { return even(i), nil })
+	assert.NoError(t, err)
+	assert.Equal(t, slice.Of(4, 8, 12), r)
 }
 
 func Test_Filt2(t *testing.T) {
@@ -412,6 +481,23 @@ func Test_FiltAndConv(t *testing.T) {
 	s := slice.Of(1, 3, 4, 5, 7, 8, 9, 11)
 	r, _ := slice.FiltAndConv(s, func(v int) (bool, error) { return v%2 == 0, nil }, func(i int) (int, error) { return i * 2, nil })
 	assert.Equal(t, slice.Of(8, 16), r)
+}
+
+func Test_AppendFiltAndConv(t *testing.T) {
+	s := slice.Of(1, 3, 4, 5, 7, 8, 9, 11)
+	r, err := slice.AppendFiltAndConv(s, []int{}, func(v int) (bool, error) { return v%2 == 0, nil }, func(i int) (int, error) { return i * 2, nil })
+	assert.Equal(t, slice.Of(8, 16), r)
+	assert.NoError(t, err)
+
+	r, err = slice.AppendFiltAndConv(s, []int{}, func(v int) (bool, error) { return v%2 == 0, op.IfElse(v == 9, errors.New("abort"), nil) }, func(i int) (int, error) { return i * 2, nil })
+
+	assert.Equal(t, slice.Of(8, 16), r)
+	assert.ErrorContains(t, err, "abort")
+
+	r, err = slice.AppendFiltAndConv(s, []int{}, func(v int) (bool, error) { return v%2 == 0, nil }, func(i int) (int, error) { return i * 2, op.IfElse(i == 8, errors.New("abort"), nil) })
+
+	assert.Equal(t, slice.Of(8), r)
+	assert.ErrorContains(t, err, "abort")
 }
 
 func Test_StringRepresentation(t *testing.T) {
@@ -540,6 +626,14 @@ func Test_SplitTwo(t *testing.T) {
 	assert.Equal(t, slice.Of("a", "b", "c"), second)
 }
 
+func Test_SplitThree(t *testing.T) {
+	first, second, third := slice.SplitThree(slice.Of("1a#", "2b$", "3c%"), func(s string) (string, string, string) { return string(s[0]), string(s[1]), string(s[2]) })
+
+	assert.Equal(t, slice.Of("1", "2", "3"), first)
+	assert.Equal(t, slice.Of("a", "b", "c"), second)
+	assert.Equal(t, slice.Of("#", "$", "%"), third)
+}
+
 func Test_SplitTwo2(t *testing.T) {
 	byIndex := func(i int) func(string) string { return func(s string) string { return string(s[i]) } }
 
@@ -562,6 +656,10 @@ func Test_OfIndexed(t *testing.T) {
 	indexed := slice.Of("0", "1", "2", "3", "4")
 	result := slice.OfIndexed(len(indexed), func(i int) string { return indexed[i] })
 	assert.Equal(t, indexed, result)
+}
+
+func Test_Series(t *testing.T) {
+	assert.Equal(t, slice.Of(-1, 0, 1, 2, 3), slice.Series(-1, func(prev int) (int, bool) { return prev + 1, prev < 3 }))
 }
 
 func Test_PeekWhile(t *testing.T) {
@@ -596,17 +694,95 @@ func Test_Slice_AppendMapResolv(t *testing.T) {
 	assert.Equal(t, []int{2, 2, 4}, groups[true])
 }
 
+func Test_Slice_AppendMapResolvv(t *testing.T) {
+	even := func(v int) bool { return v%2 == 0 }
+	groups, err := slice.AppendMapResolvv(slice.Of(2, 1, 1, 2, 4, 3, 1), func(i int) (bool, int, error) {
+		return even(i), i, nil
+	}, func(_ bool, _ bool, e []int, v int) ([]int, error) {
+		return append(e, v), nil
+	}, nil)
+
+	assert.Equal(t, []int{1, 1, 3, 1}, groups[false])
+	assert.Equal(t, []int{2, 2, 4}, groups[true])
+	assert.NoError(t, err)
+}
+
 func Test_Slice_AppendMapResolvOrderr(t *testing.T) {
-	var (
-		even               = func(v int) bool { return v%2 == 0 }
-		order, groups, err = slice.AppendMapResolvOrderr(slice.Of("2", "1", "1", "2", "4", "3", "_1"), func(val string) (bool, int, error) {
-			i, err := strconv.Atoi(val)
-			return even(i), i, err
-		}, func(exists bool, k bool, vr []int, v int) ([]int, error) { return resolv.Slice(exists, k, vr, v), nil }, nil, nil)
-	)
+	kvExtractor := func(val string) (bool, int, error) {
+		i, err := strconv.Atoi(val)
+		return even(i), i, err
+	}
+	resolver := func(exists bool, k bool, vr []int, v int) ([]int, error) { return resolv.Slice(exists, k, vr, v), nil }
+
+	order, groups, err := slice.AppendMapResolvOrderr(slice.Of("2", "1", "1", "2", "4", "3", "_1"), kvExtractor, resolver, nil, nil)
 
 	assert.Equal(t, []int{1, 1, 3}, groups[false])
 	assert.Equal(t, []int{2, 2, 4}, groups[true])
 	assert.Equal(t, []bool{true, false}, order)
 	assert.EqualError(t, err, "strconv.Atoi: parsing \"_1\": invalid syntax")
+
+	order, groups, err = slice.AppendMapResolvOrderr(slice.Of("2", "1", "1", "2", "4", "3", "1"), kvExtractor, resolver, nil, nil)
+	assert.Equal(t, []int{1, 1, 3, 1}, groups[false])
+	assert.Equal(t, []int{2, 2, 4}, groups[true])
+	assert.Equal(t, []bool{true, false}, order)
+	assert.NoError(t, err)
+
+	resolver = func(exists bool, k bool, vr []int, v int) ([]int, error) {
+		return resolv.Slice(exists, k, vr, v), op.IfElse(v == 5, errors.New("abort"), nil)
+	}
+	order, groups, err = slice.AppendMapResolvOrderr(slice.Of("2", "1", "1", "2", "4", "3", "5"), kvExtractor, resolver, nil, nil)
+	assert.Equal(t, []int{1, 1, 3}, groups[false])
+	assert.Equal(t, []int{2, 2, 4}, groups[true])
+	assert.Equal(t, []bool{true, false}, order)
+	assert.EqualError(t, err, "abort")
+
+}
+
+func Test_Slice_Filled(t *testing.T) {
+	assert.Nil(t, slice.Filled[[]int](nil, nil))
+	assert.Equal(t, slice.Of(1, 2, 3), slice.Filled[[]int](nil, slice.Of(1, 2, 3)))
+	assert.Equal(t, slice.Of(1, 2, 3), slice.Filled(slice.Of(1, 2, 3), slice.Of(1, 2)))
+}
+
+func Test_Head(t *testing.T) {
+	result, ok := slice.Head([]int{1, 3, 5, 7, 9, 11})
+
+	assert.True(t, ok)
+	assert.Equal(t, 1, result)
+
+	_, ok = slice.Head[[]int](nil)
+	assert.False(t, ok)
+}
+
+func Test_Tail(t *testing.T) {
+	result, ok := slice.Tail([]int{1, 3, 5, 7, 9, 11})
+
+	assert.True(t, ok)
+	assert.Equal(t, 11, result)
+
+	_, ok = slice.Tail[[]int](nil)
+	assert.False(t, ok)
+}
+
+func Test_Contains(t *testing.T) {
+	s := []int{1, 3, 5, 7, 9, 11}
+
+	assert.True(t, slice.Contains(s, 5))
+	assert.False(t, slice.Contains(s, 12))
+	assert.False(t, slice.Contains(([]int)(nil), 12))
+
+}
+
+func Test_Upcast(t *testing.T) {
+	type names []string
+	n := names{"Alice"}
+	strings := slice.Upcast(n)
+	assert.Equal(t, []string{"Alice"}, strings)
+}
+
+func Test_Downcast(t *testing.T) {
+	type names []string
+	s := []string{"Alice"}
+	n := slice.Downcast[names](s)
+	assert.Equal(t, names{"Alice"}, n)
 }

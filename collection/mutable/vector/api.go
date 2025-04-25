@@ -8,6 +8,7 @@ import (
 	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/collection/mutable"
 	"github.com/m4gshm/gollections/loop"
+	"github.com/m4gshm/gollections/seq"
 )
 
 // Of instantiates a vector with the specified elements
@@ -27,13 +28,19 @@ func NewCap[T any](capacity int) *mutable.Vector[T] {
 
 // From instantiates a vector with elements retrieved by the 'next' function.
 // The next returns an element with true or zero value with false if there are no more elements.
+// Deprecated: replaced by [FromSeq].
 func From[T any](next func() (T, bool)) *mutable.Vector[T] {
-	return mutable.WrapVector(loop.Slice(next))
+	return mutable.VectorFromLoop(next)
+}
+
+// FromSeq creates a vector with elements retrieved by the seq.
+func FromSeq[T any](seq seq.Seq[T]) *mutable.Vector[T] {
+	return mutable.VectorFromSeq(seq)
 }
 
 // Sort sorts the specified vector in-place by a converter that thransforms an element to an Ordered (int, string and so on).
 func Sort[T any, F constraints.Ordered](v *mutable.Vector[T], by func(T) F) *mutable.Vector[T] {
-	return collection.Sort[*mutable.Vector[T]](v, by)
+	return collection.Sort(v, by)
 }
 
 // Convert returns a loop that applies the 'converter' function to the collection elements

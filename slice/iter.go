@@ -54,7 +54,7 @@ func (i *Iter[T]) maxHasNext() int {
 	return i.size - 2
 }
 
-// All is used to iterate through the iterator using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
+// All is used to iterate through the iterator using `for ... range`.
 func (i *Iter[T]) All(consumer func(element T) bool) {
 	loop.All(i.Next, consumer)
 }

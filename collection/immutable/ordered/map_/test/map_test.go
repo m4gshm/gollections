@@ -5,31 +5,51 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/collection/immutable/ordered"
 	"github.com/m4gshm/gollections/collection/immutable/ordered/map_"
 	"github.com/m4gshm/gollections/k"
+	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/seq"
 	"github.com/m4gshm/gollections/slice"
 )
 
-func Test_Map_Iterate(t *testing.T) {
-	ordered := map_.Of(k.V(1, "1"), k.V(1, "1"), k.V(2, "2"), k.V(4, "4"), k.V(3, "3"), k.V(1, "1"))
-	assert.Equal(t, 4, len(ordered.Map()))
+func Test_Map_Of(t *testing.T) {
+	m := map_.Of(k.V(1, "1"), k.V(1, "1"), k.V(2, "2"), k.V(4, "4"), k.V(3, "3"), k.V(1, "1"))
+	iterCheck(t, m)
+}
+
+func Test_Map_From(t *testing.T) {
+	m := map_.From(loop.KeyValue(loop.Of(k.V(1, "1"), k.V(1, "1"), k.V(2, "2"), k.V(4, "4"), k.V(3, "3"), k.V(1, "1")), c.KV[int, string].Key, c.KV[int, string].Value))
+	iterCheck(t, m)
+}
+
+func Test_Map_FromSeq(t *testing.T) {
+	m := map_.FromSeq2(seq.KeyValue(seq.Of(k.V(1, "1"), k.V(1, "1"), k.V(2, "2"), k.V(4, "4"), k.V(3, "3"), k.V(1, "1")), c.KV[int, string].Key, c.KV[int, string].Value))
+	iterCheck(t, m)
+}
+
+func iterCheck(t *testing.T, m ordered.Map[int, string]) {
+	assert.Equal(t, 4, m.Len())
+	assert.Equal(t, 4, len(m.Map()))
 
 	expectedK := slice.Of(1, 2, 4, 3)
 	expectedV := slice.Of("1", "2", "4", "3")
 
 	keys := []int{}
 	values := []string{}
-	for it, key, val, ok := ordered.First(); ok; key, val, ok = it.Next() {
+	for key, val := range m.All {
 		keys = append(keys, key)
 		values = append(values, val)
 	}
 	assert.Equal(t, expectedK, keys)
 	assert.Equal(t, expectedV, values)
 
-	assert.Equal(t, slice.Of(1, 2, 4, 3), ordered.Keys().Slice())
-	assert.Equal(t, slice.Of("1", "2", "4", "3"), ordered.Values().Slice())
+	keys = m.Keys().Slice()
+	values = m.Values().Slice()
+	assert.Equal(t, slice.Of(1, 2, 4, 3), keys)
+	assert.Equal(t, slice.Of("1", "2", "4", "3"), values)
 }
 
 func Test_Map_Iterate_Keys(t *testing.T) {
@@ -117,5 +137,5 @@ func Test_Map_Sort(t *testing.T) {
 	expected := ordered.NewMap(k.V(-8, "-8"), k.V(4, "4"), k.V(5, "5"), k.V(10, "10"))
 
 	assert.Equal(t, expected, o)
-	assert.NotSame(t, m, o)
+	assert.NotSame(t, &m, &o)
 }

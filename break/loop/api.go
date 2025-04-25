@@ -1,4 +1,5 @@
 // Package loop provides helpers for loop operation and iterator implementations
+// Deprecated: use the [github.com/m4gshm/gollections/seq], [github.com/m4gshm/gollections/seqe], [github.com/m4gshm/gollections/seq2] packages API instead.
 package loop
 
 import (
@@ -78,7 +79,7 @@ func To[T any](next func() (T, bool, error), errConsumer func(error)) func() (T,
 	}
 }
 
-// All is an adapter for the next function for iterating by `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
+// All is an adapter for the next function for iterating by `for ... range`.
 func All[T any](next func() (T, bool, error), consumer func(T, error) bool) {
 	if next == nil {
 		return
@@ -176,12 +177,12 @@ func Slice[T any](next func() (T, bool, error)) (out []T, err error) {
 }
 
 // SliceCap collects the elements retrieved by the 'next' function into a new slice with predefined capacity
-func SliceCap[T any](next func() (T, bool, error), cap int) (out []T, err error) {
+func SliceCap[T any](next func() (T, bool, error), capacity int) (out []T, err error) {
 	if next == nil {
 		return nil, nil
 	}
-	if cap > 0 {
-		out = make([]T, 0, cap)
+	if capacity > 0 {
+		out = make([]T, 0, capacity)
 	}
 	return Append(next, out)
 }
@@ -311,7 +312,7 @@ func Conv[From, To any](next func() (From, bool, error), converter func(From) (T
 	return func() (t To, ok bool, err error) {
 		v, ok, err := next()
 		if err != nil || !ok {
-			return t, ok, err
+			return t, false, err
 		}
 		vc, err := converter(v)
 		return vc, err == nil, err
@@ -596,7 +597,8 @@ func Filt[T any](next func() (T, bool, error), filter func(T) (bool, error)) Loo
 		return nil
 	}
 	return func() (T, bool, error) {
-		return Firstt(next, filter)
+		t, ok, err := Firstt(next, filter)
+		return t, ok && err == nil, err
 	}
 }
 

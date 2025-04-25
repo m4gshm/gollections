@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/m4gshm/gollections/collection/immutable/set"
+	"github.com/m4gshm/gollections/seq"
 
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/predicate/eq"
@@ -156,6 +157,24 @@ func Benchmark_FindFirsManager_Loop_HasAny(b *testing.B) {
 	}
 }
 
+func Benchmark_FindFirsManager_Seq(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		alice, ok := slice.First(users, func(user User) bool {
+			return seq.Contains(seq.Convert(seq.Of(user.Roles()...), Role.Name), "Manager")
+		})
+		_, _ = alice, ok
+	}
+}
+
+func Benchmark_FindFirsManager_Seq_HasAny(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		alice, ok := slice.First(users, func(user User) bool {
+			return seq.HasAny(seq.Convert(seq.Of(user.Roles()...), Role.Name), eq.To("Manager"))
+		})
+		_, _ = alice, ok
+	}
+}
+
 func Benchmark_FindFirsManager_Old(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		legacyAlice := User{}
@@ -203,9 +222,24 @@ func Benchmark_AggregateFilteredRoles_Slice(b *testing.B) {
 
 func Benchmark_AggregateFilteredRoles_Loop(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		roles := loop.Flat(loop.Of(users...), User.Roles)
-		roleNamesExceptManager := loop.Filter(loop.Convert(roles, Role.Name), not.Eq("Manager"))
+		roleNamesExceptManager := loop.Filter(loop.Convert(loop.Flat(loop.Of(users...), User.Roles), Role.Name), not.Eq("Manager"))
 		_ = loop.Slice(roleNamesExceptManager)
+	}
+}
+
+func Benchmark_AggregateFilteredRoles_Seq_FlatSeq(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		roles := seq.FlatSeq(seq.Of(users...), func(u User) seq.Seq[Role] { return seq.Of(u.roles...) })
+		roleNamesExceptManager := seq.Filter(seq.Convert(roles, Role.Name), not.Eq("Manager"))
+		_ = seq.Slice(roleNamesExceptManager)
+	}
+}
+
+func Benchmark_AggregateFilteredRoles_Seq_Flat(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		roles := seq.Flat(seq.Of(users...), User.Roles)
+		roleNamesExceptManager := seq.Filter(seq.Convert(roles, Role.Name), not.Eq("Manager"))
+		_ = seq.Slice(roleNamesExceptManager)
 	}
 }
 

@@ -10,12 +10,18 @@ import (
 	"github.com/m4gshm/gollections/convert/ptr"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/seq"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/walk/group"
 )
 
 func Test_Set_From(t *testing.T) {
 	set := set.From(loop.Of(1, 1, 2, 2, 3, 4, 3, 2, 1))
+	assert.Equal(t, slice.Of(1, 2, 3, 4), set.Slice())
+}
+
+func Test_Set_FromSeq(t *testing.T) {
+	set := set.FromSeq(seq.Of(1, 1, 2, 2, 3, 4, 3, 2, 1))
 	assert.Equal(t, slice.Of(1, 2, 3, 4), set.Slice())
 }
 
@@ -85,7 +91,7 @@ func Test_Set_Sort(t *testing.T) {
 		sorted   = elements.Sort(op.Compare)
 	)
 	assert.Equal(t, set.Of(-2, 0, 1, 3, 5, 6, 8), sorted)
-	assert.NotSame(t, elements, sorted)
+	assert.NotSame(t, &elements, &sorted)
 }
 func Test_Set_SortStructByField(t *testing.T) {
 	var (

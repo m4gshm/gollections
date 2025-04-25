@@ -13,7 +13,23 @@ var Break = errors.New("Break")
 // Continue is an alias of the nil value used to continue iterating by For, Track methods.
 var Continue error = nil
 
+// Range provides an All function used for iterating over a sequence of elements by `for e := range collection.All`.
+type Range[T any] interface {
+	All(yield func(T) bool)
+}
+
+// OrderedRange provides an IAll function used for iterating over an ordered sequence of elements by `for i, e := range collection.IAll`.
+type OrderedRange[T any] interface {
+	IAll(yield func(int, T) bool)
+}
+
+// KVRange provides an All function used for iterating over a sequence of key\value pairs by `for k, v := range collection.All`.
+type KVRange[K, V any] interface {
+	All(yield func(K, V) bool)
+}
+
 // Iterable is a loop supplier interface
+// Deprecated: obsolete.
 type Iterable[T any, Loop ~func() (T, bool)] interface {
 	Loop() Loop
 }
@@ -36,6 +52,7 @@ type Values[V any] interface {
 
 // Collection is the base interface of non-associative collections
 type Collection[T any] interface {
+	Range[T]
 	For[T]
 	ForEach[T]
 	SliceFactory[T]
@@ -76,6 +93,7 @@ type Iterator[T any] interface {
 
 	For[T]
 	ForEach[T]
+	Range[T]
 }
 
 // Sized - storage interface with measurable size
@@ -98,34 +116,28 @@ type DelIterator[T any] interface {
 }
 
 // For is the interface of a collection that provides traversing of the elements.
+// Deprecated: obsolete.
 type For[IT any] interface {
 	//For takes elements of the collection. Can be interrupt by returning Break.
 	For(func(element IT) error) error
 }
 
 // ForEach is the interface of a collection that provides traversing of the elements without error checking.
+// Deprecated: obsolete.
 type ForEach[T any] interface {
 	// ForEach takes all elements of the collection
 	ForEach(func(element T))
 }
 
-// All provides the `All` function used for iterating over a sequence of elements by `for e := range collection.All`. Supported since go 1.22.
-type All[T any] interface {
-	All(consumer func(T) bool)
-}
-
-// KVAll provides the `All` function used for iterating over a sequence of key\value pairs by `for k, v := range collection.All`. Supported since go 1.22.
-type KVAll[K, V any] interface {
-	All(consumer func(K, V) bool)
-}
-
 // Track is the interface of a collection that provides traversing of the elements with position tracking (index, key, coordinates, etc.).
+// Deprecated: obsolete.
 type Track[P any, T any] interface {
 	// return Break for loop breaking
 	Track(func(position P, element T) error) error
 }
 
-// TrackEach is the interface of a collection that provides traversing of the elements with position tracking (index, key, coordinates, etc.) without error checking
+// TrackEach is the interface of a collection that provides traversing of the elements with position tracking (index, key, coordinates, etc.) without error checking.
+// Deprecated: obsolete.
 type TrackEach[P any, T any] interface {
 	TrackEach(func(position P, element T))
 }

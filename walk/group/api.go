@@ -7,6 +7,7 @@ import (
 )
 
 // Of - group.Of synonym of the walk.Group.
+// Deprecated: replaced by [github.com/m4gshm/gollections/seq.Group]
 func Of[T any, K comparable, W c.ForEach[T]](elements W, by func(T) K) map[K][]T {
 	return walk.Group(elements, by)
 }

@@ -13,6 +13,7 @@ import (
 	"github.com/m4gshm/gollections/loop"
 	sop "github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/op/check/not"
+	"github.com/m4gshm/gollections/seq"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/range_"
 )
@@ -25,6 +26,26 @@ var (
 	values     = range_.Closed(1, max)
 	threshhold = max / 2
 )
+
+func Benchmark_Head_Slice(b *testing.B) {
+	var f int
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		f, _ = slice.Head(values)
+	}
+	b.StopTimer()
+	assert.Equal(b, 1, f)
+}
+
+func Benchmark_Tail_Slice(b *testing.B) {
+	var f int
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		f, _ = slice.Tail(values)
+	}
+	b.StopTimer()
+	assert.Equal(b, max, f)
+}
 
 func Benchmark_First_PlainOld(b *testing.B) {
 	op := func(i int) bool { return i > threshhold }
@@ -53,6 +74,18 @@ func Benchmark_First_Slice(b *testing.B) {
 	assert.Equal(b, threshhold+1, f)
 }
 
+func Benchmark_FirstI_Slice(b *testing.B) {
+	op := func(i int) bool { return i > threshhold }
+	var f, ind int
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		f, ind = slice.FirstI(values, op)
+	}
+	b.StopTimer()
+	assert.Equal(b, threshhold+1, f)
+	assert.Equal(b, threshhold, ind)
+}
+
 func Benchmark_Last_Slice(b *testing.B) {
 	op := func(i int) bool { return i < 50000 }
 	var f int
@@ -62,6 +95,18 @@ func Benchmark_Last_Slice(b *testing.B) {
 	}
 	b.StopTimer()
 	assert.Equal(b, threshhold-1, f)
+}
+
+func Benchmark_LastI_Slice(b *testing.B) {
+	op := func(i int) bool { return i < 50000 }
+	var f, ind int
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		f, ind = slice.LastI(values, op)
+	}
+	b.StopTimer()
+	assert.Equal(b, threshhold-1, f)
+	assert.Equal(b, threshhold-2, ind)
 }
 
 func Benchmark_ConvertAndFilter_Slice_Loop(b *testing.B) {
@@ -77,7 +122,22 @@ func Benchmark_ConvertAndFilter_Slice_Loop(b *testing.B) {
 		s = loop.Slice(loop.Convert(loop.Filter(ptr.Of(slice.NewHead(items)).Next, even), convert.And(toString, addTail)))
 	}
 	_ = s
+	b.StopTimer()
+}
 
+func Benchmark_ConvertAndFilter_Slice_Seq(b *testing.B) {
+	var (
+		toString = func(i int) string { return fmt.Sprintf("%d", i) }
+		addTail  = func(s string) string { return s + "_tail" }
+		even     = func(v int) bool { return v%2 == 0 }
+	)
+	items := slice.Of(1, 2, 3, 4, 5)
+	var s []string
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		s = seq.Slice(seq.Convert(seq.Filter(seq.Of(items...), even), convert.And(toString, addTail)))
+	}
+	_ = s
 	b.StopTimer()
 }
 
@@ -150,6 +210,18 @@ func Benchmark_Flatt_Loop(b *testing.B) {
 	b.StopTimer()
 }
 
+func Benchmark_Flatt_Seq(b *testing.B) {
+	odds := func(v int) bool { return v%2 != 0 }
+	multiDimension := [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		next := seq.Of(multiDimension...)
+		oneDimension := seq.Slice(seq.Filter(seq.Flat(seq.Flat(next, as.Is), as.Is), odds))
+		_ = oneDimension
+	}
+	b.StopTimer()
+}
+
 func Benchmark_Flatt_Slice_PlainOld(b *testing.B) {
 	multiDimension := [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
 	b.ResetTimer()
@@ -179,6 +251,21 @@ func Benchmark_ReduceSum_Loop(b *testing.B) {
 	result := 0
 	for i := 0; i < b.N; i++ {
 		result = loop.Reduce(loop.Filter(loop.Flat(loop.Flat(loop.Of(multiDimension...), as.Is), as.Is), odds), sop.Sum)
+	}
+	b.StopTimer()
+	if result != expected {
+		b.Fatalf("must be %d, but %d", expected, result)
+	}
+}
+
+func Benchmark_ReduceSum_Seq(b *testing.B) {
+	odds := func(v int) bool { return v%2 != 0 }
+	multiDimension := [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
+	expected := 1 + 3 + 5 + 7
+	b.ResetTimer()
+	result := 0
+	for i := 0; i < b.N; i++ {
+		result = seq.Reduce(seq.Filter(seq.Flat(seq.Flat(seq.Of(multiDimension...), as.Is), as.Is), odds), sop.Sum)
 	}
 	b.StopTimer()
 	if result != expected {
@@ -304,6 +391,16 @@ func Benchmark_ConvertFlattStructure_Loop(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		attr := loop.FilterAndFlat(loop.Of(items...), not.Nil, (*Participant).GetAttributes)
 		_ = loop.Slice(loop.FilterAndConvert(attr, not.Nil, (*Attributes).GetName))
+	}
+	b.StopTimer()
+}
+
+func Benchmark_ConvertFlattStructure_Seq(b *testing.B) {
+	items := []*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		attr := seq.Flat(seq.Filter(seq.Of(items...), not.Nil), (*Participant).GetAttributes)
+		_ = seq.Slice(seq.Convert(seq.Filter(attr, not.Nil), (*Attributes).GetName))
 	}
 	b.StopTimer()
 }

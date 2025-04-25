@@ -1,4 +1,5 @@
 // Package loop provides helpers for loop operation and iterator implementations
+// Deprecated: use the [github.com/m4gshm/gollections/seq], [github.com/m4gshm/gollections/seqe], [github.com/m4gshm/gollections/seq2] packages API instead.
 package loop
 
 import (
@@ -49,7 +50,7 @@ func Of[T any](elements ...T) Loop[T] {
 	}
 }
 
-// All is an adapter for the next function for iterating by `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
+// All is an adapter for the next function for iterating by `for ... range`.
 func All[T any](next func() (T, bool), consumer func(T) bool) {
 	if next == nil {
 		return
@@ -148,12 +149,12 @@ func Slice[T any](next func() (T, bool)) []T {
 }
 
 // SliceCap collects the elements retrieved by the 'next' function into a new slice with predefined capacity
-func SliceCap[T any](next func() (T, bool), cap int) (out []T) {
+func SliceCap[T any](next func() (T, bool), capacity int) (out []T) {
 	if next == nil {
 		return nil
 	}
-	if cap > 0 {
-		out = make([]T, 0, cap)
+	if capacity > 0 {
+		out = make([]T, 0, capacity)
 	}
 	return Append(next, out)
 }
@@ -161,7 +162,7 @@ func SliceCap[T any](next func() (T, bool), cap int) (out []T) {
 // Append collects the elements retrieved by the 'next' function into the specified 'out' slice
 func Append[T any, TS ~[]T](next func() (T, bool), out TS) TS {
 	if next == nil {
-		return nil
+		return out
 	}
 	for {
 		v, ok := next()
@@ -797,8 +798,8 @@ func AppendMapResolvOrder[T any, K comparable, V, VR any](next func() (T, bool),
 	return order, dest
 }
 
-// Sequence makes a sequence by applying the 'next' function to the previous step generated value.
-func Sequence[T any](first T, next func(T) (T, bool)) Loop[T] {
+// Series makes a sequence by applying the 'next' function to the previous step generated value.
+func Series[T any](first T, next func(T) (T, bool)) Loop[T] {
 	if next == nil {
 		return nil
 	}
@@ -860,14 +861,14 @@ func Range[T constraints.Integer | rune](from T, toExclusive T) Loop[T] {
 // OfIndexed builds a loop by extracting elements from an indexed soruce.
 // the len is length ot the source.
 // the getAt retrieves an element by its index from the source.
-func OfIndexed[T any](len int, next func(int) T) Loop[T] {
-	if next == nil {
+func OfIndexed[T any](amount int, getAt func(int) T) Loop[T] {
+	if getAt == nil {
 		return nil
 	}
 	i := 0
 	return func() (out T, ok bool) {
-		if ok = i < len; ok {
-			out = next(i)
+		if ok = i < amount; ok {
+			out = getAt(i)
 			i++
 		}
 		return out, ok

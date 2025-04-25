@@ -32,7 +32,7 @@ type Iter[K comparable, V any] struct {
 
 var _ collection.Iterator[int, any] = (*Iter[int, any])(nil)
 
-// All is used to iterate through the iterator using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
+// All is used to iterate through the iterator using `for ... range`.
 func (i *Iter[K, V]) All(consumer func(key K, value V) bool) {
 	kvloop.All(i.Next, consumer)
 }
@@ -133,7 +133,7 @@ var (
 	_ c.Iterator[string] = KeyIter[string, any]{}
 )
 
-// All is used to iterate through the iterator using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
+// All is used to iterate through the iterator using `for ... range`.
 func (i KeyIter[K, V]) All(consumer func(element K) bool) {
 	loop.All(i.Next, consumer)
 }
@@ -176,7 +176,7 @@ var (
 	_ c.Iterator[any] = ValIter[int, any]{}
 )
 
-// All is used to iterate through the iterator using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
+// All is used to iterate through the iterator using `for ... range`.
 func (i ValIter[K, V]) All(consumer func(element V) bool) {
 	loop.All(i.Next, consumer)
 }
