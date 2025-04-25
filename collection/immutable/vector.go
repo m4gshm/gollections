@@ -40,13 +40,13 @@ func (v Vector[T]) IAll(consumer func(int, T) bool) {
 }
 
 // Loop creates a loop to iterate through the collection.
-// Deprecated: replaced by the [All].
+// Deprecated: replaced by [Vector.All].
 func (v Vector[T]) Loop() loop.Loop[T] {
 	return loop.Of(v.elements...)
 }
 
 // Head creates an iterator to iterate through the collection.
-// Deprecated: replaced by the [All].
+// Deprecated: replaced by [Vector.All].
 func (v Vector[T]) Head() slice.Iter[T] {
 	return slice.NewHead(v.elements)
 }
@@ -59,7 +59,7 @@ func (v Vector[T]) Tail() slice.Iter[T] {
 
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
-// Deprecated: replaced by the [All].
+// Deprecated: replaced by [Vector.All].
 func (v Vector[T]) First() (*slice.Iter[T], T, bool) {
 	h := slice.NewHead(v.elements)
 	return h.Crank()

@@ -1,4 +1,4 @@
-// Package set provides mutable ordered.Set constructors and helpers
+// Package set provides mutable [github.com/m4gshm/gollections/collection/ordered.Set] constructors and helpers
 package set
 
 import (

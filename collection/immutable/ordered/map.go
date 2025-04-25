@@ -41,21 +41,21 @@ func (m Map[K, V]) All(consumer func(K, V) bool) {
 }
 
 // Loop creates a loop to iterate through the collection.
-// Deprecated: replaced by the [All].
+// Deprecated: replaced by [Map.All].
 func (m Map[K, V]) Loop() kvloop.Loop[K, V] {
 	h := m.Head()
 	return h.Next
 }
 
 // Head creates an iterator to iterate through the collection.
-// Deprecated: replaced by the [All].
+// Deprecated: replaced by [Map.All].
 func (m Map[K, V]) Head() MapIter[K, V] {
 	return NewMapIter(m.elements, slice.NewHead(m.order))
 }
 
 // First returns the first key/value pair of the map, an iterator to iterate over the remaining pair, and true\false marker of availability next pairs.
 // If no more then ok==false.
-// Deprecated: replaced by the [All].
+// Deprecated: replaced by [Map.All].
 func (m Map[K, V]) First() (MapIter[K, V], K, V, bool) {
 	var (
 		iterator           = m.Head()

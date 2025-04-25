@@ -49,7 +49,7 @@ func (s *Set[T]) IAll(consumer func(int, T) bool) {
 }
 
 // Loop creates a loop to iterate through the collection.
-// Deprecated: replaced by the [All].
+// Deprecated: replaced by [Set.All].
 func (s *Set[T]) Loop() loop.Loop[T] {
 	if s == nil {
 		return nil
@@ -64,7 +64,7 @@ func (s *Set[T]) IterEdit() c.DelIterator[T] {
 }
 
 // Head creates an iterator to iterate through the collection.
-// Deprecated: replaced by the [All].
+// Deprecated: replaced by [Set.All].
 func (s *Set[T]) Head() SetIter[T] {
 	var elements *[]T
 	if s != nil {
@@ -75,7 +75,7 @@ func (s *Set[T]) Head() SetIter[T] {
 
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
-// Deprecated: replaced by the [All].
+// Deprecated: replaced by [Set.All].
 func (s *Set[T]) First() (SetIter[T], T, bool) {
 	var (
 		iterator  = s.Head()

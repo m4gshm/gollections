@@ -74,3 +74,7 @@ readme:
 	$(info #README.md...)
 	asciidoctor -b docbook internal/docs/readme.adoc 
 	pandoc -f docbook -t gfm internal/docs/readme.xml -o README.md	
+
+.PHONY: pkgsite
+pkgsite:
+	go install golang.org/x/pkgsite/cmd/pkgsite@latest && pkgsite 

@@ -1,4 +1,4 @@
-// Package set provides unordered immutable.Set constructors and helpers
+// Package set provides unordered [github.com/m4gshm/gollections/collection/immutable.Set] constructors and helpers
 package set
 
 import (

@@ -1,4 +1,4 @@
-// Package seq2 extends iter.Seq2 API with convering, filtering, and reducing functionality.
+// Package seq2 extends [iter.Seq2] API with convering, filtering, and reducing functionality.
 package seq2
 
 import (

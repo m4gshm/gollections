@@ -34,21 +34,21 @@ func (s Set[T]) All(consumer func(T) bool) {
 }
 
 // Loop creates a loop to iterate through the collection.
-// Deprecated: replaced by the [All].
+// Deprecated: replaced by [Set.All].
 func (s Set[T]) Loop() loop.Loop[T] {
 	h := s.Head()
 	return (&h).Next
 }
 
 // Head creates an iterator to iterate through the collection.
-// Deprecated: replaced by the [All].
+// Deprecated: replaced by [Set.All].
 func (s Set[T]) Head() map_.KeyIter[T, struct{}] {
 	return map_.NewKeyIter(s.elements)
 }
 
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
-// Deprecated: replaced by the [All].
+// Deprecated: replaced by [Set.All].
 func (s Set[T]) First() (map_.KeyIter[T, struct{}], T, bool) {
 	var (
 		iterator  = s.Head()
