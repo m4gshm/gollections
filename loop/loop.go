@@ -6,6 +6,7 @@ import (
 )
 
 // Loop is a function that returns the next element or ok=false if there are no more elements.
+// Deprecated: replaced by [seq.Seq]
 type Loop[T any] func() (element T, ok bool)
 
 var (

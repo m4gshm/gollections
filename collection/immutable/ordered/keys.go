@@ -39,20 +39,20 @@ func (m MapKeys[K]) IAll(consumer func(int, K) bool) {
 }
 
 // Loop creates a loop to iterate through the collection.
-// Deprecated: replaced by the All.
+// Deprecated: replaced by the [All].
 func (m MapKeys[K]) Loop() loop.Loop[K] {
 	return loop.Of(m.keys...)
 }
 
 // Head creates an iterator to iterate through the collection.
-// Deprecated: replaced by the All.
+// Deprecated: replaced by the [All].
 func (m MapKeys[K]) Head() slice.Iter[K] {
 	return slice.NewHead(m.keys)
 }
 
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
-// Deprecated: replaced by the All.
+// Deprecated: replaced by the [All].
 func (m MapKeys[K]) First() (*slice.Iter[K], K, bool) {
 	h := m.Head()
 	return h.Crank()

@@ -40,13 +40,13 @@ func (s Set[T]) IAll(consumer func(int, T) bool) {
 }
 
 // Loop creates a loop to iterate through the collection.
-// Deprecated: replaced by the All.
+// Deprecated: replaced by the [All].
 func (s Set[T]) Loop() loop.Loop[T] {
 	return loop.Of(s.order...)
 }
 
 // Head creates an iterator to iterate through the collection.
-// Deprecated: replaced by the All.
+// Deprecated: replaced by the [All].
 func (s Set[T]) Head() slice.Iter[T] {
 	return slice.NewHead(s.order)
 }
@@ -59,7 +59,7 @@ func (s Set[T]) Tail() slice.Iter[T] {
 
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
-// Deprecated: replaced by the All.
+// Deprecated: replaced by the [All].
 func (s Set[T]) First() (*slice.Iter[T], T, bool) {
 	iterator := slice.NewHead(s.order)
 	return iterator.Crank()

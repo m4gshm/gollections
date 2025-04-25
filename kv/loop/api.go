@@ -1,5 +1,5 @@
 // Package loop provides helpers for loop operation over key/value pairs and iterator implementations
-// Deprecated: use the seq, seq, seq2 packages API instead.
+// Deprecated: use the [seq], [seq], [seq2] packages API instead.
 package loop
 
 import (
