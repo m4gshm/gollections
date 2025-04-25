@@ -1,6 +1,7 @@
 package loop
 
 // Loop is a function that returns the next key\value or ok==false if there are no more elements.
+// Deprecated: replaced by [github.com/m4gshm/gollections/seq.Seq2]
 type Loop[K, V any] func() (key K, value V, ok bool, err error)
 
 // Track applies the 'consumer' function to position/element pairs retrieved by the 'next' function until the consumer returns the c.Break to stop.
