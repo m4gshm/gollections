@@ -1,4 +1,4 @@
-// Package seq extends the iter.Seq interface with convering, filtering, and reducing functionality.
+// Package seq extends iter.Seq API with convering, filtering, and reducing functionality.
 package seq
 
 import (

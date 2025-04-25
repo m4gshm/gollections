@@ -1,4 +1,4 @@
-// Package seqe extends the seq.SeqE interface with convering, filtering, and reducing functionality.
+// Package seqe provides convering, filtering, and reducing operations for the seq.SeqE interface.
 package seqe
 
 import (
