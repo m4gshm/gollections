@@ -82,6 +82,33 @@ func Test_ReduceeSumFirstErr(t *testing.T) {
 	assert.Equal(t, 2, r)
 }
 
+func Test_Firstt(t *testing.T) {
+	result, ok, err := loop.Firstt(loop.Of(1, 2, 3, 4, 5, 6), func(i int) (bool, error) {
+		return more.Than(5)(i), nil
+	})
+
+	assert.True(t, ok)
+	assert.Equal(t, 6, result)
+	assert.NoError(t, err)
+
+	result, ok, err = loop.Firstt(loop.Of(1, 2, 3, 4, 5, 6), func(_ int) (bool, error) { return true, errors.New("abort") })
+
+	assert.True(t, ok)
+	assert.Equal(t, 1, result)
+	assert.ErrorContains(t, err, "abort")
+
+	_, ok, err = loop.Firstt(loop.Of(1, 2, 3, 4, 5, 6), func(_ int) (bool, error) { return false, errors.New("abort") })
+
+	assert.False(t, ok)
+	assert.ErrorContains(t, err, "abort")
+
+	// _, ok, _ = loop.Firstt(loop.Of(1, 2, 3, 4, 5, 6), nil)
+	// assert.False(t, ok)
+
+	_, ok, _ = loop.Firstt(nil, func(_ int) (bool, error) { return false, errors.New("abort") })
+	assert.False(t, ok)
+}
+
 func Test_ReduceeEmptyLoop(t *testing.T) {
 	s := breakLoop.Of[int]()
 	r, ok, err := breakLoop.ReduceOK(s, op.Sum[int])
