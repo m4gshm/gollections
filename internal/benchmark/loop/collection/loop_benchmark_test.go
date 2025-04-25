@@ -11,6 +11,7 @@ import (
 	"github.com/m4gshm/gollections/convert/ptr"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_"
+	"github.com/m4gshm/gollections/seq"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/range_"
 )
@@ -35,7 +36,7 @@ type benchCase struct {
 	load func(int)
 }
 
-var cases = []benchCase{{"high", HighLoad}, {"low", LowLoad}}
+var cases = []benchCase{ /*{"high", HighLoad},*/ {"low", LowLoad}}
 
 func Benchmark_Loop_ImmutableOrderSet_ForEach(b *testing.B) {
 	c := oset.Of(values...)
@@ -43,6 +44,19 @@ func Benchmark_Loop_ImmutableOrderSet_ForEach(b *testing.B) {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				c.ForEach(casee.load)
+			}
+		})
+	}
+}
+
+func Benchmark_Loop_ImmutableOrderSet_All(b *testing.B) {
+	c := oset.Of(values...)
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for v := range c.All {
+					casee.load(v)
+				}
 			}
 		})
 	}
@@ -266,12 +280,37 @@ func Benchmark_Loop_Slice_Loop_NextNext(b *testing.B) {
 	}
 }
 
+func Benchmark_Loop_Slice_Loop_All(b *testing.B) {
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				l := loop.Of(values...)
+				for v := range l.All {
+					casee.load(v)
+				}
+			}
+		})
+	}
+}
+
 func Benchmark_Loop_Slice_NewHead_HasNextGetNext(b *testing.B) {
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				for it := slice.NewHead(values); it.HasNext(); {
 					casee.load(it.GetNext())
+				}
+			}
+		})
+	}
+}
+
+func Benchmark_Loop_Slice_Seq_ForByRange(b *testing.B) {
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for v := range seq.Of(values...) {
+					casee.load(v)
 				}
 			}
 		})

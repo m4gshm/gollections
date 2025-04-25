@@ -28,26 +28,27 @@ var (
 	_ fmt.Stringer        = Set[int]{}
 )
 
-// All is used to iterate through the collection using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
+// All is used to iterate through the collection using `for e := range`.
 func (s Set[T]) All(consumer func(T) bool) {
 	map_.TrackKeysWhile(s.elements, consumer)
 }
 
 // Loop creates a loop to iterate through the collection.
+// Deprecated: replaced by [Set.All].
 func (s Set[T]) Loop() loop.Loop[T] {
 	h := s.Head()
 	return (&h).Next
 }
 
-// Deprecated: Head is deprecated. Will be replaced by rance-over function iterator.
 // Head creates an iterator to iterate through the collection.
+// Deprecated: replaced by [Set.All].
 func (s Set[T]) Head() map_.KeyIter[T, struct{}] {
 	return map_.NewKeyIter(s.elements)
 }
 
-// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
+// Deprecated: replaced by [Set.All].
 func (s Set[T]) First() (map_.KeyIter[T, struct{}], T, bool) {
 	var (
 		iterator  = s.Head()
@@ -73,7 +74,7 @@ func (s Set[T]) Len() int {
 
 // IsEmpty returns true if the collection is empty
 func (s Set[T]) IsEmpty() bool {
-	return s.Len() == 0
+	return collection.IsEmpty(s)
 }
 
 // For applies the 'consumer' function for the elements until the consumer returns the c.Break to stop.

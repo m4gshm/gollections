@@ -29,18 +29,27 @@ var (
 	_ c.AddableAllNew[c.ForEach[int]] = (*Set[int])(nil)
 	_ c.Deleteable[int]               = (*Set[int])(nil)
 	_ c.DeleteableVerify[int]         = (*Set[int])(nil)
+	_ c.OrderedRange[int]             = (*Set[int])(nil)
 	_ collection.Set[int]             = (*Set[int])(nil)
 	_ fmt.Stringer                    = (*Set[int])(nil)
 )
 
-// All is used to iterate through the collection using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
+// All is used to iterate through the collection using `for e := range`.
 func (s *Set[T]) All(consumer func(T) bool) {
 	if s != nil {
 		slice.WalkWhile(*s.order, consumer)
 	}
 }
 
+// IAll is used to iterate through the collection using `for i, e := range`.
+func (s *Set[T]) IAll(consumer func(int, T) bool) {
+	if s != nil {
+		slice.TrackWhile(*s.order, consumer)
+	}
+}
+
 // Loop creates a loop to iterate through the collection.
+// Deprecated: replaced by [Set.All].
 func (s *Set[T]) Loop() loop.Loop[T] {
 	if s == nil {
 		return nil
@@ -54,8 +63,8 @@ func (s *Set[T]) IterEdit() c.DelIterator[T] {
 	return &h
 }
 
-// Deprecated: Head is deprecated. Will be replaced by rance-over function iterator.
 // Head creates an iterator to iterate through the collection.
+// Deprecated: replaced by [Set.All].
 func (s *Set[T]) Head() SetIter[T] {
 	var elements *[]T
 	if s != nil {
@@ -64,9 +73,9 @@ func (s *Set[T]) Head() SetIter[T] {
 	return NewSetIter(elements, s.DeleteOne)
 }
 
-// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
+// Deprecated: replaced by [Set.All].
 func (s *Set[T]) First() (SetIter[T], T, bool) {
 	var (
 		iterator  = s.Head()
@@ -112,7 +121,7 @@ func (s *Set[T]) Clone() *Set[T] {
 
 // IsEmpty returns true if the collection is empty
 func (s *Set[T]) IsEmpty() bool {
-	return s.Len() == 0
+	return collection.IsEmpty(s)
 }
 
 // Len returns amount of the elements

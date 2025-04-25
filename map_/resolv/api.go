@@ -9,10 +9,10 @@ import (
 )
 
 // First keeps the first value of a key
-func First[K, V any](exists bool, _ K, old, new V) V { return op.IfElse(exists, old, new) }
+func First[K, V any](exists bool, _ K, oldVal, newVal V) V { return op.IfElse(exists, oldVal, newVal) }
 
 // Last retrieves the last value of a key
-func Last[K, V any](_ bool, _ K, _, new V) V { return new }
+func Last[K, V any](_ bool, _ K, _, newVal V) V { return newVal }
 
 // Slice puts the values of one key into a slice
 func Slice[K, V any](_ bool, _ K, rv []V, v V) []V {

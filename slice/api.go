@@ -15,7 +15,9 @@ import (
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_/resolv"
 	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/op/check"
 	"github.com/m4gshm/gollections/op/check/not"
+	"github.com/m4gshm/gollections/seq"
 )
 
 // Break is the 'break' statement of the For, Track methods
@@ -50,9 +52,9 @@ func OfLoop[S, T any](source S, hasNext func(S) bool, getNext func(S) (T, error)
 // OfIndexed builds a slice by extracting elements from an indexed soruce.
 // the len is length ot the source.
 // the getAt retrieves an element by its index from the source.
-func OfIndexed[T any](len int, getAt func(int) T) []T {
-	r := make([]T, len)
-	for i := 0; i < len; i++ {
+func OfIndexed[T any](amount int, getAt func(int) T) []T {
+	r := make([]T, amount)
+	for i := 0; i < amount; i++ {
 		r[i] = getAt(i)
 	}
 	return r
@@ -106,7 +108,7 @@ func GroupOrder[TS ~[]T, T any, K comparable, V any](elements TS, keyExtractor f
 // The keysExtractor retrieves one or more keys per element.
 // The valsExtractor retrieves one or more values per element.
 func GroupByMultiple[TS ~[]T, T any, K comparable, V any](elements TS, keysExtractor func(T) []K, valsExtractor func(T) []V) map[K][]V {
-	if elements == nil {
+	if elements == nil || keysExtractor == nil || valsExtractor == nil {
 		return nil
 	}
 	groups := map[K][]V{}
@@ -136,7 +138,7 @@ func GroupByMultiple[TS ~[]T, T any, K comparable, V any](elements TS, keysExtra
 // The keysExtractor retrieves one or more keys per element.
 // The valExtractor converts an element to a value.
 func GroupByMultipleKeys[TS ~[]T, T any, K comparable, V any](elements TS, keysExtractor func(T) []K, valExtractor func(T) V) map[K][]V {
-	if elements == nil {
+	if elements == nil || keysExtractor == nil || valExtractor == nil {
 		return nil
 	}
 	groups := map[K][]V{}
@@ -157,7 +159,7 @@ func GroupByMultipleKeys[TS ~[]T, T any, K comparable, V any](elements TS, keysE
 // The keyExtractor converts an element to a key.
 // The valsExtractor retrieves one or more values per element.
 func GroupByMultipleValues[TS ~[]T, T any, K comparable, V any](elements TS, keyExtractor func(T) K, valsExtractor func(T) []V) map[K][]V {
-	if elements == nil {
+	if elements == nil || keyExtractor == nil || valsExtractor == nil {
 		return nil
 	}
 	groups := map[K][]V{}
@@ -180,7 +182,7 @@ func initGroup[K comparable, T any, TS ~[]T](key K, e T, groups map[K]TS) {
 
 // Convert creates a slice consisting of the transformed elements using the converter.
 func Convert[FS ~[]From, From, To any](elements FS, converter func(From) To) []To {
-	if elements == nil {
+	if elements == nil || converter == nil {
 		return nil
 	}
 	result := make([]To, len(elements))
@@ -192,7 +194,7 @@ func Convert[FS ~[]From, From, To any](elements FS, converter func(From) To) []T
 
 // Conv creates a slice consisting of the transformed elements using the converter.
 func Conv[FS ~[]From, From, To any](elements FS, converter func(From) (To, error)) ([]To, error) {
-	if elements == nil {
+	if elements == nil || converter == nil {
 		return nil, nil
 	}
 	result := make([]To, len(elements))
@@ -216,6 +218,9 @@ func FilterAndConvert[FS ~[]From, From, To any](elements FS, filter func(From) b
 
 // AppendFilterAndConvert selects elements that match the filter, converts and appends them to the dest.
 func AppendFilterAndConvert[FS ~[]From, DS ~[]To, From, To any](src FS, dest DS, filter func(From) bool, converter func(From) To) DS {
+	if filter == nil || converter == nil {
+		return dest
+	}
 	for _, e := range src {
 		if filter(e) {
 			dest = append(dest, converter(e))
@@ -225,20 +230,23 @@ func AppendFilterAndConvert[FS ~[]From, DS ~[]To, From, To any](src FS, dest DS,
 }
 
 // FiltAndConv selects elements that match the filter, converts and returns them.
-func FiltAndConv[FS ~[]From, From, To any](elements FS, filter func(From) (bool, error), by func(From) (To, error)) ([]To, error) {
+func FiltAndConv[FS ~[]From, From, To any](elements FS, filter func(From) (bool, error), converter func(From) (To, error)) ([]To, error) {
 	if elements == nil {
 		return nil, nil
 	}
-	return AppendFiltAndConv(elements, make([]To, 0, len(elements)/2), filter, by)
+	return AppendFiltAndConv(elements, make([]To, 0, len(elements)/2), filter, converter)
 }
 
 // AppendFiltAndConv selects elements that match the filter, converts and appends them to the dest.
-func AppendFiltAndConv[FS ~[]From, DS ~[]To, From, To any](src FS, dest DS, filter func(From) (bool, error), by func(From) (To, error)) (DS, error) {
+func AppendFiltAndConv[FS ~[]From, DS ~[]To, From, To any](src FS, dest DS, filter func(From) (bool, error), converter func(From) (To, error)) (DS, error) {
+	if filter == nil || converter == nil {
+		return dest, nil
+	}
 	for _, e := range src {
 		if ok, err := filter(e); err != nil {
 			return dest, err
 		} else if ok {
-			c, err := by(e)
+			c, err := converter(e)
 			if err != nil {
 				return dest, err
 			}
@@ -258,6 +266,9 @@ func ConvertAndFilter[FS ~[]From, From, To any](elements FS, converter func(From
 
 // AppendConvertAndFilter converts elements, filters and append mached ones to the dest slice.
 func AppendConvertAndFilter[FS ~[]From, DS ~[]To, From, To any](src FS, dest DS, converter func(From) To, filter func(To) bool) DS {
+	if filter == nil || converter == nil {
+		return dest
+	}
 	for _, e := range src {
 		if r := converter(e); filter(r) {
 			dest = append(dest, r)
@@ -308,6 +319,9 @@ func FilterAndConvertIndexed[FS ~[]From, From, To any](elements FS, filter func(
 
 // AppendFilterAndConvertIndexed filters elements that match the filter condition, converts them and appends to the dest.
 func AppendFilterAndConvertIndexed[FS ~[]From, DS ~[]To, From, To any](src FS, dest DS, filter func(index int, from From) bool, converter func(index int, from From) To) DS {
+	if filter == nil || converter == nil {
+		return dest
+	}
 	for i, e := range src {
 		if filter(i, e) {
 			dest = append(dest, converter(i, e))
@@ -318,13 +332,13 @@ func AppendFilterAndConvertIndexed[FS ~[]From, DS ~[]To, From, To any](src FS, d
 
 // ConvertOK creates a slice consisting of the transformed elements using the converter.
 // The converter may returns a value or ok=false to exclude the value from the result.
-func ConvertOK[FS ~[]From, From, To any](elements FS, by func(from From) (To, bool)) []To {
-	if elements == nil {
+func ConvertOK[FS ~[]From, From, To any](elements FS, converter func(from From) (To, bool)) []To {
+	if elements == nil || converter == nil {
 		return nil
 	}
 	var result = make([]To, 0, len(elements))
 	for _, e := range elements {
-		if to, ok := by(e); ok {
+		if to, ok := converter(e); ok {
 			result = append(result, to)
 		}
 	}
@@ -334,13 +348,13 @@ func ConvertOK[FS ~[]From, From, To any](elements FS, by func(from From) (To, bo
 // ConvOK creates a slice consisting of the transformed elements using the converter.
 // The converter may returns a converted value or ok=false if convertation is not possible.
 // This value will not be included in the results slice.
-func ConvOK[FS ~[]From, From, To any](elements FS, by func(from From) (To, bool, error)) ([]To, error) {
-	if elements == nil {
+func ConvOK[FS ~[]From, From, To any](elements FS, converter func(from From) (To, bool, error)) ([]To, error) {
+	if elements == nil || converter == nil {
 		return nil, nil
 	}
 	var result = make([]To, 0, len(elements))
 	for _, e := range elements {
-		to, ok, err := by(e)
+		to, ok, err := converter(e)
 		if err != nil {
 			return result, err
 		} else if ok {
@@ -351,22 +365,25 @@ func ConvOK[FS ~[]From, From, To any](elements FS, by func(from From) (To, bool,
 }
 
 // ConvertCheckIndexed additionally filters 'From' elements
-func ConvertCheckIndexed[FS ~[]From, From, To any](elements FS, by func(index int, from From) (To, bool)) []To {
-	if elements == nil {
+func ConvertCheckIndexed[FS ~[]From, From, To any](elements FS, converter func(index int, from From) (To, bool)) []To {
+	if elements == nil || converter == nil {
 		return nil
 	}
 	var result = make([]To, 0, len(elements))
 	for i, e := range elements {
-		if to, ok := by(i, e); ok {
+		if to, ok := converter(i, e); ok {
 			result = append(result, to)
 		}
 	}
 	return result
 }
 
-// Flat unfolds the n-dimensional slice 'elements' into a n-1 dimensional slice.
+// Flat unfolds the n-dimensional slice 'elements' into a n-1 dimensional slice like:
+//
+//	var arrays [][]int
+//	var integers []int = slice.Flat(arrays, as.Is)
 func Flat[FS ~[]From, From any, TS ~[]To, To any](elements FS, flattener func(From) TS) []To {
-	if elements == nil {
+	if elements == nil || flattener == nil {
 		return nil
 	}
 	var result = make([]To, 0, int(float32(len(elements))*1.618))
@@ -377,9 +394,31 @@ func Flat[FS ~[]From, From any, TS ~[]To, To any](elements FS, flattener func(Fr
 	return result
 }
 
-// Flatt unfolds the n-dimensional slice 'elements' into a n-1 dimensional slice.
+// FlatSeq unfolds the n-dimensional slice 'elements' into a n-1 dimensional slice like:
+//
+//	var arrays [][]int
+//	var integers []int = slice.Flat(arrays, slices.Values)
+func FlatSeq[FS ~[]From, From any, STo ~seq.Seq[To], To any](elements FS, flattener func(From) STo) []To {
+	if elements == nil || flattener == nil {
+		return nil
+	}
+	var result = make([]To, 0, int(float32(len(elements))*1.618))
+	for _, e := range elements {
+		for f := range flattener(e) {
+			result = append(result, f)
+		}
+
+	}
+	return result
+}
+
+// Flatt unfolds the n-dimensional slice 'elements' into a n-1 dimensional slice like:
+//
+//	var strings [][]string
+//	var parse = func(f []string) (iter.Seq[int], error) { ... }
+//	integers, err := Flatt(strings, parse)
 func Flatt[FS ~[]From, From, To any](elements FS, flattener func(From) ([]To, error)) ([]To, error) {
-	if elements == nil {
+	if elements == nil || flattener == nil {
 		return nil, nil
 	}
 	var result = make([]To, 0, int(float32(len(elements))*1.618))
@@ -394,9 +433,31 @@ func Flatt[FS ~[]From, From, To any](elements FS, flattener func(From) ([]To, er
 	return result, nil
 }
 
+// FlattSeq unfolds the n-dimensional slice 'elements' into a n-1 dimensional slice like:
+//
+//	var strings [][]string
+//	var parse = func(f []string) ([]int, error) { ... }
+//	integers, err := Flatt(strings, parse)
+func FlattSeq[FS ~[]From, From any, STo ~seq.SeqE[To], To any](elements FS, flattener func(From) STo) ([]To, error) {
+	if elements == nil || flattener == nil {
+		return nil, nil
+	}
+	var result = make([]To, 0, int(float32(len(elements))*1.618))
+	for _, e := range elements {
+		f := flattener(e)
+		for t, err := range f {
+			if err != nil {
+				return result, err
+			}
+			result = append(result, t)
+		}
+	}
+	return result, nil
+}
+
 // FlatAndConvert unfolds the n-dimensional slice into a n-1 dimensional slice and converts the elements
 func FlatAndConvert[FS ~[]From, From any, IS ~[]I, I, To any](elements FS, flattener func(From) IS, convert func(I) To) []To {
-	if elements == nil {
+	if elements == nil || flattener == nil || convert == nil {
 		return nil
 	}
 	var result = make([]To, 0, int(float32(len(elements))*1.618))
@@ -418,6 +479,9 @@ func FilterAndFlat[FS ~[]From, From, To any](elements FS, filter func(From) bool
 
 // AppendFilterAndFlat retrieves src elements that match the filter condition, extracts 'To' type slices from them and appends the dest.
 func AppendFilterAndFlat[FS ~[]From, DS ~[]To, From, To any](src FS, dest DS, filter func(From) bool, flattener func(From) []To) DS {
+	if filter == nil || flattener == nil {
+		return dest
+	}
 	for _, e := range src {
 		if filter(e) {
 			dest = append(dest, flattener(e)...)
@@ -436,6 +500,9 @@ func FlatAndFiler[FS ~[]From, From, To any](elements FS, flattener func(From) []
 
 // AppendFlatAndFiler extracts a slice of type "To" from each src element, filters and appends to dest.
 func AppendFlatAndFiler[FS ~[]From, DS ~[]To, From, To any](src FS, dest DS, flattener func(From) []To, filter func(To) bool) DS {
+	if filter == nil || flattener == nil {
+		return dest
+	}
 	for _, e := range src {
 		for _, to := range flattener(e) {
 			if filter(to) {
@@ -456,6 +523,9 @@ func FilterFlatFilter[FS ~[]From, From, To any](elements FS, filterFrom func(Fro
 
 // AppendFilterFlatFilter applies operations chain filter->flat->filter the src elemens and addends to the dest.
 func AppendFilterFlatFilter[FS ~[]From, DS ~[]To, From, To any](src FS, dest DS, filterFrom func(From) bool, flat func(From) []To, filterTo func(To) bool) DS {
+	if filterFrom == nil || flat == nil || filterTo == nil {
+		return dest
+	}
 	for _, e := range src {
 		if filterFrom(e) {
 			for _, to := range flat(e) {
@@ -495,6 +565,9 @@ func Filter[TS ~[]T, T any](elements TS, filter func(T) bool) TS {
 
 // AppendFilter filters elements that match the filter condition and adds them to the dest.
 func AppendFilter[TS ~[]T, DS ~[]T, T any](src TS, dest DS, filter func(T) bool) DS {
+	if filter == nil {
+		return dest
+	}
 	for _, e := range src {
 		if filter(e) {
 			dest = append(dest, e)
@@ -513,20 +586,22 @@ func Filt[TS ~[]T, T any](elements TS, filter func(T) (bool, error)) (TS, error)
 
 // AppendFilt filters elements that match the filter condition and adds them to the dest.
 func AppendFilt[TS ~[]T, DS ~[]T, T any](src TS, dest DS, filter func(T) (bool, error)) (DS, error) {
+	if filter == nil {
+		return nil, nil
+	}
 	for _, e := range src {
 		ok, err := filter(e)
-		if ok {
-			dest = append(dest, e)
-		}
 		if err != nil {
 			return dest, err
+		} else if ok {
+			dest = append(dest, e)
 		}
 	}
 	return dest, nil
 }
 
-// Sequence makes a sequence slice by applying the 'next' function to the previous step generated value.
-func Sequence[T any](first T, next func(T) (T, bool)) []T {
+// Series makes a sequence slice by applying the 'next' function to the previous step generated value.
+func Series[T any](first T, next func(T) (T, bool)) []T {
 	current := first
 	sequence := make([]T, 0, 16)
 	sequence = append(sequence, current)
@@ -694,48 +769,96 @@ func Sum[TS ~[]T, T c.Summable](elements TS) (out T) {
 	return Accum(out, elements, op.Sum[T])
 }
 
-// First returns the first element that satisfies requirements of the predicate 'by'
-func First[TS ~[]T, T any](elements TS, by func(T) bool) (no T, ok bool) {
-	for _, e := range elements {
-		if by(e) {
-			return e, true
-		}
+// Head returns the first element
+func Head[TS ~[]T, T any](elements TS) (no T, ok bool) {
+	if len(elements) > 0 {
+		return elements[0], true
 	}
 	return no, false
+}
+
+// Top returns the top n elements
+func Top[TS ~[]T, T any](n int, elements TS) TS {
+	if len(elements) > n {
+		return elements[0:n]
+	}
+	return elements
+}
+
+// Tail returns the latest element
+func Tail[TS ~[]T, T any](elements TS) (no T, ok bool) {
+	if l := len(elements); l > 0 {
+		return elements[l-1], true
+	}
+	return no, false
+}
+
+// First returns the first element that satisfies requirements of the predicate 'by'
+func First[TS ~[]T, T any](elements TS, by func(T) bool) (no T, ok bool) {
+	e, i := FirstI(elements, by)
+	return e, i != -1
 }
 
 // Firstt returns the first element that satisfies the condition of the 'by' function
 func Firstt[TS ~[]T, T any](elements TS, by func(T) (bool, error)) (no T, ok bool, err error) {
-	for _, e := range elements {
-		if ok, err = by(e); err != nil || ok {
-			return e, ok, err
-		}
-	}
-	return no, false, nil
+	e, i, err := FirsttI(elements, by)
+	return e, i != -1, err
 }
 
-// Last returns the latest element that satisfies requirements of the predicate 'filter'
+// FirstI returns the first element index that satisfies requirements of the predicate 'by'
+func FirstI[TS ~[]T, T any](elements TS, by func(T) bool) (no T, index int) {
+	for i, e := range elements {
+		if by(e) {
+			return e, i
+		}
+	}
+	return no, -1
+}
+
+// FirsttI returns the first element index that satisfies requirements of the predicate 'by'
+func FirsttI[TS ~[]T, T any](elements TS, by func(T) (bool, error)) (no T, index int, err error) {
+	for i, e := range elements {
+		if ok, err := by(e); err != nil || ok {
+			return e, i, err
+		}
+	}
+	return no, -1, nil
+}
+
+// Last returns the latest element that satisfies requirements of the predicate 'by'
 func Last[TS ~[]T, T any](elements TS, by func(T) bool) (no T, ok bool) {
+	e, i := LastI(elements, by)
+	return e, i != -1
+}
+
+// Lastt returns the latest element that satisfies requirements of the predicate 'by'
+func Lastt[TS ~[]T, T any](elements TS, by func(T) (bool, error)) (no T, ok bool, err error) {
+	e, i, err := LasttI(elements, by)
+	return e, i != -1, err
+}
+
+// LastI returns the latest element index that satisfies requirements of the predicate 'by'
+func LastI[TS ~[]T, T any](elements TS, by func(T) bool) (no T, index int) {
 	for i := len(elements) - 1; i >= 0; i-- {
 		e := elements[i]
 		if by(e) {
-			return e, true
+			return e, i
 		}
 	}
-	return no, false
+	return no, -1
 }
 
-// Lastt returns the latest element that satisfies requirements of the predicate 'filter'
-func Lastt[TS ~[]T, T any](elements TS, by func(T) (bool, error)) (no T, ok bool, err error) {
+// LasttI returns the latest element index that satisfies requirements of the predicate 'by'
+func LasttI[TS ~[]T, T any](elements TS, by func(T) (bool, error)) (no T, index int, err error) {
 	for i := len(elements) - 1; i >= 0; i-- {
 		e := elements[i]
-		if ok, err = by(e); err != nil {
-			return no, false, err
+		if ok, err := by(e); err != nil {
+			return no, i, err
 		} else if ok {
-			return e, true, nil
+			return e, i, nil
 		}
 	}
-	return no, false, nil
+	return no, -1, nil
 }
 
 // Track applies the 'consumer' function to the elements until the consumer returns the c.Break to stop.tracking
@@ -876,7 +999,7 @@ func DowncastRef[TS ~[]T, T any](elements *[]T) *TS {
 
 // Filled returns the 'ifEmpty' if the 'elements' slise is empty
 func Filled[TS ~[]T, T any](elements TS, ifEmpty []T) TS {
-	if IsEmpty(elements) {
+	if !IsEmpty(elements) {
 		return elements
 	}
 	return ifEmpty
@@ -915,7 +1038,7 @@ func Has[TS ~[]T, T any](elements TS, condition func(T) bool) bool {
 
 // IsEmpty checks whether the specified slice is empty
 func IsEmpty[TS ~[]T, T any](elements TS) bool {
-	return len(elements) == 0
+	return check.Empty(elements)
 }
 
 // NotEmpty checks whether the specified slice is not empty
@@ -946,19 +1069,19 @@ func AppendMapOrder[TS ~[]T, T any, K comparable, V any](elements TS, keyExtract
 }
 
 // MapResolv collects key\value elements into a new map by iterating over the elements with resolving of duplicated key values
-func MapResolv[TS ~[]T, T any, K comparable, V, VR any](elements TS, keyExtractor func(T) K, valExtractor func(T) V, resolver func(bool, K, VR, V) VR) map[K]VR {
+func MapResolv[TS ~[]T, T any, K comparable, V, VR any](elements TS, keyExtractor func(T) K, valExtractor func(T) V, resolver func(exists bool, key K, existVal VR, val V) VR) map[K]VR {
 	return AppendMapResolv(elements, keyExtractor, valExtractor, resolver, nil)
 }
 
 // MapResolvOrder collects key\value elements into a new map by iterating over the elements with resolving of duplicated key values.
 // Returns a slice with the keys ordered by the time they were added and the resolved key\value map.
-func MapResolvOrder[TS ~[]T, T any, K comparable, V, VR any](elements TS, keyExtractor func(T) K, valExtractor func(T) V, resolver func(bool, K, VR, V) VR) ([]K, map[K]VR) {
+func MapResolvOrder[TS ~[]T, T any, K comparable, V, VR any](elements TS, keyExtractor func(T) K, valExtractor func(T) V, resolver func(exists bool, key K, existVal VR, val V) VR) ([]K, map[K]VR) {
 	return AppendMapResolvOrder(elements, keyExtractor, valExtractor, resolver, nil, nil)
 }
 
 // AppendMapResolv collects key\value elements into the 'dest' map by iterating over the elements with resolving of duplicated key values
-func AppendMapResolv[TS ~[]T, T any, K comparable, V, VR any](elements TS, keyExtractor func(T) K, valExtractor func(T) V, resolver func(bool, K, VR, V) VR, dest map[K]VR) map[K]VR {
-	if dest == nil {
+func AppendMapResolv[TS ~[]T, T any, K comparable, V, VR any](elements TS, keyExtractor func(T) K, valExtractor func(T) V, resolver func(exists bool, key K, existVal VR, val V) VR, dest map[K]VR) map[K]VR {
+	if dest == nil || keyExtractor == nil || valExtractor == nil {
 		dest = map[K]VR{}
 	}
 	for _, e := range elements {
@@ -970,8 +1093,8 @@ func AppendMapResolv[TS ~[]T, T any, K comparable, V, VR any](elements TS, keyEx
 }
 
 // AppendMapResolvv collects key\value elements into the 'dest' map by iterating over the elements with resolving of duplicated key values
-func AppendMapResolvv[TS ~[]T, T any, K comparable, V, VR any](elements TS, kvExtractor func(T) (K, V, error), resolver func(bool, K, VR, V) (VR, error), dest map[K]VR) (map[K]VR, error) {
-	if dest == nil {
+func AppendMapResolvv[TS ~[]T, T any, K comparable, VR, V any](elements TS, kvExtractor func(T) (K, V, error), resolver func(exists bool, key K, existVal VR, val V) (VR, error), dest map[K]VR) (map[K]VR, error) {
+	if dest == nil || kvExtractor == nil || resolver == nil {
 		dest = map[K]VR{}
 	}
 	for _, e := range elements {
@@ -991,8 +1114,8 @@ func AppendMapResolvv[TS ~[]T, T any, K comparable, V, VR any](elements TS, kvEx
 
 // AppendMapResolvOrder collects key\value elements into the 'dest' map by iterating over the elements with resolving of duplicated key values.
 // Additionaly populates the 'order' slice by the keys ordered by the time they were added and the resolved key\value map.
-func AppendMapResolvOrder[TS ~[]T, T any, K comparable, V, VR any](elements TS, keyExtractor func(T) K, valExtractor func(T) V, resolver func(bool, K, VR, V) VR, order []K, dest map[K]VR) ([]K, map[K]VR) {
-	if dest == nil {
+func AppendMapResolvOrder[TS ~[]T, T any, K comparable, V, VR any](elements TS, keyExtractor func(T) K, valExtractor func(T) V, resolver func(exists bool, key K, existVal VR, val V) VR, order []K, dest map[K]VR) ([]K, map[K]VR) {
+	if dest == nil || keyExtractor == nil || valExtractor == nil {
 		dest = map[K]VR{}
 	}
 	for _, e := range elements {
@@ -1008,8 +1131,8 @@ func AppendMapResolvOrder[TS ~[]T, T any, K comparable, V, VR any](elements TS, 
 
 // AppendMapResolvOrderr collects key\value elements into the 'dest' map by iterating over the elements with resolving of duplicated key values.
 // Additionaly populates the 'order' slice by the keys ordered by the time they were added and the resolved key\value map.
-func AppendMapResolvOrderr[TS ~[]T, T any, K comparable, V, VR any](elements TS, kvExtractor func(T) (K, V, error), resolver func(bool, K, VR, V) (VR, error), order []K, dest map[K]VR) ([]K, map[K]VR, error) {
-	if dest == nil {
+func AppendMapResolvOrderr[TS ~[]T, T any, K comparable, V, VR any](elements TS, kvExtractor func(T) (K, V, error), resolver func(exists bool, key K, existVal VR, val V) (VR, error), order []K, dest map[K]VR) ([]K, map[K]VR, error) {
+	if dest == nil || kvExtractor == nil || resolver == nil {
 		dest = map[K]VR{}
 	}
 	for _, e := range elements {

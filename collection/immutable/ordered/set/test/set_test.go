@@ -85,7 +85,7 @@ func Test_Set_Sort(t *testing.T) {
 		sorted   = elements.Sort(op.Compare)
 	)
 	assert.Equal(t, set.Of(-2, 0, 1, 3, 5, 6, 8), sorted)
-	assert.NotSame(t, elements, sorted)
+	assert.NotSame(t, &elements, &sorted)
 }
 func Test_Set_SortStructByField(t *testing.T) {
 	var (

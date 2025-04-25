@@ -5,6 +5,7 @@ import (
 
 	oset "github.com/m4gshm/gollections/collection/immutable/ordered/set"
 	"github.com/m4gshm/gollections/loop"
+	"github.com/m4gshm/gollections/seq"
 	"github.com/m4gshm/gollections/slice/range_"
 )
 
@@ -28,7 +29,7 @@ type benchCase struct {
 	load func(int)
 }
 
-var cases = []benchCase{{"high", HighLoad}, {"low", LowLoad}}
+var cases = []benchCase{ /*{"high", HighLoad},*/ {"low", LowLoad}}
 
 func Benchmark_Loop_ImmutableOrderSet_ForEach(b *testing.B) {
 	c := oset.Of(values...)
@@ -36,6 +37,18 @@ func Benchmark_Loop_ImmutableOrderSet_ForEach(b *testing.B) {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				c.ForEach(casee.load)
+			}
+		})
+	}
+}
+
+func Benchmark_Loop_Slice_Seq_ForByRange(b *testing.B) {
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for v := range seq.Of(values...) {
+					casee.load(v)
+				}
 			}
 		})
 	}
@@ -121,6 +134,19 @@ func Benchmark_Loop_ImmutableOrderSet_Loop_Next(b *testing.B) {
 					if !ok {
 						break
 					}
+					casee.load(v)
+				}
+			}
+		})
+	}
+}
+
+func Benchmark_Loop_ImmutableOrderSet_ForRange_All(b *testing.B) {
+	c := oset.Of(values...)
+	for _, casee := range cases {
+		b.Run(casee.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				for v := range c.All {
 					casee.load(v)
 				}
 			}

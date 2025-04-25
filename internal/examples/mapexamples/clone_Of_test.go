@@ -26,7 +26,7 @@ func Test_Clone(t *testing.T) {
 	fmt.Printf("%v\n", employers) //map[devops:map[name:Superbob] jun:map[name:Tom]]
 	fmt.Printf("%v\n", copy)      //map[devops:map[name:Superbob]]
 
-	assert.NotSame(t, copy, employers)
+	assert.NotSame(t, &copy, &employers)
 
 	assert.Equal(t, "Superbob", copy["devops"]["name"])
 

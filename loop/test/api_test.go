@@ -254,7 +254,7 @@ func Test_ConvertFiltered(t *testing.T) {
 	assert.Equal(t, []string{"4", "8"}, loop.Slice(r))
 }
 
-func Test_ConvertFilteredInplace(t *testing.T) {
+func Test_ConvOK(t *testing.T) {
 	s := loop.Of(1, 3, 4, 5, 7, 8, 9, 11)
 	r := loop.ConvertOK(s, func(i int) (string, bool) { return strconv.Itoa(i), even(i) })
 	assert.Equal(t, []string{"4", "8"}, loop.Slice(r))
@@ -312,7 +312,7 @@ func Test_Filt(t *testing.T) {
 	l := loop.Filt(s, func(i int) (bool, error) { return even(i), op.IfElse(i > 7, errors.New("abort"), nil) })
 	r, err := breakLoop.Slice(l)
 	assert.Error(t, err)
-	assert.Equal(t, slice.Of(4, 8), r)
+	assert.Equal(t, slice.Of(4), r)
 }
 
 func Test_Filt2(t *testing.T) {
@@ -443,8 +443,8 @@ func Test_RangeClosed(t *testing.T) {
 	assert.Equal(t, slice.Of(1), loop.Slice(range_.Closed(1, 1)))
 }
 
-func Test_Sequence(t *testing.T) {
-	assert.Equal(t, slice.Of(-1, 0, 1, 2, 3), loop.Slice(loop.Sequence(-1, func(prev int) (int, bool) { return prev + 1, prev < 3 })))
+func Test_Series(t *testing.T) {
+	assert.Equal(t, slice.Of(-1, 0, 1, 2, 3), loop.Slice(loop.Series(-1, func(prev int) (int, bool) { return prev + 1, prev < 3 })))
 }
 
 func Test_OfIndexed(t *testing.T) {

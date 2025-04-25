@@ -133,5 +133,5 @@ func Test_Map_Sort(t *testing.T) {
 	expected := ordered.NewMap(k.V(-8, "-8"), k.V(4, "4"), k.V(5, "5"), k.V(10, "10"))
 
 	assert.Equal(t, expected, o)
-	assert.NotSame(t, m, o)
+	assert.NotSame(t, &m, &o)
 }

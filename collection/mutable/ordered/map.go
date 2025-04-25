@@ -37,7 +37,7 @@ var (
 	_ fmt.Stringer                                                = (*Map[int, any])(nil)
 )
 
-// All is used to iterate through the collection using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
+// All is used to iterate through the collection using `for key, val := range`.
 func (m *Map[K, V]) All(consumer func(K, V) bool) {
 	if m != nil {
 		map_.TrackOrderedWhile(m.order, m.elements, consumer)
@@ -45,13 +45,14 @@ func (m *Map[K, V]) All(consumer func(K, V) bool) {
 }
 
 // Loop creates a loop to iterate through the collection.
+// Deprecated: replaced by [Map.All].
 func (m *Map[K, V]) Loop() loop.Loop[K, V] {
 	h := m.Head()
 	return h.Next
 }
 
-// Deprecated: Head is deprecated. Will be replaced by rance-over function iterator.
 // Head creates an iterator to iterate through the collection.
+// Deprecated: replaced by [Map.All].
 func (m *Map[K, V]) Head() ordered.MapIter[K, V] {
 	var (
 		order    []K
@@ -64,8 +65,8 @@ func (m *Map[K, V]) Head() ordered.MapIter[K, V] {
 	return ordered.NewMapIter(elements, slice.NewHead(order))
 }
 
-// Deprecated: Tail is deprecated. Will be replaced by rance-over function iterator.
 // Tail creates an iterator pointing to the end of the collection
+// Deprecated: Tail is deprecated. Will be replaced by a rance-over function iterator.
 func (m *Map[K, V]) Tail() ordered.MapIter[K, V] {
 	var (
 		order    []K
@@ -78,9 +79,9 @@ func (m *Map[K, V]) Tail() ordered.MapIter[K, V] {
 	return ordered.NewMapIter(elements, slice.NewTail(order))
 }
 
-// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 // First returns the first key/value pair of the map, an iterator to iterate over the remaining pair, and true\false marker of availability next pairs.
 // If no more then ok==false.
+// Deprecated: replaced by [Map.All].
 func (m *Map[K, V]) First() (ordered.MapIter[K, V], K, V, bool) {
 	var (
 		iterator           = m.Head()
@@ -124,7 +125,7 @@ func (m *Map[K, V]) Len() int {
 
 // IsEmpty returns true if the map is empty
 func (m *Map[K, V]) IsEmpty() bool {
-	return m.Len() == 0
+	return collection.IsEmpty(m)
 }
 
 // Track applies the 'consumer' function for all key/value pairs until the consumer returns the c.Break to stop.

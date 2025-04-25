@@ -31,16 +31,12 @@ type Vector[T any] interface {
 	c.TrackEach[int, T]
 
 	c.Access[int, T]
-
-	c.KVAll[int, T]
 }
 
 // Set - collection interface that ensures the uniqueness of elements (does not insert duplicate values).
 type Set[T comparable] interface {
 	Collection[T]
 	c.Checkable[T]
-
-	c.All[T]
 }
 
 // Map - collection interface that stores key/value pairs and provide access to an element by its key
@@ -50,7 +46,7 @@ type Map[K comparable, V any] interface {
 	kv.Convertable[K, V]
 	c.Checkable[K]
 	c.Access[K, V]
-	c.KVAll[K, V]
+	c.KVRange[K, V]
 
 	Len() int
 	IsEmpty() bool

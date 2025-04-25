@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	breakLoop "github.com/m4gshm/gollections/break/loop"
+	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/notsafe"
@@ -23,35 +24,42 @@ type Vector[T any] struct {
 var (
 	_ collection.Vector[any] = (*Vector[any])(nil)
 	_ collection.Vector[any] = Vector[any]{}
+	_ c.OrderedRange[any]    = Vector[any]{}
 	_ fmt.Stringer           = (*Vector[any])(nil)
 	_ fmt.Stringer           = Vector[any]{}
 )
 
-// All is used to iterate through the collection using `for ... range`. Supported since go 1.22 with GOEXPERIMENT=rangefunc enabled.
-func (v Vector[T]) All(consumer func(int, T) bool) {
+// All is used to iterate through the collection using `for e := range`.
+func (v Vector[T]) All(consumer func(T) bool) {
+	slice.WalkWhile(v.elements, consumer)
+}
+
+// IAll is used to iterate through the collection using `for i, e := range`.
+func (v Vector[T]) IAll(consumer func(int, T) bool) {
 	slice.TrackWhile(v.elements, consumer)
 }
 
 // Loop creates a loop to iterate through the collection.
+// Deprecated: replaced by [Vector.All].
 func (v Vector[T]) Loop() loop.Loop[T] {
 	return loop.Of(v.elements...)
 }
 
-// Deprecated: Head is deprecated. Will be replaced by rance-over function iterator.
 // Head creates an iterator to iterate through the collection.
+// Deprecated: replaced by [Vector.All].
 func (v Vector[T]) Head() slice.Iter[T] {
 	return slice.NewHead(v.elements)
 }
 
-// Deprecated: Tail is deprecated. Will be replaced by rance-over function iterator.
 // Tail creates an iterator pointing to the end of the collection
+// Deprecated: Tail is deprecated. Will be replaced by a rance-over function iterator.
 func (v Vector[T]) Tail() slice.Iter[T] {
 	return slice.NewTail(v.elements)
 }
 
-// Deprecated: First is deprecated. Will be replaced by rance-over function iterator.
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
+// Deprecated: replaced by [Vector.All].
 func (v Vector[T]) First() (*slice.Iter[T], T, bool) {
 	h := slice.NewHead(v.elements)
 	return h.Crank()
@@ -87,7 +95,7 @@ func (v Vector[T]) Len() int {
 
 // IsEmpty returns true if the collection is empty
 func (v Vector[T]) IsEmpty() bool {
-	return v.Len() == 0
+	return collection.IsEmpty(v)
 }
 
 // Get returns an element by the index, otherwise, if the provided index is ouf of the vector len, returns zero T and false in the second result

@@ -11,6 +11,7 @@ import (
 	"github.com/m4gshm/gollections/convert"
 	"github.com/m4gshm/gollections/convert/ptr"
 	"github.com/m4gshm/gollections/loop"
+	"github.com/m4gshm/gollections/seq"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/range_"
 )
@@ -43,6 +44,18 @@ func Benchmark_Convert_Slice_EveryElement(b *testing.B) {
 		for i, v := range values {
 			s[i] = op(v)
 		}
+	}
+	_ = s
+	b.StopTimer()
+}
+
+func Benchmark_Convert_Seq(b *testing.B) {
+	op := convert.And(toString, addTail)
+	var s []string
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		it := seq.Of(values...)
+		s = seq.SliceCap(seq.Convert(it, op), len(values))
 	}
 	_ = s
 	b.StopTimer()

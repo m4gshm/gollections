@@ -79,6 +79,25 @@ func Benchmark_UseOtherElseGet(b *testing.B) {
 	assert.Equal(b, "Bob Smith", fullName)
 }
 
+func Benchmark_UseOtherElseGet_With_String_Wrapper(b *testing.B) {
+	user := User{name: "Bob", surname: "Smith"}
+	fullName := ""
+	for i := 0; i < b.N; i++ {
+		fullName = use.
+			If(len(user.surname) == 0, user.name).
+			Other(String(user.name).IsEmpty, user.Surname).
+			ElseGet(sum.Of(user.name, " ", user.surname))
+	}
+
+	assert.Equal(b, "Bob Smith", fullName)
+}
+
+type String string
+
+func (s String) IsEmpty() bool {
+	return len(s) == 0
+}
+
 func Benchmark_UseSimpleOld(b *testing.B) {
 	user := User{name: "Bob", surname: "Smith"}
 	fullName := ""

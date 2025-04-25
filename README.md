@@ -1,11 +1,11 @@
 # Gollections
 
-Gollections is set of functions for [slices](#slices), [maps](#maps) and
-additional implementations of data structures such as [ordered
-map](#mutable-collections) or [set](#mutable-collections) aimed to
-reduce boilerplate code.
+Gollections is set of functions for [slices](#slices), [maps](#maps),
+[iter.Seq, iter.Seq2](#seq-seq2-seqe) and additional implementations of
+data structures such as [ordered map](#mutable-collections) or
+[set](#mutable-collections) aimed to reduce boilerplate code.
 
-Supports Go version 1.22.
+Supports Go version 1.24.
 
 For example, it’s need to group some
 [users](./internal/examples/boilerplate/user_type.go) by their role
@@ -87,9 +87,7 @@ find by exploring slices [subpackages](./slice).
 
 **Be careful** when use several slice functions subsequently like
 `slice.Filter(slice.Convert(…​))`. This can lead to unnecessary RAM
-consumption. Consider
-[loop](#loop-kvloop-and-breakable-versions-breakloop-breakkvloop)
-instead of slice API.
+consumption. Consider [seq](#seq-seq2-seqe) instead of slice API.
 
 ### Main slice functions
 
@@ -281,6 +279,26 @@ import (
 result, ok := slice.First([]int{1, 3, 5, 7, 9, 11}, more.Than(5)) //7, true
 ```
 
+##### slice.Head
+
+``` go
+import (
+    "github.com/m4gshm/gollections/slice"
+)
+
+result, ok := slice.Head([]int{1, 3, 5, 7, 9, 11}) //1, true
+```
+
+##### slice.Top
+
+``` go
+import (
+    "github.com/m4gshm/gollections/slice"
+)
+
+result := slice.Top(3, []int{1, 3, 5, 7, 9, 11}) //[]int{1, 3, 5}
+```
+
 ##### slice.Last
 
 ``` go
@@ -290,6 +308,16 @@ import (
 )
 
 result, ok := slice.Last([]int{1, 3, 5, 7, 9, 11}, less.Than(9)) //7, true
+```
+
+##### slice.Tail
+
+``` go
+import (
+    "github.com/m4gshm/gollections/slice"
+)
+
+result, ok := slice.Tail([]int{1, 3, 5, 7, 9, 11}) //11, true
 ```
 
 #### Element converters
@@ -456,22 +484,32 @@ var all, err = map_.Conv(employers, func(title string, employer map[string]strin
 //map[d:Bob j:Tom], nil
 ```
 
-## [seq](./seq/api.go), [seq2](./seq2/api.go)
+## [seq](./seq/api.go), [seq2](./seq2/api.go), [seqe](./seqe/api.go)
 
-API extends rangefunc iterator types `seq.Seq[V]`, `seq.Seq2[K,V]` with
-utility functions kit.
+API extends rangefunc iterator types `iter.Seq[V]`, `iter.Seq2[K,V]`
+with utility functions kit.
 
 ``` go
 even := func(i int) bool { return i%2 == 0 }
-sequence := seq.Convert(seq.Filter(seq.Of(1, 2, 3, 4), even), strconv.Itoa)
-var result []string = seq.Slice(sequence) //[2 4]
+strSeq := seq.Convert(seq.Filter(seq.Of(1, 2, 3, 4), even), strconv.Itoa)
+
+// iterate over sequence
+for s := range strSeq {
+    fmt.Println(s)
+}
+
+// or reduce
+var oneString string = seq.Sum(strSeq) // 24
+
+// or collect
+var strings []string = seq.Slice(strSeq) //[2 4]
 ```
 
 or
 
 ``` go
 intSeq := seq.Conv(seq.Of("1", "2", "3", "ddd4", "5"), strconv.Atoi)
-ints, err := seq2.Slice(intSeq) //[1 2 3], invalid syntax
+ints, err := seqe.Slice(intSeq) //[1 2 3], invalid syntax
 ```
 
 ### Sequence API
@@ -575,7 +613,7 @@ var s []string = seq.Slice(seq.Convert(seq.Of(1, 3, 5, 7, 9, 11), strconv.Itoa))
 ##### seq.Conv
 
 ``` go
-result, err := seq2.Slice(seq.Conv(seq.Of("1", "3", "5", "_7", "9", "11"), strconv.Atoi))
+result, err := seqe.Slice(seq.Conv(seq.Of("1", "3", "5", "_7", "9", "11"), strconv.Atoi))
 //[]int{1, 3, 5}, ErrSyntax
 ```
 
@@ -610,6 +648,8 @@ var i []int = seq.Slice(seq.Flat(seq.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...), as.
 ```
 
 ## [loop](./loop/api.go), [kv/loop](./kv/loop/api.go) and breakable versions [break/loop](./break/loop/api.go), [break/kv/loop](./break/kv/loop/api.go)
+
+**Deprecated**: will be replaced by [seq](#seq-seq2-seqe) API.
 
 Legacy iterators API based on the following functions:
 
@@ -838,15 +878,13 @@ These functions combine converters, filters and reducers.
 
 ### Iterating over loops
 
-- (only for go 1.22) Using rangefunc `All` like:
+- Using rangefunc `All` like:
 
 ``` go
 for i := range range_.Of(0, 100).All {
     doOp(i)
 }
 ```
-
-don’t forget exec `go env -w GOEXPERIMENT=rangefunc` before compile.
 
 - Using `for` statement like:
 
@@ -1022,30 +1060,11 @@ The same underlying interfaces but for read-only use cases.
 
 ### Iterating over collections
 
-- (only for go 1.22) Using rangefunc `All` like:
+- Using rangefunc `All` like:
 
 ``` go
 uniques := set.From(range_.Of(0, 100))
 for i := range uniques.All {
-    doOp(i)
-}
-```
-
-- Using `for` statement like:
-
-``` go
-uniques := set.From(range_.Of(0, 100))
-next := uniques.Loop()
-for i, ok := next(); ok; i, ok = next() {
-    doOp(i)
-}
-```
-
-- or
-
-``` go
-uniques := set.From(range_.Of(0, 100))
-for iter, i, ok := uniques.First(); ok; i, ok = iter.Next() {
     doOp(i)
 }
 ```

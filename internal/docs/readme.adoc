@@ -2,9 +2,9 @@
 
 == Gollections
 
-Gollections is set of functions for link:#slices[slices], link:#maps[maps] and additional implementations of data structures such as link:#mutable-collections[ordered map] or link:#mutable-collections[set] aimed to reduce boilerplate code.
+Gollections is set of functions for link:#slices[slices], link:#maps[maps], link:#seq-seq2-seqe[iter.Seq, iter.Seq2] and additional implementations of data structures such as link:#mutable-collections[ordered map] or link:#mutable-collections[set] aimed to reduce boilerplate code.
 
-Supports Go version 1.22.
+Supports Go version 1.24.
 
 For example, it's need to group some link:./internal/examples/boilerplate/user_type.go[users] by their role names converted to lowercase:
 [source,go]
@@ -53,7 +53,7 @@ include::../examples/boilerplate/slice_filter_convert_reduce_short_test.go[lines
 
 This is a shorter version of the previous example that used short aliases link:#sumof[sum.Of] and link:#operations-chain-functions[filter.AndConvert]. More shortcuts you can find by exploring slices link:./slice[subpackages].
 
-*Be careful* when use several slice functions subsequently like [source,go]`slice.Filter(slice.Convert(...))`. This can lead to unnecessary RAM consumption. Consider link:#loop-kvloop-and-breakable-versions-breakloop-breakkvloop[loop] instead of slice API.
+*Be careful* when use several slice functions subsequently like [source,go]`slice.Filter(slice.Convert(...))`. This can lead to unnecessary RAM consumption. Consider link:#seq-seq2-seqe[seq] instead of slice API.
 
 ==== Main slice functions
 ===== Instantiators
@@ -172,6 +172,22 @@ import (
 )
 include::../examples/sliceexamples/slice_First_test.go[lines=13..15,indent=0]
 ----
+====== slice.Head
+[source,go]
+----
+import (
+    "github.com/m4gshm/gollections/slice"
+)
+include::../examples/sliceexamples/slice_Head_test.go[lines=12..14,indent=0]
+----
+====== slice.Top
+[source,go]
+----
+import (
+    "github.com/m4gshm/gollections/slice"
+)
+include::../examples/sliceexamples/slice_Top_test.go[lines=12..13,indent=0]
+----
 ====== slice.Last
 [source,go]
 ----
@@ -180,6 +196,14 @@ import (
     "github.com/m4gshm/gollections/slice"
 )
 include::../examples/sliceexamples/slice_Last_test.go[lines=13..15,indent=0]
+----
+====== slice.Tail
+[source,go]
+----
+import (
+    "github.com/m4gshm/gollections/slice"
+)
+include::../examples/sliceexamples/slice_Tail_test.go[lines=12..14,indent=0]
 ----
 ===== Element converters
 ====== slice.Convert
@@ -268,13 +292,13 @@ include::../examples/mapexamples/map_Conv_test.go[lines=17..22,indent=0]
 ----
 
 [#seq]
-=== link:./seq/api.go[seq], link:./seq2/api.go[seq2]
+=== link:./seq/api.go[seq], link:./seq2/api.go[seq2], link:./seqe/api.go[seqe]
 
-API extends rangefunc iterator types `seq.Seq[V]`, `seq.Seq2[K,V]` with utility functions kit.
+API extends rangefunc iterator types `iter.Seq[V]`, `iter.Seq2[K,V]` with utility functions kit.
 
 [source,go]
 ----
-include::../examples/seqexamples/seq_filter_convert_reduce_test.go[lines=13..17,indent=0]
+include::../examples/seqexamples/seq_filter_convert_reduce_test.go[lines=14..28,indent=0]
 ----
 or
 [source,go]
@@ -371,6 +395,8 @@ include::../examples/seqexamples/seq_Flat_test.go[lines=13..16,indent=0]
 
 [#loop]
 === link:./loop/api.go[loop], link:./kv/loop/api.go[kv/loop] and breakable versions link:./break/loop/api.go[break/loop], link:./break/kv/loop/api.go[break/kv/loop]
+
+*Deprecated*: will be replaced by link:#seq-seq2-seqe[seq] API.
 
 Legacy iterators API based on the following functions:
 
@@ -519,13 +545,12 @@ include::../examples/loopexamples/loop_Flat_test.go[lines=13..16,indent=0]
 These functions combine converters, filters and reducers.
 
 ==== Iterating over loops
-* (only for go 1.22) Using rangefunc `All` like:
+* Using rangefunc `All` like:
 
 [source,go]
 ----
 include::../examples/loopexamples/loop_iterating_go_1_22_test.go[lines=12..16,indent=0]
 ----
-don't forget exec `go env -w GOEXPERIMENT=rangefunc` before compile.
 
 * Using `for` statement like:
 
@@ -661,24 +686,11 @@ include::../examples/collection/mutable/omap.go[lines=11..15,indent=0]
 The same underlying interfaces but for read-only use cases.
 
 ==== Iterating over collections
-* (only for go 1.22) Using rangefunc `All` like:
+* Using rangefunc `All` like:
 
 [source,go]
 ----
 include::../examples/collection/collection_iterating_go_1_22_test.go[lines=13..18,indent=0]
-----
-* Using `for` statement like:
-
-[source,go]
-----
-include::../examples/collection/collection_iterating_test.go[lines=12..18,indent=0]
-----
-
-* or
-
-[source,go]
-----
-include::../examples/collection/collection_iterating_test.go[lines=22..27,indent=0]
 ----
 
 * `ForEach` method

@@ -1,4 +1,4 @@
-// Package set provides unordered mutable.Set constructors and helpers
+// Package set provides unordered [github.com/m4gshm/gollections/collection/mutable.Set] constructors and helpers
 package set
 
 import (
