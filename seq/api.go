@@ -150,13 +150,11 @@ func Firstt[S ~Seq[T], T any](seq S, predicate func(T) (bool, error)) (v T, ok b
 		return v, false, nil
 	}
 	seq(func(one T) bool {
-		p, e := predicate(one)
-		if e != nil {
-			err = e
-			return false
-		} else if p {
+		ok, err = predicate(one)
+		if ok {
 			v = one
-			ok = true
+			return false
+		} else if err != nil {
 			return false
 		}
 		return true

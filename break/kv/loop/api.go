@@ -136,7 +136,7 @@ func Firstt[K, V any](next func() (K, V, bool, error), predicate func(K, V) (boo
 		if k, v, ok, err := next(); err != nil || !ok {
 			return k, v, false, err
 		} else if ok, err := predicate(k, v); err != nil || ok {
-			return k, v, ok && err == nil, err
+			return k, v, ok, err
 		}
 	}
 }
@@ -187,7 +187,8 @@ func Filt[K, V any](next func() (K, V, bool, error), filter func(K, V) (bool, er
 		return nil
 	}
 	return func() (K, V, bool, error) {
-		return Firstt(next, filter)
+		k, v, ok, err := Firstt(next, filter)
+		return k, v, ok && err == nil, err
 	}
 }
 

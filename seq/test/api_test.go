@@ -206,17 +206,23 @@ func Test_Firstt(t *testing.T) {
 	assert.Equal(t, 6, result)
 	assert.NoError(t, err)
 
-	errCondition := func(_ int) (bool, error) { return true, errors.New("abort") }
-	result, ok, err = seq.Firstt(sequence, errCondition)
+	result, ok, err = seq.Firstt(sequence, func(_ int) (bool, error) { return true, errors.New("abort") })
+
+	assert.True(t, ok)
+	assert.Equal(t, 1, result)
+	assert.ErrorContains(t, err, "abort")
+
+	result, ok, err = seq.Firstt(sequence, func(_ int) (bool, error) { return false, errors.New("abort") })
 
 	assert.False(t, ok)
 	assert.Equal(t, 0, result)
 	assert.ErrorContains(t, err, "abort")
 
+
 	_, ok, _ = seq.Firstt(sequence, nil)
 	assert.False(t, ok)
 
-	_, ok, _ = seq.Firstt[seq.Seq[int]](nil, errCondition)
+	_, ok, _ = seq.Firstt[seq.Seq[int]](nil, func(_ int) (bool, error) { return false, errors.New("abort") })
 	assert.False(t, ok)
 
 }

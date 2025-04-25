@@ -64,13 +64,12 @@ func Firstt[S ~SeqE[T], T any](seq S, predicate func(T) (bool, error)) (v T, ok 
 		if e != nil {
 			err = e
 			return false
-		} else if p, e := predicate(one); e != nil {
-			err = e
-			return false
-		} else if p {
+		} else if ok, err = predicate(one); ok {
 			v = one
-			ok = true
 			return false
+		} else if err != nil {
+			return false
+
 		}
 		return true
 	})

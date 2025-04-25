@@ -178,7 +178,8 @@ func Test_First(t *testing.T) {
 }
 
 func Test_Firstt(t *testing.T) {
-	result, ok, err := seqe.Firstt(seq.ToSeq2(seq.Of(1, 2, 3, 4, 5, 6), noErr), func(i int) (bool, error) {
+	sequence := seq.ToSeq2(seq.Of(1, 2, 3, 4, 5, 6), noErr)
+	result, ok, err := seqe.Firstt(sequence, func(i int) (bool, error) {
 		return more.Than(5)(i), nil
 	})
 
@@ -186,20 +187,30 @@ func Test_Firstt(t *testing.T) {
 	assert.Equal(t, 6, result)
 	assert.NoError(t, err)
 
-	result, ok, err = seqe.Firstt(seq.ToSeq2(seq.Of(1, 2, 3, 4, 5, 6), noErr), func(_ int) (bool, error) {
-		return true, errors.New("abort")
-	})
+	result, ok, err = seqe.Firstt(sequence, func(_ int) (bool, error) { return true, errors.New("abort") })
+
+	assert.True(t, ok)
+	assert.Equal(t, 1, result)
+	assert.ErrorContains(t, err, "abort")
+
+	result, ok, err = seqe.Firstt(sequence, func(_ int) (bool, error) { return false, errors.New("abort") })
 
 	assert.False(t, ok)
 	assert.Equal(t, 0, result)
 	assert.ErrorContains(t, err, "abort")
 
-	_, ok, err = seqe.Firstt(seq.ToSeq2(seq.Of(1, 2, 3, 4, 5, 6), errOn(1)), func(i int) (bool, error) {
-		return more.Than(5)(i), nil
-	})
+	sequence = seq.ToSeq2(seq.Of(1, 2, 3, 4, 5, 6), errOn(1))
+	result, ok, err = seqe.Firstt(sequence, func(i int) (bool, error) { return more.Than(5)(i), nil})
 
 	assert.False(t, ok)
+	assert.Equal(t, 0, result)
 	assert.ErrorContains(t, err, "abort")
+
+	_, ok, _ = seqe.Firstt(sequence, nil)
+	assert.False(t, ok)
+
+	_, ok, _ = seqe.Firstt[seq.SeqE[int]](nil, func(_ int) (bool, error) { return false, errors.New("abort") })
+	assert.False(t, ok)
 }
 
 var even = func(v int) bool { return v%2 == 0 }

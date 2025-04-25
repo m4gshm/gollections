@@ -149,7 +149,7 @@ func Firstt[T any](next func() (T, bool, error), predicate func(T) (bool, error)
 		if out, ok, err := next(); err != nil || !ok {
 			return out, false, err
 		} else if ok, err := predicate(out); err != nil || ok {
-			return out, ok && err == nil, err
+			return out, ok, err
 		}
 	}
 }
@@ -596,7 +596,8 @@ func Filt[T any](next func() (T, bool, error), filter func(T) (bool, error)) Loo
 		return nil
 	}
 	return func() (T, bool, error) {
-		return Firstt(next, filter)
+		t, ok, err := Firstt(next, filter)
+		return t, ok && err == nil, err
 	}
 }
 
