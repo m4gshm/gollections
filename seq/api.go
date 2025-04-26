@@ -76,7 +76,7 @@ func Series[T any](first T, next func(T) (T, bool)) Seq[T] {
 	}
 }
 
-// RangeClosed creates a loop that generates integers in the range defined by from and to inclusive
+// RangeClosed creates a sequence that generates integers in the range defined by from and to inclusive
 func RangeClosed[T constraints.Integer | rune](from T, toInclusive T) Seq[T] {
 	amount := toInclusive - from
 	delta := T(1)
@@ -96,7 +96,7 @@ func RangeClosed[T constraints.Integer | rune](from T, toInclusive T) Seq[T] {
 	}
 }
 
-// Range creates a loop that generates integers in the range defined by from and to exclusive
+// Range creates a sequence that generates integers in the range defined by from and to exclusive
 func Range[T constraints.Integer | rune](from T, toExclusive T) Seq[T] {
 	amount := toExclusive - from
 	delta := T(1)
@@ -112,7 +112,6 @@ func Range[T constraints.Integer | rune](from T, toExclusive T) Seq[T] {
 			}
 			e = e + delta
 		}
-
 	}
 }
 

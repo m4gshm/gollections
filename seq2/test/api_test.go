@@ -212,3 +212,41 @@ func Test_Slice_ToMapResolvOrder(t *testing.T) {
 	assert.Equal(t, []int{2, 2, 4}, groups[true])
 	assert.Equal(t, []bool{true, false}, order)
 }
+
+func Test_Range(t *testing.T) {
+	assert.Equal(t, slice.Of(-1, 0, 1, 2, 3), seq.Slice(seq2.Values(seq2.Range(-1, 4))))
+	assert.Equal(t, slice.Of(0, 1, 2, 3, 4), seq.Slice(seq2.Keys(seq2.Range(-1, 4))))
+	assert.Equal(t, slice.Of(3, 2, 1, 0, -1), seq.Slice(seq2.Values(seq2.Range(3, -2))))
+	assert.Equal(t, slice.Of(0, 1, 2, 3, 4), seq.Slice(seq2.Keys(seq2.Range(3, -2))))
+	assert.Nil(t, seq.Slice(seq2.Values(seq2.Range(1, 1))))
+
+	var out, ind []int
+	for i, v := range seq2.Range(-1, 3) {
+		if v == 2 {
+			break
+		}
+		out = append(out, v)
+		ind = append(ind, i)
+	}
+	assert.Equal(t, slice.Of(-1, 0, 1), out)
+	assert.Equal(t, slice.Of(0, 1, 2), ind)
+}
+
+func Test_RangeClosed(t *testing.T) {
+	assert.Equal(t, slice.Of(-1, 0, 1, 2, 3), seq.Slice(seq2.Values(seq2.RangeClosed(-1, 3))))
+	assert.Equal(t, slice.Of(0, 1, 2, 3, 4), seq.Slice(seq2.Keys(seq2.RangeClosed(-1, 3))))
+	assert.Equal(t, slice.Of(3, 2, 1, 0, -1), seq.Slice(seq2.Values(seq2.RangeClosed(3, -1))))
+	assert.Equal(t, slice.Of(0, 1, 2, 3, 4), seq.Slice(seq2.Keys(seq2.RangeClosed(3, -1))))
+	assert.Equal(t, slice.Of(1), seq.Slice(seq2.Values(seq2.RangeClosed(1, 1))))
+
+	var out, ind []int
+	for i, v := range seq2.RangeClosed(-1, 3) {
+		if v == 2 {
+			break
+		}
+		out = append(out, v)
+		ind = append(ind, i)
+	}
+	assert.Equal(t, slice.Of(-1, 0, 1), out)
+	assert.Equal(t, slice.Of(0, 1, 2), ind)
+}

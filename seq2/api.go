@@ -4,6 +4,7 @@ package seq2
 import (
 	"github.com/m4gshm/gollections/map_/resolv"
 	"github.com/m4gshm/gollections/seq"
+	"golang.org/x/exp/constraints"
 )
 
 // Seq is an alias of an iterator-function that allows to iterate over elements of a sequence, such as slice.
@@ -75,6 +76,46 @@ func Series[T any](first T, next func(T) (T, bool)) Seq2[int, T] {
 		}
 	}
 }
+
+// RangeClosed creates a sequence that generates integers in the range defined by from and to inclusive
+func RangeClosed[T constraints.Integer | rune](from T, toInclusive T) Seq2[int, T] {
+	amount := toInclusive - from
+	delta := T(1)
+	if amount < 0 {
+		amount = -amount
+		delta = -delta
+	}
+	amount++
+	return func(yield func(int, T) bool) {
+		e := from
+		for i := 0; i < int(amount); i++ {
+			if !yield(i, e) {
+				return
+			}
+			e = e + delta
+		}
+	}
+}
+
+// Range creates a sequence that generates integers in the range defined by from and to exclusive
+func Range[T constraints.Integer | rune](from T, toExclusive T) Seq2[int, T] {
+	amount := toExclusive - from
+	delta := T(1)
+	if amount < 0 {
+		amount = -amount
+		delta = -delta
+	}
+	return func(yield func(int, T) bool) {
+		e := from
+		for i := 0; i < int(amount); i++ {
+			if !yield(i, e) {
+				return
+			}
+			e = e + delta
+		}
+	}
+}
+
 
 // Filter creates a rangefunc that iterates only those elements for which the 'filter' function returns true.
 func Filter[S ~Seq2[K, V], K, V any](seq S, filter func(K, V) bool) Seq2[K, V] {
