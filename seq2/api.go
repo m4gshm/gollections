@@ -3,16 +3,15 @@ package seq2
 
 import (
 	"github.com/m4gshm/gollections/map_/resolv"
-	"github.com/m4gshm/gollections/seq"
 	"golang.org/x/exp/constraints"
 )
 
 // Seq is an alias of an iterator-function that allows to iterate over elements of a sequence, such as slice.
-type Seq[T any] = seq.Seq[T]
+type Seq[V any] = func(yield func(V) bool)
 
 // Seq2 is an alias of an iterator-function that allows to iterate over key/value pairs of a sequence, such as slice or map.
 // It is used to iterate over slice index/value pairs or map key/value pairs.
-type Seq2[K, V any] = seq.Seq2[K, V]
+type Seq2[K, V any] = func(yield func(K, V) bool)
 
 // Of creates an index/value pairs iterator over the elements.
 func Of[T any](elements ...T) Seq2[int, T] {
@@ -116,7 +115,6 @@ func Range[T constraints.Integer | rune](from T, toExclusive T) Seq2[int, T] {
 	}
 }
 
-
 // Filter creates a rangefunc that iterates only those elements for which the 'filter' function returns true.
 func Filter[S ~Seq2[K, V], K, V any](seq S, filter func(K, V) bool) Seq2[K, V] {
 	return func(yield func(K, V) bool) {
@@ -168,7 +166,7 @@ func Keys[S ~Seq2[K, V], K, V any](seq S) Seq[K] {
 	}
 }
 
-// Group converts the elements of the 'seq' sequence into a new map, extracting a key for each element applying the converter 'keyExtractor'.
+// Group collects the elements of the 'seq' sequence into a new map.
 func Group[S ~Seq2[K, V], K comparable, V any](seq S) map[K][]V {
 	return MapResolv(seq, resolv.Slice[K, V])
 }
@@ -223,4 +221,14 @@ func AppendMapResolvOrder[S ~Seq2[K, V], K comparable, V, VR any](seq S, resolve
 		return true
 	})
 	return order, dest
+}
+
+// TrackEach applies the 'consumer' function to the seq elements.
+func TrackEach[K, V any](seq Seq2[K, V], consumer func(K, V)) {
+	if seq == nil {
+		return
+	}
+	for k, v := range seq {
+		consumer(k, v)
+	}
 }

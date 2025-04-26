@@ -8,6 +8,7 @@ import (
 	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/collection/immutable/ordered"
 	"github.com/m4gshm/gollections/loop"
+	"github.com/m4gshm/gollections/seq"
 )
 
 // Of instantiates Set with predefined elements.
@@ -25,9 +26,14 @@ func From[T comparable](next func() (T, bool)) ordered.Set[T] {
 	return ordered.SetFromLoop(next)
 }
 
+// From instantiates a set with elements retrieved by the seq.
+func FromSeq[T comparable](seq seq.Seq[T]) ordered.Set[T] {
+	return ordered.SetFromSeq(seq)
+}
+
 // Sort copy the specified set with sorted elements
 func Sort[T comparable, f constraints.Ordered](s ordered.Set[T], by func(T) f) ordered.Set[T] {
-	return collection.Sort[ordered.Set[T]](s, by)
+	return collection.Sort(s, by)
 }
 
 // Convert returns a loop that applies the 'converter' function to the collection elements

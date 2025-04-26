@@ -9,6 +9,7 @@ import (
 	"github.com/m4gshm/gollections/collection/mutable"
 	"github.com/m4gshm/gollections/collection/mutable/ordered"
 	"github.com/m4gshm/gollections/loop"
+	"github.com/m4gshm/gollections/seq"
 )
 
 // Of instantiates Set with predefined elements.
@@ -16,9 +17,15 @@ func Of[T comparable](elements ...T) *mutable.Set[T] {
 	return mutable.NewSet(elements...)
 }
 
-// From instantiates a set with elements retrieved by the 'next' function
+// From instantiates a set with elements retrieved by the 'next' function.
+// Deprecated: replaced by [FromSeq].
 func From[T comparable](next func() (T, bool)) *mutable.Set[T] {
 	return mutable.SetFromLoop(next)
+}
+
+// FromSeq creates a set with elements retrieved by the seq.
+func FromSeq[T comparable](seq seq.Seq[T]) *mutable.Set[T] {
+	return mutable.SetFromSeq(seq)
 }
 
 // Empty instantiates Set with zero capacity.
@@ -33,7 +40,7 @@ func NewCap[T comparable](capacity int) *mutable.Set[T] {
 
 // Sort sorts a Set in-place by a converter that thransforms an element to an Ordered (int, string and so on).
 func Sort[T comparable, F constraints.Ordered](s *mutable.Set[T], by func(T) F) *ordered.Set[T] {
-	return collection.Sort[*ordered.Set[T]](s, by)
+	return collection.Sort(s, by)
 }
 
 // Convert returns a loop that applies the 'converter' function to the collection elements

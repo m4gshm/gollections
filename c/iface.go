@@ -29,6 +29,7 @@ type KVRange[K, V any] interface {
 }
 
 // Iterable is a loop supplier interface
+// Deprecated: obsolete.
 type Iterable[T any, Loop ~func() (T, bool)] interface {
 	Loop() Loop
 }
@@ -92,6 +93,7 @@ type Iterator[T any] interface {
 
 	For[T]
 	ForEach[T]
+	Range[T]
 }
 
 // Sized - storage interface with measurable size
@@ -114,24 +116,28 @@ type DelIterator[T any] interface {
 }
 
 // For is the interface of a collection that provides traversing of the elements.
+// Deprecated: obsolete.
 type For[IT any] interface {
 	//For takes elements of the collection. Can be interrupt by returning Break.
 	For(func(element IT) error) error
 }
 
 // ForEach is the interface of a collection that provides traversing of the elements without error checking.
+// Deprecated: obsolete.
 type ForEach[T any] interface {
 	// ForEach takes all elements of the collection
 	ForEach(func(element T))
 }
 
 // Track is the interface of a collection that provides traversing of the elements with position tracking (index, key, coordinates, etc.).
+// Deprecated: obsolete.
 type Track[P any, T any] interface {
 	// return Break for loop breaking
 	Track(func(position P, element T) error) error
 }
 
-// TrackEach is the interface of a collection that provides traversing of the elements with position tracking (index, key, coordinates, etc.) without error checking
+// TrackEach is the interface of a collection that provides traversing of the elements with position tracking (index, key, coordinates, etc.) without error checking.
+// Deprecated: obsolete.
 type TrackEach[P any, T any] interface {
 	TrackEach(func(position P, element T))
 }

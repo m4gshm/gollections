@@ -9,6 +9,7 @@ import (
 	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/notsafe"
+	"github.com/m4gshm/gollections/seq"
 	"github.com/m4gshm/gollections/slice"
 )
 
@@ -23,7 +24,7 @@ type Vector[T any] []T
 
 var (
 	_ c.Addable[any]               = (*Vector[any])(nil)
-	_ c.AddableAll[c.ForEach[any]] = (*Vector[any])(nil)
+	_ c.AddableAll[seq.Seq[any]] = (*Vector[any])(nil)
 	_ c.Deleteable[int]            = (*Vector[any])(nil)
 	_ c.DeleteableVerify[int]      = (*Vector[any])(nil)
 	_ c.Settable[int, any]         = (*Vector[any])(nil)
@@ -176,9 +177,9 @@ func (v *Vector[T]) AddOne(element T) {
 }
 
 // AddAll inserts all elements from the "other" collection
-func (v *Vector[T]) AddAll(other c.ForEach[T]) {
+func (v *Vector[T]) AddAll(other seq.Seq[T]) {
 	if v != nil {
-		other.ForEach(func(element T) { *v = append(*v, element) })
+		seq.ForEach(other, func(element T) { *v = append(*v, element) })
 	}
 }
 

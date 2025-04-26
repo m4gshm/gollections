@@ -5,16 +5,33 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/collection/mutable/map_"
 	"github.com/m4gshm/gollections/collection/mutable/ordered"
 	omap "github.com/m4gshm/gollections/collection/mutable/ordered/map_"
 	"github.com/m4gshm/gollections/k"
+	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/seq"
 	"github.com/m4gshm/gollections/slice"
 )
 
-func Test_Map_Iterate(t *testing.T) {
-	ordered := omap.Of(k.V(1, "1"), k.V(1, "1"), k.V(2, "2"), k.V(4, "4"), k.V(3, "3"), k.V(1, "1"))
+func Test_Map_Of(t *testing.T) {
+	m := omap.Of(k.V(1, "1"), k.V(1, "1"), k.V(2, "2"), k.V(4, "4"), k.V(3, "3"), k.V(1, "1"))
+	iterCheck(t, m)
+}
+
+func Test_Map_From(t *testing.T) {
+	m := omap.From(loop.KeyValue(loop.Of(k.V(1, "1"), k.V(1, "1"), k.V(2, "2"), k.V(4, "4"), k.V(3, "3"), k.V(1, "1")), c.KV[int, string].Key, c.KV[int, string].Value))
+	iterCheck(t, m)
+}
+
+func Test_Map_FromSeq(t *testing.T) {
+	m := omap.FromSeq2(seq.KeyValue(seq.Of(k.V(1, "1"), k.V(1, "1"), k.V(2, "2"), k.V(4, "4"), k.V(3, "3"), k.V(1, "1")), c.KV[int, string].Key, c.KV[int, string].Value))
+	iterCheck(t, m)
+}
+
+func iterCheck(t *testing.T, ordered *ordered.Map[int, string]) {
 	assert.Equal(t, 4, len(ordered.Map()))
 
 	expectedK := slice.Of(1, 2, 4, 3)
@@ -22,8 +39,7 @@ func Test_Map_Iterate(t *testing.T) {
 
 	keys := make([]int, 0)
 	values := make([]string, 0)
-	next := ordered.Loop()
-	for key, val, ok := next(); ok; key, val, ok = next() {
+	for key, val := range ordered.All {
 		keys = append(keys, key)
 		values = append(values, val)
 	}

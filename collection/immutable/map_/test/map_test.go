@@ -6,28 +6,43 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/collection/immutable"
 	"github.com/m4gshm/gollections/collection/immutable/map_"
 	"github.com/m4gshm/gollections/collection/immutable/ordered"
 	"github.com/m4gshm/gollections/k"
+	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/seq"
 	"github.com/m4gshm/gollections/slice"
 )
 
-func Test_Map_Iterate(t *testing.T) {
-	dict := map_.Of(k.V(1, "1"), k.V(1, "1"), k.V(2, "2"), k.V(4, "4"), k.V(3, "3"), k.V(1, "1"))
+func Test_Map_Of(t *testing.T) {
+	m := map_.Of(k.V(1, "1"), k.V(1, "1"), k.V(2, "2"), k.V(4, "4"), k.V(3, "3"), k.V(1, "1"))
+	iterCheck(t, m)
+}
 
-	assert.Equal(t, 4, dict.Len())
-	assert.Equal(t, 4, len(dict.Map()))
+func Test_Map_From(t *testing.T) {
+	m := map_.From(loop.KeyValue(loop.Of(k.V(1, "1"), k.V(1, "1"), k.V(2, "2"), k.V(4, "4"), k.V(3, "3"), k.V(1, "1")), c.KV[int, string].Key, c.KV[int, string].Value))
+	iterCheck(t, m)
+}
+
+func Test_Map_FromSeq(t *testing.T) {
+	m := map_.FromSeq2(seq.KeyValue(seq.Of(k.V(1, "1"), k.V(1, "1"), k.V(2, "2"), k.V(4, "4"), k.V(3, "3"), k.V(1, "1")), c.KV[int, string].Key, c.KV[int, string].Value))
+	iterCheck(t, m)
+}
+
+func iterCheck(t *testing.T, m immutable.Map[int, string]) {
+	assert.Equal(t, 4, m.Len())
+	assert.Equal(t, 4, len(m.Map()))
 
 	expectedK := slice.Of(1, 2, 3, 4)
 	expectedV := slice.Of("1", "2", "3", "4")
 
-	keys := make([]int, 0)
-	values := make([]string, 0)
+	keys := []int{}
+	values := []string{}
 
-	it := dict.Head()
-	for key, val, ok := it.Next(); ok; key, val, ok = it.Next() {
+	for key, val := range m.All {
 		keys = append(keys, key)
 		values = append(values, val)
 	}
@@ -37,8 +52,8 @@ func Test_Map_Iterate(t *testing.T) {
 	assert.Equal(t, expectedK, keys)
 	assert.Equal(t, expectedV, values)
 
-	keys = dict.Keys().Slice()
-	values = dict.Values().Slice()
+	keys = m.Keys().Slice()
+	values = m.Values().Slice()
 	sort.Ints(keys)
 	sort.Strings(values)
 	assert.Equal(t, slice.Of(1, 2, 3, 4), keys)

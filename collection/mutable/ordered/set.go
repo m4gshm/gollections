@@ -8,6 +8,7 @@ import (
 	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_"
+	"github.com/m4gshm/gollections/seq"
 	"github.com/m4gshm/gollections/slice"
 )
 
@@ -23,15 +24,15 @@ type Set[T comparable] struct {
 }
 
 var (
-	_ c.Addable[int]                  = (*Set[int])(nil)
-	_ c.AddableNew[int]               = (*Set[int])(nil)
-	_ c.AddableAll[c.ForEach[int]]    = (*Set[int])(nil)
-	_ c.AddableAllNew[c.ForEach[int]] = (*Set[int])(nil)
-	_ c.Deleteable[int]               = (*Set[int])(nil)
-	_ c.DeleteableVerify[int]         = (*Set[int])(nil)
-	_ c.OrderedRange[int]             = (*Set[int])(nil)
-	_ collection.Set[int]             = (*Set[int])(nil)
-	_ fmt.Stringer                    = (*Set[int])(nil)
+	_ c.Addable[int]                = (*Set[int])(nil)
+	_ c.AddableNew[int]             = (*Set[int])(nil)
+	_ c.AddableAll[seq.Seq[int]]    = (*Set[int])(nil)
+	_ c.AddableAllNew[seq.Seq[int]] = (*Set[int])(nil)
+	_ c.Deleteable[int]             = (*Set[int])(nil)
+	_ c.DeleteableVerify[int]       = (*Set[int])(nil)
+	_ c.OrderedRange[int]           = (*Set[int])(nil)
+	_ collection.Set[int]           = (*Set[int])(nil)
+	_ fmt.Stringer                  = (*Set[int])(nil)
 )
 
 // All is used to iterate through the collection using `for e := range`.
@@ -185,17 +186,17 @@ func (s *Set[T]) AddOneNew(element T) (ok bool) {
 	return ok
 }
 
-// AddAll inserts all elements from the "other" collection
-func (s *Set[T]) AddAll(other c.ForEach[T]) {
+// AddAll inserts all elements from the "other" sequence
+func (s *Set[T]) AddAll(other seq.Seq[T]) {
 	if !(s == nil || other == nil) {
-		other.ForEach(s.AddOne)
+		seq.ForEach(other, s.AddOne)
 	}
 }
 
-// AddAllNew inserts elements from the "other" collection if they are not contained in the collection
-func (s *Set[T]) AddAllNew(other c.ForEach[T]) (ok bool) {
+// AddAllNew inserts elements from the "other" sequence if they are not contained in the collection
+func (s *Set[T]) AddAllNew(other seq.Seq[T]) (ok bool) {
 	if !(s == nil || other == nil) {
-		other.ForEach(func(v T) { ok = s.AddOneNew(v) || ok })
+		seq.ForEach(other, func(v T) { ok = s.AddOneNew(v) || ok })
 	}
 	return ok
 }

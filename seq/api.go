@@ -4,6 +4,7 @@ package seq
 import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/seq2"
 	"golang.org/x/exp/constraints"
 )
 
@@ -112,6 +113,17 @@ func Range[T constraints.Integer | rune](from T, toExclusive T) Seq[T] {
 			}
 			e = e + delta
 		}
+	}
+}
+
+func ToLoop[S ~Seq[T], T, K, V any](seq S, converter func(T) (K, V)) func() (T, bool) {
+	return func() (next T, ok bool) {
+		seq(func(t T) bool {
+			next = t
+			ok = true
+			return true
+		})
+		return next, ok
 	}
 }
 
@@ -526,5 +538,22 @@ func KeyValues[S ~Seq[T], T, K, V any](seq S, keyExtractor func(T) K, valsExtrac
 				}
 			}
 		}
+	}
+}
+
+// Group collects the seq elements into a new map.
+// The keyExtractor converts an element to a key.
+// The valExtractor converts an element to a value.
+func Group[S ~Seq[T], T any, K comparable, V any](seq S, keyExtractor func(T) K, valExtractor func(T) V) map[K][]V {
+	return seq2.Group(KeyValue(seq, keyExtractor, valExtractor))
+}
+
+// ForEach applies the 'consumer' function to the seq elements
+func ForEach[T any](seq Seq[T], consumer func(T)) {
+	if seq == nil {
+		return
+	}
+	for v := range seq {
+		consumer(v)
 	}
 }

@@ -549,3 +549,17 @@ func Test_ConvOK(t *testing.T) {
 	assert.Equal(t, []string{"4", "8"}, o)
 	assert.ErrorContains(t, err, "abort")
 }
+
+func Test_Group(t *testing.T) {
+	even := func(v int) bool { return v%2 == 0 }
+	
+	groups, err := seqe.Group(seq.ToSeq2(seq.Of(1, 1, 2, 4, 3, 5), errOn(5)), even, as.Is)
+	assert.Equal(t, slice.Of(2, 4), groups[true])
+	assert.Equal(t, slice.Of(1, 1, 3), groups[false])
+	assert.Error(t, err)
+
+	groups, err = seqe.Group(seq.ToSeq2(seq.Of(1, 1, 2, 4, 3, 5), noErr), even, as.Is)
+	assert.Equal(t, slice.Of(2, 4), groups[true])
+	assert.Equal(t, slice.Of(1, 1, 3,5), groups[false])
+	assert.NoError(t, err)
+}

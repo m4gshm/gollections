@@ -577,3 +577,12 @@ func Test_ToSeq2(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Empty(t, s)
 }
+
+func Test_Group(t *testing.T) {
+	var (
+		even   = func(v int) bool { return v%2 == 0 }
+		groups = seq.Group(seq.Of(1, 1, 2, 4, 3, 1), even, as.Is)
+	)
+	assert.Equal(t, slice.Of(2, 4), groups[true])
+	assert.Equal(t, slice.Of(1, 1, 3, 1), groups[false])
+}

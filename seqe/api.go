@@ -482,3 +482,36 @@ func Filt[S ~SeqE[T], T any](seq S, filter func(T) (bool, error)) SeqE[T] {
 		})
 	}
 }
+
+// Group collects the seq elements into a new map.
+// The keyExtractor converts an element to a key.
+// The valExtractor converts an element to a value.
+func Group[S ~SeqE[T], T any, K comparable, V any](seq S, keyExtractor func(T) K, valExtractor func(T) V) (map[K][]V, error) {
+	groups := map[K][]V{}
+	for e, err := range seq {
+		if err != nil {
+			return groups, err
+		}
+		key := keyExtractor(e)
+		group := groups[key]
+		if group == nil {
+			group = make([]V, 0)
+		}
+		groups[key] = append(group, valExtractor((e)))
+	}
+	return groups, nil
+}
+
+// ForEach applies the 'consumer' function to the seq elements
+func ForEach[T any](seq SeqE[T], consumer func(T)) error {
+	if seq == nil {
+		return nil
+	}
+	for v, err := range seq {
+		if err != nil {
+			return err
+		}
+		consumer(v)
+	}
+	return nil
+}
