@@ -28,7 +28,6 @@ func Test_Set_FromSeq(t *testing.T) {
 	assert.Equal(t, slice.Of(1, 2, 3, 4), sort.Asc(set.Slice()))
 }
 
-
 func Test_Set_Iterate(t *testing.T) {
 	set := set.Of(1, 1, 2, 4, 3, 1)
 	values := sort.Asc(set.Slice())

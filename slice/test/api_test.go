@@ -698,7 +698,7 @@ func Test_Slice_AppendMapResolvv(t *testing.T) {
 	even := func(v int) bool { return v%2 == 0 }
 	groups, err := slice.AppendMapResolvv(slice.Of(2, 1, 1, 2, 4, 3, 1), func(i int) (bool, int, error) {
 		return even(i), i, nil
-	}, func(ok bool, k bool, e []int, v int) ([]int, error) {
+	}, func(_ bool, _ bool, e []int, v int) ([]int, error) {
 		return append(e, v), nil
 	}, nil)
 

@@ -204,7 +204,7 @@ func Test_Slice_ToMapResolvOrder(t *testing.T) {
 		even          = func(v int) bool { return v%2 == 0 }
 		order, groups = seq2.MapResolvOrder(seq.ToSeq2(seq.Of(2, 1, 1, 2, 4, 3, 1), func(i int) (bool, int) {
 			return even(i), i
-		}), func(exists bool, key bool, valResov []int, val int) []int {
+		}), func(_ bool, _ bool, valResov []int, val int) []int {
 			return append(valResov, val)
 		})
 	)

@@ -297,8 +297,11 @@ func ConvOK[S ~SeqE[From], From, To any](seq S, converter func(from From) (To, b
 		if seq == nil || converter == nil {
 			return
 		}
-		seq(func(from From, e error) bool {
-			if to, ok, err := converter(from); ok || err != nil {
+		seq(func(from From, err error) bool {
+			if err != nil {
+				var to To
+				return yield(to, err)
+			} else if to, ok, err := converter(from); ok || err != nil {
 				return yield(to, err)
 			}
 			return true

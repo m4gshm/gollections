@@ -28,7 +28,6 @@ func From[K comparable, V any](next func() (K, V, bool)) *ordered.Map[K, V] {
 	return ordered.MapFromLoop(next)
 }
 
-
 // FromSeq2 creates a map with elements retrieved by the seq.
 func FromSeq2[K comparable, V any](seq seq.Seq2[K, V]) *ordered.Map[K, V] {
 	return ordered.MapFromSeq2(seq)

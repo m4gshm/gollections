@@ -116,17 +116,6 @@ func Range[T constraints.Integer | rune](from T, toExclusive T) Seq[T] {
 	}
 }
 
-func ToLoop[S ~Seq[T], T, K, V any](seq S, converter func(T) (K, V)) func() (T, bool) {
-	return func() (next T, ok bool) {
-		seq(func(t T) bool {
-			next = t
-			ok = true
-			return true
-		})
-		return next, ok
-	}
-}
-
 // ToSeq2 converts an iterator of single elements to an iterator of key/value pairs by applying the 'converter' function to each iterable element.
 func ToSeq2[S ~Seq[T], T, K, V any](seq S, converter func(T) (K, V)) Seq2[K, V] {
 	return func(yield func(K, V) bool) {

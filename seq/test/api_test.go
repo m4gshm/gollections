@@ -572,7 +572,7 @@ func Test_ToSeq2(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Empty(t, s)
 
-	s, err = seqe.Slice(seq.ToSeq2[seq.Seq[int]](nil, func(i int) (int, error) { return 0, errors.New("abort") }))
+	s, err = seqe.Slice(seq.ToSeq2[seq.Seq[int]](nil, func(_ int) (int, error) { return 0, errors.New("abort") }))
 
 	assert.NoError(t, err)
 	assert.Empty(t, s)

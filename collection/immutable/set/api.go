@@ -29,7 +29,7 @@ func From[T comparable](next func() (T, bool)) immutable.Set[T] {
 	return immutable.SetFromLoop(next)
 }
 
-// SetFromSeq creates a set with elements retrieved by the seq.
+// FromSeq creates a set with elements retrieved by the seq.
 func FromSeq[T comparable](seq seq.Seq[T]) immutable.Set[T] {
 	return immutable.SetFromSeq(seq)
 }
