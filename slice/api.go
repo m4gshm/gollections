@@ -37,6 +37,7 @@ func Len[TS ~[]T, T any](elements TS) int {
 // OfLoop builds a slice by iterating elements of a source.
 // The hasNext specifies a predicate that tests existing of a next element in the source.
 // The getNext extracts the element.
+//
 // Deprecated: renamed to OfNextGet.
 func OfLoop[S, T any](source S, hasNext func(S) bool, getNext func(S) (T, error)) ([]T, error) {
 	return OfSourceNextGet(source, hasNext, getNext)

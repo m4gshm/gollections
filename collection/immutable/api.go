@@ -18,6 +18,7 @@ func NewSet[T comparable](elements ...T) Set[T] {
 
 // SetFromLoop creates a set with elements retrieved by the 'next' function.
 // The next returns an element with true or zero value with false if there are no more elements.
+//
 // Deprecated: replaced by [SetFromSeq].
 func SetFromLoop[T comparable](next func() (T, bool)) Set[T] {
 	return SetFromSeq((loop.Loop[T])(next).All)
@@ -46,6 +47,7 @@ func NewMapOf[K comparable, V any](elements map[K]V) Map[K, V] {
 }
 
 // MapFromLoop creates a map with elements retrieved converter the 'next' function.
+//
 // Deprecated: replaced by [MapFromSeq2].
 func MapFromLoop[K comparable, V any](next func() (K, V, bool)) Map[K, V] {
 	return MapFromSeq2(kvloop.Loop[K, V](next).All)
@@ -67,6 +69,7 @@ func NewVector[T any](elements ...T) Vector[T] {
 
 // VectorFromLoop creates a vector with elements retrieved by the 'next' function.
 // The next returns an element with true or zero value with false if there are no more elements.
+//
 // Deprecated: replaced by [VectorFromLoop].
 func VectorFromLoop[T any](next func() (T, bool)) Vector[T] {
 	return WrapVector(loop.Slice(next))

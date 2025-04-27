@@ -23,6 +23,7 @@ func New[K comparable, V any](capacity int) *mutable.Map[K, V] {
 }
 
 // From instantiates a map with elements obtained by passing the 'loop' function.
+//
 // Deprecated: replaced by [FromSeq2].
 func From[K comparable, V any](next func() (K, V, bool)) *mutable.Map[K, V] {
 	return mutable.MapFromLoop(next)

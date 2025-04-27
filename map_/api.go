@@ -29,6 +29,7 @@ func Of[K comparable, V any](elements ...c.KV[K, V]) map[K]V {
 // OfLoop builds a map by iterating key\value pairs of a source.
 // The hasNext specifies a predicate that tests existing of a next pair in the source.
 // The getNext extracts the pair.
+//
 // Deprecated: will be deleted in a next version.
 func OfLoop[S any, K comparable, V any](source S, hasNext func(S) bool, getNext func(S) (K, V, error)) (map[K]V, error) {
 	return OfLoopResolv(source, hasNext, getNext, resolv.First[K, V])
@@ -38,6 +39,7 @@ func OfLoop[S any, K comparable, V any](source S, hasNext func(S) bool, getNext 
 // The hasNext specifies a predicate that tests existing of a next pair in the source.
 // The getNext extracts the element.
 // The resolv values for duplicated keys.
+//
 // Deprecated: will be deleted in a next version.
 func OfLoopResolv[S any, K comparable, E, V any](source S, hasNext func(S) bool, getNext func(S) (K, E, error), resolv func(bool, K, V, E) V) (map[K]V, error) {
 	r := map[K]V{}
@@ -55,6 +57,7 @@ func OfLoopResolv[S any, K comparable, E, V any](source S, hasNext func(S) bool,
 // GroupOfLoop builds a map of slices by iterating over elements, extracting key\value pairs and grouping the values for each key in the slices.
 // The hasNext specifies a predicate that tests existing of a next pair in the source.
 // The getNext extracts the pair.
+//
 // Deprecated: will be deleted in a next version.
 func GroupOfLoop[S any, K comparable, V any](source S, hasNext func(S) bool, getNext func(S) (K, V, error)) (map[K][]V, error) {
 	return OfLoopResolv(source, hasNext, getNext, func(_ bool, _ K, elements []V, val V) []V {

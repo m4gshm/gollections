@@ -33,6 +33,7 @@ func (m MapValues[K, V]) All(consumer func(V) bool) {
 }
 
 // Loop creates a loop to iterate through the collection.
+//
 // Deprecated: replaced by [MapValues.All].
 func (m MapValues[K, V]) Loop() loop.Loop[V] {
 	h := m.Head()
@@ -40,6 +41,7 @@ func (m MapValues[K, V]) Loop() loop.Loop[V] {
 }
 
 // Head creates an iterator to iterate through the collection.
+//
 // Deprecated: replaced by [MapValues.All].
 func (m MapValues[K, V]) Head() map_.ValIter[K, V] {
 	return map_.NewValIter(m.elements)
@@ -47,6 +49,7 @@ func (m MapValues[K, V]) Head() map_.ValIter[K, V] {
 
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
+//
 // Deprecated: replaced by [MapValues.All].
 func (m MapValues[K, V]) First() (map_.ValIter[K, V], V, bool) {
 	var (

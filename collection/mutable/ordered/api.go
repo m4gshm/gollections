@@ -21,6 +21,7 @@ func NewSetCap[T comparable](capacity int) *Set[T] {
 
 // SetFromLoop creates a set with elements retrieved by the 'next' function.
 // The next returns an element with true or zero value with false if there are no more elements.
+//
 // Deprecated: replaced by [SetFromSeq].
 func SetFromLoop[T comparable](next func() (T, bool)) *Set[T] {
 	return SetFromSeq((loop.Loop[T])(next).All)
@@ -70,6 +71,7 @@ func NewMapOf[K comparable, V any](order []K, elements map[K]V) *Map[K, V] {
 }
 
 // MapFromLoop creates a map with elements retrieved converter the 'next' function.
+//
 // Deprecated: replaced by [MapFromSeq2].
 func MapFromLoop[K comparable, V any](next func() (K, V, bool)) *Map[K, V] {
 	return MapFromSeq2(kvloop.Loop[K, V](next).All)

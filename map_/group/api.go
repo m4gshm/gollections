@@ -6,6 +6,7 @@ import (
 )
 
 // OfLoop - group.OfLoop synonym for the map_.GroupOfLoop.
+//
 // Deprecated: will be deleted in a next version.
 func OfLoop[S any, K comparable, V any](source S, hasNext func(S) bool, getNext func(S) (K, V, error)) (map[K][]V, error) {
 	return map_.GroupOfLoop(source, hasNext, getNext)

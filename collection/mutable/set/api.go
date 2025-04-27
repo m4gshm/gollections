@@ -18,6 +18,7 @@ func Of[T comparable](elements ...T) *mutable.Set[T] {
 }
 
 // From instantiates a set with elements retrieved by the 'next' function.
+//
 // Deprecated: replaced by [FromSeq].
 func From[T comparable](next func() (T, bool)) *mutable.Set[T] {
 	return mutable.SetFromLoop(next)

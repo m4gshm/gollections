@@ -33,6 +33,7 @@ func (m MapKeys[K, V]) All(consumer func(K) bool) {
 }
 
 // Loop creates a loop to iterate through the collection.
+//
 // Deprecated: replaced by [MapKeys.All].
 func (m MapKeys[K, V]) Loop() loop.Loop[K] {
 	h := m.Head()
@@ -40,6 +41,7 @@ func (m MapKeys[K, V]) Loop() loop.Loop[K] {
 }
 
 // Head creates an iterator to iterate through the collection.
+//
 // Deprecated: replaced by [MapKeys.All].
 func (m MapKeys[K, V]) Head() map_.KeyIter[K, V] {
 	return map_.NewKeyIter(m.elements)
@@ -47,6 +49,7 @@ func (m MapKeys[K, V]) Head() map_.KeyIter[K, V] {
 
 // First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
 // If no more elements then ok==false.
+//
 // Deprecated: replaced by [MapKeys.All].
 func (m MapKeys[K, V]) First() (map_.KeyIter[K, V], K, bool) {
 	var (
