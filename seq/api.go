@@ -39,6 +39,21 @@ func Of[T any](elements ...T) Seq[T] {
 	}
 }
 
+// Union combines several sequences into one.
+func Union[S ~Seq[T], T any](seq ...S) Seq[T] {
+	return func(yield func(T) bool) {
+		for _, s := range seq {
+			if s != nil {
+				for v := range s {
+					if !yield(v) {
+						return
+					}
+				}
+			}
+		}
+	}
+}
+
 // OfNextGet builds an iterator by iterating elements of a source.
 // The hasNext specifies a predicate that tests existing of a next element in the source.
 // The getNext extracts the element.
@@ -169,10 +184,31 @@ func Top[S ~Seq[T], T any](n int, seq S) Seq[T] {
 		if seq == nil {
 			return
 		}
-		if n > 0 {
-			seq(yield)
-			n--
+		m := n
+		seq(func(t T) bool {
+			if m == 0 {
+				return false
+			}
+			m--
+			return yield(t)
+		})
+	}
+}
+
+// Skip returns a sequence without first n elements.
+func Skip[S ~Seq[T], T any](n int, seq S) Seq[T] {
+	return func(yield func(T) bool) {
+		if seq == nil {
+			return
 		}
+		m := n
+		seq(func(t T) bool {
+			if m == 0 {
+				return yield(t)
+			}
+			m--
+			return true
+		})
 	}
 }
 

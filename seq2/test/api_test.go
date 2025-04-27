@@ -7,6 +7,7 @@ import (
 
 	"github.com/m4gshm/gollections/collection/immutable/ordered/map_"
 	"github.com/m4gshm/gollections/k"
+	"github.com/m4gshm/gollections/predicate/more"
 	"github.com/m4gshm/gollections/seq"
 	"github.com/m4gshm/gollections/seq2"
 	"github.com/m4gshm/gollections/slice"
@@ -42,6 +43,11 @@ func Test_Of(t *testing.T) {
 	}
 	assert.True(t, iter)
 	assert.Nil(t, out)
+}
+func Test_Union(t *testing.T) {
+	sequence := seq2.Union(seq2.Of(0, 1), nil, seq2.Of[int](), seq2.Of(2, 3, 4))
+	assert.Equal(t, slice.Of(0, 1, 2, 3, 4), seq.Slice(seq2.Values(sequence)))
+	assert.Equal(t, slice.Of(0, 1, 0, 1, 2), seq.Slice(seq2.Keys(sequence)))
 }
 
 func Test_OfIndexed(t *testing.T) {
@@ -114,6 +120,93 @@ func Test_Group(t *testing.T) {
 
 	assert.Equal(t, slice.Of("first", "third"), sort.Asc(m[true]))
 	assert.Equal(t, slice.Of("second"), sort.Asc(m[false]))
+}
+
+func Test_Head(t *testing.T) {
+	sequence := seq2.Of(1, 2, 3, 4, 5, 6)
+	_, result, ok := seq2.Head(sequence)
+
+	assert.True(t, ok)
+	assert.Equal(t, 1, result)
+
+	_, result, ok = seq2.Head[seq.Seq2[int, int]](nil)
+	assert.Zero(t, result)
+	assert.False(t, ok)
+}
+
+func Test_Top(t *testing.T) {
+	sequence := seq2.Of(1, 2, 3, 4, 5, 6)
+	top := seq2.Values(seq2.Top(4, sequence))
+	result := seq.Slice(top)
+	result2 := seq.Slice(top)
+
+	assert.Equal(t, slice.Of(1, 2, 3, 4), result)
+	assert.Equal(t, result2, result)
+
+	result = seq.Slice(seq2.Values(seq2.Top(0, sequence)))
+	assert.Nil(t, result)
+
+	result = seq.Slice(seq2.Values(seq2.Top[seq.Seq2[int, int]](10, nil)))
+	assert.Nil(t, result)
+	result = nil
+	for _, v := range seq2.Top(4, seq2.Of(1, 2, 3, 4, 5, 6)) {
+		if v != 3 {
+			result = append(result, v)
+		} else {
+			break
+		}
+	}
+	assert.Equal(t, slice.Of(1, 2), result)
+}
+
+func Test_Skip(t *testing.T) {
+	sequence := seq2.Of(1, 2, 3, 4, 5, 6)
+	skip := seq2.Values(seq2.Skip(4, sequence))
+	result := seq.Slice(skip)
+	result2 := seq.Slice(skip)
+
+	assert.Equal(t, slice.Of(5, 6), result)
+	assert.Equal(t, result2, result)
+
+	result = seq.Slice(seq2.Values(seq2.Skip(0, sequence)))
+	assert.Equal(t, seq.Slice(seq2.Values(sequence)), result)
+
+	result = seq.Slice(seq2.Values(seq2.Skip[seq.Seq2[int, int]](10, nil)))
+	assert.Nil(t, result)
+	result = nil
+	for _, v := range seq2.Skip(2, seq2.Of(1, 2, 3, 4, 5, 6)) {
+		if v != 5 {
+			result = append(result, v)
+		} else {
+			break
+		}
+	}
+	assert.Equal(t, slice.Of(3, 4), result)
+}
+
+func Test_SkipTop(t *testing.T) {
+	sequence := seq2.Of(1, 2, 3, 4, 5, 6)
+	middle := seq2.Top(2, seq2.Skip(2, sequence))
+	result := seq.Slice(seq2.Values(middle))
+	i := seq.Slice(seq2.Keys(middle))
+
+	assert.Equal(t, slice.Of(3, 4), result)
+	assert.Equal(t, slice.Of(2, 3), i)
+}
+
+func Test_First(t *testing.T) {
+	sequence := seq2.Of(1, 2, 3, 4, 5, 6)
+	condition := func(_ int, v int) bool { return more.Than(5)(v) }
+	i, result, ok := seq2.First(sequence, condition)
+
+	assert.True(t, ok)
+	assert.Equal(t, 5, i)
+	assert.Equal(t, 6, result)
+	_, _, ok = seq2.First[seq.Seq2[int, int]](nil, condition)
+	assert.False(t, ok)
+
+	_, _, ok = seq2.First(sequence, nil)
+	assert.False(t, ok)
 }
 
 func Test_Filter(t *testing.T) {

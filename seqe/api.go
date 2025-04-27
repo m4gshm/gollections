@@ -19,7 +19,22 @@ type SeqE[T any] = seq.SeqE[T]
 // It is used to iterate over slice index/value pairs or map key/value pairs.
 type Seq2[K, V any] = seq.Seq2[K, V]
 
-// OfNextGet builds a slice by iterating elements of a source.
+// Union combines several sequences into one.
+func Union[S ~SeqE[T], T any](seq ...S) SeqE[T] {
+	return func(yield func(T, error) bool) {
+		for _, s := range seq {
+			if s != nil {
+				for v, err := range s {
+					if !yield(v, err) {
+						return
+					}
+				}
+			}
+		}
+	}
+}
+
+// OfNextGet builds an iterator by iterating elements of a source.
 // The hasNext specifies a predicate that tests existing of a next element in the source.
 // The getNext extracts the element.
 func OfNextGet[T any](hasNext func() bool, getNext func() (T, error)) SeqE[T] {
@@ -32,21 +47,21 @@ func OfNextGet[T any](hasNext func() bool, getNext func() (T, error)) SeqE[T] {
 	}
 }
 
-// OfNextPush builds a slice by iterating elements of a source.
+// OfNextPush builds an iterator by iterating elements of a source.
 // The hasNext specifies a predicate that tests existing of a next element in the source.
 // The pushNext copy the element to the next pointer.
 func OfNextPush[T any](hasNext func() bool, pushNext func(*T) error) SeqE[T] {
 	return OfNextGet(hasNext, func() (o T, err error) { return o, pushNext(&o) })
 }
 
-// OfSourceNextGet builds a slice by iterating elements of the source.
+// OfSourceNextGet builds an iterator by iterating elements of the source.
 // The hasNext specifies a predicate that tests existing of a next element in the source.
 // The getNext extracts the element.
 func OfSourceNextGet[S, T any](source S, hasNext func(S) bool, getNext func(S) (T, error)) SeqE[T] {
 	return OfNextGet(func() bool { return hasNext(source) }, func() (T, error) { return getNext(source) })
 }
 
-// OfSourceNextPush builds a slice by iterating elements of the source.
+// OfSourceNextPush builds an iterator by iterating elements of the source.
 // The hasNext specifies a predicate that tests existing of a next element in the source.
 // The pushNext copy the element to the next pointer.
 func OfSourceNextPush[S, T any](source S, hasNext func(S) bool, pushNext func(S, *T) error) SeqE[T] {
@@ -76,10 +91,31 @@ func Top[S ~SeqE[T], T any](n int, seq S) SeqE[T] {
 		if seq == nil {
 			return
 		}
-		if n > 0 {
-			seq(yield)
-			n--
+		m := n
+		seq(func(t T, err error) bool {
+			if m == 0 {
+				return false
+			}
+			m--
+			return yield(t, err)
+		})
+	}
+}
+
+// Skip returns a sequence without first n elements.
+func Skip[S ~SeqE[T], T any](n int, seq S) SeqE[T] {
+	return func(yield func(T, error) bool) {
+		if seq == nil {
+			return
 		}
+		m := n
+		seq(func(t T, err error) bool {
+			if m == 0 {
+				return yield(t, err)
+			}
+			m--
+			return true
+		})
 	}
 }
 

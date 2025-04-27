@@ -42,6 +42,11 @@ func Test_Of(t *testing.T) {
 	assert.Nil(t, out)
 }
 
+func Test_Union(t *testing.T) {
+	sequence := seq.Union(seq.Of(0, 1), nil, seq.Of[int](), seq.Of(2, 3, 4))
+	assert.Equal(t, slice.Of(0, 1, 2, 3, 4), seq.Slice(sequence))
+}
+
 func Test_OfIndexed(t *testing.T) {
 	indexed := slice.Of("0", "1", "2", "3", "4")
 
@@ -175,6 +180,78 @@ func Test_ReduceNil(t *testing.T) {
 
 	assert.False(t, ok)
 	assert.Equal(t, 0, sum)
+}
+
+func Test_Head(t *testing.T) {
+	sequence := seq.Of(1, 2, 3, 4, 5, 6)
+	result, ok := seq.Head(sequence)
+
+	assert.True(t, ok)
+	assert.Equal(t, 1, result)
+
+	result, ok = seq.Head[seq.Seq[int]](nil)
+	assert.Zero(t, result)
+	assert.False(t, ok)
+}
+
+func Test_Top(t *testing.T) {
+	sequence := seq.Of(1, 2, 3, 4, 5, 6)
+	top := seq.Top(4, sequence)
+	result := seq.Slice(top)
+	result2 := seq.Slice(top)
+
+	assert.Equal(t, slice.Of(1, 2, 3, 4), result)
+	assert.Equal(t, result2, result)
+
+	result = seq.Slice(seq.Top(0, sequence))
+	assert.Nil(t, result)
+
+	result = seq.Slice(seq.Top[seq.Seq[int]](10, nil))
+	assert.Nil(t, result)
+
+	result = nil
+	for v := range seq.Top(4, seq.Of(1, 2, 3, 4, 5, 6)) {
+		if v != 3 {
+			result = append(result, v)
+		} else {
+			break
+		}
+	}
+	assert.Equal(t, slice.Of(1, 2), result)
+}
+
+func Test_Skip(t *testing.T) {
+	sequence := seq.Of(1, 2, 3, 4, 5, 6)
+	skip := seq.Skip(4, sequence)
+	result := seq.Slice(skip)
+	result2 := seq.Slice(skip)
+
+	assert.Equal(t, slice.Of(5, 6), result)
+	assert.Equal(t, result2, result)
+
+	result = seq.Slice(seq.Skip(0, sequence))
+	assert.Equal(t, seq.Slice(sequence), result)
+
+	result = seq.Slice(seq.Skip[seq.Seq[int]](10, nil))
+	assert.Nil(t, result)
+
+	result = nil
+	for v := range seq.Skip(2, seq.Of(1, 2, 3, 4, 5, 6)) {
+		if v != 5 {
+			result = append(result, v)
+		} else {
+			break
+		}
+	}
+	assert.Equal(t, slice.Of(3, 4), result)
+}
+
+func Test_SkipTop(t *testing.T) {
+	sequence := seq.Of(1, 2, 3, 4, 5, 6)
+	middle := seq.Top(2, seq.Skip(2, sequence))
+	result := seq.Slice(middle)
+
+	assert.Equal(t, slice.Of(3, 4), result)
 }
 
 func Test_First(t *testing.T) {
@@ -405,6 +482,24 @@ type Rows[T any] struct {
 func (r *Rows[T]) Reset()       { r.cursor = 0 }
 func (r *Rows[T]) Next() bool   { return r.cursor < len(r.row) }
 func (r *Rows[T]) Scan(dest *T) { *dest = r.row[r.cursor]; r.cursor++ }
+
+func Test_OfNextGet(t *testing.T) {
+	rows := &Rows[int]{slice.Of(1, 2, 3), 0}
+
+	result := seq.Slice(seq.OfNextGet(rows.Next, func() (out int) {
+		rows.Scan(&out)
+		return out
+	}))
+	assert.Equal(t, slice.Of(1, 2, 3), result)
+
+	rows.Reset()
+
+	result = seq.Slice(seq.OfSourceNextGet(rows, (*Rows[int]).Next, func(r *Rows[int]) (out int) {
+		r.Scan(&out)
+		return out
+	}))
+	assert.Equal(t, slice.Of(1, 2, 3), result)
+}
 
 func Test_OfNextPush(t *testing.T) {
 	rows := &Rows[int]{slice.Of(1, 2, 3), 0}
