@@ -4,6 +4,7 @@ package seqe
 import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/predicate/always"
 	"github.com/m4gshm/gollections/seq"
 )
 
@@ -67,6 +68,24 @@ func OfIndexed[T any](amount int, getAt func(int) (T, error)) Seq2[T, error] {
 			}
 		}
 	}
+}
+
+// Top returns a sequence of top n elements.
+func Top[S ~SeqE[T], T any](n int, seq S) SeqE[T] {
+	return func(yield func(T, error) bool) {
+		if seq == nil {
+			return
+		}
+		if n > 0 {
+			seq(yield)
+			n--
+		}
+	}
+}
+
+// Head returns the first element.
+func Head[S ~SeqE[T], T any](seq S) (v T, ok bool, err error) {
+	return First(seq, always.True)
 }
 
 // First returns the first element that satisfies the condition of the 'predicate' function.

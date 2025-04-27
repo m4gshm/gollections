@@ -115,6 +115,41 @@ func Range[T constraints.Integer | rune](from T, toExclusive T) Seq2[int, T] {
 	}
 }
 
+// Top returns a sequence of top n key\value pairs.
+func Top[S ~Seq2[K, V], K, V any](n int, seq S) S {
+	return func(yield func(K, V) bool) {
+		if seq == nil {
+			return
+		}
+		if n > 0 {
+			seq(yield)
+			n--
+		}
+	}
+}
+
+// Head returns the first key\value pair.
+func Head[S ~Seq2[K, V], K, V any](seq S) (k K, v V, ok bool) {
+	return First(seq, func (K,V) bool {	return true})
+}
+
+// First returns the first key\value pair that satisfies the condition of the 'predicate' function.
+func First[S ~Seq2[K, V], K, V any](seq S, predicate func(K, V) bool) (k K, v V, ok bool) {
+	if seq == nil || predicate == nil {
+		return
+	}
+	seq(func(oneK K,oneV V) bool {
+		if predicate(oneK, oneV) {
+			k = oneK
+			v = oneV
+			ok = true
+			return false
+		}
+		return true
+	})
+	return
+}
+
 // Filter creates a rangefunc that iterates only those elements for which the 'filter' function returns true.
 func Filter[S ~Seq2[K, V], K, V any](seq S, filter func(K, V) bool) Seq2[K, V] {
 	return func(yield func(K, V) bool) {

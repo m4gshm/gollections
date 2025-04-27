@@ -4,6 +4,7 @@ package seq
 import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/predicate/always"
 	"github.com/m4gshm/gollections/seq2"
 	"golang.org/x/exp/constraints"
 )
@@ -160,6 +161,24 @@ func ToSeq2[S ~Seq[T], T, K, V any](seq S, converter func(T) (K, V)) Seq2[K, V] 
 			return yield(converter(v))
 		})
 	}
+}
+
+// Top returns a sequence of top n elements.
+func Top[S ~Seq[T], T any](n int, seq S) Seq[T] {
+	return func(yield func(T) bool) {
+		if seq == nil {
+			return
+		}
+		if n > 0 {
+			seq(yield)
+			n--
+		}
+	}
+}
+
+// Head returns the first element.
+func Head[S ~Seq[T], T any](seq S) (v T, ok bool) {
+	return First(seq, always.True)
 }
 
 // First returns the first element that satisfies the condition of the 'predicate' function.
