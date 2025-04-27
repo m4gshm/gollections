@@ -408,6 +408,30 @@ func Test_Contains(t *testing.T) {
 	assert.ErrorContains(t, err, "abort")
 }
 
+type Rows[T any] struct {
+	row    []T
+	cursor int
+}
+
+func (r *Rows[T]) Reset()       { r.cursor = 0 }
+func (r *Rows[T]) Next() bool   { return r.cursor < len(r.row) }
+func (r *Rows[T]) Scan(dest *T) error { *dest = r.row[r.cursor]; r.cursor++; return nil }
+
+func Test_OfNextPush(t *testing.T) {
+	rows := &Rows[int]{slice.Of(1, 2, 3), 0}
+
+	result, err := seqe.Slice(seqe.OfNextPush(rows.Next, rows.Scan))
+	assert.NoError(t, err)
+	assert.Equal(t, slice.Of(1, 2, 3), result)
+
+	rows.Reset()
+
+	result, err = seqe.Slice(seqe.OfSourceNextPush(rows, (*Rows[int]).Next, func(r *Rows[int], out *int) error { return r.Scan(out) }))
+	assert.NoError(t, err)
+	assert.Equal(t, slice.Of(1, 2, 3), result)
+}
+
+
 func Test_SeqOfNil(t *testing.T) {
 	var in, out []int
 

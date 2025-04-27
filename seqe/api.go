@@ -18,6 +18,40 @@ type SeqE[T any] = seq.SeqE[T]
 // It is used to iterate over slice index/value pairs or map key/value pairs.
 type Seq2[K, V any] = seq.Seq2[K, V]
 
+// OfNextGet builds a slice by iterating elements of a source.
+// The hasNext specifies a predicate that tests existing of a next element in the source.
+// The getNext extracts the element.
+func OfNextGet[T any](hasNext func() bool, getNext func() (T, error)) SeqE[T] {
+	return func(yield func(T, error) bool) {
+		for hasNext() {
+			if o, err := getNext(); !yield(o, err) {
+				return
+			}
+		}
+	}
+}
+
+// OfNextPush builds a slice by iterating elements of a source.
+// The hasNext specifies a predicate that tests existing of a next element in the source.
+// The pushNext copy the element to the next pointer.
+func OfNextPush[T any](hasNext func() bool, pushNext func(*T) error) SeqE[T] {
+	return OfNextGet(hasNext, func() (o T, err error) { return o, pushNext(&o) })
+}
+
+// OfSourceNextGet builds a slice by iterating elements of the source.
+// The hasNext specifies a predicate that tests existing of a next element in the source.
+// The getNext extracts the element.
+func OfSourceNextGet[S, T any](source S, hasNext func(S) bool, getNext func(S) (T, error)) SeqE[T] {
+	return OfNextGet(func() bool { return hasNext(source) }, func() (T, error) { return getNext(source) })
+}
+
+// OfSourceNextPush builds a slice by iterating elements of the source.
+// The hasNext specifies a predicate that tests existing of a next element in the source.
+// The pushNext copy the element to the next pointer.
+func OfSourceNextPush[S, T any](source S, hasNext func(S) bool, pushNext func(S, *T) error) SeqE[T] {
+	return OfNextPush(func() bool { return hasNext(source) }, func(next *T) error { return pushNext(source, next) })
+}
+
 // OfIndexed builds a SeqE iterator by extracting elements from an indexed soruce.
 // the len is length ot the source.
 // the getAt retrieves an element by its index from the source.

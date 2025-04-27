@@ -397,6 +397,27 @@ func Test_Contains(t *testing.T) {
 	assert.False(t, seq.Contains(seq.Of(1, 2, 3), 0))
 }
 
+type Rows[T any] struct {
+	row    []T
+	cursor int
+}
+
+func (r *Rows[T]) Reset()       { r.cursor = 0 }
+func (r *Rows[T]) Next() bool   { return r.cursor < len(r.row) }
+func (r *Rows[T]) Scan(dest *T) { *dest = r.row[r.cursor]; r.cursor++ }
+
+func Test_OfNextPush(t *testing.T) {
+	rows := &Rows[int]{slice.Of(1, 2, 3), 0}
+
+	result := seq.Slice(seq.OfNextPush(rows.Next, rows.Scan))
+	assert.Equal(t, slice.Of(1, 2, 3), result)
+
+	rows.Reset()
+
+	result = seq.Slice(seq.OfSourceNextPush(rows, (*Rows[int]).Next, func(r *Rows[int], out *int) { r.Scan(out) }))
+	assert.Equal(t, slice.Of(1, 2, 3), result)
+}
+
 func Test_KeyValue(t *testing.T) {
 	s := seq.Of(1, 2, 3)
 	s2 := seq.KeyValue(s, as.Is, strconv.Itoa)

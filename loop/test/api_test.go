@@ -333,14 +333,6 @@ func Test_FiltAndConv(t *testing.T) {
 	assert.Equal(t, slice.Of(8, 16), o)
 }
 
-type rows[T any] struct {
-	row    []T
-	cursor int
-}
-
-func (r *rows[T]) hasNext() bool    { return r.cursor < len(r.row) }
-func (r *rows[T]) next() (T, error) { e := r.row[r.cursor]; r.cursor++; return e, nil }
-
 func Test_OfLoop(t *testing.T) {
 	stream := loop.Of(1, 2, 3)
 	result := loop.Slice(stream)
