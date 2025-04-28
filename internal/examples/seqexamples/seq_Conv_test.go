@@ -7,14 +7,19 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/m4gshm/gollections/seq"
-	"github.com/m4gshm/gollections/seqe"
 )
 
 func Test_Conv(t *testing.T) {
 
-	result, err := seqe.Slice(seq.Conv(seq.Of("1", "3", "5", "_7", "9", "11"), strconv.Atoi))
-	//[]int{1, 3, 5}, ErrSyntax
+	var result []int
+	for i, err := range seq.Conv(seq.Of("1", "3", "5", "_7", "9", "11"), strconv.Atoi) {
+		if err != nil {
+			//ErrSyntax
+			break
+		}
+		result = append(result, i)
+	}
+	//[]int{1, 3, 5}
 
 	assert.Equal(t, []int{1, 3, 5}, result)
-	assert.ErrorIs(t, err, strconv.ErrSyntax)
 }
