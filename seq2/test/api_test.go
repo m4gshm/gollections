@@ -343,3 +343,13 @@ func Test_RangeClosed(t *testing.T) {
 	assert.Equal(t, slice.Of(-1, 0, 1), out)
 	assert.Equal(t, slice.Of(0, 1, 2), ind)
 }
+
+func Test_TrackEach(t *testing.T) {
+	var out, ind []int
+	seq2.TrackEach(seq2.RangeClosed(-1, 3), func(i int, v int) {
+		out = append(out, v)
+		ind = append(ind, i)
+	})
+	assert.Equal(t, slice.Of(-1, 0, 1, 2, 3), out)
+	assert.Equal(t, slice.Of(0, 1, 2, 3, 4), ind)
+}

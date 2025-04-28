@@ -695,3 +695,11 @@ func Test_Group(t *testing.T) {
 	assert.Equal(t, slice.Of(1, 1, 3, 5), groups[false])
 	assert.NoError(t, err)
 }
+
+func Test_TrackEach(t *testing.T) {
+	var out []int
+	seqe.ForEach(seq.ToSeq2(seq.RangeClosed(-1, 3), errOn(2)), func(v int) {
+		out = append(out, v)
+	})
+	assert.Equal(t, slice.Of(-1, 0, 1), out)
+}
