@@ -66,7 +66,7 @@ data, err := slice.Conv(slice.Of("1", "2", "3", "4", "_", "6"), strconv.Atoi)
 //[1 2 3 4], invalid syntax
 
 even := func(i int) bool { return i%2 == 0 }
-result := slice.Reduce(slice.Convert(slice.Filter(data, even), strconv.Itoa), op.Sum) //24
+result := slice.Reduce(slice.Convert(slice.Filter(data, even), strconv.Itoa), op.Sum) //"24"
 ```
 
 In the example is used only small set of slice functions as
