@@ -319,9 +319,9 @@ import(
     "github.com/m4gshm/gollections/seq"
     "github.com/m4gshm/gollections/seq2"
 )
-include::../examples/seqexamples/seq_Of_test.go[lines=14..19,indent=0]
+include::../examples/seqexamples/seq_Of_test.go[lines=14..23,indent=0]
 ----
-====== seqe.OfNextPush
+====== seqe.OfNext
 [source,go]
 ----
 import(

@@ -532,11 +532,15 @@ import(
 
 var (
     ints  iter.Seq[int]          = seq.Of(1, 2, 3)
-    pairs iter.Seq2[string, int] = seq2.OfMap(map[string]int{"first": 1, "second": 2, "third": 3})
+    pairs iter.Seq2[string, int] = seq2.OfMap(map[string]int{
+        "first":  1,
+        "second": 2,
+        "third":  3,
+    })
 )
 ```
 
-##### seqe.OfNextPush
+##### seqe.OfNext
 
 ``` go
 import(
@@ -548,13 +552,14 @@ import(
 
 var rows sql.Rows = selectUsers()
 
-usersByAge, err := seqe.Group(seqe.OfNext(rows.Next, func(u *User) error {
-    return rows.Scan(&u.name, &u.age)
-}), User.Age, as.Is)
+rowSeq := seqe.OfNext(rows.Next, func(u *User) error { return rows.Scan(&u.name, &u.age) })
+usersByAge, err := seqe.Group(rowSeq, User.Age, as.Is)
 
 if err != nil {
     log.Fatal(err)
 }
+
+assert.Equal(t, 1, len(usersByAge))
 ```
 
 instead of:
@@ -564,7 +569,6 @@ import(
     "database/sql"
     "log"
 )
-
 var rows sql.Rows = selectUsers()
 
 var usersByAge = map[int][]User{}
@@ -576,6 +580,8 @@ for rows.Next() {
     }
     usersByAge[u.age] = append(usersByAge[u.age], u)
 }
+
+assert.Equal(t, 1, len(usersByAge))
 ```
 
 #### Collectors

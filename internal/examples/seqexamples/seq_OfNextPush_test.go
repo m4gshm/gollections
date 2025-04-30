@@ -14,9 +14,8 @@ func Test_rows_OfNext(t *testing.T) {
 
 	var rows sql.Rows = selectUsers()
 
-	usersByAge, err := seqe.Group(seqe.OfNext(rows.Next, func(u *User) error {
-		return rows.Scan(&u.name, &u.age)
-	}), User.Age, as.Is)
+	rowSeq := seqe.OfNext(rows.Next, func(u *User) error { return rows.Scan(&u.name, &u.age) })
+	usersByAge, err := seqe.Group(rowSeq, User.Age, as.Is)
 
 	if err != nil {
 		log.Fatal(err)
