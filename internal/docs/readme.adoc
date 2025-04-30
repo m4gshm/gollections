@@ -339,7 +339,7 @@ import(
     "database/sql"
     "log"
 )
-include::../examples/seqexamples/seq_OfNextPush_test.go[lines=30..41,indent=0]
+include::../examples/seqexamples/seq_OfNextPush_test.go[lines=29..41,indent=0]
 ----
 ====== seq.Range, seq2.Range
 [source,go]

@@ -567,13 +567,14 @@ import(
     "database/sql"
     "log"
 )
+
 var rows sql.Rows = selectUsers()
 
 var usersByAge = map[int][]User{}
+var err error
 for rows.Next() {
     var u User
-    if err := rows.Scan(&u.name, &u.age); err != nil {
-        log.Fatal(err)
+    if err = rows.Scan(&u.name, &u.age); err != nil {
         break
     }
     usersByAge[u.age] = append(usersByAge[u.age], u)
