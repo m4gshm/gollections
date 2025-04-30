@@ -11,9 +11,7 @@ import (
 func Test_Series(t *testing.T) {
 
 	var numbers, factorials []int
-	for i, n := range seq2.Series(1, func(i int, prev int) (int, bool) {
-		return i * prev, i <= 5
-	}) {
+	for i, n := range seq2.Series(1, func(i int, prev int) (int, bool) { return i * prev, i <= 5 }) {
 		numbers = append(numbers, i)
 		factorials = append(factorials, n)
 	}
