@@ -558,8 +558,6 @@ usersByAge, err := seqe.Group(rowSeq, User.Age, as.Is)
 if err != nil {
     log.Fatal(err)
 }
-
-assert.Equal(t, 1, len(usersByAge))
 ```
 
 instead of:
@@ -580,8 +578,6 @@ for rows.Next() {
     }
     usersByAge[u.age] = append(usersByAge[u.age], u)
 }
-
-assert.Equal(t, 1, len(usersByAge))
 ```
 
 ##### seq.Range, seq2.Range
