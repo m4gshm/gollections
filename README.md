@@ -540,7 +540,7 @@ var (
 )
 ```
 
-##### seqe.OfNext
+##### seq.OfNext, seqe.OfNext, seq.OfNextGet, seqe.OfNextGet
 
 ``` go
 import(
@@ -582,6 +582,38 @@ for rows.Next() {
 }
 
 assert.Equal(t, 1, len(usersByAge))
+```
+
+##### seq.Range, seq2.Range
+
+``` go
+import(
+    "github.com/m4gshm/gollections/seq"
+)
+
+var numbers []int
+for n := range seq.Range(5, -2) {
+    numbers = append(numbers, n)
+}
+//[]int{5, 4, 3, 2, 1, 0, -1}
+```
+
+##### seq.Series, seq2.Series
+
+``` go
+import(
+    "github.com/m4gshm/gollections/seq"
+)
+
+var numbers, factorials []int
+for i, n := range seq2.Series(1, func(i int, prev int) (int, bool) {
+    return i * prev, i <= 5
+}) {
+    numbers = append(numbers, i)
+    factorials = append(factorials, n)
+}
+//[]int{0, 1, 2, 3, 4, 5}
+//[]int{1, 1, 2, 6, 24, 120}
 ```
 
 #### Collectors

@@ -67,7 +67,7 @@ func OfIndexed[T any](amount int, getAt func(int) T) Seq2[int, T] {
 }
 
 // Series makes a sequence by applying the 'next' function to the previous step generated value.
-func Series[T any](first T, next func(T) (T, bool)) Seq2[int, T] {
+func Series[T any](first T, next func(int, T) (T, bool)) Seq2[int, T] {
 	return func(yield func(int, T) bool) {
 		if next == nil {
 			return
@@ -79,7 +79,7 @@ func Series[T any](first T, next func(T) (T, bool)) Seq2[int, T] {
 		}
 		for {
 			i++
-			next, ok := next(current)
+			next, ok := next(i, current)
 			if !ok {
 				break
 			}

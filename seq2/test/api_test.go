@@ -73,7 +73,7 @@ func Test_OfIndexed(t *testing.T) {
 }
 
 func Test_Series(t *testing.T) {
-	generator := func(prev int) (int, bool) { return prev + 1, prev < 3 }
+	generator := func(i, prev int) (int, bool) { return prev + 1, prev < 3 }
 	sequence := seq2.Series(-1, generator)
 	assert.Equal(t, slice.Of(-1, 0, 1, 2, 3), seq.Slice(seq2.Values(sequence)))
 	assert.Equal(t, slice.Of(0, 1, 2, 3, 4), seq.Slice(seq2.Keys(sequence)))
@@ -94,7 +94,7 @@ func Test_Series(t *testing.T) {
 	}
 	assert.Equal(t, slice.Of(-1, 0, 1, 2), out)
 
-	assert.Nil(t, seq.Slice(seq2.Values(seq2.Series(-1, (func(prev int) (int, bool))(nil)))))
+	assert.Nil(t, seq.Slice(seq2.Values(seq2.Series(-1, (func(i, prev int) (int, bool))(nil)))))
 }
 
 func Test_Map(t *testing.T) {

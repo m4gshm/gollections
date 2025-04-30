@@ -321,7 +321,7 @@ import(
 )
 include::../examples/seqexamples/seq_Of_test.go[lines=14..23,indent=0]
 ----
-====== seqe.OfNext
+====== seq.OfNext, seqe.OfNext, seq.OfNextGet, seqe.OfNextGet
 [source,go]
 ----
 import(
@@ -340,6 +340,22 @@ import(
     "log"
 )
 include::../examples/seqexamples/seq_OfNextPush_test.go[lines=30..42,indent=0]
+----
+====== seq.Range, seq2.Range
+[source,go]
+----
+import(
+    "github.com/m4gshm/gollections/seq"
+)
+include::../examples/seqexamples/seq_Range_test.go[lines=12..18,indent=0]
+----
+====== seq.Series, seq2.Series
+[source,go]
+----
+import(
+    "github.com/m4gshm/gollections/seq"
+)
+include::../examples/seqexamples/seq2_Series_test.go[lines=12..22,indent=0]
 ----
 ===== Collectors
 ====== seq.Slice
