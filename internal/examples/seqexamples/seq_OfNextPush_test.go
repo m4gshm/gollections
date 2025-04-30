@@ -1,7 +1,6 @@
 package seqexamples
 
 import (
-	"log"
 	"testing"
 
 	"github.com/m4gshm/gollections/convert/as"
@@ -17,12 +16,9 @@ func Test_rows_OfNext(t *testing.T) {
 	rowSeq := seqe.OfNext(rows.Next, func(u *User) error { return rows.Scan(&u.name, &u.age) })
 	usersByAge, err := seqe.Group(rowSeq, User.Age, as.Is)
 
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	assert.Equal(t, 1, len(usersByAge))
 	assert.Equal(t, "Alice", usersByAge[21][0].Name())
+	assert.NoError(t, err)
 }
 
 func Test_rows_plain_old(t *testing.T) {
@@ -53,12 +49,9 @@ func Test_rows_OfNextGet(t *testing.T) {
 		return &u, rows.Scan(&u.name, &u.age)
 	}), (*User).Age, as.Is)
 
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	assert.Equal(t, 1, len(refUsersByAge))
 	assert.Equal(t, "Alice", refUsersByAge[21][0].Name())
+	assert.NoError(t, err)
 }
 
 func selectUsers() sql.Rows {

@@ -554,10 +554,6 @@ var rows sql.Rows = selectUsers()
 
 rowSeq := seqe.OfNext(rows.Next, func(u *User) error { return rows.Scan(&u.name, &u.age) })
 usersByAge, err := seqe.Group(rowSeq, User.Age, as.Is)
-
-if err != nil {
-    log.Fatal(err)
-}
 ```
 
 instead of:

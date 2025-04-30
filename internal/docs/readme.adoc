@@ -330,7 +330,7 @@ import(
 
     "github.com/m4gshm/gollections/seq2"
 )
-include::../examples/seqexamples/seq_OfNextPush_test.go[lines=14..23,indent=0]
+include::../examples/seqexamples/seq_OfNextPush_test.go[lines=13..18,indent=0]
 ----
 instead of:
 [source,go]
@@ -339,7 +339,7 @@ import(
     "database/sql"
     "log"
 )
-include::../examples/seqexamples/seq_OfNextPush_test.go[lines=29..41,indent=0]
+include::../examples/seqexamples/seq_OfNextPush_test.go[lines=25..37,indent=0]
 ----
 ====== seq.Range, seq2.Range
 [source,go]
