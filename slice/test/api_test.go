@@ -572,7 +572,7 @@ func (r *Rows[T]) Scan(dest *T) error { *dest = r.row[r.cursor]; r.cursor++; ret
 func Test_OffNextPush(t *testing.T) {
 	var (
 		rows        = &Rows[int]{slice.Of(1, 2, 3), 0}
-		result, err = slice.OfNextPush(rows.Next, rows.Scan)
+		result, err = slice.OfNext(rows.Next, rows.Scan)
 		expected    = slice.Of(1, 2, 3)
 	)
 	assert.Equal(t, expected, result)
@@ -580,7 +580,7 @@ func Test_OffNextPush(t *testing.T) {
 
 	rows.Reset()
 
-	result, err = slice.OfSourceNextPush(rows, (*Rows[int]).Next, func(r *Rows[int], our *int) error {
+	result, err = slice.OfSourceNext(rows, (*Rows[int]).Next, func(r *Rows[int], our *int) error {
 		return r.Scan(our)
 	})
 

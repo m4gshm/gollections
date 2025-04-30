@@ -523,13 +523,13 @@ func (r *Rows[T]) Scan(dest *T) error { *dest = r.row[r.cursor]; r.cursor++; ret
 func Test_OfNextPush(t *testing.T) {
 	rows := &Rows[int]{slice.Of(1, 2, 3), 0}
 
-	result, err := seqe.Slice(seqe.OfNextPush(rows.Next, rows.Scan))
+	result, err := seqe.Slice(seqe.OfNext(rows.Next, rows.Scan))
 	assert.NoError(t, err)
 	assert.Equal(t, slice.Of(1, 2, 3), result)
 
 	rows.Reset()
 
-	result, err = seqe.Slice(seqe.OfSourceNextPush(rows, (*Rows[int]).Next, func(r *Rows[int], out *int) error { return r.Scan(out) }))
+	result, err = seqe.Slice(seqe.OfSourceNext(rows, (*Rows[int]).Next, func(r *Rows[int], out *int) error { return r.Scan(out) }))
 	assert.NoError(t, err)
 	assert.Equal(t, slice.Of(1, 2, 3), result)
 }

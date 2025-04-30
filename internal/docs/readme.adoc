@@ -321,6 +321,26 @@ import(
 )
 include::../examples/seqexamples/seq_Of_test.go[lines=14..19,indent=0]
 ----
+====== seqe.OfNextPush
+[source,go]
+----
+import(
+    "database/sql"
+    "log"
+
+    "github.com/m4gshm/gollections/seq2"
+)
+include::../examples/seqexamples/seq_OfNextPush_test.go[lines=14..24,indent=0]
+----
+instead of:
+[source,go]
+----
+import(
+    "database/sql"
+    "log"
+)
+include::../examples/seqexamples/seq_OfNextPush_test.go[lines=30..42,indent=0]
+----
 ===== Collectors
 ====== seq.Slice
 [source,go]

@@ -196,7 +196,7 @@ func (r *Rows[T]) Scan(dest *T) error { *dest = r.row[r.cursor]; r.cursor++; ret
 func Test_OffNextPush(t *testing.T) {
 	var (
 		rows        = &Rows[int]{slice.Of(1, 2, 3), 0}
-		result, err = slice.OfNextPush(rows.Next, rows.Scan)
+		result, err = slice.OfNext(rows.Next, rows.Scan)
 		expected    = slice.Of(1, 2, 3)
 	)
 	assert.Equal(t, expected, result)

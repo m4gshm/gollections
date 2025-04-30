@@ -58,10 +58,10 @@ func OfNextGet[T any](hasNext func() bool, getNext func() (next T, err error)) (
 	return r, nil
 }
 
-// OfNextPush builds a slice by iterating elements of a source.
+// OfNext builds a slice by iterating elements of a source.
 // The hasNext specifies a predicate that tests existing of a next element in the source.
 // The pushNext copy the element to the next pointer.
-func OfNextPush[T any](hasNext func() bool, pushNext func(*T) error) ([]T, error) {
+func OfNext[T any](hasNext func() bool, pushNext func(*T) error) ([]T, error) {
 	return OfNextGet(hasNext, func() (o T, err error) { return o, pushNext(&o) })
 }
 
@@ -72,11 +72,11 @@ func OfSourceNextGet[S, T any](source S, hasNext func(S) bool, getNext func(S) (
 	return OfNextGet(func() bool { return hasNext(source) }, func() (T, error) { return getNext(source) })
 }
 
-// OfSourceNextPush builds a slice by iterating elements of the source.
+// OfSourceNext builds a slice by iterating elements of the source.
 // The hasNext specifies a predicate that tests existing of a next element in the source.
 // The pushNext copy the element to the next pointer.
-func OfSourceNextPush[S, T any](source S, hasNext func(S) bool, pushNext func(S, *T) error) ([]T, error) {
-	return OfNextPush(func() bool { return hasNext(source) }, func(next *T) error { return pushNext(source, next) })
+func OfSourceNext[S, T any](source S, hasNext func(S) bool, pushNext func(S, *T) error) ([]T, error) {
+	return OfNext(func() bool { return hasNext(source) }, func(next *T) error { return pushNext(source, next) })
 }
 
 // OfIndexed builds a slice by extracting elements from an indexed soruce.

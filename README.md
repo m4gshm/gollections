@@ -536,6 +536,48 @@ var (
 )
 ```
 
+##### seqe.OfNextPush
+
+``` go
+import(
+    "database/sql"
+    "log"
+
+    "github.com/m4gshm/gollections/seq2"
+)
+
+var rows sql.Rows = selectUsers()
+
+usersByAge, err := seqe.Group(seqe.OfNext(rows.Next, func(u *User) error {
+    return rows.Scan(&u.name, &u.age)
+}), User.Age, as.Is)
+
+if err != nil {
+    log.Fatal(err)
+}
+```
+
+instead of:
+
+``` go
+import(
+    "database/sql"
+    "log"
+)
+
+var rows sql.Rows = selectUsers()
+
+var usersByAge = map[int][]User{}
+for rows.Next() {
+    var u User
+    if err := rows.Scan(&u.name, &u.age); err != nil {
+        log.Fatal(err)
+        break
+    }
+    usersByAge[u.age] = append(usersByAge[u.age], u)
+}
+```
+
 #### Collectors
 
 ##### seq.Slice

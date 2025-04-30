@@ -504,12 +504,12 @@ func Test_OfNextGet(t *testing.T) {
 func Test_OfNextPush(t *testing.T) {
 	rows := &Rows[int]{slice.Of(1, 2, 3), 0}
 
-	result := seq.Slice(seq.OfNextPush(rows.Next, rows.Scan))
+	result := seq.Slice(seq.OfNext(rows.Next, rows.Scan))
 	assert.Equal(t, slice.Of(1, 2, 3), result)
 
 	rows.Reset()
 
-	result = seq.Slice(seq.OfSourceNextPush(rows, (*Rows[int]).Next, func(r *Rows[int], out *int) { r.Scan(out) }))
+	result = seq.Slice(seq.OfSourceNext(rows, (*Rows[int]).Next, func(r *Rows[int], out *int) { r.Scan(out) }))
 	assert.Equal(t, slice.Of(1, 2, 3), result)
 }
 
