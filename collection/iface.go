@@ -8,6 +8,7 @@ import (
 )
 
 // Iterable is a loop supplier interface
+//
 // Deprecated: obsolete.
 type Iterable[T any] c.Iterable[T, loop.Loop[T]]
 

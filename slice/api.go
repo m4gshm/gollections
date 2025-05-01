@@ -37,16 +37,46 @@ func Len[TS ~[]T, T any](elements TS) int {
 // OfLoop builds a slice by iterating elements of a source.
 // The hasNext specifies a predicate that tests existing of a next element in the source.
 // The getNext extracts the element.
+//
+// Deprecated: renamed to OfNextGet.
 func OfLoop[S, T any](source S, hasNext func(S) bool, getNext func(S) (T, error)) ([]T, error) {
+	return OfSourceNextGet(source, hasNext, getNext)
+}
+
+// OfNextGet builds a slice by iterating elements of a source.
+// The hasNext specifies a predicate that tests existing of a next element in the source.
+// The getNext extracts the element.
+func OfNextGet[T any](hasNext func() bool, getNext func() (next T, err error)) ([]T, error) {
 	var r []T
-	for hasNext(source) {
-		o, err := getNext(source)
+	for hasNext() {
+		o, err := getNext()
 		if err != nil {
 			return r, err
 		}
 		r = append(r, o)
 	}
 	return r, nil
+}
+
+// OfNext builds a slice by iterating elements of a source.
+// The hasNext specifies a predicate that tests existing of a next element in the source.
+// The pushNext copy the element to the next pointer.
+func OfNext[T any](hasNext func() bool, pushNext func(*T) error) ([]T, error) {
+	return OfNextGet(hasNext, func() (o T, err error) { return o, pushNext(&o) })
+}
+
+// OfSourceNextGet builds a slice by iterating elements of the source.
+// The hasNext specifies a predicate that tests existing of a next element in the source.
+// The getNext extracts the element.
+func OfSourceNextGet[S, T any](source S, hasNext func(S) bool, getNext func(S) (T, error)) ([]T, error) {
+	return OfNextGet(func() bool { return hasNext(source) }, func() (T, error) { return getNext(source) })
+}
+
+// OfSourceNext builds a slice by iterating elements of the source.
+// The hasNext specifies a predicate that tests existing of a next element in the source.
+// The pushNext copy the element to the next pointer.
+func OfSourceNext[S, T any](source S, hasNext func(S) bool, pushNext func(S, *T) error) ([]T, error) {
+	return OfNext(func() bool { return hasNext(source) }, func(next *T) error { return pushNext(source, next) })
 }
 
 // OfIndexed builds a slice by extracting elements from an indexed soruce.

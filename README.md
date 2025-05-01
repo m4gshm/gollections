@@ -66,7 +66,7 @@ data, err := slice.Conv(slice.Of("1", "2", "3", "4", "_", "6"), strconv.Atoi)
 //[1 2 3 4], invalid syntax
 
 even := func(i int) bool { return i%2 == 0 }
-result := slice.Reduce(slice.Convert(slice.Filter(data, even), strconv.Itoa), op.Sum) //24
+result := slice.Reduce(slice.Convert(slice.Filter(data, even), strconv.Itoa), op.Sum) //"24"
 ```
 
 In the example is used only small set of slice functions as
@@ -532,8 +532,82 @@ import(
 
 var (
     ints  iter.Seq[int]          = seq.Of(1, 2, 3)
-    pairs iter.Seq2[string, int] = seq2.OfMap(map[string]int{"first": 1, "second": 2, "third": 3})
+    pairs iter.Seq2[string, int] = seq2.OfMap(map[string]int{
+        "first":  1,
+        "second": 2,
+        "third":  3,
+    })
 )
+```
+
+##### seq.OfNext, seqe.OfNext, seq.OfNextGet, seqe.OfNextGet
+
+``` go
+import(
+    "database/sql"
+    "log"
+
+    "github.com/m4gshm/gollections/seq2"
+)
+
+var rows sql.Rows = selectUsers()
+
+rowSeq := seqe.OfNext(rows.Next, func(u *User) error { return rows.Scan(&u.name, &u.age) })
+usersByAge, err := seqe.Group(rowSeq, User.Age, as.Is)
+```
+
+instead of:
+
+``` go
+import(
+    "database/sql"
+    "log"
+)
+
+var rows sql.Rows = selectUsers()
+
+var usersByAge = map[int][]User{}
+var err error
+for rows.Next() {
+    var u User
+    if err = rows.Scan(&u.name, &u.age); err != nil {
+        break
+    }
+    usersByAge[u.age] = append(usersByAge[u.age], u)
+}
+```
+
+##### seq.Range, seq2.Range
+
+``` go
+import(
+    "github.com/m4gshm/gollections/seq"
+)
+
+var numbers []int
+for n := range seq.Range(5, -2) {
+    numbers = append(numbers, n)
+}
+//[]int{5, 4, 3, 2, 1, 0, -1}
+```
+
+##### seq.Series, seq2.Series
+
+``` go
+import(
+    "github.com/m4gshm/gollections/seq"
+)
+
+var numbers, factorials []int
+for i, n := range seq2.Series(1, func(i int, prev int) (int, bool) { return i * prev, i <= 5 }) {
+    numbers = append(numbers, i)
+    factorials = append(factorials, n)
+}
+//[]int{0, 1, 2, 3, 4, 5}
+//[]int{1, 1, 2, 6, 24, 120}
+
+assert.Equal(t, []int{0, 1, 2, 3, 4, 5}, numbers)
+assert.Equal(t, []int{1, 1, 2, 6, 24, 120}, factorials)
 ```
 
 #### Collectors
@@ -546,7 +620,7 @@ names := seq.Slice(seq.Convert(seq.Filter(seq.Of(users...), filter), User.Name))
 //[Bob Tom]
 ```
 
-##### seq2.Group, seq2.Map
+##### seq.Group, seq2.Group, seq2.Map
 
 ``` go
 import (
@@ -601,25 +675,62 @@ import (
 result, ok := seq.First(seq.Of(1, 3, 5, 7, 9, 11), more.Than(5)) //7, true
 ```
 
+##### seq.Head
+
+``` go
+import (
+    "github.com/m4gshm/gollections/seq"
+)
+
+result, ok := seq.Head(seq.Of(1, 3, 5, 7, 9, 11)) //1, true
+```
+
 #### Element converters
 
 ##### seq.Convert
 
 ``` go
-var s []string = seq.Slice(seq.Convert(seq.Of(1, 3, 5, 7, 9, 11), strconv.Itoa))
+var result []string
+for s := range seq.Convert(seq.Of(1, 3, 5, 7, 9, 11), strconv.Itoa) {
+    result = append(result, s)
+}
 //[]string{"1", "3", "5", "7", "9", "11"}
 ```
 
 ##### seq.Conv
 
 ``` go
-result, err := seqe.Slice(seq.Conv(seq.Of("1", "3", "5", "_7", "9", "11"), strconv.Atoi))
-//[]int{1, 3, 5}, ErrSyntax
+var result []int
+for i, err := range seq.Conv(seq.Of("1", "3", "5", "_7", "9", "11"), strconv.Atoi) {
+    if err != nil {
+        //ErrSyntax
+        break
+    }
+    result = append(result, i)
+}
+//[]int{1, 3, 5}
 ```
 
 #### Sequence converters
 
-##### seq.Filter
+##### seq.Union
+
+``` go
+import (
+    "github.com/m4gshm/gollections/seq"
+)
+
+var result []int
+
+seq1 := seq.Of(1, 3, 5)
+seq2 := seq.Of(7, 9, 11)
+for i := range seq.Union(seq1, seq2) {
+    result = append(result, i)
+}
+//[]int{1, 3, 5, 7, 9, 11}
+```
+
+##### seq.Filter, seqe.Filter, seq2.Filter
 
 ``` go
 import (
@@ -635,7 +746,29 @@ var f2 = seq.Slice(seq.Filter(seq.Of(1, 3, 5, 7, 9, 11), exclude.All(1, 7, 11)))
 //[]int{3, 5, 9}
 ```
 
-##### seq.Flat
+##### seq.Top
+
+``` go
+import (
+    "github.com/m4gshm/gollections/seq"
+)
+
+var i []int = seq.Slice(seq.Top(4, seq.Of(1, 3, 5, 7, 9, 11)))
+//[]int{1, 3, 5, 7}
+```
+
+##### seq.Skip
+
+``` go
+import (
+    "github.com/m4gshm/gollections/seq"
+)
+
+var i []int = seq.Slice(seq.Skip(4, seq.Of(1, 3, 5, 7, 9, 11)))
+//[]int{9, 11}
+```
+
+##### seq.Flat, seq.FlatSeq, seqe.Flat, seqe.FlatSeq
 
 ``` go
 import (

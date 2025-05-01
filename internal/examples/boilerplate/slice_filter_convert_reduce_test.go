@@ -16,7 +16,7 @@ func Test_Slice_Filter_Conver_Reduce(t *testing.T) {
 	//[1 2 3 4], invalid syntax
 
 	even := func(i int) bool { return i%2 == 0 }
-	result := slice.Reduce(slice.Convert(slice.Filter(data, even), strconv.Itoa), op.Sum) //24
+	result := slice.Reduce(slice.Convert(slice.Filter(data, even), strconv.Itoa), op.Sum) //"24"
 
 	assert.ErrorIs(t, err, strconv.ErrSyntax)
 	assert.Equal(t, "24", result)

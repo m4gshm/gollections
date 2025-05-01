@@ -1,6 +1,7 @@
 package loop
 
 // Loop is a function that returns the next element, ok==false if there are no more elements or an error if something is wrong.
+//
 // Deprecated: replaced by [github.com/m4gshm/gollections/seq.SeqE]
 type Loop[T any] func() (element T, ok bool, err error)
 

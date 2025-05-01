@@ -560,19 +560,32 @@ func Test_StringsBehaveAs2(t *testing.T) {
 	assert.Equal(t, pvals, pstrs)
 }
 
-type rows[T any] struct {
+type Rows[T any] struct {
 	row    []T
 	cursor int
 }
 
-func (r *rows[T]) hasNext() bool    { return r.cursor < len(r.row) }
-func (r *rows[T]) next() (T, error) { e := r.row[r.cursor]; r.cursor++; return e, nil }
+func (r *Rows[T]) Reset()             { r.cursor = 0 }
+func (r *Rows[T]) Next() bool         { return r.cursor < len(r.row) }
+func (r *Rows[T]) Scan(dest *T) error { *dest = r.row[r.cursor]; r.cursor++; return nil }
 
-func Test_OfLoop(t *testing.T) {
-	stream := &rows[int]{slice.Of(1, 2, 3), 0}
-	result, _ := slice.OfLoop(stream, (*rows[int]).hasNext, (*rows[int]).next)
+func Test_OffNextPush(t *testing.T) {
+	var (
+		rows        = &Rows[int]{slice.Of(1, 2, 3), 0}
+		result, err = slice.OfNext(rows.Next, rows.Scan)
+		expected    = slice.Of(1, 2, 3)
+	)
+	assert.Equal(t, expected, result)
+	assert.NoError(t, err)
 
-	assert.Equal(t, slice.Of(1, 2, 3), result)
+	rows.Reset()
+
+	result, err = slice.OfSourceNext(rows, (*Rows[int]).Next, func(r *Rows[int], our *int) error {
+		return r.Scan(our)
+	})
+
+	assert.Equal(t, expected, result)
+	assert.NoError(t, err)
 }
 
 func Test_Sort(t *testing.T) {

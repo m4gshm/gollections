@@ -10,7 +10,7 @@ import (
 	"github.com/m4gshm/gollections/seq"
 )
 
-func Test_OneOf(t *testing.T) {
+func Test_Filter(t *testing.T) {
 
 	var f1 = seq.Slice(seq.Filter(seq.Of(1, 3, 5, 7, 9, 11), one.Of(1, 7).Or(one.Of(11))))
 	//[]int{1, 7, 11}

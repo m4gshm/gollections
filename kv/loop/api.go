@@ -1,4 +1,5 @@
 // Package loop provides helpers for loop operation over key/value pairs and iterator implementations
+//
 // Deprecated: use the [github.com/m4gshm/gollections/seq], [github.com/m4gshm/gollections/seqe], [github.com/m4gshm/gollections/seq2] packages API instead.
 package loop
 

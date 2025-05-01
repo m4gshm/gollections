@@ -2,7 +2,6 @@ package sliceexamples
 
 import (
 	"strconv"
-	// "strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -14,36 +13,8 @@ import (
 	"github.com/m4gshm/gollections/slice/convert"
 	"github.com/m4gshm/gollections/slice/filter"
 
-	// "github.com/m4gshm/gollections/slice/flat"
-	// "github.com/m4gshm/gollections/slice/group"
 	"github.com/m4gshm/gollections/slice/reverse"
 )
-
-// func Test_GroupBySeveralKeysAndConvertMapValues(t *testing.T) {
-// 	namesByRole := group.ByMultipleKeys(users, func(u User) []string {
-// 		return convert.AndConvert(u.Roles(), Role.Name, strings.ToLower)
-// 	}, User.Name)
-
-// 	assert.Equal(t, namesByRole[""], []string{"Tom"})
-// 	assert.Equal(t, namesByRole["manager"], []string{"Bob", "Alice"})
-// 	assert.Equal(t, namesByRole["admin"], []string{"Bob"})
-// }
-
-// func Test_FindFirsManager(t *testing.T) {
-// 	alice, _ := slice.First(users, func(user User) bool {
-// 		roles := slice.Convert(user.Roles(), Role.Name)
-// 		return slice.Contains(roles, "Manager")
-// 	})
-
-// 	assert.Equal(t, "Alice", alice.Name())
-// }
-
-// func Test_AggregateFilteredRoles(t *testing.T) {
-// 	roles := flat.AndConvert(users, User.Roles, Role.Name)
-// 	roleNamesExceptManager := slice.Filter(roles, not.Eq("Manager"))
-
-// 	assert.Equal(t, slice.Of("Admin", "manager"), roleNamesExceptManager)
-// }
 
 func Test_SortStructs(t *testing.T) {
 
@@ -214,19 +185,20 @@ func Test_BehaveAsStrings(t *testing.T) {
 	assert.Equal(t, expected, result)
 }
 
-type rows[T any] struct {
+type Rows[T any] struct {
 	row    []T
 	cursor int
 }
 
-func (r *rows[T]) hasNext() bool    { return r.cursor < len(r.row) }
-func (r *rows[T]) next() (T, error) { e := r.row[r.cursor]; r.cursor++; return e, nil }
+func (r *Rows[T]) Next() bool         { return r.cursor < len(r.row) }
+func (r *Rows[T]) Scan(dest *T) error { *dest = r.row[r.cursor]; r.cursor++; return nil }
 
-func Test_OfLoop(t *testing.T) {
+func Test_OffNextPush(t *testing.T) {
 	var (
-		stream    = &rows[int]{slice.Of(1, 2, 3), 0}
-		result, _ = slice.OfLoop(stream, (*rows[int]).hasNext, (*rows[int]).next)
-		expected  = slice.Of(1, 2, 3)
+		rows        = &Rows[int]{slice.Of(1, 2, 3), 0}
+		result, err = slice.OfNext(rows.Next, rows.Scan)
+		expected    = slice.Of(1, 2, 3)
 	)
 	assert.Equal(t, expected, result)
+	assert.NoError(t, err)
 }

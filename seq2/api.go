@@ -35,6 +35,21 @@ func OfMap[K comparable, V any](elements map[K]V) Seq2[K, V] {
 	}
 }
 
+// Union combines several sequences into one.
+func Union[S ~Seq2[K, V], K, V any](seq ...S) Seq2[K, V] {
+	return func(yield func(K, V) bool) {
+		for _, s := range seq {
+			if s != nil {
+				for k, v := range s {
+					if !yield(k, v) {
+						return
+					}
+				}
+			}
+		}
+	}
+}
+
 // OfIndexed builds an indexed Seq2 iterator by extracting elements from an indexed soruce.
 // the len is length ot the source.
 // the getAt retrieves an element by its index from the source.
@@ -52,7 +67,7 @@ func OfIndexed[T any](amount int, getAt func(int) T) Seq2[int, T] {
 }
 
 // Series makes a sequence by applying the 'next' function to the previous step generated value.
-func Series[T any](first T, next func(T) (T, bool)) Seq2[int, T] {
+func Series[T any](first T, next func(int, T) (T, bool)) Seq2[int, T] {
 	return func(yield func(int, T) bool) {
 		if next == nil {
 			return
@@ -64,7 +79,7 @@ func Series[T any](first T, next func(T) (T, bool)) Seq2[int, T] {
 		}
 		for {
 			i++
-			next, ok := next(current)
+			next, ok := next(i, current)
 			if !ok {
 				break
 			}
@@ -113,6 +128,62 @@ func Range[T constraints.Integer | rune](from T, toExclusive T) Seq2[int, T] {
 			e = e + delta
 		}
 	}
+}
+
+// Top returns a sequence of top n key\value pairs.
+func Top[S ~Seq2[K, V], K, V any](n int, seq S) S {
+	return func(yield func(K, V) bool) {
+		if seq == nil {
+			return
+		}
+		m := n
+		seq(func(k K, v V) bool {
+			if m == 0 {
+				return false
+			}
+			m--
+			return yield(k, v)
+		})
+	}
+}
+
+// Skip returns a sequence without first n elements.
+func Skip[S ~Seq2[K, V], K, V any](n int, seq S) Seq2[K, V] {
+	return func(yield func(K, V) bool) {
+		if seq == nil {
+			return
+		}
+		m := n
+		seq(func(k K, v V) bool {
+			if m == 0 {
+				return yield(k, v)
+			}
+			m--
+			return true
+		})
+	}
+}
+
+// Head returns the first key\value pair.
+func Head[S ~Seq2[K, V], K, V any](seq S) (k K, v V, ok bool) {
+	return First(seq, func(K, V) bool { return true })
+}
+
+// First returns the first key\value pair that satisfies the condition of the 'predicate' function.
+func First[S ~Seq2[K, V], K, V any](seq S, predicate func(K, V) bool) (k K, v V, ok bool) {
+	if seq == nil || predicate == nil {
+		return
+	}
+	seq(func(oneK K, oneV V) bool {
+		if predicate(oneK, oneV) {
+			k = oneK
+			v = oneV
+			ok = true
+			return false
+		}
+		return true
+	})
+	return
 }
 
 // Filter creates a rangefunc that iterates only those elements for which the 'filter' function returns true.

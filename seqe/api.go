@@ -4,6 +4,7 @@ package seqe
 import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/predicate/always"
 	"github.com/m4gshm/gollections/seq"
 )
 
@@ -17,6 +18,55 @@ type SeqE[T any] = seq.SeqE[T]
 // Seq2 is an alias of an iterator-function that allows to iterate over key/value pairs of a sequence, such as slice or map.
 // It is used to iterate over slice index/value pairs or map key/value pairs.
 type Seq2[K, V any] = seq.Seq2[K, V]
+
+// Union combines several sequences into one.
+func Union[S ~SeqE[T], T any](seq ...S) SeqE[T] {
+	return func(yield func(T, error) bool) {
+		for _, s := range seq {
+			if s != nil {
+				for v, err := range s {
+					if !yield(v, err) {
+						return
+					}
+				}
+			}
+		}
+	}
+}
+
+// OfNextGet builds an iterator by iterating elements of a source.
+// The hasNext specifies a predicate that tests existing of a next element in the source.
+// The getNext extracts the element.
+func OfNextGet[T any](hasNext func() bool, getNext func() (T, error)) SeqE[T] {
+	return func(yield func(T, error) bool) {
+		for hasNext() {
+			if o, err := getNext(); !yield(o, err) {
+				return
+			}
+		}
+	}
+}
+
+// OfNext builds an iterator by iterating elements of a source.
+// The hasNext specifies a predicate that tests existing of a next element in the source.
+// The pushNext copy the element to the next pointer.
+func OfNext[T any](hasNext func() bool, pushNext func(*T) error) SeqE[T] {
+	return OfNextGet(hasNext, func() (o T, err error) { return o, pushNext(&o) })
+}
+
+// OfSourceNextGet builds an iterator by iterating elements of the source.
+// The hasNext specifies a predicate that tests existing of a next element in the source.
+// The getNext extracts the element.
+func OfSourceNextGet[S, T any](source S, hasNext func(S) bool, getNext func(S) (T, error)) SeqE[T] {
+	return OfNextGet(func() bool { return hasNext(source) }, func() (T, error) { return getNext(source) })
+}
+
+// OfSourceNext builds an iterator by iterating elements of the source.
+// The hasNext specifies a predicate that tests existing of a next element in the source.
+// The pushNext copy the element to the next pointer.
+func OfSourceNext[S, T any](source S, hasNext func(S) bool, pushNext func(S, *T) error) SeqE[T] {
+	return OfNext(func() bool { return hasNext(source) }, func(next *T) error { return pushNext(source, next) })
+}
 
 // OfIndexed builds a SeqE iterator by extracting elements from an indexed soruce.
 // the len is length ot the source.
@@ -33,6 +83,45 @@ func OfIndexed[T any](amount int, getAt func(int) (T, error)) Seq2[T, error] {
 			}
 		}
 	}
+}
+
+// Top returns a sequence of top n elements.
+func Top[S ~SeqE[T], T any](n int, seq S) SeqE[T] {
+	return func(yield func(T, error) bool) {
+		if seq == nil {
+			return
+		}
+		m := n
+		seq(func(t T, err error) bool {
+			if m == 0 {
+				return false
+			}
+			m--
+			return yield(t, err)
+		})
+	}
+}
+
+// Skip returns a sequence without first n elements.
+func Skip[S ~SeqE[T], T any](n int, seq S) SeqE[T] {
+	return func(yield func(T, error) bool) {
+		if seq == nil {
+			return
+		}
+		m := n
+		seq(func(t T, err error) bool {
+			if m == 0 {
+				return yield(t, err)
+			}
+			m--
+			return true
+		})
+	}
+}
+
+// Head returns the first element.
+func Head[S ~SeqE[T], T any](seq S) (v T, ok bool, err error) {
+	return First(seq, always.True)
 }
 
 // First returns the first element that satisfies the condition of the 'predicate' function.

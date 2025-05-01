@@ -27,7 +27,7 @@ func Test_Set_From(t *testing.T) {
 
 func Test_Set_FromSeq(t *testing.T) {
 	set := set.FromSeq(seq.Of(1, 1, 2, 2, 3, 4, 3, 2, 1))
-	assert.Equal(t, slice.Of(1, 2, 3, 4), set.Slice())
+	assert.Equal(t, slice.Of(1, 2, 3, 4), sort.Asc(set.Slice()))
 }
 
 func Test_Set_Iterate(t *testing.T) {
