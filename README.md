@@ -605,9 +605,6 @@ for i, n := range seq2.Series(1, func(i int, prev int) (int, bool) { return i * 
 }
 //[]int{0, 1, 2, 3, 4, 5}
 //[]int{1, 1, 2, 6, 24, 120}
-
-assert.Equal(t, []int{0, 1, 2, 3, 4, 5}, numbers)
-assert.Equal(t, []int{1, 1, 2, 6, 24, 120}, factorials)
 ```
 
 #### Collectors
@@ -1097,8 +1094,7 @@ user := User{name: "Bob", surname: "Smith"}
 
 fullName := use.If(len(user.surname) == 0, user.name).If(len(user.name) == 0, user.surname).
     ElseGet(func() string { return user.name + " " + user.surname })
-
-assert.Equal(t, "Bob Smith", fullName)
+//Bob Smith 
 ```
 
 instead of:
@@ -1114,8 +1110,7 @@ if len(user.surname) == 0 {
 } else {
     fullName = user.name + " " + user.surname
 }
-
-assert.Equal(t, "Bob Smith", fullName)
+//Bob Smith
 ```
 
 #### first.Of

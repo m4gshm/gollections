@@ -355,7 +355,7 @@ include::../examples/seqexamples/seq_Range_test.go[lines=12..18,indent=0]
 import(
     "github.com/m4gshm/gollections/seq"
 )
-include::../examples/seqexamples/seq2_Series_test.go[lines=12..22,indent=0]
+include::../examples/seqexamples/seq2_Series_test.go[lines=12..20,indent=0]
 ----
 ===== Collectors
 ====== seq.Slice
@@ -681,14 +681,14 @@ As example:
 [source,go]
 ----
 import "github.com/m4gshm/gollections/expr/use"
-include::../examples/boilerplate/expr_use_test.go[lines=15..22,indent=0]
+include::../examples/boilerplate/expr_use_test.go[lines=15..21,indent=0]
 ----
 
 instead of:
 
 [source,go]
 ----
-include::../examples/boilerplate/expr_use_test.go[lines=27..38,indent=0]
+include::../examples/boilerplate/expr_use_test.go[lines=27..39,indent=0]
 ----
 
 ===== first.Of
