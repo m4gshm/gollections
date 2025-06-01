@@ -3,7 +3,7 @@ package mutable
 
 import (
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/collection/immutable/ordered"
+	"github.com/m4gshm/gollections/collection/mutable/ordered"
 	kvloop "github.com/m4gshm/gollections/kv/loop"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_"
@@ -18,7 +18,7 @@ func NewSet[T comparable](elements ...T) *Set[T] {
 }
 
 // NewSetOrdered instantiates ordered set and copies elements to it
-func NewSetOrdered[T comparable](elements ...T) ordered.Set[T] {
+func NewSetOrdered[T comparable](elements ...T) *ordered.Set[T] {
 	return ordered.NewSet[T](elements...)
 }
 
@@ -53,7 +53,7 @@ func NewMap[K comparable, V any](elements ...c.KV[K, V]) *Map[K, V] {
 }
 
 // NewMapOrdered instantiates an ordered map using key/value pairs
-func NewMapOrdered[K comparable, V any](elements ...c.KV[K, V]) ordered.Map[K, V] {
+func NewMapOrdered[K comparable, V any](elements ...c.KV[K, V]) *ordered.Map[K, V] {
 	return ordered.NewMap(elements...)
 }
 
