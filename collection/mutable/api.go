@@ -3,6 +3,7 @@ package mutable
 
 import (
 	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/collection/immutable/ordered"
 	kvloop "github.com/m4gshm/gollections/kv/loop"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_"
@@ -14,6 +15,11 @@ import (
 // NewSet instantiates set and copies elements to it
 func NewSet[T comparable](elements ...T) *Set[T] {
 	return SetFromSeq(seq.Of(elements...))
+}
+
+// NewSetOrdered instantiates ordered set and copies elements to it
+func NewSetOrdered[T comparable](elements ...T) ordered.Set[T] {
+	return ordered.NewSet[T](elements...)
 }
 
 // NewSetCap creates a set with a predefined capacity
@@ -41,9 +47,14 @@ func SetFromSeq[T comparable](seq seq.Seq[T]) *Set[T] {
 	return WrapSet(uniques)
 }
 
-// NewMap instantiates an map using key/value pairs
+// NewMap instantiates a map using key/value pairs
 func NewMap[K comparable, V any](elements ...c.KV[K, V]) *Map[K, V] {
 	return WrapMap(map_.Of(elements...))
+}
+
+// NewMapOrdered instantiates an ordered map using key/value pairs
+func NewMapOrdered[K comparable, V any](elements ...c.KV[K, V]) ordered.Map[K, V] {
+	return ordered.NewMap(elements...)
 }
 
 // NewMapCap instantiates Map with a predefined capacity
