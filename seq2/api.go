@@ -198,6 +198,31 @@ func First[S ~Seq2[K, V], K, V any](seq S, predicate func(K, V) bool) (k K, v V,
 	return
 }
 
+// Reduce reduces the elements of the 'seq' sequence an one using the 'merge' function.
+func Reduce[S ~Seq2[K, V], K, V, T any](seq S, merge func(prev *T, k K, v V) T) T {
+	result, _ := ReduceOK(seq, merge)
+	return result
+}
+
+// ReduceOK reduces the elements of the 'seq' sequence an one using the 'merge' function.
+// Returns ok==false if the seq returns ok=false at the first call (no more elements).
+func ReduceOK[S ~Seq2[K, V], K, V, T any](seq S, merge func(prev *T, k K, v V) T) (result T, ok bool) {
+	if seq == nil || merge == nil {
+		return result, false
+	}
+	started := false
+	seq(func(k K, v V) bool {
+		if !started {
+			result = merge(nil, k, v)
+		} else {
+			result = merge(&result, k, v)
+		}
+		started = true
+		return true
+	})
+	return result, started
+}
+
 // Filter creates a rangefunc that iterates only those elements for which the 'filter' function returns true.
 func Filter[S ~Seq2[K, V], K, V any](seq S, filter func(K, V) bool) Seq2[K, V] {
 	return func(yield func(K, V) bool) {

@@ -122,6 +122,30 @@ func Test_Group(t *testing.T) {
 	assert.Equal(t, slice.Of("second"), sort.Asc(m[false]))
 }
 
+func pairSum(prev *string, i int, val string) string {
+	r := strconv.Itoa(i) + val
+	if prev == nil {
+		return r
+	}
+	return *prev + r
+}
+
+func Test_ReduceSum(t *testing.T) {
+
+	sum, ok := seq2.ReduceOK(seq2.Of("A", "B", "C"), pairSum)
+
+	assert.True(t, ok)
+	assert.Equal(t, "0A1B2C", sum)
+}
+
+func Test_ReduceEmpty(t *testing.T) {
+	s := seq2.Of[string]()
+	sum, ok := seq2.ReduceOK(s, pairSum)
+
+	assert.False(t, ok)
+	assert.Equal(t, "", sum)
+}
+
 func Test_Head(t *testing.T) {
 	sequence := seq2.Of(1, 2, 3, 4, 5, 6)
 	_, result, ok := seq2.Head(sequence)
