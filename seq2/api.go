@@ -130,6 +130,18 @@ func Range[T constraints.Integer | rune](from T, toExclusive T) Seq2[int, T] {
 	}
 }
 
+// ToSeq converts an iterator of key/value pairs elements to an iterator of single elements by applying the 'converter' function to each iterable pair.
+func ToSeq[S ~Seq2[K, V], T, K, V any](seq S, converter func(K, V) T) Seq[T] {
+	return func(yield func(T) bool) {
+		if seq == nil || converter == nil {
+			return
+		}
+		seq(func(k K, v V) bool {
+			return yield(converter(k, v))
+		})
+	}
+}
+
 // Top returns a sequence of top n key\value pairs.
 func Top[S ~Seq2[K, V], K, V any](n int, seq S) S {
 	return func(yield func(K, V) bool) {
