@@ -344,6 +344,11 @@ func Test_RangeClosed(t *testing.T) {
 	assert.Equal(t, slice.Of(0, 1, 2), ind)
 }
 
+func Test_ToSeq(t *testing.T) {
+	s := seq.Slice(seq2.ToSeq(seq2.Of("A", "B", "C"), func(i int, v string) string { return strconv.Itoa(i) + v }))
+	assert.Equal(t, slice.Of("0A", "1B", "2C"), s)
+}
+
 func Test_TrackEach(t *testing.T) {
 	var out, ind []int
 	seq2.TrackEach(seq2.RangeClosed(-1, 3), func(i int, v int) {
