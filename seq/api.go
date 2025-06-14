@@ -295,10 +295,10 @@ func ReduceOK[S ~Seq[T], T any](seq S, merge func(T, T) T) (result T, ok bool) {
 	seq(func(v T) bool {
 		if !started {
 			result = v
+			started = true
 		} else {
 			result = merge(result, v)
 		}
-		started = true
 		return true
 	})
 	return result, started
@@ -320,14 +320,13 @@ func ReduceeOK[S ~Seq[T], T any](seq S, merge func(T, T) (T, error)) (result T, 
 	seq(func(v T) bool {
 		if !started {
 			result = v
+			started = true
+			return true
 		} else {
 			result, err = merge(result, v)
-			if err != nil {
-				return false
-			}
+			return err == nil
 		}
-		started = true
-		return true
+
 	})
 	return result, started, err
 }

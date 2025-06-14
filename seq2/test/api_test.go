@@ -1,6 +1,7 @@
 package test
 
 import (
+	"errors"
 	"iter"
 	"strconv"
 	"testing"
@@ -48,6 +49,15 @@ func Test_Union(t *testing.T) {
 	sequence := seq2.Union(seq2.Of(0, 1), nil, seq2.Of[int](), seq2.Of(2, 3, 4))
 	assert.Equal(t, slice.Of(0, 1, 2, 3, 4), seq.Slice(seq2.Values(sequence)))
 	assert.Equal(t, slice.Of(0, 1, 0, 1, 2), seq.Slice(seq2.Keys(sequence)))
+
+	r := []int{}
+	for _, v := range sequence {
+		if v == 4 {
+			break
+		}
+		r = append(r, v)
+	}
+	assert.Equal(t, slice.Of(0, 1, 2, 3), r)
 }
 
 func Test_OfIndexed(t *testing.T) {
@@ -120,6 +130,66 @@ func Test_Group(t *testing.T) {
 
 	assert.Equal(t, slice.Of("first", "third"), sort.Asc(m[true]))
 	assert.Equal(t, slice.Of("second"), sort.Asc(m[false]))
+}
+
+func pairSum(prev *string, i int, val string) string {
+	r := strconv.Itoa(i) + val
+	if prev == nil {
+		return r
+	}
+	return *prev + r
+}
+
+func Test_ReduceSum(t *testing.T) {
+
+	sum, ok := seq2.ReduceOK(seq2.Of("A", "B", "C"), pairSum)
+
+	assert.True(t, ok)
+	assert.Equal(t, "0A1B2C", sum)
+}
+
+func Test_ReduceeSum(t *testing.T) {
+	s := seq2.Of(1, 3, 5, 7, 9, 11)
+	reducer := func(prev *int, i, v int) (int, error) {
+		p := 0
+		if prev != nil {
+			p = *prev
+		}
+		if v == 11 {
+			return p, errors.New("stop")
+		}
+		return v + p, nil
+	}
+	r, ok, err := seq2.ReduceeOK(s, reducer)
+	assert.True(t, ok)
+	assert.Equal(t, 1+3+5+7+9, r)
+	assert.ErrorContains(t, err, "stop")
+
+	_, ok, err = seq2.ReduceeOK[seq2.Seq2[int, int]](nil, reducer)
+	assert.False(t, ok)
+	assert.NoError(t, err)
+
+	r, err = seq2.Reducee(s, reducer)
+	assert.Equal(t, 1+3+5+7+9, r)
+	assert.ErrorContains(t, err, "stop")
+}
+
+func Test_ReduceeSumFirstErr(t *testing.T) {
+	s := seq2.Of(1, 3, 5, 7, 9, 11)
+	r, ok, err := seq2.ReduceeOK(s, func(_ *int, _, _ int) (int, error) {
+		return 0, errors.New("stop")
+	})
+	assert.True(t, ok)
+	assert.Equal(t, 0, r)
+	assert.ErrorContains(t, err, "stop")
+}
+
+func Test_ReduceEmpty(t *testing.T) {
+	s := seq2.Of[string]()
+	sum, ok := seq2.ReduceOK(s, pairSum)
+
+	assert.False(t, ok)
+	assert.Equal(t, "", sum)
 }
 
 func Test_Head(t *testing.T) {
@@ -342,6 +412,11 @@ func Test_RangeClosed(t *testing.T) {
 	}
 	assert.Equal(t, slice.Of(-1, 0, 1), out)
 	assert.Equal(t, slice.Of(0, 1, 2), ind)
+}
+
+func Test_ToSeq(t *testing.T) {
+	s := seq.Slice(seq2.ToSeq(seq2.Of("A", "B", "C"), func(i int, v string) string { return strconv.Itoa(i) + v }))
+	assert.Equal(t, slice.Of("0A", "1B", "2C"), s)
 }
 
 func Test_TrackEach(t *testing.T) {
