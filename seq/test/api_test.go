@@ -45,6 +45,15 @@ func Test_Of(t *testing.T) {
 func Test_Union(t *testing.T) {
 	sequence := seq.Union(seq.Of(0, 1), nil, seq.Of[int](), seq.Of(2, 3, 4))
 	assert.Equal(t, slice.Of(0, 1, 2, 3, 4), seq.Slice(sequence))
+
+	r := []int{}
+	for i := range sequence {
+		if i == 4 {
+			break
+		}
+		r = append(r, i)
+	}
+	assert.Equal(t, slice.Of(0, 1, 2, 3), r)
 }
 
 func Test_OfIndexed(t *testing.T) {
