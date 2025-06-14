@@ -1,6 +1,7 @@
 package test
 
 import (
+	"errors"
 	"iter"
 	"strconv"
 	"testing"
@@ -136,6 +137,42 @@ func Test_ReduceSum(t *testing.T) {
 
 	assert.True(t, ok)
 	assert.Equal(t, "0A1B2C", sum)
+}
+
+func Test_ReduceeSum(t *testing.T) {
+	s := seq2.Of(1, 3, 5, 7, 9, 11)
+	reducer := func(prev *int, i, v int) (int, error) {
+		p := 0
+		if prev != nil {
+			p = *prev
+		}
+		if v == 11 {
+			return p, errors.New("stop")
+		}
+		return v + p, nil
+	}
+	r, ok, err := seq2.ReduceeOK(s, reducer)
+	assert.True(t, ok)
+	assert.Equal(t, 1+3+5+7+9, r)
+	assert.ErrorContains(t, err, "stop")
+
+	_, ok, err = seq2.ReduceeOK[seq2.Seq2[int, int]](nil, reducer)
+	assert.False(t, ok)
+	assert.NoError(t, err)
+
+	r, err = seq2.Reducee(s, reducer)
+	assert.Equal(t, 1+3+5+7+9, r)
+	assert.ErrorContains(t, err, "stop")
+}
+
+func Test_ReduceeSumFirstErr(t *testing.T) {
+	s := seq2.Of(1, 3, 5, 7, 9, 11)
+	r, ok, err := seq2.ReduceeOK(s, func(_ *int, _, _ int) (int, error) {
+		return 0, errors.New("stop")
+	})
+	assert.True(t, ok)
+	assert.Equal(t, 0, r)
+	assert.ErrorContains(t, err, "stop")
 }
 
 func Test_ReduceEmpty(t *testing.T) {

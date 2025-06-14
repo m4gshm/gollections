@@ -3,6 +3,7 @@ package seq2
 
 import (
 	"github.com/m4gshm/gollections/map_/resolv"
+	"github.com/m4gshm/gollections/op"
 	"golang.org/x/exp/constraints"
 )
 
@@ -212,15 +213,32 @@ func ReduceOK[S ~Seq2[K, V], K, V, T any](seq S, merge func(prev *T, k K, v V) T
 	}
 	started := false
 	seq(func(k K, v V) bool {
-		if !started {
-			result = merge(nil, k, v)
-		} else {
-			result = merge(&result, k, v)
-		}
+		result = merge(op.IfElse(!started, nil, &result), k, v)
 		started = true
 		return true
 	})
 	return result, started
+}
+
+// Reducee reduces the elements of the 'seq' sequence an one using the 'merge' function.
+func Reducee[S ~Seq2[K, V], K, V, T any](seq S, merge func(prev *T, k K, v V) (T, error)) (T, error) {
+	result, _, err := ReduceeOK(seq, merge)
+	return result, err
+}
+
+// ReduceeOK reduces the elements of the 'seq' sequence an one using the 'merge' function.
+// Returns ok==false if the seq returns ok=false at the first call (no more elements).
+func ReduceeOK[S ~Seq2[K, V], K, V, T any](seq S, merge func(prev *T, k K, v V) (T, error)) (result T, ok bool, err error) {
+	if seq == nil || merge == nil {
+		return result, false, nil
+	}
+	started := false
+	seq(func(k K, v V) bool {
+		result, err = merge(op.IfElse(!started, nil, &result), k, v)
+		started = true
+		return err == nil
+	})
+	return result, started, err
 }
 
 // Filter creates a rangefunc that iterates only those elements for which the 'filter' function returns true.
