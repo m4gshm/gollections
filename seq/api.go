@@ -212,6 +212,38 @@ func Skip[S ~Seq[T], T any](n int, seq S) Seq[T] {
 	}
 }
 
+// While cuts tail elements of the seq that don't match the predicate.
+func While[S ~Seq[T], T any](seq S, predicate func(T) bool) Seq[T] {
+	return func(yield func(T) bool) {
+		if seq == nil {
+			return
+		}
+		seq(func(t T) bool {
+			if !predicate(t) {
+				return false
+			}
+			return yield(t)
+		})
+	}
+}
+
+// SkipWhile returns a sequence without first elements of the seq that dont'math the predicate.
+func SkipWhile[S ~Seq[T], T any](seq S, predicate func(T) bool) Seq[T] {
+	return func(yield func(T) bool) {
+		if seq == nil {
+			return
+		}
+		started := false
+		seq(func(t T) bool {
+			if !started && predicate(t) {
+				return true
+			}
+			started = true
+			return yield(t)
+		})
+	}
+}
+
 // Head returns the first element.
 func Head[S ~Seq[T], T any](seq S) (v T, ok bool) {
 	return First(seq, always.True)

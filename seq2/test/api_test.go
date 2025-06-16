@@ -8,7 +8,11 @@ import (
 
 	"github.com/m4gshm/gollections/collection/immutable/ordered/map_"
 	"github.com/m4gshm/gollections/k"
+	kvpredicate "github.com/m4gshm/gollections/kv/predicate"
+	"github.com/m4gshm/gollections/predicate/eq"
+	"github.com/m4gshm/gollections/predicate/less"
 	"github.com/m4gshm/gollections/predicate/more"
+	"github.com/m4gshm/gollections/predicate/not"
 	"github.com/m4gshm/gollections/seq"
 	"github.com/m4gshm/gollections/seq2"
 	"github.com/m4gshm/gollections/slice"
@@ -202,6 +206,53 @@ func Test_Head(t *testing.T) {
 	_, result, ok = seq2.Head[seq.Seq2[int, int]](nil)
 	assert.Zero(t, result)
 	assert.False(t, ok)
+}
+
+func Test_While(t *testing.T) {
+	sequence := seq2.Of(1, 2, 3, 4, 5, 6)
+	part := seq2.While(sequence, kvpredicate.Value[int](not.Eq(5)))
+
+	assert.Equal(t, slice.Of(1, 2, 3, 4), seq.Slice(seq2.Values(part)))
+
+	part = seq2.While(sequence, kvpredicate.Value[int](not.Eq(7)))
+	assert.Equal(t, slice.Of(1, 2, 3, 4, 5, 6), seq.Slice(seq2.Values(part)))
+
+	part = seq2.While(sequence, kvpredicate.Value[int](eq.To(0)))
+	assert.Nil(t, seq.Slice(seq2.Values(part)))
+
+	part = seq2.While[seq.Seq2[int, int]](nil, kvpredicate.Value[int](eq.To(0)))
+	assert.Nil(t, seq.Slice(seq2.Values(part)))
+
+	r := []int{}
+	for _, i := range seq2.While(sequence, kvpredicate.Value[int](not.Eq(7))) {
+		if i == 5 {
+			break
+		}
+		r = append(r, i)
+	}
+	assert.Equal(t, slice.Of(1, 2, 3, 4), r)
+}
+
+func Test_SkipWhile(t *testing.T) {
+	sequence := seq2.Of(1, 2, 3, 4, 5, 6)
+	part := seq2.SkipWhile(sequence, kvpredicate.Value[int](less.Than(4)))
+
+	assert.Equal(t, slice.Of(4, 5, 6), seq.Slice(seq2.Values(part)))
+
+	part = seq2.SkipWhile(sequence, kvpredicate.Value[int](not.Eq(7)))
+	assert.Nil(t, seq.Slice(seq2.Values(part)))
+
+	part = seq2.SkipWhile(sequence, kvpredicate.Value[int](less.Than(0)))
+	assert.Equal(t, slice.Of(1, 2, 3, 4, 5, 6), seq.Slice(seq2.Values(part)))
+
+	r := []int{}
+	for _, i := range seq2.SkipWhile(sequence, kvpredicate.Value[int](less.Than(4))) {
+		if i == 6 {
+			break
+		}
+		r = append(r, i)
+	}
+	assert.Equal(t, slice.Of(4, 5), r)
 }
 
 func Test_Top(t *testing.T) {
