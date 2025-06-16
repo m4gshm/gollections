@@ -177,6 +177,38 @@ func Skip[S ~Seq2[K, V], K, V any](n int, seq S) Seq2[K, V] {
 	}
 }
 
+// While cuts tail elements of the seq that don't match the predicate.
+func While[S ~Seq2[K, V], K, V any](seq S, predicate func(K, V) bool) Seq2[K, V] {
+	return func(yield func(K, V) bool) {
+		if seq == nil {
+			return
+		}
+		seq(func(k K, v V) bool {
+			if !predicate(k, v) {
+				return false
+			}
+			return yield(k, v)
+		})
+	}
+}
+
+// SkipWhile returns a sequence without first elements of the seq that dont'math the predicate.
+func SkipWhile[S ~Seq2[K, V], K, V any](seq S, predicate func(K, V) bool) Seq2[K, V] {
+	return func(yield func(K, V) bool) {
+		if seq == nil {
+			return
+		}
+		started := false
+		seq(func(k K, v V) bool {
+			if !started && predicate(k, v) {
+				return true
+			}
+			started = true
+			return yield(k, v)
+		})
+	}
+}
+
 // Head returns the first key\value pair.
 func Head[S ~Seq2[K, V], K, V any](seq S) (k K, v V, ok bool) {
 	return First(seq, func(K, V) bool { return true })
