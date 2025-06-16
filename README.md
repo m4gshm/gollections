@@ -1094,7 +1094,7 @@ user := User{name: "Bob", surname: "Smith"}
 
 fullName := use.If(len(user.surname) == 0, user.name).If(len(user.name) == 0, user.surname).
     ElseGet(func() string { return user.name + " " + user.surname })
-//Bob Smith 
+//Bob Smith
 ```
 
 instead of:

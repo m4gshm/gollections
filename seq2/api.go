@@ -3,6 +3,7 @@ package seq2
 
 import (
 	"github.com/m4gshm/gollections/map_/resolv"
+	"github.com/m4gshm/gollections/op"
 	"golang.org/x/exp/constraints"
 )
 
@@ -130,6 +131,18 @@ func Range[T constraints.Integer | rune](from T, toExclusive T) Seq2[int, T] {
 	}
 }
 
+// ToSeq converts an iterator of key/value pairs elements to an iterator of single elements by applying the 'converter' function to each iterable pair.
+func ToSeq[S ~Seq2[K, V], T, K, V any](seq S, converter func(K, V) T) Seq[T] {
+	return func(yield func(T) bool) {
+		if seq == nil || converter == nil {
+			return
+		}
+		seq(func(k K, v V) bool {
+			return yield(converter(k, v))
+		})
+	}
+}
+
 // Top returns a sequence of top n key\value pairs.
 func Top[S ~Seq2[K, V], K, V any](n int, seq S) S {
 	return func(yield func(K, V) bool) {
@@ -164,6 +177,38 @@ func Skip[S ~Seq2[K, V], K, V any](n int, seq S) Seq2[K, V] {
 	}
 }
 
+// While cuts tail elements of the seq that don't match the predicate.
+func While[S ~Seq2[K, V], K, V any](seq S, predicate func(K, V) bool) Seq2[K, V] {
+	return func(yield func(K, V) bool) {
+		if seq == nil {
+			return
+		}
+		seq(func(k K, v V) bool {
+			if !predicate(k, v) {
+				return false
+			}
+			return yield(k, v)
+		})
+	}
+}
+
+// SkipWhile returns a sequence without first elements of the seq that dont'math the predicate.
+func SkipWhile[S ~Seq2[K, V], K, V any](seq S, predicate func(K, V) bool) Seq2[K, V] {
+	return func(yield func(K, V) bool) {
+		if seq == nil {
+			return
+		}
+		started := false
+		seq(func(k K, v V) bool {
+			if !started && predicate(k, v) {
+				return true
+			}
+			started = true
+			return yield(k, v)
+		})
+	}
+}
+
 // Head returns the first key\value pair.
 func Head[S ~Seq2[K, V], K, V any](seq S) (k K, v V, ok bool) {
 	return First(seq, func(K, V) bool { return true })
@@ -184,6 +229,48 @@ func First[S ~Seq2[K, V], K, V any](seq S, predicate func(K, V) bool) (k K, v V,
 		return true
 	})
 	return
+}
+
+// Reduce reduces the elements of the 'seq' sequence an one using the 'merge' function.
+func Reduce[S ~Seq2[K, V], K, V, T any](seq S, merge func(prev *T, k K, v V) T) T {
+	result, _ := ReduceOK(seq, merge)
+	return result
+}
+
+// ReduceOK reduces the elements of the 'seq' sequence an one using the 'merge' function.
+// Returns ok==false if the seq returns ok=false at the first call (no more elements).
+func ReduceOK[S ~Seq2[K, V], K, V, T any](seq S, merge func(prev *T, k K, v V) T) (result T, ok bool) {
+	if seq == nil || merge == nil {
+		return result, false
+	}
+	started := false
+	seq(func(k K, v V) bool {
+		result = merge(op.IfElse(!started, nil, &result), k, v)
+		started = true
+		return true
+	})
+	return result, started
+}
+
+// Reducee reduces the elements of the 'seq' sequence an one using the 'merge' function.
+func Reducee[S ~Seq2[K, V], K, V, T any](seq S, merge func(prev *T, k K, v V) (T, error)) (T, error) {
+	result, _, err := ReduceeOK(seq, merge)
+	return result, err
+}
+
+// ReduceeOK reduces the elements of the 'seq' sequence an one using the 'merge' function.
+// Returns ok==false if the seq returns ok=false at the first call (no more elements).
+func ReduceeOK[S ~Seq2[K, V], K, V, T any](seq S, merge func(prev *T, k K, v V) (T, error)) (result T, ok bool, err error) {
+	if seq == nil || merge == nil {
+		return result, false, nil
+	}
+	started := false
+	seq(func(k K, v V) bool {
+		result, err = merge(op.IfElse(!started, nil, &result), k, v)
+		started = true
+		return err == nil
+	})
+	return result, started, err
 }
 
 // Filter creates a rangefunc that iterates only those elements for which the 'filter' function returns true.
