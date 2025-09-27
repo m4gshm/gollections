@@ -44,6 +44,15 @@ func IfElseErr[T any](ok bool, tru T, err error) (T, error) {
 	return fal, err
 }
 
+// IfElseGetErr returns the tru value if ok, otherwise returns an error returnet by the err function
+func IfElseGetErr[T any](ok bool, tru T, err func() error) (T, error) {
+	if ok {
+		return tru, nil
+	}
+	var fal T
+	return fal, err()
+}
+
 // IfGetElse exececutes the tru func if ok, otherwise exec the fal function and returns it result
 func IfGetElse[T any](ok bool, tru, fal func() T) T {
 	if ok {
