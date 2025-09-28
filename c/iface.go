@@ -3,8 +3,6 @@ package c
 
 import (
 	"errors"
-
-	"golang.org/x/exp/constraints"
 )
 
 // Break is the 'break' statement of the For, Track methods
@@ -26,13 +24,6 @@ type OrderedRange[T any] interface {
 // KVRange provides an All function used for iterating over a sequence of key\value pairs by `for k, v := range collection.All`.
 type KVRange[K, V any] interface {
 	All(yield func(K, V) bool)
-}
-
-// Iterable is a loop supplier interface
-//
-// Deprecated: obsolete.
-type Iterable[T any, Loop ~func() (T, bool)] interface {
-	Loop() Loop
 }
 
 // KeyVal provides access to all keys and values of a key/value based collection.
@@ -63,15 +54,15 @@ type Collection[T any] interface {
 }
 
 // Filterable provides filtering content functionality
-type Filterable[T any, Loop ~func() (T, bool), LoopErr ~func() (T, bool, error)] interface {
-	Filter(predicate func(T) bool) Loop
-	Filt(predicate func(T) (bool, error)) LoopErr
+type Filterable[T any, Seq ~func(yield func(T) bool), SeqE ~func(yield func(T, error) bool)] interface {
+	Filter(predicate func(T) bool) Seq
+	Filt(predicate func(T) (bool, error)) SeqE
 }
 
 // Convertable provides converaton of collection elements functionality
-type Convertable[T any, Loop ~func() (T, bool), LoopErr ~func() (T, bool, error)] interface {
-	Convert(converter func(T) T) Loop
-	Conv(converter func(T) (T, error)) LoopErr
+type Convertable[T any, Seq ~func(yield func(T) bool), SeqE ~func(yield func(T, error) bool)] interface {
+	Convert(converter func(T) T) Seq
+	Conv(converter func(T) (T, error)) SeqE
 }
 
 // SliceFactory collects the elements of the collection into a slice
@@ -218,14 +209,4 @@ type ImmutableMapConvert[M any] interface {
 // Removable provides removing an element by its pointer (index or key).
 type Removable[P any, V any] interface {
 	Remove(P) (V, bool)
-}
-
-// Summable is a type that supports the operator +
-type Summable interface {
-	constraints.Ordered | constraints.Complex | string
-}
-
-// Number is a type that supports the operators +, -, /, *
-type Number interface {
-	constraints.Integer | constraints.Float | constraints.Complex
 }

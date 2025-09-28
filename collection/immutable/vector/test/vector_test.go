@@ -6,8 +6,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/collection/immutable"
 	"github.com/m4gshm/gollections/collection/immutable/vector"
+	"github.com/m4gshm/gollections/seq"
 
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
@@ -24,57 +26,8 @@ func Test_VectorIterate(t *testing.T) {
 	v := vector.Of(1, 2, 3, 4)
 	result := make([]int, v.Len())
 	i := 0
-	for it := v.Head(); it.HasNext(); {
-		result[i] = it.GetNext()
-		i++
-	}
-	assert.Equal(t, expected, result)
-}
-
-func Test_VectorIterate2(t *testing.T) {
-	expected := slice.Of(1, 2, 3, 4)
-	v := vector.Of(1, 2, 3, 4)
-	result := make([]int, v.Len())
-	i := 0
-	for it, v, ok := v.First(); ok; v, ok = it.Next() {
-		result[i] = v
-		i++
-	}
-	assert.Equal(t, expected, result)
-}
-
-func Test_VectorIterate3(t *testing.T) {
-	expected := slice.Of(1, 2, 3, 4)
-	v := vector.Of(1, 2, 3, 4)
-	result := make([]int, v.Len())
-	i := 0
-	it := v.Head()
-	for v, ok := it.Next(); ok; v, ok = it.Next() {
-		result[i] = v
-		i++
-	}
-	assert.Equal(t, expected, result)
-}
-
-func Test_VectorReverseIteration(t *testing.T) {
-	expected := slice.Of(4, 3, 2, 1)
-	v := vector.Of(1, 2, 3, 4)
-	result := make([]int, v.Len())
-	i := 0
-	for it := v.Tail(); it.HasPrev(); {
-		result[i] = it.GetPrev()
-		i++
-	}
-	assert.Equal(t, expected, result)
-}
-
-func Test_VectorReverseIteration2(t *testing.T) {
-	expected := slice.Of(4, 3, 2, 1)
-	v := vector.Of(1, 2, 3, 4)
-	result := make([]int, v.Len())
-	i := 0
-	for it, v, ok := v.Last(); ok; v, ok = it.Prev() {
-		result[i] = v
+	for it := range v.All {
+		result[i] = it
 		i++
 	}
 	assert.Equal(t, expected, result)
@@ -106,7 +59,7 @@ func Test_Vector_SortStructByField(t *testing.T) {
 func Test_Vector_Convert(t *testing.T) {
 	var (
 		ints     = vector.Of(3, 1, 5, 6, 8, 0, -2)
-		strings  = loop.Slice(loop.Filter(vector.Convert(ints, strconv.Itoa), func(s string) bool { return len(s) == 1 }))
+		strings  = seq.Slice(seq.Filter(vector.Convert(ints, strconv.Itoa), func(s string) bool { return len(s) == 1 }))
 		strings2 = vector.Convert(ints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 }).Slice()
 	)
 	assert.Equal(t, slice.Of("3", "1", "5", "6", "8", "0"), strings)
@@ -117,23 +70,10 @@ func Test_Vector_Flatt(t *testing.T) {
 	var (
 		deepInts    = vector.Of(vector.Of(3, 1), vector.Of(5, 6, 8, 0, -2))
 		ints        = vector.Flat(deepInts, immutable.Vector[int].Slice)
-		c           = loop.Convert(ints, strconv.Itoa)
-		stringsPipe = loop.Filter(c.Filter(func(s string) bool { return len(s) == 1 }), func(s string) bool { return len(s) == 1 })
+		c           = seq.Convert(ints, strconv.Itoa)
+		stringsPipe = seq.Filter(collection.Seq[string](c).Filter(func(s string) bool { return len(s) == 1 }), func(s string) bool { return len(s) == 1 })
 	)
-	assert.Equal(t, slice.Of("3", "1", "5", "6", "8", "0"), stringsPipe.Slice())
-}
-
-func Test_Vector_DoubleConvert(t *testing.T) {
-	var (
-		ints               = vector.Of(3, 1, 5, 6, 8, 0, -2)
-		stringsPipe        = vector.Convert(ints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 })
-		prefixedStrinsPipe = loop.Convert(stringsPipe, func(s string) string { return "_" + s })
-	)
-	assert.Equal(t, slice.Of("_3", "_1", "_5", "_6", "_8", "_0"), prefixedStrinsPipe.Slice())
-
-	//second call do nothing
-	var no []string
-	assert.Equal(t, no, stringsPipe.Slice())
+	assert.Equal(t, slice.Of("3", "1", "5", "6", "8", "0"), collection.Seq[string](stringsPipe).Slice())
 }
 
 func Test_Vector_Zero(t *testing.T) {
@@ -149,25 +89,13 @@ func Test_Vector_Zero(t *testing.T) {
 
 	vec.Slice()
 
-	head := vec.Head()
-	assert.False(t, head.HasNext())
-	assert.False(t, head.HasPrev())
+	_, ok := vec.Head()
 
-	_, ok := head.Get()
 	assert.False(t, ok)
-	_, ok = head.Next()
-	assert.False(t, ok)
-	head.Size()
 
-	tail := vec.Tail()
-	assert.False(t, tail.HasNext())
-	assert.False(t, tail.HasPrev())
+	_, ok = vec.Tail()
 
-	_, ok = tail.Get()
 	assert.False(t, ok)
-	_, ok = tail.Next()
-	assert.False(t, ok)
-	tail.Size()
 }
 
 type user struct {

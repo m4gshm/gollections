@@ -144,7 +144,7 @@ func Test_Map_Nil(t *testing.T) {
 	m.Keys().ForEach(nil)
 	m.Values().For(nil)
 	m.Values().ForEach(nil)
-	m.Values().Convert(nil).For(nil)
+	// m.Values().Convert(nil).For(nil)
 	m.Values().Filter(nil).ForEach(nil)
 }
 
@@ -189,7 +189,7 @@ func Test_Map_Zero(t *testing.T) {
 	m.Keys().ForEach(func(_ string) {})
 	m.Values().For(func(_ string) error { return nil })
 	m.Values().ForEach(func(_ string) {})
-	m.Values().Convert(as.Is[string]).For(func(_ string) error { return nil })
+	m.Values().Convert(as.Is[string]).ForEach(func(_ string) {})
 	m.Values().Filter(func(_ string) bool { return true }).ForEach(func(_ string) {})
 }
 
@@ -235,7 +235,7 @@ func Test_Map_new(t *testing.T) {
 	m.Keys().ForEach(func(_ string) {})
 	m.Values().For(func(_ string) error { return nil })
 	m.Values().ForEach(func(_ string) {})
-	m.Values().Convert(as.Is[string]).For(func(_ string) error { return nil })
+	// m.Values().Convert(as.Is[string]).For(func(_ string) error { return nil })
 	m.Values().Filter(func(_ string) bool { return true }).ForEach(func(_ string) {})
 }
 

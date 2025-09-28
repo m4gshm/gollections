@@ -9,7 +9,6 @@ import (
 	"github.com/m4gshm/gollections/collection/mutable"
 	mvector "github.com/m4gshm/gollections/collection/mutable/vector"
 	"github.com/m4gshm/gollections/convert"
-	"github.com/m4gshm/gollections/convert/ptr"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/seq"
 	"github.com/m4gshm/gollections/slice"
@@ -118,18 +117,6 @@ func Benchmark_Convert_ImmutableVector_Append(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		s = vector.Convert(items, concat).Append(make([]string, 0, len(values)))
-	}
-	_ = s
-	b.StopTimer()
-}
-
-func Benchmark_Convert_ImmutableVector_Head_Loop(b *testing.B) {
-	concat := convert.And(toString, addTail)
-	items := vector.Of(values...)
-	var s []string
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		s = loop.SliceCap(loop.Convert(ptr.Of(items.Head()).Next, concat), len(values))
 	}
 	_ = s
 	b.StopTimer()

@@ -44,7 +44,7 @@ func (m Map[K, V]) All(consumer func(k K, v V) bool) {
 	}
 }
 
-// Loop creates a loop to iterate through the collection.
+// Loop creates a seq to iterate through the collection.
 //
 // Deprecated: replaced by [Map.All].
 func (m Map[K, V]) Loop() loop.Loop[K, V] {
@@ -141,62 +141,62 @@ func (m Map[K, V]) TrackEach(consumer func(K, V)) {
 	map_.TrackEach(m.elements, consumer)
 }
 
-// FilterKey returns a loop consisting of key/value pairs where the key satisfies the condition of the 'predicate' function
+// FilterKey returns a seq consisting of key/value pairs where the key satisfies the condition of the 'predicate' function
 func (m Map[K, V]) FilterKey(predicate func(K) bool) loop.Loop[K, V] {
 	return loop.Filter(m.Loop(), filter.Key[V](predicate))
 }
 
-// FiltKey returns a loop consisting of key/value pairs where the key satisfies the condition of the 'predicate' function
+// FiltKey returns a seq consisting of key/value pairs where the key satisfies the condition of the 'predicate' function
 func (m Map[K, V]) FiltKey(predicate func(K) (bool, error)) breakLoop.Loop[K, V] {
 	return loop.Filt(m.Loop(), breakMapFilter.Key[V](predicate))
 }
 
-// ConvertKey returns a loop that applies the 'converter' function to keys of the map
+// ConvertKey returns a seq that applies the 'converter' function to keys of the map
 func (m Map[K, V]) ConvertKey(by func(K) K) loop.Loop[K, V] {
 	return loop.Convert(m.Loop(), convert.Key[V](by))
 }
 
-// ConvKey returns a loop that applies the 'converter' function to keys of the map
+// ConvKey returns a seq that applies the 'converter' function to keys of the map
 func (m Map[K, V]) ConvKey(converter func(K) (K, error)) breakLoop.Loop[K, V] {
 	return loop.Conv(m.Loop(), breakMapConvert.Key[V](converter))
 }
 
-// FilterValue returns a loop consisting of key/value pairs where the value satisfies the condition of the 'predicate' function
+// FilterValue returns a seq consisting of key/value pairs where the value satisfies the condition of the 'predicate' function
 func (m Map[K, V]) FilterValue(predicate func(V) bool) loop.Loop[K, V] {
 	return loop.Filter(m.Loop(), filter.Value[K](predicate))
 }
 
-// FiltValue returns a loop consisting of key/value pairs where the value satisfies the condition of the 'predicate' function
+// FiltValue returns a seq consisting of key/value pairs where the value satisfies the condition of the 'predicate' function
 func (m Map[K, V]) FiltValue(predicate func(V) (bool, error)) breakLoop.Loop[K, V] {
 	return loop.Filt(m.Loop(), breakMapFilter.Value[K](predicate))
 }
 
-// ConvertValue returns a loop that applies the 'converter' function to values of the map
+// ConvertValue returns a seq that applies the 'converter' function to values of the map
 func (m Map[K, V]) ConvertValue(by func(V) V) loop.Loop[K, V] {
 	return loop.Convert(m.Loop(), convert.Value[K](by))
 }
 
-// ConvValue returns a loop that applies the 'converter' function to values of the map
+// ConvValue returns a seq that applies the 'converter' function to values of the map
 func (m Map[K, V]) ConvValue(converter func(V) (V, error)) breakLoop.Loop[K, V] {
 	return loop.Conv(m.Loop(), breakMapConvert.Value[K](converter))
 }
 
-// Filter returns a loop consisting of elements that satisfy the condition of the 'predicate' function
+// Filter returns a seq consisting of elements that satisfy the condition of the 'predicate' function
 func (m Map[K, V]) Filter(predicate func(K, V) bool) loop.Loop[K, V] {
 	return loop.Filter(m.Loop(), predicate)
 }
 
-// Filt returns a breakable loop consisting of elements that satisfy the condition of the 'predicate' function
+// Filt returns a errorable seq consisting of elements that satisfy the condition of the 'predicate' function
 func (m Map[K, V]) Filt(predicate func(K, V) (bool, error)) breakLoop.Loop[K, V] {
 	return loop.Filt(m.Loop(), predicate)
 }
 
-// Convert returns a loop that applies the 'converter' function to the collection elements
+// Convert returns a seq that applies the 'converter' function to the collection elements
 func (m Map[K, V]) Convert(converter func(K, V) (K, V)) loop.Loop[K, V] {
 	return loop.Convert(m.Loop(), converter)
 }
 
-// Conv returns a breakable loop that applies the 'converter' function to the collection elements
+// Conv returns a errorable seq that applies the 'converter' function to the collection elements
 func (m Map[K, V]) Conv(converter func(K, V) (K, V, error)) breakLoop.Loop[K, V] {
 	return loop.Conv(m.Loop(), converter)
 }

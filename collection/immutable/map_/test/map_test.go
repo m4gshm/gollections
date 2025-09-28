@@ -67,7 +67,7 @@ func Test_Map_Iterate_Keys(t *testing.T) {
 	expectedK := slice.Of(1, 2, 3, 4)
 
 	keys := []int{}
-	for it, key, ok := dict.Keys().First(); ok; key, ok = it.Next() {
+	for key := range dict.Keys().All {
 		keys = append(keys, key)
 	}
 
@@ -83,7 +83,7 @@ func Test_Map_Iterate_Values(t *testing.T) {
 	expectedV := slice.Of("1", "2", "3", "4")
 
 	values := []string{}
-	for it, val, ok := ordered.Values().First(); ok; val, ok = it.Next() {
+	for val := range ordered.Values().All {
 		values = append(values, val)
 	}
 

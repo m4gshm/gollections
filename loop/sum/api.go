@@ -2,11 +2,11 @@
 package sum
 
 import (
-	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/loop"
+	"github.com/m4gshm/gollections/op"
 )
 
 // Of an alias of the loop.Sum
-func Of[T c.Summable](sum func() (T, bool)) T {
+func Of[T op.Summable](sum func() (T, bool)) T {
 	return loop.Sum(sum)
 }

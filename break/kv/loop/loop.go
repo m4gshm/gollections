@@ -44,12 +44,12 @@ func (next Loop[K, V]) HasAny(predicate func(K, V) bool) (bool, error) {
 	return HasAny(next, predicate)
 }
 
-// Filt creates a loop that checks elements by the 'filter' function and returns successful ones.
+// Filt creates a seq that checks elements by the 'filter' function and returns successful ones.
 func (next Loop[K, V]) Filt(filter func(K, V) (bool, error)) Loop[K, V] {
 	return Filt(next, filter)
 }
 
-// Filter creates a loop that checks elements by the 'filter' function and returns successful ones.
+// Filter creates a seq that checks elements by the 'filter' function and returns successful ones.
 func (next Loop[K, V]) Filter(filter func(K, V) bool) Loop[K, V] {
 	return Filter(next, filter)
 }

@@ -26,20 +26,8 @@ func Test_VectorIterate(t *testing.T) {
 	v := vector.Of(1, 2, 3, 4)
 	result := make([]int, v.Len())
 	i := 0
-	for it := v.Head(); it.HasNext(); {
-		result[i] = it.GetNext()
-		i++
-	}
-	assert.Equal(t, expected, result)
-}
-
-func Test_VectorIterate2(t *testing.T) {
-	expected := slice.Of(1, 2, 3, 4)
-	v := vector.Of(1, 2, 3, 4)
-	result := make([]int, v.Len())
-	i := 0
-	for it, v, ok := v.First(); ok; v, ok = it.Next() {
-		result[i] = v
+	for it := range v.All {
+		result[i] = it
 		i++
 	}
 	assert.Equal(t, expected, result)
@@ -51,18 +39,6 @@ func Test_VectorIterateOverRange(t *testing.T) {
 	result := make([]int, v.Len())
 	for i, val := range *v {
 		result[i] = val
-		i++
-	}
-	assert.Equal(t, expected, result)
-}
-
-func Test_VectorReverseIteration(t *testing.T) {
-	expected := slice.Of(4, 3, 2, 1)
-	v := vector.Of(1, 2, 3, 4)
-	result := make([]int, v.Len())
-	i := 0
-	for it := v.Tail(); it.HasPrev(); {
-		result[i] = it.GetPrev()
 		i++
 	}
 	assert.Equal(t, expected, result)
@@ -115,25 +91,11 @@ func Test_Vector_Nil(t *testing.T) {
 
 	assert.Equal(t, nils, vec.Slice())
 
-	head := vec.Head()
-	assert.False(t, head.HasNext())
-	assert.False(t, head.HasPrev())
+	_, ok := vec.Head()
+	assert.False(t, ok)
 
-	_, ok := head.Get()
+	_, ok = vec.Tail()
 	assert.False(t, ok)
-	_, ok = head.Next()
-	assert.False(t, ok)
-	head.Size()
-
-	tail := vec.Tail()
-	assert.False(t, tail.HasNext())
-	assert.False(t, tail.HasPrev())
-
-	_, ok = tail.Get()
-	assert.False(t, ok)
-	_, ok = tail.Next()
-	assert.False(t, ok)
-	tail.Size()
 }
 
 func Test_Vector_Zero(t *testing.T) {
@@ -163,29 +125,13 @@ func Test_Vector_Zero(t *testing.T) {
 
 	assert.Equal(t, slice.Of("a", "b", "c", "d"), vec.Slice())
 
-	head := vec.Head()
-	assert.True(t, head.HasNext())
-	assert.False(t, head.HasPrev())
-
-	_, ok := head.Get()
-	assert.False(t, ok)
-	fv, ok := head.Next()
+	head, ok := vec.Head()
 	assert.True(t, ok)
-	assert.Equal(t, "a", fv)
-	c := head.Size()
-	assert.Equal(t, 4, c)
+	assert.Equal(t, "a", head)
 
-	tail := vec.Tail()
-	assert.False(t, tail.HasNext())
-	assert.True(t, tail.HasPrev())
-
-	_, ok = tail.Get()
-	assert.False(t, ok)
-	tv, ok := tail.Prev()
+	tail, ok := vec.Tail()
 	assert.True(t, ok)
-	assert.Equal(t, "d", tv)
-	c = tail.Size()
-	assert.Equal(t, 4, c)
+	assert.Equal(t, "d", tail)
 }
 
 func Test_Vector_new(t *testing.T) {
@@ -215,29 +161,14 @@ func Test_Vector_new(t *testing.T) {
 
 	assert.Equal(t, slice.Of("a", "b", "c", "d"), vec.Slice())
 
-	head := vec.Head()
-	assert.True(t, head.HasNext())
-	assert.False(t, head.HasPrev())
-
-	_, ok := head.Get()
-	assert.False(t, ok)
-	fv, ok := head.Next()
+	head, ok := vec.Head()
 	assert.True(t, ok)
-	assert.Equal(t, "a", fv)
-	c := head.Size()
-	assert.Equal(t, 4, c)
+	assert.Equal(t, "a", head)
 
-	tail := vec.Tail()
-	assert.False(t, tail.HasNext())
-	assert.True(t, tail.HasPrev())
-
-	_, ok = tail.Get()
-	assert.False(t, ok)
-	tv, ok := tail.Prev()
+	tail, ok := vec.Tail()
 	assert.True(t, ok)
-	assert.Equal(t, "d", tv)
-	c = tail.Size()
-	assert.Equal(t, 4, c)
+	assert.Equal(t, "d", tail)
+
 }
 
 func Test_Vector_AddAllOfSelf(t *testing.T) {
@@ -255,20 +186,10 @@ func (u *user) Name() string { return u.name }
 func (u *user) Age() int     { return u.age }
 
 func Test_Vector_AddAndDelete(t *testing.T) {
-	vec := vector.NewCap[int](0)
-	vec.Add(range_.Closed(0, 1000)...)
-	deleted := false
-	for i := vec.Head(); i.HasNext(); {
-		deleted = i.DeleteNext()
-	}
-	assert.Equal(t, deleted, true)
-	assert.True(t, vec.IsEmpty())
-
-	vec.Add(range_.Closed(0, 10000)...)
-	for i := vec.Tail(); i.HasPrev(); {
-		deleted = i.DeletePrev()
-	}
-	assert.Equal(t, deleted, true)
+	vec := vector.NewCap[rune](0)
+	vec.Add(range_.Of('a', 'a'+rune(1000))...)
+	assert.Equal(t, 1000, vec.Len())
+	vec.Delete(range_.Of(0, 1000)...)
 	assert.True(t, vec.IsEmpty())
 }
 
@@ -286,107 +207,6 @@ func Test_Vector_AddAll(t *testing.T) {
 	assert.Equal(t, slice.Of(1, 1, 2, 4, 3, 1), vec.Slice())
 	vec.AddAll(seq.Of(1))
 	assert.Equal(t, slice.Of(1, 1, 2, 4, 3, 1, 1), vec.Slice())
-}
-
-func Test_Vector_Add_And_Iterate(t *testing.T) {
-	vec := vector.NewCap[int](0)
-	it, v, ok := vec.First()
-	//no a first element
-	assert.False(t, ok)
-	//no more elements
-	assert.False(t, it.HasNext())
-	vec.Add(1)
-	//exists one more
-	assert.True(t, it.HasNext())
-	v, ok = it.Get()
-	//but the cursor points out of the range
-	assert.False(t, ok)
-	//starts itaration
-	v, ok = it.Next()
-	//success
-	assert.True(t, ok)
-	assert.Equal(t, 1, v)
-	//no more
-	assert.False(t, it.HasNext())
-	//no prev
-	assert.False(t, it.HasPrev())
-	//only the current one
-	v, ok = it.Get()
-	assert.True(t, ok)
-	assert.Equal(t, 1, v)
-}
-
-func Test_Vector_Delete_And_Iterate(t *testing.T) {
-	vec := vector.Of(2)
-	it, v, ok := vec.First()
-	//success
-	assert.True(t, ok)
-	assert.Equal(t, 2, v)
-
-	//no more
-	assert.False(t, it.HasNext())
-	//no prev
-	assert.False(t, it.HasPrev())
-
-	//only the current one
-	v, ok = it.Get()
-	assert.True(t, ok)
-	assert.Equal(t, 2, v)
-
-	it.Delete()
-
-	//no the current one
-	_, ok = it.Get()
-	assert.False(t, ok)
-
-	//no more
-	assert.False(t, it.HasNext())
-	//no prev
-	assert.False(t, it.HasPrev())
-
-	assert.True(t, vec.IsEmpty())
-
-	// add values to vector
-	vec.Add(1, 3)
-
-	//it must to point before the first
-	_, ok = it.Get()
-	assert.False(t, ok)
-	assert.True(t, it.HasNext())
-	assert.False(t, it.HasPrev())
-
-	v, ok = it.Next()
-	assert.True(t, ok)
-	assert.Equal(t, 1, v)
-
-	assert.True(t, it.HasNext())
-	assert.False(t, it.HasPrev())
-
-	v, ok = it.Next()
-	assert.True(t, ok)
-	assert.Equal(t, 3, v)
-
-	assert.False(t, it.HasNext())
-	assert.True(t, it.HasPrev())
-
-	v, ok = it.Prev()
-	assert.True(t, ok)
-	assert.Equal(t, 1, v)
-
-	assert.True(t, it.HasNext())
-	assert.False(t, it.HasPrev())
-
-	//delete the first one
-	it.Delete()
-
-	//second must remains
-	assert.False(t, it.HasNext())
-	assert.False(t, it.HasPrev())
-	v, ok = it.Get()
-	assert.True(t, ok)
-	assert.Equal(t, 3, v)
-
-	assert.Equal(t, []int{3}, vec.Slice())
 }
 
 func Test_Vector_DeleteOne(t *testing.T) {
@@ -427,42 +247,6 @@ func Test_Vector_Set(t *testing.T) {
 	vec := vector.Of("1", "1", "2", "4", "3", "1")
 	vec.Set(10, "11")
 	assert.Equal(t, slice.Of("1", "1", "2", "4", "3", "1", "", "", "", "", "11"), vec.Slice())
-}
-
-func Test_Vector_DeleteByIterator(t *testing.T) {
-	vec := vector.Of(1, 1, 2, 4, 3, 1)
-	iterator := vec.Head()
-
-	i := 0
-	var v int
-	var ok bool
-	for v, ok = iterator.Next(); ok; v, ok = iterator.Next() {
-		i++
-		iterator.Delete()
-	}
-
-	_, _ = v, ok
-
-	assert.Equal(t, 6, i)
-	assert.Equal(t, 0, len(vec.Slice()))
-}
-
-func Test_Vector_DeleteByIterator_Reverse(t *testing.T) {
-	vec := vector.Of(1, 1, 2, 4, 3, 1)
-	iterator := vec.Tail()
-
-	i := 0
-	var v int
-	var ok bool
-	for v, ok = iterator.Prev(); ok; v, ok = iterator.Prev() {
-		i++
-		iterator.Delete()
-	}
-
-	_, _ = v, ok
-
-	assert.Equal(t, 6, i)
-	assert.Equal(t, 0, len(vec.Slice()))
 }
 
 func Test_Vector_FilterMapReduce(t *testing.T) {

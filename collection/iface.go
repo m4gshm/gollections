@@ -1,23 +1,15 @@
 package collection
 
 import (
-	breakLoop "github.com/m4gshm/gollections/break/loop"
 	"github.com/m4gshm/gollections/c"
 	kv "github.com/m4gshm/gollections/kv/collection"
-	"github.com/m4gshm/gollections/loop"
 )
-
-// Iterable is a loop supplier interface
-//
-// Deprecated: obsolete.
-type Iterable[T any] c.Iterable[T, loop.Loop[T]]
 
 // Collection is the base interface for the Vector and the Set impelementations
 type Collection[T any] interface {
-	Iterable[T]
 	c.Collection[T]
-	c.Filterable[T, loop.Loop[T], breakLoop.Loop[T]]
-	c.Convertable[T, loop.Loop[T], breakLoop.Loop[T]]
+	c.Filterable[T, Seq[T], SeqE[T]]
+	c.Convertable[T, Seq[T], SeqE[T]]
 
 	Len() int
 	IsEmpty() bool

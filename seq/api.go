@@ -2,7 +2,6 @@
 package seq
 
 import (
-	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/predicate/always"
 	"github.com/m4gshm/gollections/seq2"
@@ -10,7 +9,7 @@ import (
 )
 
 // Seq is an alias of an iterator-function that allows to iterate over elements of a sequence, such as slice.
-type Seq[V any] = func(yield func(V) bool)
+type Seq[T any] = func(yield func(T) bool)
 
 // SeqE is a specific iterator form that allows to retrieve a value with an error as second parameter of the iterator.
 // It is used as a result of applying functions like seq.Conv, which may throw an error during iteration.
@@ -392,7 +391,7 @@ func Accumm[T any, S ~Seq[T]](first T, seq S, merge func(T, T) (T, error)) (accu
 }
 
 // Sum returns the sum of all elements.
-func Sum[S ~Seq[T], T c.Summable](seq S) (out T) {
+func Sum[S ~Seq[T], T op.Summable](seq S) (out T) {
 	return Accum(out, seq, op.Sum[T])
 }
 

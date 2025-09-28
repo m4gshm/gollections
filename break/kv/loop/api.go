@@ -23,7 +23,7 @@ func New[S, K, V any](source S, hasNext func(S) bool, getNext func(S) (K, V, err
 	}
 }
 
-// From wrap the next loop to a breakable loop
+// From wrap the next loop to a errorable seq
 func From[K, V any](next func() (K, V, bool)) func() (K, V, bool, error) {
 	if next == nil {
 		return nil
@@ -34,7 +34,7 @@ func From[K, V any](next func() (K, V, bool)) func() (K, V, bool, error) {
 	}
 }
 
-// To transforms a breakable loop to a simple loop.
+// To transforms a errorable seq to a simple loop.
 // The errConsumer is a function that is called when an error occurs.
 func To[K, V any](next func() (K, V, bool, error), errConsumer func(error)) func() (K, V, bool) {
 	if next == nil {
@@ -143,7 +143,7 @@ func Firstt[K, V any](next func() (K, V, bool, error), predicate func(K, V) (boo
 	}
 }
 
-// Convert creates a loop that applies the 'converter' function to iterable key\values.
+// Convert creates a seq that applies the 'converter' function to iterable key\values.
 func Convert[K, V any, KOUT, VOUT any](next func() (K, V, bool, error), converter func(K, V) (KOUT, VOUT)) Loop[KOUT, VOUT] {
 	if next == nil {
 		return nil
@@ -158,7 +158,7 @@ func Convert[K, V any, KOUT, VOUT any](next func() (K, V, bool, error), converte
 	}
 }
 
-// Conv creates a loop that applies the 'converter' function to iterable key\values.
+// Conv creates a seq that applies the 'converter' function to iterable key\values.
 func Conv[K, V any, KOUT, VOUT any](next func() (K, V, bool, error), converter func(K, V) (KOUT, VOUT, error)) Loop[KOUT, VOUT] {
 	if next == nil {
 		return nil
@@ -173,7 +173,7 @@ func Conv[K, V any, KOUT, VOUT any](next func() (K, V, bool, error), converter f
 	}
 }
 
-// Filter creates a loop that checks elements by the 'filter' function and returns successful ones.
+// Filter creates a seq that checks elements by the 'filter' function and returns successful ones.
 func Filter[K, V any](next func() (K, V, bool, error), filter func(K, V) bool) Loop[K, V] {
 	if next == nil {
 		return nil
@@ -183,7 +183,7 @@ func Filter[K, V any](next func() (K, V, bool, error), filter func(K, V) bool) L
 	}
 }
 
-// Filt creates a loop that checks elements by the 'filter' function and returns successful ones.
+// Filt creates a seq that checks elements by the 'filter' function and returns successful ones.
 func Filt[K, V any](next func() (K, V, bool, error), filter func(K, V) (bool, error)) Loop[K, V] {
 	if next == nil {
 		return nil

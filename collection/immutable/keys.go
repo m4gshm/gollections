@@ -3,9 +3,7 @@ package immutable
 import (
 	"fmt"
 
-	breakLoop "github.com/m4gshm/gollections/break/loop"
 	"github.com/m4gshm/gollections/collection"
-	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/slice"
 )
@@ -32,31 +30,11 @@ func (m MapKeys[K, V]) All(consumer func(K) bool) {
 	map_.TrackKeysWhile(m.elements, consumer)
 }
 
-// Loop creates a loop to iterate through the collection.
-//
-// Deprecated: replaced by [MapKeys.All].
-func (m MapKeys[K, V]) Loop() loop.Loop[K] {
-	h := m.Head()
-	return (&h).Next
-}
-
 // Head creates an iterator to iterate through the collection.
 //
 // Deprecated: replaced by [MapKeys.All].
-func (m MapKeys[K, V]) Head() map_.KeyIter[K, V] {
-	return map_.NewKeyIter(m.elements)
-}
-
-// First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
-// If no more elements then ok==false.
-//
-// Deprecated: replaced by [MapKeys.All].
-func (m MapKeys[K, V]) First() (map_.KeyIter[K, V], K, bool) {
-	var (
-		iterator  = m.Head()
-		first, ok = iterator.Next()
-	)
-	return iterator, first, ok
+func (m MapKeys[K, V]) Head() (K, bool) {
+	return collection.Head(m)
 }
 
 // Len returns amount of elements
@@ -89,24 +67,24 @@ func (m MapKeys[K, V]) ForEach(consumer func(K)) {
 	map_.ForEachKey(m.elements, consumer)
 }
 
-// Filter returns a loop consisting of elements that satisfy the condition of the 'predicate' function
-func (m MapKeys[K, V]) Filter(filter func(K) bool) loop.Loop[K] {
-	return loop.Filter(m.Loop(), filter)
+// Filter returns a seq consisting of elements that satisfy the condition of the 'predicate' function
+func (m MapKeys[K, V]) Filter(filter func(K) bool) collection.Seq[K] {
+	return collection.Filter(m, filter)
 }
 
-// Filt returns a breakable loop consisting of elements that satisfy the condition of the 'predicate' function
-func (m MapKeys[K, V]) Filt(predicate func(K) (bool, error)) breakLoop.Loop[K] {
-	return loop.Filt(m.Loop(), predicate)
+// Filt returns a errorable seq consisting of elements that satisfy the condition of the 'predicate' function
+func (m MapKeys[K, V]) Filt(predicate func(K) (bool, error)) collection.SeqE[K] {
+	return collection.Filt(m, predicate)
 }
 
-// Convert returns a loop that applies the 'converter' function to the collection elements
-func (m MapKeys[K, V]) Convert(converter func(K) K) loop.Loop[K] {
-	return loop.Convert(m.Loop(), converter)
+// Convert returns a seq that applies the 'converter' function to the collection elements
+func (m MapKeys[K, V]) Convert(converter func(K) K) collection.Seq[K] {
+	return collection.Convert(m, converter)
 }
 
-// Conv returns a breakable loop that applies the 'converter' function to the collection elements
-func (m MapKeys[K, V]) Conv(converter func(K) (K, error)) breakLoop.Loop[K] {
-	return loop.Conv(m.Loop(), converter)
+// Conv returns a errorable seq that applies the 'converter' function to the collection elements
+func (m MapKeys[K, V]) Conv(converter func(K) (K, error)) collection.SeqE[K] {
+	return collection.Conv(m, converter)
 }
 
 // Reduce reduces the elements into an one using the 'merge' function

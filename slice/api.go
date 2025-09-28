@@ -795,7 +795,7 @@ func Accumm[TS ~[]T, T any](first T, elements TS, merge func(T, T) (T, error)) (
 }
 
 // Sum returns the sum of all elements
-func Sum[TS ~[]T, T c.Summable](elements TS) (out T) {
+func Sum[TS ~[]T, T op.Summable](elements TS) (out T) {
 	return Accum(out, elements, op.Sum[T])
 }
 

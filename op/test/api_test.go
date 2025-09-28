@@ -31,6 +31,6 @@ func Test_IfElseDelay(t *testing.T) {
 }
 
 func Test_IfDoElse(t *testing.T) {
-	assert.Equal(t, 5, op.IfGetElse(true, func() int { return 5 }, func() int { return 6 }))
-	assert.Equal(t, 6, op.IfGetElse(false, func() int { return 5 }, func() int { return 6 }))
+	assert.Equal(t, 5, op.IfGetElseGet(true, func() int { return 5 }, func() int { return 6 }))
+	assert.Equal(t, 6, op.IfGetElseGet(false, func() int { return 5 }, func() int { return 6 }))
 }

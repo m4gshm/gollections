@@ -1011,12 +1011,14 @@ These functions combine converters, filters and reducers.
 - Using rangefunc `All` like:
 
 ``` go
-for i := range range_.Of(0, 100).All {
-    doOp(i)
+   for i := range range_.Of(0, 100).All {
+        doOp(i)
+    }
+
 }
 ```
 
-- Using `for` statement like:
+- `ForEach` method
 
 ``` go
 next := range_.Of(0, 100)
@@ -1025,31 +1027,19 @@ for i, ok := next(); ok; i, ok = next() {
 }
 ```
 
-- or
-
-``` go
-for next, i, ok := range_.Of(0, 100).Crank(); ok; i, ok = next() {
-    doOp(i)
-}
-```
-
-- `ForEach` method
-
-``` go
-range_.Of(0, 100).ForEach(doOp)
-```
-
 - or `For` method that can be aborted by returning `Break` for expected
   completion, or another error otherwise.
 
 ``` go
-range_.Of(0, 100).For(func(i int) error {
-    if i > 22 {
-        return loop.Break
+func Test_Iterating_EmbeddedFor2(t *testing.T) {
+
+    for next, i, ok := range_.Of(0, 100).Crank(); ok; i, ok = next() {
+        doOp(i)
     }
-    doOp(i)
-    return loop.Continue
-})
+
+}
+
+func Test_Iterating_ForEach(t *testing.T) {
 ```
 
 ## Data structures
@@ -1200,20 +1190,13 @@ for i := range uniques.All {
 - `ForEach` method
 
 ``` go
-uniques := set.From(range_.Of(0, 100))
-uniques.ForEach(doOp)
+func doOp(i int) {
+
+}
 ```
 
 - or `For` method that can be aborted by returning `Break` for expected
   completion, or another error otherwise.
 
 ``` go
-uniques := set.From(range_.Of(0, 100))
-uniques.For(func(i int) error {
-    if i > 22 {
-        return loop.Break
-    }
-    doOp(i)
-    return loop.Continue
-})
 ```

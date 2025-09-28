@@ -1,4 +1,4 @@
-// Package group provides short aliases for functions thath are used to group key/value pairs retrieved by a loop
+// Package group provides short aliases for functions thath are used to group key/value pairs retrieved by a seq
 package group
 
 import (

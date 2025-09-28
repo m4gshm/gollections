@@ -60,7 +60,7 @@ func All[T any](next func() (T, bool), consumer func(T) bool) {
 	}
 }
 
-// New makes a loop from an abstract source
+// New makes a seq from an abstract source
 func New[S, T any](source S, hasNext func(S) bool, getNext func(S) T) Loop[T] {
 	return func() (out T, ok bool) {
 		if hasNext(source) {
@@ -242,7 +242,7 @@ func Accumm[T any](first T, next func() (T, bool), merge func(T, T) (T, error)) 
 }
 
 // Sum returns the sum of all elements
-func Sum[T c.Summable](next func() (T, bool)) (out T) {
+func Sum[T op.Summable](next func() (T, bool)) (out T) {
 	return Accum(out, next, op.Sum[T])
 }
 
@@ -265,17 +265,17 @@ func Contains[T comparable](next func() (T, bool), example T) bool {
 	return false
 }
 
-// Conv creates a loop that applies the 'converter' function to iterable elements.
+// Conv creates a seq that applies the 'converter' function to iterable elements.
 func Conv[From, To any](next func() (From, bool), converter func(From) (To, error)) breakloop.Loop[To] {
 	return breakloop.Conv(breakloop.From(next), converter)
 }
 
-// ConvS creates a loop that applies the 'converter' function to the 'elements' slice.
+// ConvS creates a seq that applies the 'converter' function to the 'elements' slice.
 func ConvS[FS ~[]From, From, To any](elements FS, converter func(From) (To, error)) breakloop.Loop[To] {
 	return Conv(S(elements), converter)
 }
 
-// Convert creates a loop that applies the 'converter' function to iterable elements.
+// Convert creates a seq that applies the 'converter' function to iterable elements.
 func Convert[From, To any](next func() (From, bool), converter func(From) To) Loop[To] {
 	if next == nil {
 		return nil
@@ -289,19 +289,19 @@ func Convert[From, To any](next func() (From, bool), converter func(From) To) Lo
 	}
 }
 
-// ConvertS creates a loop that applies the 'converter' function to the 'elements' slice.
+// ConvertS creates a seq that applies the 'converter' function to the 'elements' slice.
 func ConvertS[FS ~[]From, From, To any](elements FS, converter func(From) To) Loop[To] {
 	return Convert(S(elements), converter)
 }
 
-// ConvOK creates a loop that applies the 'converter' function to iterable elements.
+// ConvOK creates a seq that applies the 'converter' function to iterable elements.
 // The converter may returns a value or ok=false to exclude the value from the loop.
 // It may also return an error to abort the loop.
 func ConvOK[From, To any](next func() (From, bool), converter func(from From) (To, bool, error)) breakloop.Loop[To] {
 	return breakloop.ConvOK(breakloop.From(next), converter)
 }
 
-// ConvertOK creates a loop that applies the 'converter' function to iterable elements.
+// ConvertOK creates a seq that applies the 'converter' function to iterable elements.
 // The converter may returns a value or ok=false to exclude the value from the loop.
 func ConvertOK[From, To any](next func() (From, bool), converter func(from From) (To, bool)) Loop[To] {
 	if next == nil {
@@ -317,7 +317,7 @@ func ConvertOK[From, To any](next func() (From, bool), converter func(from From)
 	}
 }
 
-// FiltAndConv creates a loop that filters source elements and converts them
+// FiltAndConv creates a seq that filters source elements and converts them
 func FiltAndConv[From, To any](next func() (From, bool), filter func(From) (bool, error), converter func(From) (To, error)) breakloop.Loop[To] {
 	if next == nil {
 		return nil
@@ -335,7 +335,7 @@ func FiltAndConv[From, To any](next func() (From, bool), filter func(From) (bool
 	}
 }
 
-// FilterAndConvert creates a loop that filters source elements and converts them
+// FilterAndConvert creates a seq that filters source elements and converts them
 func FilterAndConvert[From, To any](next func() (From, bool), filter func(From) bool, converter func(From) To) Loop[To] {
 	return FilterConvertFilter(next, filter, converter, always.True[To])
 }
@@ -410,7 +410,7 @@ func Flat[From, To any](next func() (From, bool), flattener func(From) []To) Loo
 	}
 }
 
-// FlatS creates a loop that extracts slices of 'To' by the 'flattener' function from the elements of 'From' and flattens as one iterable collection of 'To' elements.
+// FlatS creates a seq that extracts slices of 'To' by the 'flattener' function from the elements of 'From' and flattens as one iterable collection of 'To' elements.
 func FlatS[FS ~[]From, From, To any](elements FS, flattener func(From) []To) Loop[To] {
 	return Flat(S(elements), flattener)
 }
@@ -484,17 +484,17 @@ func FilterFlatFilter[From, To any](next func() (From, bool), filterFrom func(Fr
 	}
 }
 
-// Filt creates a loop that checks elements by the 'filter' function and returns successful ones.
+// Filt creates a seq that checks elements by the 'filter' function and returns successful ones.
 func Filt[T any](next func() (T, bool), filter func(T) (bool, error)) breakloop.Loop[T] {
 	return breakloop.Filt(breakloop.From(next), filter)
 }
 
-// FiltS creates a loop that checks slice elements by the 'filter' function and returns successful ones.
+// FiltS creates a seq that checks slice elements by the 'filter' function and returns successful ones.
 func FiltS[TS ~[]T, T any](elements TS, filter func(T) (bool, error)) breakloop.Loop[T] {
 	return Filt(S(elements), filter)
 }
 
-// Filter creates a loop that checks elements by the 'filter' function and returns successful ones.
+// Filter creates a seq that checks elements by the 'filter' function and returns successful ones.
 func Filter[T any](next func() (T, bool), filter func(T) bool) Loop[T] {
 	if next == nil {
 		return nil
@@ -504,29 +504,29 @@ func Filter[T any](next func() (T, bool), filter func(T) bool) Loop[T] {
 	}
 }
 
-// FilterS creates a loop that checks slice elements by the 'filter' function and returns successful ones.
+// FilterS creates a seq that checks slice elements by the 'filter' function and returns successful ones.
 func FilterS[TS ~[]T, T any](elements TS, filter func(T) bool) Loop[T] {
 	return Filter(S(elements), filter)
 }
 
-// NotNil creates a loop that filters nullable elements
+// NotNil creates a seq that filters nullable elements
 func NotNil[T any](next func() (*T, bool)) Loop[*T] {
 	return Filter(next, not.Nil[T])
 }
 
-// PtrVal creates a loop that transform pointers to the values referenced by those pointers.
+// PtrVal creates a seq that transform pointers to the values referenced by those pointers.
 // Nil pointers are transformet to zero values.
 func PtrVal[T any](next func() (*T, bool)) Loop[T] {
 	return Convert(next, convert.PtrVal[T])
 }
 
-// NoNilPtrVal creates a loop that transform only not nil pointers to the values referenced referenced by those pointers.
+// NoNilPtrVal creates a seq that transform only not nil pointers to the values referenced referenced by those pointers.
 // Nil pointers are ignored.
 func NoNilPtrVal[T any](next func() (*T, bool)) Loop[T] {
 	return ConvertOK(next, convert.NoNilPtrVal[T])
 }
 
-// KeyValue transforms a loop to the key/value loop based on applying key, value extractors to the elements
+// KeyValue transforms a seq to the key/value loop based on applying key, value extractors to the elements
 func KeyValue[T any, K, V any](next func() (T, bool), keyExtractor func(T) K, valExtractor func(T) V) kvloop.Loop[K, V] {
 	if next == nil {
 		return nil
@@ -541,12 +541,12 @@ func KeyValue[T any, K, V any](next func() (T, bool), keyExtractor func(T) K, va
 	}
 }
 
-// KeyValuee transforms a loop to the key/value loop based on applying key, value extractors to the elements
+// KeyValuee transforms a seq to the key/value loop based on applying key, value extractors to the elements
 func KeyValuee[T any, K, V any](next func() (T, bool), keyExtractor func(T) (K, error), valExtractor func(T) (V, error)) breakkvloop.Loop[K, V] {
 	return breakloop.KeyValuee(breakloop.From(next), keyExtractor, valExtractor)
 }
 
-// KeysValues transforms a loop to the key/value loop based on applying multiple keys, values extractor to the elements
+// KeysValues transforms a seq to the key/value loop based on applying multiple keys, values extractor to the elements
 func KeysValues[T, K, V any](next func() (T, bool), keysExtractor func(T) []K, valsExtractor func(T) []V) kvloop.Loop[K, V] {
 	if next == nil {
 		return nil
@@ -592,62 +592,62 @@ func KeysValues[T, K, V any](next func() (T, bool), keysExtractor func(T) []K, v
 	}
 }
 
-// KeysValue transforms a loop to the key/value loop based on applying keys, value extractor to the elements
+// KeysValue transforms a seq to the key/value loop based on applying keys, value extractor to the elements
 func KeysValue[T, K, V any](next func() (T, bool), keysExtractor func(T) []K, valExtractor func(T) V) kvloop.Loop[K, V] {
 	return KeysValues(next, keysExtractor, func(t T) []V { return convert.AsSlice(valExtractor(t)) })
 }
 
-// KeysValuee transforms a loop to the key/value loop based on applying keys, value extractor to the elements
+// KeysValuee transforms a seq to the key/value loop based on applying keys, value extractor to the elements
 func KeysValuee[T, K, V any](next func() (T, bool), keysExtractor func(T) ([]K, error), valExtractor func(T) (V, error)) breakkvloop.Loop[K, V] {
 	return breakloop.KeysValuee(breakloop.From(next), keysExtractor, valExtractor)
 }
 
-// KeyValues transforms a loop to the key/value loop based on applying key, values extractor to the elements
+// KeyValues transforms a seq to the key/value loop based on applying key, values extractor to the elements
 func KeyValues[T, K, V any](next func() (T, bool), keyExtractor func(T) K, valsExtractor func(T) []V) kvloop.Loop[K, V] {
 	return KeysValues(next, func(t T) []K { return convert.AsSlice(keyExtractor(t)) }, valsExtractor)
 }
 
-// KeyValuess transforms a loop to the key/value loop based on applying key, values extractor to the elements
+// KeyValuess transforms a seq to the key/value loop based on applying key, values extractor to the elements
 func KeyValuess[T, K, V any](next func() (T, bool), keyExtractor func(T) (K, error), valsExtractor func(T) ([]V, error)) breakkvloop.Loop[K, V] {
 	return breakloop.KeyValuess(breakloop.From(next), keyExtractor, valsExtractor)
 }
 
-// ExtraVals transforms a loop to the key/value loop based on applying values extractor to the elements
+// ExtraVals transforms a seq to the key/value loop based on applying values extractor to the elements
 func ExtraVals[T, V any](next func() (T, bool), valsExtractor func(T) []V) kvloop.Loop[T, V] {
 	return KeyValues(next, as.Is[T], valsExtractor)
 }
 
-// ExtraValss transforms a loop to the key/value loop based on applying values extractor to the elements
+// ExtraValss transforms a seq to the key/value loop based on applying values extractor to the elements
 func ExtraValss[T, V any](next func() (T, bool), valsExtractor func(T) ([]V, error)) breakkvloop.Loop[T, V] {
 	return KeyValuess(next, as.ErrTail(as.Is[T]), valsExtractor)
 }
 
-// ExtraKeys transforms a loop to the key/value loop based on applying key extractor to the elements
+// ExtraKeys transforms a seq to the key/value loop based on applying key extractor to the elements
 func ExtraKeys[T, K any](next func() (T, bool), keysExtractor func(T) []K) kvloop.Loop[K, T] {
 	return KeysValue(next, keysExtractor, as.Is[T])
 }
 
-// ExtraKeyss transforms a loop to the key/value loop based on applying key extractor to the elements
+// ExtraKeyss transforms a seq to the key/value loop based on applying key extractor to the elements
 func ExtraKeyss[T, K any](next func() (T, bool), keyExtractor func(T) (K, error)) breakkvloop.Loop[K, T] {
 	return KeyValuess(next, keyExtractor, as.ErrTail(convert.AsSlice[T]))
 }
 
-// ExtraKey transforms a loop to the key/value loop based on applying key extractor to the elements
+// ExtraKey transforms a seq to the key/value loop based on applying key extractor to the elements
 func ExtraKey[T, K any](next func() (T, bool), keysExtractor func(T) K) kvloop.Loop[K, T] {
 	return KeyValue(next, keysExtractor, as.Is[T])
 }
 
-// ExtraKeyy transforms a loop to the key/value loop based on applying key extractor to the elements
+// ExtraKeyy transforms a seq to the key/value loop based on applying key extractor to the elements
 func ExtraKeyy[T, K any](next func() (T, bool), keyExtractor func(T) (K, error)) breakkvloop.Loop[K, T] {
 	return breakloop.KeyValuee[T, K](breakloop.From(next), keyExtractor, as.ErrTail(as.Is[T]))
 }
 
-// ExtraValue transforms a loop to the key/value loop based on applying value extractor to the elements
+// ExtraValue transforms a seq to the key/value loop based on applying value extractor to the elements
 func ExtraValue[T, V any](next func() (T, bool), valueExtractor func(T) V) kvloop.Loop[T, V] {
 	return KeyValue(next, as.Is[T], valueExtractor)
 }
 
-// ExtraValuee transforms a loop to the key/value loop based on applying value extractor to the elements
+// ExtraValuee transforms a seq to the key/value loop based on applying value extractor to the elements
 func ExtraValuee[T, V any](next func() (T, bool), valExtractor func(T) (V, error)) breakkvloop.Loop[T, V] {
 	return breakloop.KeyValuee[T, T, V](breakloop.From(next), as.ErrTail(as.Is[T]), valExtractor)
 }
@@ -818,7 +818,7 @@ func Series[T any](first T, next func(T) (T, bool)) Loop[T] {
 	}
 }
 
-// RangeClosed creates a loop that generates integers in the range defined by from and to inclusive
+// RangeClosed creates a seq that generates integers in the range defined by from and to inclusive
 func RangeClosed[T constraints.Integer | rune](from T, toInclusive T) Loop[T] {
 	amount := toInclusive - from
 	delta := T(1)
@@ -839,7 +839,7 @@ func RangeClosed[T constraints.Integer | rune](from T, toInclusive T) Loop[T] {
 	}
 }
 
-// Range creates a loop that generates integers in the range defined by from and to exclusive
+// Range creates a seq that generates integers in the range defined by from and to exclusive
 func Range[T constraints.Integer | rune](from T, toExclusive T) Loop[T] {
 	amount := toExclusive - from
 	delta := T(1)
@@ -859,7 +859,7 @@ func Range[T constraints.Integer | rune](from T, toExclusive T) Loop[T] {
 	}
 }
 
-// OfIndexed builds a loop by extracting elements from an indexed soruce.
+// OfIndexed builds a seq by extracting elements from an indexed soruce.
 // the len is length ot the source.
 // the getAt retrieves an element by its index from the source.
 func OfIndexed[T any](amount int, getAt func(int) T) Loop[T] {

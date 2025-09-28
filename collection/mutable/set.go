@@ -3,11 +3,9 @@ package mutable
 import (
 	"fmt"
 
-	breakLoop "github.com/m4gshm/gollections/break/loop"
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/collection/mutable/ordered"
-	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/seq"
 	"github.com/m4gshm/gollections/slice"
@@ -24,60 +22,32 @@ type Set[T comparable] struct {
 }
 
 var (
-	_ c.Addable[int]                = (*Set[int])(nil)
-	_ c.AddableNew[int]             = (*Set[int])(nil)
-	_ c.AddableAll[seq.Seq[int]]    = (*Set[int])(nil)
-	_ c.AddableAllNew[seq.Seq[int]] = (*Set[int])(nil)
-	_ c.Deleteable[int]             = (*Set[int])(nil)
-	_ c.DeleteableVerify[int]       = (*Set[int])(nil)
-	_ collection.Set[int]           = (*Set[int])(nil)
-	_ fmt.Stringer                  = (*Set[int])(nil)
+	_ c.Addable[int]                       = (*Set[int])(nil)
+	_ c.AddableNew[int]                    = (*Set[int])(nil)
+	_ c.AddableAll[collection.Seq[int]]    = (*Set[int])(nil)
+	_ c.AddableAllNew[collection.Seq[int]] = (*Set[int])(nil)
+	_ c.Deleteable[int]                    = (*Set[int])(nil)
+	_ c.DeleteableVerify[int]              = (*Set[int])(nil)
+	_ collection.Set[int]                  = (*Set[int])(nil)
+	_ fmt.Stringer                         = (*Set[int])(nil)
 )
 
 // All is used to iterate through the collection using `for e := range`.
 func (s *Set[T]) All(consumer func(T) bool) {
+	if s == nil {
+		return
+	}
 	for v := range s.elements {
 		if !consumer(v) {
 			return
 		}
 	}
+
 }
 
-// Loop creates a loop to iterate through the collection.
-//
-// Deprecated: replaced by [Set.All].
-func (s *Set[T]) Loop() loop.Loop[T] {
-	h := s.Head()
-	return (&h).Next
-}
-
-// IterEdit creates iterator that can delete iterable elements
-func (s *Set[T]) IterEdit() c.DelIterator[T] {
-	h := s.Head()
-	return &h
-}
-
-// Head creates an iterator to iterate through the collection.
-//
-// Deprecated: replaced by [Set.All].
-func (s *Set[T]) Head() SetIter[T] {
-	var elements map[T]struct{}
-	if s != nil {
-		elements = s.elements
-	}
-	return NewSetIter(elements, s.DeleteOne)
-}
-
-// First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
-// If no more elements then ok==false.
-//
-// Deprecated: replaced by [Set.All].
-func (s *Set[T]) First() (SetIter[T], T, bool) {
-	var (
-		iterator  = s.Head()
-		first, ok = iterator.Next()
-	)
-	return iterator, first, ok
+// Head returns the first element.
+func (s *Set[T]) Head() (T, bool) {
+	return collection.Head(s)
 }
 
 // Slice collects the elements to a slice
@@ -178,14 +148,14 @@ func (s *Set[T]) AddOneNew(element T) (ok bool) {
 }
 
 // AddAll inserts all elements from the "other" sequence.
-func (s *Set[T]) AddAll(elements seq.Seq[T]) {
+func (s *Set[T]) AddAll(elements collection.Seq[T]) {
 	if !(s == nil || elements == nil) {
 		seq.ForEach(elements, s.AddOne)
 	}
 }
 
 // AddAllNew inserts elements from the "other" sequence if they are not contained in the collection.
-func (s *Set[T]) AddAllNew(other seq.Seq[T]) (ok bool) {
+func (s *Set[T]) AddAllNew(other collection.Seq[T]) (ok bool) {
 	if !(s == nil || other == nil) {
 		seq.ForEach(other, func(element T) { ok = s.AddOneNew(element) || ok })
 	}
@@ -245,24 +215,24 @@ func (s *Set[T]) ForEach(consumer func(T)) {
 	}
 }
 
-// Filter returns a loop consisting of elements that satisfy the condition of the 'predicate' function
-func (s *Set[T]) Filter(predicate func(T) bool) loop.Loop[T] {
-	return loop.Filter(s.Loop(), predicate)
+// Filter returns a seq that checks elements by the 'filter' function and returns successful ones.
+func (s *Set[T]) Filter(predicate func(T) bool) collection.Seq[T] {
+	return collection.Filter(s, predicate)
 }
 
-// Filt returns a breakable loop consisting of elements that satisfy the condition of the 'predicate' function
-func (s Set[T]) Filt(predicate func(T) (bool, error)) breakLoop.Loop[T] {
-	return loop.Filt(s.Loop(), predicate)
+// Filt returns a errorable seq consisting of elements that satisfy the condition of the 'predicate' function
+func (s *Set[T]) Filt(predicate func(T) (bool, error)) collection.SeqE[T] {
+	return collection.Filt(s, predicate)
 }
 
-// Convert returns a loop that applies the 'converter' function to the collection elements
-func (s *Set[T]) Convert(converter func(T) T) loop.Loop[T] {
-	return loop.Convert(s.Loop(), converter)
+// Convert returns a seq that applies the 'converter' function to the collection elements
+func (s *Set[T]) Convert(converter func(T) T) collection.Seq[T] {
+	return collection.Convert(s, converter)
 }
 
-// Conv returns a breakable loop that applies the 'converter' function to the collection elements
-func (s *Set[T]) Conv(converter func(T) (T, error)) breakLoop.Loop[T] {
-	return loop.Conv(s.Loop(), converter)
+// Conv returns a errorable seq that applies the 'converter' function to the collection elements
+func (s *Set[T]) Conv(converter func(T) (T, error)) collection.SeqE[T] {
+	return collection.Conv(s, converter)
 }
 
 // Reduce reduces the elements into an one using the 'merge' function

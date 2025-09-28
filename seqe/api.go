@@ -2,7 +2,6 @@
 package seqe
 
 import (
-	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/predicate/always"
 	"github.com/m4gshm/gollections/seq"
@@ -291,7 +290,7 @@ func Accumm[T any, S ~SeqE[T]](first T, seq S, merge func(T, T) (T, error)) (acc
 }
 
 // Sum returns the sum of all elements.
-func Sum[S ~SeqE[T], T c.Summable](seq S) (out T, err error) {
+func Sum[S ~SeqE[T], T op.Summable](seq S) (out T, err error) {
 	return Accum(out, seq, op.Sum[T])
 }
 

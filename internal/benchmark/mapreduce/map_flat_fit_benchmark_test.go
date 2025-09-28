@@ -27,26 +27,6 @@ var (
 	threshhold = max / 2
 )
 
-func Benchmark_Head_Slice(b *testing.B) {
-	var f int
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		f, _ = slice.Head(values)
-	}
-	b.StopTimer()
-	assert.Equal(b, 1, f)
-}
-
-func Benchmark_Tail_Slice(b *testing.B) {
-	var f int
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		f, _ = slice.Tail(values)
-	}
-	b.StopTimer()
-	assert.Equal(b, max, f)
-}
-
 func Benchmark_First_PlainOld(b *testing.B) {
 	op := func(i int) bool { return i > threshhold }
 	var f int

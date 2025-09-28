@@ -9,7 +9,7 @@ import (
 	"github.com/m4gshm/gollections/map_/resolv"
 )
 
-// New makes a loop from an abstract source
+// New makes a seq from an abstract source
 func New[S, K, V any](source S, hasNext func(S) bool, getNext func(S) (K, V)) Loop[K, V] {
 	return func() (k K, v V, ok bool) {
 		if hasNext(source) {
@@ -141,7 +141,7 @@ func Firstt[K, V any](next func() (K, V, bool), predicate func(K, V) (bool, erro
 	}
 }
 
-// Convert creates a loop that applies the 'converter' function to iterable key\values.
+// Convert creates a seq that applies the 'converter' function to iterable key\values.
 func Convert[K, V any, KOUT, VOUT any](next func() (K, V, bool), converter func(K, V) (KOUT, VOUT)) Loop[KOUT, VOUT] {
 	if next == nil {
 		return nil
@@ -155,12 +155,12 @@ func Convert[K, V any, KOUT, VOUT any](next func() (K, V, bool), converter func(
 	}
 }
 
-// Conv creates a loop that applies the 'converter' function to iterable key\values.
+// Conv creates a seq that applies the 'converter' function to iterable key\values.
 func Conv[K, V any, KOUT, VOUT any](next func() (K, V, bool), converter func(K, V) (KOUT, VOUT, error)) loop.Loop[KOUT, VOUT] {
 	return loop.Conv(loop.From(next), converter)
 }
 
-// Filter creates a loop that checks elements by the 'filter' function and returns successful ones.
+// Filter creates a seq that checks elements by the 'filter' function and returns successful ones.
 func Filter[K, V any](next func() (K, V, bool), filter func(K, V) bool) Loop[K, V] {
 	if next == nil {
 		return nil
@@ -170,7 +170,7 @@ func Filter[K, V any](next func() (K, V, bool), filter func(K, V) bool) Loop[K, 
 	}
 }
 
-// Filt creates a loop that checks elements by the 'filter' function and returns successful ones.
+// Filt creates a seq that checks elements by the 'filter' function and returns successful ones.
 func Filt[K, V any](next func() (K, V, bool), filter func(K, V) (bool, error)) loop.Loop[K, V] {
 	return loop.Filt(loop.From(next), filter)
 }

@@ -74,7 +74,7 @@ func (next Loop[T]) HasAny(predicate func(T) bool) (bool, error) {
 	return HasAny(next, predicate)
 }
 
-// Filter creates a loop that checks elements by the 'filter' function and returns successful ones.
+// Filter creates a seq that checks elements by the 'filter' function and returns successful ones.
 func (next Loop[T]) Filter(filter func(T) bool) Loop[T] {
 	return Filter(next, filter)
 }

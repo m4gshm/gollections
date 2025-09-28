@@ -617,35 +617,21 @@ These functions combine converters, filters and reducers.
 
 [source,go]
 ----
-include::../examples/loopexamples/loop_iterating_go_1_22_test.go[lines=12..16,indent=0]
-----
-
-* Using `for` statement like:
-
-[source,go]
-----
-include::../examples/loopexamples/loop_iterating_test.go[lines=11..16,indent=0]
-----
-
-* or
-
-[source,go]
-----
-include::../examples/loopexamples/loop_iterating_test.go[lines=20..24,indent=0]
+include::../examples/loopexamples/loop_iterating_go_1_22_test.go[lines=13..17,indent=0]
 ----
 
 * `ForEach` method
 
 [source,go]
 ----
-include::../examples/loopexamples/loop_iterating_test.go[lines=28..30,indent=0]
+include::../examples/loopexamples/loop_iterating_test.go[lines=12..15,indent=0]
 ----
 
 * or `For` method that can be aborted by returning `Break` for expected completion, or another error otherwise.
 
 [source,go]
 ----
-include::../examples/loopexamples/loop_iterating_test.go[lines=34..42,indent=0]
+include::../examples/loopexamples/loop_iterating_test.go[lines=19..28,indent=0]
 ----
 
 === Data structures

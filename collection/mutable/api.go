@@ -3,6 +3,7 @@ package mutable
 
 import (
 	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/collection/mutable/ordered"
 	kvloop "github.com/m4gshm/gollections/kv/loop"
 	"github.com/m4gshm/gollections/loop"
@@ -36,7 +37,7 @@ func SetFromLoop[T comparable](next func() (T, bool)) *Set[T] {
 }
 
 // SetFromSeq creates a set with elements retrieved by the seq.
-func SetFromSeq[T comparable](seq seq.Seq[T]) *Set[T] {
+func SetFromSeq[T comparable](seq collection.Seq[T]) *Set[T] {
 	if seq == nil {
 		return nil
 	}
@@ -75,7 +76,7 @@ func MapFromLoop[K comparable, V any](next func() (K, V, bool)) *Map[K, V] {
 }
 
 // MapFromSeq2 creates a map with elements retrieved by the seq.
-func MapFromSeq2[K comparable, V any](seq seq.Seq2[K, V]) *Map[K, V] {
+func MapFromSeq2[K comparable, V any](seq collection.Seq2[K, V]) *Map[K, V] {
 	if seq == nil {
 		return nil
 	}
@@ -105,6 +106,6 @@ func VectorFromLoop[T any](next func() (T, bool)) *Vector[T] {
 }
 
 // VectorFromSeq creates a vector with elements retrieved by the seq.
-func VectorFromSeq[T any](s seq.Seq[T]) *Vector[T] {
+func VectorFromSeq[T any](s collection.Seq[T]) *Vector[T] {
 	return WrapVector(seq.Slice(s))
 }

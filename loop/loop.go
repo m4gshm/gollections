@@ -2,7 +2,6 @@ package loop
 
 import (
 	"github.com/m4gshm/gollections/break/loop"
-	"github.com/m4gshm/gollections/c"
 )
 
 // Loop is a function that returns the next element or ok=false if there are no more elements.
@@ -11,8 +10,8 @@ import (
 type Loop[T any] func() (element T, ok bool)
 
 var (
-	_ c.Filterable[any, Loop[any], loop.Loop[any]]  = (Loop[any])(nil)
-	_ c.Convertable[any, Loop[any], loop.Loop[any]] = (Loop[any])(nil)
+// _ c.Filterable[any]  = (Loop[any])(nil)
+// _ c.Convertable[any] = (Loop[any])(nil)
 )
 
 // All is used to iterate through the loop using `for ... range`.
@@ -93,22 +92,22 @@ func (next Loop[T]) HasAny(predicate func(T) bool) bool {
 	return HasAny(next, predicate)
 }
 
-// Filt creates a loop that checks elements by the 'filter' function and returns successful ones.
+// Filt creates a seq that checks elements by the 'filter' function and returns successful ones.
 func (next Loop[T]) Filt(filter func(T) (bool, error)) loop.Loop[T] {
 	return Filt(next, filter)
 }
 
-// Filter creates a loop that checks elements by the 'filter' function and returns successful ones.
+// Filter creates a seq that checks elements by the 'filter' function and returns successful ones.
 func (next Loop[T]) Filter(filter func(T) bool) Loop[T] {
 	return Filter(next, filter)
 }
 
-// Convert creates a loop that applies the 'converter' function to iterable elements.
+// Convert creates a seq that applies the 'converter' function to iterable elements.
 func (next Loop[T]) Convert(converter func(T) T) Loop[T] {
 	return Convert(next, converter)
 }
 
-// Conv creates a loop that applies the 'converter' function to iterable elements.
+// Conv creates a seq that applies the 'converter' function to iterable elements.
 func (next Loop[T]) Conv(converter func(T) (T, error)) loop.Loop[T] {
 	return Conv(next, converter)
 }

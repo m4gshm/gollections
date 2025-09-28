@@ -40,7 +40,7 @@ func (m Map[K, V]) All(consumer func(K, V) bool) {
 	map_.TrackOrderedWhile(m.order, m.elements, consumer)
 }
 
-// Loop creates a loop to iterate through the collection.
+// Loop creates a seq to iterate through the collection.
 //
 // Deprecated: replaced by [Map.All].
 func (m Map[K, V]) Loop() kvloop.Loop[K, V] {
@@ -144,73 +144,73 @@ func (m Map[K, V]) TrackEach(consumer func(K, V)) {
 	map_.TrackEachOrdered(m.order, m.elements, consumer)
 }
 
-// FilterKey returns a loop consisting of key/value pairs where the key satisfies the condition of the 'predicate' function
+// FilterKey returns a seq consisting of key/value pairs where the key satisfies the condition of the 'predicate' function
 func (m Map[K, V]) FilterKey(predicate func(K) bool) kvloop.Loop[K, V] {
 	h := m.Head()
 	return kvloop.Filter(h.Next, filter.Key[V](predicate))
 }
 
-// FiltKey returns a loop consisting of key/value pairs where the key satisfies the condition of the 'predicate' function
+// FiltKey returns a seq consisting of key/value pairs where the key satisfies the condition of the 'predicate' function
 func (m Map[K, V]) FiltKey(predicate func(K) (bool, error)) breakLoop.Loop[K, V] {
 	h := m.Head()
 	return kvloop.Filt(h.Next, breakMapFilter.Key[V](predicate))
 }
 
-// ConvertKey returns a loop that applies the 'converter' function to keys of the map
+// ConvertKey returns a seq that applies the 'converter' function to keys of the map
 func (m Map[K, V]) ConvertKey(by func(K) K) kvloop.Loop[K, V] {
 	h := m.Head()
 	return kvloop.Convert(h.Next, convert.Key[V](by))
 }
 
-// ConvKey returns a loop that applies the 'converter' function to keys of the map
+// ConvKey returns a seq that applies the 'converter' function to keys of the map
 func (m Map[K, V]) ConvKey(converter func(K) (K, error)) breakLoop.Loop[K, V] {
 	h := m.Head()
 	return kvloop.Conv(h.Next, breakMapConvert.Key[V](converter))
 }
 
-// FilterValue returns a loop consisting of key/value pairs where the value satisfies the condition of the 'predicate' function
+// FilterValue returns a seq consisting of key/value pairs where the value satisfies the condition of the 'predicate' function
 func (m Map[K, V]) FilterValue(predicate func(V) bool) kvloop.Loop[K, V] {
 	h := m.Head()
 	return kvloop.Filter(h.Next, filter.Value[K](predicate))
 }
 
-// FiltValue returns a breakable loop consisting of key/value pairs where the value satisfies the condition of the 'predicate' function
+// FiltValue returns a errorable seq consisting of key/value pairs where the value satisfies the condition of the 'predicate' function
 func (m Map[K, V]) FiltValue(predicate func(V) (bool, error)) breakLoop.Loop[K, V] {
 	h := m.Head()
 	return kvloop.Filt(h.Next, breakMapFilter.Value[K](predicate))
 }
 
-// ConvertValue returns a loop that applies the 'converter' function to values of the map
+// ConvertValue returns a seq that applies the 'converter' function to values of the map
 func (m Map[K, V]) ConvertValue(converter func(V) V) kvloop.Loop[K, V] {
 	h := m.Head()
 	return kvloop.Convert(h.Next, convert.Value[K](converter))
 }
 
-// ConvValue returns a breakable loop that applies the 'converter' function to values of the map
+// ConvValue returns a errorable seq that applies the 'converter' function to values of the map
 func (m Map[K, V]) ConvValue(converter func(V) (V, error)) breakLoop.Loop[K, V] {
 	h := m.Head()
 	return kvloop.Conv(h.Next, breakMapConvert.Value[K](converter))
 }
 
-// Filter returns a loop consisting of elements that satisfy the condition of the 'predicate' function
+// Filter returns a seq consisting of elements that satisfy the condition of the 'predicate' function
 func (m Map[K, V]) Filter(predicate func(K, V) bool) kvloop.Loop[K, V] {
 	h := m.Head()
 	return kvloop.Filter(h.Next, predicate)
 }
 
-// Filt returns a breakable loop consisting of elements that satisfy the condition of the 'predicate' function
+// Filt returns a errorable seq consisting of elements that satisfy the condition of the 'predicate' function
 func (m Map[K, V]) Filt(predicate func(K, V) (bool, error)) breakLoop.Loop[K, V] {
 	h := m.Head()
 	return kvloop.Filt(h.Next, predicate)
 }
 
-// Convert returns a loop that applies the 'converter' function to the collection elements
+// Convert returns a seq that applies the 'converter' function to the collection elements
 func (m Map[K, V]) Convert(converter func(K, V) (K, V)) kvloop.Loop[K, V] {
 	h := m.Head()
 	return kvloop.Convert(h.Next, converter)
 }
 
-// Conv returns a breakable loop that applies the 'converter' function to the collection elements
+// Conv returns a errorable seq that applies the 'converter' function to the collection elements
 func (m Map[K, V]) Conv(converter func(K, V) (K, V, error)) breakLoop.Loop[K, V] {
 	h := m.Head()
 	return kvloop.Conv(h.Next, converter)

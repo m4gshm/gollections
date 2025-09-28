@@ -12,7 +12,6 @@ import (
 func Test_MapKeys_Zero_Safety(t *testing.T) {
 	var collection immutable.MapKeys[int, string]
 
-	collection.Loop()
 	collection.Head()
 	collection.Convert(func(i int) int { return i })
 	collection.Filter(func(_ int) bool { return true })

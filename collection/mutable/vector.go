@@ -4,10 +4,8 @@ import (
 	"fmt"
 	"sort"
 
-	breakLoop "github.com/m4gshm/gollections/break/loop"
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/collection"
-	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/notsafe"
 	"github.com/m4gshm/gollections/seq"
 	"github.com/m4gshm/gollections/slice"
@@ -23,15 +21,15 @@ func WrapVector[T any](elements []T) *Vector[T] {
 type Vector[T any] []T
 
 var (
-	_ c.Addable[any]             = (*Vector[any])(nil)
-	_ c.AddableAll[seq.Seq[any]] = (*Vector[any])(nil)
-	_ c.Deleteable[int]          = (*Vector[any])(nil)
-	_ c.DeleteableVerify[int]    = (*Vector[any])(nil)
-	_ c.Settable[int, any]       = (*Vector[any])(nil)
-	_ c.SettableNew[int, any]    = (*Vector[any])(nil)
-	_ c.OrderedRange[any]        = (*Vector[any])(nil)
-	_ collection.Vector[any]     = (*Vector[any])(nil)
-	_ fmt.Stringer               = (*Vector[any])(nil)
+	_ c.Addable[any]                    = (*Vector[any])(nil)
+	_ c.AddableAll[collection.Seq[any]] = (*Vector[any])(nil)
+	_ c.Deleteable[int]                 = (*Vector[any])(nil)
+	_ c.DeleteableVerify[int]           = (*Vector[any])(nil)
+	_ c.Settable[int, any]              = (*Vector[any])(nil)
+	_ c.SettableNew[int, any]           = (*Vector[any])(nil)
+	_ c.OrderedRange[any]               = (*Vector[any])(nil)
+	_ collection.Vector[any]            = (*Vector[any])(nil)
+	_ fmt.Stringer                      = (*Vector[any])(nil)
 )
 
 // All is used to iterate through the collection using `for e := range`.
@@ -48,50 +46,24 @@ func (v *Vector[T]) IAll(consumer func(int, T) bool) {
 	}
 }
 
-// Loop creates a loop to iterate through the collection.
-//
-// Deprecated: replaced by [Vector.All].
-func (v *Vector[T]) Loop() loop.Loop[T] {
-	if v == nil {
-		return nil
-	}
-	return loop.Of(*v...)
-}
-
 // Head creates an iterator to iterate through the collection.
 //
 // Deprecated: replaced by [Vector.All].
-func (v *Vector[T]) Head() *SliceIter[T] {
-	return NewHead(v, v.DeleteActualOne)
+func (v *Vector[T]) Head() (t T, ok bool) {
+	if v == nil {
+		return t, false
+	}
+	return collection.Head(v)
 }
 
 // Tail creates an iterator pointing to the end of the collection
 //
 // Deprecated: Tail is deprecated. Will be replaced by a rance-over function iterator.
-func (v *Vector[T]) Tail() *SliceIter[T] {
-	return NewTail(v, v.DeleteActualOne)
-}
-
-// First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
-// If no more elements then ok==false.
-//
-// Deprecated: replaced by [Vector.All].
-func (v *Vector[T]) First() (*SliceIter[T], T, bool) {
-	var (
-		iterator  = NewHead(v, v.DeleteActualOne)
-		first, ok = iterator.Next()
-	)
-	return iterator, first, ok
-}
-
-// Last returns the latest element of the collection, an iterator to reverse iterate over the remaining elements, and true\false marker of availability previous elements.
-// If no more elements then ok==false.
-func (v *Vector[T]) Last() (*SliceIter[T], T, bool) {
-	var (
-		iterator  = NewTail(v, v.DeleteActualOne)
-		first, ok = iterator.Prev()
-	)
-	return iterator, first, ok
+func (v *Vector[T]) Tail() (t T, ok bool) {
+	if v == nil {
+		return t, false
+	}
+	return slice.Tail(*v)
 }
 
 // Slice collects the elements to a slice
@@ -181,7 +153,7 @@ func (v *Vector[T]) AddOne(element T) {
 }
 
 // AddAll inserts all elements from the "other" collection
-func (v *Vector[T]) AddAll(other seq.Seq[T]) {
+func (v *Vector[T]) AddAll(other collection.Seq[T]) {
 	if v != nil {
 		seq.ForEach(other, func(element T) { *v = append(*v, element) })
 	}
@@ -291,24 +263,24 @@ func (v *Vector[T]) SetNew(index int, value T) bool {
 	return true
 }
 
-// Filter returns a loop consisting of vector elements matching the filter
-func (v *Vector[T]) Filter(filter func(T) bool) loop.Loop[T] {
-	return loop.Filter(v.Loop(), filter)
+// Filter returns a seq consisting of vector elements matching the filter
+func (v *Vector[T]) Filter(filter func(T) bool) collection.Seq[T] {
+	return collection.Filter(v, filter)
 }
 
-// Filt returns a breakable loop consisting of elements that satisfy the condition of the 'predicate' function
-func (v *Vector[T]) Filt(predicate func(T) (bool, error)) breakLoop.Loop[T] {
-	return loop.Filt(v.Loop(), predicate)
+// Filt returns a errorable seq consisting of elements that satisfy the condition of the 'predicate' function
+func (v *Vector[T]) Filt(predicate func(T) (bool, error)) collection.SeqE[T] {
+	return collection.Filt(v, predicate)
 }
 
-// Convert returns a loop that applies the 'converter' function to the collection elements
-func (v *Vector[T]) Convert(converter func(T) T) loop.Loop[T] {
-	return loop.Convert(v.Loop(), converter)
+// Convert returns a seq that applies the 'converter' function to the collection elements
+func (v *Vector[T]) Convert(converter func(T) T) collection.Seq[T] {
+	return collection.Convert(v, converter)
 }
 
-// Conv returns a breakable loop that applies the 'converter' function to the collection elements
-func (v *Vector[T]) Conv(converter func(T) (T, error)) breakLoop.Loop[T] {
-	return loop.Conv(v.Loop(), converter)
+// Conv returns a errorable seq that applies the 'converter' function to the collection elements
+func (v *Vector[T]) Conv(converter func(T) (T, error)) collection.SeqE[T] {
+	return collection.Conv(v, converter)
 }
 
 // Reduce reduces the elements into an one using the 'merge' function
