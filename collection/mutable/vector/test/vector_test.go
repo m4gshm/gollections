@@ -7,19 +7,12 @@ import (
 
 	"github.com/m4gshm/gollections/collection/mutable"
 	"github.com/m4gshm/gollections/collection/mutable/vector"
-	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/seq"
 
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/range_"
-	"github.com/m4gshm/gollections/walk/group"
 )
-
-func Test_Vector_From(t *testing.T) {
-	set := vector.From(loop.Of(1, 1, 2, 2, 3, 4, 3, 2, 1))
-	assert.Equal(t, slice.Of(1, 1, 2, 2, 3, 4, 3, 2, 1), set.Slice())
-}
 
 func Test_VectorIterate(t *testing.T) {
 	expected := slice.Of(1, 2, 3, 4)
@@ -84,9 +77,7 @@ func Test_Vector_Nil(t *testing.T) {
 	vec.IsEmpty()
 	vec.Len()
 
-	vec.For(nil)
 	vec.ForEach(nil)
-	vec.Track(nil)
 	vec.TrackEach(nil)
 
 	assert.Equal(t, nils, vec.Slice())
@@ -118,9 +109,7 @@ func Test_Vector_Zero(t *testing.T) {
 	l := vec.Len()
 	assert.Equal(t, 4, l)
 
-	vec.For(func(_ string) error { return nil })
 	vec.ForEach(func(_ string) {})
-	vec.Track(func(_ int, _ string) error { return nil })
 	vec.TrackEach(func(_ int, _ string) {})
 
 	assert.Equal(t, slice.Of("a", "b", "c", "d"), vec.Slice())
@@ -154,9 +143,7 @@ func Test_Vector_new(t *testing.T) {
 	l := vec.Len()
 	assert.Equal(t, 4, l)
 
-	vec.For(func(_ string) error { return nil })
 	vec.ForEach(func(_ string) {})
-	vec.Track(func(_ int, _ string) error { return nil })
 	vec.TrackEach(func(_ int, _ string) {})
 
 	assert.Equal(t, slice.Of("a", "b", "c", "d"), vec.Slice())
@@ -252,12 +239,4 @@ func Test_Vector_Set(t *testing.T) {
 func Test_Vector_FilterMapReduce(t *testing.T) {
 	s := vector.Of(1, 1, 2, 4, 3, 4).Filter(func(i int) bool { return i%2 == 0 }).Convert(func(i int) int { return i * 2 }).Reduce(op.Sum[int])
 	assert.Equal(t, 20, s)
-}
-
-func Test_Vector_Group(t *testing.T) {
-	groups := group.Of(vector.Of(0, 1, 1, 2, 4, 3, 1, 6, 7), func(e int) bool { return e%2 == 0 })
-
-	assert.Equal(t, len(groups), 2)
-	assert.Equal(t, []int{1, 1, 3, 1, 7}, groups[false])
-	assert.Equal(t, []int{0, 2, 4, 6}, groups[true])
 }

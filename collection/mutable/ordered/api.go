@@ -3,8 +3,6 @@ package ordered
 
 import (
 	"github.com/m4gshm/gollections/c"
-	kvloop "github.com/m4gshm/gollections/kv/loop"
-	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/seq"
 	"github.com/m4gshm/gollections/slice/clone"
 )
@@ -17,14 +15,6 @@ func NewSet[T comparable](elements ...T) *Set[T] {
 // NewSetCap creates a set with a predefined capacity
 func NewSetCap[T comparable](capacity int) *Set[T] {
 	return WrapSet(make([]T, 0, capacity), make(map[T]int, capacity))
-}
-
-// SetFromLoop creates a set with elements retrieved by the 'next' function.
-// The next returns an element with true or zero value with false if there are no more elements.
-//
-// Deprecated: replaced by [SetFromSeq].
-func SetFromLoop[T comparable](next func() (T, bool)) *Set[T] {
-	return SetFromSeq((loop.Loop[T])(next).All)
 }
 
 // SetFromSeq creates a set with elements retrieved by the seq.
@@ -68,13 +58,6 @@ func NewMapOf[K comparable, V any](order []K, elements map[K]V) *Map[K, V] {
 		uniques[key] = elements[key]
 	}
 	return WrapMap(clone.Of(order), uniques)
-}
-
-// MapFromLoop creates a map with elements retrieved converter the 'next' function.
-//
-// Deprecated: replaced by [MapFromSeq2].
-func MapFromLoop[K comparable, V any](next func() (K, V, bool)) *Map[K, V] {
-	return MapFromSeq2(kvloop.Loop[K, V](next).All)
 }
 
 // MapFromSeq2 creates a map with elements retrieved by the seq.

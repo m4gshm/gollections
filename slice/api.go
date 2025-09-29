@@ -12,18 +12,11 @@ import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/comparer"
 	"github.com/m4gshm/gollections/convert"
-	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_/resolv"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/op/check"
 	"github.com/m4gshm/gollections/op/check/not"
 )
-
-// Break is the 'break' statement of the For, Track methods
-var Break = loop.Break
-
-// Continue is an alias of the nil value used to continue iterating by For, Track methods.
-var Continue = c.Continue
 
 // Seq is an alias of an iterator-function that allows to iterate over elements of a sequence, such as slice.
 type Seq[T any] = func(yield func(T) bool)
@@ -36,15 +29,6 @@ func Of[T any](elements ...T) []T { return elements }
 // Len return the length of the 'elements' slice
 func Len[TS ~[]T, T any](elements TS) int {
 	return len(elements)
-}
-
-// OfLoop builds a slice by iterating elements of a source.
-// The hasNext specifies a predicate that tests existing of a next element in the source.
-// The getNext extracts the element.
-//
-// Deprecated: renamed to OfNextGet.
-func OfLoop[S, T any](source S, hasNext func(S) bool, getNext func(S) (T, error)) ([]T, error) {
-	return OfSourceNextGet(source, hasNext, getNext)
 }
 
 // OfNextGet builds a slice by iterating elements of a source.
@@ -895,18 +879,6 @@ func LasttI[TS ~[]T, T any](elements TS, by func(T) (bool, error)) (no T, index 
 	return no, -1, nil
 }
 
-// Track applies the 'consumer' function to the elements until the consumer returns the c.Break to stop.tracking
-func Track[TS ~[]T, T any](elements TS, consumer func(int, T) error) error {
-	for i, e := range elements {
-		if err := consumer(i, e); err == Break {
-			return nil
-		} else if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 // TrackEach applies the 'consumer' function to the elements
 func TrackEach[TS ~[]T, T any](elements TS, consumer func(int, T)) {
 	for i, e := range elements {
@@ -921,18 +893,6 @@ func TrackWhile[TS ~[]T, T any](elements TS, predicate func(int, T) bool) {
 			break
 		}
 	}
-}
-
-// For applies the 'consumer' function for the elements until the consumer returns the c.Break to stop.
-func For[TS ~[]T, T any](elements TS, consumer func(T) error) error {
-	for _, e := range elements {
-		if err := consumer(e); err == Break {
-			return nil
-		} else if err != nil {
-			return err
-		}
-	}
-	return nil
 }
 
 // WalkWhile applies the 'predicate' function for the elements until the predicate returns false to stop.

@@ -49,22 +49,6 @@ func (m *Map[K, V]) Head() (K, V, bool) {
 	return seq2.Head(m.All)
 }
 
-// First returns the first key/value pair of the map, an iterator to iterate over the remaining pair, and true\false marker of availability next pairs.
-// If no more then ok==false.
-//
-// Deprecated: replaced by [Map.All].
-func (m *Map[K, V]) First() (map_.Iter[K, V], K, V, bool) {
-	var out map[K]V
-	if m != nil {
-		out = *m
-	}
-	var (
-		iterator           = map_.NewIter(out)
-		firstK, firstV, ok = iterator.Next()
-	)
-	return iterator, firstK, firstV, ok
-}
-
 // Map collects the key/value pairs into a new map
 func (m *Map[K, V]) Map() (out map[K]V) {
 	if m == nil {

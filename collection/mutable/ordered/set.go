@@ -47,9 +47,6 @@ func (s *Set[T]) IAll(consumer func(int, T) bool) {
 	}
 }
 
-// Head creates an iterator to iterate through the collection.
-//
-// Deprecated: replaced by [Set.All].
 func (s *Set[T]) Head() (T, bool) {
 	return collection.Head(s)
 }
@@ -209,18 +206,6 @@ func (s *Set[T]) DeleteActualOne(element T) bool {
 		}
 	}
 	return false
-}
-
-// For applies the 'consumer' function for the elements until the consumer returns the c.Break to stop.
-func (s *Set[T]) For(consumer func(T) error) error {
-	if s == nil {
-		return nil
-	}
-	order := s.order
-	if order == nil {
-		return nil
-	}
-	return slice.For(*order, consumer)
 }
 
 // ForEach applies the 'consumer' function for every element

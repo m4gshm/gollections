@@ -45,7 +45,6 @@ type Values[V any] interface {
 // Collection is the base interface of non-associative collections
 type Collection[T any] interface {
 	Range[T]
-	For[T]
 	ForEach[T]
 	SliceFactory[T]
 
@@ -83,7 +82,6 @@ type Iterator[T any] interface {
 	// If ok == false, then the iteration must be completed.
 	Next() (out T, ok bool)
 
-	For[T]
 	ForEach[T]
 	Range[T]
 }
@@ -107,28 +105,12 @@ type DelIterator[T any] interface {
 	Delete()
 }
 
-// For is the interface of a collection that provides traversing of the elements.
-//
-// Deprecated: obsolete.
-type For[IT any] interface {
-	//For takes elements of the collection. Can be interrupt by returning Break.
-	For(func(element IT) error) error
-}
-
 // ForEach is the interface of a collection that provides traversing of the elements without error checking.
 //
 // Deprecated: obsolete.
 type ForEach[T any] interface {
 	// ForEach takes all elements of the collection
 	ForEach(func(element T))
-}
-
-// Track is the interface of a collection that provides traversing of the elements with position tracking (index, key, coordinates, etc.).
-//
-// Deprecated: obsolete.
-type Track[P any, T any] interface {
-	// return Break for loop breaking
-	Track(func(position P, element T) error) error
 }
 
 // TrackEach is the interface of a collection that provides traversing of the elements with position tracking (index, key, coordinates, etc.) without error checking.

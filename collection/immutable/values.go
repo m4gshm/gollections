@@ -31,9 +31,6 @@ func (m MapValues[K, V]) All(consumer func(V) bool) {
 	map_.TrackValuesWhile(m.elements, consumer)
 }
 
-// Head creates an iterator to iterate through the collection.
-//
-// Deprecated: replaced by [MapValues.All].
 func (m MapValues[K, V]) Head() (V, bool) {
 	return collection.Head(m)
 }

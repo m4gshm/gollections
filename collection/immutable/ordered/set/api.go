@@ -19,11 +19,6 @@ func New[T comparable](elements []T) ordered.Set[T] {
 	return ordered.NewSet(elements...)
 }
 
-// From instantiates a set with elements retrieved by the 'next' function
-func From[T comparable](next func() (T, bool)) ordered.Set[T] {
-	return ordered.SetFromLoop(next)
-}
-
 // FromSeq instantiates a set with elements retrieved by the seq.
 func FromSeq[T comparable](seq seq.Seq[T]) ordered.Set[T] {
 	return ordered.SetFromSeq(seq)

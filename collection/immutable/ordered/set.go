@@ -68,11 +68,6 @@ func (s Set[T]) IsEmpty() bool {
 	return collection.IsEmpty(s)
 }
 
-// For applies the 'consumer' function for every element until the consumer returns the c.Break to stop.
-func (s Set[T]) For(consumer func(T) error) error {
-	return slice.For(s.order, consumer)
-}
-
 // ForEach applies the 'consumer' function for every element
 func (s Set[T]) ForEach(consumer func(T)) {
 	slice.ForEach(s.order, consumer)

@@ -10,7 +10,6 @@ import (
 	"github.com/m4gshm/gollections/collection/mutable/ordered"
 	omap "github.com/m4gshm/gollections/collection/mutable/ordered/map_"
 	"github.com/m4gshm/gollections/k"
-	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/seq"
 	"github.com/m4gshm/gollections/slice"
@@ -18,11 +17,6 @@ import (
 
 func Test_Map_Of(t *testing.T) {
 	m := omap.Of(k.V(1, "1"), k.V(1, "1"), k.V(2, "2"), k.V(4, "4"), k.V(3, "3"), k.V(1, "1"))
-	iterCheck(t, m)
-}
-
-func Test_Map_From(t *testing.T) {
-	m := omap.From(loop.KeyValue(loop.Of(k.V(1, "1"), k.V(1, "1"), k.V(2, "2"), k.V(4, "4"), k.V(3, "3"), k.V(1, "1")), c.KV[int, string].Key, c.KV[int, string].Value))
 	iterCheck(t, m)
 }
 
@@ -94,7 +88,6 @@ func Test_Map_Nil(t *testing.T) {
 	m.ConvertValue(nil).TrackEach(nil)
 	m.Filter(nil).Convert(nil).TrackEach(nil)
 
-	m.Keys().For(nil)
 	m.Keys().ForEach(nil)
 	m.Values().For(nil)
 	m.Values().ForEach(nil)
@@ -135,7 +128,6 @@ func Test_Map_Zero(t *testing.T) {
 	m.ConvertValue(func(s string) string { return s }).TrackEach(func(_, _ string) {})
 	m.Filter(func(_, _ string) bool { return true }).Convert(func(s1, s2 string) (string, string) { return s1, s2 }).TrackEach(func(_, _ string) {})
 
-	m.Keys().For(func(_ string) error { return nil })
 	m.Keys().ForEach(func(_ string) {})
 	m.Keys().Convert(func(s string) string { return s }).Slice()
 	// m.Keys().Convert(func(s string) string { return s }).For(func(_ string) error { return nil })
@@ -182,7 +174,6 @@ func Test_Map_new(t *testing.T) {
 	m.ConvertValue(func(s string) string { return s }).TrackEach(func(_, _ string) {})
 	m.Filter(func(_, _ string) bool { return true }).Convert(func(s1, s2 string) (string, string) { return s1, s2 }).TrackEach(func(_, _ string) {})
 
-	m.Keys().For(func(_ string) error { return nil })
 	m.Keys().ForEach(func(_ string) {})
 	m.Keys().Convert(func(s string) string { return s }).Slice()
 	m.Keys().Convert(func(s string) string { return s }).ForEach(func(_ string) {})

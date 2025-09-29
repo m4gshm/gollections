@@ -24,14 +24,6 @@ func NewCap[T any](capacity int) *mutable.Vector[T] {
 	return mutable.NewVectorCap[T](capacity)
 }
 
-// From instantiates a vector with elements retrieved by the 'next' function.
-// The next returns an element with true or zero value with false if there are no more elements.
-//
-// Deprecated: replaced by [FromSeq].
-func From[T any](next func() (T, bool)) *mutable.Vector[T] {
-	return mutable.VectorFromLoop(next)
-}
-
 // FromSeq creates a vector with elements retrieved by the seq.
 func FromSeq[T any](seq seq.Seq[T]) *mutable.Vector[T] {
 	return mutable.VectorFromSeq(seq)

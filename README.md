@@ -786,12 +786,7 @@ var i []int = seq.Slice(seq.Flat(seq.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...), as.
 Legacy iterators API based on the following functions:
 
 ``` go
-type (
-    Loop[T any]           func() (element T, ok bool)
-    KVLoop[K, V any]      func() (key K, value V, ok bool)
-    BreakLoop[T any]      func() (element T, ok bool, err error)
-    BreakKVLoop[K, V any] func() (key K, value V, ok bool, err error)
-)
+Unresolved directive in readme.adoc - include::../examples/loopexamples/type.go[lines=2..9,indent=0]
 ```
 
 The `Loop` function returns a next element from a dataset and returns
@@ -800,17 +795,14 @@ the dataset.
 The `KVLoop` behaves similar but returns key/value pairs.  
 
 ``` go
-even := func(i int) bool { return i%2 == 0 }
-seq := loop.Convert(loop.Filter(loop.Of(1, 2, 3, 4), even), strconv.Itoa)
-var result []string = seq.Slice() //[2 4]
+Unresolved directive in readme.adoc - include::../examples/loopexamples/loop_filter_convert_reduce_test.go[lines=13..17,indent=0]
 ```
 
 `BreakLoop` and `BreakKVLoop` are used for sources that can issue an
 error.
 
 ``` go
-intSeq := loop.Conv(loop.Of("1", "2", "3", "ddd4", "5"), strconv.Atoi)
-ints, err := loop.Slice(intSeq) //[1 2 3], invalid syntax
+Unresolved directive in readme.adoc - include::../examples/loopexamples/breakloop/loop_filter_convert_reduce_test.go[lines=13..16,indent=0]
 ```
 
 The API in most cases is similar to the [slice](./slice/api.go) API but
@@ -826,29 +818,20 @@ result but only return a loop provider. The loop provider is type with a
 
 ``` go
 import "github.com/m4gshm/gollections/loop"
-
-var (
-    ints    = loop.Of(1, 2, 3)
-    strings = loop.S([]string{"a", "b", "c"})
-)
+Unresolved directive in readme.adoc - include::../examples/loopexamples/loop_Of_loop_S_test.go[lines=12..17,indent=0]
 ```
 
 ##### range\_.Of
 
 ``` go
 import "github.com/m4gshm/gollections/loop/range_"
-
-var increasing = range_.Of(-1, 3).Slice()    //[]int{-1, 0, 1, 2}
-var decreasing = range_.Of('e', 'a').Slice() //[]rune{'e', 'd', 'c', 'b'}
-var nothing = range_.Of(1, 1).Slice()        //nil
+Unresolved directive in readme.adoc - include::../examples/loopexamples/range_Of_test.go[lines=11..15,indent=0]
 ```
 
 ##### range\_.Closed
 
 ``` go
-var increasing = range_.Closed(-1, 3).Slice()    //[]int{-1, 0, 1, 2, 3}
-var decreasing = range_.Closed('e', 'a').Slice() //[]rune{'e', 'd', 'c', 'b', 'a'}
-var one = range_.Closed(1, 1).Slice()            //[]int{1}
+Unresolved directive in readme.adoc - include::../examples/loopexamples/range_Closed_test.go[lines=12..16,indent=0]
 ```
 
 #### Collectors
@@ -856,9 +839,7 @@ var one = range_.Closed(1, 1).Slice()            //[]int{1}
 ##### loop.Slice
 
 ``` go
-filter := func(u User) bool { return u.age <= 30 }
-names := loop.Slice(loop.Convert(loop.Filter(loop.Of(users...), filter), User.Name))
-//[Bob Tom]
+Unresolved directive in readme.adoc - include::../examples/loopexamples/loop_Slice_test.go[lines=12..16,indent=0]
 ```
 
 ##### group.Of
@@ -870,12 +851,7 @@ import (
     "github.com/m4gshm/gollections/loop"
     "github.com/m4gshm/gollections/loop/group"
 )
-
-var ageGroups map[string][]User = group.Of(loop.Of(users...), func(u User) string {
-    return use.If(u.age <= 20, "<=20").If(u.age <= 30, "<=30").Else(">30")
-}, as.Is)
-
-//map[<=20:[{Tom 18 []}] <=30:[{Bob 26 []}] >30:[{Alice 35 []} {Chris 41 []}]]
+Unresolved directive in readme.adoc - include::../examples/loopexamples/group_Of_test.go[lines=17..23,indent=0]
 ```
 
 ##### loop.Map, loop.MapResolv
@@ -886,14 +862,7 @@ import (
     "github.com/m4gshm/gollections/op"
     "github.com/m4gshm/gollections/loop"
 )
-
-var ageGroupedSortedNames map[string][]string
-
-ageGroupedSortedNames = loop.MapResolv(loop.Of(users...), func(u User) string {
-    return op.IfElse(u.age <= 30, "<=30", ">30")
-}, User.Name, resolv.SortedSlice)
-
-//map[<=30:[Bob Tom] >30:[Alice Chris]]
+Unresolved directive in readme.adoc - include::../examples/loopexamples/loop_ToMapResolv_test.go[lines=14..22,indent=0]
 ```
 
 #### Reducers
@@ -905,28 +874,19 @@ import (
     "github.com/m4gshm/gollections/loop"
     "github.com/m4gshm/gollections/loop/sum"
 )
-
-var sum = sum.Of(loop.Of(1, 2, 3, 4, 5, 6)) //21
+Unresolved directive in readme.adoc - include::../examples/loopexamples/sum_Of_test.go[lines=13..15,indent=0]
 ```
 
 ##### loop.Reduce
 
 ``` go
-var sum = loop.Reduce(loop.Of(1, 2, 3, 4, 5, 6), func(i1, i2 int) int { return i1 + i2 })
-//21
+Unresolved directive in readme.adoc - include::../examples/loopexamples/loop_Reduce_test.go[lines=12..15,indent=0]
 ```
 
 ##### loop.ReduceOK
 
 ``` go
-adder := func(i1, i2 int) int { return i1 + i2 }
-
-sum, ok := loop.ReduceOK(loop.Of(1, 2, 3, 4, 5, 6), adder)
-//21, true
-
-emptyLoop := loop.Of[int]()
-sum, ok = loop.ReduceOK(emptyLoop, adder)
-//0, false
+Unresolved directive in readme.adoc - include::../examples/loopexamples/loop_ReduceOK_test.go[lines=12..21,indent=0]
 ```
 
 ##### loop.Accum
@@ -936,9 +896,7 @@ import (
     "github.com/m4gshm/gollections/loop"
     "github.com/m4gshm/gollections/op"
 )
-
-var sum = loop.Accum(100, loop.Of(1, 2, 3, 4, 5, 6), op.Sum)
-//121
+Unresolved directive in readme.adoc - include::../examples/loopexamples/loop_Accum_test.go[lines=13..16,indent=0]
 ```
 
 ##### loop.First
@@ -948,8 +906,7 @@ import (
     "github.com/m4gshm/gollections/predicate/more"
     "github.com/m4gshm/gollections/loop"
 )
-
-result, ok := loop.First(loop.Of(1, 3, 5, 7, 9, 11), more.Than(5)) //7, true
+Unresolved directive in readme.adoc - include::../examples/loopexamples/loop_First_test.go[lines=13..15,indent=0]
 ```
 
 #### Element converters
@@ -957,15 +914,13 @@ result, ok := loop.First(loop.Of(1, 3, 5, 7, 9, 11), more.Than(5)) //7, true
 ##### loop.Convert
 
 ``` go
-var s []string = loop.Convert(loop.Of(1, 3, 5, 7, 9, 11), strconv.Itoa).Slice()
-//[]string{"1", "3", "5", "7", "9", "11"}
+Unresolved directive in readme.adoc - include::../examples/loopexamples/loop_Convert_test.go[lines=12..15,indent=0]
 ```
 
 ##### loop.Conv
 
 ``` go
-result, err := loop.Conv(loop.Of("1", "3", "5", "_7", "9", "11"), strconv.Atoi).Slice()
-//[]int{1, 3, 5}, ErrSyntax
+Unresolved directive in readme.adoc - include::../examples/loopexamples/loop_Conv_test.go[lines=13..16,indent=0]
 ```
 
 #### Loop converters
@@ -978,12 +933,7 @@ import (
     "github.com/m4gshm/gollections/predicate/one"
     "github.com/m4gshm/gollections/loop"
 )
-
-var f1 = loop.Filter(loop.Of(1, 3, 5, 7, 9, 11), one.Of(1, 7).Or(one.Of(11))).Slice()
-//[]int{1, 7, 11}
-
-var f2 = loop.Filter(loop.Of(1, 3, 5, 7, 9, 11), exclude.All(1, 7, 11)).Slice()
-//[]int{3, 5, 9}
+Unresolved directive in readme.adoc - include::../examples/loopexamples/loop_Filter.go[lines=14..20,indent=0]
 ```
 
 ##### loop.Flat
@@ -993,9 +943,7 @@ import (
     "github.com/m4gshm/gollections/convert/as"
     "github.com/m4gshm/gollections/loop"
 )
-
-var i []int = loop.Flat(loop.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...), as.Is).Slice()
-//[]int{1, 2, 3, 4, 5, 6}
+Unresolved directive in readme.adoc - include::../examples/loopexamples/loop_Flat_test.go[lines=13..16,indent=0]
 ```
 
 #### Operations chain functions
@@ -1013,35 +961,20 @@ These functions combine converters, filters and reducers.
 - Using rangefunc `All` like:
 
 ``` go
-   for i := range range_.Of(0, 100).All {
-        doOp(i)
-    }
-
-}
+Unresolved directive in readme.adoc - include::../examples/loopexamples/loop_iterating_go_1_22_test.go[lines=13..17,indent=0]
 ```
 
 - `ForEach` method
 
 ``` go
-next := range_.Of(0, 100)
-for i, ok := next(); ok; i, ok = next() {
-    doOp(i)
-}
+Unresolved directive in readme.adoc - include::../examples/loopexamples/loop_iterating_test.go[lines=12..15,indent=0]
 ```
 
 - or `For` method that can be aborted by returning `Break` for expected
   completion, or another error otherwise.
 
 ``` go
-func Test_Iterating_EmbeddedFor2(t *testing.T) {
-
-    for next, i, ok := range_.Of(0, 100).Crank(); ok; i, ok = next() {
-        doOp(i)
-    }
-
-}
-
-func Test_Iterating_ForEach(t *testing.T) {
+Unresolved directive in readme.adoc - include::../examples/loopexamples/loop_iterating_test.go[lines=19..28,indent=0]
 ```
 
 ## Data structures
@@ -1183,18 +1116,17 @@ The same underlying interfaces but for read-only use cases.
 - Using rangefunc `All` like:
 
 ``` go
-uniques := set.From(range_.Of(0, 100))
-for i := range uniques.All {
-    doOp(i)
+   uniques := set.Of(1, 2, 3, 4, 5, 6)
+    for i := range uniques.All {
+        doOp(i)
+    }
+
 }
 ```
 
 - `ForEach` method
 
 ``` go
-func doOp(i int) {
-
-}
 ```
 
 - or `For` method that can be aborted by returning `Break` for expected

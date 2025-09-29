@@ -20,14 +20,6 @@ func New[T comparable](elements []T) immutable.Set[T] {
 	return immutable.NewSet(elements...)
 }
 
-// From instantiates a map with key/values retrieved by the 'next' function.
-// The next returns a key/value pairs with true or zero values with false if there are no more elements.
-//
-// Deprecated: replaced by [FromSeq].
-func From[T comparable](next func() (T, bool)) immutable.Set[T] {
-	return immutable.SetFromLoop(next)
-}
-
 // FromSeq creates a set with elements retrieved by the seq.
 func FromSeq[T comparable](seq seq.Seq[T]) immutable.Set[T] {
 	return immutable.SetFromSeq(seq)

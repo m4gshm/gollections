@@ -27,9 +27,6 @@ var (
 	_ fmt.Stringer               = (*MapValues[int, any])(nil)
 )
 
-// Head creates an iterator to iterate through the collection.
-//
-// Deprecated: replaced by [MapValues.All].
 func (m MapValues[K, V]) Head() (V, bool) {
 	return collection.Head(m)
 }

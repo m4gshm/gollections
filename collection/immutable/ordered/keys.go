@@ -37,9 +37,6 @@ func (m MapKeys[K]) IAll(consumer func(int, K) bool) {
 	slice.TrackWhile(m.keys, consumer)
 }
 
-// Head creates an iterator to iterate through the collection.
-//
-// Deprecated: replaced by [MapKeys.All].
 func (m MapKeys[K]) Head() (K, bool) {
 	return collection.Head(m)
 }
@@ -68,11 +65,6 @@ func (m MapKeys[K]) Append(out []K) []K {
 		out = append(out, keys...)
 	}
 	return out
-}
-
-// For applies the 'consumer' function for every key until the consumer returns the c.Break to stop.
-func (m MapKeys[K]) For(consumer func(K) error) error {
-	return slice.For(m.keys, consumer)
 }
 
 // ForEach applies the 'consumer' function for every element

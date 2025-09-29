@@ -31,9 +31,6 @@ func (m MapKeys[K, V]) All(consumer func(K) bool) {
 	map_.TrackKeysWhile(m.elements, consumer)
 }
 
-// Head creates an iterator to iterate through the collection.
-//
-// Deprecated: replaced by [MapKeys.All].
 func (m MapKeys[K, V]) Head() (K, bool) {
 	return collection.Head(m)
 }

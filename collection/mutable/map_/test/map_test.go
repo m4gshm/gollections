@@ -12,7 +12,6 @@ import (
 	"github.com/m4gshm/gollections/collection/mutable/ordered"
 	"github.com/m4gshm/gollections/convert/as"
 	"github.com/m4gshm/gollections/k"
-	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/seq"
 	"github.com/m4gshm/gollections/slice"
@@ -20,11 +19,6 @@ import (
 
 func Test_Map_Of(t *testing.T) {
 	m := map_.Of(k.V(1, "1"), k.V(1, "1"), k.V(2, "2"), k.V(4, "4"), k.V(3, "3"), k.V(1, "1"))
-	iterCheck(t, m)
-}
-
-func Test_Map_From(t *testing.T) {
-	m := map_.From(loop.KeyValue(loop.Of(k.V(1, "1"), k.V(1, "1"), k.V(2, "2"), k.V(4, "4"), k.V(3, "3"), k.V(1, "1")), c.KV[int, string].Key, c.KV[int, string].Value))
 	iterCheck(t, m)
 }
 

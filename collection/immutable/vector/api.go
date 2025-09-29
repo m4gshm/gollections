@@ -24,12 +24,6 @@ func Wrap[T any](elements []T) immutable.Vector[T] {
 	return immutable.WrapVector(elements)
 }
 
-// From instantiates a vector with elements retrieved by the 'next' function.
-// The next returns an element with true or zero value with false if there are no more elements.
-func From[T any](next func() (T, bool)) immutable.Vector[T] {
-	return immutable.VectorFromLoop(next)
-}
-
 // Sort copy the specified vector with sorted elements
 func Sort[T any, F constraints.Ordered](v immutable.Vector[T], by func(T) F) immutable.Vector[T] {
 	return collection.Sort[immutable.Vector[T]](v, by)

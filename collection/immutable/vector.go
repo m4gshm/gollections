@@ -38,16 +38,10 @@ func (v Vector[T]) IAll(consumer func(int, T) bool) {
 	slice.TrackWhile(v.elements, consumer)
 }
 
-// Head creates an iterator to iterate through the collection.
-//
-// Deprecated: replaced by [Vector.All].
 func (v Vector[T]) Head() (T, bool) {
 	return collection.Head(v)
 }
 
-// Tail creates an iterator pointing to the end of the collection
-//
-// Deprecated: Tail is deprecated. Will be replaced by a rance-over function iterator.
 func (v Vector[T]) Tail() (T, bool) {
 	return slice.Tail(v.elements)
 }
@@ -83,19 +77,9 @@ func (v Vector[T]) Get(index int) (out T, ok bool) {
 	return slice.Gett(v.elements, index)
 }
 
-// Track applies the 'consumer' function for elements until the consumer returns the c.Break to stop.
-func (v Vector[T]) Track(consumer func(int, T) error) error {
-	return slice.Track(v.elements, consumer)
-}
-
 // TrackEach applies the 'consumer' function for every key/value pairs
 func (v Vector[T]) TrackEach(consumer func(int, T)) {
 	slice.TrackEach(v.elements, consumer)
-}
-
-// For applies the 'consumer' function for the elements until the consumer returns the c.Break to stop.
-func (v Vector[T]) For(consumer func(T) error) error {
-	return slice.For(v.elements, consumer)
 }
 
 // ForEach applies the 'consumer' function for every element

@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	oset "github.com/m4gshm/gollections/collection/immutable/ordered/set"
-	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/seq"
 	"github.com/m4gshm/gollections/slice/range_"
 )
@@ -72,19 +71,6 @@ func Benchmark_Loop_ImmutableOrderSet_ForRange_All(b *testing.B) {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				for v := range c.All {
-					casee.load(v)
-				}
-			}
-		})
-	}
-}
-
-func Benchmark_Loop_Slice_Loop_NextNext(b *testing.B) {
-	for _, casee := range cases {
-		b.Run(casee.name, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
-				next := loop.Of(values...)
-				for v, ok := next(); ok; v, ok = next() {
 					casee.load(v)
 				}
 			}

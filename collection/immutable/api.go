@@ -4,8 +4,6 @@ package immutable
 import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/collection/immutable/ordered"
-	kvloop "github.com/m4gshm/gollections/kv/loop"
-	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/seq"
 	"github.com/m4gshm/gollections/seq2"
@@ -19,15 +17,7 @@ func NewSet[T comparable](elements ...T) Set[T] {
 
 // NewSetOrdered instantiates ordered set and copies elements to it
 func NewSetOrdered[T comparable](elements ...T) ordered.Set[T] {
-	return ordered.NewSet[T](elements...)
-}
-
-// SetFromLoop creates a set with elements retrieved by the 'next' function.
-// The next returns an element with true or zero value with false if there are no more elements.
-//
-// Deprecated: replaced by [SetFromSeq].
-func SetFromLoop[T comparable](next func() (T, bool)) Set[T] {
-	return SetFromSeq((loop.Loop[T])(next).All)
+	return ordered.NewSet(elements...)
 }
 
 // SetFromSeq creates a set with elements retrieved by the seq.
@@ -57,13 +47,6 @@ func NewMapOf[K comparable, V any](elements map[K]V) Map[K, V] {
 	return MapFromSeq2(seq2.OfMap(elements))
 }
 
-// MapFromLoop creates a map with elements retrieved converter the 'next' function.
-//
-// Deprecated: replaced by [MapFromSeq2].
-func MapFromLoop[K comparable, V any](next func() (K, V, bool)) Map[K, V] {
-	return MapFromSeq2(kvloop.Loop[K, V](next).All)
-}
-
 // MapFromSeq2 creates a map with elements retrieved by the seq.
 func MapFromSeq2[K comparable, V any](seq seq.Seq2[K, V]) Map[K, V] {
 	uniques := map[K]V{}
@@ -76,14 +59,6 @@ func MapFromSeq2[K comparable, V any](seq seq.Seq2[K, V]) Map[K, V] {
 // NewVector instantiates Vector populated by the 'elements' slice
 func NewVector[T any](elements ...T) Vector[T] {
 	return WrapVector(slice.Clone(elements))
-}
-
-// VectorFromLoop creates a vector with elements retrieved by the 'next' function.
-// The next returns an element with true or zero value with false if there are no more elements.
-//
-// Deprecated: replaced by [VectorFromLoop].
-func VectorFromLoop[T any](next func() (T, bool)) Vector[T] {
-	return WrapVector(loop.Slice(next))
 }
 
 // VectorFromSeq creates a vector with elements retrieved by the seq.

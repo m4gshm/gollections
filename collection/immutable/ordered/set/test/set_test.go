@@ -8,17 +8,10 @@ import (
 
 	"github.com/m4gshm/gollections/collection/immutable/ordered/set"
 	"github.com/m4gshm/gollections/convert/as"
-	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/seq"
 	"github.com/m4gshm/gollections/slice"
-	"github.com/m4gshm/gollections/walk/group"
 )
-
-func Test_Set_From(t *testing.T) {
-	set := set.From(loop.Of(1, 1, 2, 2, 3, 4, 3, 2, 1))
-	assert.Equal(t, slice.Of(1, 2, 3, 4), set.Slice())
-}
 
 func Test_Set_FromSeq(t *testing.T) {
 	set := set.FromSeq(seq.Of(1, 1, 2, 2, 3, 4, 3, 2, 1))
@@ -67,14 +60,6 @@ func Test_Set_FilterReduce(t *testing.T) {
 func Test_Set_FilterMapReduce(t *testing.T) {
 	s := set.Of(1, 1, 2, 4, 3, 1).Filter(func(i int) bool { return i%2 == 0 }).Convert(func(i int) int { return i * 2 }).Reduce(op.Sum[int])
 	assert.Equal(t, 12, s)
-}
-
-func Test_Set_Group_By_Walker(t *testing.T) {
-	groups := group.Of(set.Of(0, 1, 1, 2, 4, 3, 1, 6, 7), func(e int) bool { return e%2 == 0 })
-
-	assert.Equal(t, len(groups), 2)
-	assert.Equal(t, []int{1, 3, 7}, groups[false])
-	assert.Equal(t, []int{0, 2, 4, 6}, groups[true])
 }
 
 func Test_Set_Group_By_Iterator(t *testing.T) {

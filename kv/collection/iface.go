@@ -10,13 +10,11 @@ type Iterator[K, V any] interface {
 	// The ok result indicates whether the element was returned by the iterator.
 	// If ok == false, then the iteration must be completed.
 	Next() (key K, value V, ok bool)
-	c.Track[K, V]
 	c.TrackEach[K, V]
 }
 
 // Collection is the base interface of associative collections
 type Collection[K comparable, V any, M map[K]V | map[K][]V] interface {
-	c.Track[K, V]
 	c.TrackEach[K, V]
 	c.MapFactory[K, V, M]
 

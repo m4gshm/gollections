@@ -22,7 +22,6 @@ type Collection[T any] interface {
 type Vector[T any] interface {
 	Collection[T]
 
-	c.Track[int, T]
 	c.TrackEach[int, T]
 
 	c.Access[int, T]

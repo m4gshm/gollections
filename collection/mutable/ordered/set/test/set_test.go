@@ -10,17 +10,10 @@ import (
 	"github.com/m4gshm/gollections/collection/mutable/ordered/set"
 	"github.com/m4gshm/gollections/seq"
 
-	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/predicate/eq"
 	"github.com/m4gshm/gollections/slice"
-	"github.com/m4gshm/gollections/walk/group"
 )
-
-func Test_Set_From(t *testing.T) {
-	set := set.From(loop.Of(1, 1, 2, 2, 3, 4, 3, 2, 1))
-	assert.Equal(t, slice.Of(1, 2, 3, 4), set.Slice())
-}
 
 func Test_Set_FromSeq(t *testing.T) {
 	set := set.FromSeq(seq.Of(1, 1, 2, 2, 3, 4, 3, 2, 1))
@@ -101,14 +94,6 @@ func Test_Set_FilterMapReduce(t *testing.T) {
 	assert.Equal(t, 12, s)
 }
 
-func Test_Set_Group(t *testing.T) {
-	groups := group.Of(set.Of(0, 1, 1, 2, 4, 3, 1, 6, 7), func(e int) bool { return e%2 == 0 })
-
-	assert.Equal(t, len(groups), 2)
-	assert.Equal(t, []int{1, 3, 7}, groups[false])
-	assert.Equal(t, []int{0, 2, 4, 6}, groups[true])
-}
-
 func Test_Set_Convert(t *testing.T) {
 	var (
 		ints     = set.Of(3, 3, 1, 1, 1, 5, 6, 8, 8, 0, -2, -2)
@@ -143,7 +128,6 @@ func Test_Set_Nil(t *testing.T) {
 	set.IsEmpty()
 	set.Len()
 
-	_ = set.For(nil)
 	set.ForEach(nil)
 
 	set.Slice()
@@ -170,7 +154,6 @@ func Test_Set_Zero(t *testing.T) {
 	assert.True(t, mset.IsEmpty())
 	assert.Equal(t, 0, mset.Len())
 
-	mset.For(nil)
 	mset.ForEach(nil)
 
 	_, ok := mset.Head()
@@ -196,7 +179,6 @@ func Test_Set_new(t *testing.T) {
 	assert.True(t, mset.IsEmpty())
 	assert.Equal(t, 0, mset.Len())
 
-	mset.For(nil)
 	mset.ForEach(nil)
 
 	_, ok := mset.Head()

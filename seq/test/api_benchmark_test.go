@@ -3,7 +3,6 @@ package test
 import (
 	"testing"
 
-	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/seq"
 	"github.com/m4gshm/gollections/slice/range_"
 )
@@ -31,21 +30,6 @@ func Benchmark_Loop_Seq_Filter_Seq(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		for e := range seq.Filter(seq.Of(values...), even) {
-			_ = e
-		}
-	}
-	b.StopTimer()
-}
-
-func Benchmark_Loop_Loop_Filter_Seq(b *testing.B) {
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		next := loop.Filter(loop.Of(values...), even)
-		for {
-			e, ok := next()
-			if !ok {
-				break
-			}
 			_ = e
 		}
 	}
