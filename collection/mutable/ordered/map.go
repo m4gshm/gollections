@@ -3,16 +3,15 @@ package ordered
 import (
 	"fmt"
 
-	breakLoop "github.com/m4gshm/gollections/break/kv/loop"
-	breakMapFilter "github.com/m4gshm/gollections/break/kv/predicate"
-	breakMapConvert "github.com/m4gshm/gollections/break/map_/convert"
+	converte "github.com/m4gshm/gollections/break/kv/convert"
+	filtere "github.com/m4gshm/gollections/break/kv/predicate"
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/collection/immutable/ordered"
 	"github.com/m4gshm/gollections/kv/convert"
-	"github.com/m4gshm/gollections/kv/loop"
 	filter "github.com/m4gshm/gollections/kv/predicate"
 	"github.com/m4gshm/gollections/map_"
+	"github.com/m4gshm/gollections/seq2"
 	"github.com/m4gshm/gollections/slice"
 )
 
@@ -44,54 +43,8 @@ func (m *Map[K, V]) All(consumer func(K, V) bool) {
 	}
 }
 
-// Loop creates a seq to iterate through the collection.
-//
-// Deprecated: replaced by [Map.All].
-func (m *Map[K, V]) Loop() loop.Loop[K, V] {
-	h := m.Head()
-	return h.Next
-}
-
-// Head creates an iterator to iterate through the collection.
-//
-// Deprecated: replaced by [Map.All].
-func (m *Map[K, V]) Head() ordered.MapIter[K, V] {
-	var (
-		order    []K
-		elements map[K]V
-	)
-	if m != nil {
-		elements = m.elements
-		order = m.order
-	}
-	return ordered.NewMapIter(elements, slice.NewHead(order))
-}
-
-// Tail creates an iterator pointing to the end of the collection
-//
-// Deprecated: Tail is deprecated. Will be replaced by a rance-over function iterator.
-func (m *Map[K, V]) Tail() ordered.MapIter[K, V] {
-	var (
-		order    []K
-		elements map[K]V
-	)
-	if m != nil {
-		elements = m.elements
-		order = m.order
-	}
-	return ordered.NewMapIter(elements, slice.NewTail(order))
-}
-
-// First returns the first key/value pair of the map, an iterator to iterate over the remaining pair, and true\false marker of availability next pairs.
-// If no more then ok==false.
-//
-// Deprecated: replaced by [Map.All].
-func (m *Map[K, V]) First() (ordered.MapIter[K, V], K, V, bool) {
-	var (
-		iterator           = m.Head()
-		firstK, firstV, ok = iterator.Next()
-	)
-	return iterator, firstK, firstV, ok
+func (m *Map[K, V]) Head() (K, V, bool) {
+	return seq2.Head(m.All)
 }
 
 // Map collects the key/value pairs into a new map
@@ -237,63 +190,63 @@ func (m *Map[K, V]) String() string {
 }
 
 // FilterKey returns a seq consisting of key/value pairs where the key satisfies the condition of the 'predicate' function
-func (m *Map[K, V]) FilterKey(predicate func(K) bool) loop.Loop[K, V] {
-	return loop.Filter(m.Loop(), filter.Key[V](predicate))
+func (m *Map[K, V]) FilterKey(predicate func(K) bool) collection.Seq2[K, V] {
+	return seq2.Filter(m.All, filter.Key[V](predicate))
 }
 
 // FiltKey returns a seq consisting of key/value pairs where the key satisfies the condition of the 'predicate' function
-func (m Map[K, V]) FiltKey(predicate func(K) (bool, error)) breakLoop.Loop[K, V] {
-	return loop.Filt(m.Loop(), breakMapFilter.Key[V](predicate))
+func (m *Map[K, V]) FiltKey(predicate func(K) (bool, error)) collection.SeqE[c.KV[K, V]] {
+	return seq2.Filt(m.All, filtere.Key[V](predicate))
 }
 
 // ConvertKey returns a seq that applies the 'converter' function to keys of the map
-func (m *Map[K, V]) ConvertKey(converter func(K) K) loop.Loop[K, V] {
-	return loop.Convert(m.Loop(), convert.Key[V](converter))
+func (m *Map[K, V]) ConvertKey(converter func(K) K) collection.Seq2[K, V] {
+	return seq2.Convert(m.All, convert.Key[V](converter))
 }
 
 // ConvKey returns a seq that applies the 'converter' function to keys of the map
-func (m *Map[K, V]) ConvKey(converter func(K) (K, error)) breakLoop.Loop[K, V] {
-	return loop.Conv(m.Loop(), breakMapConvert.Key[V](converter))
+func (m *Map[K, V]) ConvKey(converter func(K) (K, error)) collection.SeqE[c.KV[K, V]] {
+	return seq2.Conv(m.All, converte.Key[V](converter))
 }
 
 // FilterValue returns a seq consisting of key/value pairs where the value satisfies the condition of the 'predicate' function
-func (m *Map[K, V]) FilterValue(predicate func(V) bool) loop.Loop[K, V] {
-	return loop.Filter(m.Loop(), filter.Value[K](predicate))
+func (m *Map[K, V]) FilterValue(predicate func(V) bool) collection.Seq2[K, V] {
+	return seq2.Filter(m.All, filter.Value[K](predicate))
 }
 
-// FiltValue returns a seq consisting of key/value pairs where the value satisfies the condition of the 'predicate' function
-func (m *Map[K, V]) FiltValue(predicate func(V) (bool, error)) breakLoop.Loop[K, V] {
-	return loop.Filt(m.Loop(), breakMapFilter.Value[K](predicate))
+// FiltValue returns a errorable seq consisting of key/value pairs where the value satisfies the condition of the 'predicate' function
+func (m *Map[K, V]) FiltValue(predicate func(V) (bool, error)) collection.SeqE[c.KV[K, V]] {
+	return seq2.Filt(m.All, filtere.Value[K](predicate))
 }
 
 // ConvertValue returns a seq that applies the 'converter' function to values of the map
-func (m *Map[K, V]) ConvertValue(converter func(V) V) loop.Loop[K, V] {
-	return loop.Convert(m.Loop(), convert.Value[K](converter))
+func (m *Map[K, V]) ConvertValue(converter func(V) V) collection.Seq2[K, V] {
+	return seq2.Convert(m.All, convert.Value[K](converter))
 }
 
-// ConvValue returns a seq that applies the 'converter' function to values of the map
-func (m Map[K, V]) ConvValue(converter func(V) (V, error)) breakLoop.Loop[K, V] {
-	return loop.Conv(m.Loop(), breakMapConvert.Value[K](converter))
+// ConvValue returns a errorable seq that applies the 'converter' function to values of the map
+func (m *Map[K, V]) ConvValue(converter func(V) (V, error)) collection.SeqE[c.KV[K, V]] {
+	return seq2.Conv(m.All, converte.Value[K](converter))
 }
 
 // Filter returns a seq consisting of elements that satisfy the condition of the 'predicate' function
-func (m *Map[K, V]) Filter(predicate func(K, V) bool) loop.Loop[K, V] {
-	return loop.Filter(m.Loop(), predicate)
+func (m *Map[K, V]) Filter(predicate func(K, V) bool) collection.Seq2[K, V] {
+	return seq2.Filter(m.All, predicate)
 }
 
 // Filt returns a errorable seq consisting of elements that satisfy the condition of the 'predicate' function
-func (m *Map[K, V]) Filt(predicate func(K, V) (bool, error)) breakLoop.Loop[K, V] {
-	return loop.Filt(m.Loop(), predicate)
+func (m *Map[K, V]) Filt(predicate func(K, V) (bool, error)) collection.SeqE[c.KV[K, V]] {
+	return seq2.Filt(m.All, predicate)
 }
 
 // Convert returns a seq that applies the 'converter' function to the collection elements
-func (m *Map[K, V]) Convert(converter func(K, V) (K, V)) loop.Loop[K, V] {
-	return loop.Convert(m.Loop(), converter)
+func (m *Map[K, V]) Convert(converter func(K, V) (K, V)) collection.Seq2[K, V] {
+	return seq2.Convert(m.All, converter)
 }
 
 // Conv returns a errorable seq that applies the 'converter' function to the collection elements
-func (m *Map[K, V]) Conv(converter func(K, V) (K, V, error)) breakLoop.Loop[K, V] {
-	return loop.Conv(m.Loop(), converter)
+func (m *Map[K, V]) Conv(converter func(K, V) (K, V, error)) collection.SeqE[c.KV[K, V]] {
+	return seq2.Conv(m.All, converter)
 }
 
 // Reduce reduces the key/value pairs of the map into an one pair using the 'merge' function

@@ -1,9 +1,9 @@
 package loop
 
 import (
+	breakMapConvert "github.com/m4gshm/gollections/break/kv/convert"
 	breakkvloop "github.com/m4gshm/gollections/break/kv/loop"
 	breakMapFilter "github.com/m4gshm/gollections/break/kv/predicate"
-	breakMapConvert "github.com/m4gshm/gollections/break/map_/convert"
 	"github.com/m4gshm/gollections/kv/convert"
 	kvPredicate "github.com/m4gshm/gollections/kv/predicate"
 )

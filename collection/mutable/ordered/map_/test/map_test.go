@@ -81,22 +81,18 @@ func Test_Map_Nil(t *testing.T) {
 	e := m.IsEmpty()
 	assert.True(t, e)
 
-	head, _, _, ok := m.First()
-	assert.False(t, ok)
-
-	head = m.Head()
-	_, _, ok = head.Next()
+	_, _, ok := m.Head()
 	assert.False(t, ok)
 
 	m.Track(nil)
 	m.TrackEach(nil)
 
 	m.Reduce(nil)
-	m.Convert(nil).Track(nil)
-	m.ConvertKey(nil).FiltKey(nil)
-	m.ConvertKey(nil).Track(nil)
-	m.ConvertValue(nil).Track(nil)
-	m.Filter(nil).Convert(nil).Track(nil)
+	m.Convert(nil).TrackEach(nil)
+	// m.ConvertKey(nil).FiltKey(nil)
+	m.ConvertKey(nil).TrackEach(nil)
+	m.ConvertValue(nil).TrackEach(nil)
+	m.Filter(nil).Convert(nil).TrackEach(nil)
 
 	m.Keys().For(nil)
 	m.Keys().ForEach(nil)
@@ -125,23 +121,19 @@ func Test_Map_Zero(t *testing.T) {
 	e := m.IsEmpty()
 	assert.False(t, e)
 
-	head, k, v, ok := m.First()
+	k, v, ok := m.Head()
 	assert.True(t, ok)
 	assert.Equal(t, "a", k)
 	assert.Equal(t, "A", v)
-
-	head = m.Head()
-	_, _, ok = head.Next()
-	assert.True(t, ok)
 
 	m.Track(func(_, _ string) error { return nil })
 	m.TrackEach(func(_, _ string) {})
 
 	m.Reduce(func(k1, v1, k2, v2 string) (string, string) { return k1 + k2, v1 + v2 })
-	m.Convert(func(_, _ string) (string, string) { return k, v }).Track(func(_, _ string) error { return nil })
-	m.ConvertKey(func(s string) string { return s }).Track(func(_, _ string) error { return nil })
-	m.ConvertValue(func(s string) string { return s }).Track(func(_, _ string) error { return nil })
-	m.Filter(func(_, _ string) bool { return true }).Convert(func(s1, s2 string) (string, string) { return s1, s2 }).Track(func(_, _ string) error { return nil })
+	m.Convert(func(_, _ string) (string, string) { return k, v }).TrackEach(func(_, _ string) {})
+	m.ConvertKey(func(s string) string { return s }).TrackEach(func(_, _ string) {})
+	m.ConvertValue(func(s string) string { return s }).TrackEach(func(_, _ string) {})
+	m.Filter(func(_, _ string) bool { return true }).Convert(func(s1, s2 string) (string, string) { return s1, s2 }).TrackEach(func(_, _ string) {})
 
 	m.Keys().For(func(_ string) error { return nil })
 	m.Keys().ForEach(func(_ string) {})
@@ -176,35 +168,31 @@ func Test_Map_new(t *testing.T) {
 	e := m.IsEmpty()
 	assert.False(t, e)
 
-	head, k, v, ok := m.First()
+	k, v, ok := m.Head()
 	assert.True(t, ok)
 	assert.Equal(t, "a", k)
 	assert.Equal(t, "A", v)
-
-	head = m.Head()
-	_, _, ok = head.Next()
-	assert.True(t, ok)
 
 	m.Track(func(_, _ string) error { return nil })
 	m.TrackEach(func(_, _ string) {})
 
 	m.Reduce(func(k1, v1, k2, v2 string) (string, string) { return k1 + k2, v1 + v2 })
-	m.Convert(func(_, _ string) (string, string) { return k, v }).Track(func(_, _ string) error { return nil })
-	m.ConvertKey(func(s string) string { return s }).Track(func(_, _ string) error { return nil })
-	m.ConvertValue(func(s string) string { return s }).Track(func(_, _ string) error { return nil })
-	m.Filter(func(_, _ string) bool { return true }).Convert(func(s1, s2 string) (string, string) { return s1, s2 }).Track(func(_, _ string) error { return nil })
+	m.Convert(func(_, _ string) (string, string) { return k, v }).TrackEach(func(_, _ string) {})
+	m.ConvertKey(func(s string) string { return s }).TrackEach(func(_, _ string) {})
+	m.ConvertValue(func(s string) string { return s }).TrackEach(func(_, _ string) {})
+	m.Filter(func(_, _ string) bool { return true }).Convert(func(s1, s2 string) (string, string) { return s1, s2 }).TrackEach(func(_, _ string) {})
 
 	m.Keys().For(func(_ string) error { return nil })
 	m.Keys().ForEach(func(_ string) {})
 	m.Keys().Convert(func(s string) string { return s }).Slice()
-	// m.Keys().Convert(func(s string) string { return s }).For(func(_ string) error { return nil })
+	m.Keys().Convert(func(s string) string { return s }).ForEach(func(_ string) {})
 	m.Keys().Filter(func(_ string) bool { return true }).Slice()
 	m.Keys().Filter(func(_ string) bool { return true }).ForEach(func(_ string) {})
 
 	m.Values().For(func(_ string) error { return nil })
 	m.Values().ForEach(func(_ string) {})
 	m.Values().Convert(func(s string) string { return s }).Slice()
-	// m.Values().Convert(func(s string) string { return s }).For(func(_ string) error { return nil })
+	m.Values().Convert(func(s string) string { return s }).ForEach(func(_ string) {})
 	m.Values().Filter(func(_ string) bool { return true }).Slice()
 	m.Values().Filter(func(_ string) bool { return true }).ForEach(func(_ string) {})
 }

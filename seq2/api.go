@@ -2,6 +2,8 @@
 package seq2
 
 import (
+	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/kv"
 	"github.com/m4gshm/gollections/map_/resolv"
 	"github.com/m4gshm/gollections/op"
 	"golang.org/x/exp/constraints"
@@ -65,6 +67,23 @@ func OfIndexed[T any](amount int, getAt func(int) T) Seq2[int, T] {
 			}
 		}
 	}
+}
+
+func OfIndexedPair[K, V any](amount int, getAt func(int) (K, V)) Seq2[K, V] {
+	return func(yield func(K, V) bool) {
+		if getAt == nil {
+			return
+		}
+		for i := range amount {
+			if !yield(getAt(i)) {
+				break
+			}
+		}
+	}
+}
+
+func OfIndexedPairS[K, V any](amount int, getKey func(int) K, getValue func(int) V) Seq2[K, V] {
+	return OfIndexedPair(amount, func(i int) (K, V) { return getKey(i), getValue(i) })
 }
 
 // Series makes a sequence by applying the 'next' function to the previous step generated value.
@@ -288,6 +307,20 @@ func Filter[S ~Seq2[K, V], K, V any](seq S, filter func(K, V) bool) Seq2[K, V] {
 	}
 }
 
+func Filt[S ~Seq2[K, V], K, V any](seq S, filter func(K, V) (bool, error)) Seq2[c.KV[K, V], error] {
+	return func(yield func(c.KV[K, V], error) bool) {
+		if seq == nil || filter == nil {
+			return
+		}
+		seq(func(k K, v V) bool {
+			if ok, err := filter(k, v); ok || err != nil {
+				return yield(kv.New(k, v), err)
+			}
+			return true
+		})
+	}
+}
+
 // Convert creates a rangefunc that applies the 'converter' function to each iterable element.
 func Convert[S ~Seq2[Kfrom, Vfrom], Kfrom, Vfrom, Kto, Vto any](seq S, converter func(Kfrom, Vfrom) (Kto, Vto)) Seq2[Kto, Vto] {
 	return func(consumer func(Kto, Vto) bool) {
@@ -296,6 +329,18 @@ func Convert[S ~Seq2[Kfrom, Vfrom], Kfrom, Vfrom, Kto, Vto any](seq S, converter
 		}
 		seq(func(k Kfrom, v Vfrom) bool {
 			return consumer(converter(k, v))
+		})
+	}
+}
+
+func Conv[S ~Seq2[Kfrom, Vfrom], Kfrom, Vfrom, Kto, Vto any](seq S, converter func(Kfrom, Vfrom) (Kto, Vto, error)) Seq2[c.KV[Kto, Vto], error] {
+	return func(consumer func(c.KV[Kto, Vto], error) bool) {
+		if seq == nil || converter == nil {
+			return
+		}
+		seq(func(k Kfrom, v Vfrom) bool {
+			kto, vto, err := converter(k, v)
+			return consumer(kv.New(kto, vto), err)
 		})
 	}
 }

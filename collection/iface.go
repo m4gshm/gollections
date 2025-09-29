@@ -36,8 +36,8 @@ type Set[T comparable] interface {
 // Map - collection interface that stores key/value pairs and provide access to an element by its key
 type Map[K comparable, V any] interface {
 	kv.Collection[K, V, map[K]V]
-	kv.Filterable[K, V]
-	kv.Convertable[K, V]
+	kv.Filterable[K, V, Seq2[K, V], SeqE[c.KV[K, V]]]
+	kv.Convertable[K, V, Seq2[K, V], SeqE[c.KV[K, V]]]
 	c.Checkable[K]
 	c.Access[K, V]
 	c.KVRange[K, V]

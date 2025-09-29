@@ -91,13 +91,8 @@ func Test_Map_Zero(t *testing.T) {
 	e := m.IsEmpty()
 	assert.True(t, e)
 
-	head, _, _, ok := m.First()
-	assert.False(t, ok)
-	_, _, ok = head.Next()
-	assert.False(t, ok)
 
-	head = m.Head()
-	_, _, ok = head.Next()
+	_,_,ok:= m.Head()
 	assert.False(t, ok)
 
 	_, ok = m.Get("")
@@ -112,13 +107,13 @@ func Test_Map_Zero(t *testing.T) {
 
 	m.Values().For(nil)
 	m.Values().ForEach(nil)
-	m.ConvertValue(nil).Track(nil)
+	m.ConvertValue(nil).TrackEach(nil)
 	m.ConvertValue(nil).Filter(nil).FilterKey(nil)
 	m.ConvertValue(nil).Filter(nil).FilterValue(nil)
 
 	m.Keys().For(nil)
 	m.Keys().ForEach(nil)
-	m.ConvertKey(nil).Track(nil)
+	m.ConvertKey(nil).TrackEach(nil)
 	m.ConvertKey(nil).Filter(nil).FilterKey(nil)
 	m.ConvertKey(nil).Filter(nil).FilterValue(nil)
 	m.Convert(nil)
