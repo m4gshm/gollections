@@ -57,12 +57,6 @@ func (s Set[T]) IsEmpty() bool {
 	return collection.IsEmpty(s)
 }
 
-// For applies the 'consumer' function for the elements until the consumer returns the c.Break to stop.
-func (s Set[T]) For(consumer func(T) error) error {
-
-	return map_.ForKeys(s.elements, consumer)
-}
-
 // ForEach applies the 'consumer' function for every element
 func (s Set[T]) ForEach(consumer func(T)) {
 	map_.ForEachKey(s.elements, consumer)

@@ -78,7 +78,6 @@ func Test_Map_Nil(t *testing.T) {
 	_, _, ok := m.Head()
 	assert.False(t, ok)
 
-	m.Track(nil)
 	m.TrackEach(nil)
 
 	m.Reduce(nil)
@@ -89,7 +88,6 @@ func Test_Map_Nil(t *testing.T) {
 	m.Filter(nil).Convert(nil).TrackEach(nil)
 
 	m.Keys().ForEach(nil)
-	m.Values().For(nil)
 	m.Values().ForEach(nil)
 	// m.Values().Convert(nil).For(nil)
 	m.Values().Filter(nil).ForEach(nil)
@@ -119,7 +117,6 @@ func Test_Map_Zero(t *testing.T) {
 	assert.Equal(t, "a", k)
 	assert.Equal(t, "A", v)
 
-	m.Track(func(_, _ string) error { return nil })
 	m.TrackEach(func(_, _ string) {})
 
 	m.Reduce(func(k1, v1, k2, v2 string) (string, string) { return k1 + k2, v1 + v2 })
@@ -134,7 +131,6 @@ func Test_Map_Zero(t *testing.T) {
 	m.Keys().Filter(func(_ string) bool { return true }).Slice()
 	m.Keys().Filter(func(_ string) bool { return true }).ForEach(func(_ string) {})
 
-	m.Values().For(func(_ string) error { return nil })
 	m.Values().ForEach(func(_ string) {})
 	m.Values().Convert(func(s string) string { return s }).Slice()
 	// m.Values().Convert(func(s string) string { return s }).For(func(_ string) error { return nil })
@@ -165,7 +161,6 @@ func Test_Map_new(t *testing.T) {
 	assert.Equal(t, "a", k)
 	assert.Equal(t, "A", v)
 
-	m.Track(func(_, _ string) error { return nil })
 	m.TrackEach(func(_, _ string) {})
 
 	m.Reduce(func(k1, v1, k2, v2 string) (string, string) { return k1 + k2, v1 + v2 })
@@ -180,7 +175,6 @@ func Test_Map_new(t *testing.T) {
 	m.Keys().Filter(func(_ string) bool { return true }).Slice()
 	m.Keys().Filter(func(_ string) bool { return true }).ForEach(func(_ string) {})
 
-	m.Values().For(func(_ string) error { return nil })
 	m.Values().ForEach(func(_ string) {})
 	m.Values().Convert(func(s string) string { return s }).Slice()
 	m.Values().Convert(func(s string) string { return s }).ForEach(func(_ string) {})

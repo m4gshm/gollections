@@ -108,11 +108,6 @@ func (m Map[K, V]) String() string {
 	return map_.ToString(m.elements)
 }
 
-// Track applies the 'consumer' function for all key/value pairs until the consumer returns the c.Break to stop.
-func (m Map[K, V]) Track(consumer func(K, V) error) error {
-	return map_.Track(m.elements, consumer)
-}
-
 // TrackEach applies the 'consumer' function for every key/value pairs
 func (m Map[K, V]) TrackEach(consumer func(K, V)) {
 	map_.TrackEach(m.elements, consumer)

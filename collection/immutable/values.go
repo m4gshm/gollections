@@ -55,11 +55,6 @@ func (m MapValues[K, V]) Append(out []V) []V {
 	return map_.AppendValues(m.elements, out)
 }
 
-// For applies the 'consumer' function for collection values until the consumer returns the c.Break to stop.
-func (m MapValues[K, V]) For(consumer func(V) error) error {
-	return map_.ForValues(m.elements, consumer)
-}
-
 // ForEach applies the 'consumer' function for every value of the collection
 func (m MapValues[K, V]) ForEach(consumer func(V)) {
 	map_.ForEachValue(m.elements, consumer)

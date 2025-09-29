@@ -130,9 +130,7 @@ func Test_Map_Nil(t *testing.T) {
 	// m.ConvertValue(nil).Filter(nil)
 	// m.Filter(nil).Convert(nil).TrackEach(nil)
 
-	m.Keys().For(nil)
 	m.Keys().ForEach(nil)
-	m.Values().For(nil)
 	m.Values().ForEach(nil)
 	// m.Values().Convert(nil).ForEach(nil)
 	m.Values().Filter(nil).ForEach(nil)
@@ -171,9 +169,7 @@ func Test_Map_Zero(t *testing.T) {
 	m.Convert(func(s1, s2 string) (string, string) { return s1, s2 }).TrackEach(func(_, _ string) {})
 	m.Filter(func(_, _ string) bool { return true }).Convert(func(s1, s2 string) (string, string) { return s1, s2 }).TrackEach(func(_, _ string) {})
 
-	m.Keys().For(func(_ string) error { return nil })
 	m.Keys().ForEach(func(_ string) {})
-	m.Values().For(func(_ string) error { return nil })
 	m.Values().ForEach(func(_ string) {})
 	m.Values().Convert(as.Is[string]).ForEach(func(_ string) {})
 	m.Values().Filter(func(_ string) bool { return true }).ForEach(func(_ string) {})
@@ -213,9 +209,7 @@ func Test_Map_new(t *testing.T) {
 
 	m.Filter(func(_, _ string) bool { return true }).Convert(func(s1, s2 string) (string, string) { return s1, s2 }).TrackEach(func(_, _ string) {})
 
-	m.Keys().For(func(_ string) error { return nil })
 	m.Keys().ForEach(func(_ string) {})
-	m.Values().For(func(_ string) error { return nil })
 	m.Values().ForEach(func(_ string) {})
 	m.Values().Convert(as.Is[string]).ForEach(func(_ string) {})
 	m.Values().Filter(func(_ string) bool { return true }).ForEach(func(_ string) {})

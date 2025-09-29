@@ -1,13 +1,6 @@
 // Package c provides common types of containers, utility types and functions
 package c
 
-import (
-	"errors"
-)
-
-// Break is the 'break' statement of the For, Track methods
-var Break = errors.New("Break")
-
 // Continue is an alias of the nil value used to continue iterating by For, Track methods.
 var Continue error = nil
 
@@ -44,6 +37,7 @@ type Values[V any] interface {
 
 // Collection is the base interface of non-associative collections
 type Collection[T any] interface {
+	Sized
 	Range[T]
 	ForEach[T]
 	SliceFactory[T]
@@ -89,33 +83,16 @@ type Iterator[T any] interface {
 // Sized - storage interface with measurable size
 type Sized interface {
 	// returns an estimated internal storage size or -1 if the size cannot be calculated
-	Size() int
-}
-
-// PrevIterator is the Iterator that provides reverse iteration over elements of a collection
-type PrevIterator[T any] interface {
-	Iterator[T]
-	//retrieves a prev element and true or zero value of T and false if no more elements
-	Prev() (T, bool)
-}
-
-// DelIterator is the Iterator provides deleting of current element.
-type DelIterator[T any] interface {
-	Iterator[T]
-	Delete()
+	Len() int
 }
 
 // ForEach is the interface of a collection that provides traversing of the elements without error checking.
-//
-// Deprecated: obsolete.
 type ForEach[T any] interface {
 	// ForEach takes all elements of the collection
 	ForEach(func(element T))
 }
 
 // TrackEach is the interface of a collection that provides traversing of the elements with position tracking (index, key, coordinates, etc.) without error checking.
-//
-// Deprecated: obsolete.
 type TrackEach[P any, T any] interface {
 	TrackEach(func(position P, element T))
 }

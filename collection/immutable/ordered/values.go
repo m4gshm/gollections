@@ -65,11 +65,6 @@ func (m MapValues[K, V]) IAll(consumer func(int, V) bool) {
 	map_.TrackOrderedValuesWhile(m.order, m.elements, consumer)
 }
 
-// For applies the 'consumer' function for every value until the consumer returns the c.Break to stop.
-func (m MapValues[K, V]) For(consumer func(V) error) error {
-	return map_.ForOrderedValues(m.order, m.elements, consumer)
-}
-
 // ForEach applies the 'consumer' function for every value
 func (m MapValues[K, V]) ForEach(consumer func(V)) {
 	map_.ForEachOrderedValues(m.order, m.elements, consumer)

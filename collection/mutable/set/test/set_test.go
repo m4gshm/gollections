@@ -148,7 +148,6 @@ func Test_Set_Nil(t *testing.T) {
 	set.IsEmpty()
 	set.Len()
 
-	_ = set.For(nil)
 	set.ForEach(nil)
 
 	set.Slice()
@@ -176,7 +175,6 @@ func Test_Set_Zero(t *testing.T) {
 	assert.True(t, mset.IsEmpty())
 	assert.Equal(t, 0, mset.Len())
 
-	mset.For(nil)
 	mset.ForEach(nil)
 
 	_, ok := mset.Head()
@@ -202,7 +200,6 @@ func Test_Set_new(t *testing.T) {
 	assert.True(t, mset.IsEmpty())
 	assert.Equal(t, 0, mset.Len())
 
-	mset.For(nil)
 	mset.ForEach(nil)
 
 	_, ok := mset.Head()

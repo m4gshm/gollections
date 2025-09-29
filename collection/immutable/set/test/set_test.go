@@ -132,7 +132,6 @@ func Test_Set_Zero(t *testing.T) {
 	set.IsEmpty()
 	set.Len()
 
-	set.For(nil)
 	set.ForEach(nil)
 
 	set.Slice()

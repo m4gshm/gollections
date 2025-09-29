@@ -91,14 +91,12 @@ func Test_Map_Zero(t *testing.T) {
 	_, ok = m.Get("")
 	assert.False(t, ok)
 
-	m.Track(nil)
 	m.TrackEach(nil)
 
 	m.Filter(nil)
 	m.FilterKey(nil)
 	m.FilterValue(nil)
 
-	m.Values().For(nil)
 	m.Values().ForEach(nil)
 	m.ConvertValue(nil).TrackEach(nil)
 	m.ConvertValue(nil).Filter(nil).FilterKey(nil)
@@ -110,10 +108,8 @@ func Test_Map_Zero(t *testing.T) {
 	m.ConvertKey(nil).Filter(nil).FilterValue(nil)
 	m.Convert(nil)
 
-	m.Sort(nil).Track(nil)
 	m.Sort(nil).TrackEach(nil)
 
-	m.StableSort(nil).Track(nil)
 	m.StableSort(nil).TrackEach(nil)
 }
 
