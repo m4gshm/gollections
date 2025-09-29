@@ -76,14 +76,14 @@ func Skip[S ~Seq2[K, V], K, V any](n int, seq S) Seq2[K, V] {
 	return s2.Skip(n, seq)
 }
 
-// While cuts tail elements of the seq that don't match the predicate.
-func While[S ~Seq2[K, V], K, V any](seq S, predicate func(K, V) bool) Seq2[K, V] {
-	return s2.While(seq, predicate)
+// While cuts tail elements of the seq that don't match the filter.
+func While[S ~Seq2[K, V], K, V any](seq S, filter func(K, V) bool) Seq2[K, V] {
+	return s2.While(seq, filter)
 }
 
-// SkipWhile returns a sequence without first elements of the seq that dont'math the predicate.
-func SkipWhile[S ~Seq2[K, V], K, V any](seq S, predicate func(K, V) bool) Seq2[K, V] {
-	return s2.SkipWhile(seq, predicate)
+// SkipWhile returns a sequence without first elements of the seq that dont'math the filter.
+func SkipWhile[S ~Seq2[K, V], K, V any](seq S, filter func(K, V) bool) Seq2[K, V] {
+	return s2.SkipWhile(seq, filter)
 }
 
 // Head returns the first key\value pair.
@@ -91,9 +91,9 @@ func Head[S ~Seq2[K, V], K, V any](seq S) (k K, v V, ok bool) {
 	return First(seq, func(K, V) bool { return true })
 }
 
-// First returns the first key\value pair that satisfies the condition of the 'predicate' function.
-func First[S ~Seq2[K, V], K, V any](seq S, predicate func(K, V) bool) (k K, v V, ok bool) {
-	return s2.First(seq, predicate)
+// First returns the first key\value pair that satisfies the condition of the 'filter' function.
+func First[S ~Seq2[K, V], K, V any](seq S, filter func(K, V) bool) (k K, v V, ok bool) {
+	return s2.First(seq, filter)
 }
 
 // Reduce reduces the elements of the 'seq' sequence an one using the 'merge' function.
@@ -118,6 +118,10 @@ func Reducee[S ~Seq2[K, V], K, V, T any](seq S, merge func(prev *T, k K, v V) (T
 // Returns ok==false if the seq returns ok=false at the first call (no more elements).
 func ReduceeOK[S ~Seq2[K, V], K, V, T any](seq S, merge func(prev *T, k K, v V) (T, error)) (result T, ok bool, err error) {
 	return s2.ReduceeOK(seq, merge)
+}
+
+func HasAny[S ~Seq2[K, V], K, V any](seq S, filter func(K, V) bool) bool {
+	return s2.HasAny(seq, filter)
 }
 
 // Filter creates a rangefunc that iterates only those elements for which the 'filter' function returns true.

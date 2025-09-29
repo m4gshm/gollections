@@ -20,7 +20,7 @@ func Test_SeqOf(t *testing.T) {
 		})
 	)
 
-	assert.Equal(t, []int{3, 2, 1}, sort.Desc(seq.Slice(seq2.Values(pairs))))
-	assert.Equal(t, []string{"first", "second", "third"}, sort.Asc(seq.Slice(seq2.Keys(pairs))))
-	assert.Equal(t, []int{1, 2, 3}, seq.Slice(ints))
+	assert.Equal(t, []int{3, 2, 1}, sort.Desc(pairs.Values().Slice()))
+	assert.Equal(t, []string{"first", "second", "third"}, sort.Asc(pairs.Keys().Slice()))
+	assert.Equal(t, []int{1, 2, 3}, ints.Slice())
 }

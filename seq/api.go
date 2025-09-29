@@ -29,6 +29,7 @@ type seqE[T any] = s.SeqE[T]
 // Seq2 is an alias of an iterator-function that allows to iterate over key/value pairs of a sequence, such as slice or map.
 // It is used to iterate over slice index/value pairs or map key/value pairs.
 type Seq2[K, V any] s.Seq2[K, V]
+type seq2[K, V any] = s.Seq2[K, V]
 
 // Of creates an iterator over the elements.
 func Of[T any](elements ...T) Seq[T] {
@@ -41,28 +42,28 @@ func Union[S ~seq[T], T any](seq ...S) Seq[T] {
 }
 
 // OfNextGet builds an iterator by iterating elements of a source.
-// The hasNext specifies a predicate that tests existing of a next element in the source.
+// The hasNext specifies a filter that tests existing of a next element in the source.
 // The getNext extracts the element.
 func OfNextGet[T any](hasNext func() bool, getNext func() T) Seq[T] {
 	return s.OfNextGet(hasNext, getNext)
 }
 
 // OfNext builds an iterator by iterating elements of a source.
-// The hasNext specifies a predicate that tests existing of a next element in the source.
+// The hasNext specifies a filter that tests existing of a next element in the source.
 // The pushNext copy the element to the next pointer.
 func OfNext[T any](hasNext func() bool, pushNext func(*T)) Seq[T] {
 	return OfNextGet(hasNext, func() (o T) { pushNext(&o); return o })
 }
 
 // OfSourceNextGet builds an iterator by iterating elements of the source.
-// The hasNext specifies a predicate that tests existing of a next element in the source.
+// The hasNext specifies a filter that tests existing of a next element in the source.
 // The getNext extracts the element.
 func OfSourceNextGet[S, T any](source S, hasNext func(S) bool, getNext func(S) T) Seq[T] {
 	return OfNextGet(func() bool { return hasNext(source) }, func() T { return getNext(source) })
 }
 
 // OfSourceNext builds an iterator by iterating elements of the source.
-// The hasNext specifies a predicate that tests existing of a next element in the source.
+// The hasNext specifies a filter that tests existing of a next element in the source.
 // The pushNext copy the element to the next pointer.
 func OfSourceNext[S, T any](source S, hasNext func(S) bool, pushNext func(S, *T)) Seq[T] {
 	return OfNext(func() bool { return hasNext(source) }, func(next *T) { pushNext(source, next) })
@@ -105,14 +106,14 @@ func Skip[S ~seq[T], T any](n int, seq S) Seq[T] {
 	return s.Skip(n, seq)
 }
 
-// While cuts tail elements of the seq that don't match the predicate.
-func While[S ~seq[T], T any](seq S, predicate func(T) bool) Seq[T] {
-	return s.While(seq, predicate)
+// While cuts tail elements of the seq that don't match the filter.
+func While[S ~seq[T], T any](seq S, filter func(T) bool) Seq[T] {
+	return s.While(seq, filter)
 }
 
-// SkipWhile returns a sequence without first elements of the seq that dont'math the predicate.
-func SkipWhile[S ~seq[T], T any](seq S, predicate func(T) bool) Seq[T] {
-	return s.SkipWhile(seq, predicate)
+// SkipWhile returns a sequence without first elements of the seq that dont'math the filter.
+func SkipWhile[S ~seq[T], T any](seq S, filter func(T) bool) Seq[T] {
+	return s.SkipWhile(seq, filter)
 }
 
 // Head returns the first element.
@@ -120,14 +121,14 @@ func Head[S ~seq[T], T any](seq S) (v T, ok bool) {
 	return First(seq, always.True)
 }
 
-// First returns the first element that satisfies the condition of the 'predicate' function.
-func First[S ~seq[T], T any](seq S, predicate func(T) bool) (v T, ok bool) {
-	return s.First(seq, predicate)
+// First returns the first element that satisfies the condition of the 'filter' function.
+func First[S ~seq[T], T any](seq S, filter func(T) bool) (v T, ok bool) {
+	return s.First(seq, filter)
 }
 
-// Firstt returns the first element that satisfies the condition of the 'predicate' function.
-func Firstt[S ~seq[T], T any](seq S, predicate func(T) (bool, error)) (v T, ok bool, err error) {
-	return s.Firstt(seq, predicate)
+// Firstt returns the first element that satisfies the condition of the 'filter' function.
+func Firstt[S ~seq[T], T any](seq S, filter func(T) (bool, error)) (v T, ok bool, err error) {
+	return s.Firstt(seq, filter)
 }
 
 // Slice collects the elements of the 'seq' sequence into a new slice.
@@ -181,13 +182,12 @@ func Accumm[T any, S ~seq[T]](first T, seq S, merge func(T, T) (T, error)) (accu
 
 // Sum returns the sum of all elements.
 func Sum[S ~seq[T], T op.Summable](seq S) (out T) {
-	return Accum(out, seq, op.Sum[T])
+	return s.Sum(seq)
 }
 
-// HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful.
-func HasAny[S ~seq[T], T any](seq S, predicate func(T) bool) bool {
-	_, ok := First(seq, predicate)
-	return ok
+// HasAny finds the first element that satisfies the 'filter' function condition and returns true if successful.
+func HasAny[S ~seq[T], T any](seq S, filter func(T) bool) bool {
+	return s.HasAny(seq, filter)
 }
 
 // Contains finds the first element that equal to the example and returns true.

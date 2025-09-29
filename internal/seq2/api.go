@@ -183,13 +183,13 @@ func Skip[S ~Seq2[K, V], K, V any](n int, seq S) Seq2[K, V] {
 	}
 }
 
-func While[S ~Seq2[K, V], K, V any](seq S, predicate func(K, V) bool) Seq2[K, V] {
+func While[S ~Seq2[K, V], K, V any](seq S, filter func(K, V) bool) Seq2[K, V] {
 	return func(yield func(K, V) bool) {
 		if seq == nil {
 			return
 		}
 		seq(func(k K, v V) bool {
-			if !predicate(k, v) {
+			if !filter(k, v) {
 				return false
 			}
 			return yield(k, v)
@@ -197,14 +197,14 @@ func While[S ~Seq2[K, V], K, V any](seq S, predicate func(K, V) bool) Seq2[K, V]
 	}
 }
 
-func SkipWhile[S ~Seq2[K, V], K, V any](seq S, predicate func(K, V) bool) Seq2[K, V] {
+func SkipWhile[S ~Seq2[K, V], K, V any](seq S, filter func(K, V) bool) Seq2[K, V] {
 	return func(yield func(K, V) bool) {
 		if seq == nil {
 			return
 		}
 		started := false
 		seq(func(k K, v V) bool {
-			if !started && predicate(k, v) {
+			if !started && filter(k, v) {
 				return true
 			}
 			started = true
@@ -217,12 +217,17 @@ func Head[S ~Seq2[K, V], K, V any](seq S) (k K, v V, ok bool) {
 	return First(seq, func(K, V) bool { return true })
 }
 
-func First[S ~Seq2[K, V], K, V any](seq S, predicate func(K, V) bool) (k K, v V, ok bool) {
-	if seq == nil || predicate == nil {
+func HasAny[S ~Seq2[K, V], K, V any](seq S, filter func(K, V) bool) bool {
+	_, _, ok := First(seq, filter)
+	return ok
+}
+
+func First[S ~Seq2[K, V], K, V any](seq S, filter func(K, V) bool) (k K, v V, ok bool) {
+	if seq == nil || filter == nil {
 		return
 	}
 	seq(func(oneK K, oneV V) bool {
-		if predicate(oneK, oneV) {
+		if filter(oneK, oneV) {
 			k = oneK
 			v = oneV
 			ok = true
@@ -231,6 +236,24 @@ func First[S ~Seq2[K, V], K, V any](seq S, predicate func(K, V) bool) (k K, v V,
 		return true
 	})
 	return
+}
+
+func Firstt[S ~Seq2[K, V], K, V any](seq S, filter func(K, V) (bool, error)) (k K, v V, ok bool, err error) {
+	if seq == nil || filter == nil {
+		return
+	}
+	seq(func(oneK K, oneV V) bool {
+		ok, err = filter(oneK, oneV)
+		if ok {
+			k = oneK
+			v = oneV
+			return false
+		} else if err != nil {
+			return false
+		}
+		return true
+	})
+	return k, v, ok, err
 }
 
 func Reduce[S ~Seq2[K, V], K, V, T any](seq S, merge func(prev *T, k K, v V) T) T {
