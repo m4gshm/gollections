@@ -87,7 +87,7 @@ func Test_OfIndexed(t *testing.T) {
 }
 
 func Test_Series(t *testing.T) {
-	generator := func(i, prev int) (int, bool) { return prev + 1, prev < 3 }
+	generator := func(_, prev int) (int, bool) { return prev + 1, prev < 3 }
 	sequence := seq2.Series(-1, generator)
 	assert.Equal(t, slice.Of(-1, 0, 1, 2, 3), seq.Slice(seq2.Values(sequence)))
 	assert.Equal(t, slice.Of(0, 1, 2, 3, 4), seq.Slice(seq2.Keys(sequence)))
@@ -154,7 +154,7 @@ func Test_ReduceSum(t *testing.T) {
 
 func Test_ReduceeSum(t *testing.T) {
 	s := seq2.Of(1, 3, 5, 7, 9, 11)
-	reducer := func(prev *int, i, v int) (int, error) {
+	reducer := func(prev *int, _, v int) (int, error) {
 		p := 0
 		if prev != nil {
 			p = *prev
@@ -169,7 +169,7 @@ func Test_ReduceeSum(t *testing.T) {
 	assert.Equal(t, 1+3+5+7+9, r)
 	assert.ErrorContains(t, err, "stop")
 
-	_, ok, err = seq2.ReduceeOK[seq2.Seq2[int, int]](nil, reducer)
+	_, ok, err = seq2.ReduceeOK[seq.Seq2[int, int]](nil, reducer)
 	assert.False(t, ok)
 	assert.NoError(t, err)
 
@@ -380,8 +380,8 @@ func Test_OfMap(t *testing.T) {
 }
 
 func Test_ConvertNilSeq(t *testing.T) {
-	var in iter.Seq2[int, int] = nil
-	var out []int = nil
+	var in iter.Seq2[int, int]
+	var out []int
 
 	iter := false
 	for _, e := range seq2.Convert(in, func(i, e int) (int, int) { return i, e }) {

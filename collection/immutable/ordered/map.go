@@ -40,6 +40,7 @@ func (m Map[K, V]) All(consumer func(K, V) bool) {
 	map_.TrackOrderedWhile(m.order, m.elements, consumer)
 }
 
+// Head returns the first key\value pair.
 func (m Map[K, V]) Head() (K, V, bool) {
 	return seq2.Head(m.All)
 }

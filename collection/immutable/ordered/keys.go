@@ -37,6 +37,7 @@ func (m MapKeys[K]) IAll(consumer func(int, K) bool) {
 	slice.TrackWhile(m.keys, consumer)
 }
 
+// Head returns the first element.
 func (m MapKeys[K]) Head() (K, bool) {
 	return collection.Head(m)
 }

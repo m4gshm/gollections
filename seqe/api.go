@@ -1,22 +1,31 @@
-// Package seqe provides convering, filtering, and reducing operations for the [seq.SeqE] interface.
+// Package seqe provides convering, filtering, and reducing operations for the [s.SeqE] interface.
 package seqe
 
 import (
-	"github.com/m4gshm/gollections/internal/seq"
+	s "github.com/m4gshm/gollections/internal/seq"
 	"github.com/m4gshm/gollections/internal/seqe"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/predicate/always"
+	"github.com/m4gshm/gollections/seq"
 )
 
-// Seq is an alias of an iterator-function that allows to iterate over elements of a sequence, such as slice.
-type Seq[T any] = seq.Seq[T]
+// Seq is an iterator-function that allows to iterate over elements of a sequence, such as slice.
+type Seq[T any] = s.Seq[T]
 
 // SeqE is a specific iterator form that allows to retrieve a value with an error as second parameter of the iterator.
 // It is used as a result of applying functions like seq.Conv, which may throw an error during iteration.
-type SeqE[T any] = seq.SeqE[T]
+// At each iteration step, it is necessary to check for the occurrence of an error.
+//
+//	for e, err := range seqence {
+//	    if err != nil {
+//	        break
+//	    }
+//	    ...
+//	}
+type SeqE[T any] = s.SeqE[T]
 
 // Union combines several sequences into one.
-func Union[S ~SeqE[T], T any](seq ...S) seq.SeqE[T] {
+func Union[S ~SeqE[T], T any](seq ...S) s.SeqE[T] {
 	return seqe.Union(seq...)
 }
 
@@ -30,21 +39,21 @@ func OfNextGet[T any](hasNext func() bool, getNext func() (T, error)) seq.SeqE[T
 // OfNext builds an iterator by iterating elements of a source.
 // The hasNext specifies a predicate that tests existing of a next element in the source.
 // The pushNext copy the element to the next pointer.
-func OfNext[T any](hasNext func() bool, pushNext func(*T) error) seq.SeqE[T] {
+func OfNext[T any](hasNext func() bool, pushNext func(*T) error) s.SeqE[T] {
 	return OfNextGet(hasNext, func() (o T, err error) { return o, pushNext(&o) })
 }
 
 // OfSourceNextGet builds an iterator by iterating elements of the source.
 // The hasNext specifies a predicate that tests existing of a next element in the source.
 // The getNext extracts the element.
-func OfSourceNextGet[S, T any](source S, hasNext func(S) bool, getNext func(S) (T, error)) seq.SeqE[T] {
+func OfSourceNextGet[S, T any](source S, hasNext func(S) bool, getNext func(S) (T, error)) s.SeqE[T] {
 	return OfNextGet(func() bool { return hasNext(source) }, func() (T, error) { return getNext(source) })
 }
 
 // OfSourceNext builds an iterator by iterating elements of the source.
 // The hasNext specifies a predicate that tests existing of a next element in the source.
 // The pushNext copy the element to the next pointer.
-func OfSourceNext[S, T any](source S, hasNext func(S) bool, pushNext func(S, *T) error) seq.SeqE[T] {
+func OfSourceNext[S, T any](source S, hasNext func(S) bool, pushNext func(S, *T) error) s.SeqE[T] {
 	return OfNext(func() bool { return hasNext(source) }, func(next *T) error { return pushNext(source, next) })
 }
 
@@ -56,12 +65,12 @@ func OfIndexed[T any](amount int, getAt func(int) (T, error)) SeqE[T] {
 }
 
 // Top returns a sequence of top n elements.
-func Top[S ~SeqE[T], T any](n int, seq S) seq.SeqE[T] {
+func Top[S ~SeqE[T], T any](n int, seq S) s.SeqE[T] {
 	return seqe.Top(n, seq)
 }
 
 // Skip returns a sequence without first n elements.
-func Skip[S ~SeqE[T], T any](n int, seq S) seq.SeqE[T] {
+func Skip[S ~SeqE[T], T any](n int, seq S) s.SeqE[T] {
 	return seqe.Skip(n, seq)
 }
 
@@ -156,25 +165,25 @@ func Contains[S ~SeqE[T], T comparable](seq S, example T) (contains bool, err er
 //	    }
 //	    ...
 //	}
-func Conv[S ~SeqE[From], From, To any](seq S, converter func(From) (To, error)) seq.SeqE[To] {
+func Conv[S ~SeqE[From], From, To any](seq S, converter func(From) (To, error)) s.SeqE[To] {
 	return seqe.Conv(seq, converter)
 }
 
 // Convert creates an iterator that applies the 'converter' function to each iterable element.
-func Convert[S ~SeqE[From], From, To any](seq S, converter func(From) To) seq.SeqE[To] {
+func Convert[S ~SeqE[From], From, To any](seq S, converter func(From) To) s.SeqE[To] {
 	return seqe.Convert(seq, converter)
 }
 
 // ConvertOK creates an iterator that applies the 'converter' function to each iterable element.
 // The converter may returns a value or ok=false to exclude the value from the loop.
-func ConvertOK[S ~SeqE[From], From, To any](seq S, converter func(from From) (To, bool)) seq.SeqE[To] {
+func ConvertOK[S ~SeqE[From], From, To any](seq S, converter func(from From) (To, bool)) s.SeqE[To] {
 	return seqe.ConvertOK(seq, converter)
 }
 
 // ConvOK creates a iterator that applies the 'converter' function to each iterable element.
 // The converter may returns a value or ok=false to exclude the value from iteration.
 // It may also return an error to abort the iteration.
-func ConvOK[S ~SeqE[From], From, To any](seq S, converter func(from From) (To, bool, error)) seq.SeqE[To] {
+func ConvOK[S ~SeqE[From], From, To any](seq S, converter func(from From) (To, bool, error)) s.SeqE[To] {
 	return seqe.ConvOK(seq, converter)
 }
 
@@ -187,7 +196,7 @@ func ConvOK[S ~SeqE[From], From, To any](seq S, converter func(from From) (To, b
 //			panic(err)
 //		}
 //	}
-func Flat[S ~SeqE[From], STo ~[]To, From any, To any](seq S, flattener func(From) STo) seq.SeqE[To] {
+func Flat[S ~SeqE[From], STo ~[]To, From any, To any](seq S, flattener func(From) STo) s.SeqE[To] {
 	return seqe.Flat(seq, flattener)
 }
 
@@ -221,7 +230,7 @@ func FlatSeq[S ~SeqE[From], STo ~Seq[To], From any, To any](seq S, flattener fun
 //		}
 //		...
 //	}
-func Flatt[S ~SeqE[From], STo ~[]To, From any, To any](seq S, flattener func(From) (STo, error)) seq.SeqE[To] {
+func Flatt[S ~SeqE[From], STo ~[]To, From any, To any](seq S, flattener func(From) (STo, error)) s.SeqE[To] {
 	return seqe.Flatt(seq, flattener)
 }
 
@@ -242,17 +251,17 @@ func Flatt[S ~SeqE[From], STo ~[]To, From any, To any](seq S, flattener func(Fro
 //		}
 //		...
 //	}
-func FlattSeq[S ~SeqE[From], STo ~SeqE[To], From any, To any](seq S, flattener func(From) STo) seq.SeqE[To] {
+func FlattSeq[S ~SeqE[From], STo ~SeqE[To], From any, To any](seq S, flattener func(From) STo) s.SeqE[To] {
 	return seqe.FlattSeq(seq, flattener)
 }
 
 // Filter creates an iterator that iterates only those elements for which the 'filter' function returns true.
-func Filter[S ~SeqE[T], T any](seq S, filter func(T) bool) seq.SeqE[T] {
+func Filter[S ~SeqE[T], T any](seq S, filter func(T) bool) s.SeqE[T] {
 	return seqe.Filter(seq, filter)
 }
 
 // Filt creates an erroreable iterator that iterates only those elements for which the 'filter' function returns true.
-func Filt[S ~SeqE[T], T any](seq S, filter func(T) (bool, error)) seq.SeqE[T] {
+func Filt[S ~SeqE[T], T any](seq S, filter func(T) (bool, error)) s.SeqE[T] {
 	return seqe.Filt(seq, filter)
 }
 

@@ -38,10 +38,12 @@ func (v Vector[T]) IAll(consumer func(int, T) bool) {
 	slice.TrackWhile(v.elements, consumer)
 }
 
+// Head returns the first element.
 func (v Vector[T]) Head() (T, bool) {
 	return collection.Head(v)
 }
 
+// Tail returns the latest element.
 func (v Vector[T]) Tail() (T, bool) {
 	return slice.Tail(v.elements)
 }

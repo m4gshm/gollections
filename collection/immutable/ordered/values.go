@@ -27,6 +27,7 @@ var (
 	_ fmt.Stringer               = (*MapValues[int, any])(nil)
 )
 
+// Head returns the first element.
 func (m MapValues[K, V]) Head() (V, bool) {
 	return collection.Head(m)
 }

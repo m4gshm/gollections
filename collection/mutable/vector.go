@@ -46,6 +46,7 @@ func (v *Vector[T]) IAll(consumer func(int, T) bool) {
 	}
 }
 
+// Head returns the first element.
 func (v *Vector[T]) Head() (t T, ok bool) {
 	if v == nil {
 		return t, false

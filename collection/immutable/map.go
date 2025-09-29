@@ -44,6 +44,7 @@ func (m Map[K, V]) All(consumer func(k K, v V) bool) {
 	}
 }
 
+// Head returns the first key\value pair.
 func (m Map[K, V]) Head() (K, V, bool) {
 	return seq2.Head(m.All)
 }

@@ -9,7 +9,7 @@ import (
 	"golang.org/x/exp/constraints"
 )
 
-// Seq is an alias of an iterator-function that allows to iterate over elements of a sequence, such as slice.
+// Seq is an iterator-function that allows to iterate over elements of a sequence, such as slice.
 type Seq[T any] s.Seq[T]
 type seq[T any] = s.Seq[T]
 
@@ -26,7 +26,7 @@ type seq[T any] = s.Seq[T]
 type SeqE[T any] s.SeqE[T]
 type seqE[T any] = s.SeqE[T]
 
-// Seq2 is an alias of an iterator-function that allows to iterate over key/value pairs of a sequence, such as slice or map.
+// Seq2 is an iterator-function that allows to iterate over key/value pairs of a sequence, such as slice or map.
 // It is used to iterate over slice index/value pairs or map key/value pairs.
 type Seq2[K, V any] s.Seq2[K, V]
 type seq2[K, V any] = s.Seq2[K, V]

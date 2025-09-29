@@ -6,63 +6,61 @@ import (
 	s "github.com/m4gshm/gollections/internal/seq"
 	s2 "github.com/m4gshm/gollections/internal/seq2"
 	"github.com/m4gshm/gollections/map_/resolv"
+	"github.com/m4gshm/gollections/seq"
 	"golang.org/x/exp/constraints"
 )
 
-// Seq is an alias of an iterator-function that allows to iterate over elements of a sequence, such as slice.
-type Seq[T any] = s.Seq[T]
-
-// Seq2 is an alias of an iterator-function that allows to iterate over key/value pairs of a sequence, such as slice or map.
+// Seq2 is an iterator-function that allows to iterate over key/value pairs of a sequence, such as slice or map.
 // It is used to iterate over slice index/value pairs or map key/value pairs.
 type Seq2[K, V any] = s.Seq2[K, V]
 
 // Of creates an index/value pairs iterator over the elements.
-func Of[T any](elements ...T) Seq2[int, T] {
+func Of[T any](elements ...T) seq.Seq2[int, T] {
 	return s2.Of(elements...)
 }
 
 // OfMap creates an key/value pairs iterator over the elements map.
-func OfMap[K comparable, V any](elements map[K]V) Seq2[K, V] {
+func OfMap[K comparable, V any](elements map[K]V) seq.Seq2[K, V] {
 	return s2.OfMap(elements)
 }
 
 // Union combines several sequences into one.
-func Union[S ~Seq2[K, V], K, V any](seq ...S) Seq2[K, V] {
+func Union[S ~Seq2[K, V], K, V any](seq ...S) seq.Seq2[K, V] {
 	return s2.Union(seq...)
 }
 
 // OfIndexed builds an indexed Seq2 iterator by extracting elements from an indexed soruce.
 // the len is length ot the source.
 // the getAt retrieves an element by its index from the source.
-func OfIndexed[T any](amount int, getAt func(int) T) Seq2[int, T] {
+func OfIndexed[T any](amount int, getAt func(int) T) seq.Seq2[int, T] {
 	return s2.OfIndexed(amount, getAt)
 }
 
-func OfIndexedKV[K, V any](amount int, getAt func(int) (K, V)) Seq2[K, V] {
+func OfIndexedKV[K, V any](amount int, getAt func(int) (K, V)) seq.Seq2[K, V] {
 	return s2.OfIndexedKV(amount, getAt)
 }
 
-func OfIndexedPair[K, V any](amount int, getKey func(int) K, getValue func(int) V) Seq2[K, V] {
+func OfIndexedPair[K, V any](amount int, getKey func(int) K, getValue func(int) V) seq.Seq2[K, V] {
 	return OfIndexedKV(amount, func(i int) (K, V) { return getKey(i), getValue(i) })
 }
 
 // Series makes a sequence by applying the 'next' function to the previous step generated value.
-func Series[T any](first T, next func(int, T) (T, bool)) Seq2[int, T] {
+func Series[T any](first T, next func(int, T) (T, bool)) seq.Seq2[int, T] {
 	return s2.Series(first, next)
 }
 
 // RangeClosed creates a sequence that generates integers in the range defined by from and to inclusive
-func RangeClosed[T constraints.Integer | rune](from T, toInclusive T) Seq2[int, T] {
+func RangeClosed[T constraints.Integer | rune](from T, toInclusive T) seq.Seq2[int, T] {
 	return s2.RangeClosed(from, toInclusive)
 }
 
 // Range creates a sequence that generates integers in the range defined by from and to exclusive
-func Range[T constraints.Integer | rune](from T, toExclusive T) Seq2[int, T] {
+func Range[T constraints.Integer | rune](from T, toExclusive T) seq.Seq2[int, T] {
 	return s2.Range(from, toExclusive)
 }
 
 // ToSeq converts an iterator of key/value pairs elements to an iterator of single elements by applying the 'converter' function to each iterable pair.
-func ToSeq[S ~Seq2[K, V], T, K, V any](seq S, converter func(K, V) T) Seq[T] {
+func ToSeq[S ~Seq2[K, V], T, K, V any](seq S, converter func(K, V) T) seq.Seq[T] {
 	return s2.ToSeq(seq, converter)
 }
 
@@ -72,17 +70,17 @@ func Top[S ~Seq2[K, V], K, V any](n int, seq S) S {
 }
 
 // Skip returns a sequence without first n elements.
-func Skip[S ~Seq2[K, V], K, V any](n int, seq S) Seq2[K, V] {
+func Skip[S ~Seq2[K, V], K, V any](n int, seq S) seq.Seq2[K, V] {
 	return s2.Skip(n, seq)
 }
 
 // While cuts tail elements of the seq that don't match the filter.
-func While[S ~Seq2[K, V], K, V any](seq S, filter func(K, V) bool) Seq2[K, V] {
+func While[S ~Seq2[K, V], K, V any](seq S, filter func(K, V) bool) seq.Seq2[K, V] {
 	return s2.While(seq, filter)
 }
 
 // SkipWhile returns a sequence without first elements of the seq that dont'math the filter.
-func SkipWhile[S ~Seq2[K, V], K, V any](seq S, filter func(K, V) bool) Seq2[K, V] {
+func SkipWhile[S ~Seq2[K, V], K, V any](seq S, filter func(K, V) bool) seq.Seq2[K, V] {
 	return s2.SkipWhile(seq, filter)
 }
 
@@ -125,30 +123,30 @@ func HasAny[S ~Seq2[K, V], K, V any](seq S, filter func(K, V) bool) bool {
 }
 
 // Filter creates a rangefunc that iterates only those elements for which the 'filter' function returns true.
-func Filter[S ~Seq2[K, V], K, V any](seq S, filter func(K, V) bool) Seq2[K, V] {
+func Filter[S ~Seq2[K, V], K, V any](seq S, filter func(K, V) bool) seq.Seq2[K, V] {
 	return s2.Filter(seq, filter)
 }
 
-func Filt[S ~Seq2[K, V], K, V any](seq S, filter func(K, V) (bool, error)) Seq2[c.KV[K, V], error] {
+func Filt[S ~Seq2[K, V], K, V any](seq S, filter func(K, V) (bool, error)) seq.SeqE[c.KV[K, V]] {
 	return s2.Filt(seq, filter)
 }
 
 // Convert creates a rangefunc that applies the 'converter' function to each iterable element.
-func Convert[S ~Seq2[Kfrom, Vfrom], Kfrom, Vfrom, Kto, Vto any](seq S, converter func(Kfrom, Vfrom) (Kto, Vto)) Seq2[Kto, Vto] {
+func Convert[S ~Seq2[Kfrom, Vfrom], Kfrom, Vfrom, Kto, Vto any](seq S, converter func(Kfrom, Vfrom) (Kto, Vto)) seq.Seq2[Kto, Vto] {
 	return s2.Convert(seq, converter)
 }
 
-func Conv[S ~Seq2[Kfrom, Vfrom], Kfrom, Vfrom, Kto, Vto any](seq S, converter func(Kfrom, Vfrom) (Kto, Vto, error)) Seq2[c.KV[Kto, Vto], error] {
+func Conv[S ~Seq2[Kfrom, Vfrom], Kfrom, Vfrom, Kto, Vto any](seq S, converter func(Kfrom, Vfrom) (Kto, Vto, error)) seq.SeqE[c.KV[Kto, Vto]] {
 	return s2.Conv(seq, converter)
 }
 
 // Values converts a key/value pairs iterator to an iterator of just values.
-func Values[S ~Seq2[K, V], K, V any](seq S) Seq[V] {
+func Values[S ~Seq2[K, V], K, V any](seq S) seq.Seq[V] {
 	return s2.Values(seq)
 }
 
 // Keys converts a key/value pairs iterator to an iterator of just keys.
-func Keys[S ~Seq2[K, V], K, V any](seq S) Seq[K] {
+func Keys[S ~Seq2[K, V], K, V any](seq S) seq.Seq[K] {
 	return s2.Keys(seq)
 }
 

@@ -46,7 +46,10 @@ func (s *Set[T]) All(consumer func(T) bool) {
 }
 
 // Head returns the first element.
-func (s *Set[T]) Head() (T, bool) {
+func (s *Set[T]) Head() (t T, ok bool) {
+	if s == nil {
+		return t, false
+	}
 	return collection.Head(s)
 }
 

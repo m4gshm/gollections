@@ -67,6 +67,7 @@ func (s Seq2[K, V]) ConvertValue(converter func(V) V) Seq2[K, V] {
 	return s2.Convert(s, convert.Value[K](converter))
 }
 
+// TrackEach applies the 'consumer' function to the seq elements.
 func (s Seq2[K, V]) TrackEach(consumer func(K, V)) {
 	s2.TrackEach(s, consumer)
 }

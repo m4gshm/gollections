@@ -31,6 +31,7 @@ func (m MapKeys[K, V]) All(consumer func(K) bool) {
 	map_.TrackKeysWhile(m.elements, consumer)
 }
 
+// Head returns the first element.
 func (m MapKeys[K, V]) Head() (K, bool) {
 	return collection.Head(m)
 }

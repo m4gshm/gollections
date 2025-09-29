@@ -1,6 +1,6 @@
 package seq
 
-import "github.com/m4gshm/gollections/seqe"
+import "github.com/m4gshm/gollections/internal/seqe"
 
 func (s SeqE[T]) Slice() ([]T, error) {
 	return seqe.Slice(s)
