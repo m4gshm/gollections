@@ -12,6 +12,10 @@ func (s Seq[T]) Reduce(merge func(a T, b T) T) T {
 	return Reduce(s, merge)
 }
 
+func (s Seq[T]) Reducee(merge func(T, T) (T, error)) (T, error) {
+	return Reducee(s, merge)
+}
+
 func (s Seq[T]) Head() (v T, ok bool) {
 	return Head(s)
 }
