@@ -6,7 +6,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/collection/immutable"
 	oset "github.com/m4gshm/gollections/collection/immutable/ordered/set"
 	"github.com/m4gshm/gollections/collection/immutable/set"
@@ -136,10 +135,10 @@ func Test_Set_Flatt(t *testing.T) {
 	var (
 		ints        = set.Of(3, 3, 1, 1, 1, 5, 6, 8, 8, 0, -2, -2)
 		fints       = set.Flat(ints, func(i int) []int { return slice.Of(i) })
-		convFilt    = collection.Seq[string](seq.Convert(fints, strconv.Itoa)).Filter(func(s string) bool { return len(s) == 1 })
+		convFilt    = seq.Convert(fints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 })
 		stringsPipe = seq.Filter(convFilt, func(s string) bool { return len(s) == 1 })
 	)
-	assert.Equal(t, slice.Of("0", "1", "3", "5", "6", "8"), sort.Asc(collection.Seq[string](stringsPipe).Slice()))
+	assert.Equal(t, slice.Of("0", "1", "3", "5", "6", "8"), sort.Asc(stringsPipe.Slice()))
 }
 
 func Test_Set_Zero(t *testing.T) {

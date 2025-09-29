@@ -529,15 +529,16 @@ import(
     "github.com/m4gshm/gollections/seq"
     "github.com/m4gshm/gollections/seq2"
 )
-
 var (
-    ints  iter.Seq[int]          = seq.Of(1, 2, 3)
-    pairs iter.Seq2[string, int] = seq2.OfMap(map[string]int{
+    ints  seq.Seq[int]          = seq.Of(1, 2, 3)
+    pairs seq.Seq2[string, int] = seq2.OfMap(map[string]int{
         "first":  1,
         "second": 2,
         "third":  3,
     })
 )
+
+assert.Equal(t, []int{3, 2, 1}, sort.Desc(seq.Slice(seq2.Values(pairs))))
 ```
 
 ##### seq.OfNext, seqe.OfNext, seq.OfNextGet, seqe.OfNextGet
@@ -629,14 +630,15 @@ import (
     "github.com/m4gshm/gollections/slice"
     "github.com/m4gshm/gollections/slice/sort"
 )
-
-var users iter.Seq[User] = seq.Of(users...)
-var groups iter.Seq2[string, User] = seq.ToSeq2(users, func(u User) (string, User) {
+var users seq.Seq[User] = seq.Of(users...)
+var groups seq.Seq2[string, User] = seq.ToSeq2(users, func(u User) (string, User) {
     return use.If(u.age <= 20, "<=20").If(u.age <= 30, "<=30").Else(">30"), u
 })
 var ageGroups map[string][]User = seq2.Group(groups)
 
 //map[<=20:[{Tom 18 []}] <=30:[{Bob 26 []}] >30:[{Alice 35 []} {Chris 41 []}]]
+
+assert.Equal(t, slice.Of("Alice", "Chris"), sort.Asc(slice.Convert(ageGroups[">30"], User.Name)))
 ```
 
 #### Reducers

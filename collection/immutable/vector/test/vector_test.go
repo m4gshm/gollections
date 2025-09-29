@@ -6,7 +6,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/collection/immutable"
 	"github.com/m4gshm/gollections/collection/immutable/vector"
 	"github.com/m4gshm/gollections/seq"
@@ -71,9 +70,9 @@ func Test_Vector_Flatt(t *testing.T) {
 		deepInts    = vector.Of(vector.Of(3, 1), vector.Of(5, 6, 8, 0, -2))
 		ints        = vector.Flat(deepInts, immutable.Vector[int].Slice)
 		c           = seq.Convert(ints, strconv.Itoa)
-		stringsPipe = seq.Filter(collection.Seq[string](c).Filter(func(s string) bool { return len(s) == 1 }), func(s string) bool { return len(s) == 1 })
+		stringsPipe = c.Filter(func(s string) bool { return len(s) == 1 })
 	)
-	assert.Equal(t, slice.Of("3", "1", "5", "6", "8", "0"), collection.Seq[string](stringsPipe).Slice())
+	assert.Equal(t, slice.Of("3", "1", "5", "6", "8", "0"), stringsPipe.Slice())
 }
 
 func Test_Vector_Zero(t *testing.T) {

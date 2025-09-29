@@ -574,7 +574,7 @@ func Test_OfNextPush(t *testing.T) {
 
 func Test_KeyValue(t *testing.T) {
 	s := seq.Of(1, 2, 3)
-	s2 := seq.KeyValue(s, as.Is, strconv.Itoa)
+	s2 := seq.ToKV(s, as.Is, strconv.Itoa)
 	k := seq.Slice(seq2.Keys(s2))
 	v := seq.Slice(seq2.Values(s2))
 

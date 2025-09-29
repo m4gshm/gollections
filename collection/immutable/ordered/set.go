@@ -5,6 +5,7 @@ import (
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/collection"
+	"github.com/m4gshm/gollections/seq"
 	"github.com/m4gshm/gollections/slice"
 )
 
@@ -78,22 +79,22 @@ func (s Set[T]) ForEach(consumer func(T)) {
 }
 
 // Filter returns a seq consisting of elements that satisfy the condition of the 'predicate' function
-func (s Set[T]) Filter(predicate func(T) bool) collection.Seq[T] {
+func (s Set[T]) Filter(predicate func(T) bool) seq.Seq[T] {
 	return collection.Filter(s, predicate)
 }
 
 // Filt returns a errorable seq consisting of elements that satisfy the condition of the 'predicate' function
-func (s Set[T]) Filt(predicate func(T) (bool, error)) collection.SeqE[T] {
+func (s Set[T]) Filt(predicate func(T) (bool, error)) seq.SeqE[T] {
 	return collection.Filt(s, predicate)
 }
 
 // Convert returns a seq that applies the 'converter' function to the collection elements
-func (s Set[T]) Convert(converter func(T) T) collection.Seq[T] {
+func (s Set[T]) Convert(converter func(T) T) seq.Seq[T] {
 	return collection.Convert(s, converter)
 }
 
 // Conv returns a errorable seq that applies the 'converter' function to the collection elements
-func (s Set[T]) Conv(converter func(T) (T, error)) collection.SeqE[T] {
+func (s Set[T]) Conv(converter func(T) (T, error)) seq.SeqE[T] {
 	return collection.Conv(s, converter)
 }
 

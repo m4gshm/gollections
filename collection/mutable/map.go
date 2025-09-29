@@ -12,6 +12,7 @@ import (
 	"github.com/m4gshm/gollections/kv/convert"
 	filter "github.com/m4gshm/gollections/kv/predicate"
 	"github.com/m4gshm/gollections/map_"
+	"github.com/m4gshm/gollections/seq"
 	"github.com/m4gshm/gollections/seq2"
 	"github.com/m4gshm/gollections/slice"
 )
@@ -211,62 +212,62 @@ func (m *Map[K, V]) String() string {
 }
 
 // FilterKey returns a seq consisting of key/value pairs where the key satisfies the condition of the 'predicate' function
-func (m Map[K, V]) FilterKey(predicate func(K) bool) collection.Seq2[K, V] {
+func (m Map[K, V]) FilterKey(predicate func(K) bool) seq.Seq2[K, V] {
 	return seq2.Filter(m.All, filter.Key[V](predicate))
 }
 
 // FiltKey returns an errorable seq consisting of key/value pairs where the key satisfies the condition of the 'predicate' function
-func (m Map[K, V]) FiltKey(predicate func(K) (bool, error)) collection.SeqE[c.KV[K, V]] {
+func (m Map[K, V]) FiltKey(predicate func(K) (bool, error)) seq.SeqE[c.KV[K, V]] {
 	return seq2.Filt(m.All, filtere.Key[V](predicate))
 }
 
 // ConvertKey returns a seq that applies the 'converter' function to keys of the map
-func (m Map[K, V]) ConvertKey(converter func(K) K) collection.Seq2[K, V] {
+func (m Map[K, V]) ConvertKey(converter func(K) K) seq.Seq2[K, V] {
 	return seq2.Convert(m.All, convert.Key[V](converter))
 }
 
 // ConvKey returns an errorable seq that applies the 'converter' function to keys of the map
-func (m Map[K, V]) ConvKey(converter func(K) (K, error)) collection.SeqE[c.KV[K, V]] {
+func (m Map[K, V]) ConvKey(converter func(K) (K, error)) seq.SeqE[c.KV[K, V]] {
 	return seq2.Conv(m.All, converte.Key[V](converter))
 }
 
 // FilterValue returns a seq consisting of key/value pairs where the value satisfies the condition of the 'predicate' function
-func (m Map[K, V]) FilterValue(predicate func(V) bool) collection.Seq2[K, V] {
+func (m Map[K, V]) FilterValue(predicate func(V) bool) seq.Seq2[K, V] {
 	return seq2.Filter(m.All, filter.Value[K](predicate))
 }
 
 // FiltValue returns an errorable seq consisting of key/value pairs where the value satisfies the condition of the 'predicate' function
-func (m Map[K, V]) FiltValue(predicate func(V) (bool, error)) collection.SeqE[c.KV[K, V]] {
+func (m Map[K, V]) FiltValue(predicate func(V) (bool, error)) seq.SeqE[c.KV[K, V]] {
 	return seq2.Filt(m.All, filtere.Value[K](predicate))
 }
 
 // ConvertValue returns a seq that applies the 'converter' function to values of the map
-func (m Map[K, V]) ConvertValue(converter func(V) V) collection.Seq2[K, V] {
+func (m Map[K, V]) ConvertValue(converter func(V) V) seq.Seq2[K, V] {
 	return seq2.Convert(m.All, convert.Value[K](converter))
 }
 
 // ConvValue returns a errorable seq that applies the 'converter' function to values of the map
-func (m Map[K, V]) ConvValue(converter func(V) (V, error)) collection.SeqE[c.KV[K, V]] {
+func (m Map[K, V]) ConvValue(converter func(V) (V, error)) seq.SeqE[c.KV[K, V]] {
 	return seq2.Conv(m.All, converte.Value[K](converter))
 }
 
 // Filter returns a seq consisting of elements that satisfy the condition of the 'predicate' function
-func (m Map[K, V]) Filter(predicate func(K, V) bool) collection.Seq2[K, V] {
+func (m Map[K, V]) Filter(predicate func(K, V) bool) seq.Seq2[K, V] {
 	return seq2.Filter(m.All, predicate)
 }
 
 // Filt returns a errorable seq consisting of elements that satisfy the condition of the 'predicate' function
-func (m Map[K, V]) Filt(predicate func(K, V) (bool, error)) collection.SeqE[c.KV[K, V]] {
+func (m Map[K, V]) Filt(predicate func(K, V) (bool, error)) seq.SeqE[c.KV[K, V]] {
 	return seq2.Filt(m.All, predicate)
 }
 
 // Convert returns a seq that applies the 'converter' function to the collection elements
-func (m Map[K, V]) Convert(converter func(K, V) (K, V)) collection.Seq2[K, V] {
+func (m Map[K, V]) Convert(converter func(K, V) (K, V)) seq.Seq2[K, V] {
 	return seq2.Convert(m.All, converter)
 }
 
 // Conv returns a errorable seq that applies the 'converter' function to the collection elements
-func (m Map[K, V]) Conv(converter func(K, V) (K, V, error)) collection.SeqE[c.KV[K, V]] {
+func (m Map[K, V]) Conv(converter func(K, V) (K, V, error)) seq.SeqE[c.KV[K, V]] {
 	return seq2.Conv(m.All, converter)
 }
 

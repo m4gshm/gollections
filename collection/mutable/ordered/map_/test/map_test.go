@@ -27,7 +27,7 @@ func Test_Map_From(t *testing.T) {
 }
 
 func Test_Map_FromSeq(t *testing.T) {
-	m := omap.FromSeq2(seq.KeyValue(seq.Of(k.V(1, "1"), k.V(1, "1"), k.V(2, "2"), k.V(4, "4"), k.V(3, "3"), k.V(1, "1")), c.KV[int, string].Key, c.KV[int, string].Value))
+	m := omap.FromSeq2(seq.ToKV(seq.Of(k.V(1, "1"), k.V(1, "1"), k.V(2, "2"), k.V(4, "4"), k.V(3, "3"), k.V(1, "1")), c.KV[int, string].Key, c.KV[int, string].Value))
 	iterCheck(t, m)
 }
 

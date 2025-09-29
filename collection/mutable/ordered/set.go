@@ -22,15 +22,15 @@ type Set[T comparable] struct {
 }
 
 var (
-	_ c.Addable[int]                       = (*Set[int])(nil)
-	_ c.AddableNew[int]                    = (*Set[int])(nil)
-	_ c.AddableAll[collection.Seq[int]]    = (*Set[int])(nil)
-	_ c.AddableAllNew[collection.Seq[int]] = (*Set[int])(nil)
-	_ c.Deleteable[int]                    = (*Set[int])(nil)
-	_ c.DeleteableVerify[int]              = (*Set[int])(nil)
-	_ c.OrderedRange[int]                  = (*Set[int])(nil)
-	_ collection.Set[int]                  = (*Set[int])(nil)
-	_ fmt.Stringer                         = (*Set[int])(nil)
+	_ c.Addable[int]                = (*Set[int])(nil)
+	_ c.AddableNew[int]             = (*Set[int])(nil)
+	_ c.AddableAll[seq.Seq[int]]    = (*Set[int])(nil)
+	_ c.AddableAllNew[seq.Seq[int]] = (*Set[int])(nil)
+	_ c.Deleteable[int]             = (*Set[int])(nil)
+	_ c.DeleteableVerify[int]       = (*Set[int])(nil)
+	_ c.OrderedRange[int]           = (*Set[int])(nil)
+	_ collection.Set[int]           = (*Set[int])(nil)
+	_ fmt.Stringer                  = (*Set[int])(nil)
 )
 
 // All is used to iterate through the collection using `for e := range`.
@@ -156,14 +156,14 @@ func (s *Set[T]) AddOneNew(element T) (ok bool) {
 }
 
 // AddAll inserts all elements from the "other" sequence
-func (s *Set[T]) AddAll(other collection.Seq[T]) {
+func (s *Set[T]) AddAll(other seq.Seq[T]) {
 	if !(s == nil || other == nil) {
 		seq.ForEach(other, s.AddOne)
 	}
 }
 
 // AddAllNew inserts elements from the "other" sequence if they are not contained in the collection
-func (s *Set[T]) AddAllNew(other collection.Seq[T]) (ok bool) {
+func (s *Set[T]) AddAllNew(other seq.Seq[T]) (ok bool) {
 	if !(s == nil || other == nil) {
 		seq.ForEach(other, func(v T) { ok = s.AddOneNew(v) || ok })
 	}
@@ -233,22 +233,22 @@ func (s *Set[T]) ForEach(consumer func(T)) {
 }
 
 // Filter returns a seq consisting of elements that satisfy the condition of the 'predicate' function
-func (s *Set[T]) Filter(predicate func(T) bool) collection.Seq[T] {
+func (s *Set[T]) Filter(predicate func(T) bool) seq.Seq[T] {
 	return collection.Filter(s, predicate)
 }
 
 // Filt returns a errorable seq consisting of elements that satisfy the condition of the 'predicate' function
-func (s *Set[T]) Filt(predicate func(T) (bool, error)) collection.SeqE[T] {
+func (s *Set[T]) Filt(predicate func(T) (bool, error)) seq.SeqE[T] {
 	return collection.Filt(s, predicate)
 }
 
 // Convert returns a seq that applies the 'converter' function to the collection elements
-func (s *Set[T]) Convert(converter func(T) T) collection.Seq[T] {
+func (s *Set[T]) Convert(converter func(T) T) seq.Seq[T] {
 	return collection.Convert(s, converter)
 }
 
 // Conv returns a errorable seq that applies the 'converter' function to the collection elements
-func (s *Set[T]) Conv(converter func(T) (T, error)) collection.SeqE[T] {
+func (s *Set[T]) Conv(converter func(T) (T, error)) seq.SeqE[T] {
 	return collection.Conv(s, converter)
 }
 

@@ -21,15 +21,15 @@ func WrapVector[T any](elements []T) *Vector[T] {
 type Vector[T any] []T
 
 var (
-	_ c.Addable[any]                    = (*Vector[any])(nil)
-	_ c.AddableAll[collection.Seq[any]] = (*Vector[any])(nil)
-	_ c.Deleteable[int]                 = (*Vector[any])(nil)
-	_ c.DeleteableVerify[int]           = (*Vector[any])(nil)
-	_ c.Settable[int, any]              = (*Vector[any])(nil)
-	_ c.SettableNew[int, any]           = (*Vector[any])(nil)
-	_ c.OrderedRange[any]               = (*Vector[any])(nil)
-	_ collection.Vector[any]            = (*Vector[any])(nil)
-	_ fmt.Stringer                      = (*Vector[any])(nil)
+	_ c.Addable[any]             = (*Vector[any])(nil)
+	_ c.AddableAll[seq.Seq[any]] = (*Vector[any])(nil)
+	_ c.Deleteable[int]          = (*Vector[any])(nil)
+	_ c.DeleteableVerify[int]    = (*Vector[any])(nil)
+	_ c.Settable[int, any]       = (*Vector[any])(nil)
+	_ c.SettableNew[int, any]    = (*Vector[any])(nil)
+	_ c.OrderedRange[any]        = (*Vector[any])(nil)
+	_ collection.Vector[any]     = (*Vector[any])(nil)
+	_ fmt.Stringer               = (*Vector[any])(nil)
 )
 
 // All is used to iterate through the collection using `for e := range`.
@@ -153,7 +153,7 @@ func (v *Vector[T]) AddOne(element T) {
 }
 
 // AddAll inserts all elements from the "other" collection
-func (v *Vector[T]) AddAll(other collection.Seq[T]) {
+func (v *Vector[T]) AddAll(other seq.Seq[T]) {
 	if v != nil {
 		seq.ForEach(other, func(element T) { *v = append(*v, element) })
 	}
@@ -264,22 +264,22 @@ func (v *Vector[T]) SetNew(index int, value T) bool {
 }
 
 // Filter returns a seq consisting of vector elements matching the filter
-func (v *Vector[T]) Filter(filter func(T) bool) collection.Seq[T] {
+func (v *Vector[T]) Filter(filter func(T) bool) seq.Seq[T] {
 	return collection.Filter(v, filter)
 }
 
 // Filt returns a errorable seq consisting of elements that satisfy the condition of the 'predicate' function
-func (v *Vector[T]) Filt(predicate func(T) (bool, error)) collection.SeqE[T] {
+func (v *Vector[T]) Filt(predicate func(T) (bool, error)) seq.SeqE[T] {
 	return collection.Filt(v, predicate)
 }
 
 // Convert returns a seq that applies the 'converter' function to the collection elements
-func (v *Vector[T]) Convert(converter func(T) T) collection.Seq[T] {
+func (v *Vector[T]) Convert(converter func(T) T) seq.Seq[T] {
 	return collection.Convert(v, converter)
 }
 
 // Conv returns a errorable seq that applies the 'converter' function to the collection elements
-func (v *Vector[T]) Conv(converter func(T) (T, error)) collection.SeqE[T] {
+func (v *Vector[T]) Conv(converter func(T) (T, error)) seq.SeqE[T] {
 	return collection.Conv(v, converter)
 }
 

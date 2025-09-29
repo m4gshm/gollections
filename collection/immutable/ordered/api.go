@@ -3,7 +3,6 @@ package ordered
 
 import (
 	"github.com/m4gshm/gollections/c"
-	"github.com/m4gshm/gollections/collection"
 	kvloop "github.com/m4gshm/gollections/kv/loop"
 	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/seq"
@@ -24,7 +23,7 @@ func SetFromLoop[T comparable](next func() (T, bool)) Set[T] {
 }
 
 // SetFromSeq creates a set with elements retrieved by the seq.
-func SetFromSeq[T comparable](seq collection.Seq[T]) Set[T] {
+func SetFromSeq[T comparable](seq seq.Seq[T]) Set[T] {
 	if seq == nil {
 		return Set[T]{}
 	}
@@ -69,7 +68,7 @@ func MapFromLoop[K comparable, V any](next func() (K, V, bool)) Map[K, V] {
 }
 
 // MapFromSeq2 creates a map with elements retrieved by the seq.
-func MapFromSeq2[K comparable, V any](seq collection.Seq2[K, V]) Map[K, V] {
+func MapFromSeq2[K comparable, V any](seq seq.Seq2[K, V]) Map[K, V] {
 	if seq == nil {
 		return Map[K, V]{}
 	}

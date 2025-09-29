@@ -5,6 +5,7 @@ import (
 
 	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/map_"
+	"github.com/m4gshm/gollections/seq"
 	"github.com/m4gshm/gollections/slice"
 )
 
@@ -68,22 +69,22 @@ func (m MapKeys[K, V]) ForEach(consumer func(K)) {
 }
 
 // Filter returns a seq consisting of elements that satisfy the condition of the 'predicate' function
-func (m MapKeys[K, V]) Filter(filter func(K) bool) collection.Seq[K] {
+func (m MapKeys[K, V]) Filter(filter func(K) bool) seq.Seq[K] {
 	return collection.Filter(m, filter)
 }
 
 // Filt returns a errorable seq consisting of elements that satisfy the condition of the 'predicate' function
-func (m MapKeys[K, V]) Filt(predicate func(K) (bool, error)) collection.SeqE[K] {
+func (m MapKeys[K, V]) Filt(predicate func(K) (bool, error)) seq.SeqE[K] {
 	return collection.Filt(m, predicate)
 }
 
 // Convert returns a seq that applies the 'converter' function to the collection elements
-func (m MapKeys[K, V]) Convert(converter func(K) K) collection.Seq[K] {
+func (m MapKeys[K, V]) Convert(converter func(K) K) seq.Seq[K] {
 	return collection.Convert(m, converter)
 }
 
 // Conv returns a errorable seq that applies the 'converter' function to the collection elements
-func (m MapKeys[K, V]) Conv(converter func(K) (K, error)) collection.SeqE[K] {
+func (m MapKeys[K, V]) Conv(converter func(K) (K, error)) seq.SeqE[K] {
 	return collection.Conv(m, converter)
 }
 

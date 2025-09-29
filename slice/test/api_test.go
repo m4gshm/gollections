@@ -387,12 +387,12 @@ func Test_FlattSeq(t *testing.T) {
 	transform := func(i int) (int, error) {
 		return i, op.IfElse(i == 5, errors.New("abort"), nil)
 	}
-	f, err := slice.FlattSeq(md, func(i []int) seq.SeqE[int] { return seq.ToSeq2(seq.Of(i...), transform) })
+	f, err := slice.FlattSeq(md, func(i []int) seq.SeqE[int] { return seq.Conv(seq.Of(i...), transform) })
 	assert.Error(t, err)
 	assert.Equal(t, []int{1, 2, 3, 4}, f)
 
 	f, err = slice.FlattSeq(md, func(i []int) seq.SeqE[int] {
-		return seq.ToSeq2(seq.Of(i...), func(i int) (int, error) { return i, nil })
+		return seq.SeqE[int](seq.ToSeq2(seq.Of(i...), func(i int) (int, error) { return i, nil }))
 	})
 	assert.NoError(t, err)
 	assert.Equal(t, []int{1, 2, 3, 4, 5, 6}, f)

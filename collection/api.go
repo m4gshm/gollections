@@ -16,47 +16,47 @@ func Head[IT c.Range[T], T any](collection IT) (T, bool) {
 }
 
 // Convert returns a seq that applies the 'converter' function to the collection elements
-func Convert[IT c.Range[From], From, To any](collection IT, converter func(From) To) Seq[To] {
+func Convert[IT c.Range[From], From, To any](collection IT, converter func(From) To) seq.Seq[To] {
 	return seq.Convert(collection.All, converter)
 }
 
 // Conv returns a errorable seq that applies the 'converter' function to the collection elements
-func Conv[IT c.Range[From], From, To any](collection IT, converter func(From) (To, error)) SeqE[To] {
+func Conv[IT c.Range[From], From, To any](collection IT, converter func(From) (To, error)) seq.SeqE[To] {
 	return seq.Conv(collection.All, converter)
 }
 
 // FilterAndConvert returns a seq that filters source elements and converts them
-func FilterAndConvert[IT c.Range[From], From, To any](collection IT, filter func(From) bool, converter func(From) To) Seq[To] {
+func FilterAndConvert[IT c.Range[From], From, To any](collection IT, filter func(From) bool, converter func(From) To) seq.Seq[To] {
 	return seq.Convert(seq.Filter(collection.All, filter), converter)
 }
 
 // Flat returns a seq that converts the collection elements into slices and then flattens them to one level
-func Flat[IT c.Range[From], From, To any](collection IT, by func(From) []To) Seq[To] {
+func Flat[IT c.Range[From], From, To any](collection IT, by func(From) []To) seq.Seq[To] {
 	return seq.Flat(collection.All, by)
 }
 
 // Flatt returns a errorable seq that converts the collection elements into slices and then flattens them to one level
-func Flatt[IT c.Range[From], From, To any](collection IT, flattener func(From) ([]To, error)) SeqE[To] {
+func Flatt[IT c.Range[From], From, To any](collection IT, flattener func(From) ([]To, error)) seq.SeqE[To] {
 	return seq.Flatt(collection.All, flattener)
 }
 
 // FilterAndFlat filters source elements and extracts slices of 'To' by the 'flattener' function
-func FilterAndFlat[IT c.Range[From], From, To any](collection IT, filter func(From) bool, flattener func(From) []To) Seq[To] {
+func FilterAndFlat[IT c.Range[From], From, To any](collection IT, filter func(From) bool, flattener func(From) []To) seq.Seq[To] {
 	return seq.Flat(seq.Filter(collection.All, filter), flattener)
 }
 
 // Filter instantiates a seq that checks elements by the 'filter' function and returns successful ones.
-func Filter[IT c.Range[T], T any](collection IT, filter func(T) bool) Seq[T] {
+func Filter[IT c.Range[T], T any](collection IT, filter func(T) bool) seq.Seq[T] {
 	return seq.Filter(collection.All, filter)
 }
 
 // Filter instantiates a seq that checks elements by the 'filter' function and returns successful ones.
-func Filt[IT c.Range[T], T any](collection IT, filter func(T) (bool, error)) SeqE[T] {
+func Filt[IT c.Range[T], T any](collection IT, filter func(T) (bool, error)) seq.SeqE[T] {
 	return seq.Filt(collection.All, filter)
 }
 
 // NotNil instantiates a seq that filters nullable elements
-func NotNil[IT c.Range[*T], T any](collection IT) Seq[*T] {
+func NotNil[IT c.Range[*T], T any](collection IT) seq.Seq[*T] {
 	return Filter(collection, not.Nil[T])
 }
 
@@ -79,8 +79,8 @@ func NotNil[IT c.Range[*T], T any](collection IT) Seq[*T] {
 // }
 
 // KeyValue transforms iterable elements to key/value iterator based on applying key, value extractors to the elements
-func KeyValue[IT c.Range[T], T any, K comparable, V any](collection IT, keyExtractor func(T) K, valExtractor func(T) V) Seq2[K, V] {
-	return seq.KeyValue(collection.All, keyExtractor, valExtractor)
+func KeyValue[IT c.Range[T], T any, K comparable, V any](collection IT, keyExtractor func(T) K, valExtractor func(T) V) seq.Seq2[K, V] {
+	return seq.ToKV(collection.All, keyExtractor, valExtractor)
 }
 
 // First returns the first element that satisfies the condition of the 'predicate' function

@@ -17,7 +17,6 @@ import (
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/op/check"
 	"github.com/m4gshm/gollections/op/check/not"
-	"github.com/m4gshm/gollections/seq"
 )
 
 // Break is the 'break' statement of the For, Track methods
@@ -25,6 +24,11 @@ var Break = loop.Break
 
 // Continue is an alias of the nil value used to continue iterating by For, Track methods.
 var Continue = c.Continue
+
+// Seq is an alias of an iterator-function that allows to iterate over elements of a sequence, such as slice.
+type Seq[T any] = func(yield func(T) bool)
+
+type SeqE[T any] = func(yield func(T, error) bool)
 
 // Of is generic slice constructor
 func Of[T any](elements ...T) []T { return elements }
@@ -428,7 +432,7 @@ func Flat[FS ~[]From, From any, TS ~[]To, To any](elements FS, flattener func(Fr
 //
 //	var arrays [][]int
 //	var integers []int = slice.Flat(arrays, slices.Values)
-func FlatSeq[FS ~[]From, From any, STo ~seq.Seq[To], To any](elements FS, flattener func(From) STo) []To {
+func FlatSeq[FS ~[]From, From any, STo ~Seq[To], To any](elements FS, flattener func(From) STo) []To {
 	if elements == nil || flattener == nil {
 		return nil
 	}
@@ -468,7 +472,7 @@ func Flatt[FS ~[]From, From, To any](elements FS, flattener func(From) ([]To, er
 //	var strings [][]string
 //	var parse = func(f []string) ([]int, error) { ... }
 //	integers, err := Flatt(strings, parse)
-func FlattSeq[FS ~[]From, From any, STo ~seq.SeqE[To], To any](elements FS, flattener func(From) STo) ([]To, error) {
+func FlattSeq[FS ~[]From, From any, STo ~SeqE[To], To any](elements FS, flattener func(From) STo) ([]To, error) {
 	if elements == nil || flattener == nil {
 		return nil, nil
 	}
