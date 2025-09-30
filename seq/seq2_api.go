@@ -27,10 +27,12 @@ func (s Seq2[K, V]) HasAny(condition func(K, V) bool) bool {
 	return s2.HasAny(s, condition)
 }
 
+// Union combines several sequences into one.
 func (s Seq2[K, V]) Union(seqences ...seq2[K, V]) Seq2[K, V] {
 	return s2.Union(append(append(make([]seq2[K, V], len(seqences)+1), s), seqences...)...)
 }
 
+// Filter creates an iterator that iterates only those elements for which the 'filter' function returns true.
 func (s Seq2[K, V]) Filter(filter func(K, V) bool) Seq2[K, V] {
 	return s2.Filter(s, filter)
 }
@@ -70,7 +72,7 @@ func (s Seq2[K, V]) FilterValue(filter func(V) bool) Seq2[K, V] {
 	return s.Filter(predicate.Value[K](filter))
 }
 
-// ConvertValue returns a seq that applies the 'converter' function to keys.
+// ConvertKey returns a seq that applies the 'converter' function to keys.
 func (s Seq2[K, V]) ConvertKey(converter func(K) K) Seq2[K, V] {
 	return s2.Convert(s, convert.Key[V](converter))
 }

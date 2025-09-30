@@ -88,6 +88,7 @@ func Firstt[S ~Seq2[K, V], K, V any](seq S, condition func(K, V) (bool, error)) 
 	return k, v, ok, err
 }
 
+// Filter creates an iterator that iterates only those elements for which the 'filter' function returns true.
 func Filter[S ~Seq2[K, V], K, V any](seq S, filter func(K, V) bool) Seq2[K, V] {
 	return func(yield func(K, V) bool) {
 		if seq == nil || filter == nil {
