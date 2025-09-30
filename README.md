@@ -514,11 +514,8 @@ ints, err := seqe.Slice(intSeq) //[1 2 3], invalid syntax
 
 ### Sequence API
 
-To use any collection or loop as a rangefunc sequecne just call
+To iterate over any collection just call
 [All](#iterating-over-collections) method of that one.
-
-In many cases the API likes the
-[loop](#loop-kvloop-and-breakable-versions-breakloop-breakkvloop) API.
 
 #### Instantiators
 

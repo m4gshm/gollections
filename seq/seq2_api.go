@@ -7,20 +7,22 @@ import (
 	"github.com/m4gshm/gollections/kv/predicate"
 )
 
+// Head returns the first key\value pair.
 func (s Seq2[K, V]) Head() (K, V, bool) {
 	return s2.Head(s)
 }
 
-func (s Seq2[K, V]) First(filter func(K, V) bool) (K, V, bool) {
-	return s2.First(s, filter)
+// First returns the first key\value pair that satisfies the condition.
+func (s Seq2[K, V]) First(condition func(K, V) bool) (K, V, bool) {
+	return s2.First(s, condition)
 }
 
-func (s Seq2[K, V]) Firstt(filter func(K, V) (bool, error)) (K, V, bool, error) {
-	return s2.Firstt(s, filter)
+func (s Seq2[K, V]) Firstt(condition func(K, V) (bool, error)) (K, V, bool, error) {
+	return s2.Firstt(s, condition)
 }
 
-func (s Seq2[K, V]) HasAny(filter func(K, V) bool) bool {
-	return s2.HasAny(s, filter)
+func (s Seq2[K, V]) HasAny(condition func(K, V) bool) bool {
+	return s2.HasAny(s, condition)
 }
 
 func (s Seq2[K, V]) Union(seqences ...seq2[K, V]) Seq2[K, V] {
@@ -31,8 +33,8 @@ func (s Seq2[K, V]) Filter(filter func(K, V) bool) Seq2[K, V] {
 	return s2.Filter(s, filter)
 }
 
-func (s Seq2[K, V]) Filt(predicate func(K, V) (bool, error)) SeqE[c.KV[K, V]] {
-	return s2.Filt(s, predicate)
+func (s Seq2[K, V]) Filt(filter func(K, V) (bool, error)) SeqE[c.KV[K, V]] {
+	return s2.Filt(s, filter)
 }
 
 func (s Seq2[K, V]) Convert(converter func(K, V) (K, V)) Seq2[K, V] {

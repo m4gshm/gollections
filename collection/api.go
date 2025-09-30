@@ -60,37 +60,37 @@ func NotNil[IT c.Range[*T], T any](collection IT) seq.Seq[*T] {
 	return Filter(collection, not.Nil[T])
 }
 
-// // PtrVal creates a seq that transform pointers to the values referenced referenced by those pointers.
-// // Nil pointers are transformet to zero values.
-// func PtrVal[IT c.Range[*T], T any](collection IT) loop.Loop[T] {
-// 	return loop.PtrVal(collection.All)
-// }
+// PtrVal creates a seq that transform pointers to the values referenced referenced by those pointers.
+// Nil pointers are transformet to zero values.
+func PtrVal[IT c.Range[*T], T any](collection IT) seq.Seq[T] {
+	return seq.PtrVal(collection.All)
+}
 
-// // NoNilPtrVal creates a seq that transform only not nil pointers to the values referenced referenced by those pointers.
-// // Nil pointers are ignored.
-// func NoNilPtrVal[T any, IT Iterable[*T]](collection IT) loop.Loop[T] {
-// 	return loop.NoNilPtrVal(collection.All)
-// }
+// NoNilPtrVal creates a seq that transform only not nil pointers to the values referenced referenced by those pointers.
+// Nil pointers are ignored.
+func NoNilPtrVal[IT c.Range[*T], T any](collection IT) seq.Seq[T] {
+	return seq.NoNilPtrVal(collection.All)
+}
 
-// // NilSafe creates a seq that filters not nil elements, converts that ones, filters not nils after converting and returns them
-// func NilSafe[From, To any, IT Iterable[*From]](collection IT, converter func(*From) *To) loop.Loop[*To] {
-// 	h := collection.All
-// 	return loopconvert.NilSafe(h, converter)
-// }
+// NilSafe creates a seq that filters not nil elements, converts that ones, filters not nils after converting and returns them
+func NilSafe[IT c.Range[*From], From, To any](collection IT, converter func(*From) *To) seq.Seq[*To] {
+	h := collection.All
+	return seq.NilSafe(h, converter)
+}
 
 // KeyValue transforms iterable elements to key/value iterator based on applying key, value extractors to the elements
 func KeyValue[IT c.Range[T], T any, K comparable, V any](collection IT, keyExtractor func(T) K, valExtractor func(T) V) seq.Seq2[K, V] {
 	return seq.ToKV(collection.All, keyExtractor, valExtractor)
 }
 
-// First returns the first element that satisfies the condition of the 'predicate' function
-func First[IT c.Range[T], T any](collection IT, predicate func(T) bool) (v T, ok bool) {
-	return seq.First(collection.All, predicate)
+// First returns the first element that satisfies the condition.
+func First[IT c.Range[T], T any](collection IT, condition func(T) bool) (v T, ok bool) {
+	return seq.First(collection.All, condition)
 }
 
-// Firstt returns the first element that satisfies the condition of the 'predicate' function
-func Firstt[IT c.Range[T], T any](collection IT, predicate func(T) (bool, error)) (v T, ok bool, err error) {
-	return seq.Firstt(collection.All, predicate)
+// Firstt returns the first element that satisfies the condition.
+func Firstt[IT c.Range[T], T any](collection IT, condition func(T) (bool, error)) (v T, ok bool, err error) {
+	return seq.Firstt(collection.All, condition)
 }
 
 // Sort sorts the specified sortable collection that contains orderable elements

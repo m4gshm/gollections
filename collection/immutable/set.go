@@ -62,14 +62,14 @@ func (s Set[T]) ForEach(consumer func(T)) {
 	map_.ForEachKey(s.elements, consumer)
 }
 
-// Filter returns a seq consisting of elements that satisfy the condition of the 'predicate' function
-func (s Set[T]) Filter(predicate func(T) bool) seq.Seq[T] {
-	return collection.Filter(s, predicate)
+// Filter returns a seq consisting of elements that satisfy the condition of the 'filter' function
+func (s Set[T]) Filter(filter func(T) bool) seq.Seq[T] {
+	return collection.Filter(s, filter)
 }
 
-// Filt returns a errorable seq consisting of elements that satisfy the condition of the 'predicate' function
-func (s Set[T]) Filt(predicate func(T) (bool, error)) seq.SeqE[T] {
-	return collection.Filt(s, predicate)
+// Filt returns a errorable seq consisting of elements that satisfy the condition of the 'filter' function
+func (s Set[T]) Filt(filter func(T) (bool, error)) seq.SeqE[T] {
+	return collection.Filt(s, filter)
 }
 
 // Convert returns a seq that applies the 'converter' function to the collection elements
@@ -90,10 +90,10 @@ func (s Set[T]) Reduce(merge func(T, T) T) T {
 	return t
 }
 
-// HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful
-func (s Set[T]) HasAny(predicate func(T) bool) bool {
+// HasAny checks whether the set contains an element that satisfies the condition.
+func (s Set[T]) HasAny(condition func(T) bool) bool {
 	return map_.HasAny(s.elements, func(t T, _ struct{}) bool {
-		return predicate(t)
+		return condition(t)
 	})
 }
 

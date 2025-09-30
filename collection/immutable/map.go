@@ -4,12 +4,12 @@ import (
 	"fmt"
 
 	converte "github.com/m4gshm/gollections/break/kv/convert"
-	filtere "github.com/m4gshm/gollections/break/kv/predicate"
+	kvFiltere "github.com/m4gshm/gollections/break/kv/predicate"
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/collection/immutable/ordered"
 	"github.com/m4gshm/gollections/kv/convert"
-	filter "github.com/m4gshm/gollections/kv/predicate"
+	kvFilter "github.com/m4gshm/gollections/kv/predicate"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/seq"
 	"github.com/m4gshm/gollections/seq2"
@@ -114,14 +114,14 @@ func (m Map[K, V]) TrackEach(consumer func(K, V)) {
 	map_.TrackEach(m.elements, consumer)
 }
 
-// FilterKey returns a seq consisting of key/value pairs where the key satisfies the condition of the 'predicate' function
-func (m Map[K, V]) FilterKey(predicate func(K) bool) seq.Seq2[K, V] {
-	return seq2.Filter(m.All, filter.Key[V](predicate))
+// FilterKey returns a seq consisting of key/value pairs where the key satisfies the condition of the 'filter' function
+func (m Map[K, V]) FilterKey(filter func(K) bool) seq.Seq2[K, V] {
+	return seq2.Filter(m.All, kvFilter.Key[V](filter))
 }
 
-// FiltKey returns an errorable seq consisting of key/value pairs where the key satisfies the condition of the 'predicate' function
-func (m Map[K, V]) FiltKey(predicate func(K) (bool, error)) seq.SeqE[c.KV[K, V]] {
-	return seq2.Filt(m.All, filtere.Key[V](predicate))
+// FiltKey returns an errorable seq consisting of key/value pairs where the key satisfies the condition of the 'filter' function
+func (m Map[K, V]) FiltKey(filter func(K) (bool, error)) seq.SeqE[c.KV[K, V]] {
+	return seq2.Filt(m.All, kvFiltere.Key[V](filter))
 }
 
 // ConvertKey returns a seq that applies the 'converter' function to keys of the map
@@ -134,14 +134,14 @@ func (m Map[K, V]) ConvKey(converter func(K) (K, error)) seq.SeqE[c.KV[K, V]] {
 	return seq2.Conv(m.All, converte.Key[V](converter))
 }
 
-// FilterValue returns a seq consisting of key/value pairs where the value satisfies the condition of the 'predicate' function
-func (m Map[K, V]) FilterValue(predicate func(V) bool) seq.Seq2[K, V] {
-	return seq2.Filter(m.All, filter.Value[K](predicate))
+// FilterValue returns a seq consisting of key/value pairs where the value satisfies the condition of the 'filter' function
+func (m Map[K, V]) FilterValue(filter func(V) bool) seq.Seq2[K, V] {
+	return seq2.Filter(m.All, kvFilter.Value[K](filter))
 }
 
-// FiltValue returns an errorable seq consisting of key/value pairs where the value satisfies the condition of the 'predicate' function
-func (m Map[K, V]) FiltValue(predicate func(V) (bool, error)) seq.SeqE[c.KV[K, V]] {
-	return seq2.Filt(m.All, filtere.Value[K](predicate))
+// FiltValue returns an errorable seq consisting of key/value pairs where the value satisfies the condition of the 'filter' function
+func (m Map[K, V]) FiltValue(filter func(V) (bool, error)) seq.SeqE[c.KV[K, V]] {
+	return seq2.Filt(m.All, kvFiltere.Value[K](filter))
 }
 
 // ConvertValue returns a seq that applies the 'converter' function to values of the map
@@ -154,14 +154,14 @@ func (m Map[K, V]) ConvValue(converter func(V) (V, error)) seq.SeqE[c.KV[K, V]] 
 	return seq2.Conv(m.All, converte.Value[K](converter))
 }
 
-// Filter returns a seq consisting of elements that satisfy the condition of the 'predicate' function
-func (m Map[K, V]) Filter(predicate func(K, V) bool) seq.Seq2[K, V] {
-	return seq2.Filter(m.All, predicate)
+// Filter returns a seq consisting of elements that satisfy the condition of the 'filter' function
+func (m Map[K, V]) Filter(filter func(K, V) bool) seq.Seq2[K, V] {
+	return seq2.Filter(m.All, filter)
 }
 
-// Filt returns a errorable seq consisting of elements that satisfy the condition of the 'predicate' function
-func (m Map[K, V]) Filt(predicate func(K, V) (bool, error)) seq.SeqE[c.KV[K, V]] {
-	return seq2.Filt(m.All, predicate)
+// Filt returns a errorable seq consisting of elements that satisfy the condition of the 'filter' function
+func (m Map[K, V]) Filt(filter func(K, V) (bool, error)) seq.SeqE[c.KV[K, V]] {
+	return seq2.Filt(m.All, filter)
 }
 
 // Convert returns a seq that applies the 'converter' function to the collection elements
@@ -179,7 +179,7 @@ func (m Map[K, V]) Reduce(merge func(K, K, V, V) (K, V)) (K, V) {
 	return map_.Reduce(m.elements, merge)
 }
 
-// HasAny finds the first key/value pair that satisfies the 'predicate' function condition and returns true if successful
-func (m Map[K, V]) HasAny(predicate func(K, V) bool) bool {
-	return map_.HasAny(m.elements, predicate)
+// HasAny checks whether the map contains a key/value pair that satisfies the condition.
+func (m Map[K, V]) HasAny(condition func(K, V) bool) bool {
+	return map_.HasAny(m.elements, condition)
 }

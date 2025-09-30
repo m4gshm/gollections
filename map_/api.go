@@ -374,10 +374,10 @@ func Reduce[M ~map[K]V, K comparable, V any](elements M, merge func(K, K, V, V) 
 	return rk, rv
 }
 
-// HasAny finds the first key/value pair that satisfies the 'predicate' function condition and returns true if successful
-func HasAny[M ~map[K]V, K comparable, V any](elements M, predicate func(K, V) bool) bool {
+// HasAny checks whether the elements contains an key\value pair that satisfies the condition.
+func HasAny[M ~map[K]V, K comparable, V any](elements M, condition func(K, V) bool) bool {
 	for k, v := range elements {
-		if predicate(k, v) {
+		if condition(k, v) {
 			return true
 		}
 	}

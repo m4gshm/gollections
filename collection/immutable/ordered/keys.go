@@ -73,14 +73,14 @@ func (m MapKeys[K]) ForEach(consumer func(K)) {
 	slice.ForEach(m.keys, consumer)
 }
 
-// Filter returns a seq consisting of elements that satisfy the condition of the 'predicate' function
+// Filter returns a seq consisting of elements that satisfy the condition of the 'filter' function
 func (m MapKeys[K]) Filter(filter func(K) bool) seq.Seq[K] {
 	return collection.Filter(m, filter)
 }
 
-// Filt returns a errorable seq consisting of elements that satisfy the condition of the 'predicate' function
-func (m MapKeys[K]) Filt(predicate func(K) (bool, error)) seq.SeqE[K] {
-	return collection.Filt(m, predicate)
+// Filt returns a errorable seq consisting of elements that satisfy the condition of the 'filter' function
+func (m MapKeys[K]) Filt(filter func(K) (bool, error)) seq.SeqE[K] {
+	return collection.Filt(m, filter)
 }
 
 // Convert returns a seq that applies the 'converter' function to the collection elements
@@ -98,9 +98,9 @@ func (m MapKeys[K]) Reduce(merge func(K, K) K) K {
 	return slice.Reduce(m.keys, merge)
 }
 
-// HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful
-func (m MapKeys[K]) HasAny(predicate func(K) bool) bool {
-	return slice.HasAny(m.keys, predicate)
+// HasAny checks whether the collection contains a key that satisfies the condition.
+func (m MapKeys[K]) HasAny(condition func(K) bool) bool {
+	return slice.HasAny(m.keys, condition)
 }
 
 // String returns string representation of the collection

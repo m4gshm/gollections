@@ -61,14 +61,14 @@ func (m MapKeys[K, V]) ForEach(consumer func(K)) {
 	map_.ForEachKey(m.elements, consumer)
 }
 
-// Filter returns a seq consisting of elements that satisfy the condition of the 'predicate' function
+// Filter returns a seq consisting of elements that satisfy the condition of the 'filter' function
 func (m MapKeys[K, V]) Filter(filter func(K) bool) seq.Seq[K] {
 	return collection.Filter(m, filter)
 }
 
-// Filt returns a errorable seq consisting of elements that satisfy the condition of the 'predicate' function
-func (m MapKeys[K, V]) Filt(predicate func(K) (bool, error)) seq.SeqE[K] {
-	return collection.Filt(m, predicate)
+// Filt returns a errorable seq consisting of elements that satisfy the condition of the 'filter' function
+func (m MapKeys[K, V]) Filt(filter func(K) (bool, error)) seq.SeqE[K] {
+	return collection.Filt(m, filter)
 }
 
 // Convert returns a seq that applies the 'converter' function to the collection elements
@@ -89,10 +89,10 @@ func (m MapKeys[K, V]) Reduce(merge func(K, K) K) K {
 	return k
 }
 
-// HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful
-func (m MapKeys[K, V]) HasAny(predicate func(K) bool) bool {
+// HasAny checks whether the collection contains a key that satisfies the condition.
+func (m MapKeys[K, V]) HasAny(condition func(K) bool) bool {
 	return map_.HasAny(m.elements, func(k K, _ V) bool {
-		return predicate(k)
+		return condition(k)
 	})
 }
 

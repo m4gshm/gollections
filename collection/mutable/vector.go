@@ -248,9 +248,9 @@ func (v *Vector[T]) Filter(filter func(T) bool) seq.Seq[T] {
 	return collection.Filter(v, filter)
 }
 
-// Filt returns a errorable seq consisting of elements that satisfy the condition of the 'predicate' function
-func (v *Vector[T]) Filt(predicate func(T) (bool, error)) seq.SeqE[T] {
-	return collection.Filt(v, predicate)
+// Filt returns a errorable seq consisting of elements that satisfy the condition of the 'filter' function
+func (v *Vector[T]) Filt(filter func(T) (bool, error)) seq.SeqE[T] {
+	return collection.Filt(v, filter)
 }
 
 // Convert returns a seq that applies the 'converter' function to the collection elements
@@ -271,10 +271,10 @@ func (v *Vector[T]) Reduce(merge func(T, T) T) (out T) {
 	return out
 }
 
-// HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful
-func (v *Vector[T]) HasAny(predicate func(T) bool) (ok bool) {
+// HasAny checks whether the vector contains an element that satisfies the condition.
+func (v *Vector[T]) HasAny(condition func(T) bool) (ok bool) {
 	if v != nil {
-		ok = slice.HasAny(*v, predicate)
+		ok = slice.HasAny(*v, condition)
 	}
 	return ok
 }

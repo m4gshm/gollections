@@ -896,19 +896,19 @@ func TrackEach[TS ~[]T, T any](elements TS, consumer func(int, T)) {
 	}
 }
 
-// TrackWhile applies the 'predicate' function to the elements while the fuction returns true.
-func TrackWhile[TS ~[]T, T any](elements TS, predicate func(int, T) bool) {
+// TrackWhile applies the 'filter' function to the elements while the fuction returns true.
+func TrackWhile[TS ~[]T, T any](elements TS, filter func(int, T) bool) {
 	for i, e := range elements {
-		if !predicate(i, e) {
+		if !filter(i, e) {
 			break
 		}
 	}
 }
 
-// WalkWhile applies the 'predicate' function for the elements until the predicate returns false to stop.
-func WalkWhile[TS ~[]T, T any](elements TS, predicate func(T) bool) {
+// WalkWhile applies the 'filter' function for the elements until the filter returns false to stop.
+func WalkWhile[TS ~[]T, T any](elements TS, filter func(T) bool) {
 	for _, e := range elements {
-		if !predicate(e) {
+		if !filter(e) {
 			break
 		}
 	}
@@ -1014,9 +1014,9 @@ func GetFilled[TS ~[]T, T any](elementsFactory func() TS, ifEmpty []T) TS {
 	return Filled(elementsFactory(), ifEmpty)
 }
 
-// HasAny tests if the 'elements' slice contains an element that satisfies the "predicate" condition
-func HasAny[TS ~[]T, T any](elements TS, predicate func(T) bool) bool {
-	_, ok := First(elements, predicate)
+// HasAny checks whether the elements contains an element that satisfies the condition.
+func HasAny[TS ~[]T, T any](elements TS, condition func(T) bool) bool {
+	_, ok := First(elements, condition)
 	return ok
 }
 

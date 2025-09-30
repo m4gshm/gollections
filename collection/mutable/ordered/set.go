@@ -221,14 +221,14 @@ func (s *Set[T]) ForEach(consumer func(T)) {
 	}
 }
 
-// Filter returns a seq consisting of elements that satisfy the condition of the 'predicate' function
-func (s *Set[T]) Filter(predicate func(T) bool) seq.Seq[T] {
-	return collection.Filter(s, predicate)
+// Filter returns a seq consisting of elements that satisfy the condition of the 'filter' function
+func (s *Set[T]) Filter(filter func(T) bool) seq.Seq[T] {
+	return collection.Filter(s, filter)
 }
 
-// Filt returns a errorable seq consisting of elements that satisfy the condition of the 'predicate' function
-func (s *Set[T]) Filt(predicate func(T) (bool, error)) seq.SeqE[T] {
-	return collection.Filt(s, predicate)
+// Filt returns a errorable seq consisting of elements that satisfy the condition of the 'filter' function
+func (s *Set[T]) Filt(filter func(T) (bool, error)) seq.SeqE[T] {
+	return collection.Filt(s, filter)
 }
 
 // Convert returns a seq that applies the 'converter' function to the collection elements
@@ -251,11 +251,11 @@ func (s *Set[T]) Reduce(merge func(T, T) T) (t T) {
 	return t
 }
 
-// HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful
-func (s *Set[K]) HasAny(predicate func(K) bool) bool {
+// HasAny checks whether the set contains an element that satisfies the condition.
+func (s *Set[K]) HasAny(condition func(K) bool) bool {
 	if s != nil {
 		if order := s.order; order != nil {
-			return slice.HasAny(*order, predicate)
+			return slice.HasAny(*order, condition)
 		}
 	}
 	return false

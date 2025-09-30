@@ -89,14 +89,14 @@ func (v Vector[T]) ForEach(consumer func(T)) {
 	slice.ForEach(v.elements, consumer)
 }
 
-// Filter returns a seq consisting of elements that satisfy the condition of the 'predicate' function
+// Filter returns a seq consisting of elements that satisfy the condition of the 'filter' function
 func (v Vector[T]) Filter(filter func(T) bool) seq.Seq[T] {
 	return collection.Filter(v, filter)
 }
 
-// Filt returns a errorable seq consisting of elements that satisfy the condition of the 'predicate' function
-func (v Vector[T]) Filt(predicate func(T) (bool, error)) seq.SeqE[T] {
-	return collection.Filt(v, predicate)
+// Filt returns a errorable seq consisting of elements that satisfy the condition of the 'filter' function
+func (v Vector[T]) Filt(filter func(T) (bool, error)) seq.SeqE[T] {
+	return collection.Filt(v, filter)
 }
 
 // Convert returns a seq that applies the 'converter' function to the collection elements
@@ -114,9 +114,9 @@ func (v Vector[T]) Reduce(merge func(T, T) T) T {
 	return slice.Reduce(v.elements, merge)
 }
 
-// HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful
-func (v Vector[T]) HasAny(predicate func(T) bool) bool {
-	return slice.HasAny(v.elements, predicate)
+// HasAny checks whether the vector contains an element that satisfies the condition.
+func (v Vector[T]) HasAny(condition func(T) bool) bool {
+	return slice.HasAny(v.elements, condition)
 }
 
 // Sort returns a sorted clone of the Vector
