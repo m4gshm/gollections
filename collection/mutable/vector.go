@@ -248,7 +248,7 @@ func (v *Vector[T]) Filter(filter func(T) bool) seq.Seq[T] {
 	return collection.Filter(v, filter)
 }
 
-// Filt returns a errorable seq consisting of elements that satisfy the condition of the 'filter' function
+// Filt returns an errorable seq consisting of elements that satisfy the condition of the 'filter' function
 func (v *Vector[T]) Filt(filter func(T) (bool, error)) seq.SeqE[T] {
 	return collection.Filt(v, filter)
 }
@@ -258,7 +258,7 @@ func (v *Vector[T]) Convert(converter func(T) T) seq.Seq[T] {
 	return collection.Convert(v, converter)
 }
 
-// Conv returns a errorable seq that applies the 'converter' function to the collection elements
+// Conv returns an errorable seq that applies the 'converter' function to the collection elements
 func (v *Vector[T]) Conv(converter func(T) (T, error)) seq.SeqE[T] {
 	return collection.Conv(v, converter)
 }

@@ -199,7 +199,7 @@ func Top[S ~seq[T], T any](n int, seq S) Seq[T] {
 	}
 }
 
-// Skip returns a sequence without first n elements.
+// Skip returns the seq without first n elements.
 func Skip[S ~seq[T], T any](n int, seq S) Seq[T] {
 	return func(yield func(T) bool) {
 		if seq == nil {
@@ -293,14 +293,8 @@ func Slice[S ~seq[T], T any](seq S) []T {
 }
 
 // SliceCap collects the elements of the 'seq' sequence into a new slice with predefined capacity.
-func SliceCap[S ~seq[T], T any](seq S, capacity int) (out []T) {
-	if seq == nil {
-		return nil
-	}
-	if capacity > 0 {
-		out = make([]T, 0, capacity)
-	}
-	return Append(seq, out)
+func SliceCap[S ~seq[T], T any](seq S, capacity int) []T {
+	return Append(seq, make([]T, 0, capacity))
 }
 
 // Append collects the elements of the 'seq' sequence into the specified 'out' slice.
@@ -315,13 +309,13 @@ func Append[S ~seq[T], TS ~[]T, T any](seq S, out TS) TS {
 	return out
 }
 
-// Reduce reduces the elements of the 'seq' sequence an one using the 'merge' function.
+// Reduce reduces the elements of the seq into one using the 'merge' function.
 func Reduce[S ~seq[T], T any](seq S, merge func(T, T) T) T {
 	result, _ := ReduceOK(seq, merge)
 	return result
 }
 
-// ReduceOK reduces the elements of the 'seq' sequence an one using the 'merge' function.
+// ReduceOK reduces the elements of the seq into one using the 'merge' function.
 // Returns ok==false if the seq returns ok=false at the first call (no more elements).
 func ReduceOK[S ~seq[T], T any](seq S, merge func(T, T) T) (result T, ok bool) {
 	if seq == nil || merge == nil {
@@ -340,13 +334,13 @@ func ReduceOK[S ~seq[T], T any](seq S, merge func(T, T) T) (result T, ok bool) {
 	return result, started
 }
 
-// Reducee reduces the elements of the 'seq' sequence an one using the 'merge' function.
+// Reducee reduces the elements of the seq into one using the 'merge' function.
 func Reducee[S ~seq[T], T any](seq S, merge func(T, T) (T, error)) (T, error) {
 	result, _, err := ReduceeOK(seq, merge)
 	return result, err
 }
 
-// ReduceeOK reduces the elements of the 'seq' sequence an one using the 'merge' function.
+// ReduceeOK reduces the elements of the seq into one using the 'merge' function.
 // Returns ok==false if the seq returns ok=false at the first call (no more elements).
 func ReduceeOK[S ~seq[T], T any](seq S, merge func(T, T) (T, error)) (result T, ok bool, err error) {
 	if seq == nil || merge == nil {
@@ -358,11 +352,9 @@ func ReduceeOK[S ~seq[T], T any](seq S, merge func(T, T) (T, error)) (result T, 
 			result = v
 			started = true
 			return true
-		} else {
-			result, err = merge(result, v)
-			return err == nil
 		}
-
+		result, err = merge(result, v)
+		return err == nil
 	})
 	return result, started, err
 }
@@ -419,7 +411,7 @@ func Contains[S ~seq[T], T comparable](seq S, example T) bool {
 	return contains
 }
 
-// Conv creates an iterator that applies the 'converter' function to each iterable element and returns value-error pairs.
+// Conv creates an errorable seq that applies the 'converter' function to the iterable elements.
 // The error should be checked at every iteration step, like:
 //
 //	var integers iter.Seq[int]
@@ -684,7 +676,7 @@ func NilSafe[From, To any](seq Seq[*From], converter func(*From) *To) Seq[*To] {
 	})
 }
 
-// ForEach applies the 'consumer' function to the seq elements
+// ForEach applies the 'consumer' function to the seq elements.
 func ForEach[T any](seq Seq[T], consumer func(T)) {
 	if seq == nil {
 		return

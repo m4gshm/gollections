@@ -413,6 +413,25 @@ func Test_AllConverted(t *testing.T) {
 	assert.Equal(t, slice.Of(10, 20, 30, 50, 70, 80, 90, 110), i)
 }
 
+func Test_AllConv(t *testing.T) {
+	i := []int{}
+
+	for kv, err := range seq2.Conv(testMap.All, func(k int, v string) (int, int, error) {
+		if k == 5 {
+			return 0, 0, errors.New("stop")
+		}
+		c, err := strconv.Atoi(v)
+		return k, c, err
+	}) {
+		if err != nil {
+			break
+		}
+		i = append(i, kv.V)
+	}
+
+	assert.Equal(t, slice.Of(10, 20, 30), i)
+}
+
 func Test_Slice_ToMapResolvOrder(t *testing.T) {
 	var (
 		even          = func(v int) bool { return v%2 == 0 }

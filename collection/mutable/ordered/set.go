@@ -226,7 +226,7 @@ func (s *Set[T]) Filter(filter func(T) bool) seq.Seq[T] {
 	return collection.Filter(s, filter)
 }
 
-// Filt returns a errorable seq consisting of elements that satisfy the condition of the 'filter' function
+// Filt returns an errorable seq consisting of elements that satisfy the condition of the 'filter' function
 func (s *Set[T]) Filt(filter func(T) (bool, error)) seq.SeqE[T] {
 	return collection.Filt(s, filter)
 }
@@ -236,7 +236,7 @@ func (s *Set[T]) Convert(converter func(T) T) seq.Seq[T] {
 	return collection.Convert(s, converter)
 }
 
-// Conv returns a errorable seq that applies the 'converter' function to the collection elements
+// Conv returns an errorable seq that applies the 'converter' function to the collection elements
 func (s *Set[T]) Conv(converter func(T) (T, error)) seq.SeqE[T] {
 	return collection.Conv(s, converter)
 }

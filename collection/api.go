@@ -2,7 +2,7 @@
 package collection
 
 import (
-	"golang.org/x/exp/constraints"
+	"cmp"
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/comparer"
@@ -20,7 +20,7 @@ func Convert[IT c.Range[From], From, To any](collection IT, converter func(From)
 	return seq.Convert(collection.All, converter)
 }
 
-// Conv returns a errorable seq that applies the 'converter' function to the collection elements
+// Conv returns an errorable seq that applies the 'converter' function to the collection elements
 func Conv[IT c.Range[From], From, To any](collection IT, converter func(From) (To, error)) seq.SeqE[To] {
 	return seq.Conv(collection.All, converter)
 }
@@ -35,7 +35,7 @@ func Flat[IT c.Range[From], From, To any](collection IT, by func(From) []To) seq
 	return seq.Flat(collection.All, by)
 }
 
-// Flatt returns a errorable seq that converts the collection elements into slices and then flattens them to one level
+// Flatt returns an errorable seq that converts the collection elements into slices and then flattens them to one level
 func Flatt[IT c.Range[From], From, To any](collection IT, flattener func(From) ([]To, error)) seq.SeqE[To] {
 	return seq.Flatt(collection.All, flattener)
 }
@@ -96,7 +96,7 @@ func Firstt[IT c.Range[T], T any](collection IT, condition func(T) (bool, error)
 // Sort sorts the specified sortable collection that contains orderable elements
 func Sort[SC any, Cmp ~func(T, T) int, C interface {
 	Sort(Cmp) SC
-}, T any, O constraints.Ordered](collection C, order func(T) O) SC {
+}, T any, O cmp.Ordered](collection C, order func(T) O) SC {
 	return collection.Sort(comparer.Of(order))
 }
 

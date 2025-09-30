@@ -35,7 +35,7 @@ func Convert[From, To comparable](set immutable.Set[From], converter func(From) 
 	return collection.Convert(set, converter)
 }
 
-// Conv returns a errorable seq that applies the 'converter' function to the collection elements
+// Conv returns an errorable seq that applies the 'converter' function to the collection elements
 func Conv[From, To comparable](set immutable.Set[From], converter func(From) (To, error)) seq.SeqE[To] {
 	return collection.Conv(set, converter)
 }
@@ -45,7 +45,7 @@ func Flat[From, To comparable](set immutable.Set[From], flattener func(From) []T
 	return collection.Flat(set, flattener)
 }
 
-// Flatt returns a errorable seq that converts the collection elements into slices and then flattens them to one level
+// Flatt returns an errorable seq that converts the collection elements into slices and then flattens them to one level
 func Flatt[From, To comparable](set immutable.Set[From], flattener func(From) ([]To, error)) seq.SeqE[To] {
 	return collection.Flatt(set, flattener)
 }

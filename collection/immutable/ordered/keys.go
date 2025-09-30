@@ -78,7 +78,7 @@ func (m MapKeys[K]) Filter(filter func(K) bool) seq.Seq[K] {
 	return collection.Filter(m, filter)
 }
 
-// Filt returns a errorable seq consisting of elements that satisfy the condition of the 'filter' function
+// Filt returns an errorable seq consisting of elements that satisfy the condition of the 'filter' function
 func (m MapKeys[K]) Filt(filter func(K) (bool, error)) seq.SeqE[K] {
 	return collection.Filt(m, filter)
 }
@@ -88,7 +88,7 @@ func (m MapKeys[K]) Convert(converter func(K) K) seq.Seq[K] {
 	return collection.Convert(m, converter)
 }
 
-// Conv returns a errorable seq that applies the 'converter' function to the collection elements
+// Conv returns an errorable seq that applies the 'converter' function to the collection elements
 func (m MapKeys[K]) Conv(converter func(K) (K, error)) seq.SeqE[K] {
 	return collection.Conv(m, converter)
 }

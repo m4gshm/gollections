@@ -83,7 +83,7 @@ func Top[S ~SeqE[T], T any](n int, seq S) seq.SeqE[T] {
 	return seqe.Top(n, seq)
 }
 
-// Skip returns a sequence without first n elements.
+// Skip returns the seq without first n elements.
 func Skip[S ~SeqE[T], T any](n int, seq S) seq.SeqE[T] {
 	return seqe.Skip(n, seq)
 }
@@ -118,23 +118,23 @@ func Append[S ~SeqE[T], T any, TS ~[]T](seq S, out TS) (TS, error) {
 	return seqe.Append(seq, out)
 }
 
-// Reduce reduces the elements of the 'seq' sequence an one using the 'merge' function.
+// Reduce reduces the elements of the seq into one using the 'merge' function.
 func Reduce[S ~SeqE[T], T any](seq S, merge func(T, T) T) (T, error) {
 	return seqe.Reduce(seq, merge)
 }
 
-// ReduceOK reduces the elements of the 'seq' sequence an one using the 'merge' function.
+// ReduceOK reduces the elements of the seq into one using the 'merge' function.
 // Returns ok==false if the seq returns ok=false at the first call (no more elements).
 func ReduceOK[S ~SeqE[T], T any](seq S, merge func(T, T) T) (result T, ok bool, err error) {
 	return seqe.ReduceOK(seq, merge)
 }
 
-// Reducee reduces the elements of the 'seq' sequence an one using the 'merge' function.
+// Reducee reduces the elements of the seq into one using the 'merge' function.
 func Reducee[S ~SeqE[T], T any](seq S, merge func(T, T) (T, error)) (T, error) {
 	return seqe.Reducee(seq, merge)
 }
 
-// ReduceeOK reduces the elements of the 'seq' sequence an one using the 'merge' function.
+// ReduceeOK reduces the elements of the seq into one using the 'merge' function.
 // Returns ok==false if the seq returns ok=false at the first call (no more elements).
 func ReduceeOK[S ~SeqE[T], T any](seq S, merge func(T, T) (T, error)) (result T, ok bool, err error) {
 	return seqe.ReduceeOK(seq, merge)
@@ -176,12 +176,12 @@ func Contains[S ~SeqE[T], T comparable](seq S, example T) (contains bool, err er
 	return
 }
 
-// Conv creates an iterator that applies the 'converter' function to each iterable element and returns value-error pairs.
+// Conv creates an errorable seq that applies the 'converter' function to the iterable elements.
 // The error should be checked at every iteration step, like:
 //
 //	var integers iter.Seq2[int, error]
 //	...
-//	for s, err := range seqe.Conv(integers,  strconv.Itoa) {
+//	for s, err := range seqe.Conv(integers, strconv.Itoa) {
 //	    if err != nil {
 //	        break
 //	    }

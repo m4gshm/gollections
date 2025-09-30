@@ -208,7 +208,7 @@ func (m *Map[K, V]) FilterValue(filter func(V) bool) seq.Seq2[K, V] {
 	return seq2.Filter(m.All, kvfilter.Value[K](filter))
 }
 
-// FiltValue returns a errorable seq consisting of key/value pairs where the value satisfies the condition of the 'filter' function
+// FiltValue returns an errorable seq consisting of key/value pairs where the value satisfies the condition of the 'filter' function
 func (m *Map[K, V]) FiltValue(filter func(V) (bool, error)) seq.SeqE[c.KV[K, V]] {
 	return seq2.Filt(m.All, filtere.Value[K](filter))
 }
@@ -218,7 +218,7 @@ func (m *Map[K, V]) ConvertValue(converter func(V) V) seq.Seq2[K, V] {
 	return seq2.Convert(m.All, convert.Value[K](converter))
 }
 
-// ConvValue returns a errorable seq that applies the 'converter' function to values of the map
+// ConvValue returns an errorable seq that applies the 'converter' function to values of the map
 func (m *Map[K, V]) ConvValue(converter func(V) (V, error)) seq.SeqE[c.KV[K, V]] {
 	return seq2.Conv(m.All, converte.Value[K](converter))
 }
@@ -228,7 +228,7 @@ func (m *Map[K, V]) Filter(filter func(K, V) bool) seq.Seq2[K, V] {
 	return seq2.Filter(m.All, filter)
 }
 
-// Filt returns a errorable seq consisting of elements that satisfy the condition of the 'filter' function
+// Filt returns an errorable seq consisting of elements that satisfy the condition of the 'filter' function
 func (m *Map[K, V]) Filt(filter func(K, V) (bool, error)) seq.SeqE[c.KV[K, V]] {
 	return seq2.Filt(m.All, filter)
 }
@@ -238,7 +238,7 @@ func (m *Map[K, V]) Convert(converter func(K, V) (K, V)) seq.Seq2[K, V] {
 	return seq2.Convert(m.All, converter)
 }
 
-// Conv returns a errorable seq that applies the 'converter' function to the collection elements
+// Conv returns an errorable seq that applies the 'converter' function to the collection elements
 func (m *Map[K, V]) Conv(converter func(K, V) (K, V, error)) seq.SeqE[c.KV[K, V]] {
 	return seq2.Conv(m.All, converter)
 }

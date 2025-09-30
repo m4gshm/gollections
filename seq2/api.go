@@ -58,6 +58,9 @@ func OfIndexed[T any](amount int, getAt func(int) T) seq.Seq2[int, T] {
 	}
 }
 
+// OfIndexedKV builds an indexed Seq2 iterator by extracting key\value pairs from an indexed soruce.
+// the len is length ot the source.
+// the getAt retrieves a key\value pair by its index from the source.
 func OfIndexedKV[K, V any](amount int, getAt func(int) (K, V)) seq.Seq2[K, V] {
 	return func(yield func(K, V) bool) {
 		if getAt == nil {
@@ -71,6 +74,10 @@ func OfIndexedKV[K, V any](amount int, getAt func(int) (K, V)) seq.Seq2[K, V] {
 	}
 }
 
+// OfIndexedPair builds an indexed Seq2 iterator by extracting key\value pairs from an indexed soruce.
+// the len is length ot the source.
+// the getKey retrieves a key by its index from the source.
+// the getValue retrieves a value by its index from the source.
 func OfIndexedPair[K, V any](amount int, getKey func(int) K, getValue func(int) V) seq.Seq2[K, V] {
 	return OfIndexedKV(amount, func(i int) (K, V) { return getKey(i), getValue(i) })
 }
@@ -168,7 +175,7 @@ func Top[S ~Seq2[K, V], K, V any](n int, seq S) S {
 	}
 }
 
-// Skip returns a sequence without first n elements.
+// Skip returns the seq without first n elements.
 func Skip[S ~Seq2[K, V], K, V any](n int, seq S) seq.Seq2[K, V] {
 	return func(yield func(K, V) bool) {
 		if seq == nil {
@@ -232,13 +239,13 @@ func Firstt[S ~Seq2[K, V], K, V any](seq S, filter func(K, V) (bool, error)) (k 
 	return s2.Firstt(seq, filter)
 }
 
-// Reduce reduces the elements of the 'seq' sequence an one using the 'merge' function.
+// Reduce reduces the elements of the seq into one using the 'merge' function.
 func Reduce[S ~Seq2[K, V], K, V, T any](seq S, merge func(prev *T, k K, v V) T) T {
 	result, _ := ReduceOK(seq, merge)
 	return result
 }
 
-// ReduceOK reduces the elements of the 'seq' sequence an one using the 'merge' function.
+// ReduceOK reduces the elements of the seq into one using the 'merge' function.
 // Returns ok==false if the seq returns ok=false at the first call (no more elements).
 func ReduceOK[S ~Seq2[K, V], K, V, T any](seq S, merge func(prev *T, k K, v V) T) (result T, ok bool) {
 	if seq == nil || merge == nil {
@@ -253,13 +260,13 @@ func ReduceOK[S ~Seq2[K, V], K, V, T any](seq S, merge func(prev *T, k K, v V) T
 	return result, started
 }
 
-// Reducee reduces the elements of the 'seq' sequence an one using the 'merge' function.
+// Reducee reduces the elements of the seq into one using the 'merge' function.
 func Reducee[S ~Seq2[K, V], K, V, T any](seq S, merge func(prev *T, k K, v V) (T, error)) (T, error) {
 	result, _, err := ReduceeOK(seq, merge)
 	return result, err
 }
 
-// ReduceeOK reduces the elements of the 'seq' sequence an one using the 'merge' function.
+// ReduceeOK reduces the elements of the seq into one using the 'merge' function.
 // Returns ok==false if the seq returns ok=false at the first call (no more elements).
 func ReduceeOK[S ~Seq2[K, V], K, V, T any](seq S, merge func(prev *T, k K, v V) (T, error)) (result T, ok bool, err error) {
 	if seq == nil || merge == nil {
@@ -274,6 +281,7 @@ func ReduceeOK[S ~Seq2[K, V], K, V, T any](seq S, merge func(prev *T, k K, v V) 
 	return result, started, err
 }
 
+// HasAny checks whether the seq contains an element that satisfies the condition.
 func HasAny[S ~Seq2[K, V], K, V any](seq S, filter func(K, V) bool) bool {
 	return s2.HasAny(seq, filter)
 }
@@ -293,6 +301,7 @@ func Convert[S ~Seq2[Kfrom, Vfrom], Kfrom, Vfrom, Kto, Vto any](seq S, converter
 	return s2.Convert(seq, converter)
 }
 
+// Conv creates an errorable seq that applies the 'converter' function to the iterable key\value pairs.
 func Conv[S ~Seq2[Kfrom, Vfrom], Kfrom, Vfrom, Kto, Vto any](seq S, converter func(Kfrom, Vfrom) (Kto, Vto, error)) seq.SeqE[c.KV[Kto, Vto]] {
 	return s2.Conv(seq, converter)
 }

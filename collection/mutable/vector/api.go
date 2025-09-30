@@ -39,7 +39,7 @@ func Convert[From, To any](vector *mutable.Vector[From], converter func(From) To
 	return collection.Convert(vector, converter)
 }
 
-// Conv returns a errorable seq that applies the 'converter' function to the collection elements
+// Conv returns an errorable seq that applies the 'converter' function to the collection elements
 func Conv[From, To comparable](vector *mutable.Vector[From], converter func(From) (To, error)) seq.SeqE[To] {
 	return collection.Conv(vector, converter)
 }
@@ -49,7 +49,7 @@ func Flat[From, To any](vector *mutable.Vector[From], flattener func(From) []To)
 	return collection.Flat(vector, flattener)
 }
 
-// Flatt returns a errorable seq that converts the collection elements into slices and then flattens them to one level
+// Flatt returns an errorable seq that converts the collection elements into slices and then flattens them to one level
 func Flatt[From, To comparable](vector *mutable.Vector[From], flattener func(From) ([]To, error)) seq.SeqE[To] {
 	return collection.Flatt(vector, flattener)
 }
