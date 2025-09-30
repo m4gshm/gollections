@@ -181,7 +181,7 @@ func Benchmark_ReduceSum_Seq(b *testing.B) {
 	b.ResetTimer()
 	result := 0
 	for i := 0; i < b.N; i++ {
-		result = seq.Reduce(seq.Filter(seq.Flat(seq.Flat(seq.Of(multiDimension...), as.Is), as.Is), odds), sop.Sum)
+		result = seq.Flat(seq.Flat(seq.Of(multiDimension...), as.Is), as.Is).Filter(odds).Reduce(sop.Sum)
 	}
 	b.StopTimer()
 	if result != expected {

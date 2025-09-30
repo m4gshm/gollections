@@ -54,6 +54,7 @@ func (v *Vector[T]) Head() (t T, ok bool) {
 	return collection.Head(v)
 }
 
+// Tail returns the latest element
 func (v *Vector[T]) Tail() (t T, ok bool) {
 	if v == nil {
 		return t, false

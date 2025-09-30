@@ -1,9 +1,6 @@
 // Package c provides common types of containers, utility types and functions
 package c
 
-// Continue is an alias of the nil value used to continue iterating by For, Track methods.
-var Continue error = nil
-
 // Range provides an All function used for iterating over a sequence of elements by `for e := range collection.All`.
 type Range[T any] interface {
 	All(yield func(T) bool)

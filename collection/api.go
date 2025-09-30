@@ -50,7 +50,7 @@ func Filter[IT c.Range[T], T any](collection IT, filter func(T) bool) seq.Seq[T]
 	return seq.Filter(collection.All, filter)
 }
 
-// Filter instantiates a seq that checks elements by the 'filter' function and returns successful ones.
+// Filt creates an erroreable iterator that iterates only those elements for which the 'filter' function returns true.
 func Filt[IT c.Range[T], T any](collection IT, filter func(T) (bool, error)) seq.SeqE[T] {
 	return seq.Filt(collection.All, filter)
 }
