@@ -118,8 +118,11 @@ func Slice[S ~SeqE[T], T any](seq S) ([]T, error) {
 }
 
 // SliceCap collects the elements of the 'seq' sequence into a new slice with predefined capacity.
-func SliceCap[S ~SeqE[T], T any](seq S, capacity int) ([]T, error) {
-	return Append(seq, make([]T, 0, capacity))
+func SliceCap[S ~SeqE[T], T any](seq S, capacity int) (out []T, err error) {
+	if capacity > 0 {
+		out = make([]T, 0, capacity)
+	}
+	return Append(seq, out)
 }
 
 // Append collects the elements of the 'seq' sequence into the specified 'out' slice.
