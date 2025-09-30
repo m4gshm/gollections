@@ -4,7 +4,6 @@ import (
 	"github.com/m4gshm/gollections/predicate/always"
 )
 
-type seq[T any] = func(func(T) bool)
 type seqE[T any] = seq2[T, error]
 type seq2[K, V any] = func(func(K, V) bool)
 
