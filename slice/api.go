@@ -1253,8 +1253,3 @@ func ConvAndReduce[FS ~[]From, From, To any](elements FS, converter func(From) (
 	}
 	return out, nil
 }
-
-// NotNil returns not nil elements only.
-func NoNil[TS ~[]*T, T any](elements TS) TS {
-	return Filter(elements, not.Nil[T])
-}

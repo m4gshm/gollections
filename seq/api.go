@@ -663,7 +663,7 @@ func Group[S ~seq[T], T any, K comparable, V any](seq S, keyExtractor func(T) K,
 }
 
 // NotNil returns teh seq without nil elements.
-func NoNil[T any](seq Seq[*T]) Seq[*T] {
+func NotNil[T any](seq Seq[*T]) Seq[*T] {
 	return Filter(seq, not.Nil[T])
 }
 
