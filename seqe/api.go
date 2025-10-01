@@ -5,6 +5,7 @@ import (
 	"github.com/m4gshm/gollections/convert"
 	"github.com/m4gshm/gollections/internal/seqe"
 	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/op/check/not"
 	"github.com/m4gshm/gollections/seq"
 )
 
@@ -195,6 +196,11 @@ func Conv[S ~SeqE[From], From, To any](seq S, converter func(From) (To, error)) 
 // Convert creates an iterator that applies the 'converter' function to each iterable element.
 func Convert[S ~SeqE[From], From, To any](seq S, converter func(From) To) seq.SeqE[To] {
 	return seqe.Convert(seq, converter)
+}
+
+// ConvertNilSafe creates a seq that filters not nil elements, converts that ones, filters not nils after converting and returns them.
+func ConvertNilSafe[S ~SeqE[*From], From, To any](seq S, converter func(*From) *To) seq.SeqE[*To] {
+	return ConvertOK(seq, convert.NilSafe(converter))
 }
 
 // ConvertOK creates an iterator that applies the 'converter' function to each iterable element.
@@ -409,27 +415,9 @@ func Group[S ~SeqE[T], T any, K comparable, V any](seq S, keyExtractor func(T) K
 	return groups, nil
 }
 
-// PtrVal creates a seq that transform pointers to the values referenced by those pointers.
-// Nil pointers are transformet to zero values.
-func PtrVal[T any](seq SeqE[*T]) SeqE[T] {
-	return Convert(seq, convert.PtrVal[T])
-}
-
-// NoNilPtrVal creates a seq that transform only not nil pointers to the values referenced by those pointer.
-func NoNilPtrVal[T any](seq SeqE[*T]) SeqE[T] {
-	return ConvertOK(seq, convert.NoNilPtrVal[T])
-}
-
-// NilSafe creates a seq that filters not nil elements, converts that ones, filters not nils after converting and returns them.
-func NilSafe[From, To any](seq SeqE[*From], converter func(*From) *To) SeqE[*To] {
-	return ConvertOK(seq, func(f *From) (*To, bool) {
-		if f != nil {
-			if t := converter(f); t != nil {
-				return t, true
-			}
-		}
-		return nil, false
-	})
+// NotNil returns teh seq without nil elements.
+func NoNil[T any](seq SeqE[*T]) SeqE[*T] {
+	return Filter(seq, not.Nil[T])
 }
 
 // ForEach applies the 'consumer' function to the seq elements

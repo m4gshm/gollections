@@ -20,6 +20,12 @@ func Convert[IT c.Range[From], From, To any](collection IT, converter func(From)
 	return seq.Convert(collection.All, converter)
 }
 
+// ConvertNilSafe creates a seq that filters not nil elements, converts that ones, filters not nils after converting and returns them
+func ConvertNilSafe[IT c.Range[*From], From, To any](collection IT, converter func(*From) *To) seq.Seq[*To] {
+	h := collection.All
+	return seq.ConvertNilSafe(h, converter)
+}
+
 // Conv returns an errorable seq that applies the 'converter' function to the collection elements
 func Conv[IT c.Range[From], From, To any](collection IT, converter func(From) (To, error)) seq.SeqE[To] {
 	return seq.Conv(collection.All, converter)
@@ -58,24 +64,6 @@ func Filt[IT c.Range[T], T any](collection IT, filter func(T) (bool, error)) seq
 // NotNil instantiates a seq that filters nullable elements
 func NotNil[IT c.Range[*T], T any](collection IT) seq.Seq[*T] {
 	return Filter(collection, not.Nil[T])
-}
-
-// PtrVal creates a seq that transform pointers to the values referenced referenced by those pointers.
-// Nil pointers are transformet to zero values.
-func PtrVal[IT c.Range[*T], T any](collection IT) seq.Seq[T] {
-	return seq.PtrVal(collection.All)
-}
-
-// NoNilPtrVal creates a seq that transform only not nil pointers to the values referenced referenced by those pointers.
-// Nil pointers are ignored.
-func NoNilPtrVal[IT c.Range[*T], T any](collection IT) seq.Seq[T] {
-	return seq.NoNilPtrVal(collection.All)
-}
-
-// NilSafe creates a seq that filters not nil elements, converts that ones, filters not nils after converting and returns them
-func NilSafe[IT c.Range[*From], From, To any](collection IT, converter func(*From) *To) seq.Seq[*To] {
-	h := collection.All
-	return seq.NilSafe(h, converter)
 }
 
 // KeyValue transforms iterable elements to key/value iterator based on applying key, value extractors to the elements

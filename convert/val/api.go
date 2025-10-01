@@ -5,5 +5,5 @@ import "github.com/m4gshm/gollections/convert"
 
 // Of is pointer-tovalue conversion helper
 func Of[T any](t *T) T {
-	return convert.PtrVal(t)
+	return convert.ToVal(t)
 }

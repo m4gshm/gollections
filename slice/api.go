@@ -574,13 +574,13 @@ func NotNil[TS ~[]*T, T any](elements TS) TS {
 // ToValues returns values referenced by the pointers.
 // If a pointer is nil then it is replaced by the zero value.
 func ToValues[TS ~[]*T, T any](pointers TS) []T {
-	return Convert(pointers, convert.PtrVal[T])
+	return Convert(pointers, convert.ToVal[T])
 }
 
 // GetValues returns values referenced by the pointers.
 // All nil pointers are excluded from the final result.
 func GetValues[TS ~[]*T, T any](elements TS) []T {
-	return ConvertOK(elements, convert.NoNilPtrVal[T])
+	return ConvertOK(elements, convert.ToValNotNil[T])
 }
 
 // Filter filters elements that match the filter condition and returns them.
@@ -1252,4 +1252,9 @@ func ConvAndReduce[FS ~[]From, From, To any](elements FS, converter func(From) (
 		}
 	}
 	return out, nil
+}
+
+// NotNil returns not nil elements only.
+func NoNil[TS ~[]*T, T any](elements TS) TS {
+	return Filter(elements, not.Nil[T])
 }

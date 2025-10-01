@@ -5,6 +5,7 @@ import (
 	"github.com/m4gshm/gollections/convert"
 	s2 "github.com/m4gshm/gollections/internal/seq2"
 	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/op/check/not"
 	"github.com/m4gshm/gollections/predicate/always"
 	"golang.org/x/exp/constraints"
 )
@@ -441,6 +442,11 @@ func Convert[S ~seq[From], From, To any](seq S, converter func(From) To) Seq[To]
 	}
 }
 
+// ConvertNilSafe creates a seq that filters not nil elements, converts that ones, filters not nils after converting and returns them.
+func ConvertNilSafe[S ~seq[*From], From, To any](seq S, converter func(*From) *To) Seq[*To] {
+	return ConvertOK(seq, convert.NilSafe(converter))
+}
+
 // ConvertOK creates an iterator that applies the 'converter' function to each iterable element.
 // The converter may returns a value or ok=false to exclude the value from the sequence.
 func ConvertOK[S ~seq[From], From, To any](seq S, converter func(from From) (To, bool)) Seq[To] {
@@ -656,27 +662,9 @@ func Group[S ~seq[T], T any, K comparable, V any](seq S, keyExtractor func(T) K,
 	return s2.Group(ToKV(seq, keyExtractor, valExtractor))
 }
 
-// PtrVal creates a seq that transform pointers to the values referenced by those pointers.
-// Nil pointers are transformet to zero values.
-func PtrVal[T any](seq Seq[*T]) Seq[T] {
-	return Convert(seq, convert.PtrVal[T])
-}
-
-// NoNilPtrVal creates a seq that transform only not nil pointers to the values referenced by those pointer.
-func NoNilPtrVal[T any](seq Seq[*T]) Seq[T] {
-	return ConvertOK(seq, convert.NoNilPtrVal[T])
-}
-
-// NilSafe creates a seq that filters not nil elements, converts that ones, filters not nils after converting and returns them.
-func NilSafe[From, To any](seq Seq[*From], converter func(*From) *To) Seq[*To] {
-	return ConvertOK(seq, func(f *From) (*To, bool) {
-		if f != nil {
-			if t := converter(f); t != nil {
-				return t, true
-			}
-		}
-		return nil, false
-	})
+// NotNil returns teh seq without nil elements.
+func NoNil[T any](seq Seq[*T]) Seq[*T] {
+	return Filter(seq, not.Nil[T])
 }
 
 // ForEach applies the 'consumer' function to the seq elements.
