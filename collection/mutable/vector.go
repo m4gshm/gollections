@@ -174,9 +174,10 @@ func (v *Vector[T]) DeleteActual(indexes ...int) bool {
 		return false
 	}
 	l := len(indexes)
-	if l == 0 {
+	switch l {
+	case 0:
 		return false
-	} else if l == 1 {
+	case 1:
 		return v.DeleteActualOne(indexes[0])
 	}
 

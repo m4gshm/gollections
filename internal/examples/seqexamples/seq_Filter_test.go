@@ -15,7 +15,7 @@ func Test_Filter(t *testing.T) {
 	var f1 = seq.Slice(seq.Filter(seq.Of(1, 3, 5, 7, 9, 11), one.Of(1, 7).Or(one.Of(11))))
 	//[]int{1, 7, 11}
 
-	var f2 = seq.Slice(seq.Filter(seq.Of(1, 3, 5, 7, 9, 11), exclude.All(1, 7, 11)))
+	var f2 = seq.Of(1, 3, 5, 7, 9, 11).Filter(exclude.All(1, 7, 11)).Slice()
 	//[]int{3, 5, 9}
 
 	assert.Equal(t, []int{1, 7, 11}, f1)

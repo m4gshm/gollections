@@ -106,16 +106,23 @@ userLoop:
 	assert.Equal(t, "Alice", legacyAlice.Name())
 }
 
-func Benchmark_FindFirsManager_Predicate_ContainsConverted(b *testing.B) {
+func Benchmark_FindFirsManager_Predicate_WhereAnyWhereEq(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		alice, ok := slice.First(users, where.Any(User.Roles, where.Eq(Role.Name, "Manager")))
 		_, _ = alice, ok
 	}
 }
 
-func Benchmark_FindFirsManager_Predicate_HasAnyConverted(b *testing.B) {
+func Benchmark_FindFirsManager_Predicate_MatchAnyMatchToEqTo(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		alice, ok := slice.First(users, match.Any(User.Roles, match.To(Role.Name, func(roleName string) bool { return roleName == "manager" })))
+		alice, ok := slice.First(users, match.Any(User.Roles, match.To(Role.Name, eq.To("Manager"))))
+		_, _ = alice, ok
+	}
+}
+
+func Benchmark_FindFirsManager_Predicate_MatchAnyMatchToFunc(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		alice, ok := slice.First(users, match.Any(User.Roles, match.To(Role.Name, func(roleName string) bool { return roleName == "Manager" })))
 		_, _ = alice, ok
 	}
 }
@@ -147,10 +154,19 @@ func Benchmark_FindFirsManager_Seq(b *testing.B) {
 	}
 }
 
-func Benchmark_FindFirsManager_Seq_HasAny(b *testing.B) {
+func Benchmark_FindFirsManager_Seq_HasAnyEqTo(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		alice, ok := slice.First(users, func(user User) bool {
-			return seq.HasAny(seq.Convert(seq.Of(user.Roles()...), Role.Name), eq.To("Manager"))
+			return seq.Convert(seq.Of(user.Roles()...), Role.Name).HasAny(eq.To("Manager"))
+		})
+		_, _ = alice, ok
+	}
+}
+
+func Benchmark_FindFirsManager_Seq_HasAnyFunc(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		alice, ok := slice.First(users, func(user User) bool {
+			return seq.Convert(seq.Of(user.Roles()...), Role.Name).HasAny(eq.To("Manager"))
 		})
 		_, _ = alice, ok
 	}

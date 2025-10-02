@@ -11,7 +11,15 @@ import (
 func Test_ToSlice(t *testing.T) {
 
 	filter := func(u User) bool { return u.age <= 30 }
-	names := seq.Slice(seq.Convert(seq.Filter(seq.Of(users...), filter), User.Name))
+	less30Names := seq.Convert(seq.Of(users...).Filter(filter), User.Name)
+
+	names := seq.Slice(less30Names)
+	//[Bob Tom]
+
+	assert.Equal(t, []string{"Bob", "Tom"}, names)
+
+	//or
+	names = less30Names.Slice()
 	//[Bob Tom]
 
 	assert.Equal(t, []string{"Bob", "Tom"}, names)

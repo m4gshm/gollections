@@ -547,7 +547,8 @@ import(
 
 var rows sql.Rows = selectUsers()
 
-rowSeq := seqe.OfNext(rows.Next, func(u *User) error { return rows.Scan(&u.name, &u.age) })
+getUser := func(u *User) error { return rows.Scan(&u.name, &u.age) }
+rowSeq := seqe.OfNext(rows.Next, getUser)
 usersByAge, err := seqe.Group(rowSeq, User.Age, as.Is)
 ```
 
@@ -611,7 +612,14 @@ for i, n := range seq2.Series(1, next) {
 
 ``` go
 filter := func(u User) bool { return u.age <= 30 }
-names := seq.Slice(seq.Convert(seq.Filter(seq.Of(users...), filter), User.Name))
+less30Names := seq.Convert(seq.Of(users...).Filter(filter), User.Name)
+
+names := seq.Slice(less30Names)
+//[Bob Tom]
+
+
+//or
+names = less30Names.Slice()
 //[Bob Tom]
 ```
 
@@ -643,7 +651,13 @@ assert.Equal(t, slice.Of("Alice", "Chris"), sort.Asc(slice.Convert(ageGroups[">3
 ##### seq.Reduce
 
 ``` go
-var sum = seq.Reduce(seq.Of(1, 2, 3, 4, 5, 6), func(i1, i2 int) int { return i1 + i2 })
+adder := func(i1, i2 int) int { return i1 + i2 }
+var sum = seq.Reduce(seq.Of(1, 2, 3, 4, 5, 6), adder)
+//21
+
+
+//or
+sum = seq.Of(1, 2, 3, 4, 5, 6).Reduce(adder)
 //21
 ```
 
@@ -651,12 +665,13 @@ var sum = seq.Reduce(seq.Of(1, 2, 3, 4, 5, 6), func(i1, i2 int) int { return i1 
 
 ``` go
 adder := func(i1, i2 int) int { return i1 + i2 }
-
 sum, ok := seq.ReduceOK(seq.Of(1, 2, 3, 4, 5, 6), adder)
 //21, true
 
+
+//or
 emptyLoop := seq.Of[int]()
-sum, ok = seq.ReduceOK(emptyLoop, adder)
+sum, ok = emptyLoop.ReduceOK(adder)
 //0, false
 ```
 
@@ -669,6 +684,10 @@ import (
 )
 
 result, ok := seq.First(seq.Of(1, 3, 5, 7, 9, 11), more.Than(5)) //7, true
+
+
+//or
+result, ok = seq.Of(1, 3, 5, 7, 9, 11).First(more.Than(5)) //7, true
 ```
 
 ##### seq.Head
@@ -679,6 +698,10 @@ import (
 )
 
 result, ok := seq.Head(seq.Of(1, 3, 5, 7, 9, 11)) //1, true
+
+
+//or
+result, ok = seq.Of(1, 3, 5, 7, 9, 11).Head() //1, true
 ```
 
 #### Element converters
@@ -738,7 +761,7 @@ import (
 var f1 = seq.Slice(seq.Filter(seq.Of(1, 3, 5, 7, 9, 11), one.Of(1, 7).Or(one.Of(11))))
 //[]int{1, 7, 11}
 
-var f2 = seq.Slice(seq.Filter(seq.Of(1, 3, 5, 7, 9, 11), exclude.All(1, 7, 11)))
+var f2 = seq.Of(1, 3, 5, 7, 9, 11).Filter(exclude.All(1, 7, 11)).Slice()
 //[]int{3, 5, 9}
 ```
 
@@ -749,7 +772,12 @@ import (
     "github.com/m4gshm/gollections/seq"
 )
 
-var i []int = seq.Slice(seq.Top(4, seq.Of(1, 3, 5, 7, 9, 11)))
+i := seq.Slice(seq.Top(4, seq.Of(1, 3, 5, 7, 9, 11)))
+//[]int{1, 3, 5, 7}
+
+
+//or
+i = seq.Of(1, 3, 5, 7, 9, 11).Top(4).Slice()
 //[]int{1, 3, 5, 7}
 ```
 
@@ -760,7 +788,12 @@ import (
     "github.com/m4gshm/gollections/seq"
 )
 
-var i []int = seq.Slice(seq.Skip(4, seq.Of(1, 3, 5, 7, 9, 11)))
+i := seq.Slice(seq.Skip(4, seq.Of(1, 3, 5, 7, 9, 11)))
+//[]int{9, 11}
+
+
+//or
+i = seq.Of(1, 3, 5, 7, 9, 11).Skip(4).Slice()
 //[]int{9, 11}
 ```
 
@@ -772,7 +805,8 @@ import (
     "github.com/m4gshm/gollections/seq"
 )
 
-var i []int = seq.Slice(seq.Flat(seq.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...), as.Is))
+twoDimensions := [][]int{{1, 2, 3}, {4}, {5, 6}}
+var i []int = seq.Slice(seq.Flat(seq.Of(twoDimensions...), as.Is))
 //[]int{1, 2, 3, 4, 5, 6}
 ```
 

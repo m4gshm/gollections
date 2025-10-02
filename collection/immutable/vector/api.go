@@ -26,7 +26,7 @@ func Wrap[T any](elements []T) immutable.Vector[T] {
 
 // Sort copy the specified vector with sorted elements
 func Sort[T any, F constraints.Ordered](v immutable.Vector[T], by func(T) F) immutable.Vector[T] {
-	return collection.Sort[immutable.Vector[T]](v, by)
+	return collection.Sort(v, by)
 }
 
 // Convert returns a seq that applies the 'converter' function to the collection elements

@@ -10,7 +10,13 @@ import (
 
 func Test_Top(t *testing.T) {
 
-	var i []int = seq.Slice(seq.Top(4, seq.Of(1, 3, 5, 7, 9, 11)))
+	i := seq.Slice(seq.Top(4, seq.Of(1, 3, 5, 7, 9, 11)))
+	//[]int{1, 3, 5, 7}
+
+	assert.Equal(t, []int{1, 3, 5, 7}, i)
+
+	//or
+	i = seq.Of(1, 3, 5, 7, 9, 11).Top(4).Slice()
 	//[]int{1, 3, 5, 7}
 
 	assert.Equal(t, []int{1, 3, 5, 7}, i)
