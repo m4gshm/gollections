@@ -127,6 +127,7 @@ func ToType[T, I any](i I) (T, bool) {
 	return t, ok
 }
 
+// NilSafe filters not nil elements, converts that ones, filters not nils after converting and returns them
 func NilSafe[From, To any](converter func(*From) *To) func(f *From) (*To, bool) {
 	return func(f *From) (*To, bool) {
 		if f != nil {
