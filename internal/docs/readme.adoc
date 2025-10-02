@@ -306,9 +306,6 @@ or
 include::../examples/seqexamples/seq2_filter_convert_reduce_test.go[lines=14..17,indent=0]
 ----
 ==== Sequence API
-
-To iterate over any collection just call link:#iterating-over-collections[All] method of that one.
-
 ===== Instantiators
 ====== seq.Of, seq2.Of, seq2.OfMap
 [source,go]
@@ -353,7 +350,7 @@ include::../examples/seqexamples/seq_Range_test.go[lines=12..18,indent=0]
 import(
     "github.com/m4gshm/gollections/seq"
 )
-include::../examples/seqexamples/seq2_Series_test.go[lines=12..20,indent=0]
+include::../examples/seqexamples/seq2_Series_test.go[lines=12..23,indent=0]
 ----
 ===== Collectors
 ====== seq.Slice
@@ -576,12 +573,5 @@ include::../examples/collection/collection_iterating_go_1_22_test.go[lines=13..1
 
 [source,go]
 ----
-include::../examples/collection/collection_iterating_test.go[lines=31..34,indent=0]
-----
-
-* or `For` method that can be aborted by returning `Break` for expected completion, or another error otherwise.
-
-[source,go]
-----
-include::../examples/collection/collection_iterating_test.go[lines=38..47,indent=0]
+include::../examples/collection/collection_iterating_test.go[lines=10..13,indent=0]
 ----

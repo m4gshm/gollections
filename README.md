@@ -514,9 +514,6 @@ ints, err := seqe.Slice(intSeq) //[1 2 3], invalid syntax
 
 ### Sequence API
 
-To iterate over any collection just call
-[All](#iterating-over-collections) method of that one.
-
 #### Instantiators
 
 ##### seq.Of, seq2.Of, seq2.OfMap
@@ -597,7 +594,10 @@ import(
 )
 
 var numbers, factorials []int
-for i, n := range seq2.Series(1, func(i int, prev int) (int, bool) { return i * prev, i <= 5 }) {
+next := func(i, prev int) (int, bool) {
+    return i * prev, i <= 5
+}
+for i, n := range seq2.Series(1, next) {
     numbers = append(numbers, i)
     factorials = append(factorials, n)
 }
@@ -926,10 +926,6 @@ The same underlying interfaces but for read-only use cases.
 - `ForEach` method
 
 ``` go
-```
-
-- or `For` method that can be aborted by returning `Break` for expected
-  completion, or another error otherwise.
-
-``` go
+uniques := set.Of(1, 2, 3, 4, 5, 6)
+uniques.ForEach(doOp)
 ```
