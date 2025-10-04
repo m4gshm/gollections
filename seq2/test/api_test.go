@@ -9,6 +9,7 @@ import (
 	"github.com/m4gshm/gollections/collection/immutable/ordered/map_"
 	"github.com/m4gshm/gollections/k"
 	kvpredicate "github.com/m4gshm/gollections/kv/predicate"
+	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/predicate/eq"
 	"github.com/m4gshm/gollections/predicate/less"
 	"github.com/m4gshm/gollections/predicate/more"
@@ -19,6 +20,8 @@ import (
 	"github.com/m4gshm/gollections/slice/clone/sort"
 	"github.com/stretchr/testify/assert"
 )
+
+var stop error = errors.New("stop")
 
 func Test_Of(t *testing.T) {
 	sequence := seq2.Of(0, 1, 2, 3, 4)
@@ -160,7 +163,7 @@ func Test_ReduceeSum(t *testing.T) {
 			p = *prev
 		}
 		if v == 11 {
-			return p, errors.New("stop")
+			return p, stop
 		}
 		return v + p, nil
 	}
@@ -181,7 +184,7 @@ func Test_ReduceeSum(t *testing.T) {
 func Test_ReduceeSumFirstErr(t *testing.T) {
 	s := seq2.Of(1, 3, 5, 7, 9, 11)
 	r, ok, err := seq2.ReduceeOK(s, func(_ *int, _, _ int) (int, error) {
-		return 0, errors.New("stop")
+		return 0, stop
 	})
 	assert.True(t, ok)
 	assert.Equal(t, 0, r)
@@ -330,6 +333,55 @@ func Test_First(t *testing.T) {
 	assert.False(t, ok)
 }
 
+func Test_Firstt(t *testing.T) {
+	sequence := seq2.Of(1, 2, 3, 4, 5, 6)
+
+	condition := func(_ int, v int) (bool, error) { return more.Than(5)(v), nil }
+	i, result, ok, err := seq2.Firstt(sequence, condition)
+
+	assert.True(t, ok)
+	assert.Equal(t, 5, i)
+	assert.Equal(t, 6, result)
+	assert.NoError(t, err)
+
+	i, result, ok, err = sequence.Firstt(condition)
+
+	assert.True(t, ok)
+	assert.Equal(t, 5, i)
+	assert.Equal(t, 6, result)
+	assert.NoError(t, err)
+
+	_, _, ok, err = seq2.Firstt[seq.Seq2[int, int]](nil, condition)
+	assert.False(t, ok)
+	assert.NoError(t, err)
+
+	_, _, ok, err = seq2.Firstt(sequence, nil)
+	assert.False(t, ok)
+	assert.NoError(t, err)
+
+	_, _, ok, err = sequence.Firstt(nil)
+	assert.False(t, ok)
+	assert.NoError(t, err)
+
+	conditionErr := func(_ int, v int) (bool, error) {
+		return more.Than(5)(v), op.IfElse(v > 3, stop, nil)
+	}
+	i, result, ok, err = sequence.Firstt(conditionErr)
+
+	assert.False(t, ok)
+	assert.Equal(t, 0, i)
+	assert.Equal(t, 0, result)
+	assert.Error(t, err)
+
+	conditionErr = func(_ int, v int) (bool, error) { return more.Than(5)(v), op.IfElse(v > 5, stop, nil) }
+	i, result, ok, err = sequence.Firstt(conditionErr)
+
+	assert.True(t, ok)
+	assert.Equal(t, 5, i)
+	assert.Equal(t, 6, result)
+	assert.Error(t, err)
+}
+
 func Test_Filter(t *testing.T) {
 	s := seq2.Filter(seq2.Of("first", "second", "third"), func(i int, _ string) bool { return i%2 == 0 })
 	k := seq.Slice(seq2.Keys(s))
@@ -418,7 +470,7 @@ func Test_AllConv(t *testing.T) {
 
 	for kv, err := range seq2.Conv(testMap.All, func(k int, v string) (int, int, error) {
 		if k == 5 {
-			return 0, 0, errors.New("stop")
+			return 0, 0, stop
 		}
 		c, err := strconv.Atoi(v)
 		return k, c, err
