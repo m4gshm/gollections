@@ -2,7 +2,7 @@
 package op
 
 import (
-	"golang.org/x/exp/constraints"
+	"cmp"
 
 	"github.com/m4gshm/gollections/op"
 )
@@ -18,12 +18,12 @@ func Sub[T op.Number](a T, b T) (T, error) {
 }
 
 // Max returns the maximum from two operands
-func Max[T constraints.Ordered](a T, b T) (T, error) {
+func Max[T cmp.Ordered](a T, b T) (T, error) {
 	return IfElse(a < b, b, a)
 }
 
 // Min returns the minimum from two operands
-func Min[T constraints.Ordered](a T, b T) (T, error) {
+func Min[T cmp.Ordered](a T, b T) (T, error) {
 	return IfElse(a > b, b, a)
 }
 
@@ -35,8 +35,8 @@ func IfElse[T any](ok bool, tru, fal T) (T, error) {
 	return fal, nil
 }
 
-// IfDoElse executes the tru func if ok, otherwise exec the fal function and returns it result
-func IfDoElse[T any](ok bool, tru, fal func() (T, error)) (T, error) {
+// IfGetElseGet executes the tru func if ok, otherwise exec the fal function and returns it result
+func IfGetElseGet[T any](ok bool, tru, fal func() (T, error)) (T, error) {
 	if ok {
 		return tru()
 	}
