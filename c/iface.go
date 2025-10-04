@@ -39,7 +39,10 @@ type Collection[T any] interface {
 	ForEach[T]
 	SliceFactory[T]
 
+	Head() (T, bool)
+	First(func(T) bool) (T, bool)
 	Reduce(merge func(T, T) T) T
+
 	HasAny(func(T) bool) bool
 }
 

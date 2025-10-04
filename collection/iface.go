@@ -14,10 +14,6 @@ type Collection[T any] interface {
 
 	Len() int
 	IsEmpty() bool
-
-	Head() (T, bool)
-	First(func(T) bool) (T, bool)
-	HasAny(func(T) bool) bool
 }
 
 // Vector - collection interface that provides elements order and access by index to the elements.
