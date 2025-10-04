@@ -20,11 +20,11 @@ func Union[S ~Seq2[K, V], K, V any](seq ...S) seq.Seq2[K, V] {
 	return s2.Union(seq...)
 }
 
-// Of creates an index/value pairs iterator over the elements.
-func Of[T any](elements ...T) seq.Seq2[int, T] {
-	return func(yield func(int, T) bool) {
-		for i, v := range elements {
-			if !yield(i, v) {
+// Of creates an key/value pairs iterator over the elements.
+func Of[K, V any](elements ...c.KV[K, V]) seq.Seq2[K, V] {
+	return func(yield func(K, V) bool) {
+		for _, p := range elements {
+			if !yield(p.K, p.V) {
 				break
 			}
 		}

@@ -2,10 +2,10 @@
 package seq2
 
 import (
+	converte "github.com/m4gshm/gollections/break/kv/convert"
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/kv"
 	"github.com/m4gshm/gollections/kv/convert"
-	converte "github.com/m4gshm/gollections/break/kv/convert"
 	"github.com/m4gshm/gollections/kv/predicate"
 	"github.com/m4gshm/gollections/map_/resolv"
 )

@@ -25,25 +25,25 @@ var stop = errors.New("stop")
 var even = func(i int, _ string) bool { return i%2 == 0 }
 
 func Test_Of(t *testing.T) {
-	sequence := seq2.Of(0, 1, 2, 3, 4)
-	var out []int
-	var ind []int
-	for i, v := range sequence {
-		out = append(out, v)
-		ind = append(ind, i)
+	sequence := seq2.Of(k.V(0, "0"), k.V(1, "1"), k.V(2, "2"), k.V(3, "3"), k.V(4, "4"))
+	var values []string
+	var keys []int
+	for k, v := range sequence {
+		values = append(values, v)
+		keys = append(keys, k)
 	}
-	assert.Equal(t, slice.Of(0, 1, 2, 3, 4), out)
-	assert.Equal(t, slice.Of(0, 1, 2, 3, 4), ind)
-	out = nil
+	assert.Equal(t, slice.Of("0", "1", "2", "3", "4"), values)
+	assert.Equal(t, slice.Of(0, 1, 2, 3, 4), keys)
+	values = nil
 	for _, v := range sequence {
-		if v == 1 {
+		if v == "1" {
 			break
 		}
-		out = append(out, v)
+		values = append(values, v)
 	}
-	assert.Equal(t, slice.Of(0), out)
+	assert.Equal(t, slice.Of("0"), values)
 
-	out = nil
+	values = nil
 	var iter = false
 	for _, v := range sequence {
 		iter = true
@@ -51,10 +51,10 @@ func Test_Of(t *testing.T) {
 		break
 	}
 	assert.True(t, iter)
-	assert.Nil(t, out)
+	assert.Nil(t, values)
 }
 func Test_Union(t *testing.T) {
-	sequence := seq2.Union(seq2.Of(0, 1), nil, seq2.Of[int](), seq2.Of(2, 3, 4))
+	sequence := seq2.Union(seq.Of2(0, 1), nil, seq.Of2[int](), seq.Of2(2, 3, 4))
 	assert.Equal(t, slice.Of(0, 1, 2, 3, 4), seq.Slice(seq2.Values(sequence)))
 	assert.Equal(t, slice.Of(0, 1, 0, 1, 2), seq.Slice(seq2.Keys(sequence)))
 
@@ -116,7 +116,7 @@ func Test_Series(t *testing.T) {
 }
 
 func Test_Map(t *testing.T) {
-	s := seq2.Of("first", "second", "third")
+	s := seq.Of2("first", "second", "third")
 	m := seq2.Map(s)
 
 	assert.Equal(t, "first", m[0])
@@ -125,7 +125,7 @@ func Test_Map(t *testing.T) {
 }
 
 func Test_Keys_Values(t *testing.T) {
-	s := seq2.Of("first", "second", "third")
+	s := seq.Of2("first", "second", "third")
 	k := seq.Slice(seq2.Keys(s))
 	v := seq.Slice(seq2.Values(s))
 	assert.Equal(t, slice.Of(0, 1, 2), k)
@@ -133,7 +133,7 @@ func Test_Keys_Values(t *testing.T) {
 }
 
 func Test_Group(t *testing.T) {
-	s := seq2.Convert(seq2.Of("first", "second", "third"), func(i int, s string) (bool, string) { return i%2 == 0, s })
+	s := seq2.Convert(seq.Of2("first", "second", "third"), func(i int, s string) (bool, string) { return i%2 == 0, s })
 	m := seq2.Group(s)
 
 	assert.Equal(t, slice.Of("first", "third"), sort.Asc(m[true]))
@@ -150,14 +150,14 @@ func pairSum(prev *string, i int, val string) string {
 
 func Test_ReduceSum(t *testing.T) {
 
-	sum, ok := seq2.ReduceOK(seq2.Of("A", "B", "C"), pairSum)
+	sum, ok := seq2.ReduceOK(seq.Of2("A", "B", "C"), pairSum)
 
 	assert.True(t, ok)
 	assert.Equal(t, "0A1B2C", sum)
 }
 
 func Test_ReduceeSum(t *testing.T) {
-	s := seq2.Of(1, 3, 5, 7, 9, 11)
+	s := seq.Of2(1, 3, 5, 7, 9, 11)
 	reducer := func(prev *int, _, v int) (int, error) {
 		p := 0
 		if prev != nil {
@@ -183,7 +183,7 @@ func Test_ReduceeSum(t *testing.T) {
 }
 
 func Test_ReduceeSumFirstErr(t *testing.T) {
-	s := seq2.Of(1, 3, 5, 7, 9, 11)
+	s := seq.Of2(1, 3, 5, 7, 9, 11)
 	r, ok, err := seq2.ReduceeOK(s, func(_ *int, _, _ int) (int, error) {
 		return 0, stop
 	})
@@ -193,7 +193,7 @@ func Test_ReduceeSumFirstErr(t *testing.T) {
 }
 
 func Test_ReduceEmpty(t *testing.T) {
-	s := seq2.Of[string]()
+	s := seq.Of2[string]()
 	sum, ok := seq2.ReduceOK(s, pairSum)
 
 	assert.False(t, ok)
@@ -201,7 +201,7 @@ func Test_ReduceEmpty(t *testing.T) {
 }
 
 func Test_Head(t *testing.T) {
-	sequence := seq2.Of(1, 2, 3, 4, 5, 6)
+	sequence := seq.Of2(1, 2, 3, 4, 5, 6)
 	_, result, ok := seq2.Head(sequence)
 	assert.True(t, ok)
 	assert.Equal(t, 1, result)
@@ -216,7 +216,7 @@ func Test_Head(t *testing.T) {
 }
 
 func Test_While(t *testing.T) {
-	sequence := seq2.Of(1, 2, 3, 4, 5, 6)
+	sequence := seq.Of2(1, 2, 3, 4, 5, 6)
 	part := seq2.While(sequence, kvpredicate.Value[int](not.Eq(5)))
 
 	assert.Equal(t, slice.Of(1, 2, 3, 4), seq.Slice(seq2.Values(part)))
@@ -241,7 +241,7 @@ func Test_While(t *testing.T) {
 }
 
 func Test_SkipWhile(t *testing.T) {
-	sequence := seq2.Of(1, 2, 3, 4, 5, 6)
+	sequence := seq.Of2(1, 2, 3, 4, 5, 6)
 	part := seq2.SkipWhile(sequence, kvpredicate.Value[int](less.Than(4)))
 
 	assert.Equal(t, slice.Of(4, 5, 6), seq.Slice(seq2.Values(part)))
@@ -263,7 +263,7 @@ func Test_SkipWhile(t *testing.T) {
 }
 
 func Test_Top(t *testing.T) {
-	sequence := seq2.Of(1, 2, 3, 4, 5, 6)
+	sequence := seq.Of2(1, 2, 3, 4, 5, 6)
 	top := seq2.Values(seq2.Top(4, sequence))
 	result := seq.Slice(top)
 	result2 := seq.Slice(top)
@@ -277,7 +277,7 @@ func Test_Top(t *testing.T) {
 	result = seq.Slice(seq2.Values(seq2.Top[seq.Seq2[int, int]](10, nil)))
 	assert.Nil(t, result)
 	result = nil
-	for _, v := range seq2.Top(4, seq2.Of(1, 2, 3, 4, 5, 6)) {
+	for _, v := range seq2.Top(4, seq.Of2(1, 2, 3, 4, 5, 6)) {
 		if v != 3 {
 			result = append(result, v)
 		} else {
@@ -288,7 +288,7 @@ func Test_Top(t *testing.T) {
 }
 
 func Test_Skip(t *testing.T) {
-	sequence := seq2.Of(1, 2, 3, 4, 5, 6)
+	sequence := seq.Of2(1, 2, 3, 4, 5, 6)
 	skip := seq2.Values(seq2.Skip(4, sequence))
 	result := seq.Slice(skip)
 	result2 := seq.Slice(skip)
@@ -302,7 +302,7 @@ func Test_Skip(t *testing.T) {
 	result = seq.Slice(seq2.Values(seq2.Skip[seq.Seq2[int, int]](10, nil)))
 	assert.Nil(t, result)
 	result = nil
-	for _, v := range seq2.Skip(2, seq2.Of(1, 2, 3, 4, 5, 6)) {
+	for _, v := range seq2.Skip(2, seq.Of2(1, 2, 3, 4, 5, 6)) {
 		if v != 5 {
 			result = append(result, v)
 		} else {
@@ -313,7 +313,7 @@ func Test_Skip(t *testing.T) {
 }
 
 func Test_SkipTop(t *testing.T) {
-	sequence := seq2.Of(1, 2, 3, 4, 5, 6)
+	sequence := seq.Of2(1, 2, 3, 4, 5, 6)
 	middle := seq2.Top(2, seq2.Skip(2, sequence))
 	result := seq.Slice(seq2.Values(middle))
 	i := seq.Slice(seq2.Keys(middle))
@@ -323,7 +323,7 @@ func Test_SkipTop(t *testing.T) {
 }
 
 func Test_First(t *testing.T) {
-	sequence := seq2.Of(1, 2, 3, 4, 5, 6)
+	sequence := seq.Of2(1, 2, 3, 4, 5, 6)
 	condition := func(_ int, v int) bool { return more.Than(5)(v) }
 	i, result, ok := seq2.First(sequence, condition)
 	assert.True(t, ok)
@@ -343,7 +343,7 @@ func Test_First(t *testing.T) {
 }
 
 func Test_HasAny(t *testing.T) {
-	sequence := seq2.Of(1, 2, 3, 4, 5, 6)
+	sequence := seq.Of2(1, 2, 3, 4, 5, 6)
 	mor5 := func(_, v int) bool { return more.Than(5)(v) }
 	ok := seq2.HasAny(sequence, mor5)
 	assert.True(t, ok)
@@ -353,7 +353,7 @@ func Test_HasAny(t *testing.T) {
 }
 
 func Test_Firstt(t *testing.T) {
-	sequence := seq2.Of(1, 2, 3, 4, 5, 6)
+	sequence := seq.Of2(1, 2, 3, 4, 5, 6)
 
 	condition := func(_ int, v int) (bool, error) { return more.Than(5)(v), nil }
 	i, result, ok, err := seq2.Firstt(sequence, condition)
@@ -402,7 +402,7 @@ func Test_Firstt(t *testing.T) {
 }
 
 func Test_Filter(t *testing.T) {
-	s := seq2.Of("first", "second", "third")
+	s := seq.Of2("first", "second", "third")
 	f := seq2.Filter(s, even)
 	k := seq.Slice(seq2.Keys(f))
 	v := seq.Slice(seq2.Values(f))
@@ -412,7 +412,7 @@ func Test_Filter(t *testing.T) {
 }
 
 func Test_Filt(t *testing.T) {
-	s := seq2.Of("first", "second", "third", "fourth")
+	s := seq.Of2("first", "second", "third", "fourth")
 	filter := func(i int, str string) (bool, error) { return even(i, str), op.IfElse(i > 2, stop, nil) }
 	r, err := seq2.Filt(s, filter).Slice()
 	assert.Error(t, err)
@@ -437,7 +437,7 @@ func Test_SeqOfNil(t *testing.T) {
 	var in, out []int
 
 	iter := false
-	for _, e := range seq2.Of(in...) {
+	for _, e := range seq.Of2(in...) {
 		iter = true
 		out = append(out, e)
 	}
@@ -605,7 +605,7 @@ func Test_RangeClosed(t *testing.T) {
 }
 
 func Test_ToSeq(t *testing.T) {
-	s := seq.Slice(seq2.ToSeq(seq2.Of("A", "B", "C"), func(i int, v string) string { return strconv.Itoa(i) + v }))
+	s := seq.Slice(seq2.ToSeq(seq.Of2("A", "B", "C"), func(i int, v string) string { return strconv.Itoa(i) + v }))
 	assert.Equal(t, slice.Of("0A", "1B", "2C"), s)
 }
 

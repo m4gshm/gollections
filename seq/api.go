@@ -46,6 +46,17 @@ func Of[T any](elements ...T) Seq[T] {
 	return Seq[T](v)
 }
 
+// Of2 creates an index/value pairs iterator over the elements.
+func Of2[T any](elements ...T) Seq2[int, T] {
+	return func(yield func(int, T) bool) {
+		for i, v := range elements {
+			if !yield(i, v) {
+				break
+			}
+		}
+	}
+}
+
 // Union combines several sequences into one.
 func Union[S ~seq[T], T any](seq ...S) Seq[T] {
 	return func(yield func(T) bool) {
