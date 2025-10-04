@@ -103,6 +103,11 @@ func (s Set[T]) HasAny(condition func(T) bool) bool {
 	return slice.HasAny(s.order, condition)
 }
 
+// First returns the first element that satisfies requirements of the condition.
+func (s Set[T]) First(condition func(T) bool) (T, bool) {
+	return slice.First(s.order, condition)
+}
+
 // Contains checks is the collection contains an element
 func (s Set[T]) Contains(element T) (ok bool) {
 	if elements := s.elements; elements != nil {

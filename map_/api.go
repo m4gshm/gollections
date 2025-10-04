@@ -376,12 +376,18 @@ func Reduce[M ~map[K]V, K comparable, V any](elements M, merge func(K, K, V, V) 
 
 // HasAny checks whether the elements contains an key\value pair that satisfies the condition.
 func HasAny[M ~map[K]V, K comparable, V any](elements M, condition func(K, V) bool) bool {
+	_, _, ok := First(elements, condition)
+	return ok
+}
+
+// First returns the first key\value pair that satisfies the condition.
+func First[M ~map[K]V, K comparable, V any](elements M, condition func(K, V) bool) (k K, v V, ok bool) {
 	for k, v := range elements {
 		if condition(k, v) {
-			return true
+			return k, v, true
 		}
 	}
-	return false
+	return k, v, false
 }
 
 // Slice collects key\value elements to a slice by applying the specified converter to evety element

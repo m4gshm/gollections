@@ -280,6 +280,14 @@ func (v *Vector[T]) HasAny(condition func(T) bool) (ok bool) {
 	return ok
 }
 
+// First returns the first element that satisfies requirements of the condition.
+func (v *Vector[T]) First(condition func(T) bool) (t T, ok bool) {
+	if v != nil {
+		t, ok = slice.First(*v, condition)
+	}
+	return t, ok
+}
+
 // Sort sorts the Vector in-place and returns it
 func (v *Vector[T]) Sort(comparer slice.Comparer[T]) *Vector[T] {
 	return v.sortBy(slice.Sort, comparer)

@@ -252,13 +252,23 @@ func (s *Set[T]) Reduce(merge func(T, T) T) (t T) {
 }
 
 // HasAny checks whether the set contains an element that satisfies the condition.
-func (s *Set[K]) HasAny(condition func(K) bool) bool {
+func (s *Set[T]) HasAny(condition func(T) bool) bool {
 	if s != nil {
 		if order := s.order; order != nil {
 			return slice.HasAny(*order, condition)
 		}
 	}
 	return false
+}
+
+// First returns the first element that satisfies requirements of the condition.
+func (s *Set[T]) First(condition func(T) bool) (t T, ok bool) {
+	if s != nil {
+		if order := s.order; order != nil {
+			return slice.First(*order, condition)
+		}
+	}
+	return t, false
 }
 
 // Sort sorts the elements

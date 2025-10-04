@@ -5,6 +5,7 @@ import (
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/collection"
+	"github.com/m4gshm/gollections/kv/predicate"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/seq"
 	"github.com/m4gshm/gollections/slice"
@@ -113,9 +114,13 @@ func (m MapValues[K, V]) Reduce(merge func(V, V) V) V {
 
 // HasAny checks whether the collection contains a value that satisfies the condition.
 func (m MapValues[K, V]) HasAny(condition func(V) bool) bool {
-	return map_.HasAny(m.elements, func(_ K, v V) bool {
-		return condition(v)
-	})
+	return map_.HasAny(m.elements, predicate.Value[K](condition))
+}
+
+// First returns the first key\value pair that satisfies the condition.
+func (m MapValues[K, V]) First(condition func(V) bool) (V, bool) {
+	_, v, ok := map_.First(m.elements, predicate.Value[K](condition))
+	return v, ok
 }
 
 func (m MapValues[K, V]) String() string {

@@ -103,6 +103,11 @@ func (m MapKeys[K]) HasAny(condition func(K) bool) bool {
 	return slice.HasAny(m.keys, condition)
 }
 
+// First returns the first key that satisfies requirements of the condition
+func (m MapKeys[K]) First(condition func(K) bool) (K, bool) {
+	return slice.First(m.keys, condition)
+}
+
 // String returns string representation of the collection
 func (m MapKeys[K]) String() string {
 	return slice.ToString(m.Slice())

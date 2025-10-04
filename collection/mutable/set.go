@@ -6,6 +6,7 @@ import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/collection/mutable/ordered"
+	"github.com/m4gshm/gollections/kv/predicate"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/seq"
 	"github.com/m4gshm/gollections/slice"
@@ -243,11 +244,18 @@ func (s *Set[T]) Reduce(merge func(T, T) T) (t T) {
 // HasAny checks whether the set contains an element that satisfies the condition.
 func (s *Set[K]) HasAny(condition func(K) bool) bool {
 	if s != nil {
-		return map_.HasAny(s.elements, func(k K, _ struct{}) bool {
-			return condition(k)
-		})
+		return map_.HasAny(s.elements, predicate.Key[struct{}](condition))
 	}
 	return false
+}
+
+// First returns the element that satisfies the condition.
+func (s *Set[T]) First(condition func(T) bool) (t T, ok bool) {
+	if s != nil {
+		t, _, ok := map_.First(s.elements, predicate.Key[struct{}](condition))
+		return t, ok
+	}
+	return t, false
 }
 
 // Sort transforms to the ordered Set contains sorted elements

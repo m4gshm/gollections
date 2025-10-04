@@ -119,6 +119,11 @@ func (v Vector[T]) HasAny(condition func(T) bool) bool {
 	return slice.HasAny(v.elements, condition)
 }
 
+// First returns the first element that satisfies requirements of  the condition.
+func (v Vector[T]) First(condition func(T) bool) (T, bool) {
+	return slice.First(v.elements, condition)
+}
+
 // Sort returns a sorted clone of the Vector
 func (v Vector[T]) Sort(comparer slice.Comparer[T]) Vector[T] {
 	return v.sortBy(slice.Sort, comparer)
