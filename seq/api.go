@@ -12,6 +12,7 @@ import (
 
 // Seq is an iterator-function that allows to iterate over elements of a sequence, such as slice.
 type Seq[T any] seq[T]
+
 type seq[T any] = func(func(T) bool)
 
 // SeqE is a specific iterator form that allows to retrieve a value with an error as second parameter of the iterator.
@@ -30,6 +31,7 @@ type seqE[T any] = seq2[T, error]
 // Seq2 is an iterator-function that allows to iterate over key/value pairs of a sequence, such as slice or map.
 // It is used to iterate over slice index/value pairs or map key/value pairs.
 type Seq2[K, V any] seq2[K, V]
+
 type seq2[K, V any] = func(func(K, V) bool)
 
 // Of creates an iterator over the elements.

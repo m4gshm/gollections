@@ -90,6 +90,16 @@ func Skip[S ~SeqE[T], T any](n int, seq S) seq.SeqE[T] {
 	return seqe.Skip(n, seq)
 }
 
+// While cuts tail elements of the seq that don't match the filter.
+func While[S ~SeqE[T], T any](seq S, filter func(T) bool) seq.SeqE[T] {
+	return seqe.While(seq, filter)
+}
+
+// SkipWhile returns a sequence without first elements of the seq that dont'math the filter.
+func SkipWhile[S ~SeqE[T], T any](seq S, filter func(T) bool) seq.SeqE[T] {
+	return seqe.SkipWhile(seq, filter)
+}
+
 // Head returns the first element.
 func Head[S ~SeqE[T], T any](seq S) (v T, ok bool, err error) {
 	return seqe.Head(seq)

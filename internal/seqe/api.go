@@ -66,6 +66,38 @@ func Skip[S ~SeqE[T], T any](n int, seq S) SeqE[T] {
 	}
 }
 
+// While cuts tail elements of the seq that don't match the filter.
+func While[S ~SeqE[T], T any](seq S, filter func(T) bool) SeqE[T] {
+	return func(yield func(T, error) bool) {
+		if seq == nil {
+			return
+		}
+		seq(func(t T, err error) bool {
+			if !filter(t) {
+				return false
+			}
+			return yield(t, err)
+		})
+	}
+}
+
+// SkipWhile returns a sequence without first elements of the seq that dont'math the filter.
+func SkipWhile[S ~SeqE[T], T any](seq S, filter func(T) bool) SeqE[T] {
+	return func(yield func(T, error) bool) {
+		if seq == nil {
+			return
+		}
+		started := false
+		seq(func(t T, err error) bool {
+			if !started && filter(t) {
+				return true
+			}
+			started = true
+			return yield(t, err)
+		})
+	}
+}
+
 // Head returns the first element.
 func Head[S ~SeqE[T], T any](seq S) (v T, ok bool, err error) {
 	return First(seq, always.True)

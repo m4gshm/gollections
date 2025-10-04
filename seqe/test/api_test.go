@@ -9,7 +9,10 @@ import (
 
 	"github.com/m4gshm/gollections/convert/as"
 	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/predicate/eq"
+	"github.com/m4gshm/gollections/predicate/less"
 	"github.com/m4gshm/gollections/predicate/more"
+	"github.com/m4gshm/gollections/predicate/not"
 	"github.com/m4gshm/gollections/seq"
 	"github.com/m4gshm/gollections/seqe"
 	"github.com/m4gshm/gollections/slice"
@@ -180,6 +183,81 @@ func Test_Head(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+func Test_While(t *testing.T) {
+	sequence := seq.SeqE[int](seq.ToSeq2(seq.Of(1, 2, 3, 4, 5, 6), noErr))
+	part := seqe.While(sequence, not.Eq(5))
+
+	s, err := seqe.Slice(part)
+	assert.Equal(t, slice.Of(1, 2, 3, 4), s)
+	assert.NoError(t, err)
+
+	part = sequence.While(not.Eq(5))
+
+	s, err = seqe.Slice(part)
+	assert.Equal(t, slice.Of(1, 2, 3, 4), s)
+	assert.NoError(t, err)
+
+	part = seqe.While(sequence, not.Eq(7))
+	s, err = seqe.Slice(part)
+	assert.Equal(t, slice.Of(1, 2, 3, 4, 5, 6), s)
+	assert.NoError(t, err)
+
+	part = seqe.While(sequence, eq.To(0))
+	s, err = seqe.Slice(part)
+	assert.Nil(t, s)
+	assert.NoError(t, err)
+
+	part = seqe.While[seq.SeqE[int]](nil, eq.To(0))
+	s, err = seqe.Slice(part)
+	assert.Nil(t, s)
+	assert.NoError(t, err)
+
+	sequence = seq.SeqE[int](seq.ToSeq2(seq.Of(1, 2, 3, 4, 5, 6), errOn(5)))
+	r := []int{}
+	for i, err := range sequence.While(not.Eq(7)) {
+		if err != nil {
+			break
+		}
+		r = append(r, i)
+	}
+	assert.Equal(t, slice.Of(1, 2, 3, 4), r)
+}
+
+func Test_SkipWhile(t *testing.T) {
+	sequence := seq.SeqE[int](seq.ToSeq2(seq.Of(1, 2, 3, 4, 5, 6), noErr))
+	part := seqe.SkipWhile(sequence, less.Than(4))
+
+	s, err := seqe.Slice(part)
+	assert.Equal(t, slice.Of(4, 5, 6), s)
+	assert.NoError(t, err)
+
+	part = sequence.SkipWhile(less.Than(4))
+
+	s, err = seqe.Slice(part)
+	assert.Equal(t, slice.Of(4, 5, 6), s)
+	assert.NoError(t, err)
+
+	part = seqe.SkipWhile(sequence, not.Eq(7))
+	s, err = seqe.Slice(part)
+	assert.Nil(t, s)
+	assert.NoError(t, err)
+
+	part = seqe.SkipWhile(sequence, less.Than(0))
+	s, err = seqe.Slice(part)
+	assert.Equal(t, slice.Of(1, 2, 3, 4, 5, 6), s)
+	assert.NoError(t, err)
+
+	r := []int{}
+	sequence = seq.SeqE[int](seq.ToSeq2(seq.Of(1, 2, 3, 4, 5, 6), errOn(6)))
+	for i, err := range sequence.SkipWhile(less.Than(4)) {
+		if err != nil {
+			break
+		}
+		r = append(r, i)
+	}
+	assert.Equal(t, slice.Of(4, 5), r)
+}
+
 func Test_Top(t *testing.T) {
 	sequence := seq.ToSeq2(seq.Of(1, 2, 3, 4, 5, 6), noErr)
 	top := seqe.Top(4, sequence)
@@ -209,7 +287,7 @@ func Test_Top(t *testing.T) {
 	assert.Equal(t, slice.Of(1, 2), result)
 
 	result = nil
-	for v := range seqe.Top(4, seq.ToSeq2(seq.Of(1, 2, 3, 4, 5, 6), errOn(2))) {
+	for v := range seq.SeqE[int](seq.ToSeq2(seq.Of(1, 2, 3, 4, 5, 6), errOn(2))).Top(4) {
 		if v != 2 {
 			result = append(result, v)
 		}
@@ -618,6 +696,22 @@ func Test_Conv(t *testing.T) {
 		out = append(out, v)
 	}
 	assert.Equal(t, slice.Of(1, 2, 3, 5), out)
+}
+
+func Test_ConvertNilSafe(t *testing.T) {
+	type entity struct{ val *string }
+	var (
+		first    = "first"
+		third    = "third"
+		fifth    = "fifth"
+		source   = seq.ToSeq2(seq.Of([]*entity{{&first}, {}, {&third}, nil, {&fifth}}...), noErr)
+		result   = seqe.ConvertNilSafe(source, func(e *entity) *string { return e.val })
+		expected = []*string{&first, &third, &fifth}
+	)
+	s, err := result.Slice()
+
+	assert.NoError(t, err)
+	assert.Equal(t, expected, s)
 }
 
 func Test_ConvertOK(t *testing.T) {

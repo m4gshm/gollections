@@ -37,6 +37,11 @@ func (s Seq[T]) Accum(first T, merge func(T, T) T) T {
 	return Accum(first, s, merge)
 }
 
+// Accumm accumulates a value by using the 'first' argument to initialize the accumulator and sequentially applying the 'merge' functon to the accumulator and each element of the 'seq' sequence.
+func (s Seq[T]) Accumm(first T, merge func(T, T) (T, error)) (T, error) {
+	return Accumm(first, s, merge)
+}
+
 // Head returns the first element.
 func (s Seq[T]) Head() (v T, ok bool) {
 	return Head(s)
@@ -60,6 +65,16 @@ func (s Seq[T]) Top(n int) Seq[T] {
 // Skip returns the seq without first n elements.
 func (s Seq[T]) Skip(n int) Seq[T] {
 	return Skip(n, s)
+}
+
+// While cuts tail elements of the seq that don't match the filter.
+func (s Seq[T]) While(filter func(T) bool) Seq[T] {
+	return While(s, filter)
+}
+
+// SkipWhile returns a sequence without first elements of the seq that dont'math the filter.
+func (s Seq[T]) SkipWhile(filter func(T) bool) Seq[T] {
+	return SkipWhile(s, filter)
 }
 
 // HasAny checks whether the seq contains an element that satisfies the condition.

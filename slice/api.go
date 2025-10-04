@@ -220,6 +220,11 @@ func Convert[FS ~[]From, From, To any](elements FS, converter func(From) To) []T
 	return result
 }
 
+// ConvertNilSafe creates a slice that filters not nil elements, converts that ones, filters not nils after converting and returns them.
+func ConvertNilSafe[FS ~[]*From, From, To any](elements FS, converter func(*From) *To) []*To {
+	return ConvertOK(elements, convert.NilSafe(converter))
+}
+
 // Conv creates a slice consisting of the transformed elements using the converter.
 func Conv[FS ~[]From, From, To any](elements FS, converter func(From) (To, error)) ([]To, error) {
 	if elements == nil || converter == nil {
