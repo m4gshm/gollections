@@ -495,6 +495,44 @@ func Test_Convert(t *testing.T) {
 	assert.Equal(t, slice.Of(10, 20, 30, 50, 70, 80, 90, 110), i)
 }
 
+func Test_ConvertValue(t *testing.T) {
+	i := []int{}
+
+	for _, e := range seq2.ConvertValue(testMap.All, func(v string) int { c, _ := strconv.Atoi(v); return c }) {
+		i = append(i, e)
+	}
+
+	assert.Equal(t, slice.Of(10, 20, 30, 50, 70, 80, 90, 110), i)
+}
+
+func Test_ConvValue(t *testing.T) {
+	i := []int{}
+
+	for kv, err := range seq2.ConvValue(testMap.All, strconv.Atoi) {
+		assert.NoError(t, err)
+		i = append(i, kv.V)
+	}
+
+	assert.Equal(t, slice.Of(10, 20, 30, 50, 70, 80, 90, 110), i)
+}
+
+func Test_ConvertKey(t *testing.T) {
+	i := []string{}
+	for k := range seq2.ConvertKey(testMap.All, strconv.Itoa) {
+		i = append(i, k)
+	}
+	assert.Equal(t, slice.Of("1", "2", "3", "5", "7", "8", "9", "11"), i)
+}
+
+func Test_ConvKey(t *testing.T) {
+	i := []int{}
+	for kv, err := range seq2.ConvKey(seq2.ConvertKey(testMap.All, strconv.Itoa), strconv.Atoi) {
+		assert.NoError(t, err)
+		i = append(i, kv.K)
+	}
+	assert.Equal(t, slice.Of(1, 2, 3, 5, 7, 8, 9, 11), i)
+}
+
 func Test_Conv(t *testing.T) {
 	i := []int{}
 

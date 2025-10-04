@@ -3,8 +3,6 @@ package seq
 import (
 	"github.com/m4gshm/gollections/c"
 	s2 "github.com/m4gshm/gollections/internal/seq2"
-	"github.com/m4gshm/gollections/kv/convert"
-	"github.com/m4gshm/gollections/kv/predicate"
 )
 
 // Head returns the first key\value pair.
@@ -64,22 +62,32 @@ func (s Seq2[K, V]) Values() Seq[V] {
 
 // FilterKey returns a seq consisting of key/value pairs where the key satisfies the condition of the 'filter' function.
 func (s Seq2[K, V]) FilterKey(filter func(K) bool) Seq2[K, V] {
-	return s.Filter(predicate.Key[V](filter))
+	return s2.FilterKey(s, filter)
 }
 
 // FilterValue returns a seq consisting of key/value pairs where the value satisfies the condition of the 'filter' function.
 func (s Seq2[K, V]) FilterValue(filter func(V) bool) Seq2[K, V] {
-	return s.Filter(predicate.Value[K](filter))
+	return s2.FilterValue(s, filter)
 }
 
 // ConvertKey returns a seq that applies the 'converter' function to keys.
 func (s Seq2[K, V]) ConvertKey(converter func(K) K) Seq2[K, V] {
-	return s2.Convert(s, convert.Key[V](converter))
+	return s2.ConvertKey(s, converter)
 }
 
-// ConvertValue returns a seq that applies the 'converter' function to values.
+// ConvKey returns a seq that applies the 'converter' function to keys.
+func (s Seq2[K, V]) ConvKey(converter func(K) (K, error)) SeqE[c.KV[K, V]] {
+	return s2.ConvKey(s, converter)
+}
+
+// ConvValue returns a seq that applies the 'converter' function to values.
 func (s Seq2[K, V]) ConvertValue(converter func(V) V) Seq2[K, V] {
-	return s2.Convert(s, convert.Value[K](converter))
+	return s2.ConvertValue(s, converter)
+}
+
+// ConvValue returns a seq that applies the 'converter' function to values.
+func (s Seq2[K, V]) ConvValue(converter func(V) (V, error)) SeqE[c.KV[K, V]] {
+	return s2.ConvValue(s, converter)
 }
 
 // TrackEach applies the 'consumer' function to the seq key\value pairs.

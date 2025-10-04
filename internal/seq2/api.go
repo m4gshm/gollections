@@ -4,6 +4,9 @@ package seq2
 import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/kv"
+	"github.com/m4gshm/gollections/kv/convert"
+	converte "github.com/m4gshm/gollections/break/kv/convert"
+	"github.com/m4gshm/gollections/kv/predicate"
 	"github.com/m4gshm/gollections/map_/resolv"
 )
 
@@ -116,6 +119,36 @@ func Filt[S ~Seq2[K, V], K, V any](seq S, filter func(K, V) (bool, error)) Seq2[
 			return true
 		})
 	}
+}
+
+// FilterKey returns a seq consisting of key/value pairs where the key satisfies the condition of the 'filter' function.
+func FilterKey[S ~Seq2[K, V], K, V any](seq S, filter func(K) bool) Seq2[K, V] {
+	return Filter(seq, predicate.Key[V](filter))
+}
+
+// FilterValue returns a seq consisting of key/value pairs where the value satisfies the condition of the 'filter' function.
+func FilterValue[S ~Seq2[K, V], K, V any](seq S, filter func(V) bool) Seq2[K, V] {
+	return Filter(seq, predicate.Value[K](filter))
+}
+
+// ConvertKey returns a seq that applies the 'converter' function to keys.
+func ConvertKey[S ~Seq2[Kfrom, V], Kfrom, Kto, V any](seq S, converter func(Kfrom) Kto) Seq2[Kto, V] {
+	return Convert(seq, convert.Key[V](converter))
+}
+
+// ConvKey returns a seq that applies the 'converter' function to keys.
+func ConvKey[S ~Seq2[Kfrom, V], Kfrom, Kto, V any](seq S, converter func(Kfrom) (Kto, error)) SeqE[c.KV[Kto, V]] {
+	return Conv(seq, converte.Key[V](converter))
+}
+
+// ConvertValue returns a seq that applies the 'converter' function to values.
+func ConvertValue[S ~Seq2[K, Vfrom], K, Vfrom, Vto any](seq S, converter func(Vfrom) Vto) Seq2[K, Vto] {
+	return Convert(seq, convert.Value[K](converter))
+}
+
+// ConvValue returns a seq that applies the 'converter' function to values.
+func ConvValue[S ~Seq2[K, Vfrom], K, Vfrom, Vto any](seq S, converter func(Vfrom) (Vto, error)) SeqE[c.KV[K, Vto]] {
+	return Conv(seq, converte.Value[K](converter))
 }
 
 // Convert creates an iterator that applies the 'converter' function to each iterable key\value pair.

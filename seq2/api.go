@@ -296,6 +296,36 @@ func Filt[S ~Seq2[K, V], K, V any](seq S, filter func(K, V) (bool, error)) seq.S
 	return s2.Filt(seq, filter)
 }
 
+// FilterKey returns a seq consisting of key/value pairs where the key satisfies the condition of the 'filter' function.
+func FilterKey[S ~Seq2[K, V], K, V any](seq S, filter func(K) bool) seq.Seq2[K, V] {
+	return s2.FilterKey(seq, filter)
+}
+
+// FilterValue returns a seq consisting of key/value pairs where the value satisfies the condition of the 'filter' function.
+func FilterValue[S ~Seq2[K, V], K, V any](seq S, filter func(V) bool) seq.Seq2[K, V] {
+	return s2.FilterValue(seq, filter)
+}
+
+// ConvertKey returns a seq that applies the 'converter' function to keys.
+func ConvertKey[S ~Seq2[Kfrom, V], Kfrom, Kto, V any](seq S, converter func(Kfrom) Kto) seq.Seq2[Kto, V] {
+	return s2.ConvertKey(seq, converter)
+}
+
+// ConvKey returns a seq that applies the 'converter' function to keys.
+func ConvKey[S ~Seq2[Kfrom, V], Kfrom, Kto, V any](seq S, converter func(Kfrom) (Kto, error)) seq.SeqE[c.KV[Kto, V]] {
+	return s2.ConvKey(seq, converter)
+}
+
+// ConvertValue returns a seq that applies the 'converter' function to values.
+func ConvertValue[S ~Seq2[K, Vfrom], K, Vfrom, Vto any](seq S, converter func(Vfrom) Vto) seq.Seq2[K, Vto] {
+	return s2.ConvertValue(seq, converter)
+}
+
+// ConvValue returns a seq that applies the 'converter' function to values.
+func ConvValue[S ~Seq2[K, Vfrom], K, Vfrom, Vto any](seq S, converter func(Vfrom) (Vto, error)) seq.SeqE[c.KV[K, Vto]] {
+	return s2.ConvValue(seq, converter)
+}
+
 // Convert creates an iterator that applies the 'converter' function to each iterable element.
 func Convert[S ~Seq2[Kfrom, Vfrom], Kfrom, Vfrom, Kto, Vto any](seq S, converter func(Kfrom, Vfrom) (Kto, Vto)) seq.Seq2[Kto, Vto] {
 	return s2.Convert(seq, converter)
