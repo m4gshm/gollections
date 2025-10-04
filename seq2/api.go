@@ -15,6 +15,11 @@ import (
 // It is used to iterate over slice index/value pairs or map key/value pairs.
 type Seq2[K, V any] = func(func(K, V) bool)
 
+// Union combines several sequences into one.
+func Union[S ~Seq2[K, V], K, V any](seq ...S) seq.Seq2[K, V] {
+	return s2.Union(seq...)
+}
+
 // Of creates an index/value pairs iterator over the elements.
 func Of[T any](elements ...T) seq.Seq2[int, T] {
 	return func(yield func(int, T) bool) {
@@ -35,11 +40,6 @@ func OfMap[K comparable, V any](elements map[K]V) seq.Seq2[K, V] {
 			}
 		}
 	}
-}
-
-// Union combines several sequences into one.
-func Union[S ~Seq2[K, V], K, V any](seq ...S) seq.Seq2[K, V] {
-	return s2.Union(seq...)
 }
 
 // OfIndexed builds an indexed Seq2 iterator by extracting elements from an indexed soruce.

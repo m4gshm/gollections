@@ -21,7 +21,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var stop error = errors.New("stop")
+var stop = errors.New("stop")
+var even = func(i int, _ string) bool { return i%2 == 0 }
 
 func Test_Of(t *testing.T) {
 	sequence := seq2.Of(0, 1, 2, 3, 4)
@@ -202,7 +203,10 @@ func Test_ReduceEmpty(t *testing.T) {
 func Test_Head(t *testing.T) {
 	sequence := seq2.Of(1, 2, 3, 4, 5, 6)
 	_, result, ok := seq2.Head(sequence)
+	assert.True(t, ok)
+	assert.Equal(t, 1, result)
 
+	_, result, ok = sequence.Head()
 	assert.True(t, ok)
 	assert.Equal(t, 1, result)
 
@@ -322,15 +326,30 @@ func Test_First(t *testing.T) {
 	sequence := seq2.Of(1, 2, 3, 4, 5, 6)
 	condition := func(_ int, v int) bool { return more.Than(5)(v) }
 	i, result, ok := seq2.First(sequence, condition)
-
 	assert.True(t, ok)
 	assert.Equal(t, 5, i)
 	assert.Equal(t, 6, result)
+
+	i, result, ok = sequence.First(condition)
+	assert.True(t, ok)
+	assert.Equal(t, 5, i)
+	assert.Equal(t, 6, result)
+
 	_, _, ok = seq2.First[seq.Seq2[int, int]](nil, condition)
 	assert.False(t, ok)
 
 	_, _, ok = seq2.First(sequence, nil)
 	assert.False(t, ok)
+}
+
+func Test_HasAny(t *testing.T) {
+	sequence := seq2.Of(1, 2, 3, 4, 5, 6)
+	mor5 := func(_, v int) bool { return more.Than(5)(v) }
+	ok := seq2.HasAny(sequence, mor5)
+	assert.True(t, ok)
+
+	ok = sequence.HasAny(mor5)
+	assert.True(t, ok)
 }
 
 func Test_Firstt(t *testing.T) {
@@ -383,12 +402,33 @@ func Test_Firstt(t *testing.T) {
 }
 
 func Test_Filter(t *testing.T) {
-	s := seq2.Filter(seq2.Of("first", "second", "third"), func(i int, _ string) bool { return i%2 == 0 })
-	k := seq.Slice(seq2.Keys(s))
-	v := seq.Slice(seq2.Values(s))
+	s := seq2.Of("first", "second", "third")
+	f := seq2.Filter(s, even)
+	k := seq.Slice(seq2.Keys(f))
+	v := seq.Slice(seq2.Values(f))
 
 	assert.Equal(t, slice.Of(0, 2), k)
 	assert.Equal(t, slice.Of("first", "third"), v)
+}
+
+func Test_Filt(t *testing.T) {
+	s := seq2.Of("first", "second", "third", "fourth")
+	filter := func(i int, str string) (bool, error) { return even(i, str), op.IfElse(i > 2, stop, nil) }
+	r, err := seq2.Filt(s, filter).Slice()
+	assert.Error(t, err)
+	assert.Equal(t, slice.Of(k.V(0, "first"), k.V(2, "third")), r)
+
+	r, err = s.Filt(filter).Slice()
+	assert.Error(t, err)
+	assert.Equal(t, slice.Of(k.V(0, "first"), k.V(2, "third")), r)
+
+	r, err = seq2.Filt(s, nil).Slice()
+	assert.NoError(t, err)
+	assert.Empty(t, r)
+
+	r, err = seq2.Filt[seq.Seq2[int, string]](nil, filter).Slice()
+	assert.NoError(t, err)
+	assert.Empty(t, r)
 }
 
 var testMap = map_.Of(k.V(1, "10"), k.V(2, "20"), k.V(3, "30"), k.V(5, "50"), k.V(7, "70"), k.V(8, "80"), k.V(9, "90"), k.V(11, "110"))
@@ -445,17 +485,7 @@ func Test_ConvertNilSeq(t *testing.T) {
 	assert.False(t, iter)
 }
 
-func Test_AllFiltered(t *testing.T) {
-	s := []string{}
-
-	for _, v := range seq2.Filter(testMap.All, func(k int, _ string) bool { return k%2 == 0 }) {
-		s = append(s, v)
-	}
-
-	assert.Equal(t, slice.Of("20", "80"), sort.Asc(s))
-}
-
-func Test_AllConverted(t *testing.T) {
+func Test_Convert(t *testing.T) {
 	i := []int{}
 
 	for _, e := range seq2.Convert(testMap.All, func(k int, v string) (int, int) { c, _ := strconv.Atoi(v); return k, c }) {
@@ -465,7 +495,7 @@ func Test_AllConverted(t *testing.T) {
 	assert.Equal(t, slice.Of(10, 20, 30, 50, 70, 80, 90, 110), i)
 }
 
-func Test_AllConv(t *testing.T) {
+func Test_Conv(t *testing.T) {
 	i := []int{}
 
 	for kv, err := range seq2.Conv(testMap.All, func(k int, v string) (int, int, error) {
