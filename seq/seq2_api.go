@@ -80,7 +80,7 @@ func (s Seq2[K, V]) ConvKey(converter func(K) (K, error)) SeqE[c.KV[K, V]] {
 	return s2.ConvKey(s, converter)
 }
 
-// ConvValue returns a seq that applies the 'converter' function to values.
+// ConvertValue returns a seq that applies the 'converter' function to values.
 func (s Seq2[K, V]) ConvertValue(converter func(V) V) Seq2[K, V] {
 	return s2.ConvertValue(s, converter)
 }

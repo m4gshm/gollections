@@ -95,7 +95,7 @@ func (m MapKeys[K, V]) HasAny(condition func(K) bool) bool {
 	return map_.HasAny(m.elements, predicate.Key[V](condition))
 }
 
-// HasAny checks whether the collection contains a key that satisfies the condition.
+// First returns the first key\value pair that satisfies the condition.
 func (m MapKeys[K, V]) First(condition func(K) bool) (K, bool) {
 	k, _, ok := map_.First(m.elements, predicate.Key[V](condition))
 	return k, ok

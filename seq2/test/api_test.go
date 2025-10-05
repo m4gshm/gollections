@@ -21,7 +21,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var stop = errors.New("stop")
+var errStop = errors.New("stop")
 var even = func(i int, _ string) bool { return i%2 == 0 }
 
 func Test_Of(t *testing.T) {
@@ -164,7 +164,7 @@ func Test_ReduceeSum(t *testing.T) {
 			p = *prev
 		}
 		if v == 11 {
-			return p, stop
+			return p, errStop
 		}
 		return v + p, nil
 	}
@@ -185,7 +185,7 @@ func Test_ReduceeSum(t *testing.T) {
 func Test_ReduceeSumFirstErr(t *testing.T) {
 	s := seq.Of2(1, 3, 5, 7, 9, 11)
 	r, ok, err := seq2.ReduceeOK(s, func(_ *int, _, _ int) (int, error) {
-		return 0, stop
+		return 0, errStop
 	})
 	assert.True(t, ok)
 	assert.Equal(t, 0, r)
@@ -383,7 +383,7 @@ func Test_Firstt(t *testing.T) {
 	assert.NoError(t, err)
 
 	conditionErr := func(_ int, v int) (bool, error) {
-		return more.Than(5)(v), op.IfElse(v > 3, stop, nil)
+		return more.Than(5)(v), op.IfElse(v > 3, errStop, nil)
 	}
 	i, result, ok, err = sequence.Firstt(conditionErr)
 
@@ -392,7 +392,7 @@ func Test_Firstt(t *testing.T) {
 	assert.Equal(t, 0, result)
 	assert.Error(t, err)
 
-	conditionErr = func(_ int, v int) (bool, error) { return more.Than(5)(v), op.IfElse(v > 5, stop, nil) }
+	conditionErr = func(_ int, v int) (bool, error) { return more.Than(5)(v), op.IfElse(v > 5, errStop, nil) }
 	i, result, ok, err = sequence.Firstt(conditionErr)
 
 	assert.True(t, ok)
@@ -413,7 +413,7 @@ func Test_Filter(t *testing.T) {
 
 func Test_Filt(t *testing.T) {
 	s := seq.Of2("first", "second", "third", "fourth")
-	filter := func(i int, str string) (bool, error) { return even(i, str), op.IfElse(i > 2, stop, nil) }
+	filter := func(i int, str string) (bool, error) { return even(i, str), op.IfElse(i > 2, errStop, nil) }
 	r, err := seq2.Filt(s, filter).Slice()
 	assert.Error(t, err)
 	assert.Equal(t, slice.Of(k.V(0, "first"), k.V(2, "third")), r)
@@ -538,7 +538,7 @@ func Test_Conv(t *testing.T) {
 
 	for kv, err := range seq2.Conv(testMap.All, func(k int, v string) (int, int, error) {
 		if k == 5 {
-			return 0, 0, stop
+			return 0, 0, errStop
 		}
 		c, err := strconv.Atoi(v)
 		return k, c, err

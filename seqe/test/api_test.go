@@ -19,14 +19,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var stop = errors.New("stop")
+var errStop = errors.New("stop")
 var even = func(v int) bool { return v%2 == 0 }
 
 func noErr[T any](t T) (T, error) { return t, nil }
 func errOn[T comparable](errVal T) func(T) (T, error) {
 	return func(val T) (T, error) {
 		if val == errVal {
-			return val, stop
+			return val, errStop
 		}
 		return val, nil
 	}
@@ -35,7 +35,7 @@ func errOn[T comparable](errVal T) func(T) (T, error) {
 func errIfContains[T comparable](errVal T) func([]T) ([]T, error) {
 	return func(val []T) ([]T, error) {
 		if slice.Contains(val, errVal) {
-			return val, stop
+			return val, errStop
 		}
 		return val, nil
 	}
@@ -62,7 +62,7 @@ func Test_OfIndexed(t *testing.T) {
 	assert.NoError(t, err)
 
 	result = seqe.OfIndexed(len(indexed), func(i int) (string, error) {
-		return indexed[i], op.IfElse(i == 3, stop, nil)
+		return indexed[i], op.IfElse(i == 3, errStop, nil)
 	})
 	out, err = seqe.Slice(result)
 
@@ -110,7 +110,7 @@ func Test_AccummSum(t *testing.T) {
 	s := seq.Conv(seq.Of(1, 3, 5, 7, 9, 11), noErr)
 	adder := func(i1, i2 int) (int, error) {
 		if i2 == 11 {
-			return i1, stop
+			return i1, errStop
 		}
 		return i1 + i2, nil
 	}
@@ -173,7 +173,7 @@ func Test_ReduceeSum(t *testing.T) {
 	s2 := seq.ToSeq2(s, noErr)
 	adderErr := func(i1, i2 int) (int, error) {
 		if i2 == 11 {
-			return i1, stop
+			return i1, errStop
 		}
 		return i1 + i2, nil
 	}
@@ -219,7 +219,7 @@ func Test_ReduceeSum(t *testing.T) {
 func Test_ReduceeSumFirstErr(t *testing.T) {
 	s := seq.ToSeq2(seq.Of(1, 3, 5, 7, 9, 11), noErr)
 	r, ok, err := seqe.ReduceeOK(s, func(_, _ int) (int, error) {
-		return 0, stop
+		return 0, errStop
 	})
 	assert.True(t, ok)
 	assert.Equal(t, 0, r)
@@ -465,9 +465,9 @@ func Test_HasAny(t *testing.T) {
 }
 
 func Test_Firstt(t *testing.T) {
-	firstErr := func(_ int) (bool, error) { return true, stop }
+	firstErr := func(_ int) (bool, error) { return true, errStop }
 	mor5NoErr := func(i int) (bool, error) { return more.Than(5)(i), nil }
-	justErr := func(_ int) (bool, error) { return false, stop }
+	justErr := func(_ int) (bool, error) { return false, errStop }
 
 	s := seq.Of(1, 2, 3, 4, 5, 6)
 	s2 := seq.ToSeq2(s, noErr)
@@ -624,7 +624,7 @@ func Test_FlattSeq(t *testing.T) {
 	assert.ErrorContains(t, err, "parsing \"_5\"")
 
 	s = seq.ToSeq2(seq.Of([][]string{{"1", "2", "3"}, {"4"}, {"_5"}, {"6"}}...), func(s []string) ([]string, error) {
-		return s, op.IfElse(slice.Contains(s, "_5"), stop, nil)
+		return s, op.IfElse(slice.Contains(s, "_5"), errStop, nil)
 	})
 	i, err = seqe.Slice(seqe.FlattSeq(s, f))
 
@@ -656,7 +656,7 @@ func Test_Filt(t *testing.T) {
 	s := seq.Of(1, 3, 4, 5, 7, 8, 9, 11)
 
 	s2 := seq.ToSeq2(s, noErr)
-	filter := func(i int) (bool, error) { return even(i), op.IfElse(i > 7, stop, nil) }
+	filter := func(i int) (bool, error) { return even(i), op.IfElse(i > 7, errStop, nil) }
 	r, err := seqe.Filt(s2, filter).Slice()
 	assert.Error(t, err)
 	assert.Equal(t, slice.Of(4), r)
@@ -692,7 +692,7 @@ func Test_Filt2(t *testing.T) {
 	s := seq.ToSeq2(seq.Of(1, 3, 4, 5, 7, 8, 9, 11), noErr)
 	l := seqe.Filt(s, func(i int) (bool, error) {
 		ok := i <= 7
-		return ok && even(i), op.IfElse(ok, nil, stop)
+		return ok && even(i), op.IfElse(ok, nil, errStop)
 	})
 	r, err := seqe.Slice(l)
 	assert.Error(t, err)
@@ -876,7 +876,7 @@ func Test_ConvOK(t *testing.T) {
 	assert.Empty(t, o)
 
 	r = seqe.ConvOK(s, func(i int) (string, bool, error) {
-		return strconv.Itoa(i), even(i), op.IfElse(i == 9, stop, nil)
+		return strconv.Itoa(i), even(i), op.IfElse(i == 9, errStop, nil)
 	})
 	o, err = seqe.Slice(r)
 
