@@ -9,7 +9,6 @@ import (
 	"github.com/m4gshm/gollections/collection/immutable/ordered"
 	"github.com/m4gshm/gollections/collection/immutable/ordered/map_"
 	"github.com/m4gshm/gollections/k"
-	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/seq"
 	"github.com/m4gshm/gollections/slice"
@@ -20,13 +19,8 @@ func Test_Map_Of(t *testing.T) {
 	iterCheck(t, m)
 }
 
-func Test_Map_From(t *testing.T) {
-	m := map_.From(loop.KeyValue(loop.Of(k.V(1, "1"), k.V(1, "1"), k.V(2, "2"), k.V(4, "4"), k.V(3, "3"), k.V(1, "1")), c.KV[int, string].Key, c.KV[int, string].Value))
-	iterCheck(t, m)
-}
-
 func Test_Map_FromSeq(t *testing.T) {
-	m := map_.FromSeq2(seq.KeyValue(seq.Of(k.V(1, "1"), k.V(1, "1"), k.V(2, "2"), k.V(4, "4"), k.V(3, "3"), k.V(1, "1")), c.KV[int, string].Key, c.KV[int, string].Value))
+	m := map_.FromSeq2(seq.ToKV(seq.Of(k.V(1, "1"), k.V(1, "1"), k.V(2, "2"), k.V(4, "4"), k.V(3, "3"), k.V(1, "1")), c.KV[int, string].Key, c.KV[int, string].Value))
 	iterCheck(t, m)
 }
 
@@ -59,7 +53,7 @@ func Test_Map_Iterate_Keys(t *testing.T) {
 	expectedK := slice.Of(1, 2, 4, 3)
 
 	keys := []int{}
-	for it, key, ok := ordered.Keys().First(); ok; key, ok = it.Next() {
+	for key := range ordered.Keys().All {
 		keys = append(keys, key)
 	}
 	assert.Equal(t, expectedK, keys)
@@ -73,7 +67,7 @@ func Test_Map_Iterate_Values(t *testing.T) {
 	expectedV := slice.Of("1", "2", "4", "3")
 
 	values := []string{}
-	for it, val, ok := ordered.Values().First(); ok; val, ok = it.Next() {
+	for val := range ordered.Values().All {
 		values = append(values, val)
 	}
 
@@ -91,42 +85,31 @@ func Test_Map_Zero(t *testing.T) {
 	e := m.IsEmpty()
 	assert.True(t, e)
 
-	head, _, _, ok := m.First()
-	assert.False(t, ok)
-	_, _, ok = head.Next()
-	assert.False(t, ok)
-
-	head = m.Head()
-	_, _, ok = head.Next()
+	_, _, ok := m.Head()
 	assert.False(t, ok)
 
 	_, ok = m.Get("")
 	assert.False(t, ok)
 
-	m.Track(nil)
 	m.TrackEach(nil)
 
 	m.Filter(nil)
 	m.FilterKey(nil)
 	m.FilterValue(nil)
 
-	m.Values().For(nil)
 	m.Values().ForEach(nil)
-	m.ConvertValue(nil).Track(nil)
+	m.ConvertValue(nil).TrackEach(nil)
 	m.ConvertValue(nil).Filter(nil).FilterKey(nil)
 	m.ConvertValue(nil).Filter(nil).FilterValue(nil)
 
-	m.Keys().For(nil)
 	m.Keys().ForEach(nil)
-	m.ConvertKey(nil).Track(nil)
+	m.ConvertKey(nil).TrackEach(nil)
 	m.ConvertKey(nil).Filter(nil).FilterKey(nil)
 	m.ConvertKey(nil).Filter(nil).FilterValue(nil)
 	m.Convert(nil)
 
-	m.Sort(nil).Track(nil)
 	m.Sort(nil).TrackEach(nil)
 
-	m.StableSort(nil).Track(nil)
 	m.StableSort(nil).TrackEach(nil)
 }
 

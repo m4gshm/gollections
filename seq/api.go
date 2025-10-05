@@ -2,15 +2,18 @@
 package seq
 
 import (
-	"github.com/m4gshm/gollections/c"
+	"github.com/m4gshm/gollections/convert"
+	s2 "github.com/m4gshm/gollections/internal/seq2"
 	"github.com/m4gshm/gollections/op"
+	"github.com/m4gshm/gollections/op/check/not"
 	"github.com/m4gshm/gollections/predicate/always"
-	"github.com/m4gshm/gollections/seq2"
 	"golang.org/x/exp/constraints"
 )
 
-// Seq is an alias of an iterator-function that allows to iterate over elements of a sequence, such as slice.
-type Seq[V any] = func(yield func(V) bool)
+// Seq is an iterator-function that allows to iterate over elements of a sequence, such as slice.
+type Seq[T any] seq[T]
+
+type seq[T any] = func(func(T) bool)
 
 // SeqE is a specific iterator form that allows to retrieve a value with an error as second parameter of the iterator.
 // It is used as a result of applying functions like seq.Conv, which may throw an error during iteration.
@@ -22,17 +25,32 @@ type Seq[V any] = func(yield func(V) bool)
 //	    }
 //	    ...
 //	}
-type SeqE[T any] = Seq2[T, error]
+type SeqE[T any] seqE[T]
+type seqE[T any] = seq2[T, error]
 
-// Seq2 is an alias of an iterator-function that allows to iterate over key/value pairs of a sequence, such as slice or map.
+// Seq2 is an iterator-function that allows to iterate over key/value pairs of a sequence, such as slice or map.
 // It is used to iterate over slice index/value pairs or map key/value pairs.
-type Seq2[K, V any] = func(yield func(K, V) bool)
+type Seq2[K, V any] seq2[K, V]
+
+type seq2[K, V any] = func(func(K, V) bool)
 
 // Of creates an iterator over the elements.
 func Of[T any](elements ...T) Seq[T] {
-	return func(yield func(T) bool) {
+	v := func(yield func(T) bool) {
 		for _, v := range elements {
 			if !yield(v) {
+				break
+			}
+		}
+	}
+	return Seq[T](v)
+}
+
+// Of2 creates an index/value pairs iterator over the elements.
+func Of2[T any](elements ...T) Seq2[int, T] {
+	return func(yield func(int, T) bool) {
+		for i, v := range elements {
+			if !yield(i, v) {
 				break
 			}
 		}
@@ -40,7 +58,7 @@ func Of[T any](elements ...T) Seq[T] {
 }
 
 // Union combines several sequences into one.
-func Union[S ~Seq[T], T any](seq ...S) Seq[T] {
+func Union[S ~seq[T], T any](seq ...S) Seq[T] {
 	return func(yield func(T) bool) {
 		for _, s := range seq {
 			if s != nil {
@@ -167,7 +185,7 @@ func Range[T constraints.Integer | rune](from T, toExclusive T) Seq[T] {
 }
 
 // ToSeq2 converts an iterator of single elements to an iterator of key/value pairs by applying the 'converter' function to each iterable element.
-func ToSeq2[S ~Seq[T], T, K, V any](seq S, converter func(T) (K, V)) Seq2[K, V] {
+func ToSeq2[S ~seq[T], T, K, V any](seq S, converter func(T) (K, V)) Seq2[K, V] {
 	return func(yield func(K, V) bool) {
 		if seq == nil || converter == nil {
 			return
@@ -179,7 +197,7 @@ func ToSeq2[S ~Seq[T], T, K, V any](seq S, converter func(T) (K, V)) Seq2[K, V] 
 }
 
 // Top returns a sequence of top n elements.
-func Top[S ~Seq[T], T any](n int, seq S) Seq[T] {
+func Top[S ~seq[T], T any](n int, seq S) Seq[T] {
 	return func(yield func(T) bool) {
 		if seq == nil {
 			return
@@ -195,8 +213,8 @@ func Top[S ~Seq[T], T any](n int, seq S) Seq[T] {
 	}
 }
 
-// Skip returns a sequence without first n elements.
-func Skip[S ~Seq[T], T any](n int, seq S) Seq[T] {
+// Skip returns the seq without first n elements.
+func Skip[S ~seq[T], T any](n int, seq S) Seq[T] {
 	return func(yield func(T) bool) {
 		if seq == nil {
 			return
@@ -212,14 +230,14 @@ func Skip[S ~Seq[T], T any](n int, seq S) Seq[T] {
 	}
 }
 
-// While cuts tail elements of the seq that don't match the predicate.
-func While[S ~Seq[T], T any](seq S, predicate func(T) bool) Seq[T] {
+// While cuts tail elements of the seq that don't match the filter.
+func While[S ~seq[T], T any](seq S, filter func(T) bool) Seq[T] {
 	return func(yield func(T) bool) {
 		if seq == nil {
 			return
 		}
 		seq(func(t T) bool {
-			if !predicate(t) {
+			if !filter(t) {
 				return false
 			}
 			return yield(t)
@@ -227,15 +245,15 @@ func While[S ~Seq[T], T any](seq S, predicate func(T) bool) Seq[T] {
 	}
 }
 
-// SkipWhile returns a sequence without first elements of the seq that dont'math the predicate.
-func SkipWhile[S ~Seq[T], T any](seq S, predicate func(T) bool) Seq[T] {
+// SkipWhile returns a sequence without first elements of the seq that dont'math the filter.
+func SkipWhile[S ~seq[T], T any](seq S, filter func(T) bool) Seq[T] {
 	return func(yield func(T) bool) {
 		if seq == nil {
 			return
 		}
 		started := false
 		seq(func(t T) bool {
-			if !started && predicate(t) {
+			if !started && filter(t) {
 				return true
 			}
 			started = true
@@ -245,17 +263,17 @@ func SkipWhile[S ~Seq[T], T any](seq S, predicate func(T) bool) Seq[T] {
 }
 
 // Head returns the first element.
-func Head[S ~Seq[T], T any](seq S) (v T, ok bool) {
+func Head[S ~seq[T], T any](seq S) (v T, ok bool) {
 	return First(seq, always.True)
 }
 
-// First returns the first element that satisfies the condition of the 'predicate' function.
-func First[S ~Seq[T], T any](seq S, predicate func(T) bool) (v T, ok bool) {
-	if seq == nil || predicate == nil {
+// First returns the first element that satisfies the condition.
+func First[S ~seq[T], T any](seq S, condition func(T) bool) (v T, ok bool) {
+	if seq == nil || condition == nil {
 		return
 	}
 	seq(func(one T) bool {
-		if predicate(one) {
+		if condition(one) {
 			v = one
 			ok = true
 			return false
@@ -265,13 +283,13 @@ func First[S ~Seq[T], T any](seq S, predicate func(T) bool) (v T, ok bool) {
 	return
 }
 
-// Firstt returns the first element that satisfies the condition of the 'predicate' function.
-func Firstt[S ~Seq[T], T any](seq S, predicate func(T) (bool, error)) (v T, ok bool, err error) {
-	if seq == nil || predicate == nil {
+// Firstt returns the first element that satisfies the condition.
+func Firstt[S ~seq[T], T any](seq S, condition func(T) (bool, error)) (v T, ok bool, err error) {
+	if seq == nil || condition == nil {
 		return v, false, nil
 	}
 	seq(func(one T) bool {
-		ok, err = predicate(one)
+		ok, err = condition(one)
 		if ok {
 			v = one
 			return false
@@ -284,15 +302,12 @@ func Firstt[S ~Seq[T], T any](seq S, predicate func(T) (bool, error)) (v T, ok b
 }
 
 // Slice collects the elements of the 'seq' sequence into a new slice.
-func Slice[S ~Seq[T], T any](seq S) []T {
+func Slice[S ~seq[T], T any](seq S) []T {
 	return SliceCap(seq, 0)
 }
 
 // SliceCap collects the elements of the 'seq' sequence into a new slice with predefined capacity.
-func SliceCap[S ~Seq[T], T any](seq S, capacity int) (out []T) {
-	if seq == nil {
-		return nil
-	}
+func SliceCap[S ~seq[T], T any](seq S, capacity int) (out []T) {
 	if capacity > 0 {
 		out = make([]T, 0, capacity)
 	}
@@ -300,7 +315,7 @@ func SliceCap[S ~Seq[T], T any](seq S, capacity int) (out []T) {
 }
 
 // Append collects the elements of the 'seq' sequence into the specified 'out' slice.
-func Append[S ~Seq[T], TS ~[]T, T any](seq S, out TS) TS {
+func Append[S ~seq[T], TS ~[]T, T any](seq S, out TS) TS {
 	if seq == nil {
 		return out
 	}
@@ -311,15 +326,15 @@ func Append[S ~Seq[T], TS ~[]T, T any](seq S, out TS) TS {
 	return out
 }
 
-// Reduce reduces the elements of the 'seq' sequence an one using the 'merge' function.
-func Reduce[S ~Seq[T], T any](seq S, merge func(T, T) T) T {
+// Reduce reduces the elements of the seq into one using the 'merge' function.
+func Reduce[S ~seq[T], T any](seq S, merge func(T, T) T) T {
 	result, _ := ReduceOK(seq, merge)
 	return result
 }
 
-// ReduceOK reduces the elements of the 'seq' sequence an one using the 'merge' function.
+// ReduceOK reduces the elements of the seq into one using the 'merge' function.
 // Returns ok==false if the seq returns ok=false at the first call (no more elements).
-func ReduceOK[S ~Seq[T], T any](seq S, merge func(T, T) T) (result T, ok bool) {
+func ReduceOK[S ~seq[T], T any](seq S, merge func(T, T) T) (result T, ok bool) {
 	if seq == nil || merge == nil {
 		return result, false
 	}
@@ -336,15 +351,15 @@ func ReduceOK[S ~Seq[T], T any](seq S, merge func(T, T) T) (result T, ok bool) {
 	return result, started
 }
 
-// Reducee reduces the elements of the 'seq' sequence an one using the 'merge' function.
-func Reducee[S ~Seq[T], T any](seq S, merge func(T, T) (T, error)) (T, error) {
+// Reducee reduces the elements of the seq into one using the 'merge' function.
+func Reducee[S ~seq[T], T any](seq S, merge func(T, T) (T, error)) (T, error) {
 	result, _, err := ReduceeOK(seq, merge)
 	return result, err
 }
 
-// ReduceeOK reduces the elements of the 'seq' sequence an one using the 'merge' function.
+// ReduceeOK reduces the elements of the seq into one using the 'merge' function.
 // Returns ok==false if the seq returns ok=false at the first call (no more elements).
-func ReduceeOK[S ~Seq[T], T any](seq S, merge func(T, T) (T, error)) (result T, ok bool, err error) {
+func ReduceeOK[S ~seq[T], T any](seq S, merge func(T, T) (T, error)) (result T, ok bool, err error) {
 	if seq == nil || merge == nil {
 		return result, false, nil
 	}
@@ -354,17 +369,15 @@ func ReduceeOK[S ~Seq[T], T any](seq S, merge func(T, T) (T, error)) (result T, 
 			result = v
 			started = true
 			return true
-		} else {
-			result, err = merge(result, v)
-			return err == nil
 		}
-
+		result, err = merge(result, v)
+		return err == nil
 	})
 	return result, started, err
 }
 
 // Accum accumulates a value by using the 'first' argument to initialize the accumulator and sequentially applying the 'merge' functon to the accumulator and each element of the 'seq' sequence.
-func Accum[T any, S ~Seq[T]](first T, seq S, merge func(T, T) T) T {
+func Accum[T any, S ~seq[T]](first T, seq S, merge func(T, T) T) T {
 	accumulator := first
 	if seq == nil || merge == nil {
 		return accumulator
@@ -378,7 +391,7 @@ func Accum[T any, S ~Seq[T]](first T, seq S, merge func(T, T) T) T {
 }
 
 // Accumm accumulates a value by using the 'first' argument to initialize the accumulator and sequentially applying the 'merge' functon to the accumulator and each element of the 'seq' sequence.
-func Accumm[T any, S ~Seq[T]](first T, seq S, merge func(T, T) (T, error)) (accumulator T, err error) {
+func Accumm[T any, S ~seq[T]](first T, seq S, merge func(T, T) (T, error)) (accumulator T, err error) {
 	accumulator = first
 	if seq == nil || merge == nil {
 		return accumulator, nil
@@ -392,18 +405,18 @@ func Accumm[T any, S ~Seq[T]](first T, seq S, merge func(T, T) (T, error)) (accu
 }
 
 // Sum returns the sum of all elements.
-func Sum[S ~Seq[T], T c.Summable](seq S) (out T) {
+func Sum[S ~seq[T], T op.Summable](seq S) (out T) {
 	return Accum(out, seq, op.Sum[T])
 }
 
-// HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful.
-func HasAny[S ~Seq[T], T any](seq S, predicate func(T) bool) bool {
-	_, ok := First(seq, predicate)
+// HasAny checks whether the seq contains an element that satisfies the condition.
+func HasAny[S ~seq[T], T any](seq S, filter func(T) bool) bool {
+	_, ok := First(seq, filter)
 	return ok
 }
 
 // Contains finds the first element that equal to the example and returns true.
-func Contains[S ~Seq[T], T comparable](seq S, example T) bool {
+func Contains[S ~seq[T], T comparable](seq S, example T) bool {
 	if seq == nil {
 		return false
 	}
@@ -415,7 +428,7 @@ func Contains[S ~Seq[T], T comparable](seq S, example T) bool {
 	return contains
 }
 
-// Conv creates an iterator that applies the 'converter' function to each iterable element and returns value-error pairs.
+// Conv creates an errorable seq that applies the 'converter' function to the iterable elements.
 // The error should be checked at every iteration step, like:
 //
 //	var integers iter.Seq[int]
@@ -426,12 +439,12 @@ func Contains[S ~Seq[T], T comparable](seq S, example T) bool {
 //	    }
 //	    ...
 //	}
-func Conv[S ~Seq[From], From, To any](seq S, converter func(From) (To, error)) SeqE[To] {
+func Conv[S ~seq[From], From, To any](seq S, converter func(From) (To, error)) SeqE[To] {
 	return SeqE[To](ToSeq2(seq, converter))
 }
 
 // Convert creates an iterator that applies the 'converter' function to each iterable element.
-func Convert[S ~Seq[From], From, To any](seq S, converter func(From) To) Seq[To] {
+func Convert[S ~seq[From], From, To any](seq S, converter func(From) To) Seq[To] {
 	return func(yield func(To) bool) {
 		if seq == nil || converter == nil {
 			return
@@ -442,9 +455,14 @@ func Convert[S ~Seq[From], From, To any](seq S, converter func(From) To) Seq[To]
 	}
 }
 
+// ConvertNilSafe creates a seq that filters not nil elements, converts that ones, filters not nils after converting and returns them.
+func ConvertNilSafe[S ~seq[*From], From, To any](seq S, converter func(*From) *To) Seq[*To] {
+	return ConvertOK(seq, convert.NilSafe(converter))
+}
+
 // ConvertOK creates an iterator that applies the 'converter' function to each iterable element.
-// The converter may returns a value or ok=false to exclude the value from the loop.
-func ConvertOK[S ~Seq[From], From, To any](seq S, converter func(from From) (To, bool)) Seq[To] {
+// The converter may returns a value or ok=false to exclude the value from the sequence.
+func ConvertOK[S ~seq[From], From, To any](seq S, converter func(from From) (To, bool)) Seq[To] {
 	return func(yield func(To) bool) {
 		if seq == nil || converter == nil {
 			return
@@ -461,7 +479,7 @@ func ConvertOK[S ~Seq[From], From, To any](seq S, converter func(from From) (To,
 // ConvOK creates a iterator that applies the 'converter' function to each iterable element.
 // The converter may returns a value or ok=false to exclude the value from iteration.
 // It may also return an error to abort the iteration.
-func ConvOK[S ~Seq[From], From, To any](seq S, converter func(from From) (To, bool, error)) SeqE[To] {
+func ConvOK[S ~seq[From], From, To any](seq S, converter func(from From) (To, bool, error)) SeqE[To] {
 	return func(yield func(To, error) bool) {
 		if seq == nil || converter == nil {
 			return
@@ -482,7 +500,7 @@ func ConvOK[S ~Seq[From], From, To any](seq S, converter func(from From) (To, bo
 //	for e := range seq.Flat(arrays, as.Is) {
 //	    ...
 //	}
-func Flat[S ~Seq[From], STo ~[]To, From any, To any](seq S, flattener func(From) STo) Seq[To] {
+func Flat[S ~seq[From], STo ~[]To, From any, To any](seq S, flattener func(From) STo) Seq[To] {
 	return func(yield func(To) bool) {
 		if seq == nil || flattener == nil {
 			return
@@ -503,10 +521,10 @@ func Flat[S ~Seq[From], STo ~[]To, From any, To any](seq S, flattener func(From)
 //
 //	var arrays iter.Seq[[]int]
 //	...
-//	for e := range seq.FlatSeq(arrays, slices.Values) {
+//	for e := range s.FlatSeq(arrays, slices.Values) {
 //	    ...
 //	}
-func FlatSeq[S ~Seq[From], STo ~Seq[To], From any, To any](seq S, flattener func(From) STo) Seq[To] {
+func FlatSeq[S ~seq[From], STo ~seq[To], From any, To any](seq S, flattener func(From) STo) Seq[To] {
 	return func(yield func(To) bool) {
 		if seq == nil || flattener == nil {
 			return
@@ -541,7 +559,7 @@ func FlatSeq[S ~Seq[From], STo ~Seq[To], From any, To any](seq S, flattener func
 //		}
 //		...
 //	}
-func Flatt[S ~Seq[From], STo ~[]To, From any, To any](seq S, flattener func(From) (STo, error)) SeqE[To] {
+func Flatt[S ~seq[From], STo ~[]To, From any, To any](seq S, flattener func(From) (STo, error)) SeqE[To] {
 	return func(yield func(To, error) bool) {
 		if seq == nil || flattener == nil {
 			return
@@ -579,7 +597,7 @@ func Flatt[S ~Seq[From], STo ~[]To, From any, To any](seq S, flattener func(From
 //		}
 //		...
 //	}
-func FlattSeq[S ~Seq[From], STo ~SeqE[To], From any, To any](seq S, flattener func(From) STo) SeqE[To] {
+func FlattSeq[S ~seq[From], STo ~seqE[To], From any, To any](seq S, flattener func(From) STo) SeqE[To] {
 	return func(yield func(To, error) bool) {
 		if seq == nil || flattener == nil {
 			return
@@ -598,7 +616,7 @@ func FlattSeq[S ~Seq[From], STo ~SeqE[To], From any, To any](seq S, flattener fu
 }
 
 // Filter creates an iterator that iterates only those elements for which the 'filter' function returns true.
-func Filter[S ~Seq[T], T any](seq S, filter func(T) bool) Seq[T] {
+func Filter[S ~seq[T], T any](seq S, filter func(T) bool) Seq[T] {
 	return func(yield func(T) bool) {
 		if seq == nil || filter == nil {
 			return
@@ -613,7 +631,7 @@ func Filter[S ~Seq[T], T any](seq S, filter func(T) bool) Seq[T] {
 }
 
 // Filt creates an erroreable iterator that iterates only those elements for which the 'filter' function returns true.
-func Filt[S ~Seq[T], T any](seq S, filter func(T) (bool, error)) SeqE[T] {
+func Filt[S ~seq[T], T any](seq S, filter func(T) (bool, error)) SeqE[T] {
 	return func(yield func(T, error) bool) {
 		if seq == nil || filter == nil {
 			return
@@ -627,13 +645,13 @@ func Filt[S ~Seq[T], T any](seq S, filter func(T) (bool, error)) SeqE[T] {
 	}
 }
 
-// KeyValue converts the seq iterator to a key/value pairs iterator by applying the key, value extractors to each iterable element.
-func KeyValue[S ~Seq[T], T, K, V any](seq S, keyExtractor func(T) K, valExtractor func(T) V) Seq2[K, V] {
+// ToKV converts the seq iterator to a key/value pairs iterator by applying the key, value extractors to each iterable element.
+func ToKV[S ~seq[T], T, K, V any](seq S, keyExtractor func(T) K, valExtractor func(T) V) Seq2[K, V] {
 	return ToSeq2(seq, func(t T) (K, V) { return keyExtractor(t), valExtractor(t) })
 }
 
 // KeyValues converts the seq iterator to a key/value pairs iterator by applying the key, values extractors to each iterable element.
-func KeyValues[S ~Seq[T], T, K, V any](seq S, keyExtractor func(T) K, valsExtractor func(T) []V) Seq2[K, V] {
+func KeyValues[S ~seq[T], T, K, V any](seq S, keyExtractor func(T) K, valsExtractor func(T) []V) Seq2[K, V] {
 	return func(yield func(K, V) bool) {
 		if seq == nil || keyExtractor == nil || valsExtractor == nil {
 			return
@@ -653,11 +671,16 @@ func KeyValues[S ~Seq[T], T, K, V any](seq S, keyExtractor func(T) K, valsExtrac
 // Group collects the seq elements into a new map.
 // The keyExtractor converts an element to a key.
 // The valExtractor converts an element to a value.
-func Group[S ~Seq[T], T any, K comparable, V any](seq S, keyExtractor func(T) K, valExtractor func(T) V) map[K][]V {
-	return seq2.Group(KeyValue(seq, keyExtractor, valExtractor))
+func Group[S ~seq[T], T any, K comparable, V any](seq S, keyExtractor func(T) K, valExtractor func(T) V) map[K][]V {
+	return s2.Group(ToKV(seq, keyExtractor, valExtractor))
 }
 
-// ForEach applies the 'consumer' function to the seq elements
+// NotNil returns teh seq without nil elements.
+func NotNil[T any](seq Seq[*T]) Seq[*T] {
+	return Filter(seq, not.Nil[T])
+}
+
+// ForEach applies the 'consumer' function to the seq elements.
 func ForEach[T any](seq Seq[T], consumer func(T)) {
 	if seq == nil {
 		return

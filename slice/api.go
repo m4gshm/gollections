@@ -12,19 +12,26 @@ import (
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/comparer"
 	"github.com/m4gshm/gollections/convert"
-	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_/resolv"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/op/check"
 	"github.com/m4gshm/gollections/op/check/not"
-	"github.com/m4gshm/gollections/seq"
 )
 
-// Break is the 'break' statement of the For, Track methods
-var Break = loop.Break
+// Seq is an iterator-function that allows to iterate over elements of a sequence, such as slice.
+type Seq[T any] = func(yield func(T) bool)
 
-// Continue is an alias of the nil value used to continue iterating by For, Track methods.
-var Continue = c.Continue
+// SeqE is a specific iterator form that allows to retrieve a value with an error as second parameter of the iterator.
+// It is used as a result of applying functions like seq.Conv, which may throw an error during iteration.
+// At each iteration step, it is necessary to check for the occurrence of an error.
+//
+//	for e, err := range seqence {
+//	    if err != nil {
+//	        break
+//	    }
+//	    ...
+//	}
+type SeqE[T any] = func(yield func(T, error) bool)
 
 // Of is generic slice constructor
 func Of[T any](elements ...T) []T { return elements }
@@ -32,15 +39,6 @@ func Of[T any](elements ...T) []T { return elements }
 // Len return the length of the 'elements' slice
 func Len[TS ~[]T, T any](elements TS) int {
 	return len(elements)
-}
-
-// OfLoop builds a slice by iterating elements of a source.
-// The hasNext specifies a predicate that tests existing of a next element in the source.
-// The getNext extracts the element.
-//
-// Deprecated: renamed to OfNextGet.
-func OfLoop[S, T any](source S, hasNext func(S) bool, getNext func(S) (T, error)) ([]T, error) {
-	return OfSourceNextGet(source, hasNext, getNext)
 }
 
 // OfNextGet builds a slice by iterating elements of a source.
@@ -220,6 +218,11 @@ func Convert[FS ~[]From, From, To any](elements FS, converter func(From) To) []T
 		result[i] = converter(e)
 	}
 	return result
+}
+
+// ConvertNilSafe creates a slice that filters not nil elements, converts that ones, filters not nils after converting and returns them.
+func ConvertNilSafe[FS ~[]*From, From, To any](elements FS, converter func(*From) *To) []*To {
+	return ConvertOK(elements, convert.NilSafe(converter))
 }
 
 // Conv creates a slice consisting of the transformed elements using the converter.
@@ -428,7 +431,7 @@ func Flat[FS ~[]From, From any, TS ~[]To, To any](elements FS, flattener func(Fr
 //
 //	var arrays [][]int
 //	var integers []int = slice.Flat(arrays, slices.Values)
-func FlatSeq[FS ~[]From, From any, STo ~seq.Seq[To], To any](elements FS, flattener func(From) STo) []To {
+func FlatSeq[FS ~[]From, From any, STo ~Seq[To], To any](elements FS, flattener func(From) STo) []To {
 	if elements == nil || flattener == nil {
 		return nil
 	}
@@ -468,7 +471,7 @@ func Flatt[FS ~[]From, From, To any](elements FS, flattener func(From) ([]To, er
 //	var strings [][]string
 //	var parse = func(f []string) ([]int, error) { ... }
 //	integers, err := Flatt(strings, parse)
-func FlattSeq[FS ~[]From, From any, STo ~seq.SeqE[To], To any](elements FS, flattener func(From) STo) ([]To, error) {
+func FlattSeq[FS ~[]From, From any, STo ~SeqE[To], To any](elements FS, flattener func(From) STo) ([]To, error) {
 	if elements == nil || flattener == nil {
 		return nil, nil
 	}
@@ -576,13 +579,13 @@ func NotNil[TS ~[]*T, T any](elements TS) TS {
 // ToValues returns values referenced by the pointers.
 // If a pointer is nil then it is replaced by the zero value.
 func ToValues[TS ~[]*T, T any](pointers TS) []T {
-	return Convert(pointers, convert.PtrVal[T])
+	return Convert(pointers, convert.ToVal[T])
 }
 
 // GetValues returns values referenced by the pointers.
 // All nil pointers are excluded from the final result.
 func GetValues[TS ~[]*T, T any](elements TS) []T {
-	return ConvertOK(elements, convert.NoNilPtrVal[T])
+	return ConvertOK(elements, convert.ToValNotNil[T])
 }
 
 // Filter filters elements that match the filter condition and returns them.
@@ -795,7 +798,7 @@ func Accumm[TS ~[]T, T any](first T, elements TS, merge func(T, T) (T, error)) (
 }
 
 // Sum returns the sum of all elements
-func Sum[TS ~[]T, T c.Summable](elements TS) (out T) {
+func Sum[TS ~[]T, T op.Summable](elements TS) (out T) {
 	return Accum(out, elements, op.Sum[T])
 }
 
@@ -891,18 +894,6 @@ func LasttI[TS ~[]T, T any](elements TS, by func(T) (bool, error)) (no T, index 
 	return no, -1, nil
 }
 
-// Track applies the 'consumer' function to the elements until the consumer returns the c.Break to stop.tracking
-func Track[TS ~[]T, T any](elements TS, consumer func(int, T) error) error {
-	for i, e := range elements {
-		if err := consumer(i, e); err == Break {
-			return nil
-		} else if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 // TrackEach applies the 'consumer' function to the elements
 func TrackEach[TS ~[]T, T any](elements TS, consumer func(int, T)) {
 	for i, e := range elements {
@@ -910,31 +901,19 @@ func TrackEach[TS ~[]T, T any](elements TS, consumer func(int, T)) {
 	}
 }
 
-// TrackWhile applies the 'predicate' function to the elements while the fuction returns true.
-func TrackWhile[TS ~[]T, T any](elements TS, predicate func(int, T) bool) {
+// TrackWhile applies the 'filter' function to the elements while the fuction returns true.
+func TrackWhile[TS ~[]T, T any](elements TS, filter func(int, T) bool) {
 	for i, e := range elements {
-		if !predicate(i, e) {
+		if !filter(i, e) {
 			break
 		}
 	}
 }
 
-// For applies the 'consumer' function for the elements until the consumer returns the c.Break to stop.
-func For[TS ~[]T, T any](elements TS, consumer func(T) error) error {
+// WalkWhile applies the 'filter' function for the elements until the filter returns false to stop.
+func WalkWhile[TS ~[]T, T any](elements TS, filter func(T) bool) {
 	for _, e := range elements {
-		if err := consumer(e); err == Break {
-			return nil
-		} else if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-// WalkWhile applies the 'predicate' function for the elements until the predicate returns false to stop.
-func WalkWhile[TS ~[]T, T any](elements TS, predicate func(T) bool) {
-	for _, e := range elements {
-		if !predicate(e) {
+		if !filter(e) {
 			break
 		}
 	}
@@ -1040,9 +1019,9 @@ func GetFilled[TS ~[]T, T any](elementsFactory func() TS, ifEmpty []T) TS {
 	return Filled(elementsFactory(), ifEmpty)
 }
 
-// HasAny tests if the 'elements' slice contains an element that satisfies the "predicate" condition
-func HasAny[TS ~[]T, T any](elements TS, predicate func(T) bool) bool {
-	_, ok := First(elements, predicate)
+// HasAny checks whether the elements contains an element that satisfies the condition.
+func HasAny[TS ~[]T, T any](elements TS, condition func(T) bool) bool {
+	_, ok := First(elements, condition)
 	return ok
 }
 

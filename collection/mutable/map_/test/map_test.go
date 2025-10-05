@@ -12,7 +12,6 @@ import (
 	"github.com/m4gshm/gollections/collection/mutable/ordered"
 	"github.com/m4gshm/gollections/convert/as"
 	"github.com/m4gshm/gollections/k"
-	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/seq"
 	"github.com/m4gshm/gollections/slice"
@@ -23,13 +22,8 @@ func Test_Map_Of(t *testing.T) {
 	iterCheck(t, m)
 }
 
-func Test_Map_From(t *testing.T) {
-	m := map_.From(loop.KeyValue(loop.Of(k.V(1, "1"), k.V(1, "1"), k.V(2, "2"), k.V(4, "4"), k.V(3, "3"), k.V(1, "1")), c.KV[int, string].Key, c.KV[int, string].Value))
-	iterCheck(t, m)
-}
-
 func Test_Map_FromSeq(t *testing.T) {
-	m := map_.FromSeq2(seq.KeyValue(seq.Of(k.V(1, "1"), k.V(1, "1"), k.V(2, "2"), k.V(4, "4"), k.V(3, "3"), k.V(1, "1")), c.KV[int, string].Key, c.KV[int, string].Value))
+	m := map_.FromSeq2(seq.ToKV(seq.Of(k.V(1, "1"), k.V(1, "1"), k.V(2, "2"), k.V(4, "4"), k.V(3, "3"), k.V(1, "1")), c.KV[int, string].Key, c.KV[int, string].Value))
 	iterCheck(t, m)
 }
 
@@ -127,24 +121,18 @@ func Test_Map_Nil(t *testing.T) {
 	e := m.IsEmpty()
 	assert.True(t, e)
 
-	head, _, _, ok := m.First()
-	assert.False(t, ok)
-
-	head = m.Head()
-	_, _, ok = head.Next()
+	_, _, ok := m.Head()
 	assert.False(t, ok)
 
 	m.Reduce(nil)
-	m.Convert(nil).Track(nil)
-	m.ConvertKey(nil).Filter(nil)
-	m.ConvertValue(nil).Filter(nil)
-	m.Filter(nil).Convert(nil).Track(nil)
+	// m.Convert(nil).TrackEach(nil)
+	// m.ConvertKey(nil).Filter(nil)
+	// m.ConvertValue(nil).Filter(nil)
+	// m.Filter(nil).Convert(nil).TrackEach(nil)
 
-	m.Keys().For(nil)
 	m.Keys().ForEach(nil)
-	m.Values().For(nil)
 	m.Values().ForEach(nil)
-	m.Values().Convert(nil).For(nil)
+	// m.Values().Convert(nil).ForEach(nil)
 	m.Values().Filter(nil).ForEach(nil)
 }
 
@@ -172,24 +160,18 @@ func Test_Map_Zero(t *testing.T) {
 	l := m.Len()
 	assert.Equal(t, 1, l)
 
-	head, k, v, ok := m.First()
+	k, v, ok := m.Head()
 	assert.True(t, ok)
 	assert.Equal(t, "d", k)
 	assert.Equal(t, "D", v)
 
-	head = m.Head()
-	_, _, ok = head.Next()
-	assert.True(t, ok)
-
 	m.Reduce(func(k1, v1, k2, v2 string) (string, string) { return k1 + k2, v1 + v2 })
-	m.Convert(func(s1, s2 string) (string, string) { return s1, s2 }).Track(func(_, _ string) error { return nil })
-	m.Filter(func(_, _ string) bool { return true }).Convert(func(s1, s2 string) (string, string) { return s1, s2 }).Track(func(_, _ string) error { return nil })
+	m.Convert(func(s1, s2 string) (string, string) { return s1, s2 }).TrackEach(func(_, _ string) {})
+	m.Filter(func(_, _ string) bool { return true }).Convert(func(s1, s2 string) (string, string) { return s1, s2 }).TrackEach(func(_, _ string) {})
 
-	m.Keys().For(func(_ string) error { return nil })
 	m.Keys().ForEach(func(_ string) {})
-	m.Values().For(func(_ string) error { return nil })
 	m.Values().ForEach(func(_ string) {})
-	m.Values().Convert(as.Is[string]).For(func(_ string) error { return nil })
+	m.Values().Convert(as.Is[string]).ForEach(func(_ string) {})
 	m.Values().Filter(func(_ string) bool { return true }).ForEach(func(_ string) {})
 }
 
@@ -217,25 +199,19 @@ func Test_Map_new(t *testing.T) {
 	l := m.Len()
 	assert.Equal(t, 1, l)
 
-	head, k, v, ok := m.First()
+	k, v, ok := m.Head()
 	assert.True(t, ok)
 	assert.Equal(t, "d", k)
 	assert.Equal(t, "D", v)
 
-	head = m.Head()
-	_, _, ok = head.Next()
-	assert.True(t, ok)
-
 	m.Reduce(func(k1, v1, k2, v2 string) (string, string) { return k1 + k2, v1 + v2 })
-	m.Convert(func(s1, s2 string) (string, string) { return s1, s2 }).Track(func(_, _ string) error { return nil })
+	m.Convert(func(s1, s2 string) (string, string) { return s1, s2 }).TrackEach(func(_, _ string) {})
 
-	m.Filter(func(_, _ string) bool { return true }).Convert(func(s1, s2 string) (string, string) { return s1, s2 }).Track(func(_, _ string) error { return nil })
+	m.Filter(func(_, _ string) bool { return true }).Convert(func(s1, s2 string) (string, string) { return s1, s2 }).TrackEach(func(_, _ string) {})
 
-	m.Keys().For(func(_ string) error { return nil })
 	m.Keys().ForEach(func(_ string) {})
-	m.Values().For(func(_ string) error { return nil })
 	m.Values().ForEach(func(_ string) {})
-	m.Values().Convert(as.Is[string]).For(func(_ string) error { return nil })
+	m.Values().Convert(as.Is[string]).ForEach(func(_ string) {})
 	m.Values().Filter(func(_ string) bool { return true }).ForEach(func(_ string) {})
 }
 

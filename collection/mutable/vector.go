@@ -4,10 +4,8 @@ import (
 	"fmt"
 	"sort"
 
-	breakLoop "github.com/m4gshm/gollections/break/loop"
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/collection"
-	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/notsafe"
 	"github.com/m4gshm/gollections/seq"
 	"github.com/m4gshm/gollections/slice"
@@ -48,50 +46,20 @@ func (v *Vector[T]) IAll(consumer func(int, T) bool) {
 	}
 }
 
-// Loop creates a loop to iterate through the collection.
-//
-// Deprecated: replaced by [Vector.All].
-func (v *Vector[T]) Loop() loop.Loop[T] {
+// Head returns the first element.
+func (v *Vector[T]) Head() (t T, ok bool) {
 	if v == nil {
-		return nil
+		return t, false
 	}
-	return loop.Of(*v...)
+	return collection.Head(v)
 }
 
-// Head creates an iterator to iterate through the collection.
-//
-// Deprecated: replaced by [Vector.All].
-func (v *Vector[T]) Head() *SliceIter[T] {
-	return NewHead(v, v.DeleteActualOne)
-}
-
-// Tail creates an iterator pointing to the end of the collection
-//
-// Deprecated: Tail is deprecated. Will be replaced by a rance-over function iterator.
-func (v *Vector[T]) Tail() *SliceIter[T] {
-	return NewTail(v, v.DeleteActualOne)
-}
-
-// First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
-// If no more elements then ok==false.
-//
-// Deprecated: replaced by [Vector.All].
-func (v *Vector[T]) First() (*SliceIter[T], T, bool) {
-	var (
-		iterator  = NewHead(v, v.DeleteActualOne)
-		first, ok = iterator.Next()
-	)
-	return iterator, first, ok
-}
-
-// Last returns the latest element of the collection, an iterator to reverse iterate over the remaining elements, and true\false marker of availability previous elements.
-// If no more elements then ok==false.
-func (v *Vector[T]) Last() (*SliceIter[T], T, bool) {
-	var (
-		iterator  = NewTail(v, v.DeleteActualOne)
-		first, ok = iterator.Prev()
-	)
-	return iterator, first, ok
+// Tail returns the latest element
+func (v *Vector[T]) Tail() (t T, ok bool) {
+	if v == nil {
+		return t, false
+	}
+	return slice.Tail(*v)
 }
 
 // Slice collects the elements to a slice
@@ -128,27 +96,11 @@ func (v *Vector[T]) Len() int {
 	return notsafe.GetLen(*v)
 }
 
-// Track applies consumer to elements with error checking until the consumer returns the c.Break to stop.tracking.
-func (v *Vector[T]) Track(consumer func(int, T) error) error {
-	if v == nil {
-		return nil
-	}
-	return slice.Track(*v, consumer)
-}
-
 // TrackEach applies consumer to elements without error checking
 func (v *Vector[T]) TrackEach(consumer func(int, T)) {
 	if v != nil {
 		slice.TrackEach(*v, consumer)
 	}
-}
-
-// For applies the 'consumer' function for the elements until the consumer returns the c.Break to stop.
-func (v *Vector[T]) For(consumer func(T) error) error {
-	if v == nil {
-		return nil
-	}
-	return slice.For(*v, consumer)
 }
 
 // ForEach applies consumer to elements without error checking
@@ -222,9 +174,10 @@ func (v *Vector[T]) DeleteActual(indexes ...int) bool {
 		return false
 	}
 	l := len(indexes)
-	if l == 0 {
+	switch l {
+	case 0:
 		return false
-	} else if l == 1 {
+	case 1:
 		return v.DeleteActualOne(indexes[0])
 	}
 
@@ -291,24 +244,24 @@ func (v *Vector[T]) SetNew(index int, value T) bool {
 	return true
 }
 
-// Filter returns a loop consisting of vector elements matching the filter
-func (v *Vector[T]) Filter(filter func(T) bool) loop.Loop[T] {
-	return loop.Filter(v.Loop(), filter)
+// Filter returns a seq consisting of vector elements matching the filter
+func (v *Vector[T]) Filter(filter func(T) bool) seq.Seq[T] {
+	return collection.Filter(v, filter)
 }
 
-// Filt returns a breakable loop consisting of elements that satisfy the condition of the 'predicate' function
-func (v *Vector[T]) Filt(predicate func(T) (bool, error)) breakLoop.Loop[T] {
-	return loop.Filt(v.Loop(), predicate)
+// Filt returns an errorable seq consisting of elements that satisfy the condition of the 'filter' function
+func (v *Vector[T]) Filt(filter func(T) (bool, error)) seq.SeqE[T] {
+	return collection.Filt(v, filter)
 }
 
-// Convert returns a loop that applies the 'converter' function to the collection elements
-func (v *Vector[T]) Convert(converter func(T) T) loop.Loop[T] {
-	return loop.Convert(v.Loop(), converter)
+// Convert returns a seq that applies the 'converter' function to the collection elements
+func (v *Vector[T]) Convert(converter func(T) T) seq.Seq[T] {
+	return collection.Convert(v, converter)
 }
 
-// Conv returns a breakable loop that applies the 'converter' function to the collection elements
-func (v *Vector[T]) Conv(converter func(T) (T, error)) breakLoop.Loop[T] {
-	return loop.Conv(v.Loop(), converter)
+// Conv returns an errorable seq that applies the 'converter' function to the collection elements
+func (v *Vector[T]) Conv(converter func(T) (T, error)) seq.SeqE[T] {
+	return collection.Conv(v, converter)
 }
 
 // Reduce reduces the elements into an one using the 'merge' function
@@ -319,12 +272,20 @@ func (v *Vector[T]) Reduce(merge func(T, T) T) (out T) {
 	return out
 }
 
-// HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful
-func (v *Vector[T]) HasAny(predicate func(T) bool) (ok bool) {
+// HasAny checks whether the vector contains an element that satisfies the condition.
+func (v *Vector[T]) HasAny(condition func(T) bool) (ok bool) {
 	if v != nil {
-		ok = slice.HasAny(*v, predicate)
+		ok = slice.HasAny(*v, condition)
 	}
 	return ok
+}
+
+// First returns the first element that satisfies requirements of the condition.
+func (v *Vector[T]) First(condition func(T) bool) (t T, ok bool) {
+	if v != nil {
+		t, ok = slice.First(*v, condition)
+	}
+	return t, ok
 }
 
 // Sort sorts the Vector in-place and returns it

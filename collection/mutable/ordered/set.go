@@ -3,10 +3,8 @@ package ordered
 import (
 	"fmt"
 
-	breakLoop "github.com/m4gshm/gollections/break/loop"
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/collection"
-	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/map_"
 	"github.com/m4gshm/gollections/seq"
 	"github.com/m4gshm/gollections/slice"
@@ -49,43 +47,12 @@ func (s *Set[T]) IAll(consumer func(int, T) bool) {
 	}
 }
 
-// Loop creates a loop to iterate through the collection.
-//
-// Deprecated: replaced by [Set.All].
-func (s *Set[T]) Loop() loop.Loop[T] {
+// Head returns the first element.
+func (s *Set[T]) Head() (t T, ok bool) {
 	if s == nil {
-		return nil
+		return t, false
 	}
-	return loop.Of((*s.order)...)
-}
-
-// IterEdit creates iterator that can delete iterable elements
-func (s *Set[T]) IterEdit() c.DelIterator[T] {
-	h := s.Head()
-	return &h
-}
-
-// Head creates an iterator to iterate through the collection.
-//
-// Deprecated: replaced by [Set.All].
-func (s *Set[T]) Head() SetIter[T] {
-	var elements *[]T
-	if s != nil {
-		elements = s.order
-	}
-	return NewSetIter(elements, s.DeleteOne)
-}
-
-// First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
-// If no more elements then ok==false.
-//
-// Deprecated: replaced by [Set.All].
-func (s *Set[T]) First() (SetIter[T], T, bool) {
-	var (
-		iterator  = s.Head()
-		first, ok = iterator.Next()
-	)
-	return iterator, first, ok
+	return collection.Head(s)
 }
 
 // Slice collects the elements to a slice
@@ -245,18 +212,6 @@ func (s *Set[T]) DeleteActualOne(element T) bool {
 	return false
 }
 
-// For applies the 'consumer' function for the elements until the consumer returns the c.Break to stop.
-func (s *Set[T]) For(consumer func(T) error) error {
-	if s == nil {
-		return nil
-	}
-	order := s.order
-	if order == nil {
-		return nil
-	}
-	return slice.For(*order, consumer)
-}
-
 // ForEach applies the 'consumer' function for every element
 func (s *Set[T]) ForEach(consumer func(T)) {
 	if s != nil {
@@ -266,25 +221,24 @@ func (s *Set[T]) ForEach(consumer func(T)) {
 	}
 }
 
-// Filter returns a loop consisting of elements that satisfy the condition of the 'predicate' function
-func (s *Set[T]) Filter(predicate func(T) bool) loop.Loop[T] {
-	h := s.Head()
-	return loop.Filter(h.Next, predicate)
+// Filter returns a seq consisting of elements that satisfy the condition of the 'filter' function
+func (s *Set[T]) Filter(filter func(T) bool) seq.Seq[T] {
+	return collection.Filter(s, filter)
 }
 
-// Filt returns a breakable loop consisting of elements that satisfy the condition of the 'predicate' function
-func (s *Set[T]) Filt(predicate func(T) (bool, error)) breakLoop.Loop[T] {
-	return loop.Filt(s.Loop(), predicate)
+// Filt returns an errorable seq consisting of elements that satisfy the condition of the 'filter' function
+func (s *Set[T]) Filt(filter func(T) (bool, error)) seq.SeqE[T] {
+	return collection.Filt(s, filter)
 }
 
-// Convert returns a loop that applies the 'converter' function to the collection elements
-func (s *Set[T]) Convert(converter func(T) T) loop.Loop[T] {
-	return loop.Convert(s.Loop(), converter)
+// Convert returns a seq that applies the 'converter' function to the collection elements
+func (s *Set[T]) Convert(converter func(T) T) seq.Seq[T] {
+	return collection.Convert(s, converter)
 }
 
-// Conv returns a breakable loop that applies the 'converter' function to the collection elements
-func (s *Set[T]) Conv(converter func(T) (T, error)) breakLoop.Loop[T] {
-	return loop.Conv(s.Loop(), converter)
+// Conv returns an errorable seq that applies the 'converter' function to the collection elements
+func (s *Set[T]) Conv(converter func(T) (T, error)) seq.SeqE[T] {
+	return collection.Conv(s, converter)
 }
 
 // Reduce reduces the elements into an one using the 'merge' function
@@ -297,14 +251,24 @@ func (s *Set[T]) Reduce(merge func(T, T) T) (t T) {
 	return t
 }
 
-// HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful
-func (s *Set[K]) HasAny(predicate func(K) bool) bool {
+// HasAny checks whether the set contains an element that satisfies the condition.
+func (s *Set[T]) HasAny(condition func(T) bool) bool {
 	if s != nil {
 		if order := s.order; order != nil {
-			return slice.HasAny(*order, predicate)
+			return slice.HasAny(*order, condition)
 		}
 	}
 	return false
+}
+
+// First returns the first element that satisfies requirements of the condition.
+func (s *Set[T]) First(condition func(T) bool) (t T, ok bool) {
+	if s != nil {
+		if order := s.order; order != nil {
+			return slice.First(*order, condition)
+		}
+	}
+	return t, false
 }
 
 // Sort sorts the elements

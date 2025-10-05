@@ -57,6 +57,9 @@ func Test_Union(t *testing.T) {
 		r = append(r, i)
 	}
 	assert.Equal(t, slice.Of(0, 1, 2, 3), r)
+
+	sequence = seq.Of(0, 1).Union(nil, seq.Of[int]()).Union(seq.Of(2, 3, 4))
+	assert.Equal(t, slice.Of(0, 1, 2, 3, 4), seq.Slice(sequence))
 }
 
 func Test_OfIndexed(t *testing.T) {
@@ -112,8 +115,11 @@ func Test_Append(t *testing.T) {
 	out := seq.Append[seq.Seq[int]](nil, in)
 	assert.Equal(t, in, out)
 
-	out = seq.Append(seq.Of(2), in)
+	out = seq.Append(seq.Of(2), out)
 	assert.Equal(t, []int{1, 2}, out)
+
+	out = seq.Of(3).Append(out)
+	assert.Equal(t, []int{1, 2, 3}, out)
 }
 
 func Test_AccumSum(t *testing.T) {
@@ -125,22 +131,35 @@ func Test_AccumSum(t *testing.T) {
 
 	r = seq.Sum(s)
 	assert.Equal(t, 1+3+5+7+9+11, r)
+
+	r = s.Accum(100, op.Sum[int])
+	assert.Equal(t, 100+1+3+5+7+9+11, r)
 }
 
 func Test_AccummSum(t *testing.T) {
 	s := seq.Of(1, 3, 5, 7, 9, 11)
-	r, err := seq.Accumm(100, s, func(i1, i2 int) (int, error) {
+	summator := func(i1, i2 int) (int, error) {
 		if i2 == 11 {
 			return i1, errors.New("stop")
 		}
 		return i1 + i2, nil
-	})
+	}
+	r, err := seq.Accumm(100, s, summator)
+	assert.Equal(t, 100+1+3+5+7+9, r)
+	assert.ErrorContains(t, err, "stop")
+
+	r, err = s.Accumm(100, summator)
 	assert.Equal(t, 100+1+3+5+7+9, r)
 	assert.ErrorContains(t, err, "stop")
 }
 
 func Test_ReduceSum(t *testing.T) {
 	sum, ok := seq.ReduceOK(seq.Of(1, 2, 3, 4, 5, 6), op.Sum)
+
+	assert.True(t, ok)
+	assert.Equal(t, 21, sum)
+
+	sum, ok = seq.Of(1, 2, 3, 4, 5, 6).ReduceOK(op.Sum)
 
 	assert.True(t, ok)
 	assert.Equal(t, 21, sum)
@@ -159,11 +178,20 @@ func Test_ReduceeSum(t *testing.T) {
 	assert.Equal(t, 1+3+5+7+9, r)
 	assert.ErrorContains(t, err, "stop")
 
+	r, ok, err = s.ReduceeOK(reducer)
+	assert.True(t, ok)
+	assert.Equal(t, 1+3+5+7+9, r)
+	assert.ErrorContains(t, err, "stop")
+
 	_, ok, err = seq.ReduceeOK[seq.Seq[int]](nil, reducer)
 	assert.False(t, ok)
 	assert.NoError(t, err)
 
 	r, err = seq.Reducee(s, reducer)
+	assert.Equal(t, 1+3+5+7+9, r)
+	assert.ErrorContains(t, err, "stop")
+
+	r, err = s.Reducee(reducer)
 	assert.Equal(t, 1+3+5+7+9, r)
 	assert.ErrorContains(t, err, "stop")
 }
@@ -204,11 +232,20 @@ func Test_Head(t *testing.T) {
 	result, ok = seq.Head[seq.Seq[int]](nil)
 	assert.Zero(t, result)
 	assert.False(t, ok)
+
+	result, ok = sequence.Head()
+
+	assert.True(t, ok)
+	assert.Equal(t, 1, result)
 }
 
 func Test_While(t *testing.T) {
 	sequence := seq.Of(1, 2, 3, 4, 5, 6)
 	part := seq.While(sequence, not.Eq(5))
+
+	assert.Equal(t, slice.Of(1, 2, 3, 4), seq.Slice(part))
+
+	part = sequence.While(not.Eq(5))
 
 	assert.Equal(t, slice.Of(1, 2, 3, 4), seq.Slice(part))
 
@@ -237,6 +274,10 @@ func Test_SkipWhile(t *testing.T) {
 
 	assert.Equal(t, slice.Of(4, 5, 6), seq.Slice(part))
 
+	part = sequence.SkipWhile(less.Than(4))
+
+	assert.Equal(t, slice.Of(4, 5, 6), seq.Slice(part))
+
 	part = seq.SkipWhile(sequence, not.Eq(7))
 	assert.Nil(t, seq.Slice(part))
 
@@ -262,6 +303,10 @@ func Test_Top(t *testing.T) {
 	assert.Equal(t, slice.Of(1, 2, 3, 4), result)
 	assert.Equal(t, result2, result)
 
+	top = sequence.Top(4)
+	result = seq.Slice(top)
+	assert.Equal(t, result2, result)
+
 	result = seq.Slice(seq.Top(0, sequence))
 	assert.Nil(t, result)
 
@@ -270,6 +315,15 @@ func Test_Top(t *testing.T) {
 
 	result = nil
 	for v := range seq.Top(4, seq.Of(1, 2, 3, 4, 5, 6)) {
+		if v != 3 {
+			result = append(result, v)
+		} else {
+			break
+		}
+	}
+	assert.Equal(t, slice.Of(1, 2), result)
+	result = nil
+	for v := range seq.Of(1, 2, 3, 4, 5, 6).Top(4) {
 		if v != 3 {
 			result = append(result, v)
 		} else {
@@ -286,6 +340,9 @@ func Test_Skip(t *testing.T) {
 	result2 := seq.Slice(skip)
 
 	assert.Equal(t, slice.Of(5, 6), result)
+	assert.Equal(t, result2, result)
+
+	skip = sequence.Skip(4)
 	assert.Equal(t, result2, result)
 
 	result = seq.Slice(seq.Skip(0, sequence))
@@ -320,7 +377,13 @@ func Test_First(t *testing.T) {
 	assert.True(t, ok)
 	assert.Equal(t, 6, result)
 
+	result, ok = sequence.First(more.Than(5))
+
+	assert.True(t, ok)
+	assert.Equal(t, 6, result)
+
 	assert.True(t, seq.HasAny(sequence, more.Than(5)))
+	assert.True(t, sequence.HasAny(more.Than(5)))
 
 	_, ok = seq.First[seq.Seq[int]](nil, more.Than(5))
 	assert.False(t, ok)
@@ -334,21 +397,36 @@ func Test_First(t *testing.T) {
 
 func Test_Firstt(t *testing.T) {
 	sequence := seq.Of(1, 2, 3, 4, 5, 6)
-	result, ok, err := seq.Firstt(sequence, func(i int) (bool, error) {
+	noErrCond := func(i int) (bool, error) {
 		return more.Than(5)(i), nil
-	})
+	}
+	result, ok, err := seq.Firstt(sequence, noErrCond)
 
 	assert.True(t, ok)
 	assert.Equal(t, 6, result)
 	assert.NoError(t, err)
 
-	result, ok, err = seq.Firstt(sequence, func(_ int) (bool, error) { return true, errors.New("abort") })
+	result, ok, err = sequence.Firstt(noErrCond)
+
+	assert.True(t, ok)
+	assert.Equal(t, 6, result)
+	assert.NoError(t, err)
+
+	firstOkButErr := func(_ int) (bool, error) { return true, errors.New("abort") }
+	result, ok, err = seq.Firstt(sequence, firstOkButErr)
 
 	assert.True(t, ok)
 	assert.Equal(t, 1, result)
 	assert.ErrorContains(t, err, "abort")
 
-	result, ok, err = seq.Firstt(sequence, func(_ int) (bool, error) { return false, errors.New("abort") })
+	result, ok, err = sequence.Firstt(firstOkButErr)
+
+	assert.True(t, ok)
+	assert.Equal(t, 1, result)
+	assert.ErrorContains(t, err, "abort")
+
+	allErr := func(_ int) (bool, error) { return false, errors.New("abort") }
+	result, ok, err = seq.Firstt(sequence, allErr)
 
 	assert.False(t, ok)
 	assert.Equal(t, 0, result)
@@ -357,7 +435,7 @@ func Test_Firstt(t *testing.T) {
 	_, ok, _ = seq.Firstt(sequence, nil)
 	assert.False(t, ok)
 
-	_, ok, _ = seq.Firstt[seq.Seq[int]](nil, func(_ int) (bool, error) { return false, errors.New("abort") })
+	_, ok, _ = seq.Firstt[seq.Seq[int]](nil, allErr)
 	assert.False(t, ok)
 
 }
@@ -499,6 +577,9 @@ func Test_Filter(t *testing.T) {
 	s := seq.Of(1, 3, 4, 5, 7, 8, 9, 11)
 	r := seq.Filter(s, even)
 	assert.Equal(t, slice.Of(4, 8), seq.Slice(r))
+
+	r = s.Filter(even)
+	assert.Equal(t, slice.Of(4, 8), seq.Slice(r))
 }
 
 func Test_Filt(t *testing.T) {
@@ -506,6 +587,11 @@ func Test_Filt(t *testing.T) {
 	filter := func(i int) (bool, error) { return even(i), op.IfElse(i > 7, errors.New("abort"), nil) }
 	l := seq.Filt(s, filter)
 	r, err := seqe.Slice(l)
+
+	assert.Error(t, err)
+	assert.Equal(t, slice.Of(4), r)
+
+	r, err = s.Filt(filter).Slice()
 
 	assert.Error(t, err)
 	assert.Equal(t, slice.Of(4), r)
@@ -519,11 +605,15 @@ func Test_Filt(t *testing.T) {
 
 func Test_Filt2(t *testing.T) {
 	s := seq.Of(1, 3, 4, 5, 7, 8, 9, 11)
-	l := seq.Filt(s, func(i int) (bool, error) {
+	cond := func(i int) (bool, error) {
 		ok := i <= 7
 		return ok && even(i), op.IfElse(ok, nil, errors.New("abort"))
-	})
-	r, err := seqe.Slice(l)
+	}
+	r, err := seqe.Slice(seq.Filt(s, cond))
+	assert.Error(t, err)
+	assert.Equal(t, slice.Of(4), r)
+
+	r, err = seq.Filt(s, cond).Slice()
 	assert.Error(t, err)
 	assert.Equal(t, slice.Of(4), r)
 }
@@ -574,7 +664,7 @@ func Test_OfNextPush(t *testing.T) {
 
 func Test_KeyValue(t *testing.T) {
 	s := seq.Of(1, 2, 3)
-	s2 := seq.KeyValue(s, as.Is, strconv.Itoa)
+	s2 := seq.ToKV(s, as.Is, strconv.Itoa)
 	k := seq.Slice(seq2.Keys(s2))
 	v := seq.Slice(seq2.Values(s2))
 
@@ -587,6 +677,12 @@ func Test_KeyValues(t *testing.T) {
 	s2 := seq.KeyValues(s, slice.Len, as.Is)
 	keys := seq.Slice(seq2.Keys(s2))
 	vals := seq.Slice(seq2.Values(s2))
+
+	assert.Equal(t, slice.Of(2, 2, 1), keys)
+	assert.Equal(t, slice.Of(1, 2, 3), vals)
+
+	keys = s2.Keys().Slice()
+	vals = s2.Values().Slice()
 
 	assert.Equal(t, slice.Of(2, 2, 1), keys)
 	assert.Equal(t, slice.Of(1, 2, 3), vals)
@@ -681,6 +777,20 @@ func Test_Conv(t *testing.T) {
 	}
 
 	assert.Equal(t, slice.Of(1, 2, 3, 5, 8, 9, 11), i)
+}
+
+func Test_ConvertNilSafe(t *testing.T) {
+	type entity struct{ val *string }
+	var (
+		first    = "first"
+		third    = "third"
+		fifth    = "fifth"
+		source   = seq.Of([]*entity{{&first}, {}, {&third}, nil, {&fifth}}...)
+		result   = seq.ConvertNilSafe(source, func(e *entity) *string { return e.val })
+		expected = []*string{&first, &third, &fifth}
+	)
+	s := result.Slice()
+	assert.Equal(t, expected, s)
 }
 
 func Test_ConvertOK(t *testing.T) {

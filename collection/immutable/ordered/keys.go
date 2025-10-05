@@ -3,10 +3,9 @@ package ordered
 import (
 	"fmt"
 
-	breakLoop "github.com/m4gshm/gollections/break/loop"
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/collection"
-	"github.com/m4gshm/gollections/loop"
+	"github.com/m4gshm/gollections/seq"
 	"github.com/m4gshm/gollections/slice"
 )
 
@@ -38,27 +37,9 @@ func (m MapKeys[K]) IAll(consumer func(int, K) bool) {
 	slice.TrackWhile(m.keys, consumer)
 }
 
-// Loop creates a loop to iterate through the collection.
-//
-// Deprecated: replaced by [MapKeys.All].
-func (m MapKeys[K]) Loop() loop.Loop[K] {
-	return loop.Of(m.keys...)
-}
-
-// Head creates an iterator to iterate through the collection.
-//
-// Deprecated: replaced by [MapKeys.All].
-func (m MapKeys[K]) Head() slice.Iter[K] {
-	return slice.NewHead(m.keys)
-}
-
-// First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
-// If no more elements then ok==false.
-//
-// Deprecated: replaced by [MapKeys.All].
-func (m MapKeys[K]) First() (*slice.Iter[K], K, bool) {
-	h := m.Head()
-	return h.Crank()
+// Head returns the first element.
+func (m MapKeys[K]) Head() (K, bool) {
+	return collection.Head(m)
 }
 
 // Len returns amount of elements
@@ -87,34 +68,29 @@ func (m MapKeys[K]) Append(out []K) []K {
 	return out
 }
 
-// For applies the 'consumer' function for every key until the consumer returns the c.Break to stop.
-func (m MapKeys[K]) For(consumer func(K) error) error {
-	return slice.For(m.keys, consumer)
-}
-
 // ForEach applies the 'consumer' function for every element
 func (m MapKeys[K]) ForEach(consumer func(K)) {
 	slice.ForEach(m.keys, consumer)
 }
 
-// Filter returns a loop consisting of elements that satisfy the condition of the 'predicate' function
-func (m MapKeys[K]) Filter(filter func(K) bool) loop.Loop[K] {
-	return loop.Filter(m.Loop(), filter)
+// Filter returns a seq consisting of elements that satisfy the condition of the 'filter' function
+func (m MapKeys[K]) Filter(filter func(K) bool) seq.Seq[K] {
+	return collection.Filter(m, filter)
 }
 
-// Filt returns a breakable loop consisting of elements that satisfy the condition of the 'predicate' function
-func (m MapKeys[K]) Filt(predicate func(K) (bool, error)) breakLoop.Loop[K] {
-	return loop.Filt(m.Loop(), predicate)
+// Filt returns an errorable seq consisting of elements that satisfy the condition of the 'filter' function
+func (m MapKeys[K]) Filt(filter func(K) (bool, error)) seq.SeqE[K] {
+	return collection.Filt(m, filter)
 }
 
-// Convert returns a loop that applies the 'converter' function to the collection elements
-func (m MapKeys[K]) Convert(converter func(K) K) loop.Loop[K] {
-	return loop.Convert(m.Loop(), converter)
+// Convert returns a seq that applies the 'converter' function to the collection elements
+func (m MapKeys[K]) Convert(converter func(K) K) seq.Seq[K] {
+	return collection.Convert(m, converter)
 }
 
-// Conv returns a breakable loop that applies the 'converter' function to the collection elements
-func (m MapKeys[K]) Conv(converter func(K) (K, error)) breakLoop.Loop[K] {
-	return loop.Conv(m.Loop(), converter)
+// Conv returns an errorable seq that applies the 'converter' function to the collection elements
+func (m MapKeys[K]) Conv(converter func(K) (K, error)) seq.SeqE[K] {
+	return collection.Conv(m, converter)
 }
 
 // Reduce reduces the elements into an one using the 'merge' function
@@ -122,9 +98,14 @@ func (m MapKeys[K]) Reduce(merge func(K, K) K) K {
 	return slice.Reduce(m.keys, merge)
 }
 
-// HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful
-func (m MapKeys[K]) HasAny(predicate func(K) bool) bool {
-	return slice.HasAny(m.keys, predicate)
+// HasAny checks whether the collection contains a key that satisfies the condition.
+func (m MapKeys[K]) HasAny(condition func(K) bool) bool {
+	return slice.HasAny(m.keys, condition)
+}
+
+// First returns the first key that satisfies requirements of the condition
+func (m MapKeys[K]) First(condition func(K) bool) (K, bool) {
+	return slice.First(m.keys, condition)
 }
 
 // String returns string representation of the collection

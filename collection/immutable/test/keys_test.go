@@ -5,14 +5,12 @@ import (
 
 	"github.com/m4gshm/gollections/collection/immutable"
 	"github.com/m4gshm/gollections/collection/immutable/ordered"
-	"github.com/m4gshm/gollections/convert/ptr"
 	"github.com/stretchr/testify/assert"
 )
 
 func Test_MapKeys_Zero_Safety(t *testing.T) {
 	var collection immutable.MapKeys[int, string]
 
-	collection.Loop()
 	collection.Head()
 	collection.Convert(func(i int) int { return i })
 	collection.Filter(func(_ int) bool { return true })
@@ -26,8 +24,6 @@ func Test_MapKeys_Zero_Safety(t *testing.T) {
 func Test_Map_Zero(t *testing.T) {
 	var collection ordered.Map[int, string]
 
-	collection.Loop()
-	ptr.Of(collection.Head()).Next()
 	collection.Convert(func(_ int, _ string) (int, string) { return 0, "" })
 	collection.Filter(func(_ int, _ string) bool { return true })
 	collection.Map()

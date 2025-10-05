@@ -1,6 +1,7 @@
 package test
 
 import (
+	"errors"
 	"fmt"
 	"testing"
 
@@ -17,7 +18,7 @@ func (t testError) Error() string {
 }
 
 func Test_error_As(t *testing.T) {
-	e := fmt.Errorf("wrap: %w", testError("test error"))
+	e := errors.Join(fmt.Errorf("any error"), fmt.Errorf("wrap2: %w", fmt.Errorf("wrap: %w", testError("test error"))))
 
 	err, ok := error_.As[testError](e)
 

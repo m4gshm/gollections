@@ -33,14 +33,7 @@ func ToNotNil[FS ~[]From, From, To any](elements FS, converter func(From) *To) [
 
 // NilSafe - convert.NilSafe filters not nil elements, converts that ones, filters not nils after converting and returns them
 func NilSafe[FS ~[]*From, From, To any](elements FS, converter func(*From) *To) []*To {
-	return slice.ConvertOK(elements, func(f *From) (*To, bool) {
-		if f != nil {
-			if t := converter(f); t != nil {
-				return t, true
-			}
-		}
-		return nil, false
-	})
+	return slice.ConvertNilSafe(elements, converter)
 }
 
 // Check - convert.Check is a short alias of slice.ConvertOK

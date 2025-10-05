@@ -3,11 +3,11 @@ package ordered
 import (
 	"fmt"
 
-	breakLoop "github.com/m4gshm/gollections/break/loop"
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/collection"
-	"github.com/m4gshm/gollections/loop"
+	"github.com/m4gshm/gollections/kv/predicate"
 	"github.com/m4gshm/gollections/map_"
+	"github.com/m4gshm/gollections/seq"
 	"github.com/m4gshm/gollections/slice"
 )
 
@@ -28,39 +28,9 @@ var (
 	_ fmt.Stringer               = (*MapValues[int, any])(nil)
 )
 
-// Loop creates a loop to iterate through the collection.
-//
-// Deprecated: replaced by [MapValues.All].
-func (m MapValues[K, V]) Loop() loop.Loop[V] {
-	h := m.Head()
-	return h.Next
-}
-
-// Head creates an iterator to iterate through the collection.
-//
-// Deprecated: replaced by [MapValues.All].
-func (m MapValues[K, V]) Head() *ValIter[K, V] {
-	var (
-		order    []K
-		elements map[K]V
-	)
-
-	order = m.order
-	elements = m.elements
-
-	return NewValIter(order, elements)
-}
-
-// First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
-// If no more elements then ok==false.
-//
-// Deprecated: replaced by [MapValues.All].
-func (m MapValues[K, V]) First() (*ValIter[K, V], V, bool) {
-	var (
-		iterator  = m.Head()
-		first, ok = iterator.Next()
-	)
-	return iterator, first, ok
+// Head returns the first element.
+func (m MapValues[K, V]) Head() (V, bool) {
+	return collection.Head(m)
 }
 
 // Len returns amount of elements
@@ -97,11 +67,6 @@ func (m MapValues[K, V]) IAll(consumer func(int, V) bool) {
 	map_.TrackOrderedValuesWhile(m.order, m.elements, consumer)
 }
 
-// For applies the 'consumer' function for every value until the consumer returns the c.Break to stop.
-func (m MapValues[K, V]) For(consumer func(V) error) error {
-	return map_.ForOrderedValues(m.order, m.elements, consumer)
-}
-
 // ForEach applies the 'consumer' function for every value
 func (m MapValues[K, V]) ForEach(consumer func(V)) {
 	map_.ForEachOrderedValues(m.order, m.elements, consumer)
@@ -119,24 +84,24 @@ func (m MapValues[K, V]) Get(index int) (V, bool) {
 	return no, false
 }
 
-// Filter returns a loop consisting of elements that satisfy the condition of the 'predicate' function
-func (m MapValues[K, V]) Filter(filter func(V) bool) loop.Loop[V] {
-	return loop.Filter(m.Loop(), filter)
+// Filter returns a seq consisting of elements that satisfy the condition of the 'filter' function
+func (m MapValues[K, V]) Filter(filter func(V) bool) seq.Seq[V] {
+	return collection.Filter(m, filter)
 }
 
-// Filt returns a breakable loop consisting of elements that satisfy the condition of the 'predicate' function
-func (m MapValues[K, V]) Filt(filter func(V) (bool, error)) breakLoop.Loop[V] {
-	return loop.Filt(m.Loop(), filter)
+// Filt returns an errorable seq consisting of elements that satisfy the condition of the 'filter' function
+func (m MapValues[K, V]) Filt(filter func(V) (bool, error)) seq.SeqE[V] {
+	return collection.Filt(m, filter)
 }
 
-// Convert returns a loop that applies the 'converter' function to the collection elements
-func (m MapValues[K, V]) Convert(converter func(V) V) loop.Loop[V] {
-	return loop.Convert(m.Loop(), converter)
+// Convert returns a seq that applies the 'converter' function to the collection elements
+func (m MapValues[K, V]) Convert(converter func(V) V) seq.Seq[V] {
+	return collection.Convert(m, converter)
 }
 
-// Conv returns a breakable loop that applies the 'converter' function to the collection elements
-func (m MapValues[K, V]) Conv(converter func(V) (V, error)) breakLoop.Loop[V] {
-	return loop.Conv(m.Loop(), converter)
+// Conv returns an errorable seq that applies the 'converter' function to the collection elements
+func (m MapValues[K, V]) Conv(converter func(V) (V, error)) seq.SeqE[V] {
+	return collection.Conv(m, converter)
 }
 
 // Reduce reduces the elements into an one using the 'merge' function
@@ -147,11 +112,15 @@ func (m MapValues[K, V]) Reduce(merge func(V, V) V) V {
 	return v
 }
 
-// HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful
-func (m MapValues[K, V]) HasAny(predicate func(V) bool) bool {
-	return map_.HasAny(m.elements, func(_ K, v V) bool {
-		return predicate(v)
-	})
+// HasAny checks whether the collection contains a value that satisfies the condition.
+func (m MapValues[K, V]) HasAny(condition func(V) bool) bool {
+	return map_.HasAny(m.elements, predicate.Value[K](condition))
+}
+
+// First returns the first key\value pair that satisfies the condition.
+func (m MapValues[K, V]) First(condition func(V) bool) (V, bool) {
+	_, v, ok := map_.First(m.elements, predicate.Value[K](condition))
+	return v, ok
 }
 
 func (m MapValues[K, V]) String() string {

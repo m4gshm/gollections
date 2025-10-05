@@ -514,12 +514,6 @@ ints, err := seqe.Slice(intSeq) //[1 2 3], invalid syntax
 
 ### Sequence API
 
-To use any collection or loop as a rangefunc sequecne just call
-[All](#iterating-over-collections) method of that one.
-
-In many cases the API likes the
-[loop](#loop-kvloop-and-breakable-versions-breakloop-breakkvloop) API.
-
 #### Instantiators
 
 ##### seq.Of, seq2.Of, seq2.OfMap
@@ -529,15 +523,16 @@ import(
     "github.com/m4gshm/gollections/seq"
     "github.com/m4gshm/gollections/seq2"
 )
-
 var (
-    ints  iter.Seq[int]          = seq.Of(1, 2, 3)
-    pairs iter.Seq2[string, int] = seq2.OfMap(map[string]int{
+    ints  seq.Seq[int]          = seq.Of(1, 2, 3)
+    pairs seq.Seq2[string, int] = seq2.OfMap(map[string]int{
         "first":  1,
         "second": 2,
         "third":  3,
     })
 )
+
+assert.Equal(t, []int{3, 2, 1}, sort.Desc(pairs.Values().Slice()))
 ```
 
 ##### seq.OfNext, seqe.OfNext, seq.OfNextGet, seqe.OfNextGet
@@ -552,7 +547,8 @@ import(
 
 var rows sql.Rows = selectUsers()
 
-rowSeq := seqe.OfNext(rows.Next, func(u *User) error { return rows.Scan(&u.name, &u.age) })
+getUser := func(u *User) error { return rows.Scan(&u.name, &u.age) }
+rowSeq := seqe.OfNext(rows.Next, getUser)
 usersByAge, err := seqe.Group(rowSeq, User.Age, as.Is)
 ```
 
@@ -599,7 +595,10 @@ import(
 )
 
 var numbers, factorials []int
-for i, n := range seq2.Series(1, func(i int, prev int) (int, bool) { return i * prev, i <= 5 }) {
+next := func(i, prev int) (int, bool) {
+    return i * prev, i <= 5
+}
+for i, n := range seq2.Series(1, next) {
     numbers = append(numbers, i)
     factorials = append(factorials, n)
 }
@@ -613,7 +612,14 @@ for i, n := range seq2.Series(1, func(i int, prev int) (int, bool) { return i * 
 
 ``` go
 filter := func(u User) bool { return u.age <= 30 }
-names := seq.Slice(seq.Convert(seq.Filter(seq.Of(users...), filter), User.Name))
+less30Names := seq.Convert(seq.Of(users...).Filter(filter), User.Name)
+
+names := seq.Slice(less30Names)
+//[Bob Tom]
+
+
+//or
+names = less30Names.Slice()
 //[Bob Tom]
 ```
 
@@ -629,14 +635,15 @@ import (
     "github.com/m4gshm/gollections/slice"
     "github.com/m4gshm/gollections/slice/sort"
 )
-
-var users iter.Seq[User] = seq.Of(users...)
-var groups iter.Seq2[string, User] = seq.ToSeq2(users, func(u User) (string, User) {
+var users seq.Seq[User] = seq.Of(users...)
+var groups seq.Seq2[string, User] = seq.ToSeq2(users, func(u User) (string, User) {
     return use.If(u.age <= 20, "<=20").If(u.age <= 30, "<=30").Else(">30"), u
 })
 var ageGroups map[string][]User = seq2.Group(groups)
 
 //map[<=20:[{Tom 18 []}] <=30:[{Bob 26 []}] >30:[{Alice 35 []} {Chris 41 []}]]
+
+assert.Equal(t, slice.Of("Alice", "Chris"), sort.Asc(slice.Convert(ageGroups[">30"], User.Name)))
 ```
 
 #### Reducers
@@ -644,7 +651,13 @@ var ageGroups map[string][]User = seq2.Group(groups)
 ##### seq.Reduce
 
 ``` go
-var sum = seq.Reduce(seq.Of(1, 2, 3, 4, 5, 6), func(i1, i2 int) int { return i1 + i2 })
+adder := func(i1, i2 int) int { return i1 + i2 }
+var sum = seq.Reduce(seq.Of(1, 2, 3, 4, 5, 6), adder)
+//21
+
+
+//or
+sum = seq.Of(1, 2, 3, 4, 5, 6).Reduce(adder)
 //21
 ```
 
@@ -652,12 +665,13 @@ var sum = seq.Reduce(seq.Of(1, 2, 3, 4, 5, 6), func(i1, i2 int) int { return i1 
 
 ``` go
 adder := func(i1, i2 int) int { return i1 + i2 }
-
 sum, ok := seq.ReduceOK(seq.Of(1, 2, 3, 4, 5, 6), adder)
 //21, true
 
+
+//or
 emptyLoop := seq.Of[int]()
-sum, ok = seq.ReduceOK(emptyLoop, adder)
+sum, ok = emptyLoop.ReduceOK(adder)
 //0, false
 ```
 
@@ -670,6 +684,10 @@ import (
 )
 
 result, ok := seq.First(seq.Of(1, 3, 5, 7, 9, 11), more.Than(5)) //7, true
+
+
+//or
+result, ok = seq.Of(1, 3, 5, 7, 9, 11).First(more.Than(5)) //7, true
 ```
 
 ##### seq.Head
@@ -680,6 +698,10 @@ import (
 )
 
 result, ok := seq.Head(seq.Of(1, 3, 5, 7, 9, 11)) //1, true
+
+
+//or
+result, ok = seq.Of(1, 3, 5, 7, 9, 11).Head() //1, true
 ```
 
 #### Element converters
@@ -739,7 +761,7 @@ import (
 var f1 = seq.Slice(seq.Filter(seq.Of(1, 3, 5, 7, 9, 11), one.Of(1, 7).Or(one.Of(11))))
 //[]int{1, 7, 11}
 
-var f2 = seq.Slice(seq.Filter(seq.Of(1, 3, 5, 7, 9, 11), exclude.All(1, 7, 11)))
+var f2 = seq.Of(1, 3, 5, 7, 9, 11).Filter(exclude.All(1, 7, 11)).Slice()
 //[]int{3, 5, 9}
 ```
 
@@ -750,7 +772,12 @@ import (
     "github.com/m4gshm/gollections/seq"
 )
 
-var i []int = seq.Slice(seq.Top(4, seq.Of(1, 3, 5, 7, 9, 11)))
+i := seq.Slice(seq.Top(4, seq.Of(1, 3, 5, 7, 9, 11)))
+//[]int{1, 3, 5, 7}
+
+
+//or
+i = seq.Of(1, 3, 5, 7, 9, 11).Top(4).Slice()
 //[]int{1, 3, 5, 7}
 ```
 
@@ -761,7 +788,12 @@ import (
     "github.com/m4gshm/gollections/seq"
 )
 
-var i []int = seq.Slice(seq.Skip(4, seq.Of(1, 3, 5, 7, 9, 11)))
+i := seq.Slice(seq.Skip(4, seq.Of(1, 3, 5, 7, 9, 11)))
+//[]int{9, 11}
+
+
+//or
+i = seq.Of(1, 3, 5, 7, 9, 11).Skip(4).Slice()
 //[]int{9, 11}
 ```
 
@@ -773,283 +805,9 @@ import (
     "github.com/m4gshm/gollections/seq"
 )
 
-var i []int = seq.Slice(seq.Flat(seq.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...), as.Is))
+twoDimensions := [][]int{{1, 2, 3}, {4}, {5, 6}}
+var i []int = seq.Slice(seq.Flat(seq.Of(twoDimensions...), as.Is))
 //[]int{1, 2, 3, 4, 5, 6}
-```
-
-## [loop](./loop/api.go), [kv/loop](./kv/loop/api.go) and breakable versions [break/loop](./break/loop/api.go), [break/kv/loop](./break/kv/loop/api.go)
-
-**Deprecated**: will be replaced by [seq](#seq-seq2-seqe) API.
-
-Legacy iterators API based on the following functions:
-
-``` go
-type (
-    Loop[T any]           func() (element T, ok bool)
-    KVLoop[K, V any]      func() (key K, value V, ok bool)
-    BreakLoop[T any]      func() (element T, ok bool, err error)
-    BreakKVLoop[K, V any] func() (key K, value V, ok bool, err error)
-)
-```
-
-The `Loop` function returns a next element from a dataset and returns
-`ok==true` on success. `ok==false` means there are no more elements in
-the dataset.  
-The `KVLoop` behaves similar but returns key/value pairs.  
-
-``` go
-even := func(i int) bool { return i%2 == 0 }
-seq := loop.Convert(loop.Filter(loop.Of(1, 2, 3, 4), even), strconv.Itoa)
-var result []string = seq.Slice() //[2 4]
-```
-
-`BreakLoop` and `BreakKVLoop` are used for sources that can issue an
-error.
-
-``` go
-intSeq := loop.Conv(loop.Of("1", "2", "3", "ddd4", "5"), strconv.Atoi)
-ints, err := loop.Slice(intSeq) //[1 2 3], invalid syntax
-```
-
-The API in most cases is similar to the [slice](./slice/api.go) API but
-with delayed computation which means that the methods don’t compute a
-result but only return a loop provider. The loop provider is type with a
-`Next` method that returns a next processed element.
-
-### Main loop functions
-
-#### Instantiators
-
-##### loop.Of, loop.S
-
-``` go
-import "github.com/m4gshm/gollections/loop"
-
-var (
-    ints    = loop.Of(1, 2, 3)
-    strings = loop.S([]string{"a", "b", "c"})
-)
-```
-
-##### range\_.Of
-
-``` go
-import "github.com/m4gshm/gollections/loop/range_"
-
-var increasing = range_.Of(-1, 3).Slice()    //[]int{-1, 0, 1, 2}
-var decreasing = range_.Of('e', 'a').Slice() //[]rune{'e', 'd', 'c', 'b'}
-var nothing = range_.Of(1, 1).Slice()        //nil
-```
-
-##### range\_.Closed
-
-``` go
-var increasing = range_.Closed(-1, 3).Slice()    //[]int{-1, 0, 1, 2, 3}
-var decreasing = range_.Closed('e', 'a').Slice() //[]rune{'e', 'd', 'c', 'b', 'a'}
-var one = range_.Closed(1, 1).Slice()            //[]int{1}
-```
-
-#### Collectors
-
-##### loop.Slice
-
-``` go
-filter := func(u User) bool { return u.age <= 30 }
-names := loop.Slice(loop.Convert(loop.Filter(loop.Of(users...), filter), User.Name))
-//[Bob Tom]
-```
-
-##### group.Of
-
-``` go
-import (
-    "github.com/m4gshm/gollections/convert/as"
-    "github.com/m4gshm/gollections/expr/use"
-    "github.com/m4gshm/gollections/loop"
-    "github.com/m4gshm/gollections/loop/group"
-)
-
-var ageGroups map[string][]User = group.Of(loop.Of(users...), func(u User) string {
-    return use.If(u.age <= 20, "<=20").If(u.age <= 30, "<=30").Else(">30")
-}, as.Is)
-
-//map[<=20:[{Tom 18 []}] <=30:[{Bob 26 []}] >30:[{Alice 35 []} {Chris 41 []}]]
-```
-
-##### loop.Map, loop.MapResolv
-
-``` go
-import (
-    "github.com/m4gshm/gollections/map_/resolv"
-    "github.com/m4gshm/gollections/op"
-    "github.com/m4gshm/gollections/loop"
-)
-
-var ageGroupedSortedNames map[string][]string
-
-ageGroupedSortedNames = loop.MapResolv(loop.Of(users...), func(u User) string {
-    return op.IfElse(u.age <= 30, "<=30", ">30")
-}, User.Name, resolv.SortedSlice)
-
-//map[<=30:[Bob Tom] >30:[Alice Chris]]
-```
-
-#### Reducers
-
-##### sum.Of
-
-``` go
-import (
-    "github.com/m4gshm/gollections/loop"
-    "github.com/m4gshm/gollections/loop/sum"
-)
-
-var sum = sum.Of(loop.Of(1, 2, 3, 4, 5, 6)) //21
-```
-
-##### loop.Reduce
-
-``` go
-var sum = loop.Reduce(loop.Of(1, 2, 3, 4, 5, 6), func(i1, i2 int) int { return i1 + i2 })
-//21
-```
-
-##### loop.ReduceOK
-
-``` go
-adder := func(i1, i2 int) int { return i1 + i2 }
-
-sum, ok := loop.ReduceOK(loop.Of(1, 2, 3, 4, 5, 6), adder)
-//21, true
-
-emptyLoop := loop.Of[int]()
-sum, ok = loop.ReduceOK(emptyLoop, adder)
-//0, false
-```
-
-##### loop.Accum
-
-``` go
-import (
-    "github.com/m4gshm/gollections/loop"
-    "github.com/m4gshm/gollections/op"
-)
-
-var sum = loop.Accum(100, loop.Of(1, 2, 3, 4, 5, 6), op.Sum)
-//121
-```
-
-##### loop.First
-
-``` go
-import (
-    "github.com/m4gshm/gollections/predicate/more"
-    "github.com/m4gshm/gollections/loop"
-)
-
-result, ok := loop.First(loop.Of(1, 3, 5, 7, 9, 11), more.Than(5)) //7, true
-```
-
-#### Element converters
-
-##### loop.Convert
-
-``` go
-var s []string = loop.Convert(loop.Of(1, 3, 5, 7, 9, 11), strconv.Itoa).Slice()
-//[]string{"1", "3", "5", "7", "9", "11"}
-```
-
-##### loop.Conv
-
-``` go
-result, err := loop.Conv(loop.Of("1", "3", "5", "_7", "9", "11"), strconv.Atoi).Slice()
-//[]int{1, 3, 5}, ErrSyntax
-```
-
-#### Loop converters
-
-##### loop.Filter
-
-``` go
-import (
-    "github.com/m4gshm/gollections/predicate/exclude"
-    "github.com/m4gshm/gollections/predicate/one"
-    "github.com/m4gshm/gollections/loop"
-)
-
-var f1 = loop.Filter(loop.Of(1, 3, 5, 7, 9, 11), one.Of(1, 7).Or(one.Of(11))).Slice()
-//[]int{1, 7, 11}
-
-var f2 = loop.Filter(loop.Of(1, 3, 5, 7, 9, 11), exclude.All(1, 7, 11)).Slice()
-//[]int{3, 5, 9}
-```
-
-##### loop.Flat
-
-``` go
-import (
-    "github.com/m4gshm/gollections/convert/as"
-    "github.com/m4gshm/gollections/loop"
-)
-
-var i []int = loop.Flat(loop.Of([][]int{{1, 2, 3}, {4}, {5, 6}}...), as.Is).Slice()
-//[]int{1, 2, 3, 4, 5, 6}
-```
-
-#### Operations chain functions
-
-- convert.AndReduce, conv.AndReduce
-
-- convert.AndFilter
-
-- filter.AndConvert
-
-These functions combine converters, filters and reducers.
-
-### Iterating over loops
-
-- Using rangefunc `All` like:
-
-``` go
-for i := range range_.Of(0, 100).All {
-    doOp(i)
-}
-```
-
-- Using `for` statement like:
-
-``` go
-next := range_.Of(0, 100)
-for i, ok := next(); ok; i, ok = next() {
-    doOp(i)
-}
-```
-
-- or
-
-``` go
-for next, i, ok := range_.Of(0, 100).Crank(); ok; i, ok = next() {
-    doOp(i)
-}
-```
-
-- `ForEach` method
-
-``` go
-range_.Of(0, 100).ForEach(doOp)
-```
-
-- or `For` method that can be aborted by returning `Break` for expected
-  completion, or another error otherwise.
-
-``` go
-range_.Of(0, 100).For(func(i int) error {
-    if i > 22 {
-        return loop.Break
-    }
-    doOp(i)
-    return loop.Continue
-})
 ```
 
 ## Data structures
@@ -1191,29 +949,17 @@ The same underlying interfaces but for read-only use cases.
 - Using rangefunc `All` like:
 
 ``` go
-uniques := set.From(range_.Of(0, 100))
-for i := range uniques.All {
-    doOp(i)
+   uniques := set.Of(1, 2, 3, 4, 5, 6)
+    for i := range uniques.All {
+        doOp(i)
+    }
+
 }
 ```
 
 - `ForEach` method
 
 ``` go
-uniques := set.From(range_.Of(0, 100))
+uniques := set.Of(1, 2, 3, 4, 5, 6)
 uniques.ForEach(doOp)
-```
-
-- or `For` method that can be aborted by returning `Break` for expected
-  completion, or another error otherwise.
-
-``` go
-uniques := set.From(range_.Of(0, 100))
-uniques.For(func(i int) error {
-    if i > 22 {
-        return loop.Break
-    }
-    doOp(i)
-    return loop.Continue
-})
 ```

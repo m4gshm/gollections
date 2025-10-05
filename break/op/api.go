@@ -2,29 +2,28 @@
 package op
 
 import (
-	"golang.org/x/exp/constraints"
+	"cmp"
 
-	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/op"
 )
 
 // Sum returns the sum of two operands
-func Sum[T c.Summable](a T, b T) (T, error) {
+func Sum[T op.Summable](a T, b T) (T, error) {
 	return op.Sum(a, b), nil
 }
 
 // Sub returns the substraction of the b from the a
-func Sub[T c.Number](a T, b T) (T, error) {
+func Sub[T op.Number](a T, b T) (T, error) {
 	return op.Sub(a, b), nil
 }
 
 // Max returns the maximum from two operands
-func Max[T constraints.Ordered](a T, b T) (T, error) {
+func Max[T cmp.Ordered](a T, b T) (T, error) {
 	return IfElse(a < b, b, a)
 }
 
 // Min returns the minimum from two operands
-func Min[T constraints.Ordered](a T, b T) (T, error) {
+func Min[T cmp.Ordered](a T, b T) (T, error) {
 	return IfElse(a > b, b, a)
 }
 
@@ -36,8 +35,8 @@ func IfElse[T any](ok bool, tru, fal T) (T, error) {
 	return fal, nil
 }
 
-// IfDoElse exececutes the tru func if ok, otherwise exec the fal function and returns it result
-func IfDoElse[T any](ok bool, tru, fal func() (T, error)) (T, error) {
+// IfGetElseGet executes the tru func if ok, otherwise exec the fal function and returns it result
+func IfGetElseGet[T any](ok bool, tru, fal func() (T, error)) (T, error) {
 	if ok {
 		return tru()
 	}

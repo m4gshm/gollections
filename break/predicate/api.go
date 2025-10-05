@@ -59,13 +59,15 @@ func Or[T any](p1, p2 Predicate[T]) Predicate[T] {
 // Xor makes an exclusive OR of two predicates
 func Xor[T any](p1, p2 Predicate[T]) Predicate[T] {
 	return func(v T) (bool, error) {
-		if ok, err := p1(v); err != nil {
+		ok, err := p1(v)
+		if err != nil {
 			return ok, err
-		} else if ok2, err := p2(v); err != nil {
-			return ok2, err
-		} else {
-			return ok != ok2, nil
 		}
+		ok2, err := p2(v)
+		if err != nil {
+			return ok2, err
+		}
+		return ok != ok2, nil
 	}
 }
 

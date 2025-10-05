@@ -1,37 +1,25 @@
 package collection
 
 import (
-	breakLoop "github.com/m4gshm/gollections/break/loop"
 	"github.com/m4gshm/gollections/c"
 	kv "github.com/m4gshm/gollections/kv/collection"
-	"github.com/m4gshm/gollections/loop"
+	"github.com/m4gshm/gollections/seq"
 )
-
-// Iterable is a loop supplier interface
-//
-// Deprecated: obsolete.
-type Iterable[T any] c.Iterable[T, loop.Loop[T]]
 
 // Collection is the base interface for the Vector and the Set impelementations
 type Collection[T any] interface {
-	Iterable[T]
 	c.Collection[T]
-	c.Filterable[T, loop.Loop[T], breakLoop.Loop[T]]
-	c.Convertable[T, loop.Loop[T], breakLoop.Loop[T]]
+	c.Filterable[T, seq.Seq[T], seq.SeqE[T]]
+	c.Convertable[T, seq.Seq[T], seq.SeqE[T]]
 
 	Len() int
 	IsEmpty() bool
-
-	HasAny(func(T) bool) bool
 }
 
 // Vector - collection interface that provides elements order and access by index to the elements.
 type Vector[T any] interface {
 	Collection[T]
-
-	c.Track[int, T]
 	c.TrackEach[int, T]
-
 	c.Access[int, T]
 }
 
@@ -44,8 +32,8 @@ type Set[T comparable] interface {
 // Map - collection interface that stores key/value pairs and provide access to an element by its key
 type Map[K comparable, V any] interface {
 	kv.Collection[K, V, map[K]V]
-	kv.Filterable[K, V]
-	kv.Convertable[K, V]
+	kv.Filterable[K, V, seq.Seq2[K, V], seq.SeqE[c.KV[K, V]]]
+	kv.Convertable[K, V, seq.Seq2[K, V], seq.SeqE[c.KV[K, V]]]
 	c.Checkable[K]
 	c.Access[K, V]
 	c.KVRange[K, V]

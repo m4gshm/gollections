@@ -306,11 +306,6 @@ or
 include::../examples/seqexamples/seq2_filter_convert_reduce_test.go[lines=14..17,indent=0]
 ----
 ==== Sequence API
-
-To use any collection or loop as a rangefunc sequecne just call link:#iterating-over-collections[All] method of that one.
-
-In many cases the API likes the link:#loop-kvloop-and-breakable-versions-breakloop-breakkvloop[loop] API.
-
 ===== Instantiators
 ====== seq.Of, seq2.Of, seq2.OfMap
 [source,go]
@@ -330,7 +325,7 @@ import(
 
     "github.com/m4gshm/gollections/seq2"
 )
-include::../examples/seqexamples/seq_OfNextPush_test.go[lines=13..18,indent=0]
+include::../examples/seqexamples/seq_OfNextPush_test.go[lines=13..19,indent=0]
 ----
 instead of:
 [source,go]
@@ -339,7 +334,7 @@ import(
     "database/sql"
     "log"
 )
-include::../examples/seqexamples/seq_OfNextPush_test.go[lines=25..37,indent=0]
+include::../examples/seqexamples/seq_OfNextPush_test.go[lines=26..38,indent=0]
 ----
 ====== seq.Range, seq2.Range
 [source,go]
@@ -355,13 +350,14 @@ include::../examples/seqexamples/seq_Range_test.go[lines=12..18,indent=0]
 import(
     "github.com/m4gshm/gollections/seq"
 )
-include::../examples/seqexamples/seq2_Series_test.go[lines=12..20,indent=0]
+include::../examples/seqexamples/seq2_Series_test.go[lines=12..23,indent=0]
 ----
 ===== Collectors
 ====== seq.Slice
 [source,go]
 ----
-include::../examples/seqexamples/seq_Slice_test.go[lines=12..16,indent=0]
+include::../examples/seqexamples/seq_Slice_test.go[lines=12..18,indent=0]
+include::../examples/seqexamples/seq_Slice_test.go[lines=20..24,indent=0]
 ----
 ====== seq.Group, seq2.Group, seq2.Map
 [source,go]
@@ -381,12 +377,14 @@ include::../examples/seqexamples/seq2_Group_test.go[lines=17..25,indent=0]
 ====== seq.Reduce
 [source,go]
 ----
-include::../examples/seqexamples/seq_Reduce_test.go[lines=12..15,indent=0]
+include::../examples/seqexamples/seq_Reduce_test.go[lines=12..16,indent=0]
+include::../examples/seqexamples/seq_Reduce_test.go[lines=18..22,indent=0]
 ----
 ====== seq.ReduceOK
 [source,go]
 ----
-include::../examples/seqexamples/seq_ReduceOK_test.go[lines=12..21,indent=0]
+include::../examples/seqexamples/seq_ReduceOK_test.go[lines=12..16,indent=0]
+include::../examples/seqexamples/seq_ReduceOK_test.go[lines=19..24,indent=0]
 ----
 ====== seq.First
 [source,go]
@@ -396,6 +394,7 @@ import (
     "github.com/m4gshm/gollections/seq"
 )
 include::../examples/seqexamples/seq_First_test.go[lines=13..15,indent=0]
+include::../examples/seqexamples/seq_First_test.go[lines=18..21,indent=0]
 ----
 ====== seq.Head
 [source,go]
@@ -404,6 +403,7 @@ import (
     "github.com/m4gshm/gollections/seq"
 )
 include::../examples/seqexamples/seq_Head_test.go[lines=12..14,indent=0]
+include::../examples/seqexamples/seq_Head_test.go[lines=17..20,indent=0]
 ----
 ===== Element converters
 ====== seq.Convert
@@ -442,6 +442,7 @@ import (
     "github.com/m4gshm/gollections/seq"
 )
 include::../examples/seqexamples/seq_Top_test.go[lines=12..15,indent=0]
+include::../examples/seqexamples/seq_Top_test.go[lines=17..21,indent=0]
 ----
 ====== seq.Skip
 [source,go]
@@ -450,6 +451,7 @@ import (
     "github.com/m4gshm/gollections/seq"
 )
 include::../examples/seqexamples/seq_Skip_test.go[lines=12..15,indent=0]
+include::../examples/seqexamples/seq_Skip_test.go[lines=17..21,indent=0]
 ----
 ====== seq.Flat, seq.FlatSeq, seqe.Flat, seqe.FlatSeq
 [source,go]
@@ -458,194 +460,7 @@ import (
     "github.com/m4gshm/gollections/convert/as"
     "github.com/m4gshm/gollections/seq"
 )
-include::../examples/seqexamples/seq_Flat_test.go[lines=13..16,indent=0]
-----
-
-[#loop]
-=== link:./loop/api.go[loop], link:./kv/loop/api.go[kv/loop] and breakable versions link:./break/loop/api.go[break/loop], link:./break/kv/loop/api.go[break/kv/loop]
-
-*Deprecated*: will be replaced by link:#seq-seq2-seqe[seq] API.
-
-Legacy iterators API based on the following functions:
-
-[source,go]
-----
-include::../examples/loopexamples/type.go[lines=2..9,indent=0]
-----
-
-The `Loop` function returns a next element from a dataset and returns ``ok==true`` on success. ``ok==false`` means there are no more elements in the dataset. +
-The `KVLoop` behaves similar but returns key/value pairs. +
-
-[source,go]
-----
-include::../examples/loopexamples/loop_filter_convert_reduce_test.go[lines=13..17,indent=0]
-----
-
-`BreakLoop` and `BreakKVLoop` are used for sources that can issue an error.
-
-[source,go]
-----
-include::../examples/loopexamples/breakloop/loop_filter_convert_reduce_test.go[lines=13..16,indent=0]
-----
-
-The API in most cases is similar to the link:./slice/api.go[slice] API but with delayed computation which means that the methods don't compute a result but only return a loop provider. The loop provider is type with a ``Next`` method that returns a next processed element.
-
-==== Main loop functions
-===== Instantiators
-====== loop.Of, loop.S
-[source,go]
-----
-import "github.com/m4gshm/gollections/loop"
-include::../examples/loopexamples/loop_Of_loop_S_test.go[lines=12..17,indent=0]
-----
-====== range_.Of
-[source,go]
-----
-import "github.com/m4gshm/gollections/loop/range_"
-include::../examples/loopexamples/range_Of_test.go[lines=11..15,indent=0]
-----
-====== range_.Closed
-[source,go]
-----
-include::../examples/loopexamples/range_Closed_test.go[lines=12..16,indent=0]
-----
-===== Collectors
-====== loop.Slice
-[source,go]
-----
-include::../examples/loopexamples/loop_Slice_test.go[lines=12..16,indent=0]
-----
-====== group.Of
-[source,go]
-----
-import (
-    "github.com/m4gshm/gollections/convert/as"
-    "github.com/m4gshm/gollections/expr/use"
-    "github.com/m4gshm/gollections/loop"
-    "github.com/m4gshm/gollections/loop/group"
-)
-include::../examples/loopexamples/group_Of_test.go[lines=17..23,indent=0]
-----
-====== loop.Map, loop.MapResolv
-[source,go]
-----
-import (
-    "github.com/m4gshm/gollections/map_/resolv"
-    "github.com/m4gshm/gollections/op"
-    "github.com/m4gshm/gollections/loop"
-)
-include::../examples/loopexamples/loop_ToMapResolv_test.go[lines=14..22,indent=0]
-----
-===== Reducers
-====== sum.Of
-[source,go]
-----
-import (
-    "github.com/m4gshm/gollections/loop"
-	"github.com/m4gshm/gollections/loop/sum"
-)
-include::../examples/loopexamples/sum_Of_test.go[lines=13..15,indent=0]
-----
-====== loop.Reduce
-[source,go]
-----
-include::../examples/loopexamples/loop_Reduce_test.go[lines=12..15,indent=0]
-----
-====== loop.ReduceOK
-[source,go]
-----
-include::../examples/loopexamples/loop_ReduceOK_test.go[lines=12..21,indent=0]
-----
-====== loop.Accum
-[source,go]
-----
-import (
-	"github.com/m4gshm/gollections/loop"
-	"github.com/m4gshm/gollections/op"
-)
-include::../examples/loopexamples/loop_Accum_test.go[lines=13..16,indent=0]
-----
-====== loop.First
-[source,go]
-----
-import (
-    "github.com/m4gshm/gollections/predicate/more"
-    "github.com/m4gshm/gollections/loop"
-)
-include::../examples/loopexamples/loop_First_test.go[lines=13..15,indent=0]
-----
-===== Element converters
-====== loop.Convert
-[source,go]
-----
-include::../examples/loopexamples/loop_Convert_test.go[lines=12..15,indent=0]
-----
-====== loop.Conv
-[source,go]
-----
-include::../examples/loopexamples/loop_Conv_test.go[lines=13..16,indent=0]
-----
-===== Loop converters
-====== loop.Filter
-[source,go]
-----
-import (
-    "github.com/m4gshm/gollections/predicate/exclude"
-    "github.com/m4gshm/gollections/predicate/one"
-    "github.com/m4gshm/gollections/loop"
-)
-include::../examples/loopexamples/loop_Filter.go[lines=14..20,indent=0]
-----
-====== loop.Flat
-[source,go]
-----
-import (
-    "github.com/m4gshm/gollections/convert/as"
-    "github.com/m4gshm/gollections/loop"
-)
-include::../examples/loopexamples/loop_Flat_test.go[lines=13..16,indent=0]
-----
-===== Operations chain functions
-* convert.AndReduce, conv.AndReduce 
-* convert.AndFilter 
-* filter.AndConvert
-
-These functions combine converters, filters and reducers.
-
-==== Iterating over loops
-* Using rangefunc `All` like:
-
-[source,go]
-----
-include::../examples/loopexamples/loop_iterating_go_1_22_test.go[lines=12..16,indent=0]
-----
-
-* Using `for` statement like:
-
-[source,go]
-----
-include::../examples/loopexamples/loop_iterating_test.go[lines=11..16,indent=0]
-----
-
-* or
-
-[source,go]
-----
-include::../examples/loopexamples/loop_iterating_test.go[lines=20..24,indent=0]
-----
-
-* `ForEach` method
-
-[source,go]
-----
-include::../examples/loopexamples/loop_iterating_test.go[lines=28..30,indent=0]
-----
-
-* or `For` method that can be aborted by returning `Break` for expected completion, or another error otherwise.
-
-[source,go]
-----
-include::../examples/loopexamples/loop_iterating_test.go[lines=34..42,indent=0]
+include::../examples/seqexamples/seq_Flat_test.go[lines=13..17,indent=0]
 ----
 
 === Data structures
@@ -765,12 +580,5 @@ include::../examples/collection/collection_iterating_go_1_22_test.go[lines=13..1
 
 [source,go]
 ----
-include::../examples/collection/collection_iterating_test.go[lines=31..34,indent=0]
-----
-
-* or `For` method that can be aborted by returning `Break` for expected completion, or another error otherwise.
-
-[source,go]
-----
-include::../examples/collection/collection_iterating_test.go[lines=38..47,indent=0]
+include::../examples/collection/collection_iterating_test.go[lines=10..13,indent=0]
 ----

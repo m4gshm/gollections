@@ -99,21 +99,21 @@ func ExtraKeys[T, K any](element T, keysExtractor func(T) []K) (out []c.KV[K, T]
 	return out
 }
 
-// Ptr converts a value to the value pointer
-func Ptr[T any](value T) *T {
+// ToPtr converts a value to the value pointer
+func ToPtr[T any](value T) *T {
 	return &value
 }
 
-// PtrVal returns a value referenced by the pointer or the zero value if the pointer is nil
-func PtrVal[T any](pointer *T) (t T) {
+// ToVal returns a value referenced by the pointer or the zero value if the pointer is nil
+func ToVal[T any](pointer *T) (t T) {
 	if pointer != nil {
 		t = *pointer
 	}
 	return t
 }
 
-// NoNilPtrVal returns a value referenced by the pointer or ok==false if the pointer is nil
-func NoNilPtrVal[T any](pointer *T) (t T, ok bool) {
+// ToValNotNil returns a value referenced by the pointer or ok==false if the pointer is nil
+func ToValNotNil[T any](pointer *T) (t T, ok bool) {
 	if pointer != nil {
 		return *pointer, true
 	}
@@ -125,4 +125,16 @@ func ToType[T, I any](i I) (T, bool) {
 	var a any = i
 	t, ok := a.(T)
 	return t, ok
+}
+
+// NilSafe filters not nil elements, converts that ones, filters not nils after converting and returns them
+func NilSafe[From, To any](converter func(*From) *To) func(f *From) (*To, bool) {
+	return func(f *From) (*To, bool) {
+		if f != nil {
+			if t := converter(f); t != nil {
+				return t, true
+			}
+		}
+		return nil, false
+	}
 }

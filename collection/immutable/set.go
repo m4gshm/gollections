@@ -3,11 +3,11 @@ package immutable
 import (
 	"fmt"
 
-	breakLoop "github.com/m4gshm/gollections/break/loop"
 	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/collection/immutable/ordered"
-	"github.com/m4gshm/gollections/loop"
+	"github.com/m4gshm/gollections/kv/predicate"
 	"github.com/m4gshm/gollections/map_"
+	"github.com/m4gshm/gollections/seq"
 	"github.com/m4gshm/gollections/slice"
 )
 
@@ -33,31 +33,9 @@ func (s Set[T]) All(consumer func(T) bool) {
 	map_.TrackKeysWhile(s.elements, consumer)
 }
 
-// Loop creates a loop to iterate through the collection.
-//
-// Deprecated: replaced by [Set.All].
-func (s Set[T]) Loop() loop.Loop[T] {
-	h := s.Head()
-	return (&h).Next
-}
-
-// Head creates an iterator to iterate through the collection.
-//
-// Deprecated: replaced by [Set.All].
-func (s Set[T]) Head() map_.KeyIter[T, struct{}] {
-	return map_.NewKeyIter(s.elements)
-}
-
-// First returns the first element of the collection, an iterator to iterate over the remaining elements, and true\false marker of availability next elements.
-// If no more elements then ok==false.
-//
-// Deprecated: replaced by [Set.All].
-func (s Set[T]) First() (map_.KeyIter[T, struct{}], T, bool) {
-	var (
-		iterator  = s.Head()
-		first, ok = iterator.Next()
-	)
-	return iterator, first, ok
+// Head returns the first element.
+func (s Set[T]) Head() (T, bool) {
+	return collection.Head(s)
 }
 
 // Slice collects the elements to a slice
@@ -80,35 +58,29 @@ func (s Set[T]) IsEmpty() bool {
 	return collection.IsEmpty(s)
 }
 
-// For applies the 'consumer' function for the elements until the consumer returns the c.Break to stop.
-func (s Set[T]) For(consumer func(T) error) error {
-
-	return map_.ForKeys(s.elements, consumer)
-}
-
 // ForEach applies the 'consumer' function for every element
 func (s Set[T]) ForEach(consumer func(T)) {
 	map_.ForEachKey(s.elements, consumer)
 }
 
-// Filter returns a loop consisting of elements that satisfy the condition of the 'predicate' function
-func (s Set[T]) Filter(predicate func(T) bool) loop.Loop[T] {
-	return loop.Filter(s.Loop(), predicate)
+// Filter returns a seq consisting of elements that satisfy the condition of the 'filter' function
+func (s Set[T]) Filter(filter func(T) bool) seq.Seq[T] {
+	return collection.Filter(s, filter)
 }
 
-// Filt returns a breakable loop consisting of elements that satisfy the condition of the 'predicate' function
-func (s Set[T]) Filt(predicate func(T) (bool, error)) breakLoop.Loop[T] {
-	return loop.Filt(s.Loop(), predicate)
+// Filt returns an errorable seq consisting of elements that satisfy the condition of the 'filter' function
+func (s Set[T]) Filt(filter func(T) (bool, error)) seq.SeqE[T] {
+	return collection.Filt(s, filter)
 }
 
-// Convert returns a loop that applies the 'converter' function to the collection elements
-func (s Set[T]) Convert(converter func(T) T) loop.Loop[T] {
-	return loop.Convert(s.Loop(), converter)
+// Convert returns a seq that applies the 'converter' function to the collection elements
+func (s Set[T]) Convert(converter func(T) T) seq.Seq[T] {
+	return collection.Convert(s, converter)
 }
 
-// Conv returns a breakable loop that applies the 'converter' function to the collection elements
-func (s Set[T]) Conv(converter func(T) (T, error)) breakLoop.Loop[T] {
-	return loop.Conv(s.Loop(), converter)
+// Conv returns an errorable seq that applies the 'converter' function to the collection elements
+func (s Set[T]) Conv(converter func(T) (T, error)) seq.SeqE[T] {
+	return collection.Conv(s, converter)
 }
 
 // Reduce reduces the elements into an one using the 'merge' function
@@ -119,11 +91,15 @@ func (s Set[T]) Reduce(merge func(T, T) T) T {
 	return t
 }
 
-// HasAny finds the first element that satisfies the 'predicate' function condition and returns true if successful
-func (s Set[T]) HasAny(predicate func(T) bool) bool {
-	return map_.HasAny(s.elements, func(t T, _ struct{}) bool {
-		return predicate(t)
-	})
+// HasAny checks whether the set contains an element that satisfies the condition.
+func (s Set[T]) HasAny(condition func(T) bool) bool {
+	return map_.HasAny(s.elements, predicate.Key[struct{}](condition))
+}
+
+// First returns the first element that satisfies the condition.
+func (s Set[T]) First(condition func(T) bool) (T, bool) {
+	k, _, ok := map_.First(s.elements, predicate.Key[struct{}](condition))
+	return k, ok
 }
 
 // Contains checks is the collection contains an element

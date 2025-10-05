@@ -14,4 +14,10 @@ func Test_Head(t *testing.T) {
 
 	assert.True(t, ok)
 	assert.Equal(t, 1, result)
+
+	//or
+	result, ok = seq.Of(1, 3, 5, 7, 9, 11).Head() //1, true
+
+	assert.True(t, ok)
+	assert.Equal(t, 1, result)
 }

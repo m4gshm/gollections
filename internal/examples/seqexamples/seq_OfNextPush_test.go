@@ -13,7 +13,8 @@ func Test_rows_OfNext(t *testing.T) {
 
 	var rows sql.Rows = selectUsers()
 
-	rowSeq := seqe.OfNext(rows.Next, func(u *User) error { return rows.Scan(&u.name, &u.age) })
+	getUser := func(u *User) error { return rows.Scan(&u.name, &u.age) }
+	rowSeq := seqe.OfNext(rows.Next, getUser)
 	usersByAge, err := seqe.Group(rowSeq, User.Age, as.Is)
 
 	assert.Equal(t, 1, len(usersByAge))

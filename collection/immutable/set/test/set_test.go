@@ -10,20 +10,12 @@ import (
 	oset "github.com/m4gshm/gollections/collection/immutable/ordered/set"
 	"github.com/m4gshm/gollections/collection/immutable/set"
 	"github.com/m4gshm/gollections/convert/as"
-	"github.com/m4gshm/gollections/convert/ptr"
 	"github.com/m4gshm/gollections/seq"
 
-	"github.com/m4gshm/gollections/loop"
 	"github.com/m4gshm/gollections/op"
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/sort"
-	"github.com/m4gshm/gollections/walk/group"
 )
-
-func Test_Set_From(t *testing.T) {
-	set := set.From(loop.Of(1, 1, 2, 2, 3, 4, 3, 2, 1))
-	assert.Equal(t, slice.Of(1, 2, 3, 4), sort.Asc(set.Slice()))
-}
 
 func Test_Set_FromSeq(t *testing.T) {
 	set := set.FromSeq(seq.Of(1, 1, 2, 2, 3, 4, 3, 2, 1))
@@ -39,11 +31,11 @@ func Test_Set_Iterate(t *testing.T) {
 	expected := slice.Of(1, 2, 3, 4)
 	assert.Equal(t, expected, values)
 
-	loopSlice := sort.Asc(loop.Slice(ptr.Of(set.Head()).Next))
+	loopSlice := sort.Asc(seq.Slice(set.All))
 	assert.Equal(t, expected, loopSlice)
 
 	out := make(map[int]int, 0)
-	for it, v, ok := set.First(); ok; v, ok = it.Next() {
+	for v := range set.All {
 		out[v] = v
 	}
 
@@ -76,18 +68,8 @@ func Test_Set_FilterMapReduce(t *testing.T) {
 	assert.Equal(t, 12, s)
 }
 
-func Test_Set_Group_By_Walker(t *testing.T) {
-	groups := group.Of(set.Of(0, 1, 1, 2, 4, 3, 1, 6, 7), func(e int) bool { return e%2 == 0 })
-
-	fg := sort.Asc(groups[false])
-	tg := sort.Asc(groups[true])
-	assert.Equal(t, len(groups), 2)
-	assert.Equal(t, []int{1, 3, 7}, fg)
-	assert.Equal(t, []int{0, 2, 4, 6}, tg)
-}
-
 func Test_Set_Group_By_Iterator(t *testing.T) {
-	groups := loop.Group(set.Of(0, 1, 1, 2, 4, 3, 1, 6, 7).Loop(), func(e int) bool { return e%2 == 0 }, as.Is[int])
+	groups := seq.Group(set.Of(0, 1, 1, 2, 4, 3, 1, 6, 7).All, func(e int) bool { return e%2 == 0 }, as.Is[int])
 
 	assert.Equal(t, len(groups), 2)
 	fg := sort.Asc(groups[false])
@@ -124,7 +106,7 @@ func Test_Set_SortStructByField(t *testing.T) {
 func Test_Set_Convert(t *testing.T) {
 	var (
 		ints     = set.Of(3, 3, 1, 1, 1, 5, 6, 8, 8, 0, -2, -2)
-		strings  = sort.Asc(loop.Slice(loop.Filter(set.Convert(ints, strconv.Itoa), func(s string) bool { return len(s) == 1 })))
+		strings  = sort.Asc(seq.Slice(seq.Filter(set.Convert(ints, strconv.Itoa), func(s string) bool { return len(s) == 1 })))
 		strings2 = sort.Asc(set.Convert(ints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 }).Slice())
 	)
 	assert.Equal(t, slice.Of("0", "1", "3", "5", "6", "8"), strings)
@@ -136,23 +118,10 @@ func Test_Set_Flatt(t *testing.T) {
 	var (
 		ints        = set.Of(3, 3, 1, 1, 1, 5, 6, 8, 8, 0, -2, -2)
 		fints       = set.Flat(ints, func(i int) []int { return slice.Of(i) })
-		convFilt    = loop.Convert(fints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 })
-		stringsPipe = loop.Filter(convFilt, func(s string) bool { return len(s) == 1 })
+		convFilt    = seq.Convert(fints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 })
+		stringsPipe = seq.Filter(convFilt, func(s string) bool { return len(s) == 1 })
 	)
 	assert.Equal(t, slice.Of("0", "1", "3", "5", "6", "8"), sort.Asc(stringsPipe.Slice()))
-}
-
-func Test_Set_DoubleConvert(t *testing.T) {
-	var (
-		ints               = set.Of(3, 1, 5, 6, 8, 0, -2)
-		stringsPipe        = set.Convert(ints, strconv.Itoa).Filter(func(s string) bool { return len(s) == 1 })
-		prefixedStrinsPipe = loop.Convert(stringsPipe, func(s string) string { return "_" + s })
-	)
-	assert.Equal(t, slice.Of("_0", "_1", "_3", "_5", "_6", "_8"), sort.Asc(prefixedStrinsPipe.Slice()))
-
-	//second call do nothing
-	var no []string
-	assert.Equal(t, no, stringsPipe.Slice())
 }
 
 func Test_Set_Zero(t *testing.T) {
@@ -163,7 +132,6 @@ func Test_Set_Zero(t *testing.T) {
 	set.IsEmpty()
 	set.Len()
 
-	set.For(nil)
 	set.ForEach(nil)
 
 	set.Slice()
@@ -171,11 +139,7 @@ func Test_Set_Zero(t *testing.T) {
 	set.Convert(nil)
 	set.Filter(nil)
 
-	head := set.Head()
-	_, ok := head.Next()
-	assert.False(t, ok)
-
-	_, _, ok = set.First()
+	_, ok := set.Head()
 	assert.False(t, ok)
 
 }

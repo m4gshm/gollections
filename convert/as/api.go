@@ -17,7 +17,7 @@ func ErrTail[I, O any](f func(I) O) func(I) (O, error) {
 }
 
 // Ptr converts a value to the value pointer
-func Ptr[T any](value T) *T { return convert.Ptr(value) }
+func Ptr[T any](value T) *T { return convert.ToPtr(value) }
 
 // Val returns a value referenced by the pointer or the zero value if the pointer is nil
-func Val[T any](pointer *T) T { return convert.PtrVal(pointer) }
+func Val[T any](pointer *T) T { return convert.ToVal(pointer) }

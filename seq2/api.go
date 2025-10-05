@@ -2,23 +2,29 @@
 package seq2
 
 import (
+	"golang.org/x/exp/constraints"
+
+	"github.com/m4gshm/gollections/c"
+	s2 "github.com/m4gshm/gollections/internal/seq2"
 	"github.com/m4gshm/gollections/map_/resolv"
 	"github.com/m4gshm/gollections/op"
-	"golang.org/x/exp/constraints"
+	"github.com/m4gshm/gollections/seq"
 )
 
-// Seq is an alias of an iterator-function that allows to iterate over elements of a sequence, such as slice.
-type Seq[V any] = func(yield func(V) bool)
-
-// Seq2 is an alias of an iterator-function that allows to iterate over key/value pairs of a sequence, such as slice or map.
+// Seq2 is an iterator-function that allows to iterate over key/value pairs of a sequence, such as slice or map.
 // It is used to iterate over slice index/value pairs or map key/value pairs.
-type Seq2[K, V any] = func(yield func(K, V) bool)
+type Seq2[K, V any] = func(func(K, V) bool)
 
-// Of creates an index/value pairs iterator over the elements.
-func Of[T any](elements ...T) Seq2[int, T] {
-	return func(yield func(int, T) bool) {
-		for i, v := range elements {
-			if !yield(i, v) {
+// Union combines several sequences into one.
+func Union[S ~Seq2[K, V], K, V any](seq ...S) seq.Seq2[K, V] {
+	return s2.Union(seq...)
+}
+
+// Of creates an key/value pairs iterator over the elements.
+func Of[K, V any](elements ...c.KV[K, V]) seq.Seq2[K, V] {
+	return func(yield func(K, V) bool) {
+		for _, p := range elements {
+			if !yield(p.K, p.V) {
 				break
 			}
 		}
@@ -26,7 +32,7 @@ func Of[T any](elements ...T) Seq2[int, T] {
 }
 
 // OfMap creates an key/value pairs iterator over the elements map.
-func OfMap[K comparable, V any](elements map[K]V) Seq2[K, V] {
+func OfMap[K comparable, V any](elements map[K]V) seq.Seq2[K, V] {
 	return func(yield func(K, V) bool) {
 		for k, v := range elements {
 			if !yield(k, v) {
@@ -36,25 +42,10 @@ func OfMap[K comparable, V any](elements map[K]V) Seq2[K, V] {
 	}
 }
 
-// Union combines several sequences into one.
-func Union[S ~Seq2[K, V], K, V any](seq ...S) Seq2[K, V] {
-	return func(yield func(K, V) bool) {
-		for _, s := range seq {
-			if s != nil {
-				for k, v := range s {
-					if !yield(k, v) {
-						return
-					}
-				}
-			}
-		}
-	}
-}
-
 // OfIndexed builds an indexed Seq2 iterator by extracting elements from an indexed soruce.
 // the len is length ot the source.
 // the getAt retrieves an element by its index from the source.
-func OfIndexed[T any](amount int, getAt func(int) T) Seq2[int, T] {
+func OfIndexed[T any](amount int, getAt func(int) T) seq.Seq2[int, T] {
 	return func(yield func(int, T) bool) {
 		if getAt == nil {
 			return
@@ -67,8 +58,32 @@ func OfIndexed[T any](amount int, getAt func(int) T) Seq2[int, T] {
 	}
 }
 
+// OfIndexedKV builds an indexed Seq2 iterator by extracting key\value pairs from an indexed soruce.
+// the len is length ot the source.
+// the getAt retrieves a key\value pair by its index from the source.
+func OfIndexedKV[K, V any](amount int, getAt func(int) (K, V)) seq.Seq2[K, V] {
+	return func(yield func(K, V) bool) {
+		if getAt == nil {
+			return
+		}
+		for i := range amount {
+			if !yield(getAt(i)) {
+				break
+			}
+		}
+	}
+}
+
+// OfIndexedPair builds an indexed Seq2 iterator by extracting key\value pairs from an indexed soruce.
+// the len is length ot the source.
+// the getKey retrieves a key by its index from the source.
+// the getValue retrieves a value by its index from the source.
+func OfIndexedPair[K, V any](amount int, getKey func(int) K, getValue func(int) V) seq.Seq2[K, V] {
+	return OfIndexedKV(amount, func(i int) (K, V) { return getKey(i), getValue(i) })
+}
+
 // Series makes a sequence by applying the 'next' function to the previous step generated value.
-func Series[T any](first T, next func(int, T) (T, bool)) Seq2[int, T] {
+func Series[T any](first T, next func(int, T) (T, bool)) seq.Seq2[int, T] {
 	return func(yield func(int, T) bool) {
 		if next == nil {
 			return
@@ -93,7 +108,7 @@ func Series[T any](first T, next func(int, T) (T, bool)) Seq2[int, T] {
 }
 
 // RangeClosed creates a sequence that generates integers in the range defined by from and to inclusive
-func RangeClosed[T constraints.Integer | rune](from T, toInclusive T) Seq2[int, T] {
+func RangeClosed[T constraints.Integer | rune](from T, toInclusive T) seq.Seq2[int, T] {
 	amount := toInclusive - from
 	delta := T(1)
 	if amount < 0 {
@@ -112,8 +127,8 @@ func RangeClosed[T constraints.Integer | rune](from T, toInclusive T) Seq2[int, 
 	}
 }
 
-// Range creates a sequence that generates integers in the range defined by from and to exclusive
-func Range[T constraints.Integer | rune](from T, toExclusive T) Seq2[int, T] {
+// Range creates a sequence that generates integers in the range defined by from and to exclusive.
+func Range[T constraints.Integer | rune](from T, toExclusive T) seq.Seq2[int, T] {
 	amount := toExclusive - from
 	delta := T(1)
 	if amount < 0 {
@@ -132,7 +147,7 @@ func Range[T constraints.Integer | rune](from T, toExclusive T) Seq2[int, T] {
 }
 
 // ToSeq converts an iterator of key/value pairs elements to an iterator of single elements by applying the 'converter' function to each iterable pair.
-func ToSeq[S ~Seq2[K, V], T, K, V any](seq S, converter func(K, V) T) Seq[T] {
+func ToSeq[S ~Seq2[K, V], T, K, V any](seq S, converter func(K, V) T) seq.Seq[T] {
 	return func(yield func(T) bool) {
 		if seq == nil || converter == nil {
 			return
@@ -160,8 +175,8 @@ func Top[S ~Seq2[K, V], K, V any](n int, seq S) S {
 	}
 }
 
-// Skip returns a sequence without first n elements.
-func Skip[S ~Seq2[K, V], K, V any](n int, seq S) Seq2[K, V] {
+// Skip returns the seq without first n elements.
+func Skip[S ~Seq2[K, V], K, V any](n int, seq S) seq.Seq2[K, V] {
 	return func(yield func(K, V) bool) {
 		if seq == nil {
 			return
@@ -177,14 +192,14 @@ func Skip[S ~Seq2[K, V], K, V any](n int, seq S) Seq2[K, V] {
 	}
 }
 
-// While cuts tail elements of the seq that don't match the predicate.
-func While[S ~Seq2[K, V], K, V any](seq S, predicate func(K, V) bool) Seq2[K, V] {
+// While cuts tail elements of the seq that don't match the filter.
+func While[S ~Seq2[K, V], K, V any](seq S, filter func(K, V) bool) seq.Seq2[K, V] {
 	return func(yield func(K, V) bool) {
 		if seq == nil {
 			return
 		}
 		seq(func(k K, v V) bool {
-			if !predicate(k, v) {
+			if !filter(k, v) {
 				return false
 			}
 			return yield(k, v)
@@ -192,15 +207,15 @@ func While[S ~Seq2[K, V], K, V any](seq S, predicate func(K, V) bool) Seq2[K, V]
 	}
 }
 
-// SkipWhile returns a sequence without first elements of the seq that dont'math the predicate.
-func SkipWhile[S ~Seq2[K, V], K, V any](seq S, predicate func(K, V) bool) Seq2[K, V] {
+// SkipWhile returns a sequence without first elements of the seq that dont'math the filter.
+func SkipWhile[S ~Seq2[K, V], K, V any](seq S, filter func(K, V) bool) seq.Seq2[K, V] {
 	return func(yield func(K, V) bool) {
 		if seq == nil {
 			return
 		}
 		started := false
 		seq(func(k K, v V) bool {
-			if !started && predicate(k, v) {
+			if !started && filter(k, v) {
 				return true
 			}
 			started = true
@@ -214,30 +229,23 @@ func Head[S ~Seq2[K, V], K, V any](seq S) (k K, v V, ok bool) {
 	return First(seq, func(K, V) bool { return true })
 }
 
-// First returns the first key\value pair that satisfies the condition of the 'predicate' function.
-func First[S ~Seq2[K, V], K, V any](seq S, predicate func(K, V) bool) (k K, v V, ok bool) {
-	if seq == nil || predicate == nil {
-		return
-	}
-	seq(func(oneK K, oneV V) bool {
-		if predicate(oneK, oneV) {
-			k = oneK
-			v = oneV
-			ok = true
-			return false
-		}
-		return true
-	})
-	return
+// First returns the first key\value pair that satisfies the condition.
+func First[S ~Seq2[K, V], K, V any](seq S, condition func(K, V) bool) (k K, v V, ok bool) {
+	return s2.First(seq, condition)
 }
 
-// Reduce reduces the elements of the 'seq' sequence an one using the 'merge' function.
+// Firstt returns the first key\value pair that satisfies the condition.
+func Firstt[S ~Seq2[K, V], K, V any](seq S, filter func(K, V) (bool, error)) (k K, v V, ok bool, err error) {
+	return s2.Firstt(seq, filter)
+}
+
+// Reduce reduces the elements of the seq into one using the 'merge' function.
 func Reduce[S ~Seq2[K, V], K, V, T any](seq S, merge func(prev *T, k K, v V) T) T {
 	result, _ := ReduceOK(seq, merge)
 	return result
 }
 
-// ReduceOK reduces the elements of the 'seq' sequence an one using the 'merge' function.
+// ReduceOK reduces the elements of the seq into one using the 'merge' function.
 // Returns ok==false if the seq returns ok=false at the first call (no more elements).
 func ReduceOK[S ~Seq2[K, V], K, V, T any](seq S, merge func(prev *T, k K, v V) T) (result T, ok bool) {
 	if seq == nil || merge == nil {
@@ -252,13 +260,13 @@ func ReduceOK[S ~Seq2[K, V], K, V, T any](seq S, merge func(prev *T, k K, v V) T
 	return result, started
 }
 
-// Reducee reduces the elements of the 'seq' sequence an one using the 'merge' function.
+// Reducee reduces the elements of the seq into one using the 'merge' function.
 func Reducee[S ~Seq2[K, V], K, V, T any](seq S, merge func(prev *T, k K, v V) (T, error)) (T, error) {
 	result, _, err := ReduceeOK(seq, merge)
 	return result, err
 }
 
-// ReduceeOK reduces the elements of the 'seq' sequence an one using the 'merge' function.
+// ReduceeOK reduces the elements of the seq into one using the 'merge' function.
 // Returns ok==false if the seq returns ok=false at the first call (no more elements).
 func ReduceeOK[S ~Seq2[K, V], K, V, T any](seq S, merge func(prev *T, k K, v V) (T, error)) (result T, ok bool, err error) {
 	if seq == nil || merge == nil {
@@ -273,120 +281,104 @@ func ReduceeOK[S ~Seq2[K, V], K, V, T any](seq S, merge func(prev *T, k K, v V) 
 	return result, started, err
 }
 
-// Filter creates a rangefunc that iterates only those elements for which the 'filter' function returns true.
-func Filter[S ~Seq2[K, V], K, V any](seq S, filter func(K, V) bool) Seq2[K, V] {
-	return func(yield func(K, V) bool) {
-		if seq == nil || filter == nil {
-			return
-		}
-		seq(func(k K, v V) bool {
-			if filter(k, v) {
-				return yield(k, v)
-			}
-			return true
-		})
-	}
+// HasAny checks whether the seq contains an element that satisfies the condition.
+func HasAny[S ~Seq2[K, V], K, V any](seq S, filter func(K, V) bool) bool {
+	return s2.HasAny(seq, filter)
 }
 
-// Convert creates a rangefunc that applies the 'converter' function to each iterable element.
-func Convert[S ~Seq2[Kfrom, Vfrom], Kfrom, Vfrom, Kto, Vto any](seq S, converter func(Kfrom, Vfrom) (Kto, Vto)) Seq2[Kto, Vto] {
-	return func(consumer func(Kto, Vto) bool) {
-		if seq == nil || converter == nil {
-			return
-		}
-		seq(func(k Kfrom, v Vfrom) bool {
-			return consumer(converter(k, v))
-		})
-	}
+// Filter creates an iterator that iterates only those elements for which the 'filter' function returns true.
+func Filter[S ~Seq2[K, V], K, V any](seq S, filter func(K, V) bool) seq.Seq2[K, V] {
+	return s2.Filter(seq, filter)
+}
+
+// Filt creates an erroreable iterator that iterates only those key\value pairs for which the 'filter' function returns true.
+func Filt[S ~Seq2[K, V], K, V any](seq S, filter func(K, V) (bool, error)) seq.SeqE[c.KV[K, V]] {
+	return s2.Filt(seq, filter)
+}
+
+// FilterKey returns a seq consisting of key/value pairs where the key satisfies the condition of the 'filter' function.
+func FilterKey[S ~Seq2[K, V], K, V any](seq S, filter func(K) bool) seq.Seq2[K, V] {
+	return s2.FilterKey(seq, filter)
+}
+
+// FilterValue returns a seq consisting of key/value pairs where the value satisfies the condition of the 'filter' function.
+func FilterValue[S ~Seq2[K, V], K, V any](seq S, filter func(V) bool) seq.Seq2[K, V] {
+	return s2.FilterValue(seq, filter)
+}
+
+// ConvertKey returns a seq that applies the 'converter' function to keys.
+func ConvertKey[S ~Seq2[Kfrom, V], Kfrom, Kto, V any](seq S, converter func(Kfrom) Kto) seq.Seq2[Kto, V] {
+	return s2.ConvertKey(seq, converter)
+}
+
+// ConvKey returns a seq that applies the 'converter' function to keys.
+func ConvKey[S ~Seq2[Kfrom, V], Kfrom, Kto, V any](seq S, converter func(Kfrom) (Kto, error)) seq.SeqE[c.KV[Kto, V]] {
+	return s2.ConvKey(seq, converter)
+}
+
+// ConvertValue returns a seq that applies the 'converter' function to values.
+func ConvertValue[S ~Seq2[K, Vfrom], K, Vfrom, Vto any](seq S, converter func(Vfrom) Vto) seq.Seq2[K, Vto] {
+	return s2.ConvertValue(seq, converter)
+}
+
+// ConvValue returns a seq that applies the 'converter' function to values.
+func ConvValue[S ~Seq2[K, Vfrom], K, Vfrom, Vto any](seq S, converter func(Vfrom) (Vto, error)) seq.SeqE[c.KV[K, Vto]] {
+	return s2.ConvValue(seq, converter)
+}
+
+// Convert creates an iterator that applies the 'converter' function to each iterable element.
+func Convert[S ~Seq2[Kfrom, Vfrom], Kfrom, Vfrom, Kto, Vto any](seq S, converter func(Kfrom, Vfrom) (Kto, Vto)) seq.Seq2[Kto, Vto] {
+	return s2.Convert(seq, converter)
+}
+
+// Conv creates an errorable seq that applies the 'converter' function to the iterable key\value pairs.
+func Conv[S ~Seq2[Kfrom, Vfrom], Kfrom, Vfrom, Kto, Vto any](seq S, converter func(Kfrom, Vfrom) (Kto, Vto, error)) seq.SeqE[c.KV[Kto, Vto]] {
+	return s2.Conv(seq, converter)
 }
 
 // Values converts a key/value pairs iterator to an iterator of just values.
-func Values[S ~Seq2[K, V], K, V any](seq S) Seq[V] {
-	return func(yield func(V) bool) {
-		if seq == nil {
-			return
-		}
-		seq(func(_ K, v V) bool {
-			return yield(v)
-		})
-	}
+func Values[S ~Seq2[K, V], K, V any](seq S) seq.Seq[V] {
+	return s2.Values(seq)
 }
 
 // Keys converts a key/value pairs iterator to an iterator of just keys.
-func Keys[S ~Seq2[K, V], K, V any](seq S) Seq[K] {
-	return func(yield func(K) bool) {
-		if seq == nil {
-			return
-		}
-		seq(func(k K, _ V) bool {
-			return yield(k)
-		})
-	}
+func Keys[S ~Seq2[K, V], K, V any](seq S) seq.Seq[K] {
+	return s2.Keys(seq)
 }
 
 // Group collects the elements of the 'seq' sequence into a new map.
 func Group[S ~Seq2[K, V], K comparable, V any](seq S) map[K][]V {
-	return MapResolv(seq, resolv.Slice[K, V])
+	return s2.Group(seq)
 }
 
 // Map collects key\value elements into a new map by iterating over the elements.
 func Map[S ~Seq2[K, V], K comparable, V any](seq S) map[K]V {
-	return MapResolv(seq, resolv.First[K, V])
+	return s2.MapResolv(seq, resolv.First[K, V])
 }
 
 // MapResolv collects key\value elements into a new map by iterating over the elements with resolving of duplicated key values.
 func MapResolv[S ~Seq2[K, V], K comparable, V, VR any](seq S, resolver func(exists bool, key K, valResolv VR, val V) VR) map[K]VR {
-	return AppendMapResolv(seq, resolver, nil)
+	return s2.MapResolv(seq, resolver)
 }
 
 // MapResolvOrder collects key\value elements into a new map by iterating over the elements with resolving of duplicated key values.
 // Returns a slice with the keys ordered by the time they were added and the resolved key\value map.
 func MapResolvOrder[S ~Seq2[K, V], K comparable, V, VR any](seq S, resolver func(exists bool, key K, valResolv VR, val V) VR) ([]K, map[K]VR) {
-	return AppendMapResolvOrder(seq, resolver, nil, nil)
+	return s2.MapResolvOrder(seq, resolver)
 }
 
 // AppendMapResolv collects key\value elements into the 'dest' map by iterating over the elements with resolving of duplicated key values.
 func AppendMapResolv[S ~Seq2[K, V], K comparable, V, VR any](seq S, resolver func(exists bool, key K, valResolv VR, val V) VR, dest map[K]VR) map[K]VR {
-	if seq == nil || resolver == nil {
-		return nil
-	}
-	if dest == nil {
-		dest = map[K]VR{}
-	}
-	seq(func(k K, v V) bool {
-		exists, ok := dest[k]
-		dest[k] = resolver(ok, k, exists, v)
-		return true
-	})
-	return dest
+	return s2.AppendMapResolv(seq, resolver, dest)
 }
 
 // AppendMapResolvOrder collects key\value elements into the 'dest' map by iterating over the elements with resolving of duplicated key values
 // Additionaly populates the 'order' slice by the keys ordered by the time they were added and the resolved key\value map.
 func AppendMapResolvOrder[S ~Seq2[K, V], K comparable, V, VR any](seq S, resolver func(exists bool, key K, valResolv VR, val V) VR, order []K, dest map[K]VR) ([]K, map[K]VR) {
-	if seq == nil || resolver == nil {
-		return nil, nil
-	}
-	if dest == nil {
-		dest = map[K]VR{}
-	}
-	seq(func(k K, v V) bool {
-		exists, ok := dest[k]
-		dest[k] = resolver(ok, k, exists, v)
-		if !ok {
-			order = append(order, k)
-		}
-		return true
-	})
-	return order, dest
+	return s2.AppendMapResolvOrder(seq, resolver, order, dest)
 }
 
 // TrackEach applies the 'consumer' function to the seq elements.
-func TrackEach[K, V any](seq Seq2[K, V], consumer func(K, V)) {
-	if seq == nil {
-		return
-	}
-	for k, v := range seq {
-		consumer(k, v)
-	}
+func TrackEach[S ~Seq2[K, V], K, V any](seq S, consumer func(K, V)) {
+	s2.TrackEach(seq, consumer)
 }

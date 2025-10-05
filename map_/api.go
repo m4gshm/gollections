@@ -10,9 +10,6 @@ import (
 	"github.com/m4gshm/gollections/map_/resolv"
 )
 
-// Break is For, Track breaker
-var Break = c.Break
-
 // Of instantiates a ap from the specified key/value pairs
 func Of[K comparable, V any](elements ...c.KV[K, V]) map[K]V {
 	var (
@@ -24,45 +21,6 @@ func Of[K comparable, V any](elements ...c.KV[K, V]) map[K]V {
 		uniques[key] = val
 	}
 	return uniques
-}
-
-// OfLoop builds a map by iterating key\value pairs of a source.
-// The hasNext specifies a predicate that tests existing of a next pair in the source.
-// The getNext extracts the pair.
-//
-// Deprecated: will be deleted in a next version.
-func OfLoop[S any, K comparable, V any](source S, hasNext func(S) bool, getNext func(S) (K, V, error)) (map[K]V, error) {
-	return OfLoopResolv(source, hasNext, getNext, resolv.First[K, V])
-}
-
-// OfLoopResolv builds a map by iterating elements of a source.
-// The hasNext specifies a predicate that tests existing of a next pair in the source.
-// The getNext extracts the element.
-// The resolv values for duplicated keys.
-//
-// Deprecated: will be deleted in a next version.
-func OfLoopResolv[S any, K comparable, E, V any](source S, hasNext func(S) bool, getNext func(S) (K, E, error), resolv func(bool, K, V, E) V) (map[K]V, error) {
-	r := map[K]V{}
-	for hasNext(source) {
-		k, elem, err := getNext(source)
-		if err != nil {
-			return r, err
-		}
-		existVal, ok := r[k]
-		r[k] = resolv(ok, k, existVal, elem)
-	}
-	return r, nil
-}
-
-// GroupOfLoop builds a map of slices by iterating over elements, extracting key\value pairs and grouping the values for each key in the slices.
-// The hasNext specifies a predicate that tests existing of a next pair in the source.
-// The getNext extracts the pair.
-//
-// Deprecated: will be deleted in a next version.
-func GroupOfLoop[S any, K comparable, V any](source S, hasNext func(S) bool, getNext func(S) (K, V, error)) (map[K][]V, error) {
-	return OfLoopResolv(source, hasNext, getNext, func(_ bool, _ K, elements []V, val V) []V {
-		return append(elements, val)
-	})
 }
 
 // Generate builds a map by an generator function.
@@ -280,18 +238,6 @@ func ValuesConverted[M ~map[K]V, K comparable, V, Vto any](elements M, by func(V
 	return values
 }
 
-// Track applies the 'consumer' function for all key/value pairs until the consumer returns the c.Break to stop.
-func Track[M ~map[K]V, K comparable, V any](elements M, consumer func(K, V) error) error {
-	for key, val := range elements {
-		if err := consumer(key, val); err == Break {
-			return nil
-		} else if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 // TrackEach applies the 'consumer' function for every key/value pairs from the 'elements' map
 func TrackEach[M ~map[K]V, K comparable, V any](elements M, consumer func(K, V)) {
 	for key, val := range elements {
@@ -306,18 +252,6 @@ func TrackWhile[M ~map[K]V, K comparable, V any](elements M, consumer func(K, V)
 			break
 		}
 	}
-}
-
-// TrackOrdered applies the 'consumer' function for key/value pairs from the 'elements' map in order of the 'order' slice until the consumer returns the c.Break to stop.
-func TrackOrdered[M ~map[K]V, K comparable, V any](order []K, elements M, consumer func(K, V) error) error {
-	for _, key := range order {
-		if err := consumer(key, elements[key]); err == Break {
-			return nil
-		} else if err != nil {
-			return err
-		}
-	}
-	return nil
 }
 
 // TrackEachOrdered applies the 'consumer' function for evey key/value pair from the 'elements' map in order of the 'order' slice
@@ -363,18 +297,6 @@ func TrackValuesWhile[M ~map[K]V, K comparable, V any](elements M, consumer func
 	}
 }
 
-// ForKeys applies the 'consumer' function for keys from the 'elements' map  until the consumer returns the c.Break to stop.
-func ForKeys[M ~map[K]V, K comparable, V any](elements M, consumer func(K) error) error {
-	for key := range elements {
-		if err := consumer(key); err == Break {
-			return nil
-		} else if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 // ForEachKey applies the 'consumer' function for every key from from the 'elements' map
 func ForEachKey[M ~map[K]V, K comparable, V any](elements M, consumer func(K)) {
 	for key := range elements {
@@ -382,36 +304,11 @@ func ForEachKey[M ~map[K]V, K comparable, V any](elements M, consumer func(K)) {
 	}
 }
 
-// ForValues applies the 'consumer' function for values from the 'elements' map  until the consumer returns the c.Break to stop..
-func ForValues[M ~map[K]V, K comparable, V any](elements M, consumer func(V) error) error {
-	for _, val := range elements {
-		if err := consumer(val); err == Break {
-			return nil
-		} else if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 // ForEachValue applies the 'consumer' function for every value from from the 'elements' map
 func ForEachValue[M ~map[K]V, K comparable, V any](elements M, consumer func(V)) {
 	for _, val := range elements {
 		consumer(val)
 	}
-}
-
-// ForOrderedValues applies the 'consumer' function for values from the 'elements' map in order of the 'order' slice until the consumer returns the c.Break to stop..
-func ForOrderedValues[M ~map[K]V, K comparable, V any](order []K, elements M, consumer func(V) error) error {
-	for _, key := range order {
-		val := elements[key]
-		if err := consumer(val); err == Break {
-			return nil
-		} else if err != nil {
-			return err
-		}
-	}
-	return nil
 }
 
 // ForEachOrderedValues applies the 'consumer' function for each value from the 'elements' map in order of the 'order' slice
@@ -477,14 +374,20 @@ func Reduce[M ~map[K]V, K comparable, V any](elements M, merge func(K, K, V, V) 
 	return rk, rv
 }
 
-// HasAny finds the first key/value pair that satisfies the 'predicate' function condition and returns true if successful
-func HasAny[M ~map[K]V, K comparable, V any](elements M, predicate func(K, V) bool) bool {
+// HasAny checks whether the elements contains an key\value pair that satisfies the condition.
+func HasAny[M ~map[K]V, K comparable, V any](elements M, condition func(K, V) bool) bool {
+	_, _, ok := First(elements, condition)
+	return ok
+}
+
+// First returns the first key\value pair that satisfies the condition.
+func First[M ~map[K]V, K comparable, V any](elements M, condition func(K, V) bool) (k K, v V, ok bool) {
 	for k, v := range elements {
-		if predicate(k, v) {
-			return true
+		if condition(k, v) {
+			return k, v, true
 		}
 	}
-	return false
+	return k, v, false
 }
 
 // Slice collects key\value elements to a slice by applying the specified converter to evety element
