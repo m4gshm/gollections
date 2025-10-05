@@ -828,6 +828,19 @@ func Test_ConvertNilSafe(t *testing.T) {
 	assert.Equal(t, expected, s)
 }
 
+func Test_NotLit(t *testing.T) {
+	var (
+		first  = "first"
+		third  = "third"
+		fifth  = "fifth"
+		source = seq.ToSeq2(seq.Of(&first, nil, &third, nil, &fifth), noErr)
+		result = seqe.NotNil(source)
+	)
+	s, err := result.Slice()
+	assert.Equal(t, slice.Of(&first, &third, &fifth), s)
+	assert.NoError(t, err)
+}
+
 func Test_ConvertOK(t *testing.T) {
 	s := seq.ToSeq2(seq.Of(1, 3, 4, 5, 7, 8, 9, 11), noErr)
 	converter := func(i int) (string, bool) { return strconv.Itoa(i), even(i) }

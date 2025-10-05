@@ -298,9 +298,9 @@ func Test_ConvertNotNil(t *testing.T) {
 func Test_ConvertValues(t *testing.T) {
 	type entity struct{ val string }
 	var (
-		source   = []*entity{{"first"}, nil, {"third"}, nil, {"fifth"}}
+		source   = []*entity{{"first"}, nil, {"third"}, {}, {"fifth"}}
 		result   = convert.NotNil(source, as.Val[entity])
-		expected = []entity{{"first"}, {"third"}, {"fifth"}}
+		expected = []entity{{"first"}, {"third"}, {}, {"fifth"}}
 	)
 	assert.Equal(t, expected, result)
 }
