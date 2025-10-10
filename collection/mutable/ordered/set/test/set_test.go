@@ -136,6 +136,20 @@ func Test_Set_Nil(t *testing.T) {
 	assert.False(t, ok)
 }
 
+func Test_Set_Empty_All(t *testing.T) {
+	set := &ordered.Set[int]{}
+	assert.Equal(t, 0, len(seq.Slice(set.All)))
+}
+
+func Test_Set_Empty_IAll(t *testing.T) {
+	set := &ordered.Set[int]{}
+	out := []int{}
+	for _, v := range set.IAll {
+		out = append(out, v)
+	}
+	assert.Equal(t, 0, len(out))
+}
+
 func Test_Set_Zero(t *testing.T) {
 	var mset ordered.Set[int]
 	var nils []int

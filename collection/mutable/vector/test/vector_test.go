@@ -26,6 +26,26 @@ func Test_VectorIterate(t *testing.T) {
 	assert.Equal(t, expected, result)
 }
 
+func Test_Vector_Empty_IAll(t *testing.T) {
+	expected := []int{}
+	v := &mutable.Vector[int]{}
+	result := make([]int, v.Len())
+	for  _, it := range v.IAll {
+		result = append(result, it)
+	}
+	assert.Equal(t, expected, result)
+}
+
+func Test_Vector_Empty_All(t *testing.T) {
+	expected := []int{}
+	v := &mutable.Vector[int]{}
+	result := make([]int, v.Len())
+	for it := range v.All {
+		result = append(result, it)
+	}
+	assert.Equal(t, expected, result)
+}
+
 func Test_VectorIterateOverRange(t *testing.T) {
 	expected := slice.Of(1, 2, 3, 4)
 	v := vector.Of(1, 2, 3, 4)

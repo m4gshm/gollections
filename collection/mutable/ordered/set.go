@@ -36,14 +36,18 @@ var (
 // All is used to iterate through the collection using `for e := range`.
 func (s *Set[T]) All(consumer func(T) bool) {
 	if s != nil {
-		slice.WalkWhile(*s.order, consumer)
+		if order := s.order; order != nil {
+			slice.WalkWhile(*order, consumer)
+		}
 	}
 }
 
 // IAll is used to iterate through the collection using `for i, e := range`.
 func (s *Set[T]) IAll(consumer func(int, T) bool) {
 	if s != nil {
-		slice.TrackWhile(*s.order, consumer)
+		if order := s.order; order != nil {
+			slice.TrackWhile(*order, consumer)
+		}
 	}
 }
 
