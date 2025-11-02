@@ -81,6 +81,14 @@ func IfElseGet[T any](ok bool, tru T, fal func() T) T {
 	return fal()
 }
 
+// IfGetElse executes the tru value if ok, otherwise returns the fal value
+func IfGetElse[T any](ok bool, tru func() T, fal T) T {
+	if ok {
+		return tru()
+	}
+	return fal
+}
+
 // IfGetElseGet executes the tru func if ok, otherwise exec the fal function and returns it result
 func IfGetElseGet[T any](ok bool, tru, fal func() T) T {
 	if ok {
@@ -89,7 +97,7 @@ func IfGetElseGet[T any](ok bool, tru, fal func() T) T {
 	return fal()
 }
 
-// IfElseGetWithErr executes the tru func if ok, otherwise exec tthe fal function and returns it result
+// IfElseGetWithErr executes the tru func if ok, otherwise exec the fal function and returns it result
 func IfElseGetWithErr[T any](ok bool, tru T, fal func() (T, error)) (T, error) {
 	if ok {
 		return tru, nil
