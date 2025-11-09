@@ -12,7 +12,7 @@ func Benchmark_Loop_ImmutableOrderSet_All_direct(b *testing.B) {
 	c := oset.Of(values...)
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
-			for b.Loop() {
+			for i := 0; i < b.N; i++ {
 				c.All(func(v int) bool {
 					casee.load(v)
 					return true
@@ -26,7 +26,7 @@ func Benchmark_Loop_ImmutableOrderSet_All(b *testing.B) {
 	c := oset.Of(values...)
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
-			for b.Loop() {
+			for i := 0; i < b.N; i++ {
 				for v := range c.All {
 					casee.load(v)
 				}

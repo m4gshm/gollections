@@ -405,7 +405,7 @@ func Test_FlatAndConvert(t *testing.T) {
 func Benchmark_Flat(b *testing.B) {
 	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
 
-	for b.Loop() {
+	for i := 0; i < b.N; i++ {
 		_ = slice.Flat(md, as.Is)
 	}
 }
@@ -413,7 +413,7 @@ func Benchmark_Flat(b *testing.B) {
 func Benchmark_Flat_Convert_AsIs(b *testing.B) {
 	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
 
-	for b.Loop() {
+	for i := 0; i < b.N; i++ {
 		_ = slice.FlatAndConvert(md, as.Is, as.Is)
 	}
 }

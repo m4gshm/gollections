@@ -16,7 +16,7 @@ func Benchmark_Loop_Slice_Filter_plainOld(b *testing.B) {
 	c := values
 
 	b.ResetTimer()
-	for b.Loop() {
+	for i := 0; i < b.N; i++ {
 		for _, e := range c {
 			if even(e) {
 				_ = e
@@ -28,7 +28,7 @@ func Benchmark_Loop_Slice_Filter_plainOld(b *testing.B) {
 
 func Benchmark_Loop_Seq_Filter_Seq(b *testing.B) {
 	b.ResetTimer()
-	for b.Loop() {
+	for i := 0; i < b.N; i++ {
 		for e := range seq.Filter(seq.Of(values...), even) {
 			_ = e
 		}

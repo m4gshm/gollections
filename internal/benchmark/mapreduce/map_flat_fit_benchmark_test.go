@@ -28,7 +28,7 @@ func Benchmark_First_PlainOld(b *testing.B) {
 	op := func(i int) bool { return i > threshold }
 	var f int
 
-	for b.Loop() {
+	for i := 0; i < b.N; i++ {
 		for _, v := range values {
 			if op(v) {
 				f = v
@@ -44,7 +44,7 @@ func Benchmark_First_Slice(b *testing.B) {
 	op := func(i int) bool { return i > threshold }
 	var f int
 
-	for b.Loop() {
+	for i := 0; i < b.N; i++ {
 		f, _ = slice.First(values, op)
 	}
 	b.StopTimer()
@@ -55,7 +55,7 @@ func Benchmark_FirstI_Slice(b *testing.B) {
 	op := func(i int) bool { return i > threshold }
 	var f, ind int
 
-	for b.Loop() {
+	for i := 0; i < b.N; i++ {
 		f, ind = slice.FirstI(values, op)
 	}
 	b.StopTimer()
@@ -67,7 +67,7 @@ func Benchmark_Last_Slice(b *testing.B) {
 	op := func(i int) bool { return i < 50000 }
 	var f int
 
-	for b.Loop() {
+	for i := 0; i < b.N; i++ {
 		f, _ = slice.Last(values, op)
 	}
 	b.StopTimer()
@@ -78,7 +78,7 @@ func Benchmark_LastI_Slice(b *testing.B) {
 	op := func(i int) bool { return i < 50000 }
 	var f, ind int
 
-	for b.Loop() {
+	for i := 0; i < b.N; i++ {
 		f, ind = slice.LastI(values, op)
 	}
 	b.StopTimer()
@@ -95,7 +95,7 @@ func Benchmark_ConvertAndFilter_Slice_Seq(b *testing.B) {
 	items := slice.Of(1, 2, 3, 4, 5)
 	var s []string
 
-	for b.Loop() {
+	for i := 0; i < b.N; i++ {
 		s = seq.Slice(seq.Convert(seq.Filter(seq.Of(items...), even), convert.And(toString, addTail)))
 	}
 	_ = s
@@ -109,7 +109,7 @@ func Benchmark_ConvertAndFilter_Slice_PlainOld(b *testing.B) {
 	)
 
 	items := []int{1, 2, 3, 4, 5}
-	for b.Loop() {
+	for i := 0; i < b.N; i++ {
 		s := make([]string, 0)
 		for _, i := range items {
 			if i%2 == 0 {
@@ -130,7 +130,7 @@ func Benchmark_FilterAndConvert_Embedder_Slice(b *testing.B) {
 	items := slice.Of(1, 2, 3, 4, 5)
 	var s []string
 	b.ResetTimer()
-	for b.Loop() {
+	for i := 0; i < b.N; i++ {
 		s = slice.FilterAndConvert(items, even, convert.And(toString, addTail))
 	}
 	_ = s
@@ -142,7 +142,7 @@ func Benchmark_Flatt_Seq(b *testing.B) {
 	odds := func(v int) bool { return v%2 != 0 }
 	multiDimension := [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
 	b.ResetTimer()
-	for b.Loop() {
+	for i := 0; i < b.N; i++ {
 		next := seq.Of(multiDimension...)
 		oneDimension := seq.Slice(seq.Filter(seq.Flat(seq.Flat(next, as.Is), as.Is), odds))
 		_ = oneDimension
@@ -153,7 +153,7 @@ func Benchmark_Flatt_Seq(b *testing.B) {
 func Benchmark_Flatt_Slice_PlainOld(b *testing.B) {
 	multiDimension := [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
 
-	for b.Loop() {
+	for i := 0; i < b.N; i++ {
 		oneDimension := make([]int, 0)
 		for _, i := range multiDimension {
 			for _, ii := range i {
@@ -178,7 +178,7 @@ func Benchmark_ReduceSum_Seq(b *testing.B) {
 	expected := 1 + 3 + 5 + 7
 	b.ResetTimer()
 	result := 0
-	for b.Loop() {
+	for i := 0; i < b.N; i++ {
 		result = seq.Flat(seq.Flat(seq.Of(multiDimension...), as.Is), as.Is).Filter(odds).Reduce(sop.Sum)
 	}
 	b.StopTimer()
@@ -193,7 +193,7 @@ func Benchmark_ReduceSum_Slice(b *testing.B) {
 	expected := 1 + 3 + 5 + 7
 	b.ResetTimer()
 	result := 0
-	for b.Loop() {
+	for i := 0; i < b.N; i++ {
 		result = slice.Reduce(slice.Filter(slice.Flat(slice.Flat(multiDimension, as.Is), as.Is), odds), sop.Sum)
 	}
 	b.StopTimer()
@@ -207,7 +207,7 @@ func Benchmark_ReduceSum_Slice_PlainOld(b *testing.B) {
 	expected := 1 + 3 + 5 + 7
 
 	result := 0
-	for b.Loop() {
+	for i := 0; i < b.N; i++ {
 		result = 0
 		for _, i := range multiDimension {
 			for _, ii := range i {
@@ -230,7 +230,7 @@ func Benchmark_ReduceSum_Slice_PlainOld_Index(b *testing.B) {
 	expected := 1 + 3 + 5 + 7
 
 	result := 0
-	for b.Loop() {
+	for i := 0; i < b.N; i++ {
 		result = 0
 		for i := range multiDimension {
 			for ii := range multiDimension[i] {
@@ -270,7 +270,7 @@ func (p *Participant) GetAttributes() []*Attributes {
 func Benchmark_ConvertFlattStructure_Seq(b *testing.B) {
 	items := []*Participant{{attributes: []*Attributes{{name: "first"}, {name: "second"}, nil}}, nil}
 	b.ResetTimer()
-	for b.Loop() {
+	for i := 0; i < b.N; i++ {
 		attr := seq.Flat(seq.Filter(seq.Of(items...), not.Nil), (*Participant).GetAttributes)
 		_ = seq.Slice(seq.Convert(seq.Filter(attr, not.Nil), (*Attributes).GetName))
 	}
@@ -294,7 +294,7 @@ func Benchmark_ConvertFlattStructure_Slice_PlainOld(b *testing.B) {
 		return names
 	}
 
-	for b.Loop() {
+	for i := 0; i < b.N; i++ {
 		_ = flattener(items)
 	}
 	b.StopTimer()

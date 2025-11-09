@@ -45,7 +45,7 @@ func Benchmark_UseIfElse(b *testing.B) {
 	user := User{name: "Bob", surname: "Smith"}
 
 	fullName := ""
-	for b.Loop() {
+	for i := 0; i < b.N; i++ {
 		fullName = use.
 			If(len(user.surname) == 0, user.name).
 			If(len(user.name) == 0, user.surname).
@@ -58,7 +58,7 @@ func Benchmark_UseIfElse(b *testing.B) {
 func Benchmark_UseIfElseGetSumOf(b *testing.B) {
 	user := User{name: "Bob", surname: "Smith"}
 	fullName := ""
-	for b.Loop() {
+	for i := 0; i < b.N; i++ {
 		fullName = use.
 			If(len(user.surname) == 0, user.name).
 			If(len(user.name) == 0, user.surname).
@@ -71,7 +71,7 @@ func Benchmark_UseIfElseGetSumOf(b *testing.B) {
 func Benchmark_UseOtherElseGet(b *testing.B) {
 	user := User{name: "Bob", surname: "Smith"}
 	fullName := ""
-	for b.Loop() {
+	for i := 0; i < b.N; i++ {
 		fullName = use.
 			If(len(user.surname) == 0, user.name).
 			Other(isEmpty(user.name), user.Surname).
@@ -84,7 +84,7 @@ func Benchmark_UseOtherElseGet(b *testing.B) {
 func Benchmark_UseOtherElseGet_With_String_Wrapper(b *testing.B) {
 	user := User{name: "Bob", surname: "Smith"}
 	fullName := ""
-	for b.Loop() {
+	for i := 0; i < b.N; i++ {
 		fullName = use.
 			If(len(user.surname) == 0, user.name).
 			Other(String(user.name).IsEmpty, user.Surname).
@@ -103,7 +103,7 @@ func (s String) IsEmpty() bool {
 func Benchmark_UseSimpleOld(b *testing.B) {
 	user := User{name: "Bob", surname: "Smith"}
 	fullName := ""
-	for b.Loop() {
+	for i := 0; i < b.N; i++ {
 		if len(user.surname) == 0 {
 			fullName = user.name
 		} else if len(user.name) == 0 {

@@ -34,7 +34,7 @@ func Benchmark_Loop_ImmutableOrderSet_ForEach(b *testing.B) {
 	c := oset.Of(values...)
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
-			for b.Loop() {
+			for i := 0; i < b.N; i++ {
 				c.ForEach(casee.load)
 			}
 		})
@@ -44,7 +44,7 @@ func Benchmark_Loop_ImmutableOrderSet_ForEach(b *testing.B) {
 func Benchmark_Loop_Slice_Seq_ForByRange(b *testing.B) {
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
-			for b.Loop() {
+			for i := 0; i < b.N; i++ {
 				for v := range seq.Of(values...) {
 					casee.load(v)
 				}
@@ -56,7 +56,7 @@ func Benchmark_Loop_Slice_Seq_ForByRange(b *testing.B) {
 func Benchmark_Loop_Slice_Embedded_ForByRange(b *testing.B) {
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
-			for b.Loop() {
+			for i := 0; i < b.N; i++ {
 				for _, v := range values {
 					casee.load(v)
 				}
@@ -69,7 +69,7 @@ func Benchmark_Loop_ImmutableOrderSet_ForRange_All(b *testing.B) {
 	c := oset.Of(values...)
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
-			for b.Loop() {
+			for i := 0; i < b.N; i++ {
 				for v := range c.All {
 					casee.load(v)
 				}

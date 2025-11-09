@@ -34,7 +34,7 @@ func Benchmark_SliceRange_Iterating(b *testing.B) {
 	integers := slice.Range(0, maxValOfRange)
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
-			for b.Loop() {
+			for i := 0; i < b.N; i++ {
 				for _, v := range integers {
 					casee.load(v)
 				}
@@ -46,7 +46,7 @@ func Benchmark_SliceRange_Iterating(b *testing.B) {
 func Benchmark_SeqRange_Iterating(b *testing.B) {
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
-			for b.Loop() {
+			for i := 0; i < b.N; i++ {
 				for v := range seq.Range(0, maxValOfRange) {
 					casee.load(v)
 				}

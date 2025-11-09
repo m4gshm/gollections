@@ -12,7 +12,7 @@ var m = map[int]int{0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9}
 
 func Benchmark_Keys(b *testing.B) {
 	var k []int
-	for b.Loop() {
+	for i := 0; i < b.N; i++ {
 		k = map_.Keys(m)
 	}
 	_ = k
@@ -20,7 +20,7 @@ func Benchmark_Keys(b *testing.B) {
 
 func Benchmark_KeysConvert(b *testing.B) {
 	var k []string
-	for b.Loop() {
+	for i := 0; i < b.N; i++ {
 		k = map_.KeysConvert(m, strconv.Itoa)
 	}
 	_ = k
@@ -28,7 +28,7 @@ func Benchmark_KeysConvert(b *testing.B) {
 
 func Benchmark_KeysConvertAsIs(b *testing.B) {
 	var k []int
-	for b.Loop() {
+	for i := 0; i < b.N; i++ {
 		k = map_.KeysConvert(m, as.Is)
 	}
 	_ = k
@@ -36,7 +36,7 @@ func Benchmark_KeysConvertAsIs(b *testing.B) {
 
 func Benchmark_Values(b *testing.B) {
 	var v []int
-	for b.Loop() {
+	for i := 0; i < b.N; i++ {
 		v = map_.Values(m)
 	}
 	_ = v
@@ -44,7 +44,7 @@ func Benchmark_Values(b *testing.B) {
 
 func Benchmark_ValuesConvert(b *testing.B) {
 	var k []string
-	for b.Loop() {
+	for i := 0; i < b.N; i++ {
 		k = map_.ValuesConvert(m, strconv.Itoa)
 	}
 	_ = k
@@ -52,7 +52,7 @@ func Benchmark_ValuesConvert(b *testing.B) {
 
 func Benchmark_ValuesConvertAsIs(b *testing.B) {
 	var k []int
-	for b.Loop() {
+	for i := 0; i < b.N; i++ {
 		k = map_.ValuesConvert(m, as.Is)
 	}
 	_ = k

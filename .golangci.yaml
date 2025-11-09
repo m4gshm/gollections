@@ -51,6 +51,11 @@ linters:
           - prealloc
           - makezero
           - err113
+          - intrange
+          - modernize
   settings:
     exhaustruct:
       allow-empty: true
+    testifylint:
+      disable:
+        - require-error

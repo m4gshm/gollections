@@ -26,7 +26,7 @@ func Benchmark_Convert_Slice(b *testing.B) {
 	op := convert.And(toString, addTail)
 	var s []string
 	b.ResetTimer()
-	for b.Loop() {
+	for i := 0; i < b.N; i++ {
 		s = slice.Convert(values, op)
 	}
 	_ = len(s)
@@ -37,7 +37,7 @@ func Benchmark_Convert_Slice_EveryElement(b *testing.B) {
 	op := convert.And(toString, addTail)
 	var s []string
 	b.ResetTimer()
-	for b.Loop() {
+	for i := 0; i < b.N; i++ {
 		s = make([]string, len(values))
 		for i, v := range values {
 			s[i] = op(v)
@@ -51,7 +51,7 @@ func Benchmark_Convert_Seq(b *testing.B) {
 	op := convert.And(toString, addTail)
 	var s []string
 	b.ResetTimer()
-	for b.Loop() {
+	for i := 0; i < b.N; i++ {
 		it := seq.Of(values...)
 		s = seq.SliceCap(seq.Convert(it, op), len(values))
 	}
@@ -64,7 +64,7 @@ func Benchmark_Convert_ImmutableVector_Iterable(b *testing.B) {
 	items := vector.Of(values...)
 	var s []string
 	b.ResetTimer()
-	for b.Loop() {
+	for i := 0; i < b.N; i++ {
 		s = collection.Convert(items, concat).Slice()
 	}
 	_ = s
@@ -77,7 +77,7 @@ func Benchmark_Convert_ImmutableVector_Iterable_Append(b *testing.B) {
 	items := vector.Of(values...)
 	var s []string
 	b.ResetTimer()
-	for b.Loop() {
+	for i := 0; i < b.N; i++ {
 		s = collection.Convert(items, concat).Append(make([]string, 0, len(values)))
 	}
 	_ = s
@@ -90,7 +90,7 @@ func Benchmark_Convert_ImmutableVector(b *testing.B) {
 	items := vector.Of(values...)
 	var s []string
 	b.ResetTimer()
-	for b.Loop() {
+	for i := 0; i < b.N; i++ {
 		s = vector.Convert(items, concat).Slice()
 	}
 	_ = s
@@ -102,7 +102,7 @@ func Benchmark_Convert_ImmutableVector_Append(b *testing.B) {
 	items := vector.Of(values...)
 	var s []string
 	b.ResetTimer()
-	for b.Loop() {
+	for i := 0; i < b.N; i++ {
 		s = vector.Convert(items, concat).Append(make([]string, 0, len(values)))
 	}
 	_ = s
@@ -115,7 +115,7 @@ func Benchmark_Convert_ImmutableVector_ForEach_To_MutableVector(b *testing.B) {
 	c := len(values)
 	var s *mutable.Vector[string]
 	b.ResetTimer()
-	for b.Loop() {
+	for i := 0; i < b.N; i++ {
 		s = mvector.NewCap[string](c)
 		items.ForEach(func(element int) { s.Add(concat(element)) })
 	}
