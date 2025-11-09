@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
 	"github.com/m4gshm/gollections/op"
 )
@@ -54,20 +53,20 @@ func Test_SumAndSub(t *testing.T) {
 func Test_IfElseErrfAndErr(t *testing.T) {
 	// IfElseErrf success
 	v, err := op.IfElseErrf(true, 10, "should not happen")
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 10, v)
 	// failure case with format
 	_, err = op.IfElseErrf(false, 0, "%s %d", "value", 5)
-	require.Error(t, err)
+	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "value 5")
 
 	// IfElseErr success
 	v2, err := op.IfElseErr(true, 20, errors.New("boom"))
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 20, v2)
 	// failure case
 	_, err = op.IfElseErr(false, 0, errors.New("error occurred"))
-	require.Error(t, err)
+	assert.Error(t, err)
 	assert.Equal(t, "error occurred", err.Error())
 }
 
@@ -94,20 +93,20 @@ func Test_IfElseGetAndGetters(t *testing.T) {
 func Test_IfElseGetWithErrAndGettersErr(t *testing.T) {
 	// IfElseGetWithErr success
 	v, err := op.IfElseGetWithErr(true, 7, func() (int, error) { return 8, nil })
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 7, v)
 	// failure case
 	_, err = op.IfElseGetWithErr(false, 0, func() (int, error) { return 9, errors.New("fail") })
-	require.Error(t, err)
+	assert.Error(t, err)
 	assert.Equal(t, "fail", err.Error())
 
 	// IfGetElseGetErr success
 	v2, err := op.IfGetElseGetErr(true, func() int { return 10 }, func() error { return nil })
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 10, v2)
 	// failure case
 	_, err = op.IfGetElseGetErr(false, func() int { return 11 }, func() error { return errors.New("oops") })
-	require.Error(t, err)
+	assert.Error(t, err)
 	assert.Equal(t, "oops", err.Error())
 }
 
@@ -125,10 +124,10 @@ func Test_CompareAndGet(t *testing.T) {
 func Test_IfElseGetErr(t *testing.T) {
 	// success case
 	v, err := op.IfElseGetErr(true, 42, func() error { return errors.New("should not happen") })
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 42, v)
 	// failure case
 	_, err = op.IfElseGetErr(false, 0, func() error { return errors.New("boom") })
-	require.Error(t, err)
+	assert.Error(t, err)
 	assert.Equal(t, "boom", err.Error())
 }

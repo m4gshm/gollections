@@ -71,7 +71,7 @@ func Xor[T any](p1, p2 Predicate[T]) Predicate[T] {
 	}
 }
 
-// Union applies And to predicates
+// Union applies And to predicates.
 func Union[T any](predicates ...Predicate[T]) Predicate[T] {
 	l := len(predicates)
 	switch l {
@@ -99,7 +99,7 @@ func Always[T any](v bool) Predicate[T] {
 	return func(_ T) (bool, error) { return v, nil }
 }
 
-// Never returns the negative of v every time
+// Never returns the negative of v every time.
 func Never[T any](v bool) Predicate[T] {
 	return func(_ T) (bool, error) { return !v, nil }
 }

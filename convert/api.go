@@ -6,7 +6,7 @@ import (
 	"github.com/m4gshm/gollections/k"
 )
 
-// AsIs helper for Map, Flatt
+// AsIs helper for Map, Flatt.
 func AsIs[T any](value T) T { return value }
 
 // And apply two converters in order.
@@ -26,18 +26,18 @@ func Or[I, O comparable](first func(I) O, second func(I) O) func(I) O {
 	}
 }
 
-// ToSlice convert an one element to a slice
+// ToSlice convert an one element to a slice.
 func ToSlice[T any](value T) []T { return []T{value} }
 
-// AsSlice convert an one element to a slice
+// AsSlice convert an one element to a slice.
 func AsSlice[T any](value T) []T { return ToSlice(value) }
 
-// KeyValue transforms one element to one key/value pair
+// KeyValue transforms one element to one key/value pair.
 func KeyValue[T, K, V any](element T, keyExtractor func(T) K, valExtractor func(T) V) c.KV[K, V] {
 	return k.V(keyExtractor(element), valExtractor(element))
 }
 
-// KeysValues transforms one element to multiple key/value pairs slices
+// KeysValues transforms one element to multiple key/value pairs slices.
 func KeysValues[T, K, V any](element T, keysExtractor func(T) []K, valsExtractor func(T) []V) (out []c.KV[K, V]) {
 	var (
 		keys   = keysExtractor(element)

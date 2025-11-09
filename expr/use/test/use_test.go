@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
 	"github.com/m4gshm/gollections/expr/use"
 )
@@ -77,10 +76,10 @@ func Test_UseIfElseGet(t *testing.T) {
 
 func Test_UseIfElseErr(t *testing.T) {
 	_, e := use.If(false, 1).ElseErr(err)
-	require.Error(t, e)
+	assert.Error(t, e)
 
 	result, e := use.If(true, 1).ElseErr(err)
-	require.NoError(t, e)
+	assert.NoError(t, e)
 	assert.Equal(t, 1, result)
 
 	result = use.If(true, 1).If(true, 2).Else(3)

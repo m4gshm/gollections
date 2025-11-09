@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
 	"github.com/m4gshm/gollections/convert/ptr"
 	"github.com/m4gshm/gollections/map_"
@@ -61,7 +60,7 @@ func Test_KeysConvert(t *testing.T) {
 
 func Test_KeysConv(t *testing.T) {
 	keys, err := map_.KeysConv(map_.ConvertKeys(entities, strconv.Itoa), strconv.Atoi)
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, slice.Of(1, 2, 3), sort.Asc(keys))
 }
 
@@ -77,7 +76,7 @@ func Test_ValuesConvert(t *testing.T) {
 
 func Test_ValuesConv(t *testing.T) {
 	values, err := map_.ValuesConv(entities, func(e *entity) (int, error) { return strconv.Atoi(string([]rune(e.val)[0])) })
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, slice.Of(1, 2, 3), sort.Asc(values))
 }
 

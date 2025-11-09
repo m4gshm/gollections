@@ -1,6 +1,6 @@
 package seqexamples
 
-// see the User structure above
+// see the User structure above.
 var users = []User{
 	{name: "Bob", age: 26},
 	{name: "Alice", age: 35},

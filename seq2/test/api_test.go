@@ -19,7 +19,6 @@ import (
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/clone/sort"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 var errStop = errors.New("stop")
@@ -171,15 +170,15 @@ func Test_ReduceeSum(t *testing.T) {
 	r, ok, err := seq2.ReduceeOK(s, reducer)
 	assert.True(t, ok)
 	assert.Equal(t, 1+3+5+7+9, r)
-	require.ErrorContains(t, err, "stop")
+	assert.ErrorContains(t, err, "stop")
 
 	_, ok, err = seq2.ReduceeOK[seq.Seq2[int, int]](nil, reducer)
 	assert.False(t, ok)
-	require.NoError(t, err)
+	assert.NoError(t, err)
 
 	r, err = seq2.Reducee(s, reducer)
 	assert.Equal(t, 1+3+5+7+9, r)
-	require.ErrorContains(t, err, "stop")
+	assert.ErrorContains(t, err, "stop")
 }
 
 func Test_ReduceeSumFirstErr(t *testing.T) {
@@ -189,7 +188,7 @@ func Test_ReduceeSumFirstErr(t *testing.T) {
 	})
 	assert.True(t, ok)
 	assert.Equal(t, 0, r)
-	require.ErrorContains(t, err, "stop")
+	assert.ErrorContains(t, err, "stop")
 }
 
 func Test_ReduceEmpty(t *testing.T) {
@@ -361,26 +360,26 @@ func Test_Firstt(t *testing.T) {
 	assert.True(t, ok)
 	assert.Equal(t, 5, i)
 	assert.Equal(t, 6, result)
-	require.NoError(t, err)
+	assert.NoError(t, err)
 
 	i, result, ok, err = sequence.Firstt(condition)
 
 	assert.True(t, ok)
 	assert.Equal(t, 5, i)
 	assert.Equal(t, 6, result)
-	require.NoError(t, err)
+	assert.NoError(t, err)
 
 	_, _, ok, err = seq2.Firstt[seq.Seq2[int, int]](nil, condition)
 	assert.False(t, ok)
-	require.NoError(t, err)
+	assert.NoError(t, err)
 
 	_, _, ok, err = seq2.Firstt(sequence, nil)
 	assert.False(t, ok)
-	require.NoError(t, err)
+	assert.NoError(t, err)
 
 	_, _, ok, err = sequence.Firstt(nil)
 	assert.False(t, ok)
-	require.NoError(t, err)
+	assert.NoError(t, err)
 
 	conditionErr := func(_ int, v int) (bool, error) {
 		return more.Than(5)(v), op.IfElse(v > 3, errStop, nil)
@@ -390,7 +389,7 @@ func Test_Firstt(t *testing.T) {
 	assert.False(t, ok)
 	assert.Equal(t, 0, i)
 	assert.Equal(t, 0, result)
-	require.Error(t, err)
+	assert.Error(t, err)
 
 	conditionErr = func(_ int, v int) (bool, error) { return more.Than(5)(v), op.IfElse(v > 5, errStop, nil) }
 	i, result, ok, err = sequence.Firstt(conditionErr)
@@ -398,7 +397,7 @@ func Test_Firstt(t *testing.T) {
 	assert.True(t, ok)
 	assert.Equal(t, 5, i)
 	assert.Equal(t, 6, result)
-	require.Error(t, err)
+	assert.Error(t, err)
 }
 
 func Test_Filter(t *testing.T) {
@@ -415,19 +414,19 @@ func Test_Filt(t *testing.T) {
 	s := seq.Of2("first", "second", "third", "fourth")
 	filter := func(i int, str string) (bool, error) { return even(i, str), op.IfElse(i > 2, errStop, nil) }
 	r, err := seq2.Filt(s, filter).Slice()
-	require.Error(t, err)
+	assert.Error(t, err)
 	assert.Equal(t, slice.Of(k.V(0, "first"), k.V(2, "third")), r)
 
 	r, err = s.Filt(filter).Slice()
-	require.Error(t, err)
+	assert.Error(t, err)
 	assert.Equal(t, slice.Of(k.V(0, "first"), k.V(2, "third")), r)
 
 	r, err = seq2.Filt(s, nil).Slice()
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	assert.Empty(t, r)
 
 	r, err = seq2.Filt[seq.Seq2[int, string]](nil, filter).Slice()
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	assert.Empty(t, r)
 }
 
@@ -509,7 +508,7 @@ func Test_ConvValue(t *testing.T) {
 	i := []int{}
 
 	for kv, err := range seq2.ConvValue(testMap.All, strconv.Atoi) {
-		require.NoError(t, err)
+		assert.NoError(t, err)
 		i = append(i, kv.V)
 	}
 
@@ -527,7 +526,7 @@ func Test_ConvertKey(t *testing.T) {
 func Test_ConvKey(t *testing.T) {
 	i := []int{}
 	for kv, err := range seq2.ConvKey(seq2.ConvertKey(testMap.All, strconv.Itoa), strconv.Atoi) {
-		require.NoError(t, err)
+		assert.NoError(t, err)
 		i = append(i, kv.K)
 	}
 	assert.Equal(t, slice.Of(1, 2, 3, 5, 7, 8, 9, 11), i)

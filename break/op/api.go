@@ -35,7 +35,7 @@ func IfElse[T any](ok bool, tru, fal T) (T, error) {
 	return fal, nil
 }
 
-// IfGetElseGet executes the tru func if ok, otherwise exec the fal function and returns it result
+// IfGetElseGet executes the tru func if ok, otherwise exec the fal function and returns it result.
 func IfGetElseGet[T any](ok bool, tru, fal func() (T, error)) (T, error) {
 	if ok {
 		return tru()

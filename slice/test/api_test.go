@@ -12,7 +12,6 @@ import (
 	"unsafe"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
 	_less "github.com/m4gshm/gollections/break/predicate/less"
 	_more "github.com/m4gshm/gollections/break/predicate/more"
@@ -129,7 +128,7 @@ func Test_ReduceeSum(t *testing.T) {
 	assert.Equal(t, 1+3+5+7+9+11, r)
 
 	r2, err := slice.Reducee(s, func(i1, i2 int) (int, error) { return i1 + i2, op.IfElse(i2 == 7, errors.New("abort"), nil) })
-	require.Error(t, err)
+	assert.Error(t, err)
 	assert.Equal(t, 1+3+5+7, r2)
 }
 
@@ -144,7 +143,7 @@ func Test_AccummSum(t *testing.T) {
 	r, _ := slice.Accumm(100, s, func(i1, i2 int) (int, error) { return i1 + i2, nil })
 	assert.Equal(t, 100+1+3+5+7+9+11, r)
 	r2, err := slice.Accumm(100, s, func(i1, i2 int) (int, error) { return i1 + i2, op.IfElse(i2 == 7, errors.New("abort"), nil) })
-	require.Error(t, err)
+	assert.Error(t, err)
 	assert.Equal(t, 100+1+3+5+7, r2)
 }
 
@@ -157,19 +156,19 @@ func Test_ConvertAndReduce(t *testing.T) {
 func Test_ConvAndReduce(t *testing.T) {
 	s := slice.Of("1", "3", "5", "7", "9", "11")
 	r, err := conv.AndReduce(s, strconv.Atoi, op.Sum[int])
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 1+3+5+7+9+11, r)
 
 	s = slice.Of("1", "3", "5", "_7", "9", "11")
 
 	r, err = conv.AndReduce(s, strconv.Atoi, op.Sum[int])
-	require.ErrorContains(t, err, "parsing \"_7\": invalid syntax")
+	assert.ErrorContains(t, err, "parsing \"_7\": invalid syntax")
 	assert.Equal(t, 1+3+5, r)
 
 	s = slice.Of("_1")
 
 	r, err = conv.AndReduce(s, strconv.Atoi, op.Sum[int])
-	require.ErrorContains(t, err, "parsing \"_1\": invalid syntax")
+	assert.ErrorContains(t, err, "parsing \"_1\": invalid syntax")
 	assert.Equal(t, 0, r)
 }
 
@@ -199,7 +198,7 @@ func Test_Firstt(t *testing.T) {
 	assert.False(t, nook)
 
 	_, _, err := slice.Firstt(s, func(_ int) (bool, error) { return true, errors.New("abort") })
-	require.Error(t, err)
+	assert.Error(t, err)
 }
 
 func Test_Last(t *testing.T) {
@@ -222,7 +221,7 @@ func Test_Lastt(t *testing.T) {
 	assert.False(t, nook)
 
 	_, _, err := slice.Lastt(s, func(_ int) (bool, error) { return true, errors.New("abort") })
-	require.Error(t, err)
+	assert.Error(t, err)
 }
 
 var absPath = op.IfElse(runtime.GOOS == "windows", "c:\\home\\user", "/home/user")
@@ -257,7 +256,7 @@ func Test_ConvOK(t *testing.T) {
 		return i, even(i), nil
 	})
 	var expected *strconv.NumError
-	require.ErrorAs(t, err, &expected)
+	assert.ErrorAs(t, err, &expected)
 	assert.Equal(t, []int{4, 8}, r)
 
 	s = slice.Of("1", "3", "4", "5", "7", "8", "9", "11", "12")
@@ -265,7 +264,7 @@ func Test_ConvOK(t *testing.T) {
 		i, err := strconv.Atoi(v)
 		return i, true, err
 	})
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, []int{1, 3, 4, 5, 7, 8, 9, 11, 12}, r)
 }
 
@@ -273,7 +272,7 @@ func Test_Conv(t *testing.T) {
 	s := slice.Of("1", "3", "5", "7", "_9", "11")
 	r, err := slice.Conv(s, strconv.Atoi)
 	var expected *strconv.NumError
-	require.ErrorAs(t, err, &expected)
+	assert.ErrorAs(t, err, &expected)
 	assert.Equal(t, []int{1, 3, 5, 7}, r)
 }
 
@@ -372,11 +371,11 @@ func Test_FlatSeq(t *testing.T) {
 func Test_Flatt(t *testing.T) {
 	md := [][]int{{1, 2, 3}, {4}, {5, 6}}
 	f, err := slice.Flatt(md, func(i []int) ([]int, error) { return i, op.IfElse(len(i) == 2, errors.New("abort"), nil) })
-	require.Error(t, err)
+	assert.Error(t, err)
 	assert.Equal(t, []int{1, 2, 3, 4}, f)
 
 	f, err = slice.Flatt(md, func(i []int) ([]int, error) { return i, nil })
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, []int{1, 2, 3, 4, 5, 6}, f)
 }
 
@@ -386,13 +385,13 @@ func Test_FlattSeq(t *testing.T) {
 		return i, op.IfElse(i == 5, errors.New("abort"), nil)
 	}
 	f, err := slice.FlattSeq(md, func(i []int) seq.SeqE[int] { return seq.Conv(seq.Of(i...), transform) })
-	require.Error(t, err)
+	assert.Error(t, err)
 	assert.Equal(t, []int{1, 2, 3, 4}, f)
 
 	f, err = slice.FlattSeq(md, func(i []int) seq.SeqE[int] {
 		return seq.SeqE[int](seq.ToSeq2(seq.Of(i...), func(i int) (int, error) { return i, nil }))
 	})
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, []int{1, 2, 3, 4, 5, 6}, f)
 }
 
@@ -455,11 +454,11 @@ func Test_FilterConvertFilter(t *testing.T) {
 func Test_Filt(t *testing.T) {
 	s := slice.Of(1, 3, 4, 5, 7, 8, 9, 12)
 	r, err := slice.Filt(s, func(i int) (bool, error) { return even(i), op.IfElse(i > 7, errors.New("abort"), nil) })
-	require.Error(t, err)
+	assert.Error(t, err)
 	assert.Equal(t, slice.Of(4), r)
 
 	r, err = slice.Filt(s, func(i int) (bool, error) { return even(i), nil })
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, slice.Of(4, 8, 12), r)
 }
 
@@ -469,7 +468,7 @@ func Test_Filt2(t *testing.T) {
 		ok := i <= 7
 		return ok && even(i), op.IfElse(ok, nil, errors.New("abort"))
 	})
-	require.Error(t, err)
+	assert.Error(t, err)
 	assert.Equal(t, slice.Of(4), r)
 }
 
@@ -483,17 +482,17 @@ func Test_AppendFiltAndConv(t *testing.T) {
 	s := slice.Of(1, 3, 4, 5, 7, 8, 9, 11)
 	r, err := slice.AppendFiltAndConv(s, []int{}, func(v int) (bool, error) { return v%2 == 0, nil }, func(i int) (int, error) { return i * 2, nil })
 	assert.Equal(t, slice.Of(8, 16), r)
-	require.NoError(t, err)
+	assert.NoError(t, err)
 
 	r, err = slice.AppendFiltAndConv(s, []int{}, func(v int) (bool, error) { return v%2 == 0, op.IfElse(v == 9, errors.New("abort"), nil) }, func(i int) (int, error) { return i * 2, nil })
 
 	assert.Equal(t, slice.Of(8, 16), r)
-	require.ErrorContains(t, err, "abort")
+	assert.ErrorContains(t, err, "abort")
 
 	r, err = slice.AppendFiltAndConv(s, []int{}, func(v int) (bool, error) { return v%2 == 0, nil }, func(i int) (int, error) { return i * 2, op.IfElse(i == 8, errors.New("abort"), nil) })
 
 	assert.Equal(t, slice.Of(8), r)
-	require.ErrorContains(t, err, "abort")
+	assert.ErrorContains(t, err, "abort")
 }
 
 func Test_StringRepresentation(t *testing.T) {
@@ -572,7 +571,7 @@ func Test_OffNextPush(t *testing.T) {
 		expected    = slice.Of(1, 2, 3)
 	)
 	assert.Equal(t, expected, result)
-	require.NoError(t, err)
+	assert.NoError(t, err)
 
 	rows.Reset()
 
@@ -581,7 +580,7 @@ func Test_OffNextPush(t *testing.T) {
 	})
 
 	assert.Equal(t, expected, result)
-	require.NoError(t, err)
+	assert.NoError(t, err)
 }
 
 func Test_Sort(t *testing.T) {
@@ -713,7 +712,7 @@ func Test_Slice_AppendMapResolvv(t *testing.T) {
 
 	assert.Equal(t, []int{1, 1, 3, 1}, groups[false])
 	assert.Equal(t, []int{2, 2, 4}, groups[true])
-	require.NoError(t, err)
+	assert.NoError(t, err)
 }
 
 func Test_Slice_AppendMapResolvOrderr(t *testing.T) {
@@ -728,13 +727,13 @@ func Test_Slice_AppendMapResolvOrderr(t *testing.T) {
 	assert.Equal(t, []int{1, 1, 3}, groups[false])
 	assert.Equal(t, []int{2, 2, 4}, groups[true])
 	assert.Equal(t, []bool{true, false}, order)
-	require.EqualError(t, err, "strconv.Atoi: parsing \"_1\": invalid syntax")
+	assert.EqualError(t, err, "strconv.Atoi: parsing \"_1\": invalid syntax")
 
 	order, groups, err = slice.AppendMapResolvOrderr(slice.Of("2", "1", "1", "2", "4", "3", "1"), kvExtractor, resolver, nil, nil)
 	assert.Equal(t, []int{1, 1, 3, 1}, groups[false])
 	assert.Equal(t, []int{2, 2, 4}, groups[true])
 	assert.Equal(t, []bool{true, false}, order)
-	require.NoError(t, err)
+	assert.NoError(t, err)
 
 	resolver = func(exists bool, k bool, vr []int, v int) ([]int, error) {
 		return resolv.Slice(exists, k, vr, v), op.IfElse(v == 5, errors.New("abort"), nil)
