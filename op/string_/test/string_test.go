@@ -8,7 +8,6 @@ import (
 )
 
 func TestConcat(t *testing.T) {
-
 	result := string_.Of("1", "2", "3")
 	assert.Equal(t, "123", result())
 }

@@ -297,14 +297,14 @@ func TrackValuesWhile[M ~map[K]V, K comparable, V any](elements M, consumer func
 	}
 }
 
-// ForEachKey applies the 'consumer' function for every key from from the 'elements' map
+// ForEachKey applies the 'consumer' function for every key from the 'elements' map
 func ForEachKey[M ~map[K]V, K comparable, V any](elements M, consumer func(K)) {
 	for key := range elements {
 		consumer(key)
 	}
 }
 
-// ForEachValue applies the 'consumer' function for every value from from the 'elements' map
+// ForEachValue applies the 'consumer' function for every value from the 'elements' map
 func ForEachValue[M ~map[K]V, K comparable, V any](elements M, consumer func(V)) {
 	for _, val := range elements {
 		consumer(val)

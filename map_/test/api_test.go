@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/m4gshm/gollections/convert/ptr"
 	"github.com/m4gshm/gollections/map_"
@@ -60,7 +61,7 @@ func Test_KeysConvert(t *testing.T) {
 
 func Test_KeysConv(t *testing.T) {
 	keys, err := map_.KeysConv(map_.ConvertKeys(entities, strconv.Itoa), strconv.Atoi)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, slice.Of(1, 2, 3), sort.Asc(keys))
 }
 
@@ -76,12 +77,12 @@ func Test_ValuesConvert(t *testing.T) {
 
 func Test_ValuesConv(t *testing.T) {
 	values, err := map_.ValuesConv(entities, func(e *entity) (int, error) { return strconv.Atoi(string([]rune(e.val)[0])) })
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, slice.Of(1, 2, 3), sort.Asc(values))
 }
 
 func Test_ConvertValues(t *testing.T) {
-	var strValues map[int]string = map_.ConvertValues(entities, func(e *entity) string { return e.val })
+	strValues := map_.ConvertValues(entities, func(e *entity) string { return e.val })
 
 	assert.Equal(t, "1_first", strValues[1])
 	assert.Equal(t, "2_second", strValues[2])
@@ -89,7 +90,7 @@ func Test_ConvertValues(t *testing.T) {
 }
 
 func Test_ValuesConverted(t *testing.T) {
-	var values []string = map_.ValuesConverted(entities, func(e *entity) string { return e.val })
+	values := map_.ValuesConverted(entities, func(e *entity) string { return e.val })
 	assert.Equal(t, slice.Of("1_first", "2_second", "3_third"), sort.Asc(values))
 }
 
@@ -165,7 +166,7 @@ func Test_Filter(t *testing.T) {
 
 	result := map_.Filter(elements, func(key int, val string) bool { return key <= 2 || val == "4" })
 	check := map_.KeyChecker(result)
-	assert.Equal(t, 3, len(result))
+	assert.Len(t, result, 3)
 	assert.True(t, check(1))
 	assert.True(t, check(2))
 	assert.False(t, check(3))
@@ -177,7 +178,7 @@ func Test_FilterKeys(t *testing.T) {
 
 	result := filter.Keys(elements, func(key int) bool { return key <= 2 })
 	check := map_.KeyChecker(result)
-	assert.Equal(t, 2, len(result))
+	assert.Len(t, result, 2)
 	assert.True(t, check(1))
 	assert.True(t, check(2))
 	assert.False(t, check(3))
@@ -189,7 +190,7 @@ func Test_FilterValues(t *testing.T) {
 
 	result := filter.Values(elements, func(val string) bool { return val <= "2" })
 	check := map_.KeyChecker(result)
-	assert.Equal(t, 2, len(result))
+	assert.Len(t, result, 2)
 	assert.True(t, check(1))
 	assert.True(t, check(2))
 	assert.False(t, check(3))
@@ -207,7 +208,7 @@ func Test_Getter(t *testing.T) {
 
 	nilGetter := map_.Getter[map[int]string](nil)
 
-	assert.Equal(t, "", nilGetter(0))
+	assert.Empty(t, nilGetter(0))
 
 	getterOk := map_.GetterOk(elements)
 

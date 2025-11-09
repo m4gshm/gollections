@@ -106,7 +106,7 @@ func OfSourceNext[S, T any](source S, hasNext func(S) bool, pushNext func(S, *T)
 	return OfNext(func() bool { return hasNext(source) }, func(next *T) { pushNext(source, next) })
 }
 
-// OfIndexed builds a Seq iterator by extracting elements from an indexed soruce.
+// OfIndexed builds a Seq iterator by extracting elements from an indexed source.
 // the len is length ot the source.
 // the getAt retrieves an element by its index from the source.
 func OfIndexed[T any](amount int, getAt func(int) T) Seq[T] {
@@ -160,7 +160,7 @@ func RangeClosed[T constraints.Integer | rune](from T, toInclusive T) Seq[T] {
 			if !yield(e) {
 				return
 			}
-			e = e + delta
+			e += delta
 		}
 	}
 }
@@ -179,7 +179,7 @@ func Range[T constraints.Integer | rune](from T, toExclusive T) Seq[T] {
 			if !yield(e) {
 				return
 			}
-			e = e + delta
+			e += delta
 		}
 	}
 }
@@ -401,7 +401,6 @@ func Accumm[T any, S ~seq[T]](first T, seq S, merge func(T, T) (T, error)) (accu
 		return err == nil
 	})
 	return accumulator, err
-
 }
 
 // Sum returns the sum of all elements.
@@ -675,7 +674,7 @@ func Group[S ~seq[T], T any, K comparable, V any](seq S, keyExtractor func(T) K,
 	return s2.Group(ToKV(seq, keyExtractor, valExtractor))
 }
 
-// NotNil returns teh seq without nil elements.
+// NotNil returns the seq without nil elements.
 func NotNil[T any](seq Seq[*T]) Seq[*T] {
 	return Filter(seq, not.Nil[T])
 }

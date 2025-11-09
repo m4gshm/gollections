@@ -1,0 +1,56 @@
+version: "2"
+linters:
+  default: "all"
+  disable:
+    - inamedparam
+    - paralleltest
+    - revive
+    - noinlineerr
+    - nlreturn
+    - varnamelen
+    - wrapcheck
+    - wsl
+    - wsl_v5
+    - nonamedreturns
+    - testpackage
+    - mnd
+    - lll
+    - ireturn
+    - gosec
+    - godot
+    - gocritic
+    - depguard
+    - godox
+  exclusions:
+    rules:
+      - path: op/api\.go
+        linters:
+          - err113
+      - path: collection/mutable/sync/map\.go
+        linters:
+          - forcetypeassert
+      - path: seq/
+        linters:
+          - intrange
+      - path: internal/examples
+        linters:
+          - staticcheck
+          - whitespace
+          - wastedassign
+          - testifylint
+          - gochecknoglobals
+          - forbidigo
+          - exhaustruct
+          - goconst
+      - path: _test\.go
+        linters:
+          - gochecknoglobals
+          - unused
+          - perfsprint
+          - predeclared
+          - prealloc
+          - makezero
+          - err113
+  settings:
+    exhaustruct:
+      allow-empty: true

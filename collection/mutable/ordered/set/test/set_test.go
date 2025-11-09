@@ -24,7 +24,7 @@ func Test_Set_Iterate(t *testing.T) {
 	set := set.Of(1, 1, 2, 4, 3, 1)
 	values := set.Slice()
 
-	assert.Equal(t, 4, len(values))
+	assert.Len(t, values, 4)
 
 	expected := slice.Of(1, 2, 4, 3)
 	assert.Equal(t, expected, values)
@@ -45,9 +45,9 @@ func Test_Set_Iterate(t *testing.T) {
 func Test_Set_AddVerify(t *testing.T) {
 	set := set.NewCap[int](0)
 	added := set.AddNew(1, 2, 4, 3)
-	assert.Equal(t, added, true)
+	assert.True(t, added)
 	added = set.AddOneNew(1)
-	assert.Equal(t, added, false)
+	assert.False(t, added)
 
 	values := set.Slice()
 
@@ -86,7 +86,7 @@ func Test_Set_Delete(t *testing.T) {
 		set.Delete(v)
 	}
 
-	assert.Equal(t, 0, len(set.Slice()))
+	assert.Empty(t, set.Slice())
 }
 
 func Test_Set_FilterMapReduce(t *testing.T) {
@@ -138,7 +138,7 @@ func Test_Set_Nil(t *testing.T) {
 
 func Test_Set_Empty_All(t *testing.T) {
 	set := &ordered.Set[int]{}
-	assert.Equal(t, 0, len(seq.Slice(set.All)))
+	assert.Empty(t, seq.Slice(set.All))
 }
 
 func Test_Set_Empty_IAll(t *testing.T) {
@@ -147,7 +147,7 @@ func Test_Set_Empty_IAll(t *testing.T) {
 	for _, v := range set.IAll {
 		out = append(out, v)
 	}
-	assert.Equal(t, 0, len(out))
+	assert.Empty(t, out)
 }
 
 func Test_Set_Zero(t *testing.T) {

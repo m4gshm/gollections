@@ -15,7 +15,7 @@ var (
 func Benchmark_Vector_Add(b *testing.B) {
 	v := vector.NewCap[int](maxValue)
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		v.Add(values...)
 	}
 	b.StopTimer()
@@ -25,7 +25,7 @@ func Benchmark_Vector_Add(b *testing.B) {
 func Benchmark_Vector_Add_ByOne(b *testing.B) {
 	v := vector.NewCap[int](maxValue)
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		for _, i := range values {
 			v.Add(i)
 		}
@@ -37,7 +37,7 @@ func Benchmark_Vector_Add_ByOne(b *testing.B) {
 func Benchmark_Vector_Add_All(b *testing.B) {
 	v := vector.NewCap[int](maxValue)
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		v.Add(values...)
 	}
 	b.StopTimer()

@@ -14,13 +14,13 @@ var (
 )
 
 func Benchmark_Slice_RangeClosed_Generate(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_ = srange.Closed(1, maxVal)
 	}
 }
 
 func Benchmark_Slice_RangeClosed_Iterate(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		for i, v := range values {
 			_, _ = i, v
 		}
@@ -28,7 +28,7 @@ func Benchmark_Slice_RangeClosed_Iterate(b *testing.B) {
 }
 
 func Benchmark_Seq_RangeClosed_Iterate(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		for v := range seq.RangeClosed(1, maxVal) {
 			_ = v
 		}
@@ -36,7 +36,7 @@ func Benchmark_Seq_RangeClosed_Iterate(b *testing.B) {
 }
 
 func Benchmark_Slice_Series_Generate(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		for n := range slice.Series(1, func(prev int) (int, bool) { return prev + 1, prev <= maxVal }) {
 			_ = n
 		}
@@ -44,7 +44,7 @@ func Benchmark_Slice_Series_Generate(b *testing.B) {
 }
 
 func Benchmark_Seq_Series_Generate(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		for n := range seq.Series(1, func(prev int) (int, bool) { return prev + 1, prev <= maxVal }) {
 			_ = n
 		}

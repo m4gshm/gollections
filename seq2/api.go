@@ -42,7 +42,7 @@ func OfMap[K comparable, V any](elements map[K]V) seq.Seq2[K, V] {
 	}
 }
 
-// OfIndexed builds an indexed Seq2 iterator by extracting elements from an indexed soruce.
+// OfIndexed builds an indexed Seq2 iterator by extracting elements from an indexed source.
 // the len is length ot the source.
 // the getAt retrieves an element by its index from the source.
 func OfIndexed[T any](amount int, getAt func(int) T) seq.Seq2[int, T] {
@@ -58,7 +58,7 @@ func OfIndexed[T any](amount int, getAt func(int) T) seq.Seq2[int, T] {
 	}
 }
 
-// OfIndexedKV builds an indexed Seq2 iterator by extracting key\value pairs from an indexed soruce.
+// OfIndexedKV builds an indexed Seq2 iterator by extracting key\value pairs from an indexed source.
 // the len is length ot the source.
 // the getAt retrieves a key\value pair by its index from the source.
 func OfIndexedKV[K, V any](amount int, getAt func(int) (K, V)) seq.Seq2[K, V] {
@@ -74,7 +74,7 @@ func OfIndexedKV[K, V any](amount int, getAt func(int) (K, V)) seq.Seq2[K, V] {
 	}
 }
 
-// OfIndexedPair builds an indexed Seq2 iterator by extracting key\value pairs from an indexed soruce.
+// OfIndexedPair builds an indexed Seq2 iterator by extracting key\value pairs from an indexed source.
 // the len is length ot the source.
 // the getKey retrieves a key by its index from the source.
 // the getValue retrieves a value by its index from the source.
@@ -118,11 +118,11 @@ func RangeClosed[T constraints.Integer | rune](from T, toInclusive T) seq.Seq2[i
 	amount++
 	return func(yield func(int, T) bool) {
 		e := from
-		for i := 0; i < int(amount); i++ {
+		for i := range int(amount) {
 			if !yield(i, e) {
 				return
 			}
-			e = e + delta
+			e += delta
 		}
 	}
 }
@@ -137,11 +137,11 @@ func Range[T constraints.Integer | rune](from T, toExclusive T) seq.Seq2[int, T]
 	}
 	return func(yield func(int, T) bool) {
 		e := from
-		for i := 0; i < int(amount); i++ {
+		for i := range int(amount) {
 			if !yield(i, e) {
 				return
 			}
-			e = e + delta
+			e += delta
 		}
 	}
 }
@@ -373,7 +373,7 @@ func AppendMapResolv[S ~Seq2[K, V], K comparable, V, VR any](seq S, resolver fun
 }
 
 // AppendMapResolvOrder collects key\value elements into the 'dest' map by iterating over the elements with resolving of duplicated key values
-// Additionaly populates the 'order' slice by the keys ordered by the time they were added and the resolved key\value map.
+// Additionally populates the 'order' slice by the keys ordered by the time they were added and the resolved key\value map.
 func AppendMapResolvOrder[S ~Seq2[K, V], K comparable, V, VR any](seq S, resolver func(exists bool, key K, valResolv VR, val V) VR, order []K, dest map[K]VR) ([]K, map[K]VR) {
 	return s2.AppendMapResolvOrder(seq, resolver, order, dest)
 }

@@ -63,7 +63,7 @@ func OfSourceNext[S, T any](source S, hasNext func(S) bool, pushNext func(S, *T)
 	return OfNext(func() bool { return hasNext(source) }, func(next *T) error { return pushNext(source, next) })
 }
 
-// OfIndexed builds a SeqE iterator by extracting elements from an indexed soruce.
+// OfIndexed builds a SeqE iterator by extracting elements from an indexed source.
 // the len is length ot the source.
 // the getAt retrieves an element by its index from the source.
 func OfIndexed[T any](amount int, getAt func(int) (T, error)) seq.SeqE[T] {
@@ -425,7 +425,7 @@ func Group[S ~SeqE[T], T any, K comparable, V any](seq S, keyExtractor func(T) K
 	return groups, nil
 }
 
-// NotNil returns teh seq without nil elements.
+// NotNil returns the seq without nil elements.
 func NotNil[T any](seq SeqE[*T]) seq.SeqE[*T] {
 	return Filter(seq, not.Nil[T])
 }

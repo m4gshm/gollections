@@ -107,28 +107,28 @@ userLoop:
 }
 
 func Benchmark_FindFirsManager_Predicate_WhereAnyWhereEq(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		alice, ok := slice.First(users, where.Any(User.Roles, where.Eq(Role.Name, "Manager")))
 		_, _ = alice, ok
 	}
 }
 
 func Benchmark_FindFirsManager_Predicate_MatchAnyMatchToEqTo(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		alice, ok := slice.First(users, match.Any(User.Roles, match.To(Role.Name, eq.To("Manager"))))
 		_, _ = alice, ok
 	}
 }
 
 func Benchmark_FindFirsManager_Predicate_MatchAnyMatchToFunc(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		alice, ok := slice.First(users, match.Any(User.Roles, match.To(Role.Name, func(roleName string) bool { return roleName == "Manager" })))
 		_, _ = alice, ok
 	}
 }
 
 func Benchmark_FindFirsManager_Set(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		alice, ok := slice.First(users, func(user User) bool {
 			return set.Convert(set.New(user.Roles()), Role.Name).HasAny(eq.To("Manager"))
 		})
@@ -137,7 +137,7 @@ func Benchmark_FindFirsManager_Set(b *testing.B) {
 }
 
 func Benchmark_FindFirsManager_Slice(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		alice, ok := slice.First(users, func(user User) bool {
 			return slice.Contains(slice.Convert(user.Roles(), Role.Name), "Manager")
 		})
@@ -146,7 +146,7 @@ func Benchmark_FindFirsManager_Slice(b *testing.B) {
 }
 
 func Benchmark_FindFirsManager_Seq(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		alice, ok := slice.First(users, func(user User) bool {
 			return seq.Contains(seq.Convert(seq.Of(user.Roles()...), Role.Name), "Manager")
 		})
@@ -155,7 +155,7 @@ func Benchmark_FindFirsManager_Seq(b *testing.B) {
 }
 
 func Benchmark_FindFirsManager_Seq_HasAnyEqTo(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		alice, ok := slice.First(users, func(user User) bool {
 			return seq.Convert(seq.Of(user.Roles()...), Role.Name).HasAny(eq.To("Manager"))
 		})
@@ -164,7 +164,7 @@ func Benchmark_FindFirsManager_Seq_HasAnyEqTo(b *testing.B) {
 }
 
 func Benchmark_FindFirsManager_Seq_HasAnyFunc(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		alice, ok := slice.First(users, func(user User) bool {
 			return seq.Convert(seq.Of(user.Roles()...), Role.Name).HasAny(eq.To("Manager"))
 		})
@@ -173,7 +173,7 @@ func Benchmark_FindFirsManager_Seq_HasAnyFunc(b *testing.B) {
 }
 
 func Benchmark_FindFirsManager_Old(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		legacyAlice := User{}
 		ok := false
 	loopUsers:
@@ -210,7 +210,7 @@ func Test_AggregateFilteredRoles(t *testing.T) {
 }
 
 func Benchmark_AggregateFilteredRoles_Slice(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		roles := slice.Flat(users, User.Roles)
 		roleNamesExceptManager := convert.AndFilter(roles, Role.Name, not.Eq("Manager"))
 		_ = roleNamesExceptManager
@@ -218,7 +218,7 @@ func Benchmark_AggregateFilteredRoles_Slice(b *testing.B) {
 }
 
 func Benchmark_AggregateFilteredRoles_Seq_FlatSeq(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		roles := seq.FlatSeq(seq.Of(users...), func(u User) seq.Seq[Role] { return seq.Of(u.roles...) })
 		roleNamesExceptManager := seq.Filter(seq.Convert(roles, Role.Name), not.Eq("Manager"))
 		_ = seq.Slice(roleNamesExceptManager)
@@ -226,7 +226,7 @@ func Benchmark_AggregateFilteredRoles_Seq_FlatSeq(b *testing.B) {
 }
 
 func Benchmark_AggregateFilteredRoles_Seq_Flat(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		roles := seq.Flat(seq.Of(users...), User.Roles)
 		roleNamesExceptManager := seq.Filter(seq.Convert(roles, Role.Name), not.Eq("Manager"))
 		_ = seq.Slice(roleNamesExceptManager)
@@ -234,7 +234,7 @@ func Benchmark_AggregateFilteredRoles_Seq_Flat(b *testing.B) {
 }
 
 func Benchmark_AggregateFilteredRoles_Old(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		legacyRoleNamesExceptManager := []string{}
 		for _, u := range users {
 			for _, r := range u.Roles() {

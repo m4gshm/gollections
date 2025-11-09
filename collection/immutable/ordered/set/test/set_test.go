@@ -22,7 +22,7 @@ func Test_Set_Iterate(t *testing.T) {
 	set := set.Of(1, 1, 2, 4, 3, 1)
 	values := set.Slice()
 
-	assert.Equal(t, 4, len(values))
+	assert.Len(t, values, 4)
 
 	expected := slice.Of(1, 2, 4, 3)
 	assert.Equal(t, expected, values)
@@ -65,7 +65,7 @@ func Test_Set_FilterMapReduce(t *testing.T) {
 func Test_Set_Group_By_Iterator(t *testing.T) {
 	groups := seq.Group(set.Of(0, 1, 1, 2, 4, 3, 1, 6, 7).All, func(e int) bool { return e%2 == 0 }, as.Is[int])
 
-	assert.Equal(t, len(groups), 2)
+	assert.Len(t, groups, 2)
 	assert.Equal(t, []int{1, 3, 7}, groups[false])
 	assert.Equal(t, []int{0, 2, 4, 6}, groups[true])
 }

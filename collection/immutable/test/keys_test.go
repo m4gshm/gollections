@@ -18,7 +18,6 @@ func Test_MapKeys_Zero_Safety(t *testing.T) {
 	collection.Reduce(func(_, _ int) int { return 0 })
 	s := collection.String()
 	assert.Equal(t, "[]", s)
-
 }
 
 func Test_Map_Zero(t *testing.T) {
@@ -30,5 +29,4 @@ func Test_Map_Zero(t *testing.T) {
 	collection.Reduce(func(_, _ int, _, _ string) (int, string) { return 0, "" })
 	s := collection.String()
 	assert.Equal(t, "[]", s)
-
 }

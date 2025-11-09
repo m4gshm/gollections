@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/m4gshm/gollections/expr/get"
 )
@@ -23,11 +24,11 @@ var (
 )
 
 func Test_GetIfElse(t *testing.T) {
-	result, err := get.If_(true, getErr).Else(2)
-	assert.Error(t, err)
+	_, err := get.If_(true, getErr).Else(2)
+	require.Error(t, err)
 
-	result, err = get.If_(false, getErr).Else(2)
-	assert.NoError(t, err)
+	result, err := get.If_(false, getErr).Else(2)
+	require.NoError(t, err)
 	assert.Equal(t, 2, result)
 }
 

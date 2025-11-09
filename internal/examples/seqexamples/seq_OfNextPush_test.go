@@ -17,7 +17,7 @@ func Test_rows_OfNext(t *testing.T) {
 	rowSeq := seqe.OfNext(rows.Next, getUser)
 	usersByAge, err := seqe.Group(rowSeq, User.Age, as.Is)
 
-	assert.Equal(t, 1, len(usersByAge))
+	assert.Len(t, usersByAge, 1)
 	assert.Equal(t, "Alice", usersByAge[21][0].Name())
 	assert.NoError(t, err)
 }
@@ -36,7 +36,7 @@ func Test_rows_plain_old(t *testing.T) {
 		usersByAge[u.age] = append(usersByAge[u.age], u)
 	}
 
-	assert.Equal(t, 1, len(usersByAge))
+	assert.Len(t, usersByAge, 1)
 	assert.Equal(t, "Alice", usersByAge[21][0].Name())
 	assert.NoError(t, err)
 }
@@ -50,7 +50,7 @@ func Test_rows_OfNextGet(t *testing.T) {
 		return &u, rows.Scan(&u.name, &u.age)
 	}), (*User).Age, as.Is)
 
-	assert.Equal(t, 1, len(refUsersByAge))
+	assert.Len(t, refUsersByAge, 1)
 	assert.Equal(t, "Alice", refUsersByAge[21][0].Name())
 	assert.NoError(t, err)
 }

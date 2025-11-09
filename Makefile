@@ -55,21 +55,8 @@ update:
 .PHONY: lint
 lint:
 	$(info #Lints...)
-	go install golang.org/x/tools/cmd/goimports@latest
-	goimports -w .
-	go vet ./...
-	# go install github.com/tetafro/godot/cmd/godot@latest
-	# godot .
-	# go install github.com/kisielk/errcheck@latest
-	# errcheck -ignoretests ./...
-	# go install github.com/alexkohler/nakedret/cmd/nakedret@latest
-	# nakedret ./...
-	# go install golang.org/x/lint/golint@latest
-	# golint ./...
-	go install github.com/mgechev/revive@latest
-	revive -exclude internal/examples/... -exclude internal/benchmark/... ./...
-# 	go install github.com/alexkohler/prealloc@latest
-# 	prealloc ./...
+	go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
+	golangci-lint run
 
 .PHONY: readme
 readme:

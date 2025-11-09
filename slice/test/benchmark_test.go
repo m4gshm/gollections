@@ -13,7 +13,7 @@ type someType struct {
 
 func Benchmark_GetTypeSize(b *testing.B) {
 	var size uintptr
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		size = notsafe.GetTypeSize[someType]()
 	}
 	_ = size

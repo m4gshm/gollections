@@ -21,7 +21,7 @@ func Eq[From any, To comparable](getter func(From) To, example To) predicate.Pre
 	return Match(getter, eq.To(example))
 }
 
-// Not creates negate condition for a  a strcut property
+// Not creates negate condition for a strcut property
 func Not[From, To any](getter func(From) To, condition predicate.Predicate[To]) predicate.Predicate[From] {
 	return predicate.Not(Match(getter, condition))
 }
