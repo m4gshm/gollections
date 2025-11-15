@@ -26,7 +26,7 @@ func Test_Set_Iterate(t *testing.T) {
 	set := set.Of(1, 1, 2, 4, 3, 1)
 	values := sort.Asc(set.Slice())
 
-	assert.Equal(t, 4, len(values))
+	assert.Len(t, values, 4)
 
 	expected := slice.Of(1, 2, 3, 4)
 	assert.Equal(t, expected, values)
@@ -39,7 +39,7 @@ func Test_Set_Iterate(t *testing.T) {
 		out[v] = v
 	}
 
-	assert.Equal(t, len(expected), len(out))
+	assert.Len(t, out, len(expected))
 	for k := range out {
 		assert.True(t, set.Contains(k))
 	}
@@ -47,7 +47,7 @@ func Test_Set_Iterate(t *testing.T) {
 	out = make(map[int]int, 0)
 	set.ForEach(func(n int) { out[n] = n })
 
-	assert.Equal(t, len(expected), len(out))
+	assert.Len(t, out, len(expected))
 	for k := range out {
 		assert.True(t, set.Contains(k))
 	}
@@ -71,7 +71,7 @@ func Test_Set_FilterMapReduce(t *testing.T) {
 func Test_Set_Group_By_Iterator(t *testing.T) {
 	groups := seq.Group(set.Of(0, 1, 1, 2, 4, 3, 1, 6, 7).All, func(e int) bool { return e%2 == 0 }, as.Is[int])
 
-	assert.Equal(t, len(groups), 2)
+	assert.Len(t, groups, 2)
 	fg := sort.Asc(groups[false])
 
 	tg := sort.Asc(groups[true])
@@ -114,7 +114,6 @@ func Test_Set_Convert(t *testing.T) {
 }
 
 func Test_Set_Flatt(t *testing.T) {
-
 	var (
 		ints        = set.Of(3, 3, 1, 1, 1, 5, 6, 8, 8, 0, -2, -2)
 		fints       = set.Flat(ints, func(i int) []int { return slice.Of(i) })
@@ -141,7 +140,6 @@ func Test_Set_Zero(t *testing.T) {
 
 	_, ok := set.Head()
 	assert.False(t, ok)
-
 }
 
 type user struct {

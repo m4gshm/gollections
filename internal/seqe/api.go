@@ -137,7 +137,6 @@ func Firstt[S ~SeqE[T], T any](seq S, predicate func(T) (bool, error)) (v T, ok 
 			return false
 		} else if err != nil {
 			return false
-
 		}
 		return true
 	})

@@ -2,14 +2,14 @@
 package stablesort
 
 import (
-	"golang.org/x/exp/constraints"
+	"cmp"
 
 	"github.com/m4gshm/gollections/slice"
 	"github.com/m4gshm/gollections/slice/clone"
 )
 
 // By makes clone of stable sorted elements by converting them to Ordered values and applying the operator <
-func By[T any, O constraints.Ordered, TS ~[]T](elements TS, orderConverter func(T) O) TS {
+func By[T any, O cmp.Ordered, TS ~[]T](elements TS, orderConverter func(T) O) TS {
 	return slice.StableSortAsc(clone.Of(elements), orderConverter)
 }
 
@@ -19,6 +19,6 @@ func ByLess[T any, TS ~[]T](elements TS, comparer func(T, T) int) TS {
 }
 
 // Asc makes clone of stable sorted orderable elements
-func Asc[T constraints.Ordered, TS ~[]T](elements TS) TS {
+func Asc[T cmp.Ordered, TS ~[]T](elements TS) TS {
 	return By(elements, func(o T) T { return o })
 }

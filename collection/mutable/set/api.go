@@ -2,7 +2,7 @@
 package set
 
 import (
-	"golang.org/x/exp/constraints"
+	"cmp"
 
 	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/collection/mutable"
@@ -31,7 +31,7 @@ func NewCap[T comparable](capacity int) *mutable.Set[T] {
 }
 
 // Sort sorts a Set in-place by a converter that thransforms an element to an Ordered (int, string and so on).
-func Sort[T comparable, F constraints.Ordered](s *mutable.Set[T], by func(T) F) *ordered.Set[T] {
+func Sort[T comparable, F cmp.Ordered](s *mutable.Set[T], by func(T) F) *ordered.Set[T] {
 	return collection.Sort(s, by)
 }
 

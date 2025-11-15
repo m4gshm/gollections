@@ -15,8 +15,8 @@ func Test_ValueTypeAlwaysNotNil(t *testing.T) {
 }
 
 func Test_NilIsNil(t *testing.T) {
-	assert.False(t, NotNil[interface{}](nil))
-	assert.True(t, Nil[interface{}](nil))
+	assert.False(t, NotNil[any](nil))
+	assert.True(t, Nil[any](nil))
 }
 
 func Test_RealNil(t *testing.T) {
@@ -28,7 +28,6 @@ func Test_RealNil(t *testing.T) {
 }
 
 func Test_NilStruct(t *testing.T) {
-
 	type someStruct struct{ somField string }
 
 	v := someStruct{somField: "someValue"}
@@ -41,7 +40,7 @@ func Test_NilStruct(t *testing.T) {
 	assert.True(t, Nil(r))
 	assert.True(t, Nil[*someStruct](nil))
 
-	var i interface{}
+	var i any
 	assert.False(t, Nil(&i))
 }
 
@@ -50,5 +49,4 @@ func Test_ZeroStruct(t *testing.T) {
 
 	var v someStruct
 	assert.True(t, Zero(v))
-
 }

@@ -23,10 +23,8 @@ func Benchmark_Nil_StaticFunc(b *testing.B) {
 }
 
 func Benchmark_Nil_StaticFuncInterface(b *testing.B) {
+	Nil := func(i any) bool { return i == nil }
 
-	Nil := func(i interface{}) bool { return i == nil }
-
-	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_ = Nil(nil)
 	}

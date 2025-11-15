@@ -649,7 +649,6 @@ func Test_Filter(t *testing.T) {
 	r, err = seq.Conv(s, noErr).Filter(even).Slice()
 	assert.Equal(t, slice.Of(4, 8), r)
 	assert.NoError(t, err)
-
 }
 
 func Test_Filt(t *testing.T) {
@@ -918,10 +917,12 @@ func Test_Group(t *testing.T) {
 func Test_TrackEach(t *testing.T) {
 	var out []int
 	s2 := seq.ToSeq2(seq.RangeClosed(-1, 3), errOn(2))
-	seqe.ForEach(s2, func(v int) { out = append(out, v) })
+	err := seqe.ForEach(s2, func(v int) { out = append(out, v) })
+	assert.ErrorIs(t, err, errStop)
 	assert.Equal(t, slice.Of(-1, 0, 1), out)
 
 	out = nil
-	seq.Conv(seq.RangeClosed(-1, 3), errOn(2)).ForEach(func(v int) { out = append(out, v) })
+	err = seq.Conv(seq.RangeClosed(-1, 3), errOn(2)).ForEach(func(v int) { out = append(out, v) })
+	assert.ErrorIs(t, err, errStop)
 	assert.Equal(t, slice.Of(-1, 0, 1), out)
 }

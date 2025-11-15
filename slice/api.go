@@ -3,6 +3,7 @@ package slice
 
 import (
 	"bytes"
+	"cmp"
 	"fmt"
 	"slices"
 	"unsafe"
@@ -77,12 +78,12 @@ func OfSourceNext[S, T any](source S, hasNext func(S) bool, pushNext func(S, *T)
 	return OfNext(func() bool { return hasNext(source) }, func(next *T) error { return pushNext(source, next) })
 }
 
-// OfIndexed builds a slice by extracting elements from an indexed soruce.
+// OfIndexed builds a slice by extracting elements from an indexed source.
 // the len is length ot the source.
 // the getAt retrieves an element by its index from the source.
 func OfIndexed[T any](amount int, getAt func(int) T) []T {
 	r := make([]T, amount)
-	for i := 0; i < amount; i++ {
+	for i := range amount {
 		r[i] = getAt(i)
 	}
 	return r
@@ -422,7 +423,6 @@ func Flat[FS ~[]From, From any, TS ~[]To, To any](elements FS, flattener func(Fr
 	var result = make([]To, 0, int(float32(len(elements))*1.618))
 	for _, e := range elements {
 		result = append(result, flattener(e)...)
-
 	}
 	return result
 }
@@ -440,7 +440,6 @@ func FlatSeq[FS ~[]From, From any, STo ~Seq[To], To any](elements FS, flattener 
 		for f := range flattener(e) {
 			result = append(result, f)
 		}
-
 	}
 	return result
 }
@@ -461,7 +460,6 @@ func Flatt[FS ~[]From, From, To any](elements FS, flattener func(From) ([]To, er
 			return result, err
 		}
 		result = append(result, f...)
-
 	}
 	return result, nil
 }
@@ -664,9 +662,9 @@ func RangeClosed[T constraints.Integer | rune](from T, toInclusive T) []T {
 
 	elements := make([]T, amount)
 	e := from
-	for i := 0; i < int(amount); i++ {
+	for i := range int(amount) {
 		elements[i] = e
-		e = e + T(delta)
+		e += T(delta)
 	}
 	return elements
 }
@@ -684,9 +682,9 @@ func Range[T constraints.Integer | rune](from T, toExclusive T) []T {
 	}
 	elements := make([]T, amount)
 	e := from
-	for i := T(0); i < T(amount); i++ {
+	for i := T(0); i < amount; i++ {
 		elements[i] = e
-		e = e + delta
+		e += delta
 	}
 	return elements
 }
@@ -724,22 +722,22 @@ func StableSort[TS ~[]T, T any](elements TS, comparer Comparer[T]) TS {
 }
 
 // SortAsc sorts elements in ascending order, using the orderConverner function to retrieve a value of type Ordered.
-func SortAsc[T any, O constraints.Ordered, TS ~[]T](elements TS, orderConverner func(T) O) TS {
+func SortAsc[T any, O cmp.Ordered, TS ~[]T](elements TS, orderConverner func(T) O) TS {
 	return Sort(elements, comparer.Of(orderConverner))
 }
 
 // StableSortAsc sorts elements in ascending order, using the orderConverner function to retrieve a value of type Ordered.
-func StableSortAsc[T any, O constraints.Ordered, TS ~[]T](elements TS, orderConverner func(T) O) TS {
+func StableSortAsc[T any, O cmp.Ordered, TS ~[]T](elements TS, orderConverner func(T) O) TS {
 	return StableSort(elements, comparer.Of(orderConverner))
 }
 
 // SortDesc sorts elements in descending order, using the orderConverner function to retrieve a value of type Ordered.
-func SortDesc[T any, O constraints.Ordered, TS ~[]T](elements TS, orderConverner func(T) O) TS {
+func SortDesc[T any, O cmp.Ordered, TS ~[]T](elements TS, orderConverner func(T) O) TS {
 	return Sort(elements, comparer.Reverse(orderConverner))
 }
 
 // StableSortDesc sorts elements in descending order, using the orderConverner function to retrieve a value of type Ordered.
-func StableSortDesc[T any, O constraints.Ordered, TS ~[]T](elements TS, orderConverner func(T) O) TS {
+func StableSortDesc[T any, O cmp.Ordered, TS ~[]T](elements TS, orderConverner func(T) O) TS {
 	return StableSort(elements, comparer.Reverse(orderConverner))
 }
 
@@ -1027,22 +1025,12 @@ func HasAny[TS ~[]T, T any](elements TS, condition func(T) bool) bool {
 
 // Contains checks is the 'elements' slice contains the example
 func Contains[TS ~[]T, T comparable](elements TS, example T) bool {
-	for _, e := range elements {
-		if e == example {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(elements, example)
 }
 
 // Has checks is the 'elements' slice contains a value that satisfies the specified condition
 func Has[TS ~[]T, T any](elements TS, condition func(T) bool) bool {
-	for _, e := range elements {
-		if condition(e) {
-			return true
-		}
-	}
-	return false
+	return slices.ContainsFunc(elements, condition)
 }
 
 // IsEmpty checks whether the specified slice is empty
@@ -1122,7 +1110,7 @@ func AppendMapResolvv[TS ~[]T, T any, K comparable, VR, V any](elements TS, kvEx
 }
 
 // AppendMapResolvOrder collects key\value elements into the 'dest' map by iterating over the elements with resolving of duplicated key values.
-// Additionaly populates the 'order' slice by the keys ordered by the time they were added and the resolved key\value map.
+// Additionally populates the 'order' slice by the keys ordered by the time they were added and the resolved key\value map.
 func AppendMapResolvOrder[TS ~[]T, T any, K comparable, V, VR any](elements TS, keyExtractor func(T) K, valExtractor func(T) V, resolver func(exists bool, key K, existVal VR, val V) VR, order []K, dest map[K]VR) ([]K, map[K]VR) {
 	if dest == nil || keyExtractor == nil || valExtractor == nil {
 		dest = map[K]VR{}
@@ -1139,7 +1127,7 @@ func AppendMapResolvOrder[TS ~[]T, T any, K comparable, V, VR any](elements TS, 
 }
 
 // AppendMapResolvOrderr collects key\value elements into the 'dest' map by iterating over the elements with resolving of duplicated key values.
-// Additionaly populates the 'order' slice by the keys ordered by the time they were added and the resolved key\value map.
+// Additionally populates the 'order' slice by the keys ordered by the time they were added and the resolved key\value map.
 func AppendMapResolvOrderr[TS ~[]T, T any, K comparable, V, VR any](elements TS, kvExtractor func(T) (K, V, error), resolver func(exists bool, key K, existVal VR, val V) (VR, error), order []K, dest map[K]VR) ([]K, map[K]VR, error) {
 	if dest == nil || kvExtractor == nil || resolver == nil {
 		dest = map[K]VR{}

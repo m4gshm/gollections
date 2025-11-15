@@ -16,18 +16,18 @@ import (
 )
 
 var (
-	toString   = func(i int) string { return fmt.Sprintf("%d", i) }
-	addTail    = func(s string) string { return s + "_tail" }
-	even       = func(v int) bool { return v%2 == 0 }
-	max        = 100000
-	values     = range_.Closed(1, max)
-	threshhold = max / 2
+	toString      = func(i int) string { return fmt.Sprintf("%d", i) }
+	addTail       = func(s string) string { return s + "_tail" }
+	even          = func(v int) bool { return v%2 == 0 }
+	maxValOfRange = 100000
+	values        = range_.Closed(1, maxValOfRange)
+	threshold     = maxValOfRange / 2
 )
 
 func Benchmark_First_PlainOld(b *testing.B) {
-	op := func(i int) bool { return i > threshhold }
+	op := func(i int) bool { return i > threshold }
 	var f int
-	b.ResetTimer()
+
 	for i := 0; i < b.N; i++ {
 		for _, v := range values {
 			if op(v) {
@@ -37,53 +37,53 @@ func Benchmark_First_PlainOld(b *testing.B) {
 		}
 	}
 	b.StopTimer()
-	assert.Equal(b, threshhold+1, f)
+	assert.Equal(b, threshold+1, f)
 }
 
 func Benchmark_First_Slice(b *testing.B) {
-	op := func(i int) bool { return i > threshhold }
+	op := func(i int) bool { return i > threshold }
 	var f int
-	b.ResetTimer()
+
 	for i := 0; i < b.N; i++ {
 		f, _ = slice.First(values, op)
 	}
 	b.StopTimer()
-	assert.Equal(b, threshhold+1, f)
+	assert.Equal(b, threshold+1, f)
 }
 
 func Benchmark_FirstI_Slice(b *testing.B) {
-	op := func(i int) bool { return i > threshhold }
+	op := func(i int) bool { return i > threshold }
 	var f, ind int
-	b.ResetTimer()
+
 	for i := 0; i < b.N; i++ {
 		f, ind = slice.FirstI(values, op)
 	}
 	b.StopTimer()
-	assert.Equal(b, threshhold+1, f)
-	assert.Equal(b, threshhold, ind)
+	assert.Equal(b, threshold+1, f)
+	assert.Equal(b, threshold, ind)
 }
 
 func Benchmark_Last_Slice(b *testing.B) {
 	op := func(i int) bool { return i < 50000 }
 	var f int
-	b.ResetTimer()
+
 	for i := 0; i < b.N; i++ {
 		f, _ = slice.Last(values, op)
 	}
 	b.StopTimer()
-	assert.Equal(b, threshhold-1, f)
+	assert.Equal(b, threshold-1, f)
 }
 
 func Benchmark_LastI_Slice(b *testing.B) {
 	op := func(i int) bool { return i < 50000 }
 	var f, ind int
-	b.ResetTimer()
+
 	for i := 0; i < b.N; i++ {
 		f, ind = slice.LastI(values, op)
 	}
 	b.StopTimer()
-	assert.Equal(b, threshhold-1, f)
-	assert.Equal(b, threshhold-2, ind)
+	assert.Equal(b, threshold-1, f)
+	assert.Equal(b, threshold-2, ind)
 }
 
 func Benchmark_ConvertAndFilter_Slice_Seq(b *testing.B) {
@@ -94,7 +94,7 @@ func Benchmark_ConvertAndFilter_Slice_Seq(b *testing.B) {
 	)
 	items := slice.Of(1, 2, 3, 4, 5)
 	var s []string
-	b.ResetTimer()
+
 	for i := 0; i < b.N; i++ {
 		s = seq.Slice(seq.Convert(seq.Filter(seq.Of(items...), even), convert.And(toString, addTail)))
 	}
@@ -109,18 +109,15 @@ func Benchmark_ConvertAndFilter_Slice_PlainOld(b *testing.B) {
 	)
 
 	items := []int{1, 2, 3, 4, 5}
-	var s []string
-	b.ResetTimer()
-	for j := 0; j < b.N; j++ {
+	for i := 0; i < b.N; i++ {
 		s := make([]string, 0)
 		for _, i := range items {
 			if i%2 == 0 {
 				s = append(s, convert.And(toString, addTail)(i))
 			}
 		}
+		_ = s
 	}
-	_ = s
-	// fmt.Println(b.Name(), s)
 	b.StopTimer()
 }
 
@@ -155,8 +152,8 @@ func Benchmark_Flatt_Seq(b *testing.B) {
 
 func Benchmark_Flatt_Slice_PlainOld(b *testing.B) {
 	multiDimension := [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
-	b.ResetTimer()
-	for j := 0; j < b.N; j++ {
+
+	for i := 0; i < b.N; i++ {
 		oneDimension := make([]int, 0)
 		for _, i := range multiDimension {
 			for _, ii := range i {
@@ -167,6 +164,7 @@ func Benchmark_Flatt_Slice_PlainOld(b *testing.B) {
 				}
 			}
 		}
+		_ = oneDimension
 	}
 	b.StopTimer()
 }
@@ -207,9 +205,9 @@ func Benchmark_ReduceSum_Slice(b *testing.B) {
 func Benchmark_ReduceSum_Slice_PlainOld(b *testing.B) {
 	multiDimension := [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
 	expected := 1 + 3 + 5 + 7
-	b.ResetTimer()
+
 	result := 0
-	for j := 0; j < b.N; j++ {
+	for i := 0; i < b.N; i++ {
 		result = 0
 		for _, i := range multiDimension {
 			for _, ii := range i {
@@ -230,9 +228,9 @@ func Benchmark_ReduceSum_Slice_PlainOld(b *testing.B) {
 func Benchmark_ReduceSum_Slice_PlainOld_Index(b *testing.B) {
 	multiDimension := [][][]int{{{1, 2, 3}, {4, 5, 6}}, {{7}, nil}, nil}
 	expected := 1 + 3 + 5 + 7
-	b.ResetTimer()
+
 	result := 0
-	for j := 0; j < b.N; j++ {
+	for i := 0; i < b.N; i++ {
 		result = 0
 		for i := range multiDimension {
 			for ii := range multiDimension[i] {
@@ -295,8 +293,8 @@ func Benchmark_ConvertFlattStructure_Slice_PlainOld(b *testing.B) {
 		}
 		return names
 	}
-	b.ResetTimer()
-	for j := 0; j < b.N; j++ {
+
+	for i := 0; i < b.N; i++ {
 		_ = flattener(items)
 	}
 	b.StopTimer()

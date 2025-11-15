@@ -21,7 +21,7 @@ func Test_VectorIterate_All(t *testing.T) {
 		out = append(out, v)
 	}
 
-	assert.Equal(t, len(expected), len(out))
+	assert.Len(t, out, len(expected))
 
 	for i := range out {
 		assert.Equal(t, out[i], expected[i])

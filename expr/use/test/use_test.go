@@ -75,10 +75,10 @@ func Test_UseIfElseGet(t *testing.T) {
 }
 
 func Test_UseIfElseErr(t *testing.T) {
-	result, e := use.If(false, 1).ElseErr(err)
+	_, e := use.If(false, 1).ElseErr(err)
 	assert.Error(t, e)
 
-	result, e = use.If(true, 1).ElseErr(err)
+	result, e := use.If(true, 1).ElseErr(err)
 	assert.NoError(t, e)
 	assert.Equal(t, 1, result)
 

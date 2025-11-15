@@ -26,7 +26,8 @@ func Test_Map_FromSeq(t *testing.T) {
 }
 
 func iterCheck(t *testing.T, ordered *ordered.Map[int, string]) {
-	assert.Equal(t, 4, len(ordered.Map()))
+	t.Helper()
+	assert.Len(t, ordered.Map(), 4)
 
 	expectedK := slice.Of(1, 2, 4, 3)
 	expectedV := slice.Of("1", "2", "4", "3")
@@ -47,12 +48,12 @@ func iterCheck(t *testing.T, ordered *ordered.Map[int, string]) {
 func Test_Map_Add(t *testing.T) {
 	d := omap.New[int, string](4)
 	s := d.SetNew(1, "1")
-	assert.Equal(t, s, true)
+	assert.True(t, s)
 	d.Set(2, "2")
 	d.Set(4, "4")
 	d.Set(3, "3")
 	s = d.SetNew(1, "11")
-	assert.Equal(t, s, false)
+	assert.False(t, s)
 
 	assert.Equal(t, slice.Of(1, 2, 4, 3), d.Keys().Slice())
 	assert.Equal(t, slice.Of("1", "2", "4", "3"), d.Values().Slice())
@@ -70,7 +71,7 @@ func Test_Map_Nil(t *testing.T) {
 	m.SetMap(map_.Of(k.V("d", "D")))
 
 	out := m.Map()
-	assert.Equal(t, 0, len(out))
+	assert.Empty(t, out)
 
 	e := m.IsEmpty()
 	assert.True(t, e)
@@ -91,7 +92,6 @@ func Test_Map_Nil(t *testing.T) {
 	m.Values().ForEach(nil)
 	// m.Values().Convert(nil).For(nil)
 	m.Values().Filter(nil).ForEach(nil)
-
 }
 
 func Test_Map_Zero(t *testing.T) {
@@ -107,7 +107,7 @@ func Test_Map_Zero(t *testing.T) {
 	m.SetMap(map_.Of(k.V("d", "D")))
 
 	out := m.Map()
-	assert.Equal(t, 3, len(out))
+	assert.Len(t, out, 3)
 
 	e := m.IsEmpty()
 	assert.False(t, e)
@@ -151,7 +151,7 @@ func Test_Map_new(t *testing.T) {
 	m.SetMap(map_.Of(k.V("d", "D")))
 
 	out := m.Map()
-	assert.Equal(t, 3, len(out))
+	assert.Len(t, out, 3)
 
 	e := m.IsEmpty()
 	assert.False(t, e)

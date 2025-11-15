@@ -6,7 +6,6 @@ import (
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/collection"
-	"github.com/m4gshm/gollections/notsafe"
 	"github.com/m4gshm/gollections/seq"
 	"github.com/m4gshm/gollections/slice"
 )
@@ -93,7 +92,7 @@ func (v *Vector[T]) Len() int {
 	if v == nil {
 		return 0
 	}
-	return notsafe.GetLen(*v)
+	return len(*v)
 }
 
 // TrackEach applies consumer to elements without error checking
@@ -105,7 +104,7 @@ func (v *Vector[T]) TrackEach(consumer func(int, T)) {
 
 // ForEach applies consumer to elements without error checking
 func (v *Vector[T]) ForEach(consumer func(T)) {
-	if !(v == nil) {
+	if v != nil {
 		slice.ForEach(*v, consumer)
 	}
 }

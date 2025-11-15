@@ -43,7 +43,6 @@ func (s *Set[T]) All(consumer func(T) bool) {
 			return
 		}
 	}
-
 }
 
 // Head returns the first element.
@@ -153,14 +152,14 @@ func (s *Set[T]) AddOneNew(element T) (ok bool) {
 
 // AddAll inserts all elements from the "other" sequence.
 func (s *Set[T]) AddAll(elements seq.Seq[T]) {
-	if !(s == nil || elements == nil) {
+	if s != nil && elements != nil {
 		seq.ForEach(elements, s.AddOne)
 	}
 }
 
 // AddAllNew inserts elements from the "other" sequence if they are not contained in the collection.
 func (s *Set[T]) AddAllNew(other seq.Seq[T]) (ok bool) {
-	if !(s == nil || other == nil) {
+	if s != nil && other != nil {
 		seq.ForEach(other, func(element T) { ok = s.AddOneNew(element) || ok })
 	}
 	return ok
@@ -196,7 +195,7 @@ func (s *Set[T]) DeleteActual(elements ...T) bool {
 
 // DeleteActualOne removes an element only if it is contained in the collection
 func (s *Set[T]) DeleteActualOne(element T) (ok bool) {
-	if !(s == nil || s.elements == nil) {
+	if s != nil && s.elements != nil {
 		if _, ok = s.elements[element]; ok {
 			delete(s.elements, element)
 		}

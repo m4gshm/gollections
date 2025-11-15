@@ -1,0 +1,72 @@
+version: "2"
+linters:
+  default: "all"
+  disable:
+    - inamedparam
+    - paralleltest
+    # - revive
+    - noinlineerr
+    - nlreturn
+    - varnamelen
+    - wrapcheck
+    - wsl
+    - wsl_v5
+    - nonamedreturns
+    - testpackage
+    - mnd
+    - lll
+    - ireturn
+    - gosec
+    - godot
+    - depguard
+    - godox
+  exclusions:
+    rules:
+      - path: op/api\.go
+        linters:
+          - err113
+      - path: collection/mutable/sync/map\.go
+        linters:
+          - forcetypeassert
+      - path: seq/
+        linters:
+          - intrange
+      - path: internal/examples
+        linters:
+          - staticcheck
+          - whitespace
+          - wastedassign
+          - testifylint
+          - gochecknoglobals
+          - forbidigo
+          - exhaustruct
+          - goconst
+          - gocritic
+          - revive
+      - path: _test\.go
+        linters:
+          - gochecknoglobals
+          - unused
+          - perfsprint
+          - predeclared
+          - prealloc
+          - makezero
+          - err113
+          - intrange
+          - modernize
+          - gocritic
+  settings:
+    revive:
+      rules:
+        - name: var-naming
+          disabled: true
+          severity: warning
+    gocritic:
+      settings:
+        ifElseChain:
+          minThreshold: 4
+    exhaustruct:
+      allow-empty: true
+    testifylint:
+      disable:
+        - require-error

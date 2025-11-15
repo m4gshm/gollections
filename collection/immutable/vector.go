@@ -5,7 +5,6 @@ import (
 
 	"github.com/m4gshm/gollections/c"
 	"github.com/m4gshm/gollections/collection"
-	"github.com/m4gshm/gollections/notsafe"
 	"github.com/m4gshm/gollections/seq"
 	"github.com/m4gshm/gollections/slice"
 )
@@ -66,7 +65,7 @@ func (v Vector[T]) Append(out []T) []T {
 
 // Len returns amount of elements
 func (v Vector[T]) Len() int {
-	return notsafe.GetLen(v.elements)
+	return len(v.elements)
 }
 
 // IsEmpty returns true if the collection is empty

@@ -25,8 +25,9 @@ func Test_Map_FromSeq(t *testing.T) {
 }
 
 func iterCheck(t *testing.T, m ordered.Map[int, string]) {
+	t.Helper()
 	assert.Equal(t, 4, m.Len())
-	assert.Equal(t, 4, len(m.Map()))
+	assert.Len(t, m.Map(), 4)
 
 	expectedK := slice.Of(1, 2, 4, 3)
 	expectedV := slice.Of("1", "2", "4", "3")
@@ -48,7 +49,7 @@ func iterCheck(t *testing.T, m ordered.Map[int, string]) {
 
 func Test_Map_Iterate_Keys(t *testing.T) {
 	ordered := map_.Of(k.V(1, "1"), k.V(1, "1"), k.V(2, "2"), k.V(4, "4"), k.V(3, "3"), k.V(1, "1"))
-	assert.Equal(t, 4, len(ordered.Map()))
+	assert.Len(t, ordered.Map(), 4)
 
 	expectedK := slice.Of(1, 2, 4, 3)
 
@@ -57,12 +58,11 @@ func Test_Map_Iterate_Keys(t *testing.T) {
 		keys = append(keys, key)
 	}
 	assert.Equal(t, expectedK, keys)
-
 }
 
 func Test_Map_Iterate_Values(t *testing.T) {
 	ordered := map_.Of(k.V(1, "1"), k.V(1, "1"), k.V(2, "2"), k.V(4, "4"), k.V(3, "3"), k.V(1, "1"))
-	assert.Equal(t, 4, len(ordered.Map()))
+	assert.Len(t, ordered.Map(), 4)
 
 	expectedV := slice.Of("1", "2", "4", "3")
 
@@ -80,7 +80,7 @@ func Test_Map_Zero(t *testing.T) {
 	m.Contains("")
 
 	out := m.Map()
-	assert.Equal(t, 0, len(out))
+	assert.Empty(t, out)
 
 	e := m.IsEmpty()
 	assert.True(t, e)

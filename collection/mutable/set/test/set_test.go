@@ -25,7 +25,7 @@ func Test_Set_Iterate(t *testing.T) {
 	set := set.Of(1, 1, 2, 4, 3, 1)
 	values := sort.Asc(set.Slice())
 
-	assert.Equal(t, 4, len(values))
+	assert.Len(t, values, 4)
 
 	expected := slice.Of(1, 2, 3, 4)
 	assert.Equal(t, expected, values)
@@ -38,7 +38,7 @@ func Test_Set_Iterate(t *testing.T) {
 		out[v] = v
 	}
 
-	assert.Equal(t, len(expected), len(out))
+	assert.Len(t, out, len(expected))
 	for k := range out {
 		assert.True(t, set.Contains(k))
 	}
@@ -46,7 +46,7 @@ func Test_Set_Iterate(t *testing.T) {
 	out = make(map[int]int, 0)
 	set.ForEach(func(n int) { out[n] = n })
 
-	assert.Equal(t, len(expected), len(out))
+	assert.Len(t, expected, len(out))
 	for k := range out {
 		assert.True(t, set.Contains(k))
 	}
@@ -55,9 +55,9 @@ func Test_Set_Iterate(t *testing.T) {
 func Test_Set_AddVerify(t *testing.T) {
 	set := set.NewCap[int](0)
 	added := set.AddNew(1, 2, 4, 3)
-	assert.Equal(t, added, true)
+	assert.True(t, added)
 	added = set.AddOneNew(1)
-	assert.Equal(t, added, false)
+	assert.False(t, added)
 
 	values := sort.Asc(set.Slice())
 
@@ -96,7 +96,7 @@ func Test_Set_Delete(t *testing.T) {
 		set.Delete(v)
 	}
 
-	assert.Equal(t, 0, len(set.Slice()))
+	assert.Empty(t, set.Slice())
 }
 
 func Test_Set_Contains(t *testing.T) {

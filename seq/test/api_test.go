@@ -342,7 +342,7 @@ func Test_Skip(t *testing.T) {
 	assert.Equal(t, slice.Of(5, 6), result)
 	assert.Equal(t, result2, result)
 
-	skip = sequence.Skip(4)
+	result = sequence.Skip(4).Slice()
 	assert.Equal(t, result2, result)
 
 	result = seq.Slice(seq.Skip(0, sequence))
@@ -437,7 +437,6 @@ func Test_Firstt(t *testing.T) {
 
 	_, ok, _ = seq.Firstt[seq.Seq[int]](nil, allErr)
 	assert.False(t, ok)
-
 }
 
 var even = func(v int) bool { return v%2 == 0 }

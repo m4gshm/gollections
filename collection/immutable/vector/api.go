@@ -2,7 +2,7 @@
 package vector
 
 import (
-	"golang.org/x/exp/constraints"
+	"cmp"
 
 	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/collection/immutable"
@@ -25,7 +25,7 @@ func Wrap[T any](elements []T) immutable.Vector[T] {
 }
 
 // Sort copy the specified vector with sorted elements
-func Sort[T any, F constraints.Ordered](v immutable.Vector[T], by func(T) F) immutable.Vector[T] {
+func Sort[T any, F cmp.Ordered](v immutable.Vector[T], by func(T) F) immutable.Vector[T] {
 	return collection.Sort(v, by)
 }
 

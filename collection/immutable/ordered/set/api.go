@@ -2,7 +2,7 @@
 package set
 
 import (
-	"golang.org/x/exp/constraints"
+	"cmp"
 
 	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/collection/immutable/ordered"
@@ -25,7 +25,7 @@ func FromSeq[T comparable](seq seq.Seq[T]) ordered.Set[T] {
 }
 
 // Sort copy the specified set with sorted elements
-func Sort[T comparable, f constraints.Ordered](s ordered.Set[T], by func(T) f) ordered.Set[T] {
+func Sort[T comparable, f cmp.Ordered](s ordered.Set[T], by func(T) f) ordered.Set[T] {
 	return collection.Sort(s, by)
 }
 

@@ -12,10 +12,10 @@ import (
 )
 
 var (
-	max        = 100000
-	values     = range_.Closed(1, max)
-	resultInt  = 0
-	threshhold = max / 2
+	max       = 100000
+	values    = range_.Closed(1, max)
+	resultInt = 0
+	threshold = max / 2
 )
 
 func LowLoad(v int) {
@@ -99,7 +99,7 @@ func Benchmark_Loop_Slice_Embedded_ForByIndex(b *testing.B) {
 	for _, casee := range cases {
 		b.Run(casee.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				for j := 0; j < l; j++ {
+				for j := range l {
 					v := values[j]
 					casee.load(v)
 				}
@@ -110,7 +110,7 @@ func Benchmark_Loop_Slice_Embedded_ForByIndex(b *testing.B) {
 
 func Benchmark_Loop_Map_Embedded_ForByKeyValueRange(b *testing.B) {
 	values := map[int]struct{}{}
-	for i := 0; i < max; i++ {
+	for i := range max {
 		values[i] = struct{}{}
 	}
 	for _, casee := range cases {

@@ -57,7 +57,6 @@ func Test_OneOf(t *testing.T) {
 }
 
 func Test_Match_To(t *testing.T) {
-
 	oneEvenMatcher := match.To(as.Is[int], func(i int) bool { return i%2 == 0 })
 
 	assert.False(t, oneEvenMatcher(1))
@@ -67,14 +66,11 @@ func Test_Match_To(t *testing.T) {
 
 	assert.False(t, anyEvenMatcher(slice.Of(1, 2)))
 	assert.True(t, anyEvenMatcher(slice.Of(1, 2, 3)))
-
 }
 
 func Test_Match_Any(t *testing.T) {
-
 	anyEvenMatcher := match.Any(as.Is, func(i int) bool { return i%2 == 0 })
 
 	assert.False(t, anyEvenMatcher(slice.Of(1, 3)))
 	assert.True(t, anyEvenMatcher(slice.Of(1, 2)))
-
 }

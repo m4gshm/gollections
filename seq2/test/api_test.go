@@ -149,7 +149,6 @@ func pairSum(prev *string, i int, val string) string {
 }
 
 func Test_ReduceSum(t *testing.T) {
-
 	sum, ok := seq2.ReduceOK(seq.Of2("A", "B", "C"), pairSum)
 
 	assert.True(t, ok)
@@ -197,7 +196,7 @@ func Test_ReduceEmpty(t *testing.T) {
 	sum, ok := seq2.ReduceOK(s, pairSum)
 
 	assert.False(t, ok)
-	assert.Equal(t, "", sum)
+	assert.Empty(t, sum)
 }
 
 func Test_Head(t *testing.T) {

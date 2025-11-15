@@ -28,8 +28,9 @@ func Test_Map_FromSeq(t *testing.T) {
 }
 
 func iterCheck(t *testing.T, m *mutable.Map[int, string]) {
+	t.Helper()
 	assert.Equal(t, 4, m.Len())
-	assert.Equal(t, 4, len(m.Map()))
+	assert.Len(t, m.Map(), 4)
 
 	expectedK := slice.Of(1, 2, 3, 4)
 	expectedV := slice.Of("1", "2", "3", "4")
@@ -56,7 +57,7 @@ func iterCheck(t *testing.T, m *mutable.Map[int, string]) {
 
 func Test_Map_IterateOverRange(t *testing.T) {
 	unordered := map_.Of(k.V(1, "1"), k.V(1, "1"), k.V(2, "2"), k.V(4, "4"), k.V(3, "3"), k.V(1, "1"))
-	assert.Equal(t, 4, len(unordered.Map()))
+	assert.Len(t, unordered.Map(), 4)
 
 	expectedK := slice.Of(1, 2, 3, 4)
 	expectedV := slice.Of("1", "2", "3", "4")
@@ -84,14 +85,14 @@ func Test_Map_IterateOverRange(t *testing.T) {
 func Test_Map_Add(t *testing.T) {
 	d := map_.New[int, string](4)
 	s := d.SetNew(1, "1")
-	assert.Equal(t, s, true)
+	assert.True(t, s)
 
 	d.Set(2, "2")
 	d.Set(4, "4")
 	d.Set(3, "3")
 
 	s = d.SetNew(1, "11")
-	assert.Equal(t, s, false)
+	assert.False(t, s)
 
 	keys := d.Keys().Slice()
 	sort.Ints(keys)
@@ -111,7 +112,7 @@ func Test_Map_Nil(t *testing.T) {
 	m.SetMap(map_.Of(k.V("d", "D")))
 
 	out := m.Map()
-	assert.Equal(t, 0, len(out))
+	assert.Empty(t, out)
 
 	m.Delete("b")
 	var nilKeys []string
@@ -147,7 +148,7 @@ func Test_Map_Zero(t *testing.T) {
 	m.SetMap(map_.Of(k.V("d", "D")))
 
 	out := m.Map()
-	assert.Equal(t, 3, len(out))
+	assert.Len(t, out, 3)
 
 	m.Delete("b")
 	var nilKeys []string
@@ -186,7 +187,7 @@ func Test_Map_new(t *testing.T) {
 	m.SetMap(map_.Of(k.V("d", "D")))
 
 	out := m.Map()
-	assert.Equal(t, 3, len(out))
+	assert.Len(t, out, 3)
 
 	m.Delete("b")
 	var nilKeys []string

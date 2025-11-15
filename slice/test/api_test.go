@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"reflect"
 	"runtime"
 	"slices"
 	"strconv"
@@ -57,14 +56,15 @@ func Test_Reverse(t *testing.T) {
 	src := range_.Closed(3, -1)
 	reversed := slice.Reverse(src)
 	assert.Equal(t, slice.Of(-1, 0, 1, 2, 3), reversed)
-	assert.Equal(t, (*reflect.SliceHeader)(unsafe.Pointer(&src)).Data, (*reflect.SliceHeader)(unsafe.Pointer(&reversed)).Data)
+
+	assert.Equal(t, unsafe.SliceData(src), unsafe.SliceData(reversed))
 }
 
 func Test_ReverseCloned(t *testing.T) {
 	src := range_.Closed(3, -1)
 	reversed := reverse.Of(src)
 	assert.Equal(t, slice.Of(-1, 0, 1, 2, 3), reversed)
-	assert.NotEqual(t, (*reflect.SliceHeader)(unsafe.Pointer(&src)).Data, (*reflect.SliceHeader)(unsafe.Pointer(&reversed)).Data)
+	assert.NotEqual(t, unsafe.SliceData(src), unsafe.SliceData(reversed))
 }
 
 func Test_Clone(t *testing.T) {
@@ -107,7 +107,6 @@ func Test_DeepClone(t *testing.T) {
 }
 
 func Test_PointerClone(t *testing.T) {
-
 	s1 := "test"
 	p1 := &s1
 
@@ -231,12 +230,13 @@ var absPath2 = op.IfElse(runtime.GOOS == "windows", "c:\\usr\\bin", "/usr/bin")
 func TestConv(t *testing.T) {
 	if homeDir, err := os.UserHomeDir(); err != nil {
 		t.Error(err)
-	} else if err := os.Chdir(homeDir); err != nil {
-		t.Error(err)
-	} else if abs, err := slice.Conv(slice.Of(absPath, "././inTemp"), filepath.Abs); err != nil {
-		t.Error(err)
 	} else {
-		assert.Equal(t, slice.Of(absPath, filepath.Join(homeDir, "inTemp")), abs)
+		t.Chdir(homeDir)
+		if abs, err := slice.Conv(slice.Of(absPath, "././inTemp"), filepath.Abs); err != nil {
+			t.Error(err)
+		} else {
+			assert.Equal(t, slice.Of(absPath, filepath.Join(homeDir, "inTemp")), abs)
+		}
 	}
 }
 
@@ -254,7 +254,6 @@ func Test_ConvOK(t *testing.T) {
 			return i, false, err
 		}
 		return i, even(i), nil
-
 	})
 	var expected *strconv.NumError
 	assert.ErrorAs(t, err, &expected)
@@ -264,11 +263,9 @@ func Test_ConvOK(t *testing.T) {
 	r, err = slice.ConvOK(s, func(v string) (int, bool, error) {
 		i, err := strconv.Atoi(v)
 		return i, true, err
-
 	})
 	assert.NoError(t, err)
 	assert.Equal(t, []int{1, 3, 4, 5, 7, 8, 9, 11, 12}, r)
-
 }
 
 func Test_Conv(t *testing.T) {
@@ -396,7 +393,6 @@ func Test_FlattSeq(t *testing.T) {
 	})
 	assert.NoError(t, err)
 	assert.Equal(t, []int{1, 2, 3, 4, 5, 6}, f)
-
 }
 
 func Test_FlatAndConvert(t *testing.T) {
@@ -471,7 +467,6 @@ func Test_Filt2(t *testing.T) {
 	r, err := slice.Filt(s, func(i int) (bool, error) {
 		ok := i <= 7
 		return ok && even(i), op.IfElse(ok, nil, errors.New("abort"))
-
 	})
 	assert.Error(t, err)
 	assert.Equal(t, slice.Of(4), r)
@@ -530,8 +525,8 @@ func Test_BehaveAsStrings(t *testing.T) {
 	strs := slice.BehaveAsStrings(vals)
 
 	assert.Equal(t, []string{"1", "2", "3"}, strs)
-	pvals := unsafe.Pointer((*reflect.SliceHeader)(unsafe.Pointer(&vals)).Data)
-	pstrs := unsafe.Pointer((*reflect.SliceHeader)(unsafe.Pointer(&strs)).Data)
+	pvals := (*string)(unsafe.SliceData(vals))
+	pstrs := unsafe.SliceData(strs)
 	assert.Equal(t, pvals, pstrs)
 }
 
@@ -543,8 +538,8 @@ func Test_StringsBehaveAs(t *testing.T) {
 	strs := slice.StringsBehaveAs[ArrayTypeBasedOnString](vals)
 
 	assert.Equal(t, ArrayTypeBasedOnString{"1", "2", "3"}, strs)
-	pvals := unsafe.Pointer((*reflect.SliceHeader)(unsafe.Pointer(&vals)).Data)
-	pstrs := unsafe.Pointer((*reflect.SliceHeader)(unsafe.Pointer(&strs)).Data)
+	pvals := unsafe.SliceData(vals)
+	pstrs := (*string)(unsafe.SliceData(strs))
 	assert.Equal(t, pvals, pstrs)
 }
 
@@ -555,8 +550,8 @@ func Test_StringsBehaveAs2(t *testing.T) {
 	strs := slice.StringsBehaveAs[[]TypeBasedOnString](vals)
 
 	assert.Equal(t, []TypeBasedOnString{"1", "2", "3"}, strs)
-	pvals := unsafe.Pointer((*reflect.SliceHeader)(unsafe.Pointer(&vals)).Data)
-	pstrs := unsafe.Pointer((*reflect.SliceHeader)(unsafe.Pointer(&strs)).Data)
+	pvals := unsafe.SliceData(vals)
+	pstrs := (*string)(unsafe.SliceData(strs))
 	assert.Equal(t, pvals, pstrs)
 }
 
@@ -592,28 +587,28 @@ func Test_Sort(t *testing.T) {
 	src := range_.Closed(3, -1)
 	sorted := sort.Asc(src)
 	assert.Equal(t, slice.Of(-1, 0, 1, 2, 3), sorted)
-	assert.Equal(t, (*reflect.SliceHeader)(unsafe.Pointer(&src)).Data, (*reflect.SliceHeader)(unsafe.Pointer(&sorted)).Data)
+	assert.Equal(t, unsafe.SliceData(src), unsafe.SliceData(sorted))
 }
 
 func Test_SortCloned(t *testing.T) {
 	src := range_.Closed(3, -1)
 	sorted := csort.Asc(src)
 	assert.Equal(t, slice.Of(-1, 0, 1, 2, 3), sorted)
-	assert.NotEqual(t, (*reflect.SliceHeader)(unsafe.Pointer(&src)).Data, (*reflect.SliceHeader)(unsafe.Pointer(&sorted)).Data)
+	assert.NotEqual(t, unsafe.SliceData(src), unsafe.SliceData(sorted))
 }
 
 func Test_StableSort(t *testing.T) {
 	src := range_.Closed(3, -1)
 	sorted := stablesort.Asc(src)
 	assert.Equal(t, slice.Of(-1, 0, 1, 2, 3), sorted)
-	assert.Equal(t, (*reflect.SliceHeader)(unsafe.Pointer(&src)).Data, (*reflect.SliceHeader)(unsafe.Pointer(&sorted)).Data)
+	assert.Equal(t, unsafe.SliceData(src), unsafe.SliceData(sorted))
 }
 
 func Test_StableSortCloned(t *testing.T) {
 	src := range_.Closed(3, -1)
 	sorted := cstablesort.Asc(src)
 	assert.Equal(t, slice.Of(-1, 0, 1, 2, 3), sorted)
-	assert.NotEqual(t, (*reflect.SliceHeader)(unsafe.Pointer(&src)).Data, (*reflect.SliceHeader)(unsafe.Pointer(&sorted)).Data)
+	assert.NotEqual(t, unsafe.SliceData(src), unsafe.SliceData(sorted))
 }
 
 func Test_MatchAny(t *testing.T) {
@@ -748,7 +743,6 @@ func Test_Slice_AppendMapResolvOrderr(t *testing.T) {
 	assert.Equal(t, []int{2, 2, 4}, groups[true])
 	assert.Equal(t, []bool{true, false}, order)
 	assert.EqualError(t, err, "abort")
-
 }
 
 func Test_Slice_Filled(t *testing.T) {
@@ -783,7 +777,6 @@ func Test_Contains(t *testing.T) {
 	assert.True(t, slice.Contains(s, 5))
 	assert.False(t, slice.Contains(s, 12))
 	assert.False(t, slice.Contains(([]int)(nil), 12))
-
 }
 
 func Test_Upcast(t *testing.T) {

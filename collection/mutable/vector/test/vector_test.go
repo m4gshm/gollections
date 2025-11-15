@@ -30,7 +30,7 @@ func Test_Vector_Empty_IAll(t *testing.T) {
 	expected := []int{}
 	v := &mutable.Vector[int]{}
 	result := make([]int, v.Len())
-	for  _, it := range v.IAll {
+	for _, it := range v.IAll {
 		result = append(result, it)
 	}
 	assert.Equal(t, expected, result)
@@ -50,10 +50,7 @@ func Test_VectorIterateOverRange(t *testing.T) {
 	expected := slice.Of(1, 2, 3, 4)
 	v := vector.Of(1, 2, 3, 4)
 	result := make([]int, v.Len())
-	for i, val := range *v {
-		result[i] = val
-		i++
-	}
+	copy(result, *v)
 	assert.Equal(t, expected, result)
 }
 
@@ -175,7 +172,6 @@ func Test_Vector_new(t *testing.T) {
 	tail, ok := vec.Tail()
 	assert.True(t, ok)
 	assert.Equal(t, "d", tail)
-
 }
 
 func Test_Vector_AddAllOfSelf(t *testing.T) {
@@ -221,7 +217,7 @@ func Test_Vector_DeleteOne(t *testing.T) {
 	vec.DeleteOne(3)
 	assert.Equal(t, slice.Of("1", "1", "2", "3", "1"), vec.Slice())
 	r := vec.DeleteActualOne(5)
-	assert.Equal(t, r, false)
+	assert.False(t, r)
 }
 
 func Test_Vector_DeleteMany(t *testing.T) {
@@ -229,7 +225,7 @@ func Test_Vector_DeleteMany(t *testing.T) {
 	vec.Delete(3, 0, 5)
 	assert.Equal(t, slice.Of("1", "2", "4", "6"), vec.Slice())
 	r := vec.DeleteActual(5, 4)
-	assert.Equal(t, r, false)
+	assert.False(t, r)
 }
 
 func Test_Vector_DeleteManyFromTail(t *testing.T) {

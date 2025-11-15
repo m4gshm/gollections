@@ -2,7 +2,7 @@
 package vector
 
 import (
-	"golang.org/x/exp/constraints"
+	"cmp"
 
 	"github.com/m4gshm/gollections/collection"
 	"github.com/m4gshm/gollections/collection/mutable"
@@ -30,7 +30,7 @@ func FromSeq[T any](seq seq.Seq[T]) *mutable.Vector[T] {
 }
 
 // Sort sorts the specified vector in-place by a converter that thransforms an element to an Ordered (int, string and so on).
-func Sort[T any, F constraints.Ordered](v *mutable.Vector[T], by func(T) F) *mutable.Vector[T] {
+func Sort[T any, F cmp.Ordered](v *mutable.Vector[T], by func(T) F) *mutable.Vector[T] {
 	return collection.Sort(v, by)
 }
 

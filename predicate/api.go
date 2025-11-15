@@ -39,7 +39,7 @@ func Or[T any](p1, p2 Predicate[T]) Predicate[T] {
 
 // Xor makes an exclusive OR of two predicates
 func Xor[T any](p1, p2 Predicate[T]) Predicate[T] {
-	return func(v T) bool { return !(p1(v) == p2(v)) }
+	return func(v T) bool { return p1(v) != p2(v) }
 }
 
 // Union applies And to predicates
@@ -54,7 +54,7 @@ func Union[T any](predicates ...Predicate[T]) Predicate[T] {
 		return And(predicates[0], predicates[1])
 	}
 	return func(v T) bool {
-		for i := 0; i < len(predicates); i++ {
+		for i := range predicates {
 			if !predicates[i](v) {
 				return false
 			}

@@ -21,7 +21,7 @@ func Test_Set_Iterate_All(t *testing.T) {
 		out[v] = v
 	}
 
-	assert.Equal(t, len(expected), len(out))
+	assert.Len(t, out, len(expected))
 	for k := range out {
 		assert.True(t, set.Contains(k))
 	}

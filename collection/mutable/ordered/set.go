@@ -162,14 +162,14 @@ func (s *Set[T]) AddOneNew(element T) (ok bool) {
 
 // AddAll inserts all elements from the "other" sequence
 func (s *Set[T]) AddAll(other seq.Seq[T]) {
-	if !(s == nil || other == nil) {
+	if s != nil && other != nil {
 		seq.ForEach(other, s.AddOne)
 	}
 }
 
 // AddAllNew inserts elements from the "other" sequence if they are not contained in the collection
 func (s *Set[T]) AddAllNew(other seq.Seq[T]) (ok bool) {
-	if !(s == nil || other == nil) {
+	if s != nil && other != nil {
 		seq.ForEach(other, func(v T) { ok = s.AddOneNew(v) || ok })
 	}
 	return ok
@@ -199,7 +199,7 @@ func (s *Set[T]) DeleteActual(elements ...T) bool {
 
 // DeleteActualOne removes an element only if it is contained in the collection
 func (s *Set[T]) DeleteActualOne(element T) bool {
-	if !(s == nil || s.elements == nil) {
+	if s != nil && s.elements != nil {
 		elements := s.elements
 		if pos, ok := elements[element]; ok {
 			delete(elements, element)
