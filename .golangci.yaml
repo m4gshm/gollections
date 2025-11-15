@@ -20,7 +20,6 @@ linters:
     - godot
     - depguard
     - godox
-    - intrange
   exclusions:
     rules:
       - path: op/api\.go
@@ -57,11 +56,6 @@ linters:
           - modernize
           - gocritic
   settings:
-    staticcheck:
-      
-      checks:
-        - `QF1003:
-          ``
     revive:
       rules:
         - name: var-naming
