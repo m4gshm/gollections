@@ -1,3 +1,4 @@
+// Package predicate provides predicate key/value adapters
 package predicate
 
 // Key adapts a key appliable predicate to a key\value one

@@ -1,3 +1,4 @@
+// Package collection consists of common collection interfaces.
 package collection
 
 import (

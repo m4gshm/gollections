@@ -1,5 +1,5 @@
 // Package map_ provides immutable.Map constructors
-package map_ //nilint
+package map_ // nilint
 
 import (
 	"github.com/m4gshm/gollections/c"

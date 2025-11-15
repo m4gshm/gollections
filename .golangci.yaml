@@ -4,7 +4,7 @@ linters:
   disable:
     - inamedparam
     - paralleltest
-    - revive
+    # - revive
     - noinlineerr
     - nlreturn
     - varnamelen
@@ -18,7 +18,6 @@ linters:
     - ireturn
     - gosec
     - godot
-    - gocritic
     - depguard
     - godox
   exclusions:
@@ -42,6 +41,8 @@ linters:
           - forbidigo
           - exhaustruct
           - goconst
+          - gocritic
+          - revive
       - path: _test\.go
         linters:
           - gochecknoglobals
@@ -53,7 +54,18 @@ linters:
           - err113
           - intrange
           - modernize
+          - gocritic
   settings:
+    revive:
+      rules:
+        - name: var-naming
+          disabled: true
+          severity: warning
+          
+    gocritic:
+      settings:
+        ifElseChain:
+          minThreshold: 4
     exhaustruct:
       allow-empty: true
     testifylint:
