@@ -74,15 +74,16 @@ func Xor[T any](p1, p2 Predicate[T]) Predicate[T] {
 // Union applies And to predicates
 func Union[T any](predicates ...Predicate[T]) Predicate[T] {
 	l := len(predicates)
-	if l == 0 {
+	switch l {
+	case 0:
 		return func(_ T) (bool, error) { return false, nil }
-	} else if l == 1 {
+	case 1:
 		return predicates[0]
-	} else if l == 2 {
+	case 2:
 		return And(predicates[0], predicates[1])
 	}
 	return func(v T) (bool, error) {
-		for i := 0; i < len(predicates); i++ {
+		for i := range predicates {
 			if ok, err := predicates[i](v); err != nil {
 				return ok, err
 			} else if !ok {
