@@ -121,12 +121,12 @@ func (m Map[K, V]) FiltKey(filter func(K) (bool, error)) seq.SeqE[c.KV[K, V]] {
 }
 
 // ConvertKey returns a seq that applies the 'converter' function to keys of the map
-func (m Map[K, V]) ConvertKey(converter func(K) K) seq.Seq2[K, V] {
+func (m Map[K, V]) ConvertKey[KO comparable](converter func(K) KO) seq.Seq2[KO, V] {
 	return seq2.Convert(m.All, convert.Key[V](converter))
 }
 
 // ConvKey returns an errorable seq that applies the 'converter' function to keys of the map
-func (m Map[K, V]) ConvKey(converter func(K) (K, error)) seq.SeqE[c.KV[K, V]] {
+func (m Map[K, V]) ConvKey[KO comparable](converter func(K) (KO, error)) seq.SeqE[c.KV[KO, V]] {
 	return seq2.Conv(m.All, converte.Key[V](converter))
 }
 
@@ -141,12 +141,12 @@ func (m Map[K, V]) FiltValue(filter func(V) (bool, error)) seq.SeqE[c.KV[K, V]] 
 }
 
 // ConvertValue returns a seq that applies the 'converter' function to values of the map
-func (m Map[K, V]) ConvertValue(converter func(V) V) seq.Seq2[K, V] {
+func (m Map[K, V]) ConvertValue[VO any](converter func(V) VO) seq.Seq2[K, VO] {
 	return seq2.Convert(m.All, convert.Value[K](converter))
 }
 
 // ConvValue returns an errorable seq that applies the 'converter' function to values of the map
-func (m Map[K, V]) ConvValue(converter func(V) (V, error)) seq.SeqE[c.KV[K, V]] {
+func (m Map[K, V]) ConvValue[VO any](converter func(V) (VO, error)) seq.SeqE[c.KV[K, VO]] {
 	return seq2.Conv(m.All, converte.Value[K](converter))
 }
 
@@ -161,12 +161,12 @@ func (m Map[K, V]) Filt(filter func(K, V) (bool, error)) seq.SeqE[c.KV[K, V]] {
 }
 
 // Convert returns a seq that applies the 'converter' function to the collection elements
-func (m Map[K, V]) Convert(converter func(K, V) (K, V)) seq.Seq2[K, V] {
+func (m Map[K, V]) Convert[KO comparable, VO any](converter func(K, V) (KO, VO)) seq.Seq2[KO, VO] {
 	return seq2.Convert(m.All, converter)
 }
 
 // Conv returns an errorable seq that applies the 'converter' function to the collection elements
-func (m Map[K, V]) Conv(converter func(K, V) (K, V, error)) seq.SeqE[c.KV[K, V]] {
+func (m Map[K, V]) Conv[KO comparable, VO any](converter func(K, V) (KO, VO, error)) seq.SeqE[c.KV[KO, VO]] {
 	return seq2.Conv(m.All, converter)
 }
 

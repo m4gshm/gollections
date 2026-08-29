@@ -55,7 +55,7 @@ var namesByRole = group.ByMultipleKeys(users, func(u User) []string {
 
 ## Installation
 
-``` console
+```
 go get -u github.com/m4gshm/gollections
 ```
 
@@ -818,7 +818,7 @@ Provides implelentations of [Vector](./collection/iface.go#L25),
 [Set](./collection/iface.go#L35) and [Map](./collection/iface.go#L41).
 
 Mutables support content appending, updating and deleting (the ordered
-map implementation is not supported delete operations).  
+map implementation is not supported delete operations).\
 Immutables are read-only datasets.
 
 Detailed description of implementations [below](#mutable-collections).
@@ -842,7 +842,7 @@ bob, _ := slice.First(users, where.Eq(User.Name, "Bob"))
 ### Expressions: [use.If](./expr/use/api.go), [get.If](./expr/get/api.go), [first.Of](#firstof), [last.Of](#lastof)
 
 Aimed to evaluate a value using conditions. May cause to make code
-shorter by not in all cases.  
+shorter by not in all cases.\
 As example:
 
 ``` go

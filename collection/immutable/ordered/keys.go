@@ -84,12 +84,12 @@ func (m MapKeys[K]) Filt(filter func(K) (bool, error)) seq.SeqE[K] {
 }
 
 // Convert returns a seq that applies the 'converter' function to the collection elements
-func (m MapKeys[K]) Convert(converter func(K) K) seq.Seq[K] {
+func (m MapKeys[K]) Convert[O any](converter func(K) O) seq.Seq[O] {
 	return collection.Convert(m, converter)
 }
 
 // Conv returns an errorable seq that applies the 'converter' function to the collection elements
-func (m MapKeys[K]) Conv(converter func(K) (K, error)) seq.SeqE[K] {
+func (m MapKeys[K]) Conv[O any](converter func(K) (O, error)) seq.SeqE[O] {
 	return collection.Conv(m, converter)
 }
 

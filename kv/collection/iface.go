@@ -24,21 +24,6 @@ type Collection[K comparable, V any, M map[K]V | map[K][]V] interface {
 	All(consumer func(K, V) bool)
 }
 
-// Convertable provides limited kit of map transformation methods
-type Convertable[K, V any,
-	Seq2 ~func(yield func(K, V) bool),
-	SeqE ~func(yield func(c.KV[K, V], error) bool),
-] interface {
-	Convert(converter func(K, V) (K, V)) Seq2
-	Conv(converter func(K, V) (K, V, error)) SeqE
-
-	ConvertKey(converter func(K) K) Seq2
-	ConvertValue(converter func(V) V) Seq2
-
-	ConvKey(converter func(K) (K, error)) SeqE
-	ConvValue(converter func(V) (V, error)) SeqE
-}
-
 // Filterable provides limited kit of filering methods
 type Filterable[K, V any,
 	Seq2 ~func(yield func(K, V) bool),

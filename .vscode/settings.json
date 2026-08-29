@@ -12,5 +12,11 @@
     "go.formatFlags": [
         "fmt",
         "--stdin"
-    ]
+    ],
+    "yaml.schemas": {
+        "file:///c%3A/Users/mfour/.vscode-oss/extensions/continue.continue-2.0.0-win32-x64/config-yaml-schema.json": [
+            ".continue/**/*.yaml"
+        ],
+        "file:///c:/Users/mfour/.vscode-oss/extensions/continue.continue-2.0.0-win32-x64/config-yaml-schema.json": "file:///c%3A/Users/mfour/.continue/config.yaml"
+    }
 }

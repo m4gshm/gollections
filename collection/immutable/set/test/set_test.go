@@ -135,7 +135,7 @@ func Test_Set_Zero(t *testing.T) {
 
 	set.Slice()
 
-	set.Convert(nil)
+	set.Convert[any](nil)
 	set.Filter(nil)
 
 	_, ok := set.Head()

@@ -254,12 +254,12 @@ func (v *Vector[T]) Filt(filter func(T) (bool, error)) seq.SeqE[T] {
 }
 
 // Convert returns a seq that applies the 'converter' function to the collection elements
-func (v *Vector[T]) Convert(converter func(T) T) seq.Seq[T] {
+func (v *Vector[T]) Convert[O any](converter func(T) O) seq.Seq[O] {
 	return collection.Convert(v, converter)
 }
 
 // Conv returns an errorable seq that applies the 'converter' function to the collection elements
-func (v *Vector[T]) Conv(converter func(T) (T, error)) seq.SeqE[T] {
+func (v *Vector[T]) Conv[O any](converter func(T) (O, error)) seq.SeqE[O] {
 	return collection.Conv(v, converter)
 }
 

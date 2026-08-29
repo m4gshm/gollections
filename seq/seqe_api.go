@@ -100,12 +100,12 @@ func (s SeqE[T]) Filt(filter func(s T) (bool, error)) SeqE[T] {
 }
 
 // Convert creates an iterator that applies the 'converter' function to each iterable element.
-func (s SeqE[T]) Convert(converter func(t T) T) SeqE[T] {
+func (s SeqE[T]) Convert[O any](converter func(t T) O) SeqE[O] {
 	return seqe.Convert(s, converter)
 }
 
 // Conv creates an errorable seq that applies the 'converter' function to the collection elements.
-func (s SeqE[T]) Conv(converter func(T) (T, error)) SeqE[T] {
+func (s SeqE[T]) Conv[O any](converter func(T) (O, error)) SeqE[O] {
 	return seqe.Conv(s, converter)
 }
 
