@@ -8,6 +8,7 @@ on:
       - main
       - dev
       - "dev**"
+      - "go**"      
       - "releases/**"
       - "feature/**"
       - "bugfix/**"
