@@ -187,6 +187,7 @@ func ReduceOK[S ~SeqE[T], T any](seq S, merge func(T, T) T) (result T, ok bool, 
 	}
 	started := false
 	seq(func(v T, e error) bool {
+		//nolint:gocritic
 		if e != nil {
 			err = e
 			return false
@@ -215,6 +216,7 @@ func ReduceeOK[S ~SeqE[T], T any](seq S, merge func(T, T) (T, error)) (result T,
 	}
 	started := false
 	seq(func(v T, e error) bool {
+		//nolint:gocritic
 		if e != nil {
 			err = e
 			return false

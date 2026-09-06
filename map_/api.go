@@ -332,7 +332,7 @@ func ToStringOrderedf[M ~map[K]V, K comparable, V any](order []K, elements M, kv
 		if i > 0 {
 			_, _ = str.WriteString(delim)
 		}
-		str.WriteString(fmt.Sprintf(kvFormat, K, elements[K]))
+		fmt.Fprintf(&str, kvFormat, K, elements[K])
 	}
 	str.WriteString("]")
 	return str.String()
@@ -352,7 +352,7 @@ func ToStringf[M ~map[K]V, K comparable, V any](elements M, kvFormat, delim stri
 		if i > 0 {
 			_, _ = str.WriteString(delim)
 		}
-		str.WriteString(fmt.Sprintf(kvFormat, K, V))
+		fmt.Fprintf(&str, kvFormat, K, V)
 		i++
 	}
 	str.WriteString("]")

@@ -25,6 +25,7 @@ type seq[T any] = func(func(T) bool)
 //	    }
 //	    ...
 //	}
+//nolint:revive
 type SeqE[T any] seqE[T]
 type seqE[T any] = seq2[T, error]
 
