@@ -1,6 +1,8 @@
 version: "2"
 linters:
   default: "all"
+  enable:
+    - gomodguard_v2 
   disable:
     - inamedparam
     - paralleltest
@@ -22,6 +24,7 @@ linters:
     - godox
     - exhaustruct
     - exhaustruct_v5
+    - gomodguard
   exclusions:
     rules:
       - path: op/api\.go
