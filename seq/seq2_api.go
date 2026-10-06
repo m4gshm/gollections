@@ -35,7 +35,7 @@ func (s Seq2[K, V]) Filter(filter func(K, V) bool) Seq2[K, V] {
 	return s2.Filter(s, filter)
 }
 
-// Filt creates an erroreable iterator that iterates only those key\value pairs for which the 'filter' function returns true.
+// Filt creates an errorable iterator that iterates only those key\value pairs for which the 'filter' function returns true.
 func (s Seq2[K, V]) Filt(filter func(K, V) (bool, error)) SeqE[c.KV[K, V]] {
 	return s2.Filt(s, filter)
 }

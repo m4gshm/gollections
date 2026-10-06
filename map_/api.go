@@ -399,7 +399,7 @@ func Slice[M ~map[K]V, K comparable, V any, T any](elements M, converter func(ke
 	return out
 }
 
-// Slicee collects key\value elements to a slice by applying the specified erroreable converter to evety element
+// Slicee collects key\value elements to a slice by applying the specified errorable converter to evety element
 func Slicee[M ~map[K]V, K comparable, V any, T any](elements M, converter func(key K, val V) (T, error)) ([]T, error) {
 	out := make([]T, 0, len(elements))
 	for key, val := range elements {

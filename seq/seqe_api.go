@@ -69,12 +69,12 @@ func (s SeqE[T]) Skip(n int) SeqE[T] {
 	return seqe.Skip(n, s)
 }
 
-// While cuts tail elements of the seq that don't match the filter.
+// While returns a sequence that iterates elements while they match the filter.
 func (s SeqE[T]) While(filter func(T) bool) SeqE[T] {
 	return seqe.While(s, filter)
 }
 
-// SkipWhile returns a sequence without first elements of the seq that dont'math the filter.
+// SkipWhile returns a sequence that skips elements while they match the filter, then iterates the rest.
 func (s SeqE[T]) SkipWhile(filter func(T) bool) SeqE[T] {
 	return seqe.SkipWhile(s, filter)
 }
@@ -94,7 +94,7 @@ func (s SeqE[T]) Filter(filter func(s T) bool) SeqE[T] {
 	return seqe.Filter(s, filter)
 }
 
-// Filt creates an erroreable iterator that iterates only those elements for which the 'filter' function returns true.
+// Filt creates an errorable iterator that iterates only those elements for which the 'filter' function returns true.
 func (s SeqE[T]) Filt(filter func(s T) (bool, error)) SeqE[T] {
 	return seqe.Filt(s, filter)
 }
