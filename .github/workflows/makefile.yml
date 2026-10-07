@@ -8,6 +8,7 @@ on:
       - main
       - dev
       - "dev**"
+      - "go**"      
       - "releases/**"
       - "feature/**"
       - "bugfix/**"
@@ -27,8 +28,14 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v3
-      - name: run tests
-        uses: docker://golang:1.24-bullseye
+      - name: Set up Go
+        uses: actions/setup-go@v5
         with:
-          args: make build lint bench cover-console-out
-
+          go-version: '1.27'
+          cache: true
+      - name: setup Task
+        uses: go-task/setup-task@v2
+        with:
+          version: 3.x
+      - name: run tests
+        run: task build lint bench cover-console-out

@@ -1,6 +1,8 @@
 version: "2"
 linters:
   default: "all"
+  enable:
+    - gomodguard_v2 
   disable:
     - inamedparam
     - paralleltest
@@ -20,6 +22,9 @@ linters:
     - godot
     - depguard
     - godox
+    - exhaustruct
+    - exhaustruct_v5
+    - gomodguard
   exclusions:
     rules:
       - path: op/api\.go
@@ -39,7 +44,7 @@ linters:
           - testifylint
           - gochecknoglobals
           - forbidigo
-          - exhaustruct
+          - exhaustruct_v5
           - goconst
           - gocritic
           - revive
@@ -55,18 +60,7 @@ linters:
           - intrange
           - modernize
           - gocritic
-  settings:
-    revive:
-      rules:
-        - name: var-naming
-          disabled: true
-          severity: warning
-    gocritic:
-      settings:
-        ifElseChain:
-          minThreshold: 4
-    exhaustruct:
-      allow-empty: true
-    testifylint:
-      disable:
-        - require-error
+          - goconst
+          - testifylint
+          - revive
+

@@ -10,7 +10,6 @@ import (
 type Collection[T any] interface {
 	c.Collection[T]
 	c.Filterable[T, seq.Seq[T], seq.SeqE[T]]
-	c.Convertable[T, seq.Seq[T], seq.SeqE[T]]
 
 	Len() int
 	IsEmpty() bool
@@ -33,7 +32,6 @@ type Set[T comparable] interface {
 type Map[K comparable, V any] interface {
 	kv.Collection[K, V, map[K]V]
 	kv.Filterable[K, V, seq.Seq2[K, V], seq.SeqE[c.KV[K, V]]]
-	kv.Convertable[K, V, seq.Seq2[K, V], seq.SeqE[c.KV[K, V]]]
 	c.Checkable[K]
 	c.Access[K, V]
 	c.KVRange[K, V]

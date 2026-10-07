@@ -69,12 +69,12 @@ func (s SeqE[T]) Skip(n int) SeqE[T] {
 	return seqe.Skip(n, s)
 }
 
-// While cuts tail elements of the seq that don't match the filter.
+// While returns a sequence that iterates elements while they match the filter.
 func (s SeqE[T]) While(filter func(T) bool) SeqE[T] {
 	return seqe.While(s, filter)
 }
 
-// SkipWhile returns a sequence without first elements of the seq that dont'math the filter.
+// SkipWhile returns a sequence that skips elements while they match the filter, then iterates the rest.
 func (s SeqE[T]) SkipWhile(filter func(T) bool) SeqE[T] {
 	return seqe.SkipWhile(s, filter)
 }
@@ -94,18 +94,18 @@ func (s SeqE[T]) Filter(filter func(s T) bool) SeqE[T] {
 	return seqe.Filter(s, filter)
 }
 
-// Filt creates an erroreable iterator that iterates only those elements for which the 'filter' function returns true.
+// Filt creates an errorable iterator that iterates only those elements for which the 'filter' function returns true.
 func (s SeqE[T]) Filt(filter func(s T) (bool, error)) SeqE[T] {
 	return seqe.Filt(s, filter)
 }
 
 // Convert creates an iterator that applies the 'converter' function to each iterable element.
-func (s SeqE[T]) Convert(converter func(t T) T) SeqE[T] {
+func (s SeqE[T]) Convert[O any](converter func(t T) O) SeqE[O] {
 	return seqe.Convert(s, converter)
 }
 
 // Conv creates an errorable seq that applies the 'converter' function to the collection elements.
-func (s SeqE[T]) Conv(converter func(T) (T, error)) SeqE[T] {
+func (s SeqE[T]) Conv[O any](converter func(T) (O, error)) SeqE[O] {
 	return seqe.Conv(s, converter)
 }
 

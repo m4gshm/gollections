@@ -2,17 +2,17 @@
 
 == Gollections
 
-Gollections is set of functions for link:#slices[slices], link:#maps[maps], link:#seq-seq2-seqe[iter.Seq, iter.Seq2] and additional implementations of data structures such as link:#mutable-collections[ordered map] or link:#mutable-collections[set] aimed to reduce boilerplate code.
+Gollections is a set of functions for link:#slices[slices], link:#maps[maps], link:#seq-seq2-seqe[iter.Seq, iter.Seq2] and additional implementations of data structures such as link:#mutable-collections[ordered map] or link:#mutable-collections[set] aimed to reduce boilerplate code.
 
 Supports Go version 1.24.
 
-For example, it's need to group some link:./internal/examples/boilerplate/user_type.go[users] by their role names converted to lowercase:
+For example, you need to group some link:./internal/examples/boilerplate/user_type.go[users] by their role names converted to lowercase:
 [source,go]
 ----
 include::../examples/boilerplate/user_data.go[lines=3..-1]
 ----
 
-You can make clear code, extensive, but without dependencies:
+You can write clear, verbose code, without dependencies:
 [source,go]
 ----
 include::../examples/boilerplate/slice_namesbyRole_old_test.go[lines=11..26,indent=0]
@@ -42,7 +42,7 @@ go get -u github.com/m4gshm/gollections
 include::../examples/boilerplate/slice_filter_convert_reduce_test.go[lines=14..20,indent=0]
 ----
 
-In the example is used only small set of slice functions as link:#slicefilter[slice.Filter], link:#sliceconv[slice.Conv] link:#sliceconvert#[slice.Convert], and link:#slicereduce[slice.Reduce]. More you can look in the link:./slice/api.go[slice] package.
+In the example is used only a small set of slice functions as link:#slicefilter[slice.Filter], link:#sliceconv[slice.Conv], link:#sliceconvert[slice.Convert], and link:#slicereduce[slice.Reduce]. More you can find in the link:./slice/api.go[slice] package.
 
 ==== Shortcut packages
 
@@ -53,7 +53,7 @@ include::../examples/boilerplate/slice_filter_convert_reduce_short_test.go[lines
 
 This is a shorter version of the previous example that used short aliases link:#sumof[sum.Of] and link:#operations-chain-functions[filter.AndConvert]. More shortcuts you can find by exploring slices link:./slice[subpackages].
 
-*Be careful* when use several slice functions subsequently like [source,go]`slice.Filter(slice.Convert(...))`. This can lead to unnecessary RAM consumption. Consider link:#seq-seq2-seqe[seq] instead of slice API.
+*Be careful* when using several slice functions subsequently like [source,go]`slice.Filter(slice.Convert(...))`. This can lead to unnecessary RAM consumption. Consider link:#seq-seq2-seqe[seq] instead of slice API.
 
 ==== Main slice functions
 ===== Instantiators
@@ -466,9 +466,9 @@ include::../examples/seqexamples/seq_Flat_test.go[lines=13..17,indent=0]
 === Data structures
 ==== link:./collection/mutable/api.go[mutable] and link:./collection/immutable/api.go[immutable] collections
 
-Provides implelentations of link:./collection/iface.go#L25[Vector], link:./collection/iface.go#L35[Set] and link:./collection/iface.go#L41[Map].
+Provides implementations of link:./collection/iface.go#L25[Vector], link:./collection/iface.go#L35[Set] and link:./collection/iface.go#L41[Map].
 
-Mutables support content appending, updating and deleting (the ordered map implementation is not supported delete operations). +
+Mutables support content appending, updating and deleting (the ordered map implementation does not support delete operations). +
 Immutables are read-only datasets.
 
 Detailed description of implementations xref:mutable-collections[below].
@@ -477,7 +477,7 @@ Detailed description of implementations xref:mutable-collections[below].
 
 ==== link:./predicate/api.go[predicate] and breakable link:./predicate/api.go[break/predicate]
 
-Provides predicate builder api that used for filtering collection elements.
+Provides a predicate builder API that is used for filtering collection elements.
 
 [source,go]
 ----
@@ -490,7 +490,7 @@ include::../examples/boilerplate/predicate_test.go[lines=16..18,indent=0]
 
 ==== Expressions: link:./expr/use/api.go[use.If], link:./expr/get/api.go[get.If], link:#firstof[first.Of], link:#lastof[last.Of]
 
-Aimed to evaluate a value using conditions. May cause to make code shorter by not in all cases. +
+Aimed to evaluate a value using conditions. May make code shorter in some cases, but not all. +
 As example:
 
 [source,go]
@@ -573,7 +573,7 @@ The same underlying interfaces but for read-only use cases.
 
 [source,go]
 ----
-include::../examples/collection/collection_iterating_go_1_22_test.go[lines=13..18,indent=0]
+include::../examples/collection/collection_iterating_go_1_22_test.go[lines=13..17,indent=0]
 ----
 
 * `ForEach` method

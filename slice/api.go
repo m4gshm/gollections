@@ -937,7 +937,7 @@ func ToStringf[TS ~[]T, T any](elements TS, elementFormat, delimeter string) str
 		if i > 0 {
 			_, _ = str.WriteString(delimeter)
 		}
-		str.WriteString(fmt.Sprintf(elementFormat, v))
+		fmt.Fprintf(&str, elementFormat, v)
 	}
 	str.WriteString("]")
 	return str.String()
@@ -959,7 +959,7 @@ func ToStringRefsf[T any, TS ~[]*T](references TS, elementFormat, nilValue, deli
 		if ref == nil {
 			str.WriteString(nilValue)
 		} else {
-			str.WriteString(fmt.Sprintf(elementFormat, *ref))
+			fmt.Fprintf(&str, elementFormat, *ref)
 		}
 	}
 	str.WriteString("]")

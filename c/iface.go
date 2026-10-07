@@ -52,12 +52,6 @@ type Filterable[T any, Seq ~func(yield func(T) bool), SeqE ~func(yield func(T, e
 	Filt(predicate func(T) (bool, error)) SeqE
 }
 
-// Convertable provides converaton of collection elements functionality
-type Convertable[T any, Seq ~func(yield func(T) bool), SeqE ~func(yield func(T, error) bool)] interface {
-	Convert(converter func(T) T) Seq
-	Conv(converter func(T) (T, error)) SeqE
-}
-
 // SliceFactory collects the elements of the collection into a slice
 type SliceFactory[T any] interface {
 	Slice() []T

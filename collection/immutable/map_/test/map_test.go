@@ -109,15 +109,15 @@ func Test_Map_Zero(t *testing.T) {
 	m.FilterValue(nil)
 
 	m.Values().ForEach(nil)
-	m.ConvertValue(nil).TrackEach(nil)
-	m.ConvertValue(nil).Filter(nil).FilterKey(nil)
-	m.ConvertValue(nil).Filter(nil).FilterValue(nil)
+	m.ConvertValue[string](nil).TrackEach(nil)
+	m.ConvertValue[string](nil).Filter(nil).FilterKey(nil)
+	m.ConvertValue[string](nil).Filter(nil).FilterValue(nil)
 
 	m.Keys().ForEach(nil)
-	m.ConvertKey(nil).TrackEach(nil)
-	m.ConvertKey(nil).Filter(nil).FilterKey(nil)
-	m.ConvertKey(nil).Filter(nil).FilterValue(nil)
-	m.Convert(nil)
+	m.ConvertKey[string](nil).TrackEach(nil)
+	m.ConvertKey[string](nil).Filter(nil).FilterKey(nil)
+	m.ConvertKey[string](nil).Filter(nil).FilterValue(nil)
+	m.Convert[any, string](nil)
 
 	m.Sort(nil).TrackEach(nil)
 

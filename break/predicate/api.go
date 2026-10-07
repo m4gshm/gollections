@@ -18,7 +18,7 @@ func Of[T comparable](predicate func(T) bool) Predicate[T] {
 	return func(c T) (bool, error) { return predicate(c), nil }
 }
 
-// Wrap converts the specified predicate to the erroreable one
+// Wrap converts the specified predicate to the errorable one
 func Wrap[T any](predicate func(T) bool) Predicate[T] {
 	return func(t T) (bool, error) { return predicate(t), nil }
 }

@@ -35,18 +35,18 @@ func (s Seq2[K, V]) Filter(filter func(K, V) bool) Seq2[K, V] {
 	return s2.Filter(s, filter)
 }
 
-// Filt creates an erroreable iterator that iterates only those key\value pairs for which the 'filter' function returns true.
+// Filt creates an errorable iterator that iterates only those key\value pairs for which the 'filter' function returns true.
 func (s Seq2[K, V]) Filt(filter func(K, V) (bool, error)) SeqE[c.KV[K, V]] {
 	return s2.Filt(s, filter)
 }
 
 // Convert creates an iterator that applies the 'converter' function to each iterable key\value pair.
-func (s Seq2[K, V]) Convert(converter func(K, V) (K, V)) Seq2[K, V] {
+func (s Seq2[K, V]) Convert[KO comparable, VO any](converter func(K, V) (KO, VO)) Seq2[KO, VO] {
 	return s2.Convert(s, converter)
 }
 
 // Conv creates an errorable seq that applies the 'converter' function to the iterable key\value pairs.
-func (s Seq2[K, V]) Conv(converter func(K, V) (K, V, error)) SeqE[c.KV[K, V]] {
+func (s Seq2[K, V]) Conv[KO comparable, VO any](converter func(K, V) (KO, VO, error)) SeqE[c.KV[KO, VO]] {
 	return s2.Conv(s, converter)
 }
 
@@ -71,22 +71,22 @@ func (s Seq2[K, V]) FilterValue(filter func(V) bool) Seq2[K, V] {
 }
 
 // ConvertKey returns a seq that applies the 'converter' function to keys.
-func (s Seq2[K, V]) ConvertKey(converter func(K) K) Seq2[K, V] {
+func (s Seq2[K, V]) ConvertKey[KO comparable](converter func(K) KO) Seq2[KO, V] {
 	return s2.ConvertKey(s, converter)
 }
 
 // ConvKey returns a seq that applies the 'converter' function to keys.
-func (s Seq2[K, V]) ConvKey(converter func(K) (K, error)) SeqE[c.KV[K, V]] {
+func (s Seq2[K, V]) ConvKey[KO comparable](converter func(K) (KO, error)) SeqE[c.KV[KO, V]] {
 	return s2.ConvKey(s, converter)
 }
 
 // ConvertValue returns a seq that applies the 'converter' function to values.
-func (s Seq2[K, V]) ConvertValue(converter func(V) V) Seq2[K, V] {
+func (s Seq2[K, V]) ConvertValue[VO any](converter func(V) VO) Seq2[K, VO] {
 	return s2.ConvertValue(s, converter)
 }
 
 // ConvValue returns a seq that applies the 'converter' function to values.
-func (s Seq2[K, V]) ConvValue(converter func(V) (V, error)) SeqE[c.KV[K, V]] {
+func (s Seq2[K, V]) ConvValue[VO any](converter func(V) (VO, error)) SeqE[c.KV[K, VO]] {
 	return s2.ConvValue(s, converter)
 }
 

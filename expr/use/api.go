@@ -26,6 +26,8 @@ func IfGetErr[T any](condition bool, tru func() (T, error)) WhenErr[T] {
 }
 
 // If_ is alias of IfErr
+//
+//revive:disable
 func If_[T any](condition bool, tru func() (T, error)) WhenErr[T] {
 	return IfGetErr(condition, tru)
 }

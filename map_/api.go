@@ -332,7 +332,7 @@ func ToStringOrderedf[M ~map[K]V, K comparable, V any](order []K, elements M, kv
 		if i > 0 {
 			_, _ = str.WriteString(delim)
 		}
-		str.WriteString(fmt.Sprintf(kvFormat, K, elements[K]))
+		fmt.Fprintf(&str, kvFormat, K, elements[K])
 	}
 	str.WriteString("]")
 	return str.String()
@@ -352,7 +352,7 @@ func ToStringf[M ~map[K]V, K comparable, V any](elements M, kvFormat, delim stri
 		if i > 0 {
 			_, _ = str.WriteString(delim)
 		}
-		str.WriteString(fmt.Sprintf(kvFormat, K, V))
+		fmt.Fprintf(&str, kvFormat, K, V)
 		i++
 	}
 	str.WriteString("]")
@@ -399,7 +399,7 @@ func Slice[M ~map[K]V, K comparable, V any, T any](elements M, converter func(ke
 	return out
 }
 
-// Slicee collects key\value elements to a slice by applying the specified erroreable converter to evety element
+// Slicee collects key\value elements to a slice by applying the specified errorable converter to evety element
 func Slicee[M ~map[K]V, K comparable, V any, T any](elements M, converter func(key K, val V) (T, error)) ([]T, error) {
 	out := make([]T, 0, len(elements))
 	for key, val := range elements {

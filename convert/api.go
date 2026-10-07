@@ -99,11 +99,6 @@ func ExtraKeys[T, K any](element T, keysExtractor func(T) []K) (out []c.KV[K, T]
 	return out
 }
 
-// ToPtr converts a value to the value pointer
-func ToPtr[T any](value T) *T {
-	return &value
-}
-
 // ToVal returns a value referenced by the pointer or the zero value if the pointer is nil
 func ToVal[T any](pointer *T) (t T) {
 	if pointer != nil {

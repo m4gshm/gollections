@@ -66,7 +66,7 @@ func Skip[S ~SeqE[T], T any](n int, seq S) SeqE[T] {
 	}
 }
 
-// While cuts tail elements of the seq that don't match the filter.
+// While returns a sequence that iterates elements while they match the filter.
 func While[S ~SeqE[T], T any](seq S, filter func(T) bool) SeqE[T] {
 	return func(yield func(T, error) bool) {
 		if seq == nil {
@@ -81,7 +81,7 @@ func While[S ~SeqE[T], T any](seq S, filter func(T) bool) SeqE[T] {
 	}
 }
 
-// SkipWhile returns a sequence without first elements of the seq that dont'math the filter.
+// SkipWhile returns a sequence that skips elements while they match the filter, then iterates the rest.
 func SkipWhile[S ~SeqE[T], T any](seq S, filter func(T) bool) SeqE[T] {
 	return func(yield func(T, error) bool) {
 		if seq == nil {
@@ -187,6 +187,7 @@ func ReduceOK[S ~SeqE[T], T any](seq S, merge func(T, T) T) (result T, ok bool, 
 	}
 	started := false
 	seq(func(v T, e error) bool {
+		//nolint:gocritic
 		if e != nil {
 			err = e
 			return false
@@ -215,6 +216,7 @@ func ReduceeOK[S ~SeqE[T], T any](seq S, merge func(T, T) (T, error)) (result T,
 	}
 	started := false
 	seq(func(v T, e error) bool {
+		//nolint:gocritic
 		if e != nil {
 			err = e
 			return false
@@ -328,7 +330,7 @@ func Filter[S ~SeqE[T], T any](seq S, filter func(T) bool) SeqE[T] {
 	}
 }
 
-// Filt creates an erroreable iterator that iterates only those elements for which the 'filter' function returns true.
+// Filt creates an errorable iterator that iterates only those elements for which the 'filter' function returns true.
 func Filt[S ~SeqE[T], T any](seq S, filter func(T) (bool, error)) SeqE[T] {
 	return func(yield func(T, error) bool) {
 		if seq == nil || filter == nil {

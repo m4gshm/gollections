@@ -1,13 +1,13 @@
 # Gollections
 
-Gollections is set of functions for [slices](#slices), [maps](#maps),
+Gollections is a set of functions for [slices](#slices), [maps](#maps),
 [iter.Seq, iter.Seq2](#seq-seq2-seqe) and additional implementations of
 data structures such as [ordered map](#mutable-collections) or
 [set](#mutable-collections) aimed to reduce boilerplate code.
 
 Supports Go version 1.24.
 
-For example, it’s need to group some
+For example, you need to group some
 [users](./internal/examples/boilerplate/user_type.go) by their role
 names converted to lowercase:
 
@@ -19,7 +19,7 @@ var users = []User{
 }
 ```
 
-You can make clear code, extensive, but without dependencies:
+You can write clear, verbose code, without dependencies:
 
 ``` go
 var namesByRole = map[string][]string{}
@@ -55,7 +55,7 @@ var namesByRole = group.ByMultipleKeys(users, func(u User) []string {
 
 ## Installation
 
-``` console
+```
 go get -u github.com/m4gshm/gollections
 ```
 
@@ -69,10 +69,10 @@ even := func(i int) bool { return i%2 == 0 }
 result := slice.Reduce(slice.Convert(slice.Filter(data, even), strconv.Itoa), op.Sum) //"24"
 ```
 
-In the example is used only small set of slice functions as
-[slice.Filter](#slicefilter), [slice.Conv](#sliceconv)
-[slice.Convert](#sliceconvert#), and [slice.Reduce](#slicereduce). More
-you can look in the [slice](./slice/api.go) package.
+In the example is used only a small set of slice functions as
+[slice.Filter](#slicefilter), [slice.Conv](#sliceconv),
+[slice.Convert](#sliceconvert), and [slice.Reduce](#slicereduce). More
+you can find in the [slice](./slice/api.go) package.
 
 ### Shortcut packages
 
@@ -85,7 +85,7 @@ aliases [sum.Of](#sumof) and
 [filter.AndConvert](#operations-chain-functions). More shortcuts you can
 find by exploring slices [subpackages](./slice).
 
-**Be careful** when use several slice functions subsequently like
+**Be careful** when using several slice functions subsequently like
 `slice.Filter(slice.Convert(…​))`. This can lead to unnecessary RAM
 consumption. Consider [seq](#seq-seq2-seqe) instead of slice API.
 
@@ -814,11 +814,11 @@ var i []int = seq.Slice(seq.Flat(seq.Of(twoDimensions...), as.Is))
 
 ### [mutable](./collection/mutable/api.go) and [immutable](./collection/immutable/api.go) collections
 
-Provides implelentations of [Vector](./collection/iface.go#L25),
+Provides implementations of [Vector](./collection/iface.go#L25),
 [Set](./collection/iface.go#L35) and [Map](./collection/iface.go#L41).
 
 Mutables support content appending, updating and deleting (the ordered
-map implementation is not supported delete operations).  
+map implementation does not support delete operations).\
 Immutables are read-only datasets.
 
 Detailed description of implementations [below](#mutable-collections).
@@ -827,7 +827,7 @@ Detailed description of implementations [below](#mutable-collections).
 
 ### [predicate](./predicate/api.go) and breakable [break/predicate](./predicate/api.go)
 
-Provides predicate builder api that used for filtering collection
+Provides a predicate builder API that is used for filtering collection
 elements.
 
 ``` go
@@ -841,8 +841,8 @@ bob, _ := slice.First(users, where.Eq(User.Name, "Bob"))
 
 ### Expressions: [use.If](./expr/use/api.go), [get.If](./expr/get/api.go), [first.Of](#firstof), [last.Of](#lastof)
 
-Aimed to evaluate a value using conditions. May cause to make code
-shorter by not in all cases.  
+Aimed to evaluate a value using conditions. May make code shorter in
+some cases, but not all.\
 As example:
 
 ``` go
@@ -949,11 +949,9 @@ The same underlying interfaces but for read-only use cases.
 - Using rangefunc `All` like:
 
 ``` go
-   uniques := set.Of(1, 2, 3, 4, 5, 6)
-    for i := range uniques.All {
-        doOp(i)
-    }
-
+uniques := set.Of(1, 2, 3, 4, 5, 6)
+for i := range uniques.All {
+    doOp(i)
 }
 ```
 
